@@ -1,0 +1,4 @@
+*_gen.yaml
+.DS_Store
+tmp/
+*-tmp.yaml

@@ -1,0 +1,165 @@
+# Override values for the Prometheus Operator helm chart
+#
+# Prometheus Operator Helm Chart
+# https://github.com/helm/charts/blob/master/stable/prometheus-operator/README.md
+#
+# CRDs
+# https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md
+#
+# Default Values
+# https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml
+
+
+# https://github.com/helm/charts/tree/master/stable/prometheus-operator#prometheus-operator-1
+commonLabels:
+  sas.com/monitoring-base: kube-viya-monitoring
+
+# ===================
+# Prometheus Operator
+# ===================
+# https://github.com/coreos/prometheus-operator
+prometheusOperator:
+  image:
+    # v0.39+ requires Kubernetes 1.16+
+    # tag: v0.39.0
+    tag: v0.38.1
+  logFormat: json
+  logLevel: info
+  createCustomResource: false
+
+# ======================
+# kubelet ServiceMonitor
+# ======================
+kubelet:
+  serviceMonitor:
+    # Default to use the https-metrics endpoint
+    # Depending on your environment, this may require configuration
+    # changes to the kubelet.
+    # See issue: https://github.com/coreos/prometheus-operator/issues/926
+    https: true
+
+# ==========
+# Prometheus
+# ==========
+# https://github.com/helm/charts/tree/master/stable/prometheus-operator#prometheus
+# https://prometheus.io/
+prometheus:
+  serviceAccount:
+    name: sas-ops-acct
+  service:
+    type: NodePort
+    nodePort: 31090
+  prometheusSpec:
+    image:
+      tag: v2.18.1
+    logLevel: info
+    logFormat: json
+    # Don't restrict ServiceMonitor namespace selection by default
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    retention: 7d
+    retentionSize: 20GiB
+    replicas: 1
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          # storageClassName:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 25Gi    
+          volumeMode: Filesystem
+
+# =======================
+# Prometheus AlertManager
+# =======================
+# https://github.com/helm/charts/tree/master/stable/prometheus-operator#alertmanager
+# https://prometheus.io/docs/alerting/alertmanager/
+alertmanager:
+  service:
+    type: NodePort
+    nodePort: 31091
+  alertmanagerSpec:
+    image:
+      tag: v0.20.0
+    logFormat: json
+    retention: 240h
+    storage:
+      volumeClaimTemplate:
+        spec:
+          # storageClassName:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+          volumeMode: Filesystem
+
+# =========
+# Exporters
+# =========
+# https://github.com/helm/charts/tree/master/stable/prometheus-operator#exporters
+
+# Prometheus Node Exporter
+# https://github.com/prometheus/node_exporter
+# https://github.com/helm/charts/tree/master/stable/prometheus-node-exporter
+
+prometheus-node-exporter:
+  image:
+    tag: v1.0.0
+  service:
+    # Override the default port of 9100 to avoid potential conflicts
+    port: 9110
+    targetPort: 9110
+  # Allow pod to be scheduled on master nodes that otherwise
+  # wouldn't schedule normal pods 
+  tolerations:
+  - key: node-role.kubernetes.io/master
+    effect: NoSchedule  
+
+# =======
+# Grafana
+# =======
+# https://github.com/helm/charts/tree/master/stable/grafana#configuration
+# https://grafana.com/
+grafana:
+  image:
+    tag: "7.0.1"
+  grafana.ini:
+    analytics:
+      check_for_updates: false
+    log.console:
+      format: json
+  service:
+    type: NodePort
+    nodePort: 31100
+  # TODO: Use secret for Grafana admin user/password
+  # See: https://github.com/helm/charts/tree/master/stable/grafana#configuration
+  adminPassword: admin
+  plugins:
+  - grafana-piechart-panel
+  - grafana-clock-panel
+  - camptocamp-prometheus-alertmanager-datasource
+  - flant-statusmap-panel
+  - btplc-status-dot-panel
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+    datasources:
+      enabled: true
+      label: grafana_datasource
+  persistence:
+    type: pvc
+    enabled: true
+    # storageClassName:
+    accessModes:
+      - ReadWriteOnce
+    size: 5Gi
+    # annotations: {}
+    finalizers:
+      - kubernetes.io/pvc-protection
+    # subPath: ""
+    # existingClaim:

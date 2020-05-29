@@ -1,0 +1,44 @@
+service:
+#  type: ClusterIP
+adminPassword: admin
+# rbac:
+#   namespaced: true
+sidecar:
+  dashboards:
+    enabled: true
+    label: grafana_dashboard
+  datasources:
+    enabled: true
+    label: grafana_datasource
+persistence:
+  type: pvc
+  enabled: true
+  # storageClassName: nfs-client
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi
+  # annotations: {}
+  finalizers:
+    - kubernetes.io/pvc-protection
+  # subPath: ""
+  # existingClaim:
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus:9090
+      access: proxy
+      isDefault: true
+grafana.ini:
+  server:
+    protocol: http
+    domain: grafana.viya-a.host.mycluster.example.com
+    root_url: http://grafana.viya-a.host.mycluster.example.com/
+    serve_from_sub_path: false
+ingress:
+  enabled: true
+  path: /
+  hosts:
+  - grafana.viya-a.host.mycluster.example.com

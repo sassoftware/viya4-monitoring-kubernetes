@@ -1,0 +1,55 @@
+# Chart: https://github.com/helm/charts/blob/master/stable/prometheus-operator/README.md
+# Default values: https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml
+
+# Place overrides for the Prometheus Operator Helm Chart Here
+
+# Custom Resource Definitions
+# https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md
+
+# All 'enabled' values default to true. Set the respective 'enabled' value to
+# false to disable deployment of that component.
+
+# Setting the 'externalUrl', 'domain' and 'root_url' values is optional, but will
+# ensure cross-component (e.g. Grafana->Prometheus) and alert links are correct.
+
+# prometheusOperator:
+#   enabled: true
+
+# kubelet:
+  # serviceMonitor:
+    # Default to use the https-metrics endpoint
+    # Depending on your environment, this may require configuration
+    # changes to the kubelet.
+    # See issue: https://github.com/coreos/prometheus-operator/issues/926
+    # https: true
+
+# prometheus:
+#   enabled: true
+#   prometheusSpec:
+#     externalUrl: http://host.mycluster.example.com:31090
+
+# alertmanager:
+#   enabled:true
+#   alertManagerSpec:
+#     externalUrl: http://host.mycluster.example.com:31091
+
+# grafana:
+#   enabled: true
+#   adminPassword: yourSecretPasswordHere
+#   grafana.ini:
+#     # Specifying domain and root_url will create the correct links in alert notifications
+#     server:
+#       domain: host.mycluster.example.com
+#       # This value should change to ingress host/port/path if configured
+#       root_url: http://host.mycluster.example.com:31100/
+
+# nodeExporter:
+#   enabled: true
+
+# prometheus-node-exporter:
+  # Changes to extraArgs would be a full replacement of the default values
+  # The default extraArgs are included here. Add to them unless they are
+  # specifically not desired
+  # extraArgs:
+  # - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+)($|/)
+  # - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|cgroup|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|mqueue|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|sysfs|tracefs)$

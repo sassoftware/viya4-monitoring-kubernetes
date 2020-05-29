@@ -1,0 +1,26 @@
+elasticsearch:
+  master:
+    enabled: true
+    podAnnotations: 
+      fluentbit.io/parser: elasticsearch
+    replicas: 3
+    persistence:
+      enabled: true
+      #storageClass: alt-storage
+      size: 8Gi
+
+  data:
+    enabled: true
+    podAnnotations:
+      fluentbit.io/parser: elasticsearch
+    replicas: 3
+    persistence:
+      enabled: true
+      #storageClass: alt-storage
+      size: 30Gi
+
+  client:
+    enabled: true
+    podAnnotations:
+      fluentbit.io/parser: elasticsearch
+    replicas: 2

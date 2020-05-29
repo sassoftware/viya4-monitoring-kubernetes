@@ -1,0 +1,51 @@
+# Place overrides for the Prometheus Operator Helm Chart Here
+
+# Prometheus Operator Helm Chart
+# https://github.com/helm/charts/blob/master/stable/prometheus-operator/README.md
+#
+# CRDs
+# https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md
+#
+# Default Values
+# https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml
+
+# This sample demonstrates host-based ingress
+
+# NOTE: Edit hostnames and ingress port
+
+prometheus:
+  # Disable default configuration of NodePort
+  service:
+    type: ClusterIP
+    nodePort: null
+  # Define host-based ingress
+  ingress:
+    enabled: true
+    hosts:
+    - prometheus.host.mycluster.example.com
+  prometheusSpec:
+    externalUrl: http://prometheus.host.mycluster.example.com
+
+alertmanager:
+  # Disable default configuration of NodePort
+  service:
+    type: ClusterIP
+    nodePort: null
+  # Define host-based ingress
+  ingress:
+    enabled: true
+    hosts:
+    - alertmanager.host.mycluster.example.com
+  alertManagerSpec:
+    externalUrl: http://alertmanager.host.mycluster.example.com
+
+grafana:
+  # Disable default configuration of NodePort
+  service:
+    type: ClusterIP
+    nodePort: null
+  # Define host-based ingress
+  ingress:
+    enabled: true
+    hosts:
+    - grafana.host.mycluster.example.com
