@@ -1,8 +1,5 @@
 #! /bin/bash
 
-# Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
-
 source logging/bin/common.sh
 
 # Elasticsearch user customizations
@@ -34,18 +31,20 @@ odfe_tgz_file=opendistro-es-1.7.0.tgz
 baseDir=$(pwd)
 if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
    cd $TMP_DIR
-   if [ ! -d "$TMP_DIR/opendistro-build/helm/opendistro-es" ]; then
-      log_info "Cloning Open Distro for Elasticsearch repo"     
-      git clone https://github.com/opendistro-for-elasticsearch/opendistro-build
-   else
-      log_info "Updating Open Distro for Elasticsearch repo"
-      git pull      
-   fi
+
+   rm -rf $TMP_DIR/opendistro-build
+   log_info "Cloning Open Distro for Elasticsearch repo"
+   git clone https://github.com/opendistro-for-elasticsearch/opendistro-build
+
+   # checkout commit before 1.8.0 changes
+   cd opendistro-build
+   git checkout f08d6f599673b16b0b72ea815d6798636446fa25
 
    # build package
    log_info "Packaging Helm Chart for Elasticsearch"
 
-   cd opendistro-build/helm/opendistro-es/
+   # cd opendistro-build/helm/opendistro-es/
+   cd helm/opendistro-es/
    helm package .
 
    # move .tgz file to $TMP_DIR
