@@ -16,7 +16,18 @@ spec:
       targetLabel: sas_deployment
     - sourceLabels: [__meta_kubernetes_pod_node_name]
       targetLabel: node
+    - sourceLabels: [__meta_kubernetes_pod_annotation_sas_com_tls_enabled_ports]
+      action: replace
+      regex: all|.*tcp.*
+      targetLabel: __scheme__
+      replacement: https
+    - sourceLabels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+      action: replace
+      regex: (https?)
+      targetLabel: __scheme__
     - sourceLabels: [service]
       regex: .+
       targetLabel: sas_service_base
       replacement: golang
+    tlsConfig:
+      insecureSkipVerify: true

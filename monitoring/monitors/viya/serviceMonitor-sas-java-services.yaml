@@ -72,6 +72,14 @@ spec:
       regex: sas-model-repository
       targetLabel: __metrics_path__
       replacement: /modelRepository/commons/prometheus
+    - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+      regex: sas-studio-app
+      targetLabel: __metrics_path__
+      replacement: /SASStudio/commons/prometheus
+    - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+      regex: sas-job-execution-app
+      targetLabel: __metrics_path__
+      replacement: /SASJobExecution/commons/prometheus
     # End workaround
 
     - sourceLabels: [__meta_kubernetes_pod_label_sas_com_deployment]
@@ -81,7 +89,18 @@ spec:
     - sourceLabels: [__meta_kubernetes_pod_annotation_sas_com_kustomize_base]
       targetLabel: sas_service_base
       replacement: $1
-    
+    - sourceLabels: [__meta_kubernetes_pod_annotation_sas_com_tls_enabled_ports]
+      action: replace
+      regex: all|.*http.*
+      targetLabel: __scheme__
+      replacement: https
+    - sourceLabels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+      action: replace
+      regex: (https?)
+      targetLabel: __scheme__
+    tlsConfig:
+      insecureSkipVerify: true
+
     metricRelabelings:
     # Rename logback_events_total to have consistency with the
     # Go services metric log_events_total
