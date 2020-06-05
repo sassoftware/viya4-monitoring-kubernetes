@@ -32,16 +32,11 @@ These components are deployed:
 ### Clone the Repository
 
 * From a command line, create a directory to contain the cloned repository.
-
 * Change to the directory you created.
-
-* Use this command to clone the repository to your directory for the cloned repository:
-
-```bash
-# cd to the directory that will hold the kube-viya-monitoring repo
-git clone https://github.com/sassoftware/kube-viya-monitoring.git
-cd kube-viya-monitoring
-```
+* Clone the repository
+* `cd` to the repository directory
+* If you have already cloned the repository, use the `git pull` command to
+ensure that you have the most recent updates.
 
 If you have already cloned the repository, use the `git pull` command to ensure
 that you have the most recent updates.
