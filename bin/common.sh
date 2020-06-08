@@ -29,11 +29,20 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     log_info KUBE_CLIENT_VER="$KUBE_CLIENT_VER"
     log_info KUBE_SERVER_VER="$KUBE_SERVER_VER"
 
-    export TMP_DIR=${TMP_DIR:-/tmp}
+    export TMP_DIR=${TMP_DIR:-${TMPDIR:-/tmp}}
+    TMP_DIR=$(mktemp -d --tmpdir=$TMP_DIR sas.mon.XXXXXXXX)
     if [ ! -d "$TMP_DIR" ]; then
       log_error "TMP_DIR [$TMP_DIR] does not exist"
       exit 1
     fi
+    log_debug "Created temporary working directory: [$TMP_DIR]"
+
+    # Delete the temp directory on exit
+    function cleanup {
+      rm -rf "$TMP_DIR"
+      log_debug "Deleted temporary working directory: [$TMP_DIR]"
+    }
+    trap cleanup EXIT
 
     export SAS_COMMON_SOURCED=true
 fi
