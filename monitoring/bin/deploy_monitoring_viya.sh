@@ -25,12 +25,14 @@ PUSHGATEWAY_ENABLED=${PUSHGATEWAY_ENABLED:-true}
 if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
   log_info "Installing the Prometheus Pushgateway to the [$VIYA_NS] namespace"
   if [ "$HELM_VER_MAJOR" == "2" ]; then
+    helm3ReleaseCheck prometheus-pushgateway $VIYA_NS
     helm $helmDebug upgrade --install pushgateway-$VIYA_NS \
     --namespace $VIYA_NS \
     -f monitoring/values-pushgateway.yaml \
     -f monitoring/user-values-pushgateway.yaml \
     stable/prometheus-pushgateway
   else
+    helm2ReleaseCheck pushgateway-$VIYA_NS
     helm $helmDebug upgrade --install prometheus-pushgateway \
     --namespace $VIYA_NS \
     -f monitoring/values-pushgateway.yaml \

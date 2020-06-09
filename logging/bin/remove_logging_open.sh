@@ -5,6 +5,12 @@
 
 source logging/bin/common.sh
 
+# Check for existing incompatible helm releases up front
+helm2ReleaseCheck odfe-$LOG_NS
+helm2ReleaseCheck es-exporter-$LOG_NS
+helm3ReleaseCheck odfe $LOG_NS
+helm3ReleaseCheck es-exporter $LOG_NS
+
 log_info "Removing logging components"
 
 logging/bin/remove_logging_fluentbit_open.sh
@@ -13,7 +19,7 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     helm delete -n $LOG_NS es-exporter
     helm delete -n $LOG_NS odfe
 else
-    helm delete --purge es-exporter
+    helm delete --purge es-exporter-$LOG_NS
     helm delete --purge odfe-$LOG_NS
 fi
 

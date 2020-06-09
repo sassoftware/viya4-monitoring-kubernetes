@@ -5,6 +5,9 @@
 
 source monitoring/bin/common.sh
 
+helm2ReleaseCheck prometheus-$MON_NS
+helm3ReleaseCheck prometheus-operator $MON_NS
+
 export HELM_DEBUG="${HELM_DEBUG:-false}"
 export NGINX_NS="${NGINX_NS:-ingress-nginx}"
 
@@ -61,8 +64,8 @@ log_info "Deploying Prometheus Operator. This may take a few minutes..."
 log_info "User response file: [$PROM_OPER_USER_YAML]"
 if [ "$HELM_VER_MAJOR" == "3" ]; then
   log_debug "Installing via Helm 3..."
-  PROM_RELEASE=${PROM_RELEASE:-prometheus-operator}
-  helm $helmDebug upgrade --install $PROM_RELEASE \
+  promRelease=prometheus-operator  
+  helm $helmDebug upgrade --install $promRelease \
     --namespace $MON_NS \
     -f monitoring/values-prom-operator.yaml \
     -f $genValuesFile \
@@ -72,8 +75,8 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     stable/prometheus-operator
 else
   log_debug "Installing via Helm 2..."
-  PROM_RELEASE=${PROM_RELEASE:-prometheus-$MON_NS}
-  helm $helmDebug upgrade --install $PROM_RELEASE \
+  promRelease=prometheus-$MON_NS
+  helm $helmDebug upgrade --install $promRelease \
     --namespace $MON_NS \
     -f monitoring/values-prom-operator.yaml \
     -f $genValuesFile \

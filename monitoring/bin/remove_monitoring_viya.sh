@@ -10,6 +10,9 @@ if [ "$VIYA_NS" == "" ]; then
   exit 1
 fi
 
+helm2ReleaseCheck pushgateway-$VIYA_NS
+helm3ReleaseCheck prometheus-pushgateway $VIYA_NS
+
 # Delete the old names (will be removed in the future)
 log_info "Removing third-party exporters..."
 if [ "$HELM_VER_MAJOR" == "2" ]; then

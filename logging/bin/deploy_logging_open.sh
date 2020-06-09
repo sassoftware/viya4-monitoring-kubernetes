@@ -66,9 +66,11 @@ helm repo update
 
 # Deploy Elasticsearch via Helm chart
 if [ "$HELM_VER_MAJOR" == "3" ]; then
+   helm2ReleaseCheck odfe-$LOG_NS
    helm upgrade --install odfe --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 else
-   helm install --name odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
+   helm3ReleaseCheck odfe $LOG_NS
+   helm upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 fi
 
 # wait for pod to come up
@@ -232,13 +234,15 @@ ELASTICSEARCH_EXPORTER_ENABLED=${ELASTICSEARCH_EXPORTER_ENABLED:-true}
 if [ "$ELASTICSEARCH_EXPORTER_ENABLED" == "true" ]; then
    # Elasticsearch metric exporter
    if [ "$HELM_VER_MAJOR" == "3" ]; then
+      helm2ReleaseCheck es-exporter-$LOG_NS
       helm upgrade --install es-exporter \
       --namespace $LOG_NS \
       -f logging/es/odfe/values-es-exporter_open.yaml \
       -f logging/user-values-es-exporter.yaml \
       stable/elasticsearch-exporter
    else
-      helm install --name es-exporter \
+      helm3ReleaseCheck es-exporter $LOG_NS
+      helm upgrade --install es-exporter-$LOG_NS \
       --namespace $LOG_NS \
       -f logging/es/odfe/values-es-exporter_open.yaml \
       -f logging/user-values-es-exporter.yaml \

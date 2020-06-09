@@ -5,6 +5,9 @@
 
 source logging/bin/common.sh
 
+helm2ReleaseCheck fb-$LOG_NS
+helm3ReleaseCheck fb $LOG_NS
+
 log_info "Removing Fluent Bit components from the [$LOG_NS] namespace"
 
 if [ "$HELM_VER_MAJOR" == "3" ]; then

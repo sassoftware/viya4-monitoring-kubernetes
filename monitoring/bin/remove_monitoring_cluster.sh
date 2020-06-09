@@ -5,6 +5,10 @@
 
 source monitoring/bin/common.sh
 
+# Check for existing incompatible helm releases up front
+helm2ReleaseCheck prometheus-$MON_NS
+helm3ReleaseCheck prometheus-operator $MON_NS
+
 log_info "Removing dashboards..."
 monitoring/bin/remove_dashboards.sh
 
@@ -14,22 +18,22 @@ kubectl delete --ignore-not-found servicemonitor -n $MON_NS fluent-bit
 
 log_info "Removing the Prometheus Operator..."
 if [ "$HELM_VER_MAJOR" == "3" ]; then
-  PROM_RELEASE=${PROM_RELEASE:-prometheus-operator}
-  helm uninstall --namespace $MON_NS $PROM_RELEASE
+  promRelease=prometheus-operator
+  helm uninstall --namespace $MON_NS $promRelease
   if [ $? != 0 ]; then
-    log_warn "Uninstall of [$PROM_RELEASE] was not successful. Check output above for details."
+    log_warn "Uninstall of [$promRelease] was not successful. Check output above for details."
   fi
 else
-  PROM_RELEASE=${PROM_RELEASE:-prometheus-$MON_NS}
-  helm delete --purge $PROM_RELEASE
+  promRelease=prometheus-$MON_NS
+  helm delete --purge $promRelease
   if [ $? != 0 ]; then
-    log_warn "Deletion of [$PROM_RELEASE] was not successful. Check output above for details."
+    log_warn "Deletion of [$promRelease] was not successful. Check output above for details."
   fi
 fi
 
 # Wait for resources to terminate
-log_info "Waiting 30 sec for resources to terminate..."
-sleep 30
+log_info "Waiting 60 sec for resources to terminate..."
+sleep 60
 
 log_info "Checking contents of the [$MON_NS] namespace:"
 crds=( all pvc servicemonitor podmonitor prometheus alertmanager prometheusrule thanosrulers )
