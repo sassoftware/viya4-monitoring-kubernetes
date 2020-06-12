@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.1.7
+       Set  fb_configMap_version 0.1.8
        #Set clusterID NOT_SET
     [FILTER]
        # NOTE: This kubernetes filter _only_ applies to the **METALOGGING** messages
@@ -31,6 +31,11 @@ data:
        Merge_Log_Key       json_log
        K8S-Logging.Parser  On
        K8S-Logging.Exclude On
+    [FILTER]
+       Name modify
+       Match *
+       Condition  Key_exists     json_log
+       Set        DB__structlog  true
     [FILTER]
        Name           nest
        Match          *
@@ -72,7 +77,10 @@ data:
        Name           modify
        Match          *
        Copy           labels_app  appname
+       # following used for Crunchy Data message processing
        Copy           labels_vendor  temp_vendor
+       Copy           labels_role    temp_role
+       Copy           labels_pgo-pg-database temp_pgo-pg-database
     [FILTER]
        #
        # Use kubernetes.labels.k8s-app for appname
@@ -191,6 +199,28 @@ data:
        Parser          consul
        Parser          consul_telemetry
        Reserve_Data    On
+
+    [FILTER]
+       Alias           flag_crunchy_msgs
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_equals   temp_vendor    crunchydata
+       Condition       Key_value_equals   temp_pgo-pg-database  true
+       #Condition       Key_value_matches  temp_role      master|replica
+       #Condition       Key_value_equals   logsource      database
+       #Condition       Key_value_equals   PROPS__stream  stdout
+       Copy            message   crunchy_message
+       Rename          message   unparsed_message
+       Add             flagged4parsing crunchy
+    [FILTER]
+       Alias           parse_crunchy_msgs
+       Name            parser
+       Match           kube.*
+       Key_name        crunchy_message
+       Parser          crunchy_database
+       Reserve_Data    On
+
+
     [FILTER]
        Alias           operator_msgs
        Name            modify
@@ -206,7 +236,7 @@ data:
     [FILTER]
        Alias           flag_operator_msgs
        Name            modify
-       Match           kube.*
+       Match           VVVVVkube.*
        Condition       Key_value_equals   temp_vendor  crunchydata
        Condition       Key_value_matches   logsource operator|scheduler
        Condition       Key_value_equals   PROPS__stream  stdout
@@ -216,7 +246,7 @@ data:
     [FILTER]
        Alias           parse_operator_msgs
        Name            parser
-       Match           kube.*
+       Match           VVVVkube.*
        Key_name        operator_message
        Parser          operator
        Reserve_Data    On
@@ -249,7 +279,7 @@ data:
        Name            modify
        Match           kube.*
        Condition       Key_value_equals   temp_vendor  crunchydata
-       Condition       Key_value_matches  logsource apiserver|collect|backrest
+       Condition       Key_value_matches  logsource apiserver|collect|backrest|operator|scheduler
        Copy            message   collectapi_message
        Rename          message   unparsed_message
        Add             flagged4parsing collectapi
@@ -260,7 +290,6 @@ data:
        Key_name        collectapi_message
        Parser          collectapi
        Reserve_Data    On
-
     [FILTER]
        #
        # prometheus node-exporter
@@ -325,6 +354,42 @@ data:
        #Remove          time_ms
        #Remove          uname
        #Remove          userId
+    [FILTER]
+       Alias           flag_rabbit
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_equals   logsource sas-rabbitmq-server
+       Condition       Key_value_equals   PROPS__stream  stdout
+       # pod label "app=sas-rabbitmq-server"
+       # appname eq "sas-rabbitmq-server"
+       Copy            message   rabbit_message
+       Rename          message   unparsed_message
+       Add             flagged4parsing rabbit
+    [FILTER]
+       Alias           parse_rabbit_msgs
+       Name            parser
+       Match           kube.*
+       Key_name        rabbit_message
+       Parser          sas-rabbitmq
+       Reserve_Data    On
+    [FILTER]
+       Alias           flag_rabbitstderr
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_equals   logsource sas-rabbitmq-server
+       Condition       Key_value_equals   PROPS__stream  stderr
+       # pod label "app=sas-rabbitmq-server"
+       # appname eq "sas-rabbitmq-server"
+       Copy            message   rbstderr_message
+       Rename          message   unparsed_message
+       Add             flagged4parsing rabbitstderr
+    [FILTER]
+       Alias           parse_rabbitstderr
+       Name            parser
+       Match           kube.*
+       Key_name        rbstderr_message
+       Parser          sas-rabbitmq-stderr
+       Reserve_Data    On
     [FILTER]
        Alias           flag_discovery
        Name            modify
@@ -445,6 +510,7 @@ data:
        Parser          misc-stderr2
        Parser          misc2
        Parser          misc3
+       Parser          gopanic
        Reserve_Data    On
     [FILTER]
        Alias           post_misc
@@ -509,6 +575,15 @@ data:
        Condition      Key_value_does_not_match __temp_level_fixed Y
        Condition      Key_value_matches level (?i:info*)|(?i:note*)|(?i:log*)|(?:\AI\z)
        Set            level INFO
+       Set            __temp_level_fixed   Y
+    [FILTER]
+       # "Standardize" Level: PANIC (includes "C"=critical)
+       Alias          fix_level_panic
+       Name           modify
+       Match          *
+       Condition      Key_value_does_not_match __temp_level_fixed Y
+       Condition      Key_value_matches level (?i:panic)
+       Set            level PANIC
        Set            __temp_level_fixed   Y
     [FILTER]
        # "Standardize" Level: WARN
