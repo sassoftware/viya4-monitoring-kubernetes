@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.1.8
+       Set  fb_configMap_version 0.1.9
        #Set clusterID NOT_SET
     [FILTER]
        # NOTE: This kubernetes filter _only_ applies to the **METALOGGING** messages
@@ -43,6 +43,11 @@ data:
        Nested_under   kubernetes
        Add_prefix     k8s_
     [FILTER]
+       # Move/Copy any Kubernetes top-level items here
+       Name           modify
+       Match          *
+       Copy           k8s_namespace_name temp_namespace
+    [FILTER]
        Name           nest
        Match          *
        Operation      lift
@@ -77,6 +82,8 @@ data:
        Name           modify
        Match          *
        Copy           labels_app  appname
+       # following used for ETCD message processing
+       Copy           labels_component temp_component
        # following used for Crunchy Data message processing
        Copy           labels_vendor  temp_vendor
        Copy           labels_role    temp_role
@@ -199,63 +206,15 @@ data:
        Parser          consul
        Parser          consul_telemetry
        Reserve_Data    On
-
     [FILTER]
-       Alias           flag_crunchy_msgs
-       Name            modify
-       Match           kube.*
-       Condition       Key_value_equals   temp_vendor    crunchydata
-       Condition       Key_value_equals   temp_pgo-pg-database  true
-       #Condition       Key_value_matches  temp_role      master|replica
-       #Condition       Key_value_equals   logsource      database
-       #Condition       Key_value_equals   PROPS__stream  stdout
-       Copy            message   crunchy_message
-       Rename          message   unparsed_message
-       Add             flagged4parsing crunchy
-    [FILTER]
-       Alias           parse_crunchy_msgs
-       Name            parser
-       Match           kube.*
-       Key_name        crunchy_message
-       Parser          crunchy_database
-       Reserve_Data    On
-
-
-    [FILTER]
-       Alias           operator_msgs
-       Name            modify
-       Match           XXXkube.*
-       Condition       Key_value_equals   temp_vendor  crunchydata
-       Condition       Key_value_matches   logsource operator|scheduler
-       Rename          msg  message
-       Rename          time xx_timestamp
-       Rename          func  PROPS__func
-       Rename          file  PROPS__file
-       Rename          version PROPS__xxversion
-       Add             flagged4parsing operatorX
-    [FILTER]
-       Alias           flag_operator_msgs
-       Name            modify
-       Match           VVVVVkube.*
-       Condition       Key_value_equals   temp_vendor  crunchydata
-       Condition       Key_value_matches   logsource operator|scheduler
-       Condition       Key_value_equals   PROPS__stream  stdout
-       Copy            message   operator_message
-       Rename          message   unparsed_message
-       Add             flagged4parsing operator
-    [FILTER]
-       Alias           parse_operator_msgs
-       Name            parser
-       Match           VVVVkube.*
-       Key_name        operator_message
-       Parser          operator
-       Reserve_Data    On
-    [FILTER]
+       #
+       # CRUNCHY DATA HANDLING -- start
+       #
        Alias           flag_operator_stderr
        Name            modify
        Match           kube.*
        Condition       Key_value_equals   temp_vendor  crunchydata
-       Condition       Key_value_matches   logsource operator|scheduler
+       Condition       Key_value_matches  logsource operator|scheduler
        Condition       Key_value_equals   PROPS__stream  stderr
        Copy            message   misc_message
        Rename          message   unparsed_message
@@ -280,6 +239,7 @@ data:
        Match           kube.*
        Condition       Key_value_equals   temp_vendor  crunchydata
        Condition       Key_value_matches  logsource apiserver|collect|backrest|operator|scheduler
+       Condition       Key_does_not_exist flagged4parsing
        Copy            message   collectapi_message
        Rename          message   unparsed_message
        Add             flagged4parsing collectapi
@@ -289,12 +249,72 @@ data:
        Match           kube.*
        Key_name        collectapi_message
        Parser          collectapi
+       Parser          crunchy_green
+       Parser          misc5
+       Reserve_Data    On
+    [FILTER]
+       # MUST come last to ensure "special" cases are handled first
+       Alias           flag_crunchy_msgs
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_equals   temp_vendor    crunchydata
+       Condition       Key_value_equals   temp_pgo-pg-database  true
+       #Condition       Key_value_matches  temp_role      master|replica
+       #Condition       Key_value_equals   logsource      database
+       #Condition       Key_value_equals   PROPS__stream  stdout
+       Copy            message   crunchy_message
+       Rename          message   unparsed_message
+       Add             flagged4parsing crunchy
+    [FILTER]
+       Alias           parse_crunchy_msgs
+       Name            parser
+       Match           kube.*
+       Key_name        crunchy_message
+       Parser          crunchy_database
+       Parser          crunchy_green
+       Parser          crunchy_stderr2
+       Reserve_Data    On
+       #
+       # CRUNCHY DATA HANDLING -- end
+       #
+    [FILTER]
+       #
+       # etcd
+       #
+       Alias           flag_etcd_msgs
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_equals  temp_namespace kube-system
+       Condition       Key_value_equals  temp_component etcd
+       Copy            message   etcd_message
+       Rename          message   unparsed_message
+       Add             flagged4parsing etcd
+    [FILTER]
+       Alias           parse_etcd_msgs
+       Name            parser
+       Match           kube.*
+       Key_name        etcd_message
+       Parser          etcd
        Reserve_Data    On
     [FILTER]
        #
        # prometheus node-exporter
-       # parsing handled via annotation;this section handles post-parsing logic
        #
+       Alias           flag_promex_msgs
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_equals   logsource node-exporter
+       Copy            message   promex_message
+       Rename          message   unparsed_message
+       Add             flagged4parsing node_exp
+    [FILTER]
+       Alias           parse_promex_msgs
+       Name            parser
+       Match           kube.*
+       Key_name        promex_message
+       Parser          logfmt
+       Reserve_Data    On
+    [FILTER]
        Alias           post_node_exporter
        Name            modify
        Match           kube.*
@@ -305,7 +325,6 @@ data:
        Rename          name    PROPS__name
        Rename          caller  PROPS__caller
        Rename          ts      timestamp
-       Add             flagged4parsing node_exp
     [FILTER]
        #
        # grafana
@@ -317,6 +336,7 @@ data:
        Match           kube.*
        Condition       Key_value_equals   logsource grafana
        Condition       Key_exists lvl
+       Add             flagged4parsing grafana
        Rename          message unparsed_message
        Rename          t       timeStamp
        Rename          msg     message
@@ -336,7 +356,6 @@ data:
        Rename          type    PROPS__type
        Rename          var     PROPS__var
        Rename          version PROPS__version
-       Add             flagged4parsing grafana
        # The following other sub-components of the captured "message" have been seen during testing
        # We may want to keep one or more of these under PROPERTIES
        #Remove          address
@@ -455,7 +474,26 @@ data:
        Condition       Key_value_equals   PROPS__stream  stderr
        Hard_rename     msg message
     [FILTER]
-       # parsing handled via annotation; this section handles post-parsing logic
+       #
+       # ingress-nginx -TO DO
+       # somethings appears to have changed w/o our noticing
+       # Disabling FLAG/PARSE steps since those are new...retaining the annotation.
+       #
+       Alias           flag_nginx_msgs
+       Name            modify
+       Match           XXXkube.*
+       Condition       Key_value_matches  temp_app_kubernetes_name .*nginx.*
+       Copy            message   nginx_message
+       Rename          message   unparsed_message
+       Add             flagged4parsing nginx
+    [FILTER]
+       Alias           parse_nginx_msgs
+       Name            parser
+       Match           XXXkube.*
+       Key_name        nginx_message
+       Parser          nginx-ingress
+       Reserve_Data    On
+    [FILTER]
        Alias           post_nginx
        Name            modify
        Match           kube.*
@@ -510,6 +548,9 @@ data:
        Parser          misc-stderr2
        Parser          misc2
        Parser          misc3
+       Parser          misc5
+       Parser          misc6
+       Parser          misc7
        Parser          gopanic
        Reserve_Data    On
     [FILTER]
@@ -542,11 +583,11 @@ data:
        Nest_under      properties
        Remove_prefix   PROPS__
     [FILTER]
-       # "Standardize" Level: DEBUG
+       # "Standardize" Level: DEBUG (includes 'HINT')
        Alias          fix_level_debug
        Name           modify
        Match          *
-       Condition      Key_value_matches level (?i:DEBUG)|(?:\AD\z)
+       Condition      Key_value_matches level (?i:DEBUG)|(?:\AD\z)|(?i:hint)
        Set            level DEBUG
        Set            __temp_level_fixed   Y
     [FILTER]
@@ -564,11 +605,11 @@ data:
        Name           modify
        Match          *
        Condition      Key_value_does_not_match __temp_level_fixed Y
-       Condition      Key_value_matches level (?i:fatal*)|(?i:critical)|(?:\AC\z)
+       Condition      Key_value_matches level (?i:fatal*)|(?i:crit*)|(?:\AC\z)
        Set            level FATAL
        Set            __temp_level_fixed   Y
     [FILTER]
-       # "Standardize" Level: INFO
+       # "Standardize" Level: INFO (includes 'NOTE','LOG')
        Alias          fix_level_info
        Name           modify
        Match          *
@@ -577,13 +618,22 @@ data:
        Set            level INFO
        Set            __temp_level_fixed   Y
     [FILTER]
-       # "Standardize" Level: PANIC (includes "C"=critical)
+       # "Standardize" Level: PANIC
        Alias          fix_level_panic
        Name           modify
        Match          *
        Condition      Key_value_does_not_match __temp_level_fixed Y
        Condition      Key_value_matches level (?i:panic)
        Set            level PANIC
+       Set            __temp_level_fixed   Y
+    [FILTER]
+       # "Standardize" Level: TRACE
+       Alias          fix_level_trace
+       Name           modify
+       Match          *
+       Condition      Key_value_does_not_match __temp_level_fixed Y
+       Condition      Key_value_matches level (?i:trace)|(?:\AT\t)
+       Set            level TRACE
        Set            __temp_level_fixed   Y
     [FILTER]
        # "Standardize" Level: WARN
@@ -641,7 +691,7 @@ data:
        Name           modify
        Match          *
        # comment out the following line to
-       # pass internal debugging variables 
+       # pass internal debugging variables
        # to Elasticsearch
        # Remove         debug
        Remove         time
