@@ -39,6 +39,11 @@ kubelet:
     # See issue: https://github.com/coreos/prometheus-operator/issues/926
     https: true
 
+# ======================
+# kube-state-metrics
+# ======================
+# https://github.com/kubernetes/kube-state-metrics
+# https://github.com/helm/charts/tree/master/stable/kube-state-metrics
 kube-state-metrics:
   image:
     tag: v1.9.7
@@ -88,7 +93,7 @@ alertmanager:
     nodePort: 31091
   alertmanagerSpec:
     image:
-      tag: v0.20.0
+      tag: v0.21.0
     logFormat: json
     retention: 240h
     storage:
@@ -113,7 +118,7 @@ alertmanager:
 
 prometheus-node-exporter:
   image:
-    tag: v1.0.0
+    tag: v1.0.1
   service:
     # Override the default port of 9100 to avoid potential conflicts
     port: 9110
