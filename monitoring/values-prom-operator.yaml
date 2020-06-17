@@ -39,6 +39,10 @@ kubelet:
     # See issue: https://github.com/coreos/prometheus-operator/issues/926
     https: true
 
+kube-state-metrics:
+  image:
+    tag: v1.9.7
+
 # ==========
 # Prometheus
 # ==========
