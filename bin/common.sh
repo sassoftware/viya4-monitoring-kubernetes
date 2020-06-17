@@ -29,8 +29,7 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     log_info KUBE_CLIENT_VER="$KUBE_CLIENT_VER"
     log_info KUBE_SERVER_VER="$KUBE_SERVER_VER"
 
-    export TMP_DIR=${TMP_DIR:-${TMPDIR:-/tmp}}
-    TMP_DIR=$(mktemp -d --tmpdir=$TMP_DIR sas.mon.XXXXXXXX)
+    export TMP_DIR=$(mktemp -d -t sas.mon.XXXXXXXX)
     if [ ! -d "$TMP_DIR" ]; then
       log_error "TMP_DIR [$TMP_DIR] does not exist"
       exit 1
