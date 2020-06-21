@@ -64,7 +64,7 @@ suitable, you might need to customize some values (such as for ingress,
 for example).
 
 Specify override values in the files `monitoring/user-values-prom-operator.yaml`
-and/or `monitoring/user-values-pushgateway` as needed. The default values and
+and/or `monitoring/user-values-pushgateway.yaml` as needed. The default values and
 links to the Helm chart documentation are in the `user-values*.yaml` files.
 
 ## Deploy Cluster Monitoring Components

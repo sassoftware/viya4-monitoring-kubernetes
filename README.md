@@ -3,12 +3,12 @@
 This repository provides simple scripts and customization options to deploy
 monitoring, alerts, and log aggregation for Viya 4.x running on Kubernetes.
 
-Monitoring and logging may be deployed separately or together. There are
-no hard dependencies between the two deployments.
+Monitoring and logging may be deployed independently or together. There are
+no hard dependencies between the two.
 
 The following components are included:
 
-## Monitoring
+## Monitoring Components
 
 - [Prometheus Operator](https://github.com/coreos/prometheus-operator)
   - [Prometheus](https://prometheus.io/docs/introduction/overview/)
@@ -25,16 +25,17 @@ The following components are included:
   - SAS Go Services
   - RabbitMQ (multiple dashboards)
   - Postgres (multiple dashboards)
-  - Elasticsearch (optional)
-  - Istio (multiple dashboards, optional)
-  - NGINX (optional)
+  - Fluent Bit
+  - Elasticsearch
+  - Istio (multiple dashboards)
+  - NGINX
 - Kubernetes cluster alert definitions
 - [Prometheus Pushgateway](https://github.com/helm/charts/tree/master/stable/prometheus-pushgateway)
 
 Most of the SAS components, as well as Kubernetes itself, provide built-in
 support for Prometheus.
 
-## Logging
+## Logging Components
 
 - [Fluent Bit](https://fluentbit.io/)
   - Custom Fluent Bit parsers
@@ -72,13 +73,15 @@ does not require Tiller or a `helm init` command.
 You can safely ignore the `NOTES` sections that you see when a Helm chart
 deploys successfully.
 
-## Deploy Monitoring
+## Installation
+
+### Monitoring
 
 See the [monitoring README](monitoring/README.md) to deploy the monitoring
 components, including Prometheus Operator, Prometheus, Alert Manager, Grafana,
 service monitors, and custom dashboards.
 
-## Deploy Logging
+### Logging
 
 See the [logging README](logging/README.md) to deploy the logging components,
 including Fluent Bit, ElasticSearch, and Kibana.

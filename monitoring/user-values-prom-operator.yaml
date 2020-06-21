@@ -1,9 +1,22 @@
+# Place overrides for the Prometheus Operator Helm Chart Here
+
 # Chart: https://github.com/helm/charts/blob/master/stable/prometheus-operator/README.md
 # Default values: https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml
 
-# Place overrides for the Prometheus Operator Helm Chart Here
+# Subcharts ued by the Prometheus Operator chart
+# Grafana
+# https://github.com/helm/charts/tree/master/stable/grafana#configuration
+# https://grafana.com/
 
-# Custom Resource Definitions
+# Prometheus Node Exporter
+# https://github.com/prometheus/node_exporter
+# https://github.com/helm/charts/tree/master/stable/prometheus-node-exporter
+
+# kube-state-metrics
+# https://github.com/kubernetes/kube-state-metrics
+# https://github.com/helm/charts/tree/master/stable/kube-state-metrics
+
+# Custom Resource Definitions for the Prometheus Operator
 # https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md
 
 # All 'enabled' values default to true. Set the respective 'enabled' value to
@@ -27,11 +40,16 @@
 #   enabled: true
 #   prometheusSpec:
 #     externalUrl: http://host.mycluster.example.com:31090
+#   storageSpec:
+#     storageClassName: myCustomStorageClass
+
 
 # alertmanager:
 #   enabled:true
 #   alertManagerSpec:
 #     externalUrl: http://host.mycluster.example.com:31091
+#   storageSpec:
+#     storageClassName: myCustomStorageClass
 
 # grafana:
 #   enabled: true
@@ -42,14 +60,11 @@
 #       domain: host.mycluster.example.com
 #       # This value should change to ingress host/port/path if configured
 #       root_url: http://host.mycluster.example.com:31100/
+#   persistence:
+#     storageClassName: myCustomStorageClass
 
 # nodeExporter:
 #   enabled: true
 
 # prometheus-node-exporter:
-  # Changes to extraArgs would be a full replacement of the default values
-  # The default extraArgs are included here. Add to them unless they are
-  # specifically not desired
-  # extraArgs:
-  # - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+)($|/)
-  # - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|cgroup|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|mqueue|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|sysfs|tracefs)$
+  # priorityClassName: system-node-critical
