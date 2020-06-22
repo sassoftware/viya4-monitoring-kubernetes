@@ -60,6 +60,11 @@ if [ "$(kubectl get crd prometheuses.monitoring.coreos.com -o name 2>/dev/null)"
   createPromCRDs=false
 fi
 
+# node-exporter TLS
+kubectl delete cm -n monitoring node-exporter-tls-web-config --ignore-not-found
+sleep 1
+kubectl create cm -n monitoring node-exporter-tls-web-config --from-file monitoring/tls/node-exporter-web.yaml
+
 log_info "Deploying Prometheus Operator. This may take a few minutes..."
 log_info "User response file: [$PROM_OPER_USER_YAML]"
 if [ "$HELM_VER_MAJOR" == "3" ]; then
