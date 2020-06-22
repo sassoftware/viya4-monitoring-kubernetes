@@ -21,9 +21,9 @@ commonLabels:
 prometheusOperator:
   # v0.39+ requires Kubernetes 1.16+
   image:
-    tag: v0.39.0
+    tag: v0.40.0
   prometheusConfigReloaderImage:
-    tag: v0.39.0
+    tag: v0.40.0
   logFormat: json
   logLevel: info
   createCustomResource: false
@@ -61,7 +61,7 @@ prometheus:
     nodePort: 31090
   prometheusSpec:
     image:
-      tag: v2.19.0
+      tag: v2.19.1
     logLevel: info
     logFormat: json
     # Don't restrict ServiceMonitor namespace selection by default
