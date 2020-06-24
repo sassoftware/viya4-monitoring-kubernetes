@@ -60,10 +60,15 @@ if [ "$(kubectl get crd prometheuses.monitoring.coreos.com -o name 2>/dev/null)"
   createPromCRDs=false
 fi
 
-# node-exporter TLS
-kubectl delete cm -n monitoring node-exporter-tls-web-config --ignore-not-found
-sleep 1
-kubectl create cm -n monitoring node-exporter-tls-web-config --from-file monitoring/tls/node-exporter-web.yaml
+# Optional TLS Support
+if [ "$MON_TLS_ENABLE" == "true" ]; then
+  cat monitoring/values-prom-operator-tls.yaml >> $genValuesFile
+
+  # node-exporter TLS
+  kubectl delete cm -n $MON_NS node-exporter-tls-web-config --ignore-not-found
+  sleep 1
+  kubectl create cm -n $MON_NS node-exporter-tls-web-config --from-file monitoring/tls/node-exporter-web.yaml
+fi
 
 log_info "Deploying Prometheus Operator. This may take a few minutes..."
 log_info "User response file: [$PROM_OPER_USER_YAML]"

@@ -1,0 +1,13 @@
+prometheus-node-exporter:
+  extraArgs:
+  - --web.config=/opt/node-exporter/node-exporter-web.yaml
+  configmaps:
+  - name: node-exporter-tls-web-config
+    mountPath: /opt/node-exporter
+
+grafana:
+  "grafana.ini":
+    server:
+      protocol: https
+      cert_file: /tls/tls.crt
+      cert_key: /tls/tls.key

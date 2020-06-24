@@ -123,13 +123,6 @@ prometheus-node-exporter:
     # Override the default port of 9100 to avoid potential conflicts
     port: 9110
     targetPort: 9110
-  # Allow pod to be scheduled on master nodes that otherwise
-  # wouldn't schedule normal pods 
-  extraArgs:
-  - --web.config=/opt/node-exporter/node-exporter-web.yaml
-  configmaps:
-  - name: node-exporter-tls-web-config
-    mountPath: /opt/node-exporter
 
 # =======
 # Grafana
@@ -139,11 +132,13 @@ prometheus-node-exporter:
 grafana:
   image:
     tag: "7.0.3"
-  grafana.ini:
+  "grafana.ini":
     analytics:
       check_for_updates: false
-    log.console:
-      format: json
+    log:
+      mode: console
+    "log.console":
+        format: json
   service:
     type: NodePort
     nodePort: 31100
