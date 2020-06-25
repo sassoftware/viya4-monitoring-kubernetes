@@ -47,7 +47,7 @@ if [ "$ELASTICSEARCH_DATASOURCE" == "true" ]; then
   log_info "Provisioning Elasticsearch datasource for Grafana..."
   kubectl delete secret -n $MON_NS --ignore-not-found grafana-datasource-es
   kubectl create secret generic -n $MON_NS grafana-datasource-es --from-file monitoring/grafana-datasource-es.yaml
-  kubectl label secret -n $MON_NS grafana-datasource-es grafana_datasource=1
+  kubectl label secret -n $MON_NS grafana-datasource-es grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
 else
   log_debug "ELASTICSEARCH_DATASOURCE not set"
   log_debug "Skipping creation of Elasticsearch datasource for Grafana"
@@ -64,13 +64,29 @@ fi
 if [ "$MON_TLS_ENABLE" == "true" ]; then
   cat monitoring/values-prom-operator-tls.yaml >> $genValuesFile
 
+  log_info "Provisioning TLS-enabled Prometheus datasource for Grafana..."
+  cp monitoring/tls/grafana-datasource-prom-https.yaml $TMP_DIR/grafana-datasource-prom-https.yaml
+  if [ "$HELM_VER_MAJOR" == "3" ]; then
+    kubectl delete cm -n $MON_NS --ignore-not-found prometheus-operator-grafana-datasource
+    echo "      url: https://prometheus-operator-prometheus:9490" >> $TMP_DIR/grafana-datasource-prom-https.yaml
+  else
+    kubectl delete cm -n $MON_NS --ignore-not-found prometheus-$MON_NS-grafana-datasource
+    echo "      url: https://prometheus-$MON_NS-prometheus:9490" >> $TMP_DIR/grafana-datasource-prom-https.yaml
+  fi
+  
+  kubectl delete cm -n $MON_NS --ignore-not-found grafana-datasource-prom-https
+  kubectl create cm -n $MON_NS grafana-datasource-prom-https --from-file $TMP_DIR/grafana-datasource-prom-https.yaml
+  kubectl label cm -n $MON_NS grafana-datasource-prom-https grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
+
   # node-exporter TLS
+  log_info "Enabling Prometheus node-exporter for TLS..."
   kubectl delete cm -n $MON_NS node-exporter-tls-web-config --ignore-not-found
   sleep 1
   kubectl create cm -n $MON_NS node-exporter-tls-web-config --from-file monitoring/tls/node-exporter-web.yaml
+  kubectl label cm -n $MON_NS node-exporter-tls-web-config sas.com/monitoring-base=kube-viya-monitoring
 fi
 
-log_info "Deploying Prometheus Operator. This may take a few minutes..."
+log_info "Deploying Prometheus Operator. This may take a few minutes (15min timeout)..."
 log_info "User response file: [$PROM_OPER_USER_YAML]"
 if [ "$HELM_VER_MAJOR" == "3" ]; then
   log_debug "Installing via Helm 3..."

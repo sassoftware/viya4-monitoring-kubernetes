@@ -9,13 +9,6 @@ source monitoring/bin/common.sh
 helm2ReleaseCheck prometheus-$MON_NS
 helm3ReleaseCheck prometheus-operator $MON_NS
 
-log_info "Removing dashboards..."
-monitoring/bin/remove_dashboards.sh
-
-log_info "Removing service monitors..."
-kubectl delete --ignore-not-found servicemonitor -n $MON_NS elasticsearch
-kubectl delete --ignore-not-found servicemonitor -n $MON_NS fluent-bit
-
 log_info "Removing the Prometheus Operator..."
 if [ "$HELM_VER_MAJOR" == "3" ]; then
   promRelease=prometheus-operator
@@ -31,12 +24,23 @@ else
   fi
 fi
 
+log_info "Removing dashboards..."
+monitoring/bin/remove_dashboards.sh
+
+log_info "Removing service monitors..."
+kubectl delete --ignore-not-found servicemonitor -n $MON_NS elasticsearch
+kubectl delete --ignore-not-found servicemonitor -n $MON_NS fluent-bit
+
+log_info "Removing configmaps and secrets..."
+kubectl delete cm --ignore-not-found -n $MON_NS -l sas.com/monitoring-base=kube-viya-monitoring
+kubectl delete secret --ignore-not-found -n $MON_NS -l sas.com/monitoring-base=kube-viya-monitoring
+
 # Wait for resources to terminate
 log_info "Waiting 60 sec for resources to terminate..."
 sleep 60
 
 log_info "Checking contents of the [$MON_NS] namespace:"
-crds=( all pvc servicemonitor podmonitor prometheus alertmanager prometheusrule thanosrulers )
+crds=( all pvc cm servicemonitor podmonitor prometheus alertmanager prometheusrule thanosrulers )
 empty="true"
 for crd in "${crds[@]}"
 do
