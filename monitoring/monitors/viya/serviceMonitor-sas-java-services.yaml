@@ -80,6 +80,22 @@ spec:
       regex: sas-job-execution-app
       targetLabel: __metrics_path__
       replacement: /SASJobExecution/commons/prometheus
+    - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+      regex: sas-conversation-designer-app
+      targetLabel: __metrics_path__
+      replacement: /SASConversationDesigner/commons/prometheus
+    - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+      regex: sas-natural-language-conversations
+      targetLabel: __metrics_path__
+      replacement: /naturalLanguageConversations/commons/prometheus
+    - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+      regex: sas-natural-language-generation
+      targetLabel: __metrics_path__
+      replacement: /naturalLanguageGeneration/commons/prometheus
+    - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+      regex: sas-natural-language-understanding
+      targetLabel: __metrics_path__
+      replacement: /naturalLanguageUnderstanding/commons/prometheus
     # End workaround
 
     - sourceLabels: [__meta_kubernetes_pod_label_sas_com_deployment]
