@@ -6,7 +6,6 @@
 
 if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     source bin/common.sh
-    
 
     if [ -f "logging/user.env" ]; then
         userEnv=$(grep -v '^[[:blank:]]*$' logging/user.env | grep -v '^#' | xargs)

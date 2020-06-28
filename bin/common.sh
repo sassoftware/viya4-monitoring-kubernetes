@@ -5,10 +5,11 @@
 # Current directory must be the root directory of the repo
 
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
-    if [ -f "user.env" ]; then
+    USER_DIR=${USER_DIR:-.}
+    if [ -f "$USER_DIR/user.env" ]; then
         userEnv=$(grep -v '^[[:blank:]]*$' user.env | grep -v '^#' | xargs)
         if [ "$userEnv" != "" ]; then
-          echo "Loading user environment file: user.env"
+          echo "Loading global user environment file: user.env"
           if [ "$userEnv" != "" ]; then
             export $userEnv
           fi

@@ -3,6 +3,9 @@
 # Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+# This script is not intended to be run directly
+# Assumes bin/common.sh has been sourced
+
 if [ ! $(which helm) ]; then
   echo "helm not found on the current PATH"
   exit 1
