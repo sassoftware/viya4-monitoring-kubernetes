@@ -21,6 +21,11 @@ prometheus:
 
   ingress:
     enabled: true
+    # Comment out this tls section if monitoring was not deployed with TLS enabled
+    tls:
+    - hosts:
+      - host.mycluster.example.com
+      secretName: monitoring-prometheus-tls-secret
     hosts:
     - host.mycluster.example.com
   prometheusSpec:
@@ -57,6 +62,11 @@ grafana:
     nodePort: null
   ingress:
     enabled: true
+    # Comment out this tls section if monitoring was not deployed with TLS enabled
+    tls:
+    - hosts:
+      - host.mycluster.example.com
+      secretName: monitoring-grafana-tls-secret
     hosts:
     - host.mycluster.example.com
     path: /grafana

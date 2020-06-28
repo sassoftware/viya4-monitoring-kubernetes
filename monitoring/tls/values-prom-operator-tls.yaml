@@ -1,50 +1,41 @@
 prometheus:
   prometheusSpec:
     listenLocal: true
-    alerting:
-      alertmanagers:
-      - apiVersion: v2
-        name: prometheus-operator-alertmanager
-        namespace: monitoring
-        pathPrefix: /
-        port: web
-        scheme: https
-        tlsConfig:
-          insecureSkipVerify: true
     containers:
       # Add square/ghosttunnel TLS proxy
       - name: tls-proxy
         args:
         - server
-        - --listen=:9490
+        - --listen=:443
         - --target=127.0.0.1:9090
-        - --key=cert/key
-        - --cert=cert/cert
+        - --key=/cert/tls.key
+        - --cert=/cert/tls.crt
         - --disable-authentication
         image: squareup/ghostunnel:v1.5.2
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 9490 
-          name: https
+        - name: https
+          containerPort: 443 
           protocol: TCP
         resources: {}
         securityContext:
-          allowPrivilegeEscalation: false
+          allowPrivilegeEscalation: true
+          privileged: true
           readOnlyRootFilesystem: true
+          runAsUser: 0
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /cert
           name: tls-proxy-secret
           readOnly: true
+    securityContext:
+      runAsNonRoot: false
     volumes:
       - name: tls-proxy-secret
         secret:
           defaultMode: 420
-          secretName: prometheus-operator-admission
-  service:
-    port: 9490
-    targetPort: 9490
+          secretName: monitoring-prometheus-tls-secret
 
 # alertmanager:
 #   alertmanagerSpec:
@@ -104,20 +95,51 @@ grafana:
   readinessProbe:
     httpGet:
       scheme: HTTPS
+      port: 443
   livenessProbe:
     httpGet:
-      scheme: HTTPS      
-  extraSecretMounts:
+      scheme: HTTPS
+      port: 443
+  extraContainers: |
+    # Add square/ghosttunnel TLS proxy
+    - name: tls-proxy
+      args:
+      - server
+      - --listen=:443
+      - --target=127.0.0.1:3000
+      - --key=/cert/tls.key
+      - --cert=/cert/tls.crt
+      - --disable-authentication
+      image: squareup/ghostunnel:v1.5.2
+      imagePullPolicy: IfNotPresent
+      ports:
+      - name: https
+        containerPort: 443 
+        protocol: TCP
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: true
+        privileged: true
+        readOnlyRootFilesystem: true
+        runAsUser: 0
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /cert
+        name: tls-proxy-secret
+        readOnly: true
+  extraContainerVolumes:
   - name: tls-proxy-secret
-    defaultMode: 420
-    secretName: prometheus-operator-admission
-    mountPath: /cert
-    readOnly: true
+    secret:
+      defaultMode: 420
+      secretName: monitoring-grafana-tls-secret
+  service:
+    port: 443
+    targetPort: 443
   sidecar:
     datasources:
       defaultDatasourceEnabled: false
   "grafana.ini":
     server:
-      protocol: https
-      cert_file: /cert/cert
-      cert_key: /cert/key
+      # Bind to localhost so https (tls-proxy) is the only way in
+      http_addr: 127.0.0.1
