@@ -5,11 +5,11 @@
 # Current directory must be the root directory of the repo
 
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
-    USER_DIR=${USER_DIR:-.}
+    export USER_DIR=${USER_DIR:-$(pwd)}
     if [ -f "$USER_DIR/user.env" ]; then
-        userEnv=$(grep -v '^[[:blank:]]*$' user.env | grep -v '^#' | xargs)
+        userEnv=$(grep -v '^[[:blank:]]*$' $USER_DIR/user.env | grep -v '^#' | xargs)
         if [ "$userEnv" != "" ]; then
-          echo "Loading global user environment file: user.env"
+          echo "Loading global user environment file: $USER_DIR/user.env"
           if [ "$userEnv" != "" ]; then
             export $userEnv
           fi
@@ -22,25 +22,28 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     source bin/helm_ver.sh
     source bin/kube_ver.sh
 
+    log_debug "Working directory: $(pwd)"
+    log_debug "User directory: $USER_DIR"
     log_info "Helm client version: $HELM_VER_FULL"
     if [ "$HELM_VER_MAJOR" == "2" ] && [ "$HELM_SERVER_VER_FULL" != "" ]; then
       log_info "Helm server version: $HELM_SERVER_VER_FULL"
     fi
 
-    log_info KUBE_CLIENT_VER="$KUBE_CLIENT_VER"
-    log_info KUBE_SERVER_VER="$KUBE_SERVER_VER"
+    log_info Kubernetes client version: "$KUBE_CLIENT_VER"
+    log_info Kubernetes server version: "$KUBE_SERVER_VER"
 
     export TMP_DIR=$(mktemp -d -t sas.mon.XXXXXXXX)
     if [ ! -d "$TMP_DIR" ]; then
-      log_error "TMP_DIR [$TMP_DIR] does not exist"
+      log_error "Could not create temporary directory [$TMP_DIR]"
       exit 1
     fi
-    log_debug "Created temporary working directory: [$TMP_DIR]"
+    log_debug "Temporary directory: [$TMP_DIR]"
+    echo "# This file intentionally empty" > $TMP_DIR/empty.yaml
 
     # Delete the temp directory on exit
     function cleanup {
       rm -rf "$TMP_DIR"
-      log_debug "Deleted temporary working directory: [$TMP_DIR]"
+      log_debug "Deleted temporary directory: [$TMP_DIR]"
     }
     trap cleanup EXIT
 

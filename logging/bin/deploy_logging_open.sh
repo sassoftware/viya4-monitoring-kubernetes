@@ -7,7 +7,16 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
 # Elasticsearch user customizations
-ES_OPEN_USER_YAML="${ES_OPEN_USER_YAML:-logging/user-values-elasticsearch-open.yaml}"
+ES_OPEN_USER_YAML="${ES_OPEN_USER_YAML:-$USER_DIR/logging/user-values-elasticsearch-open.yaml}"
+if [ ! -f "$ES_OPEN_USER_YAML" ]; then
+  log_debug "[$ES_OPEN_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
+  ES_OPEN_USER_YAML=$TMP_DIR/empty.yaml
+fi
+ES_OPEN_EXPORTER_USER_YAML="${ES_OPEN_EXPORTER_USER_YAML:-$USER_DIR/logging/user-values-es-exporter.yaml}"
+if [ ! -f "$ES_OPEN_EXPORTER_USER_YAML" ]; then
+  log_debug "[$ES_OPEN_EXPORTER_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
+  ES_OPEN_EXPORTER_USER_YAML=$TMP_DIR/empty.yaml
+fi
 FLUENT_BIT_ENABLED=${FLUENT_BIT_ENABLED:-true}
 
 # Kibana user customizations
@@ -239,14 +248,14 @@ if [ "$ELASTICSEARCH_EXPORTER_ENABLED" == "true" ]; then
       helm upgrade --install es-exporter \
       --namespace $LOG_NS \
       -f logging/es/odfe/values-es-exporter_open.yaml \
-      -f logging/user-values-es-exporter.yaml \
+      -f $ES_OPEN_EXPORTER_USER_YAML \
       stable/elasticsearch-exporter
    else
       helm3ReleaseCheck es-exporter $LOG_NS
       helm upgrade --install es-exporter-$LOG_NS \
       --namespace $LOG_NS \
       -f logging/es/odfe/values-es-exporter_open.yaml \
-      -f logging/user-values-es-exporter.yaml \
+      -f $ES_OPEN_EXPORTER_USER_YAML \
       stable/elasticsearch-exporter
    fi
 fi

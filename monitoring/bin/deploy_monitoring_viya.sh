@@ -11,6 +11,12 @@ if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
 
+PUSHGATEWAY_USER_YAML="${PUSHGATEWAY_USER_YAML:-$USER_DIR/monitoring/user-values-pushgateway.yaml}"
+if [ ! -f "$PUSHGATEWAY_USER_YAML" ]; then
+  log_debug "[$PUSHGATEWAY_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
+  PUSHGATEWAY_USER_YAML=$TMP_DIR/empty.yaml
+fi
+
 if [ "$VIYA_NS" == "" ]; then
   log_error "VIYA_NS must be set to the namespace of an existing Viya deployment"
   exit 1
@@ -30,14 +36,14 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
     helm $helmDebug upgrade --install pushgateway-$VIYA_NS \
     --namespace $VIYA_NS \
     -f monitoring/values-pushgateway.yaml \
-    -f monitoring/user-values-pushgateway.yaml \
+    -f $PUSHGATEWAY_USER_YAML \
     stable/prometheus-pushgateway
   else
     helm2ReleaseCheck pushgateway-$VIYA_NS
     helm $helmDebug upgrade --install prometheus-pushgateway \
     --namespace $VIYA_NS \
     -f monitoring/values-pushgateway.yaml \
-    -f monitoring/user-values-pushgateway.yaml \
+    -f $PUSHGATEWAY_USER_YAML \
     stable/prometheus-pushgateway
   fi
 fi

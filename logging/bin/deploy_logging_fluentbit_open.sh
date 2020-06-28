@@ -9,7 +9,11 @@ source logging/bin/common.sh
 HELM_DEBUG="${HELM_DEBUG:-false}"
 
 # Fluent Bit user customizations
-FB_OPEN_USER_YAML="${FB_OPEN_USER_YAML:-logging/user-values-fluent-bit-open.yaml}"
+FB_OPEN_USER_YAML="${FB_OPEN_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-open.yaml}"
+if [ ! -f "$FB_OPEN_USER_YAML" ]; then
+  log_debug "[$FB_OPEN_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
+  FB_OPEN_USER_YAML=$TMP_DIR/empty.yaml
+fi
 
 # Fluent Bit
 

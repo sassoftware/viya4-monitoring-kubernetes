@@ -12,7 +12,11 @@ helm3ReleaseCheck prometheus-operator $MON_NS
 export HELM_DEBUG="${HELM_DEBUG:-false}"
 export NGINX_NS="${NGINX_NS:-ingress-nginx}"
 
-PROM_OPER_USER_YAML="${PROM_OPER_USER_YAML:-monitoring/user-values-prom-operator.yaml}"
+PROM_OPER_USER_YAML="${PROM_OPER_USER_YAML:-$USER_DIR/monitoring/user-values-prom-operator.yaml}"
+if [ ! -f "$PROM_OPER_USER_YAML" ]; then
+  log_debug "[$PROM_OPER_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
+  PROM_OPER_USER_YAML=$TMP_DIR/empty.yaml
+fi
 
 if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
