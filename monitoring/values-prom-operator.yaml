@@ -61,7 +61,7 @@ prometheus:
     nodePort: 31090
   prometheusSpec:
     image:
-      tag: v2.19.1
+      tag: v2.19.2
     logLevel: info
     logFormat: json
     # Don't restrict ServiceMonitor namespace selection by default
@@ -131,7 +131,7 @@ prometheus-node-exporter:
 # https://grafana.com/
 grafana:
   image:
-    tag: "7.0.3"
+    tag: "7.0.4"
   "grafana.ini":
     analytics:
       check_for_updates: false
