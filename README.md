@@ -75,6 +75,29 @@ deploys successfully.
 
 ## Installation
 
+### USER_DIR
+
+The `USER_DIR` environment variable allows you to locate user-customized files
+outside of this repository - for example, to check in environment-specific
+customimzations into a separate Git repository.
+
+`USER_DIR` must refer to a directory. The directory can include any or all of
+the following files in the structure below. Additional content is allowed, but
+will be ignored.
+
+```text
+- user.env
+- [monitoring]
+  - user.env
+  - user-values-prom-operator.yaml
+  - user-values-pushgateway.yaml
+- [logging]
+  - user.env
+  - user-values-elasticsearch-open.yaml
+  - user-values-es-exporter.yaml
+  - user-values-fluent-bit-open.yaml
+```
+
 ### Monitoring
 
 See the [monitoring README](monitoring/README.md) to deploy the monitoring
