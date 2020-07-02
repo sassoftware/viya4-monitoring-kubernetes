@@ -68,20 +68,36 @@ fi
 # Optional TLS Support
 if [ "$MON_TLS_ENABLE" == "true" ]; then
   # Create issuers if needed
+  # Issuers and certs honor USER_DIR for overrides/customizations
   
   if [ -z "$(kubectl get issuer -n $MON_NS selfsigning-issuer -o name 2>/dev/null)" ]; then
     log_info "Creating selfsigning-issuer for the [$MON_NS] namespace..."
-    kubectl apply -f monitoring/tls/selfsigning-issuer.yaml
+    selfsignIssuer=monitoring/tls/selfsigning-issuer.yaml
+    if [ -f "$USER_DIR/monitoring/tls/selfsigning-issuer.yaml" ]; then
+      selfsignIssuer="$USER_DIR/monitoring/tls/selfsigning-issuer.yaml"
+    fi
+    log_debug "Self-sign issuer yaml is [$selfsignIssuer]"
+    kubectl apply -f "$selfsignIssuer"
     sleep 5
   fi
   if [ -z "$(kubectl get secret -n $MON_NS ca-certificate -o name 2>/dev/null)" ]; then
     log_info "Creating self-signed CA certificate for the [$MON_NS] namespace..."
-    kubectl apply -f monitoring/tls/ca-certificate.yaml
+    caCert=monitoring/tls/ca-certificate.yaml
+    if [ -f "$USER_DIR/monitoring/tls/ca-certificate.yaml" ]; then
+      caCert="$USER_DIR/monitoring/tls/ca-certificate.yaml"
+    fi
+    log_debug "CA cert yaml file is [$caCert]"
+    kubectl apply -f "$caCert"
     sleep 5
   fi
   if [ -z "$(kubectl get issuer -n $MON_NS namespace-issuer -o name 2>/dev/null)" ]; then
     log_info "Creating namespace-issuer for the [$MON_NS] namespace..."
-    kubectl apply -f monitoring/tls/namespace-issuer.yaml
+    namespaceIssuer=monitoring/tls/namespace-issuer.yaml
+    if [ -f "$USER_DIR/monitoring/tls/namespace-issuer.yaml" ]; then
+      namespaceIssuer="$USER_DIR/monitoring/tls/namespace-issuer.yaml"
+    fi
+    log_debug "Namespace issuer yaml is [$namespaceIssuer]"
+    kubectl apply -f "$namespaceIssuer"
     sleep 5
   fi
 
@@ -91,8 +107,12 @@ if [ "$MON_TLS_ENABLE" == "true" ]; then
     TLS_SECRET_NAME=$app-tls-secret
     if [ -z "$(kubectl get secret -n $MON_NS $TLS_SECRET_NAME -o name 2>/dev/null)" ]; then
       # Create the certificate using cert-manager
-      log_debug "Creating cert-manager certificate custom resource for [$app]"
-      kubectl apply -f monitoring/tls/$app-tls-cert.yaml
+      certyaml=monitoring/tls/$app-tls-cert.yaml
+      if [ -f "$USER_DIR/monitoring/tls/$app-tls-cert.yaml" ]; then
+        certyaml="$USER_DIR/monitoring/tls/$app-tls-cert.yaml"
+      fi
+      log_debug "Creating cert-manager certificate custom resource for [$app] using [$certyaml]"
+      kubectl apply -f "$certyaml"
     else
       log_debug "Using existing $TLS_SECRET_NAME for [$app]"
     fi

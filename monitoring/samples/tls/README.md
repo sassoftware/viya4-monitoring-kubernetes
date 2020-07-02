@@ -53,7 +53,9 @@ cp path/to/this/repo/monitoring/samples/tls/user-values-prom-operator.yaml $USER
 ```
 
 Edit `$USER_DIR/monitoring/user-values-prom-operator.yaml` and replace
-any hostnames with the real values.
+any hostnames with the real values. Specifically, replace
+`host.cluster.example.com` with the name of the ingress node (many times
+this is the cluster master node, but environments vary).
 
 Any other desired customizations to the YAML should be completed at this
 time as well.
