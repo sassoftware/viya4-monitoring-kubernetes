@@ -43,29 +43,47 @@ that you have the most recent updates.
 
 ## Customize the Deployment
 
+### USER_DIR
+
+Setting the `USER_DIR` environment variable allows for any user customizations
+to be stored outside of the directory structure of this repository. The default
+`USER_DIR` is the root of this repository. A directory referenced by `USER_DIR`
+should include `user*` files in the same relative structure as they exist in
+this repository.
+
+The following files are automatically used by the monitoring scripts if available
+in `USER_DIR`:
+
+* `user.env`
+* `monitoring/user.env`
+* `monitoring/user-values-prom-operator.yaml`
+* `monitoring/user-values-pushgateway.yaml`
+
 ### user.env
 
-The `monitoring/user.env` file contains flags to customize the components that are
-deployed as well as to specify some script behavior (such as enable debug).
+The `monitoring/user.env` file contains environment variable flags that customize
+the components that are deployed or to alter some script behavior (such as to
+enable debug output). All values in `user.env` files are exported as environment
+variables available to the scripts. A `#` as the first character in a line
+is treated as a comment.
 
 ### user-values-*.yaml
 
 The monitoring stack uses the following Helm charts:
 
-* **Prometheus Operator**
+* **Prometheus Operator** - used by `deploy_monitoring_cluster.sh`
   * [Chart](https://github.com/helm/charts/blob/master/stable/prometheus-operator/README.md)
   * [Default values](https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml)
-* **Prometheus Pushgateway**
+* **Prometheus Pushgateway** - used by `deploy_monitoring_viya.sh`
   * [Chart](https://github.com/helm/charts/tree/master/stable/prometheus-pushgateway)
   * [Default values](https://github.com/helm/charts/blob/master/stable/prometheus-pushgateway/values.yaml)
 
 These charts are highly customizable. Although the default values might be
 suitable, you might need to customize some values (such as for ingress,
-for example).
-
-Specify override values in the files `monitoring/user-values-prom-operator.yaml`
-and/or `monitoring/user-values-pushgateway.yaml` as needed. The default values and
-links to the Helm chart documentation are in the `user-values*.yaml` files.
+for example). The Prometheus Operator helm chart, in particular, aggregates
+other helm charts such as Grafana and the Prometheus Node Exporter. Links
+to the charts and default values are included in the
+`user-values-prom-operator.yaml` file.
 
 ## Deploy Cluster Monitoring Components
 
@@ -76,7 +94,8 @@ To deploy the monitoring components for the cluster, issue this command:
 monitoring/bin/deploy_monitoring_cluster.sh
 ```
 
-NodePorts are used by default. The applications are available on these default ports:
+NodePorts are used by default at the moment, but this may change in the
+future. The applications are available on these ports by default:
 
 * Grafana - Port 31100 `http://master-node.yourcluster.example.com:31100`
 * Prometheus - Port 31090 `http://master-node.yourcluster.example.com:31090`
@@ -85,6 +104,9 @@ NodePorts are used by default. The applications are available on these default p
 The default credentials for Grafana are `admin`:`admin`.
 
 ## Deploy SAS Viya Monitoring Components
+
+Scripts may be run from any directory, but a current working directory
+of the root of this repository is assumed for the examples below.
 
 To enable direct monitoring of SAS Viya components, run the following command,
 which deploys ServiceMonitors and the Prometheus Pushgateway for each SAS Viya
@@ -100,21 +122,16 @@ By default, the components are deployed into the namespace `monitoring`.
 
 ## Update Monitoring Components
 
-Updates in-place are supported if you use Helm 3.x. To update, re-run the
+Updates in-place are supported. To update, re-run the
 `deploy_monitoring_cluster.sh` and/or `deploy_monitoring_viya.sh`
 scripts to pick up the latest versions of the applications, dashboards, service
 monitors, and exporters.
-
-If you use Helm 2.x, you must remove and re-install the monitoring components
-to update them.
 
 ## Remove Monitoring Components
 
 To remove the monitoring components, run the following commands:
 
 ```bash
-cd <kube-viya-monitoring repo directory>
-
 # Remove SAS Viya monitoring
 # Run this section once per Viya namespace
 export VIYA_NS=<your_viya_namespace>
@@ -123,6 +140,15 @@ monitoring/bin/remove_monitoring_viya.sh
 # Remove cluster monitoring
 monitoring/bin/remove_monitoring_cluster.sh
 ```
+
+## TLS Support
+
+The `MON_TLS` setting in user.env can be used to enable TLS support.
+
+There are manual steps required prior to deployment. In addition,
+configuring ingress requires YAML changes.
+
+See the [TLS Sample](samples/tls) for more information.
 
 ## Miscellaneous Notes and Troubleshooting
 
@@ -136,7 +162,7 @@ metrics. To enable kube-proxy metrics, which are used in the
 ```bash
 kubectl edit cm -n kube-system kube-proxy
 # Change metricsBindAddress to 0.0.0.0:10249
-# Restart kube-proxy pods
+# Restart all kube-proxy pods
 kubectl delete po -n kube-system -l k8s-app=kube-proxy
 # Pods will automatically be recreated
 ```

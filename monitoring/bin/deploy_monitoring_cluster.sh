@@ -22,7 +22,7 @@ if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
 
-if [ "$(kubectl get ns $MON_NS -o name 2>/dev/null)" == "" ]; then
+if [ -z "$(kubectl get ns $MON_NS -o name 2>/dev/null)" ]; then
   kubectl create ns $MON_NS
 fi
 
@@ -60,73 +60,45 @@ fi
 
 # Check if Prometheus Operator CRDs are already installed
 createPromCRDs=true
-if [ "$(kubectl get crd prometheuses.monitoring.coreos.com -o name 2>/dev/null)" != "" ]; then
+if [ "$(kubectl get crd prometheuses.monitoring.coreos.com -o name 2>/dev/null)" ]; then
   log_debug "Found existing Prometheus CRDs. Skipping creation."
   createPromCRDs=false
 fi
 
 # Optional TLS Support
 if [ "$MON_TLS_ENABLE" == "true" ]; then
-  if [ ! $(which openssl) ]; then
-    echo "openssl not found on the current PATH"
-    exit 1
+  # Create issuers if needed
+  
+  if [ -z "$(kubectl get issuer -n $MON_NS selfsigning-issuer -o name 2>/dev/null)" ]; then
+    log_info "Creating selfsigning-issuer for the [$MON_NS] namespace..."
+    kubectl apply -f monitoring/tls/selfsigning-issuer.yaml
+    sleep 5
   fi
-  if [ -z "$CA_KEY" ] && [ -z "$CA_CERT" ]; then
-    CA_SAVE_DIR=${CA_SAVE_DIR:-$HOME/.kube-viya-monitoring}
-    mkdir -p "$CA_SAVE_DIR"
-
-    CA_KEY=${CA_KEY:-$CA_SAVE_DIR/rootCA.key}
-    CA_CERT=${CA_CERT:-$CA_SAVE_DIR/rootCA.pem}
-
-    CA_PASS=${CA_PASS:-ops4viya}
-    CA_DAYS=${CA_DAYS:-1024}
-    CA_SUBJ=${CA_SUBJ:-/C=US/ST=North Carolina/O=SAS Institute/distinguished_name=kube-viya-monitoring}
-
-    # Look for saved CAs
-    if [ ! -f "$CA_SAVE_DIR/rootCA.key" ]; then
-      # Generate new CA key
-      openssl genrsa -des3 -out "$CA_KEY" -passout "pass:$CA_PASS" 2048
-    fi
-    if [ ! -f "$CA_SAVE_DIR/rootCA.pem" ]; then
-      # Generate new CA cert
-      openssl req -x509 -new -nodes -key "$CA_KEY" -sha256 -days "$CA_DAYS" -out "$CA_CERT" -passin "pass:$CA_PASS" -subj "$CA_SUBJ"
-    fi
-  elif [ -z "$CA_KEY" ] || [ -z "$CA_CERT" ] || [ -z $"CA_PASS" ]; then
-    log_error "Must specify CA_KEY, CA_CERT, and CA_PASS to use an exististing CA"
-    log_error "  CA_KEY =[$CA_KEY]"
-    log_error "  CA_CERT=[$CA_CERT]"
-    exit 1
-  else
-    log_info "Using existing CA"
-    log_info "  CA_KEY =[$CA_KEY]"
-    log_info "  CA_CERT=[$CA_CERT]"
-    log_info '  CA_PASS=******'
-    log_info "  CA_DAYS=[$CA_DAYS]"
+  if [ -z "$(kubectl get secret -n $MON_NS ca-certificate -o name 2>/dev/null)" ]; then
+    log_info "Creating self-signed CA certificate for the [$MON_NS] namespace..."
+    kubectl apply -f monitoring/tls/ca-certificate.yaml
+    sleep 5
+  fi
+  if [ -z "$(kubectl get issuer -n $MON_NS namespace-issuer -o name 2>/dev/null)" ]; then
+    log_info "Creating namespace-issuer for the [$MON_NS] namespace..."
+    kubectl apply -f monitoring/tls/namespace-issuer.yaml
+    sleep 5
   fi
 
-  # Generate server certificates
-  KEY_FILE=${KEY_FILE:-$TMP_DIR/tls.key}
-  CERT_FILE=${CERT_FILE:-$TMP_DIR/tls.crt}
-  CSR_FILE=${CSR_FILE:-$TMP_DIR/server.csr}
-  V3_EXT_FILE=$TMP_DIR/v3.ext
-  cp monitoring/tls/v3.ext "$V3_EXT_FILE"
-  echo "DNS.1 = $MON_INGRESS_HOST" >> "$V3_EXT_FILE"
-  echo "DNS.2 = *.$MON_INGRESS_HOST" >> "$V3_EXT_FILE"
+  apps=( prometheus alertmanager grafana )
+  for app in "${apps[@]}"; do
+    # Only create the secrets if they do not exist
+    TLS_SECRET_NAME=$app-tls-secret
+    if [ -z "$(kubectl get secret -n $MON_NS $TLS_SECRET_NAME -o name 2>/dev/null)" ]; then
+      # Create the certificate using cert-manager
+      log_debug "Creating cert-manager certificate custom resource for [$app]"
+      kubectl apply -f monitoring/tls/$app-tls-cert.yaml
+    else
+      log_debug "Using existing $TLS_SECRET_NAME for [$app]"
+    fi
+  done
 
-  openssl req -new -sha256 -nodes -out "$CSR_FILE" -newkey rsa:2048 -keyout "$KEY_FILE" -config <( cat monitoring/tls/server.csr.cnf )
-  openssl x509 -req -in "$CSR_FILE" -CA "$CA_CERT" -CAkey "$CA_KEY" -CAcreateserial -out "$CERT_FILE" -days 500 -sha256 -extfile "$V3_EXT_FILE" -passin "pass:$CA_PASS"
-
-  # Prometheus
-  TLS_SECRET_NAME=$MON_NS-prometheus-tls-secret
-  kubectl delete --ignore-not-found secret -n $MON_NS $TLS_SECRET_NAME
-  kubectl create secret tls -n $MON_NS ${TLS_SECRET_NAME} --key ${KEY_FILE} --cert ${CERT_FILE}
-  kubectl label secret -n $MON_NS ${TLS_SECRET_NAME} sas.com/monitoring-base=kube-viya-monitoring
-  # Grafana
-  TLS_SECRET_NAME=$MON_NS-grafana-tls-secret
-  kubectl delete --ignore-not-found secret -n $MON_NS $TLS_SECRET_NAME
-  kubectl create secret tls -n $MON_NS ${TLS_SECRET_NAME} --key ${KEY_FILE} --cert ${CERT_FILE}
-  kubectl label secret -n $MON_NS ${TLS_SECRET_NAME} sas.com/monitoring-base=kube-viya-monitoring
-
+  log_debug "Appending monitoring/tls/values-prom-operator-tls.yaml to $genValuesFile"
   cat monitoring/tls/values-prom-operator-tls.yaml >> $genValuesFile
 
   log_info "Provisioning TLS-enabled Prometheus datasource for Grafana..."

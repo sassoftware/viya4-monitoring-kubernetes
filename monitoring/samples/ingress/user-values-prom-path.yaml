@@ -25,7 +25,7 @@ prometheus:
     tls:
     - hosts:
       - host.mycluster.example.com
-      secretName: monitoring-prometheus-tls-secret
+      secretName: prometheus-tls-secret
     hosts:
     - host.mycluster.example.com
   prometheusSpec:
@@ -66,7 +66,7 @@ grafana:
     tls:
     - hosts:
       - host.mycluster.example.com
-      secretName: monitoring-grafana-tls-secret
+      secretName: grafana-tls-secret
     hosts:
     - host.mycluster.example.com
     path: /grafana

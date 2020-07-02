@@ -8,6 +8,27 @@ All components will have TLS enabled on ingress. Due to limitations in the
 underlying helm charts, some components may not have TLS enabled in-cluster.
 See the Limitations/Known Issues section below for details.
 
+When using this sample for HTTPS for ingress, the following secrets are
+expected to be populated in the `monitoring` namespace (or `MON_NS` value)
+manually **BEFORE** running any scripts in this repository:
+
+* kubernetes.io/tls secret - `prometheus-ingress-tls-secret`
+* kubernetes.io/tls secret - `alertmanager-ingress-tls-secret`
+* kubernetes.io/tls secret - `grafana-ingress-tls-secret`
+
+Generating these certificates is outside the scope of this README, but the
+same process described by the SAS Viya deployment documentation can be used
+here, just using the `monitoring` namespace instead.
+
+For in-cluster (east-west traffic) TLS for monitoring components,
+[cert-manager](https://cert-manager.io/) is used to populate the following
+secrets containing pod certificates (existing secrets are not overwritten,
+so they can still be manually populated):
+
+* kubernetes.io/tls secret - `prometheus-tls-secret`
+* kubernetes.io/tls secret - `alertmanager-tls-secret`
+* kubernetes.io/tls secret - `grafana-tls-secret`
+
 ## Instructions
 
 Set up an empty directory with a `monitoring` subdirectory to be used for the
@@ -24,21 +45,18 @@ should be set in the file:
 
 * `MON_TLS_ENABLE=true` - This flag modifies the deployment of Prometheus,
 Grafana, and AlertManager to be TLS-enabled.
-* `MON_INGRESS_HOST` - The hostname of the ingress host for the cluster.
-By default, the TLS-enablement will prepend this value with `prometheus.`,
-`grafana.`, and `alertmanager.` and use host-based ingress for those
-applications.
 
 Next, copy the sample TLS helm user response file to your `USER_DIR`:
 
 ```bash
-cp path/to/this/repo/monitoring/samples/tls/user-tls-values-prom-operator.yaml $USER_DIR/monitoring/
+cp path/to/this/repo/monitoring/samples/tls/user-values-prom-operator.yaml $USER_DIR/monitoring/
 ```
 
-Edit `$USER_DIR/monitoring/user-tls-values-prom-operator.yaml` and replace
+Edit `$USER_DIR/monitoring/user-values-prom-operator.yaml` and replace
 any hostnames with the real values.
 
-Any other desired customization should be completed here as well.
+Any other desired customizations to the YAML should be completed at this
+time as well.
 
 Once `USER_DIR` is properly set per the above instructions, deploy cluster
 monitoring normally:
@@ -51,12 +69,14 @@ path/to/this/repo/monitoring/bin/deploy_monitoring_cluster.sh
 
 There is a [bug in the AlertManager helm template](https://github.com/helm/charts/issues/22939)
 that prevents mounting the TLS certificates for the reverse proxy sidecar.
-It is expected that this issue will be addressed before GA.
+It is expected that this issue will be addressed before GA. HTTPS is still
+supported for alertmanager at the ingress level, just not for the pod (in-cluster).
 
 The Prometheus node exporter and kube-state-metrics exporters do not currently
 support TLS. These components are not exposed over ingress, so in-cluster
 access will be over HTTP and not HTTPS.
 
-When using a self-signed CA, the CA certificate must be added to any machine
-using a browser to access the monitoring components over ingress. The process
-to import and trust certificates varies by platform.
+A self-signed cert-manager Issuer is created if needed which will generate
+self-signed certificates when TLS is enabled and the secrets do no already
+exist. In cluster traffic between monitoring components (not ingress) is
+configured to skip TLS CA verification by default.

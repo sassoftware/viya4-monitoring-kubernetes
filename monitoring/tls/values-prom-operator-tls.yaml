@@ -35,8 +35,9 @@ prometheus:
       - name: tls-proxy-secret
         secret:
           defaultMode: 420
-          secretName: monitoring-prometheus-tls-secret
+          secretName: prometheus-tls-secret
 
+# Commented out due to https://github.com/helm/charts/issues/22939
 # alertmanager:
 #   alertmanagerSpec:
 #     listenLocal: true
@@ -45,15 +46,15 @@ prometheus:
 #       - name: tls-proxy
 #         args:
 #         - server
-#         - --listen=:9493
+#         - --listen=:443
 #         - --target=127.0.0.1:9093
-#         - --key=cert/key
-#         - --cert=cert/cert
+#         - --key=cert/tls.key
+#         - --cert=cert/tls.crt
 #         - --disable-authentication
 #         image: squareup/ghostunnel:v1.5.2
 #         imagePullPolicy: IfNotPresent
 #         ports:
-#         - containerPort: 9493 
+#         - containerPort: 443 
 #           name: https
 #           protocol: TCP
 #         resources: {}
@@ -72,10 +73,7 @@ prometheus:
 #       - name: tls-proxy-secret
 #         secret:
 #           defaultMode: 420
-#           secretName: prometheus-operator-admission
-#   service:
-#     port: 9493
-#     targetPort: 9493
+#           secretName: alertmanager-tls-secret
 
 prometheus-node-exporter:
   extraArgs:
@@ -132,7 +130,7 @@ grafana:
   - name: tls-proxy-secret
     secret:
       defaultMode: 420
-      secretName: monitoring-grafana-tls-secret
+      secretName: grafana-tls-secret
   service:
     port: 443
     targetPort: 443
