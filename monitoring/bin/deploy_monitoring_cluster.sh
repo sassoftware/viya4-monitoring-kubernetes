@@ -77,7 +77,7 @@ if [ "$MON_TLS_ENABLE" == "true" ]; then
       selfsignIssuer="$USER_DIR/monitoring/tls/selfsigning-issuer.yaml"
     fi
     log_debug "Self-sign issuer yaml is [$selfsignIssuer]"
-    kubectl apply -f "$selfsignIssuer"
+    kubectl apply -n $MON_NS -f "$selfsignIssuer"
     sleep 5
   fi
   if [ -z "$(kubectl get secret -n $MON_NS ca-certificate -o name 2>/dev/null)" ]; then
@@ -87,7 +87,7 @@ if [ "$MON_TLS_ENABLE" == "true" ]; then
       caCert="$USER_DIR/monitoring/tls/ca-certificate.yaml"
     fi
     log_debug "CA cert yaml file is [$caCert]"
-    kubectl apply -f "$caCert"
+    kubectl apply -n $MON_NS -f "$caCert"
     sleep 5
   fi
   if [ -z "$(kubectl get issuer -n $MON_NS namespace-issuer -o name 2>/dev/null)" ]; then
@@ -97,7 +97,7 @@ if [ "$MON_TLS_ENABLE" == "true" ]; then
       namespaceIssuer="$USER_DIR/monitoring/tls/namespace-issuer.yaml"
     fi
     log_debug "Namespace issuer yaml is [$namespaceIssuer]"
-    kubectl apply -f "$namespaceIssuer"
+    kubectl apply -n $MON_NS -f "$namespaceIssuer"
     sleep 5
   fi
 
@@ -112,7 +112,7 @@ if [ "$MON_TLS_ENABLE" == "true" ]; then
         certyaml="$USER_DIR/monitoring/tls/$app-tls-cert.yaml"
       fi
       log_debug "Creating cert-manager certificate custom resource for [$app] using [$certyaml]"
-      kubectl apply -f "$certyaml"
+      kubectl apply -n $MON_NS -f "$certyaml"
     else
       log_debug "Using existing $TLS_SECRET_NAME for [$app]"
     fi
