@@ -31,7 +31,7 @@ datasources:
       url: http://prometheus:9090
       access: proxy
       isDefault: true
-grafana.ini:
+"grafana.ini":
   server:
     protocol: http
     domain: grafana.viya-b.host.mycluster.example.com

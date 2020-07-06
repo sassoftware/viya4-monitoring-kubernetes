@@ -128,7 +128,7 @@ if [ "$MON_TLS_ENABLE" == "true" ]; then
     echo "      url: https://prometheus-operator-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
   else
     kubectl delete cm -n $MON_NS --ignore-not-found prometheus-$MON_NS-grafana-datasource
-    echo "      url: https://prometheus-$MON_NS-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
+    echo "      url: https://prometheus-$MON_NS-prom-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
   fi
 
   kubectl delete cm -n $MON_NS --ignore-not-found grafana-datasource-prom-https

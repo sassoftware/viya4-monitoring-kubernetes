@@ -1,7 +1,7 @@
 # SMTP e-mail configuration for Grafana
 # This will allow 'Email' alert notification channels to be created
 grafana:
-  grafana.ini:
+  "grafana.ini":
     # Specifying domain and root_url will create the correct links in alert notifications
     server:
       domain: host.mycluster.example.com
