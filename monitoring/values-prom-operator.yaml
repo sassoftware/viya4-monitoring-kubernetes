@@ -123,6 +123,8 @@ prometheus-node-exporter:
     # Override the default port of 9100 to avoid potential conflicts
     port: 9110
     targetPort: 9110
+  # tolerations:
+  # - effect: NoSchedule
 
 # =======
 # Grafana
@@ -131,10 +133,12 @@ prometheus-node-exporter:
 # https://grafana.com/
 grafana:
   image:
-    tag: "7.0.4"
+    tag: "v7.1.0-beta2"
   "grafana.ini":
     analytics:
       check_for_updates: false
+    # dashboards:
+    #   default_home_dashboard_path: 
     log:
       mode: console
     "log.console":

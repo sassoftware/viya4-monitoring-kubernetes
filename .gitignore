@@ -3,3 +3,4 @@
 tmp/
 *-tmp.yaml
 user-dir/
+user-dir-*/
