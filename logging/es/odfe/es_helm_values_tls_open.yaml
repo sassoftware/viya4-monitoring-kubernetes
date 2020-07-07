@@ -1,0 +1,61 @@
+# Chart: https://github.com/opendistro-for-elasticsearch/opendistro-build/tree/master/helm
+# Default values: https://github.com/opendistro-for-elasticsearch/opendistro-build/blob/master/helm/opendistro-es/values.yaml
+
+############################
+# Uses following secrets
+#########################
+
+ elasticsearch:
+   config: 
+     # Following contents originally copied from elasticsearch.yaml file found
+     # on pod after deploying with demo security config
+     cluster.name: "docker-cluster"
+     network.host: 0.0.0.0
+
+     # SASGZS Changes: renamed various .pem files to use elk- prefix (expected/required by Helm templates)
+     #                 set:        opendistro_security.authcz.admin_dn
+     #                 added/set:  opendistro_security.nodes_dn
+
+     # 
+     opendistro_security.ssl.transport.pemcert_filepath: elk-transport-crt.pem
+     opendistro_security.ssl.transport.pemkey_filepath: elk-transport-key.pem
+     opendistro_security.ssl.transport.pemtrustedcas_filepath: elk-transport-root-ca.pem
+     opendistro_security.ssl.transport.enforce_hostname_verification: false
+     opendistro_security.ssl.http.enabled: true
+     opendistro_security.ssl.http.pemcert_filepath: elk-transport-crt.pem
+     opendistro_security.ssl.http.pemkey_filepath: elk-transport-key.pem
+     opendistro_security.ssl.http.pemtrustedcas_filepath: elk-transport-root-ca.pem
+     opendistro_security.allow_unsafe_democertificates: true
+     opendistro_security.allow_default_init_securityindex: true
+     opendistro_security.authcz.admin_dn:
+       - "CN=es-admin,O=cert-manager"
+     opendistro_security.nodes_dn:
+        - "CN=es-transport,O=cert-manager"
+
+     opendistro_security.audit.type: internal_elasticsearch
+     opendistro_security.enable_snapshot_restore_privilege: true
+     opendistro_security.check_snapshot_restore_write_privileges: true
+     opendistro_security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
+     cluster.routing.allocation.disk.threshold_enabled: false
+     node.max_local_storage_nodes: 3
+     ######## End OpenDistro for Elasticsearch Security Demo Configuration ########
+
+   ssl:
+     transport:
+        enabled: true
+        existingCertSecret: es-transport-tls-secret
+        existingCertSecretCertSubPath: tls.crt
+        existingCertSecretKeySubPath: tls.key
+        existingCertSecretRootCASubPath: ca.crt 
+     rest:
+        enabled: true
+        existingCertSecret: es-rest-tls-secret
+        existingCertSecretCertSubPath: tls.crt
+        existingCertSecretKeySubPath: tls.key
+        existingCertSecretRootCASubPath: ca.crt 
+     admin:
+        enabled: true
+        existingCertSecret: es-admin-tls-secret
+        existingCertSecretCertSubPath: tls.crt
+        existingCertSecretKeySubPath: tls.key
+        existingCertSecretRootCASubPath: ca.crt 

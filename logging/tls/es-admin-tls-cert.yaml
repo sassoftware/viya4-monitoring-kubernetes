@@ -11,6 +11,7 @@ spec:
     kind: Issuer
     name: namespace-issuer
   secretName: es-admin-tls-secret
+  keyEncoding: pkcs8
   usages:
   - digital signature
   - key encipherment

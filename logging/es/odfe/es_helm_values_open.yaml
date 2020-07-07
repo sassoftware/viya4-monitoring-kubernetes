@@ -1,4 +1,6 @@
 elasticsearch:
+  imageTag: 1.7.0
+
   master:
     enabled: true
     podAnnotations: 
@@ -24,3 +26,6 @@ elasticsearch:
     podAnnotations:
       fluentbit.io/parser: elasticsearch
     replicas: 2
+ 
+kibana:
+  imageTag: 1.7.0

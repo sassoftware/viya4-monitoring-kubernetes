@@ -38,6 +38,11 @@ log_notice "Deploying logging components to the [$LOG_NS] namespace"
 
 # Optional TLS Support
 if [ "$LOG_TLS_ENABLE" == "true" ]; then
+
+  # TLS-specific Helm chart values currently maintained in separate YAML file
+  ES_OPEN_TLS_YAML=$USER_DIR/logging/es/odfe/es_helm_values_tls_open.yaml
+
+
   # Create issuers if needed
   # Issuers and certs honor USER_DIR for overrides/customizations
   
@@ -89,13 +94,15 @@ if [ "$LOG_TLS_ENABLE" == "true" ]; then
     fi
   done
 else
+  # point to an empty yaml file
+  ES_OPEN_TLS_YAML=$TMP_DIR/empty.yaml
   log_debug "TLS not enabled for logging components. Skipping."
 fi
 
 # Elasticsearch
 log_info "Step 1: Deploying Elasticsearch"
 
-odfe_tgz_file=opendistro-es-1.7.0.tgz
+odfe_tgz_file=opendistro-es-1.8.0.tgz
 
 baseDir=$(pwd)
 if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
@@ -105,9 +112,9 @@ if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
    log_info "Cloning Open Distro for Elasticsearch repo"
    git clone https://github.com/opendistro-for-elasticsearch/opendistro-build
 
-   # checkout commit before 1.8.0 changes
+   # checkout specific commit
    cd opendistro-build
-   git checkout f08d6f599673b16b0b72ea815d6798636446fa25
+   git checkout 2c139044ee31a490b58ac6a306a5a5ef5ef21383
 
    # build package
    log_info "Packaging Helm Chart for Elasticsearch"
@@ -133,10 +140,10 @@ helm repo update
 # Deploy Elasticsearch via Helm chart
 if [ "$HELM_VER_MAJOR" == "3" ]; then
    helm2ReleaseCheck odfe-$LOG_NS
-   helm upgrade --install odfe --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
+   helm upgrade --install odfe --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_TLS_YAML" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 else
    helm3ReleaseCheck odfe $LOG_NS
-   helm upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
+   helm upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_TLS_YAML" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 fi
 
 # wait for pod to come up
