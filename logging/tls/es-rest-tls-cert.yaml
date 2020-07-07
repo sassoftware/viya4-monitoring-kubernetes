@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: es-rest-tls-cert
+spec:
+  commonName: es-rest
+  dnsNames:
+  - localhost
+  - v4m-es-client-service
+  issuerRef:
+    kind: Issuer
+    name: namespace-issuer
+  secretName: es-rest-tls-secret
+  usages:
+  - digital signature
+  - key encipherment
+  - server auth
+  - client auth

@@ -36,6 +36,62 @@ set -e
 
 log_notice "Deploying logging components to the [$LOG_NS] namespace"
 
+# Optional TLS Support
+if [ "$LOG_TLS_ENABLE" == "true" ]; then
+  # Create issuers if needed
+  # Issuers and certs honor USER_DIR for overrides/customizations
+  
+  if [ -z "$(kubectl get issuer -n $LOG_NS selfsigning-issuer -o name 2>/dev/null)" ]; then
+    log_info "Creating selfsigning-issuer for the [$LOG_NS] namespace..."
+    selfsignIssuer=logging/tls/selfsigning-issuer.yaml
+    if [ -f "$USER_DIR/logging/tls/selfsigning-issuer.yaml" ]; then
+      selfsignIssuer="$USER_DIR/logging/tls/selfsigning-issuer.yaml"
+    fi
+    log_debug "Self-sign issuer yaml is [$selfsignIssuer]"
+    kubectl apply -n $LOG_NS -f "$selfsignIssuer"
+    sleep 5
+  fi
+  if [ -z "$(kubectl get secret -n $LOG_NS ca-certificate -o name 2>/dev/null)" ]; then
+    log_info "Creating self-signed CA certificate for the [$LOG_NS] namespace..."
+    caCert=logging/tls/ca-certificate.yaml
+    if [ -f "$USER_DIR/logging/tls/ca-certificate.yaml" ]; then
+      caCert="$USER_DIR/logging/tls/ca-certificate.yaml"
+    fi
+    log_debug "CA cert yaml file is [$caCert]"
+    kubectl apply -n $LOG_NS -f "$caCert"
+    sleep 5
+  fi
+  if [ -z "$(kubectl get issuer -n $LOG_NS namespace-issuer -o name 2>/dev/null)" ]; then
+    log_info "Creating namespace-issuer for the [$LOG_NS] namespace..."
+    namespaceIssuer=logging/tls/namespace-issuer.yaml
+    if [ -f "$USER_DIR/logging/tls/namespace-issuer.yaml" ]; then
+      namespaceIssuer="$USER_DIR/logging/tls/namespace-issuer.yaml"
+    fi
+    log_debug "Namespace issuer yaml is [$namespaceIssuer]"
+    kubectl apply -n $LOG_NS -f "$namespaceIssuer"
+    sleep 5
+  fi
+
+  apps=( es-transport es-rest es-admin kibana )
+  for app in "${apps[@]}"; do
+    # Only create the secrets if they do not exist
+    TLS_SECRET_NAME=$app-tls-secret
+    if [ -z "$(kubectl get secret -n $LOG_NS $TLS_SECRET_NAME -o name 2>/dev/null)" ]; then
+      # Create the certificate using cert-manager
+      certyaml=logging/tls/$app-tls-cert.yaml
+      if [ -f "$USER_DIR/logging/tls/$app-tls-cert.yaml" ]; then
+        certyaml="$USER_DIR/logging/tls/$app-tls-cert.yaml"
+      fi
+      log_debug "Creating cert-manager certificate custom resource for [$app] using [$certyaml]"
+      kubectl apply -n $LOG_NS -f "$certyaml"
+    else
+      log_debug "Using existing $TLS_SECRET_NAME for [$app]"
+    fi
+  done
+else
+  log_debug "TLS not enabled for logging components. Skipping."
+fi
+
 # Elasticsearch
 log_info "Step 1: Deploying Elasticsearch"
 
