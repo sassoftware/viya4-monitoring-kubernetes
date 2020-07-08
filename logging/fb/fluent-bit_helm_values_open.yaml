@@ -38,7 +38,6 @@ extraVolumes:
 fullConfigMap: false
 existingConfigMap: fb-fluent-bit-config
 
-# Allow Fluent Bit pods to be scheduled everywhere
+# Be very tolerant
 tolerations:
-- key: node-role.kubernetes.io/master
-  effect: NoSchedule
+- operator: "Exists"

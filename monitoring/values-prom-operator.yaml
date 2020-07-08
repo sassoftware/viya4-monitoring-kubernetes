@@ -123,8 +123,9 @@ prometheus-node-exporter:
     # Override the default port of 9100 to avoid potential conflicts
     port: 9110
     targetPort: 9110
-  # tolerations:
-  # - effect: NoSchedule
+  # Be very tolerant
+  tolerations:
+  - operator: "Exists"
 
 # =======
 # Grafana
