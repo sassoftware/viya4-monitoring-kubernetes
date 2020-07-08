@@ -6,6 +6,14 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
+# enable debug on Helm via env var
+export HELM_DEBUG="${HELM_DEBUG:-false}"
+
+if [ "$HELM_DEBUG" == "true" ]; then
+  helmDebug="--debug"
+fi
+
+
 # Elasticsearch user customizations
 ES_OPEN_USER_YAML="${ES_OPEN_USER_YAML:-$USER_DIR/logging/user-values-elasticsearch-open.yaml}"
 if [ ! -f "$ES_OPEN_USER_YAML" ]; then
@@ -40,7 +48,7 @@ log_notice "Deploying logging components to the [$LOG_NS] namespace"
 if [ "$LOG_TLS_ENABLE" == "true" ]; then
 
   # TLS-specific Helm chart values currently maintained in separate YAML file
-  ES_OPEN_TLS_YAML=$USER_DIR/logging/es/odfe/es_helm_values_tls_open.yaml
+  ES_OPEN_TLS_YAML=logging/es/odfe/es_helm_values_tls_open.yaml
 
 
   # Create issuers if needed
@@ -140,10 +148,10 @@ helm repo update
 # Deploy Elasticsearch via Helm chart
 if [ "$HELM_VER_MAJOR" == "3" ]; then
    helm2ReleaseCheck odfe-$LOG_NS
-   helm upgrade --install odfe --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_TLS_YAML" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
+   helm $helmDebug upgrade --install odfe --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_TLS_YAML" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 else
    helm3ReleaseCheck odfe $LOG_NS
-   helm upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_TLS_YAML" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
+   helm $helmDebug upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_TLS_YAML" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 fi
 
 # wait for pod to come up
@@ -308,7 +316,7 @@ if [ "$ELASTICSEARCH_EXPORTER_ENABLED" == "true" ]; then
    # Elasticsearch metric exporter
    if [ "$HELM_VER_MAJOR" == "3" ]; then
       helm2ReleaseCheck es-exporter-$LOG_NS
-      helm upgrade --install es-exporter \
+      helm $helmDebug upgrade --install es-exporter \
       --namespace $LOG_NS \
       -f logging/es/odfe/values-es-exporter_open.yaml \
       -f $ES_OPEN_EXPORTER_USER_YAML \
