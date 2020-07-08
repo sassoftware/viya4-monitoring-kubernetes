@@ -11,16 +11,14 @@
 
  elasticsearch:
    config: 
-     # Following contents originally copied from elasticsearch.yaml file found
-     # on pod after deploying with demo security config
-     cluster.name: "docker-cluster"
-     network.host: 0.0.0.0
-
+     ######## OpenDistro for Elasticsearch Security Configuration - START ########
+     # Based on elasticsearch.yaml file found on pod after deploying with demo security config
+     #
      # Changes: renamed various .pem files to use elk- prefix (expected/required by Helm templates)
      #          set:        opendistro_security.authcz.admin_dn
      #          added/set:  opendistro_security.nodes_dn
+     #          removed:    various items unrelated to TLS
 
-     #
      opendistro_security.ssl.transport.pemcert_filepath: elk-transport-crt.pem
      opendistro_security.ssl.transport.pemkey_filepath: elk-transport-key.pem
      opendistro_security.ssl.transport.pemtrustedcas_filepath: elk-transport-root-ca.pem
@@ -29,7 +27,7 @@
      opendistro_security.ssl.http.pemcert_filepath: elk-transport-crt.pem
      opendistro_security.ssl.http.pemkey_filepath: elk-transport-key.pem
      opendistro_security.ssl.http.pemtrustedcas_filepath: elk-transport-root-ca.pem
-     opendistro_security.allow_unsafe_democertificates: true
+     opendistro_security.allow_unsafe_democertificates: false
      opendistro_security.allow_default_init_securityindex: true
      opendistro_security.authcz.admin_dn:
        - "CN=es-admin,O=cert-manager"
@@ -42,11 +40,11 @@
      opendistro_security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
      cluster.routing.allocation.disk.threshold_enabled: false
      node.max_local_storage_nodes: 3
-     ######## End OpenDistro for Elasticsearch Security Demo Configuration ########
+     ######## End OpenDistro for Elasticsearch Security Configuration ########
 
    ssl:
      transport:
-        enabled: true
+        # TLS is mandatory for transport layer(cannot be disabled)
         existingCertSecret: es-transport-tls-secret
         existingCertSecretCertSubPath: tls.crt
         existingCertSecretKeySubPath: tls.key
