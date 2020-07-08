@@ -1,7 +1,7 @@
 # Deployment on Azure
 
 This sample contains values appropriate for deployment on Microsoft Azure. The 
-sample assumes NGINX ingress, but can be modified for other solutions.
+sample assumes that NGINX ingress is used, but it can be modified for other solutions.
 
 ## Instructions
 
@@ -12,7 +12,7 @@ cp monitoring/samples/azure/deployment/user-values-prom-operator.yaml $USER_DIR/
 # Edit `$USER_DIR/monitoring/user-values-prom-operator.yaml` and replace the
 # example hostname with the real ingress hostname
 monitoring/bin/deploy_monitoring_cluster.sh
-# Deployment takes a bit...then
+# Deployment takes a while. After it completes, run
 VIYA_NS=my-viya-namespace-here monitoring/bin/deploy_monitoring_viya.sh
 ```
 
