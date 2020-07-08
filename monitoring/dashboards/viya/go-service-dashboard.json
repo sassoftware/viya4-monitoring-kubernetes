@@ -1,4 +1,31 @@
 {
+  "__inputs": [],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "7.0.4"
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "singlestat",
+      "name": "Singlestat",
+      "version": ""
+    }
+  ],
   "annotations": {
     "list": [
       {
@@ -30,8 +57,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "id": 26,
-  "iteration": 1585498649689,
+  "id": null,
+  "iteration": 1594219140161,
   "links": [],
   "panels": [
     {
@@ -62,6 +89,12 @@
       "decimals": 1,
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "s",
       "gauge": {
         "maxValue": 100,
@@ -111,7 +144,7 @@
         "lineColor": "rgb(31, 120, 193)",
         "show": false
       },
-      "tableColumn": "",
+      "tableColumn": "2.43.1",
       "targets": [
         {
           "expr": "sas_build_info{job=~\"$application\", pod=~\"$instance\"}",
@@ -150,6 +183,12 @@
       "decimals": 1,
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "s",
       "gauge": {
         "maxValue": 100,
@@ -237,6 +276,12 @@
       "decimals": 2,
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "bytes",
       "gauge": {
         "maxValue": 100,
@@ -332,6 +377,12 @@
       "datasource": "$Datasource",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "grid": {
@@ -441,6 +492,12 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "$Datasource",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -531,6 +588,12 @@
       "datasource": "$Datasource",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "grid": {
@@ -647,6 +710,12 @@
       "datasource": "$Datasource",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "grid": {
@@ -772,6 +841,12 @@
       "datasource": "$Datasource",
       "editable": true,
       "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "grid": {
@@ -906,6 +981,12 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "$Datasource",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -1003,6 +1084,12 @@
       "dashes": false,
       "datasource": "$Datasource",
       "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -1091,7 +1178,7 @@
     }
   ],
   "refresh": "",
-  "schemaVersion": 22,
+  "schemaVersion": 25,
   "style": "dark",
   "tags": [
     "sas-viya"
@@ -1100,7 +1187,7 @@
     "list": [
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "Prometheus",
           "value": "Prometheus"
         },
@@ -1117,18 +1204,39 @@
         "type": "datasource"
       },
       {
+        "allValue": ".+",
+        "current": {},
+        "datasource": "$Datasource",
+        "definition": "label_values(sas_build_info{sas_service_base=\"golang\"},namespace)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Namespace",
+        "multi": true,
+        "name": "namespace",
+        "options": [],
+        "query": "label_values(sas_build_info{sas_service_base=\"golang\"},namespace)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
         "allValue": null,
         "current": {},
         "datasource": "$Datasource",
-        "definition": "label_values(go_info{sas_service_base=\"golang\"}, service)",
+        "definition": "label_values(go_info{sas_service_base=\"golang\",namespace=~\"$namespace\"}, service)",
         "hide": 0,
         "includeAll": false,
-        "index": -1,
         "label": "Application",
         "multi": false,
         "name": "application",
         "options": [],
-        "query": "label_values(go_info{sas_service_base=\"golang\"}, service)",
+        "query": "label_values(go_info{sas_service_base=\"golang\",namespace=~\"$namespace\"}, service)",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -1144,16 +1252,15 @@
         "allValue": null,
         "current": {},
         "datasource": "$Datasource",
-        "definition": "label_values(go_info{job=\"$application\"}, pod)",
+        "definition": "label_values(go_info{job=\"$application\",namespace=~\"$namespace\"}, pod)",
         "hide": 0,
         "includeAll": false,
-        "index": -1,
         "label": "Instance",
         "multi": false,
         "multiFormat": "glob",
         "name": "instance",
         "options": [],
-        "query": "label_values(go_info{job=\"$application\"}, pod)",
+        "query": "label_values(go_info{job=\"$application\",namespace=~\"$namespace\"}, pod)",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -1173,7 +1280,6 @@
   "timepicker": {
     "now": true,
     "refresh_intervals": [
-      "5s",
       "10s",
       "30s",
       "1m",
@@ -1199,8 +1305,5 @@
   "timezone": "browser",
   "title": "SAS Go Service Details",
   "uid": "3j9N_AlZk",
-  "variables": {
-    "list": []
-  },
   "version": 1
 }
