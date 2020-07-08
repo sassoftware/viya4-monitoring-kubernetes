@@ -1,9 +1,13 @@
 # Chart: https://github.com/opendistro-for-elasticsearch/opendistro-build/tree/master/helm
 # Default values: https://github.com/opendistro-for-elasticsearch/opendistro-build/blob/master/helm/opendistro-es/values.yaml
 
-############################
-# Uses following secrets
-#########################
+################################################################################
+# Obtains TLS certs via the following secrets:
+#
+#                         es-transport-tls-secret
+#                         es-rest-tls-secret
+#                         es-admin-tls-secret
+#################################################################################
 
  elasticsearch:
    config: 
@@ -12,11 +16,11 @@
      cluster.name: "docker-cluster"
      network.host: 0.0.0.0
 
-     # SASGZS Changes: renamed various .pem files to use elk- prefix (expected/required by Helm templates)
-     #                 set:        opendistro_security.authcz.admin_dn
-     #                 added/set:  opendistro_security.nodes_dn
+     # Changes: renamed various .pem files to use elk- prefix (expected/required by Helm templates)
+     #          set:        opendistro_security.authcz.admin_dn
+     #          added/set:  opendistro_security.nodes_dn
 
-     # 
+     #
      opendistro_security.ssl.transport.pemcert_filepath: elk-transport-crt.pem
      opendistro_security.ssl.transport.pemkey_filepath: elk-transport-key.pem
      opendistro_security.ssl.transport.pemtrustedcas_filepath: elk-transport-root-ca.pem
@@ -46,16 +50,16 @@
         existingCertSecret: es-transport-tls-secret
         existingCertSecretCertSubPath: tls.crt
         existingCertSecretKeySubPath: tls.key
-        existingCertSecretRootCASubPath: ca.crt 
+        existingCertSecretRootCASubPath: ca.crt
      rest:
         enabled: true
         existingCertSecret: es-rest-tls-secret
         existingCertSecretCertSubPath: tls.crt
         existingCertSecretKeySubPath: tls.key
-        existingCertSecretRootCASubPath: ca.crt 
+        existingCertSecretRootCASubPath: ca.crt
      admin:
         enabled: true
         existingCertSecret: es-admin-tls-secret
         existingCertSecretCertSubPath: tls.crt
         existingCertSecretKeySubPath: tls.key
-        existingCertSecretRootCASubPath: ca.crt 
+        existingCertSecretRootCASubPath: ca.crt
