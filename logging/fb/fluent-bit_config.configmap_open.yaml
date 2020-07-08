@@ -249,6 +249,7 @@ data:
        Match           kube.*
        Key_name        collectapi_message
        Parser          collectapi
+       Parser          collectapiT
        Parser          crunchy_green
        Parser          misc5
        Reserve_Data    On
