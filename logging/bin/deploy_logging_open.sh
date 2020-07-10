@@ -6,13 +6,14 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
+checkDefaultStorageClass
+
 # enable debug on Helm via env var
 export HELM_DEBUG="${HELM_DEBUG:-false}"
 
 if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
-
 
 # Elasticsearch user customizations
 ES_OPEN_USER_YAML="${ES_OPEN_USER_YAML:-$USER_DIR/logging/user-values-elasticsearch-open.yaml}"

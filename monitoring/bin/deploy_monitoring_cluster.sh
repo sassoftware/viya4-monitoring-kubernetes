@@ -8,6 +8,7 @@ source monitoring/bin/common.sh
 
 helm2ReleaseCheck prometheus-$MON_NS
 helm3ReleaseCheck prometheus-operator $MON_NS
+checkDefaultStorageClass
 
 export HELM_DEBUG="${HELM_DEBUG:-false}"
 export NGINX_NS="${NGINX_NS:-ingress-nginx}"

@@ -6,6 +6,8 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 
+checkDefaultStorageClass
+
 HELM_DEBUG="${HELM_DEBUG:-false}"
 if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"

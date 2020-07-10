@@ -49,3 +49,17 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
 
     export SAS_COMMON_SOURCED=true
 fi
+
+function checkDefaultStorageClass {
+    if [ -z "$defaultStorageClass" ]; then
+      # Check for kubernetes environment conflicts/requirements
+      defaultStorageClass=$(kubectl get storageclass -o jsonpath="{range .items[*]}{.metadata.name}{'\t'}{.metadata.annotations..storageclass\.kubernetes\.io/is-default-class}{'\n'}{end}" | grep true | awk '{print $1}')
+      if [ "$defaultStorageClass" ]; then
+        log_debug "Found default storageClass: [$defaultStorageClass]"
+      else
+        log_warn "This cluster does not have a default storageclass defined"
+        log warn "This may cause errors unless storageclass values are explicitly defined"
+        defaultStorageClass=_NONE_
+      fi
+    fi
+}
