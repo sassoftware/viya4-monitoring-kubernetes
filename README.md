@@ -98,6 +98,14 @@ will be ignored.
   - user-values-fluent-bit-open.yaml
 ```
 
+### Default StorageClass
+
+The default cluster StorageClass is used for both monitoring and logging
+unless the value is specifically set in `user-*.yaml` file(s). The
+deployment scripts will issue a warning if no default StorageClass is
+available even if the value is properly set by the user. In this case,
+the warning can be safely ignored.
+
 ### Monitoring
 
 See the [monitoring README](monitoring/README.md) to deploy the monitoring
