@@ -26,6 +26,31 @@ elasticsearch:
     podAnnotations:
       fluentbit.io/parser: elasticsearch
     replicas: 2
- 
+
 kibana:
   imageTag: 1.7.0
+  service:
+    type: NodePort
+    # nodePort option below is not currently supported
+    # by Helm chart; inc. for clarity and future enhancements
+    nodePort: 31033
+
+  config:
+    # Based on kibana.yaml found on deployment with ODFE demo security config
+    server.name: kibana
+    server.host: "0"
+
+    elasticsearch.hosts: https://v4m-es-client-service:9200
+    elasticsearch.ssl.verificationMode: none
+    elasticsearch.username: kibanaserver
+    elasticsearch.password: kibanaserver
+
+    opendistro_security.multitenancy.enabled: true
+    opendistro_security.multitenancy.tenants.preferred: ["Global","Private"]
+    elasticsearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
+
+    opendistro_security.readonly_mode.roles: ["kibana_read_only"]
+
+    newsfeed.enabled: false
+    telemetry.optIn: false
+    telemetry.enabled: false

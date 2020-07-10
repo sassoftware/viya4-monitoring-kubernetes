@@ -50,10 +50,23 @@ if [ "$LOG_TLS_ENABLE" == "true" ]; then
   # TLS-specific Helm chart values currently maintained in separate YAML file
   ES_OPEN_TLS_YAML=logging/es/odfe/es_helm_values_tls_open.yaml
 
+  if [ "$LOG_KB_TLS_ENABLE" == "true" ]; then
+     # Kibana TLS-specific Helm chart values currently maintained in separate YAML file
+     KB_OPEN_TLS_YAML=logging/es/odfe/es_helm_values_kb_tls_open.yaml
+     # w/TLS: use HTTPS in curl commands
+     KB_CURL_PROTOCOL=https
+     log_debug "TLS enabled for Kibana."
+  else
+     # point to an empty yaml file
+     KB_OPEN_TLS_YAML=$TMP_DIR/empty.yaml
+     # w/o TLS: use HTTP in curl commands
+     KB_CURL_PROTOCOL=http
+     log_debug "TLS not enabled for Kibana. Skipping."
+  fi
 
   # Create issuers if needed
   # Issuers and certs honor USER_DIR for overrides/customizations
-  
+
   if [ -z "$(kubectl get issuer -n $LOG_NS selfsigning-issuer -o name 2>/dev/null)" ]; then
     log_info "Creating selfsigning-issuer for the [$LOG_NS] namespace..."
     selfsignIssuer=logging/tls/selfsigning-issuer.yaml
@@ -102,8 +115,11 @@ if [ "$LOG_TLS_ENABLE" == "true" ]; then
     fi
   done
 else
-  # point to an empty yaml file
+  # point to empty yaml files
   ES_OPEN_TLS_YAML=$TMP_DIR/empty.yaml
+  KB_OPEN_TLS_YAML=$TMP_DIR/empty.yaml
+  # w/TLS: use HTTPS in curl commands
+  KB_CURL_PROTOCOL=http
   log_debug "TLS not enabled for logging components. Skipping."
 fi
 
@@ -148,10 +164,10 @@ helm repo update
 # Deploy Elasticsearch via Helm chart
 if [ "$HELM_VER_MAJOR" == "3" ]; then
    helm2ReleaseCheck odfe-$LOG_NS
-   helm $helmDebug upgrade --install odfe --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_TLS_YAML" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
+   helm $helmDebug upgrade --install odfe --namespace $LOG_NS  --values logging/es/odfe/es_helm_values_open.yaml  --values "$ES_OPEN_TLS_YAML" --values "$KB_OPEN_TLS_YAML" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 else
    helm3ReleaseCheck odfe $LOG_NS
-   helm $helmDebug upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_TLS_YAML" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
+   helm $helmDebug upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_TLS_YAML"  --values "$KB_OPEN_TLS_YAML"  --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 fi
 
 # wait for pod to come up
@@ -195,8 +211,10 @@ if [ "$podready" != "TRUE" ]; then
    exit 14
 fi
 
+
 log_info "Waiting [4] minutes to allow Elasticsearch to initialize [$(date)]"
-sleep 240
+sleep 240s
+
 
 # set up temporary port forwarding to allow curl access
 ES_PORT=$(kubectl -n $LOG_NS get service v4m-es-client-service -o=jsonpath='{.spec.ports[?(@.name=="http")].port}')
@@ -207,6 +225,7 @@ kubectl -n $LOG_NS port-forward --address localhost svc/v4m-es-client-service :$
 # get PID to allow us to kill process later
 pfPID=$!
 log_debug "pfPID: $pfPID"
+
 
 # pause to allow port-forwarding messages to appear
 sleep 5s
@@ -309,6 +328,7 @@ rm -f $tmpfile
 
 sleep 7s
 
+
 log_info "Step 1a: Deploying Elasticsearch metric exporter"
 
 ELASTICSEARCH_EXPORTER_ENABLED=${ELASTICSEARCH_EXPORTER_ENABLED:-true}
@@ -338,7 +358,13 @@ log_info "Step 2: Configuring Kibana"
 
 #### TEMP?  Remove when defining nodePort via HELM chart?
 SVC=v4m-es-kibana-svc
-kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"},{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
+SVC_TYPE=$(kubectl get svc -n logging $SVC -o jsonpath='{.spec.type}')
+if [ "$SVC_TYPE" == "NodePort" ]; then
+  KIBANA_PORT=31033
+  kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
+  log_info "Set Kibana service NodePort to 31033"
+fi
+
 
 # construct URL to access Kibana
 # Use existing NODE_NAME or find one
@@ -348,7 +374,6 @@ if [ "$NODE_NAME" == "" ]; then
   NODE_NAME=$(kubectl get nodes | awk 'NR==2 { print $1 }')
 fi
 
-KIBANA_PORT=$(kubectl -n $LOG_NS get service v4m-es-kibana-svc -o jsonpath="{.spec.ports[0].nodePort}")
 
 # Need to wait 2-3 minutes for kibana to come up and
 # and be ready to accept the curl commands below
@@ -379,6 +404,7 @@ fi
 log_info "Waiting [4] minutes to allow Kibana to initialize [$(date)] "
 sleep 240s
 
+
 # set up temporary port forwarding to allow curl access
 K_PORT=$(kubectl -n $LOG_NS get service v4m-es-kibana-svc -o=jsonpath='{.spec.ports[?(@.name=="kibana-svc")].port}')
 
@@ -407,8 +433,17 @@ else
   exit 18
 fi
 
+
+
 # Import Kibana Searches, Visualizations and Dashboard Objects using curl
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "http://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"  -H "securitytenant: global"  --form file=@logging/kibana/kibana_saved_objects_7.4.2_200405.ndjson  --user admin:admin --insecure )
+
+# FEATURE FLAG!: If Kibana multi-tenancy is enabled; we need to include tenant in Kibana curl
+if [ "$NO_KIBANA_TENANT" == "true" ]; then
+  response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.4.2_200405.ndjson  --user admin:admin --insecure )
+else
+  response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   -H "securitytenant: global"  --form file=@logging/kibana/kibana_saved_objects_7.4.2_200405.ndjson  --user admin:admin --insecure )
+fi
+
 # TO DO/CHECK: this should return a SUCCESS message like this: {"success":true,"successCount":20}
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading content into Kibana [$response]"
@@ -440,5 +475,6 @@ echo ""
 
 # Print URL to access Kibana
 log_notice "================================================================================"
-log_notice "== Access Kibana using this URL: http://$NODE_NAME:$KIBANA_PORT/app/kibana =="
+log_notice "== Access Kibana using this URL: $KB_CURL_PROTOCOL://$NODE_NAME:$KIBANA_PORT/app/kibana =="
 log_notice "================================================================================"
+
