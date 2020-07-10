@@ -6,6 +6,9 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
+LOG_DELETE_PVCS_ON_REMOVE=${LOG_DELETE_PVCS_ON_REMOVE:-false}
+LOG_DELETE_NAMESPACE_ON_REMOVE=${LOG_DELETE_NAMESPACE_ON_REMOVE:-false}
+
 # Check for existing incompatible helm releases up front
 helm2ReleaseCheck odfe-$LOG_NS
 helm2ReleaseCheck es-exporter-$LOG_NS
@@ -22,6 +25,24 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
 else
     helm delete --purge es-exporter-$LOG_NS
     helm delete --purge odfe-$LOG_NS
+fi
+
+if [ "$LOG_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
+  log_info "Deleting the [$LOG_NS] namespace..."
+  if kubectl delete namespace $LOG_NS; then
+    log_info "[$LOG_NS] namespace and logging components successfully removed"
+    exit 0
+  else
+    log_error "Unable to delete the [$LOG_NS] namespace"
+    exit 1
+  fi
+fi
+
+log_info "Removing components from the [$LOG_NS] namespace..."
+
+if [ "$LOG_DELETE_PVCS_ON_REMOVE" == "true" ]; then
+  log_info "Removing known logging PVCs..."
+  kubectl delete pvc --ignore-not-found -n $LOG_NS -l app=v4m-es
 fi
 
 log_info "Waiting 60 sec for resources to terminate..."

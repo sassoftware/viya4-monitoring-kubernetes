@@ -6,6 +6,9 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 
+MON_DELETE_PVCS_ON_REMOVE=${MON_DELETE_PVCS_ON_REMOVE:-false}
+MON_DELETE_NAMESPACE_ON_REMOVE=${MON_DELETE_NAMESPACE_ON_REMOVE:-false}
+
 # Check for existing incompatible helm releases up front
 helm2ReleaseCheck prometheus-$MON_NS
 helm3ReleaseCheck prometheus-operator $MON_NS
@@ -25,6 +28,19 @@ else
   fi
 fi
 
+if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
+  log_info "Deleting the [$MON_NS] namespace..."
+  if kubectl delete namespace $MON_NS; then
+    log_info "[$MON_NS] namespace and monitoring components successfully removed"
+    exit 0
+  else
+    log_error "Unable to delete the [$MON_NS] namespace"
+    exit 1
+  fi
+fi
+
+log_info "Removing components from the [$MON_NS] namespace..."
+
 log_info "Removing dashboards..."
 monitoring/bin/remove_dashboards.sh
 
@@ -36,6 +52,13 @@ log_info "Removing configmaps and secrets..."
 kubectl delete cm --ignore-not-found -n $MON_NS -l sas.com/monitoring-base=kube-viya-monitoring
 kubectl delete secret --ignore-not-found -n $MON_NS -l sas.com/monitoring-base=kube-viya-monitoring
 
+if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
+  log_info "Removing known monitoring PVCs..."
+  kubectl delete pvc --ignore-not-found -n $MON_NS -l app=alertmanager
+  kubectl delete pvc --ignore-not-found -n $MON_NS -l app.kubernetes.io/name=grafana
+  kubectl delete pvc --ignore-not-found -n $MON_NS -l app=prometheus
+fi
+
 # Wait for resources to terminate
 log_info "Waiting 60 sec for resources to terminate..."
 sleep 60
@@ -45,7 +68,7 @@ crds=( all pvc cm servicemonitor podmonitor prometheus alertmanager prometheusru
 empty="true"
 for crd in "${crds[@]}"
 do
-	out=$(kubectl get -n $MON_NS $crd 2>&1)
+  out=$(kubectl get -n $MON_NS $crd 2>&1)
   if [[ "$out" =~ 'No resources found' ]]; then
     :
   else

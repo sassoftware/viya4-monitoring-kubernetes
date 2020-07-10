@@ -10,11 +10,11 @@ if [ "$SAS_MONITORING_COMMON_SOURCED" = "" ]; then
     if [ -f "$USER_DIR/monitoring/user.env" ]; then
         userEnv=$(grep -v '^[[:blank:]]*$' $USER_DIR/monitoring/user.env | grep -v '^#' | xargs)
         log_info "Loading user environment file: $USER_DIR/monitoring/user.env"
-        if [ "$userEnv" != "" ]; then
+        if [ "$userEnv" ]; then
           export $userEnv
         fi
     fi
-    
+
     export MON_NS="${MON_NS:-monitoring}"
     export SAS_MONITORING_COMMON_SOURCED=true
     export TLS_ENABLE="${MON_TLS_ENABLE:-false}"

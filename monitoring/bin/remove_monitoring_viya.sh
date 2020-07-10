@@ -6,6 +6,8 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 
+MON_DELETE_PVCS_ON_REMOVE=${MON_DELETE_PVCS_ON_REMOVE:-false}
+
 if [ "$VIYA_NS" == "" ]; then
   log_error "VIYA_NS must be set to the Viya deployment namespace"
   exit 1
@@ -31,5 +33,10 @@ done
 
 # Catch-all
 kubectl delete all --ignore-not-found -n $VIYA_NS -l 'sas.com/monitoring-base=kube-viya-monitoring'
+
+if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
+  log_info "Removing known monitoring PVCs..."
+  kubectl delete pvc -n $MON_NS -l app=prometheus-pushgateway
+fi
 
 log_info "Removed monitoring components from the [$VIYA_NS] namespace"
