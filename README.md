@@ -1,12 +1,10 @@
-# Overview
+# SAS® Viya® Monitoring for Kubernetes
 
-This repository provides simple scripts and customization options to deploy
-monitoring, alerts, and log aggregation for Viya 4.x running on Kubernetes.
+SAS® Viya® Monitoring for Kubernetes provides simple scripts and customization
+options to deploy monitoring, alerts, and log aggregation for Viya 4.x.
 
 Monitoring and logging may be deployed independently or together. There are
 no hard dependencies between the two.
-
-The following components are included:
 
 ## Monitoring Components
 
@@ -29,11 +27,7 @@ The following components are included:
   - Elasticsearch
   - Istio (multiple dashboards)
   - NGINX
-- Kubernetes cluster alert definitions
-- [Prometheus Pushgateway](https://github.com/helm/charts/tree/master/stable/prometheus-pushgateway)
-
-Most of the SAS components, as well as Kubernetes itself, provide built-in
-support for Prometheus.
+- Alert definitions
 
 ## Logging Components
 
@@ -48,8 +42,9 @@ support for Prometheus.
 
 ## Prerequisites
 
-- You must have cluster-admin access to the Kubernetes cluster. Options for
-namespace-only deployments are being investigated for future releases.
+- A Kubernetes cluster that meets the prerequisites for SAS Viya
+- Helm (3.x recommended)
+- kubectl with cluster-admin access
 
 ### Helm
 
@@ -74,6 +69,19 @@ You can safely ignore the `NOTES` sections that you see when a Helm chart
 deploys successfully.
 
 ## Installation
+
+### Monitoring
+
+See the [monitoring README](monitoring/README.md) to deploy the monitoring
+components, including Prometheus Operator, Prometheus, Alert Manager, Grafana,
+service monitors, and custom dashboards.
+
+### Logging
+
+See the [logging README](logging/README.md) to deploy the logging components,
+including Fluent Bit, ElasticSearch, and Kibana.
+
+## Miscellaneous
 
 ### USER_DIR
 
@@ -105,14 +113,3 @@ unless the value is specifically set in `user-*.yaml` file(s). The
 deployment scripts will issue a warning if no default StorageClass is
 available even if the value is properly set by the user. In this case,
 the warning can be safely ignored.
-
-### Monitoring
-
-See the [monitoring README](monitoring/README.md) to deploy the monitoring
-components, including Prometheus Operator, Prometheus, Alert Manager, Grafana,
-service monitors, and custom dashboards.
-
-### Logging
-
-See the [logging README](logging/README.md) to deploy the logging components,
-including Fluent Bit, ElasticSearch, and Kibana.

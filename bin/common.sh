@@ -5,22 +5,22 @@
 # Current directory must be the root directory of the repo
 
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
+    # Includes
+    source bin/colors-include.sh
+    source bin/log-include.sh
+    source bin/helm-include.sh
+    source bin/kube-include.sh
+
     export USER_DIR=${USER_DIR:-$(pwd)}
     if [ -f "$USER_DIR/user.env" ]; then
         userEnv=$(grep -v '^[[:blank:]]*$' $USER_DIR/user.env | grep -v '^#' | xargs)
         if [ "$userEnv" != "" ]; then
-          echo "Loading global user environment file: $USER_DIR/user.env"
+          log_debug "Loading global user environment file: $USER_DIR/user.env"
           if [ "$userEnv" != "" ]; then
             export $userEnv
           fi
         fi
     fi
-
-    source bin/.colors
-    source bin/.logging
-
-    source bin/helm_ver.sh
-    source bin/kube_ver.sh
 
     log_debug "Working directory: $(pwd)"
     log_debug "User directory: $USER_DIR"

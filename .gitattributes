@@ -1,7 +1,6 @@
 # Linux
 *.sh text eol=lf
-.colors text eol=lf
-.logging text eol=lf
+
 # Windows
 *.bat text eol=crlf
 *.ps1 text eol=crlf
