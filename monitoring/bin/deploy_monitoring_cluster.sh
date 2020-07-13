@@ -6,6 +6,9 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 
+source bin/tls-include.sh
+verify_cert_manager
+
 helm2ReleaseCheck prometheus-$MON_NS
 helm3ReleaseCheck prometheus-operator $MON_NS
 checkDefaultStorageClass
@@ -39,7 +42,7 @@ genValuesFile=$TMP_DIR/values-prom-operator-tmp.yaml
 rm -f $genValuesFile
 touch $genValuesFile
 
-# Istio
+# Istio - Federate data from Istio's Prometheus instance
 if [ "$ISTIO_ENABLED" == "true" ]; then
   cat monitoring/values-prom-operator-istio.yaml >> $genValuesFile
 else
@@ -47,8 +50,8 @@ else
   log_debug "Skipping deployment of federated scrape of Istio Prometheus instance"
 fi
 
+# Elasticsearch Datasource for Grafana
 ELASTICSEARCH_DATASOURCE="${ELASTICSEARCH_DATASOURCE:-true}"
-
 if [ "$ELASTICSEARCH_DATASOURCE" == "true" ]; then
   log_info "Provisioning Elasticsearch datasource for Grafana..."
   kubectl delete secret -n $MON_NS --ignore-not-found grafana-datasource-es
@@ -67,57 +70,9 @@ if [ "$(kubectl get crd prometheuses.monitoring.coreos.com -o name 2>/dev/null)"
 fi
 
 # Optional TLS Support
-if [ "$MON_TLS_ENABLE" == "true" ]; then
-  # Create issuers if needed
-  # Issuers and certs honor USER_DIR for overrides/customizations
-  
-  if [ -z "$(kubectl get issuer -n $MON_NS selfsigning-issuer -o name 2>/dev/null)" ]; then
-    log_info "Creating selfsigning-issuer for the [$MON_NS] namespace..."
-    selfsignIssuer=monitoring/tls/selfsigning-issuer.yaml
-    if [ -f "$USER_DIR/monitoring/tls/selfsigning-issuer.yaml" ]; then
-      selfsignIssuer="$USER_DIR/monitoring/tls/selfsigning-issuer.yaml"
-    fi
-    log_debug "Self-sign issuer yaml is [$selfsignIssuer]"
-    kubectl apply -n $MON_NS -f "$selfsignIssuer"
-    sleep 5
-  fi
-  if [ -z "$(kubectl get secret -n $MON_NS ca-certificate -o name 2>/dev/null)" ]; then
-    log_info "Creating self-signed CA certificate for the [$MON_NS] namespace..."
-    caCert=monitoring/tls/ca-certificate.yaml
-    if [ -f "$USER_DIR/monitoring/tls/ca-certificate.yaml" ]; then
-      caCert="$USER_DIR/monitoring/tls/ca-certificate.yaml"
-    fi
-    log_debug "CA cert yaml file is [$caCert]"
-    kubectl apply -n $MON_NS -f "$caCert"
-    sleep 5
-  fi
-  if [ -z "$(kubectl get issuer -n $MON_NS namespace-issuer -o name 2>/dev/null)" ]; then
-    log_info "Creating namespace-issuer for the [$MON_NS] namespace..."
-    namespaceIssuer=monitoring/tls/namespace-issuer.yaml
-    if [ -f "$USER_DIR/monitoring/tls/namespace-issuer.yaml" ]; then
-      namespaceIssuer="$USER_DIR/monitoring/tls/namespace-issuer.yaml"
-    fi
-    log_debug "Namespace issuer yaml is [$namespaceIssuer]"
-    kubectl apply -n $MON_NS -f "$namespaceIssuer"
-    sleep 5
-  fi
-
+if [ "$TLS_ENABLE" == "true" ]; then
   apps=( prometheus alertmanager grafana )
-  for app in "${apps[@]}"; do
-    # Only create the secrets if they do not exist
-    TLS_SECRET_NAME=$app-tls-secret
-    if [ -z "$(kubectl get secret -n $MON_NS $TLS_SECRET_NAME -o name 2>/dev/null)" ]; then
-      # Create the certificate using cert-manager
-      certyaml=monitoring/tls/$app-tls-cert.yaml
-      if [ -f "$USER_DIR/monitoring/tls/$app-tls-cert.yaml" ]; then
-        certyaml="$USER_DIR/monitoring/tls/$app-tls-cert.yaml"
-      fi
-      log_debug "Creating cert-manager certificate custom resource for [$app] using [$certyaml]"
-      kubectl apply -n $MON_NS -f "$certyaml"
-    else
-      log_debug "Using existing $TLS_SECRET_NAME for [$app]"
-    fi
-  done
+  create_tls_certs $MON_NS monitoring ${apps[@]}
 
   log_debug "Appending monitoring/tls/values-prom-operator-tls.yaml to $genValuesFile"
   cat monitoring/tls/values-prom-operator-tls.yaml >> $genValuesFile

@@ -17,7 +17,7 @@ if [ "$SAS_MONITORING_COMMON_SOURCED" = "" ]; then
 
     export MON_NS="${MON_NS:-monitoring}"
     export SAS_MONITORING_COMMON_SOURCED=true
-    export TLS_ENABLE="${MON_TLS_ENABLE:-false}"
+    export TLS_ENABLE="${MON_TLS_ENABLE:-${TLS_ENABLE:-false}}"
     export TLS_CERT_MANAGER_ENABLE="${TLS_CERT_MANAGER_ENABLE:-$TLS_ENABLE}"
 fi
 echo ""

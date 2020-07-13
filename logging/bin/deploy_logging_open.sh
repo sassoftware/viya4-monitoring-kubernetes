@@ -5,6 +5,9 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
+export LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-${TLS_ENABLE:-false}}
+source bin/tls-include.sh
+verify_cert_manager
 
 checkDefaultStorageClass
 
@@ -46,8 +49,7 @@ set -e
 log_notice "Deploying logging components to the [$LOG_NS] namespace"
 
 # Optional TLS Support
-if [ "$LOG_TLS_ENABLE" == "true" ]; then
-
+if [ "$TLS_ENABLE" == "true" ]; then
   # TLS-specific Helm chart values currently maintained in separate YAML file
   ES_OPEN_TLS_YAML=logging/es/odfe/es_helm_values_tls_open.yaml
 
@@ -65,56 +67,8 @@ if [ "$LOG_TLS_ENABLE" == "true" ]; then
      log_debug "TLS not enabled for Kibana. Skipping."
   fi
 
-  # Create issuers if needed
-  # Issuers and certs honor USER_DIR for overrides/customizations
-
-  if [ -z "$(kubectl get issuer -n $LOG_NS selfsigning-issuer -o name 2>/dev/null)" ]; then
-    log_info "Creating selfsigning-issuer for the [$LOG_NS] namespace..."
-    selfsignIssuer=logging/tls/selfsigning-issuer.yaml
-    if [ -f "$USER_DIR/logging/tls/selfsigning-issuer.yaml" ]; then
-      selfsignIssuer="$USER_DIR/logging/tls/selfsigning-issuer.yaml"
-    fi
-    log_debug "Self-sign issuer yaml is [$selfsignIssuer]"
-    kubectl apply -n $LOG_NS -f "$selfsignIssuer"
-    sleep 5
-  fi
-  if [ -z "$(kubectl get secret -n $LOG_NS ca-certificate -o name 2>/dev/null)" ]; then
-    log_info "Creating self-signed CA certificate for the [$LOG_NS] namespace..."
-    caCert=logging/tls/ca-certificate.yaml
-    if [ -f "$USER_DIR/logging/tls/ca-certificate.yaml" ]; then
-      caCert="$USER_DIR/logging/tls/ca-certificate.yaml"
-    fi
-    log_debug "CA cert yaml file is [$caCert]"
-    kubectl apply -n $LOG_NS -f "$caCert"
-    sleep 5
-  fi
-  if [ -z "$(kubectl get issuer -n $LOG_NS namespace-issuer -o name 2>/dev/null)" ]; then
-    log_info "Creating namespace-issuer for the [$LOG_NS] namespace..."
-    namespaceIssuer=logging/tls/namespace-issuer.yaml
-    if [ -f "$USER_DIR/logging/tls/namespace-issuer.yaml" ]; then
-      namespaceIssuer="$USER_DIR/logging/tls/namespace-issuer.yaml"
-    fi
-    log_debug "Namespace issuer yaml is [$namespaceIssuer]"
-    kubectl apply -n $LOG_NS -f "$namespaceIssuer"
-    sleep 5
-  fi
-
   apps=( es-transport es-rest es-admin kibana )
-  for app in "${apps[@]}"; do
-    # Only create the secrets if they do not exist
-    TLS_SECRET_NAME=$app-tls-secret
-    if [ -z "$(kubectl get secret -n $LOG_NS $TLS_SECRET_NAME -o name 2>/dev/null)" ]; then
-      # Create the certificate using cert-manager
-      certyaml=logging/tls/$app-tls-cert.yaml
-      if [ -f "$USER_DIR/logging/tls/$app-tls-cert.yaml" ]; then
-        certyaml="$USER_DIR/logging/tls/$app-tls-cert.yaml"
-      fi
-      log_debug "Creating cert-manager certificate custom resource for [$app] using [$certyaml]"
-      kubectl apply -n $LOG_NS -f "$certyaml"
-    else
-      log_debug "Using existing $TLS_SECRET_NAME for [$app]"
-    fi
-  done
+  create_tls_certs $LOG_NS logging ${apps[@]}
 else
   # point to empty yaml files
   ES_OPEN_TLS_YAML=$TMP_DIR/empty.yaml
