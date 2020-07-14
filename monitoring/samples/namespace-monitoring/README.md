@@ -1,37 +1,93 @@
 # Namespace Monitoring
 
-This directory contains a set of user response files that enabled the
-separation of cluster monitoring from SAS Viya namespace monitoring.
+This is a sample demonstrating a customized monitoring
+deployment to separate cluster monitoring from SAS Viya (namespace)
+monitoring.
 
-Cluster monitoring components (Prometheus, Alert Manager, Grafana,
-and several exporters and associated ServiceMonitors) will be deployed
-to the `monitoring` namespace. If the customer already has a cluster
-monitoring solution (e.g. OpenShift), this step can be skipped.
+The basic steps are:
 
-Separate instances of Prometheus, Alert Manager, and Grafana will be
-deployed to each SAS Viya namespace along with the needed dashboards
-and ServiceMonitors.
+* Create the monitoring namespace and label others for
+cluster vs. Viya monitoring
+* Deploy cluster monitoring and restrict to only cluster dashboards
+* Deploy standard Viya monitoring to each Viya namespace
+* Create Prometheus custom resources (CRs) that are configured to
+only monitor their respective Viya namespaces
+* Deploy Grafana to each Viya namespace for visualization
+* All resources above are configured for host-based ingress
+* In this example, all three Prometheus instances share the same
+alertmanager, mainly just to show how to centralize alerts. It
+is still very possible to deploy a separate AlertManager to go
+with each Prometheus by using AlertManager CRs.
+
+This sample assumes two SAS Viya namespaces, but it should be
+fairly straightforward to customize the files to deploy to any
+number of namespaces.
 
 ## Deployment
 
 ```bash
+# cd to the base of this repository
+
+# Set USER_DIR to a working directory outside of this repo
+# (change path as desired)
+export USER_DIR=~/my-workspace/newdir
+# First SAS Viya namespace
+export VIYA_ONE_NS=viya-one
+# Second Viya namespace
+export VIYA_TWO_NS=viya-two
+# Copy the sample
+cp -R monitoring/samples/namespace-monitoring/* $USER_DIR/
+
+# Edit the copied files:
+#   - Replace the hostnames (`*.host.cluster.example.com`)
+#   - Replace the namespaces (`viya-one` and `viya-two`)
+#   - Further customize user.env/*.yaml files as needed
+
+# Create and label namespaces
+kubectl create ns monitoring
+kubectl label ns kube-system sas.com/cluster-monitoring=true
+kubectl label ns ingress-nginx sas.com/cluster-monitoring=true
+kubectl label ns monitoring sas.com/cluster-monitoring=true
+kubectl label ns cert-manager sas.com/cluster-monitoring=true
+kubectl label ns logging sas.com/cluster-monitoring=true
+
+kubectl label ns $VIYA_ONE_NS sas.com/viya-namespace=$VIYA_ONE_NS
+kubectl label ns $VIYA_TWO_NS sas.com/viya-namespace=$VIYA_TWO_NS
+
 # Deploy cluster monitoring (including the Prometheus Operator)
-# with a custom user file and no Viya dashboards
-VIYA_DASH=false PROM_OPER_USER_YAML=monitoring/samples/namespace-monitoring/cluster-only-values-prom-operator.yaml monitoring/bin/deploy_monitoring_cluster.sh
+# with a custom user dir and no Viya dashboards
+
+VIYA_DASH=false monitoring/bin/deploy_monitoring_cluster.sh
 
 # Deploy standard Viya monitoring components each Viya namespace
-VIYA_NS=anakin monitoring/bin/deploy_monitoring_viya.sh
-VIYA_NS=babyyoda monitoring/bin/deploy_monitoring_viya.sh
+VIYA_NS=$VIYA_ONE_NS monitoring/bin/deploy_monitoring_viya.sh
+VIYA_NS=$VIYA_ONE_NS monitoring/bin/deploy_monitoring_viya.sh
 
 # Deploy Prometheus to each Viya namespace
-kubectl apply -n anakin -f monitoring/samples/namespace-monitoring/prometheus-viya-anakin.yaml
-kubectl apply -n babyyoda -f monitoring/samples/namespace-monitoring/prometheus-viya-babyyoda.yaml
+kubectl apply -n viya-one -f $USER_DIR/monitoring/prometheus-viya-one.yaml
+kubectl apply -n viya-two -f $USER_DIR/monitoring/prometheus-viya-two.yaml
 
 # Deploy Grafana to each Viya namespace
-helm upgrade --install --namespace anakin grafana-anakin -f monitoring/samples/namespace-monitoring/grafana-viya-anakin.yaml stable/grafana
-helm upgrade --install --namespace babyyoda grafana-babyyoda -f monitoring/samples/namespace-monitoring/grafana-viya-babyyoda.yaml stable/grafana
+helm upgrade --install --namespace viya-one grafana-viya-one \
+  -f $USER_DIR/monitoring/grafana-common-values.yaml \
+  -f $USER_DIR/monitoring/grafana-viya-one-values.yaml stable/grafana
+helm upgrade --install --namespace viya-two grafana-viya-two \
+  -f $USER_DIR/monitoring/grafana-common-values.yaml \
+  -f $USER_DIR/monitoring/grafana-viya-two-values.yaml stable/grafana
 
 # Deploy SAS Viya dashboards to each Viya namespace
-DASH_NS=anakin KUBE_DASH=false LOGGING_DASH=false monitoring/bin/deploy_dashboards.sh
-DASH_NS=babyyoda KUBE_DASH=false LOGGING_DASH=false monitoring/bin/deploy_dashboards.sh
+DASH_NS=$VIYA_ONE_NS KUBE_DASH=false LOGGING_DASH=false monitoring/bin/deploy_dashboards.sh
+DASH_NS=$VIYA_TWO_NS KUBE_DASH=false LOGGING_DASH=false monitoring/bin/deploy_dashboards.sh
 ```
+
+## URLs
+
+* [Cluster Grafana](http://grafana.host.cluster.example.com)
+* [Armstrong Grafana](http://grafana.viya-one.host.cluster.example.com)
+* [Aldrin Grafana](http://grafana.viya-two.host.cluster.example.com/)
+
+## References
+
+* [Prometheus Operator Helm Chart](https://github.com/helm/charts/tree/master/stable/prometheus-operator)
+* [Prometheus Operator Custom Resource Definitions](https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md)
+* [Grafana Helm Chart](https://github.com/helm/charts/tree/master/stable/grafana)

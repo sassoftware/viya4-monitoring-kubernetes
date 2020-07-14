@@ -1,8 +1,13 @@
+image:
+  tag: "7.0.4"
+plugins:
+- grafana-piechart-panel
+- grafana-clock-panel
+- camptocamp-prometheus-alertmanager-datasource
+- flant-statusmap-panel
+- btplc-status-dot-panel
 service:
-#  type: ClusterIP
-adminPassword: admin
-# rbac:
-#   namespaced: true
+  type: ClusterIP
 sidecar:
   dashboards:
     enabled: true
@@ -32,13 +37,9 @@ datasources:
       access: proxy
       isDefault: true
 "grafana.ini":
-  server:
-    protocol: http
-    domain: grafana.viya-a.host.mycluster.example.com
-    root_url: http://grafana.viya-a.host.mycluster.example.com/
-    serve_from_sub_path: false
-ingress:
-  enabled: true
-  path: /
-  hosts:
-  - grafana.viya-a.host.mycluster.example.com
+  analytics:
+    check_for_updates: false
+  log:
+    mode: console
+  "log.console":
+      format: json

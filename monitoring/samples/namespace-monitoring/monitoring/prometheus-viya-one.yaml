@@ -60,7 +60,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-viya
-  namespace: viya-b
+  namespace: viya-one
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
@@ -69,9 +69,16 @@ metadata:
     app: prometheus
   name: prometheus-viya
 spec:
-  image: quay.io/prometheus/prometheus:v2.18.1
+  image: quay.io/prometheus/prometheus:v2.19.1
+  alerting:
+    alertmanagers:
+    - apiVersion: v2
+      name: prometheus-operator-alertmanager
+      namespace: monitoring
+      pathPrefix: /
+      port: web
   enableAdminAPI: false
-  externalUrl: http://prometheus.viya-b.host.mycluster.example.com
+  externalUrl: http://prometheus.viya-one.host.cluster.example.com
   listenLocal: false
   logFormat: json
   logLevel: info
@@ -89,21 +96,21 @@ spec:
 
   serviceMonitorNamespaceSelector:
     matchLabels:
-     sas.com/viya-namespace: viya-b
+     sas.com/viya-namespace: viya-one
   serviceMonitorSelector: {}
   
   # Leave commented to find all podmonitors in the target namespace
   podMonitorNamespaceSelector:
     matchLabels:
-      sas.com/viya-namespace: viya-b
+      sas.com/viya-namespace: viya-one
   podMonitorSelector: {}
   
   ruleNamespaceSelector:
     matchLabels:
-      sas.com/viya-namespace: viya-b
+      sas.com/viya-namespace: viya-one
   ruleSelector: {}
 
-  version: v2.18.1
+  version: v2.19.1
 ---
 apiVersion: v1
 kind: Service
@@ -145,7 +152,7 @@ metadata:
   name: prometheus
 spec:
   rules:
-  - host: prometheus.viya-b.host.mycluster.example.com
+  - host: prometheus.viya-one.host.cluster.example.com
     http:
       paths:
       - backend:

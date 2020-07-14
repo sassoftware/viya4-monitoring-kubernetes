@@ -22,9 +22,9 @@ prometheus:
   ingress:
     enabled: true
     hosts:
-    - prometheus.host.mycluster.example.com
+    - prometheus.host.cluster.example.com
   prometheusSpec:
-    externalUrl: http://prometheus.host.mycluster.example.com
+    externalUrl: http://prometheus.host.cluster.example.com
     # Only monitor cluster resources and do not pick up
     # servicemonitors from other namespaces
     serviceMonitorNamespaceSelector:
@@ -41,6 +41,8 @@ prometheus:
     ruleSelectorNilUsesHelmValues: false
 
 alertmanager:
+  alertmanagerSpec:
+    externalUrl: http://alertmanager.host.cluster.example.com
   # Disable default configuration of NodePort
   service:
     type: ClusterIP
@@ -49,7 +51,7 @@ alertmanager:
   ingress:
     enabled: true
     hosts:
-    - alertmanager.host.mycluster.example.com
+    - alertmanager.host.cluster.example.com
 
 grafana:
   # Disable default configuration of NodePort
@@ -60,4 +62,4 @@ grafana:
   ingress:
     enabled: true
     hosts:
-    - grafana.host.mycluster.example.com
+    - grafana.host.cluster.example.com
