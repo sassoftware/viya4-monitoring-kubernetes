@@ -313,7 +313,7 @@ log_info "Step 2: Configuring Kibana"
 
 #### TEMP?  Remove when defining nodePort via HELM chart?
 SVC=v4m-es-kibana-svc
-SVC_TYPE=$(kubectl get svc -n logging $SVC -o jsonpath='{.spec.type}')
+SVC_TYPE=$(kubectl get svc -n $LOG_NS $SVC -o jsonpath='{.spec.type}')
 if [ "$SVC_TYPE" == "NodePort" ]; then
   KIBANA_PORT=31033
   kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
@@ -388,16 +388,8 @@ else
   exit 18
 fi
 
-
-
 # Import Kibana Searches, Visualizations and Dashboard Objects using curl
-
-# FEATURE FLAG!: If Kibana multi-tenancy is enabled; we need to include tenant in Kibana curl
-if [ "$NO_KIBANA_TENANT" == "true" ]; then
-  response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.4.2_200405.ndjson  --user admin:admin --insecure )
-else
-  response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   -H "securitytenant: global"  --form file=@logging/kibana/kibana_saved_objects_7.4.2_200405.ndjson  --user admin:admin --insecure )
-fi
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.4.2_200405.ndjson  --user admin:admin --insecure )
 
 # TO DO/CHECK: this should return a SUCCESS message like this: {"success":true,"successCount":20}
 if [[ $response != 2* ]]; then
