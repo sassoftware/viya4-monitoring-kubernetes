@@ -1,15 +1,14 @@
 # SAS® Viya® Monitoring for Kubernetes
 
 SAS® Viya® Monitoring for Kubernetes provides simple scripts and customization
-options to deploy monitoring, alerts, and log aggregation for Viya 4.x.
+options to deploy monitoring, alerts, and log aggregation for SAS Viya 4.x.
 
 Monitoring and logging may be deployed independently or together. There are
 no hard dependencies between the two.
 
 ## Monitoring - Metrics and Alerts
 
-![Grafana - Cluster Monintoring](img/screenshot-grafana-cluster.png)
-![Grafana - SAS CAS Monintoring](img/screenshot-grafana-cas.png)
+The monitoring solution includes these components:
 
 - [Prometheus Operator](https://github.com/coreos/prometheus-operator)
   - [Prometheus](https://prometheus.io/docs/introduction/overview/)
@@ -33,9 +32,15 @@ no hard dependencies between the two.
   - Istio
   - NGINX
 
+This is an example of a Grafana dashboard for cluster monitoring.
+![Grafana - Cluster Monitoring](img/screenshot-grafana-cluster.png)
+
+This is an example of a Grafana dashboard for SAS CAS monitoring.
+![Grafana - SAS CAS Monitoring](img/screenshot-grafana-cas.png)
+
 ## Logging - Aggregation, Searching, & Filtering
 
-![Kibana - Log Message Volume Dashboard](img/screenshot-logs-dashboard.png)
+The logging solution includes these components:
 
 - [Fluent Bit](https://fluentbit.io/)
   - Custom Fluent Bit parsers
@@ -46,6 +51,10 @@ no hard dependencies between the two.
 - [Kibana](https://www.elastic.co/products/kibana)
   - Custom Kibana dashboards
 
+  This is an example of a Kibana dashboard displaying log message volumes.
+
+  ![Kibana - Log Message Volume Dashboard](img/screenshot-logs-dashboard.png)
+
 ## Prerequisites
 
 - A Kubernetes cluster that meets the prerequisites for SAS Viya
@@ -54,7 +63,7 @@ no hard dependencies between the two.
 
 ### Helm
 
-[Helm](https://helm.sh) Helm 2.x and 3.x are both supported. The scripts
+[Helm](https://helm.sh) 2.x and 3.x are both supported. The scripts
 should auto-detect the Helm version on the `PATH`.
 
 **NOTE:** You cannot use Helm 3.x to upgrade a monitoring or logging
@@ -91,11 +100,10 @@ including Fluent Bit, ElasticSearch, and Kibana.
 
 ### Customization
 
-The components deployed are highly customizable. The recommended approach is
+The components that are deployed are highly customizable. The recommended approach for customization is
 to set a `USER_DIR` environment variable. `USER_DIR` points to a directory
-containing user-customized files which can exist outside of this repository -
-for example, to check in environment-specific customimzations into a separate
-Git repository.
+containing user-modified customization files which can exist outside of your repository.
+You can use customization files to check in environment-specific customimzations into a separate Git repository, for example.
 
 `USER_DIR` must refer to a directory. The directory can include any or all of
 the following files in the structure below. Additional content is allowed, but
@@ -117,7 +125,7 @@ will be ignored.
 ### Default StorageClass
 
 The default cluster StorageClass is used for both monitoring and logging
-unless the value is specifically set in `user-*.yaml` file(s). The
-deployment scripts will issue a warning if no default StorageClass is
-available even if the value is properly set by the user. In this case,
-the warning can be safely ignored.
+unless the value is specifically set in `user-*.yaml` files for monitoring or logging. The
+deployment scripts issue a warning if no default StorageClass is
+available, even if the value is properly set by the user. In this case,
+you can safely ignore the warning.

@@ -116,16 +116,16 @@ necessary persistent volumes (PVs) before you run the deployment scripts.
 
 To prevent Elasticsearch and your SAS Viya deployment from competing for
 the same disk space, you might want to direct the Elasticsearch PVCs
-to a different Kubernetes storageClass.  This will prevent contention
-and insulate each one from storage issues that are caused by the other. For
+to a different Kubernetes storageClass. This prevents contention
+and insulates each one from storage issues that are caused by the other. For
 example, if you use different storageClasses and your SAS Viya deployment
 runs out of disk space, Elasticsearch continues to operate.
 
 To specify an alternate storageClass to use, modify the appropriate
 `user-values-*.yaml` file used for Helm processing, as described above.
-The lines referencing the storageClass in the persistence stanza of the
-`user-values-*.yaml` file are commented out by default, which specified that
-the default storage class is used.  To direct the Elasticsearch PVCs to use an
+By default, the lines referencing the storageClass in the persistence stanza of the
+`user-values-*.yaml` file are commented out, which specifies that
+the default storage class is used. To direct the Elasticsearch PVCs to use an
 alternate storageClass, edit the file to uncomment the appropriate lines
 and confirm the storageClassName matches your preferred storageClass.
 The example used in the section ___"Modify user-values-*.yaml"___ above
@@ -175,7 +175,7 @@ appears in the console window:
 ```
 
 The message provides the URL address for the Kibana application. To validate
-that the deployment was successful and confirm all of the logging components
+that the deployment was successful and confirm that all of the logging components
 are working, access Kibana and review the log messages that are collected.
 
 __Note:__ The displayed URL for Kibana might not be correct if you defined

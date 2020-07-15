@@ -6,20 +6,19 @@ monitoring.
 
 The basic steps are:
 
-* Create the monitoring namespace and label others for
-cluster vs. Viya monitoring
-* Deploy cluster monitoring and restrict to only cluster dashboards
-* Deploy standard Viya monitoring to each Viya namespace
-* Create Prometheus custom resources (CRs) that are configured to
-only monitor their respective Viya namespaces
-* Deploy Grafana to each Viya namespace for visualization
-* All resources above are configured for host-based ingress
-* In this example, all three Prometheus instances share the same
-alertmanager, mainly just to show how to centralize alerts. It
-is still very possible to deploy a separate AlertManager to go
-with each Prometheus by using AlertManager CRs.
+* Create the monitoring namespace and label other namespaces for
+cluster or SAS Viya monitoring
+* Deploy cluster monitoring and restrict it to use only cluster dashboards
+* Deploy standard SAS Viya monitoring to each SAS Viya namespace
+* Create Prometheus custom resources (CRs) that are configured to monitor only their respective SAS Viya namespaces
+* Deploy Grafana to each SAS Viya namespace to provide visualization
 
-This sample assumes two SAS Viya namespaces, but it should be
+All resources in this sample are configured for host-based ingress.
+
+In this example, all three Prometheus instances share the same
+instance of AlertManager, mainly to demonstrate how to centralize alerts. You can use AlertManager CRs to deploy a separate AlertManager for each instance of Prometheus.
+
+This sample assumes that you are deploying two SAS Viya namespaces, but it should be
 fairly straightforward to customize the files to deploy to any
 number of namespaces.
 
@@ -33,7 +32,7 @@ number of namespaces.
 export USER_DIR=~/my-workspace/newdir
 # First SAS Viya namespace
 export VIYA_ONE_NS=viya-one
-# Second Viya namespace
+# Second SAS Viya namespace
 export VIYA_TWO_NS=viya-two
 # Copy the sample
 cp -R monitoring/samples/namespace-monitoring/* $USER_DIR/
@@ -55,19 +54,19 @@ kubectl label ns $VIYA_ONE_NS sas.com/viya-namespace=$VIYA_ONE_NS
 kubectl label ns $VIYA_TWO_NS sas.com/viya-namespace=$VIYA_TWO_NS
 
 # Deploy cluster monitoring (including the Prometheus Operator)
-# with a custom user dir and no Viya dashboards
+# with a custom user dir and no SAS Viya dashboards
 
 VIYA_DASH=false monitoring/bin/deploy_monitoring_cluster.sh
 
-# Deploy standard Viya monitoring components each Viya namespace
+# Deploy standard SAS Viya monitoring components each Viya namespace
 VIYA_NS=$VIYA_ONE_NS monitoring/bin/deploy_monitoring_viya.sh
 VIYA_NS=$VIYA_ONE_NS monitoring/bin/deploy_monitoring_viya.sh
 
-# Deploy Prometheus to each Viya namespace
+# Deploy Prometheus to each SAS Viya namespace
 kubectl apply -n viya-one -f $USER_DIR/monitoring/prometheus-viya-one.yaml
 kubectl apply -n viya-two -f $USER_DIR/monitoring/prometheus-viya-two.yaml
 
-# Deploy Grafana to each Viya namespace
+# Deploy Grafana to each SAS Viya namespace
 helm upgrade --install --namespace viya-one grafana-viya-one \
   -f $USER_DIR/monitoring/grafana-common-values.yaml \
   -f $USER_DIR/monitoring/grafana-viya-one-values.yaml stable/grafana
@@ -75,7 +74,7 @@ helm upgrade --install --namespace viya-two grafana-viya-two \
   -f $USER_DIR/monitoring/grafana-common-values.yaml \
   -f $USER_DIR/monitoring/grafana-viya-two-values.yaml stable/grafana
 
-# Deploy SAS Viya dashboards to each Viya namespace
+# Deploy SAS Viya dashboards to each SAS Viya namespace
 DASH_NS=$VIYA_ONE_NS KUBE_DASH=false LOGGING_DASH=false monitoring/bin/deploy_dashboards.sh
 DASH_NS=$VIYA_TWO_NS KUBE_DASH=false LOGGING_DASH=false monitoring/bin/deploy_dashboards.sh
 ```

@@ -35,11 +35,11 @@ These components are deployed:
 * Change to the directory you created.
 * Clone the repository
 * `cd` to the repository directory
-* If you have already cloned the repository, use the `git pull` command to
-ensure that you have the most recent updates.
 
 If you have already cloned the repository, use the `git pull` command to ensure
 that you have the most recent updates.
+
+If you use TLS to encrypt network traffic, you must perform manual steps prior to deployment. See the **TLS Support** section below for more information.
 
 ## Customize the Deployment
 
@@ -51,8 +51,7 @@ to be stored outside of the directory structure of this repository. The default
 should include `user*` files in the same relative structure as they exist in
 this repository.
 
-The following files are automatically used by the monitoring scripts if available
-in `USER_DIR`:
+The following files are automatically used by the monitoring scripts if they are present in `USER_DIR`:
 
 * `user.env`
 * `monitoring/user.env`
@@ -122,7 +121,7 @@ By default, the components are deployed into the namespace `monitoring`.
 
 ## Update Monitoring Components
 
-Updates in-place are supported. To update, pull/clone the desired version
+Updates in-place are supported. To update, pull and clone the desired version
 of this repository, then re-run the
 `deploy_monitoring_cluster.sh` and/or `deploy_monitoring_viya.sh`
 scripts to pick up the latest versions of the applications, dashboards, service
@@ -149,13 +148,13 @@ collected monitoring data.
 
 ## TLS Support
 
-The `TLS_ENABLE` or `MON_TLS_ENABLE` settings in user.env can be
-used to enable TLS support, which will encrypt network traffic
-between pods for the monitoring pods.
+You can use the `TLS_ENABLE` or `MON_TLS_ENABLE` settings in user.env 
+to enable TLS support, which encrypts network traffic
+between pods for use by the monitoring pods.
 
-There are manual steps required prior to deployment to enable TLS.
+You must perform manual steps prior to deployment in order to enable TLS.
 In addition, configuring HTTPS ingress involves a separate set of
-steps, similar to those needed for SAS Viya.
+steps, which are similar to those needed for SAS Viya.
 
 See the [TLS Sample](samples/tls) for more information.
 

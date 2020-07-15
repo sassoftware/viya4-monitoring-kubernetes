@@ -16,7 +16,7 @@ monitoring/bin/deploy_monitoring_cluster.sh
 VIYA_NS=my-viya-namespace-here monitoring/bin/deploy_monitoring_viya.sh
 ```
 
-The monitoring applications will be available as root paths under the ingress host:
+The monitoring applications are available as root paths under the ingress host:
 
 * http://host.cluster.example.com/grafana
 * http://host.cluster.example.com/prometheus
