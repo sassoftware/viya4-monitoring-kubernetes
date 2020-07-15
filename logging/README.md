@@ -16,11 +16,11 @@ namespace or a subset of namespaces.
 
 These components are deployed:
 
-* Fluent Bit - Log collection with limited transformation
-* Elasticsearch - Unstructured document storage and query engine
-* Kibana - User interface for query and visualization
-* Prometheus Exporter for Elasticsearch - Provides detailed Elasticsearch
-performance information for Prometheus
+* [Fluent Bit](https://fluentbit.io/) - Log collection with limited transformation
+* [Elasticsearch](https://www.elastic.co/) - Unstructured document storage and query engine
+* [Kibana](https://www.elastic.co/kibana) - User interface for query and visualization
+* [Prometheus Exporter for Elasticsearch](https://github.com/justwatchcom/elasticsearch_exporter) -
+Provides detailed Elasticsearch performance information for Prometheus
 
 ## Perform Pre-Deployment Tasks
 
@@ -34,6 +34,23 @@ performance information for Prometheus
 ensure that you have the most recent updates.
 
 ### Customize the Deployment
+
+### USER_DIR
+
+Setting the `USER_DIR` environment variable allows for any user customizations
+to be stored outside of the directory structure of this repository. The default
+`USER_DIR` is the root of this repository. A directory referenced by `USER_DIR`
+should include `user*` files in the same relative structure as they exist in
+this repository.
+
+The following files are automatically used by the monitoring scripts if available
+in `USER_DIR`:
+
+* `user.env`
+* `logging/user.env`
+* `logging/user-values-elasticsearch-open.yaml`
+* `logging/user-values-es-exporter.yaml`
+* `logging/user-values-fluent-bit-open.yaml`
 
 #### Use user.env
 

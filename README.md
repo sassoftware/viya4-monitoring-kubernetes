@@ -6,30 +6,36 @@ options to deploy monitoring, alerts, and log aggregation for Viya 4.x.
 Monitoring and logging may be deployed independently or together. There are
 no hard dependencies between the two.
 
-## Monitoring Components
+## Monitoring - Metrics and Alerts
+
+![Grafana - Cluster Monintoring](img/screenshot-grafana-cluster.png)
+![Grafana - SAS CAS Monintoring](img/screenshot-grafana-cas.png)
 
 - [Prometheus Operator](https://github.com/coreos/prometheus-operator)
   - [Prometheus](https://prometheus.io/docs/introduction/overview/)
   - [Alert Manager](https://prometheus.io/docs/alerting/alertmanager/)
   - [Grafana](https://grafana.com/)
+- Prometheus Exporters
   - [node-exporter](https://github.com/prometheus/node_exporter)
   - [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics)
   - [Prometheus Adapter for Kubernetes Metrics APIs](https://github.com/DirectXMan12/k8s-prometheus-adapter)
   - [Prometheus Pushgateway](https://github.com/prometheus/pushgateway)
+- Alert definitions
 - Grafana dashboards
-  - Kubernetes cluster monitoring (multiple dashboards)
+  - Kubernetes cluster monitoring
   - SAS CAS Overview
   - SAS Java Services
   - SAS Go Services
-  - RabbitMQ (multiple dashboards)
-  - Postgres (multiple dashboards)
+  - RabbitMQ
+  - Postgres
   - Fluent Bit
   - Elasticsearch
-  - Istio (multiple dashboards)
+  - Istio
   - NGINX
-- Alert definitions
 
-## Logging Components
+## Logging - Aggregation, Searching, & Filtering
+
+![Kibana - Log Message Volume Dashboard](img/screenshot-logs-dashboard.png)
 
 - [Fluent Bit](https://fluentbit.io/)
   - Custom Fluent Bit parsers
@@ -43,12 +49,12 @@ no hard dependencies between the two.
 ## Prerequisites
 
 - A Kubernetes cluster that meets the prerequisites for SAS Viya
-- Helm (3.x recommended)
-- kubectl with cluster-admin access
+- [Helm](https://helm.sh) (version 3.x recommended)
+- `kubectl` with cluster-admin access
 
 ### Helm
 
-[Helm](https://helm.sh/) Helm 2.x and 3.x are both supported. The scripts
+[Helm](https://helm.sh) Helm 2.x and 3.x are both supported. The scripts
 should auto-detect the Helm version on the `PATH`.
 
 **NOTE:** You cannot use Helm 3.x to upgrade a monitoring or logging
@@ -74,7 +80,7 @@ deploys successfully.
 
 See the [monitoring README](monitoring/README.md) to deploy the monitoring
 components, including Prometheus Operator, Prometheus, Alert Manager, Grafana,
-service monitors, and custom dashboards.
+metric exporters, service monitors, and custom dashboards.
 
 ### Logging
 
@@ -83,11 +89,13 @@ including Fluent Bit, ElasticSearch, and Kibana.
 
 ## Miscellaneous
 
-### USER_DIR
+### Customization
 
-The `USER_DIR` environment variable allows you to locate user-customized files
-outside of this repository - for example, to check in environment-specific
-customimzations into a separate Git repository.
+The components deployed are highly customizable. The recommended approach is
+to set a `USER_DIR` environment variable. `USER_DIR` points to a directory
+containing user-customized files which can exist outside of this repository -
+for example, to check in environment-specific customimzations into a separate
+Git repository.
 
 `USER_DIR` must refer to a directory. The directory can include any or all of
 the following files in the structure below. Additional content is allowed, but

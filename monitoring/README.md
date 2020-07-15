@@ -122,7 +122,8 @@ By default, the components are deployed into the namespace `monitoring`.
 
 ## Update Monitoring Components
 
-Updates in-place are supported. To update, re-run the
+Updates in-place are supported. To update, pull/clone the desired version
+of this repository, then re-run the
 `deploy_monitoring_cluster.sh` and/or `deploy_monitoring_viya.sh`
 scripts to pick up the latest versions of the applications, dashboards, service
 monitors, and exporters.
@@ -132,21 +133,29 @@ monitors, and exporters.
 To remove the monitoring components, run the following commands:
 
 ```bash
-# Remove SAS Viya monitoring
+# Remove cluster monitoring
+monitoring/bin/remove_monitoring_cluster.sh
+
+# Optional: Remove SAS Viya monitoring
 # Run this section once per Viya namespace
 export VIYA_NS=<your_viya_namespace>
 monitoring/bin/remove_monitoring_viya.sh
-
-# Remove cluster monitoring
-monitoring/bin/remove_monitoring_cluster.sh
 ```
+
+Removing cluster monitoring does not remove persistent volume claims
+by default. A re-install after removal should retain existing data.
+Manually delete the PVCs or the namespace to delete previously
+collected monitoring data.
 
 ## TLS Support
 
-The `MON_TLS` setting in user.env can be used to enable TLS support.
+The `TLS_ENABLE` or `MON_TLS_ENABLE` settings in user.env can be
+used to enable TLS support, which will encrypt network traffic
+between pods for the monitoring pods.
 
-There are manual steps required prior to deployment. In addition,
-configuring ingress requires YAML changes.
+There are manual steps required prior to deployment to enable TLS.
+In addition, configuring HTTPS ingress involves a separate set of
+steps, similar to those needed for SAS Viya.
 
 See the [TLS Sample](samples/tls) for more information.
 
