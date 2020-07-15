@@ -103,7 +103,7 @@ including Fluent Bit, ElasticSearch, and Kibana.
 The components that are deployed are highly customizable. The recommended approach for customization is
 to set a `USER_DIR` environment variable. `USER_DIR` points to a directory
 containing user-modified customization files which can exist outside of your repository.
-You can use customization files to check in environment-specific customimzations into a separate Git repository, for example.
+You can use customization files to check in environment-specific customizations into a separate Git repository, for example.
 
 `USER_DIR` must refer to a directory. The directory can include any or all of
 the following files in the structure below. Additional content is allowed, but
