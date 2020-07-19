@@ -36,6 +36,10 @@ prometheus:
         secret:
           defaultMode: 420
           secretName: prometheus-tls-secret
+  serviceMonitor:
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
 
 # Commented out due to https://github.com/helm/charts/issues/22939
 # alertmanager:

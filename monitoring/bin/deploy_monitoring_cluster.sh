@@ -130,6 +130,12 @@ rm -f $genValuesFile
 
 sleep 2
 
+if [ "$TLS_ENABLE" == "true" ]; then
+  log_info "Patching Grafana ServiceMonitor for TLS..."
+  kubectl patch servicemonitor prometheus-operator-grafana --type=json \
+    -p='[{"op": "replace", "path": "/spec/endpoints/0/scheme", "value":"https"},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig", "value":{}},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig/insecureSkipVerify", "value":true}]'
+fi
+
 log_info "Deploying cluster ServiceMonitors..."
 
 # NGINX
