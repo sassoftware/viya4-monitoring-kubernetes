@@ -134,7 +134,7 @@ prometheus-node-exporter:
 # https://grafana.com/
 grafana:
   image:
-    tag: "7.1.0-beta2"
+    tag: "7.1.0"
   "grafana.ini":
     analytics:
       check_for_updates: false
