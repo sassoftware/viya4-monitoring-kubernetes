@@ -16,8 +16,8 @@
   "editable": true,
   "gnetId": 5450,
   "graphTooltip": 0,
-  "id": 46,
-  "iteration": 1595422401171,
+  "id": 27,
+  "iteration": 1595434298467,
   "links": [],
   "panels": [
     {
@@ -33,8 +33,12 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "rgb(168, 168, 168)",
+                "color": "green",
                 "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 1
               }
             ]
           },
@@ -419,7 +423,7 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {
