@@ -12,171 +12,253 @@
       }
     ]
   },
+  "description": "Alerts from prometheus.",
   "editable": true,
-  "gnetId": null,
+  "gnetId": 5450,
   "graphTooltip": 0,
-  "id": 77,
+  "id": 46,
+  "iteration": 1595422401171,
   "links": [],
   "panels": [
     {
-      "columns": [],
+      "cacheTimeout": null,
       "datasource": null,
-      "fontSize": "100%",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "nullValueMode": "connected",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "rgb(168, 168, 168)",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
       "gridPos": {
-        "h": 7,
-        "w": 24,
+        "h": 8,
+        "w": 4,
         "x": 0,
         "y": 0
       },
-      "id": 2,
+      "id": 23,
+      "interval": null,
       "links": [],
-      "pageSize": null,
-      "scroll": true,
-      "showHeader": true,
-      "sort": {
-        "col": 0,
-        "desc": true
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "styles": [
-        {
-          "alias": "Time",
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "link": false,
-          "pattern": "Time",
-          "type": "date"
-        },
-        {
-          "alias": "",
-          "colorMode": "row",
-          "colors": [
-            "rgba(50, 172, 45, 0.97)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(245, 54, 54, 0.9)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 0,
-          "link": false,
-          "mappingType": 1,
-          "pattern": "severity_num",
-          "thresholds": [
-            "200",
-            "300"
-          ],
-          "type": "string",
-          "unit": "none"
-        },
-        {
-          "alias": "",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "mappingType": 1,
-          "pattern": "__name__",
-          "thresholds": [],
-          "type": "hidden",
-          "unit": "short"
-        },
-        {
-          "alias": "",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "mappingType": 1,
-          "pattern": "alertstate",
-          "thresholds": [],
-          "type": "hidden",
-          "unit": "short"
-        },
-        {
-          "alias": "",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "mappingType": 1,
-          "pattern": "Value",
-          "thresholds": [],
-          "type": "hidden",
-          "unit": "short"
-        },
-        {
-          "alias": "",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "mappingType": 1,
-          "pattern": "alert_value",
-          "thresholds": [],
-          "type": "number",
-          "unit": "none"
-        }
-      ],
+      "pluginVersion": "7.1.0",
       "targets": [
         {
-          "expr": "ALERTS{alertstate=\"firing\"}",
-          "format": "table",
-          "instant": true,
-          "interval": "",
-          "intervalFactor": 4,
+          "expr": "count(ALERTS{alertstate=~\"$alertstate\"}) OR vector(0)",
+          "format": "time_series",
+          "interval": "2m",
+          "intervalFactor": 1,
           "legendFormat": "",
           "refId": "A"
         }
       ],
       "timeFrom": null,
-      "title": "Active Alerts",
-      "transform": "table",
-      "transparent": false,
-      "type": "table"
+      "title": "Alerts",
+      "type": "stat"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "decimals": 0,
+      "description": "",
+      "editable": true,
+      "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 2,
+      "fillGradient": 0,
+      "grid": {},
+      "gridPos": {
+        "h": 8,
+        "w": 20,
+        "x": 4,
+        "y": 0
+      },
+      "height": "400px",
+      "hiddenSeries": false,
+      "id": 25,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "hideEmpty": true,
+        "hideZero": true,
+        "max": true,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "sort": "current",
+        "sortDesc": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pluginVersion": "7.1.0",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": true,
+      "steppedLine": true,
+      "targets": [
+        {
+          "calculatedInterval": "10s",
+          "datasourceErrors": {},
+          "errors": {},
+          "expr": "count(ALERTS{alertstate=~\"$alertstate\"}) by (alertname)",
+          "format": "time_series",
+          "interval": "2m",
+          "intervalFactor": 1,
+          "legendFormat": "{{alertname}}",
+          "metric": "probe_http_status_code",
+          "refId": "A",
+          "step": 60,
+          "target": ""
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": null,
+          "yaxis": "left"
+        }
+      ],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Alerts",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 2,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": 0,
+          "format": "short",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "none",
+          "logBase": 1,
+          "max": null,
+          "min": 0,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "columns": [],
       "datasource": null,
+      "description": "",
+      "editable": true,
+      "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fontSize": "100%",
       "gridPos": {
-        "h": 7,
+        "h": 16,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 8
       },
-      "id": 3,
+      "id": 24,
       "links": [],
       "pageSize": null,
       "scroll": true,
       "showHeader": true,
       "sort": {
-        "col": 0,
+        "col": 1,
         "desc": true
       },
       "styles": [
         {
-          "alias": "Time",
+          "alias": "Date",
+          "align": "auto",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "link": false,
+          "decimals": 2,
+          "link": true,
+          "linkTargetBlank": false,
+          "linkTooltip": "",
+          "linkUrl": "                      ",
           "pattern": "Time",
-          "type": "date"
+          "sanitize": true,
+          "thresholds": [],
+          "type": "hidden",
+          "unit": "short"
         },
         {
-          "alias": "",
-          "colorMode": "row",
+          "alias": "Count",
+          "align": "auto",
+          "colorMode": null,
           "colors": [
             "rgba(50, 172, 45, 0.97)",
             "rgba(237, 129, 40, 0.89)",
@@ -184,18 +266,16 @@
           ],
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
           "decimals": 0,
-          "link": false,
-          "mappingType": 1,
-          "pattern": "severity_num",
+          "pattern": "Value",
           "thresholds": [
-            "200",
-            "300"
+            ""
           ],
-          "type": "string",
-          "unit": "none"
+          "type": "number",
+          "unit": "short"
         },
         {
-          "alias": "",
+          "alias": "Severity",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -205,13 +285,32 @@
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
           "decimals": 2,
           "mappingType": 1,
-          "pattern": "__name__",
+          "pattern": "severity",
           "thresholds": [],
-          "type": "hidden",
+          "type": "string",
+          "unit": "short",
+          "valueMaps": []
+        },
+        {
+          "alias": "Name",
+          "align": "auto",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "alertname",
+          "thresholds": [],
+          "type": "string",
           "unit": "short"
         },
         {
-          "alias": "",
+          "alias": "State",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -223,76 +322,112 @@
           "mappingType": 1,
           "pattern": "alertstate",
           "thresholds": [],
-          "type": "hidden",
+          "type": "string",
           "unit": "short"
-        },
-        {
-          "alias": "",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "mappingType": 1,
-          "pattern": "Value",
-          "thresholds": [],
-          "type": "hidden",
-          "unit": "short"
-        },
-        {
-          "alias": "",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "mappingType": 1,
-          "pattern": "alert_value",
-          "thresholds": [],
-          "type": "number",
-          "unit": "none"
         }
       ],
       "targets": [
         {
-          "expr": "ALERTS{alertstate=\"firing\"}",
+          "expr": "count(ALERTS{alertstate=~\"$alertstate\"}) by (alertname,alertstate,severity)",
           "format": "table",
-          "instant": false,
+          "instant": true,
           "interval": "",
-          "intervalFactor": 4,
-          "legendFormat": "",
-          "refId": "A"
+          "intervalFactor": 2,
+          "legendFormat": "service: {{service}} instance: {{instance}}  alertname: {{alertname}}",
+          "refId": "A",
+          "step": 4
         }
       ],
-      "timeFrom": "1w",
-      "title": "Alert History (1 week)",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Current Alerts",
       "transform": "table",
-      "transparent": false,
-      "type": "table"
+      "type": "table-old"
     }
   ],
   "refresh": "1m",
-  "schemaVersion": 16,
+  "schemaVersion": 26,
   "style": "dark",
-  "tags": [
-    "kubernetes-cluster"
-  ],
+  "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "Prometheus",
+        "definition": "label_values(ALERTS,alertname)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "alertname",
+        "multi": true,
+        "name": "alertname",
+        "options": [],
+        "query": "label_values(ALERTS,alertname)",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": null,
+        "tags": [],
+        "tagsQuery": null,
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "tags": [],
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "hide": 0,
+        "includeAll": true,
+        "label": "alertstate",
+        "multi": true,
+        "name": "alertstate",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "$__all"
+          },
+          {
+            "selected": false,
+            "text": "firing",
+            "value": "firing"
+          },
+          {
+            "selected": false,
+            "text": "pending",
+            "value": "pending"
+          }
+        ],
+        "query": "firing, pending",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
   },
   "time": {
-    "from": "now-2d",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {
+    "collapse": false,
+    "enable": true,
+    "notice": false,
+    "now": true,
     "refresh_intervals": [
-      "5s",
       "10s",
       "30s",
       "1m",
@@ -303,6 +438,7 @@
       "2h",
       "1d"
     ],
+    "status": "Stable",
     "time_options": [
       "5m",
       "15m",
@@ -313,10 +449,11 @@
       "2d",
       "7d",
       "30d"
-    ]
+    ],
+    "type": "timepicker"
   },
-  "timezone": "",
-  "title": "Prometheus Alerts",
-  "uid": "QTsttxNmk",
-  "version": 1
+  "timezone": "browser",
+  "title": "Alerts",
+  "uid": "SOn6MeNmk",
+  "version": 2
 }
