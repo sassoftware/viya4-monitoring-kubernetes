@@ -58,7 +58,7 @@ function checkDefaultStorageClass {
         log_debug "Found default storageClass: [$defaultStorageClass]"
       else
         log_warn "This cluster does not have a default storageclass defined"
-        log warn "This may cause errors unless storageclass values are explicitly defined"
+        log_warn "This may cause errors unless storageclass values are explicitly defined"
         defaultStorageClass=_NONE_
       fi
     fi
