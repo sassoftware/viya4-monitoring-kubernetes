@@ -48,6 +48,11 @@ fi
 
 set -e
 
+if [ "$EVENTROUTER_ENABLE" == "true" ]; then
+  log_info "Deploying eventrouter..."
+  kubectl apply -f logging/eventrouter.yaml
+fi
+
 log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 
 # Optional TLS Support
