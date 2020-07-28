@@ -39,10 +39,6 @@ fullConfigMap: false
 existingConfigMap: fb-fluent-bit-config
 
 env:
-#   - name: ES_LOGCOLLECTOR_USER
-#     value: admin
-#   - name: ES_LOGCOLLECTOR_PASSWD
-#     value: admin
    - name: ES_LOGCOLLECTOR_USER
      valueFrom:
        secretKeyRef:
