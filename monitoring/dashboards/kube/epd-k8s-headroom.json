@@ -20,9 +20,11 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 32,
-  "iteration": 1589724482327,
-  "links": [],
+  "id": 45,
+  "iteration": 1593114955933,
+  "links": [
+    
+  ],
   "panels": [
     {
       "cacheTimeout": null,
@@ -38,9 +40,13 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {
+            
+          }
         },
-        "overrides": []
+        "overrides": [
+          
+        ]
       },
       "format": "none",
       "gauge": {
@@ -58,7 +64,9 @@
       },
       "id": 11,
       "interval": null,
-      "links": [],
+      "links": [
+        
+      ],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -133,11 +141,15 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {
+            
+          }
         },
-        "overrides": []
+        "overrides": [
+          
+        ]
       },
-      "format": "bytes",
+      "format": "decbytes",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -153,7 +165,9 @@
       },
       "id": 12,
       "interval": null,
-      "links": [],
+      "links": [
+        
+      ],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -202,7 +216,7 @@
       "thresholds": "",
       "timeFrom": null,
       "timeShift": null,
-      "title": "Total Allocatable Memory(GB)",
+      "title": "Total Allocatable Memory",
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -228,9 +242,13 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {
+            
+          }
         },
-        "overrides": []
+        "overrides": [
+          
+        ]
       },
       "format": "none",
       "gauge": {
@@ -248,7 +266,9 @@
       },
       "id": 14,
       "interval": null,
-      "links": [],
+      "links": [
+        
+      ],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -324,9 +344,13 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {
+            
+          }
         },
-        "overrides": []
+        "overrides": [
+          
+        ]
       },
       "format": "none",
       "gauge": {
@@ -344,7 +368,9 @@
       },
       "id": 7,
       "interval": null,
-      "links": [],
+      "links": [
+        
+      ],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -419,11 +445,15 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {
+            
+          }
         },
-        "overrides": []
+        "overrides": [
+          
+        ]
       },
-      "format": "bytes",
+      "format": "decbytes",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -439,7 +469,9 @@
       },
       "id": 8,
       "interval": null,
-      "links": [],
+      "links": [
+        
+      ],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -488,7 +520,7 @@
       "thresholds": "",
       "timeFrom": null,
       "timeShift": null,
-      "title": "Total Allocatable Memory(GB) Available",
+      "title": "Total Allocatable Memory Available",
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -514,9 +546,13 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {
+            
+          }
         },
-        "overrides": []
+        "overrides": [
+          
+        ]
       },
       "format": "none",
       "gauge": {
@@ -534,7 +570,9 @@
       },
       "id": 15,
       "interval": null,
-      "links": [],
+      "links": [
+        
+      ],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -609,9 +647,13 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {
+            
+          }
         },
-        "overrides": []
+        "overrides": [
+          
+        ]
       },
       "format": "percent",
       "gauge": {
@@ -629,7 +671,9 @@
       },
       "id": 9,
       "interval": null,
-      "links": [],
+      "links": [
+        
+      ],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -704,9 +748,13 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {
+            
+          }
         },
-        "overrides": []
+        "overrides": [
+          
+        ]
       },
       "format": "percent",
       "gauge": {
@@ -724,7 +772,9 @@
       },
       "id": 10,
       "interval": null,
-      "links": [],
+      "links": [
+        
+      ],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -799,9 +849,13 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {
+            
+          }
         },
-        "overrides": []
+        "overrides": [
+          
+        ]
       },
       "format": "percent",
       "gauge": {
@@ -819,7 +873,9 @@
       },
       "id": 16,
       "interval": null,
-      "links": [],
+      "links": [
+        
+      ],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -881,14 +937,20 @@
       "valueName": "avg"
     },
     {
-      "columns": [],
+      "columns": [
+        
+      ],
       "datasource": null,
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {
+            
+          }
         },
-        "overrides": []
+        "overrides": [
+          
+        ]
       },
       "fontSize": "100%",
       "gridPos": {
@@ -926,13 +988,15 @@
           "decimals": 2,
           "mappingType": 1,
           "pattern": "namespace",
-          "thresholds": [],
+          "thresholds": [
+            
+          ],
           "type": "string",
           "unit": "none"
         },
         {
           "alias": "CPU Requests",
-          "align": "auto",
+          "align": "right",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -943,13 +1007,15 @@
           "decimals": 3,
           "mappingType": 1,
           "pattern": "Value #C",
-          "thresholds": [],
+          "thresholds": [
+            
+          ],
           "type": "number",
           "unit": "none"
         },
         {
           "alias": "Mem Requests",
-          "align": "auto",
+          "align": "right",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -957,16 +1023,18 @@
             "rgba(50, 172, 45, 0.97)"
           ],
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 0,
+          "decimals": 3,
           "mappingType": 1,
           "pattern": "Value #D",
-          "thresholds": [],
+          "thresholds": [
+            
+          ],
           "type": "number",
-          "unit": "bytes"
+          "unit": "decbytes"
         },
         {
           "alias": "cpu allocatable",
-          "align": "auto",
+          "align": "right",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -977,13 +1045,15 @@
           "decimals": 3,
           "mappingType": 1,
           "pattern": "Value #E",
-          "thresholds": [],
+          "thresholds": [
+            
+          ],
           "type": "number",
           "unit": "none"
         },
         {
-          "alias": "mem(GB) allocatable",
-          "align": "auto",
+          "alias": "mem allocatable",
+          "align": "right",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -991,16 +1061,18 @@
             "rgba(50, 172, 45, 0.97)"
           ],
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": null,
+          "decimals": 3,
           "mappingType": 1,
           "pattern": "Value #F",
-          "thresholds": [],
+          "thresholds": [
+            
+          ],
           "type": "number",
-          "unit": "none"
+          "unit": "decbytes"
         },
         {
           "alias": "Pods",
-          "align": "auto",
+          "align": "right",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1011,7 +1083,9 @@
           "decimals": 0,
           "mappingType": 1,
           "pattern": "Value #A",
-          "thresholds": [],
+          "thresholds": [
+            
+          ],
           "type": "number",
           "unit": "short"
         },
@@ -1028,7 +1102,9 @@
           "decimals": 0,
           "mappingType": 1,
           "pattern": "Value #B",
-          "thresholds": [],
+          "thresholds": [
+            
+          ],
           "type": "number",
           "unit": "short"
         }
@@ -1055,13 +1131,13 @@
           "refId": "E"
         },
         {
-          "expr": "1/1000000000*sum(kube_pod_container_resource_requests_memory_bytes{cluster=\"$cluster\"}) by (namespace)",
+          "expr": "sum(kube_pod_container_resource_requests_memory_bytes{cluster=\"$cluster\"}) by (namespace)",
           "format": "table",
           "hide": false,
           "instant": true,
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "GB mem req",
+          "legendFormat": "mem req",
           "refId": "D"
         },
         {
@@ -1071,7 +1147,7 @@
           "instant": true,
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "GB mem total allocatable",
+          "legendFormat": "mem total allocatable",
           "refId": "F"
         },
         {
@@ -1102,14 +1178,20 @@
       "type": "table-old"
     },
     {
-      "columns": [],
+      "columns": [
+        
+      ],
       "datasource": null,
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {
+            
+          }
         },
-        "overrides": []
+        "overrides": [
+          
+        ]
       },
       "fontSize": "100%",
       "gridPos": {
@@ -1136,7 +1218,7 @@
         },
         {
           "alias": "Pods Count",
-          "align": "auto",
+          "align": "right",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1147,13 +1229,15 @@
           "decimals": null,
           "mappingType": 1,
           "pattern": "Value #A",
-          "thresholds": [],
+          "thresholds": [
+            
+          ],
           "type": "number",
           "unit": "short"
         },
         {
           "alias": "Pods Allocatable",
-          "align": "auto",
+          "align": "right",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1164,13 +1248,15 @@
           "decimals": null,
           "mappingType": 1,
           "pattern": "Value #B",
-          "thresholds": [],
+          "thresholds": [
+            
+          ],
           "type": "number",
           "unit": "short"
         },
         {
           "alias": "CPU Requests",
-          "align": "auto",
+          "align": "right",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1181,13 +1267,15 @@
           "decimals": 3,
           "mappingType": 1,
           "pattern": "Value #C",
-          "thresholds": [],
+          "thresholds": [
+            
+          ],
           "type": "number",
           "unit": "short"
         },
         {
           "alias": "CPU Allocatable",
-          "align": "auto",
+          "align": "right",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1198,13 +1286,15 @@
           "decimals": 3,
           "mappingType": 1,
           "pattern": "Value #D",
-          "thresholds": [],
+          "thresholds": [
+            
+          ],
           "type": "number",
           "unit": "short"
         },
         {
           "alias": "Mem Requests",
-          "align": "auto",
+          "align": "right",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1215,13 +1305,15 @@
           "decimals": 3,
           "mappingType": 1,
           "pattern": "Value #E",
-          "thresholds": [],
+          "thresholds": [
+            
+          ],
           "type": "number",
-          "unit": "bytes"
+          "unit": "decbytes"
         },
         {
           "alias": "Mem Allocatable",
-          "align": "auto",
+          "align": "right",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1232,9 +1324,11 @@
           "decimals": 3,
           "mappingType": 1,
           "pattern": "Value #F",
-          "thresholds": [],
+          "thresholds": [
+            
+          ],
           "type": "number",
-          "unit": "bytes"
+          "unit": "decbytes"
         }
       ],
       "targets": [
@@ -1321,7 +1415,9 @@
         "label": null,
         "multi": false,
         "name": "datasource",
-        "options": [],
+        "options": [
+          
+        ],
         "query": "prometheus",
         "refresh": 1,
         "regex": "",
@@ -1343,14 +1439,18 @@
         "label": "cluster",
         "multi": false,
         "name": "cluster",
-        "options": [],
+        "options": [
+          
+        ],
         "query": "label_values(kube_pod_info, cluster)",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
         "sort": 1,
         "tagValuesQuery": "",
-        "tags": [],
+        "tags": [
+          
+        ],
         "tagsQuery": "",
         "type": "query",
         "useTags": false
@@ -1388,5 +1488,5 @@
   "timezone": "",
   "title": "EPD / Kubernetes Headroom",
   "uid": "ab4f13a9892a76a4d21ce8c2445bf4ec",
-  "version": 1
+  "version": 3
 }
