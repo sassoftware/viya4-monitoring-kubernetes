@@ -5,6 +5,8 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
+source logging/bin/secrets-include.sh
+
 export LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-${TLS_ENABLE:-false}}
 source bin/tls-include.sh
 verify_cert_manager
@@ -46,7 +48,7 @@ fi
 
 set -e
 
-log_notice "Deploying logging components to the [$LOG_NS] namespace"
+log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 
 # Optional TLS Support
 if [ "$TLS_ENABLE" == "true" ]; then
@@ -76,6 +78,49 @@ else
   # w/TLS: use HTTPS in curl commands
   KB_CURL_PROTOCOL=http
   log_debug "TLS not enabled for logging components. Skipping."
+fi
+
+# FEATURE FLAG: configure Elasticsearch security configuration
+ES_SECURITY_CONFIG_ENABLE=${ES_SECURITY_CONFIG_ENABLE:-false}
+
+if [ "$ES_SECURITY_CONFIG_ENABLE" == "true" ]; then
+  # Elasticsearch Passwords
+  export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD:-admin}
+  export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD:-$(uuidgen)}
+  export ES_LOGCOLLECTOR_PASSWD=${ES_LOGCOLLECTOR_PASSWD:-$(uuidgen)}
+  export ES_METRICGETTER_PASSWD=${ES_METRICGETTER_PASSWD:-$(uuidgen)}
+
+
+  # Create secrets containing SecurityConfig files
+  create_secret_from_file securityconfig/action_groups.yml security-action-groups
+  create_secret_from_file securityconfig/config.yml security-config
+  create_secret_from_file securityconfig/internal_users.yml security-internal-users
+  create_secret_from_file securityconfig/roles.yml security-roles
+  create_secret_from_file securityconfig/roles_mapping.yml security-roles-mapping
+
+  # Create secrets containing internal user credentials
+  create_user_secret internal-user-admin admin $ES_ADMIN_PASSWD
+  create_user_secret internal-user-kibanaserver kibanaserver $ES_KIBANASERVER_PASSWD
+  create_user_secret internal-user-logcollector logcollector $ES_LOGCOLLECTOR_PASSWD
+  create_user_secret internal-user-metricgetter metricgetter $ES_METRICGETTER_PASSWD
+
+  # Create ConfigMap for securityadmin script
+  if [ -z "$(kubectl -n $LOG_NS get configmap run-securityadmin.sh -o name 2>/dev/null)" ]; then
+    kubectl -n $LOG_NS create configmap run-securityadmin.sh --from-file logging/es/odfe/run_securityadmin.sh
+  else
+    log_info "Using existing ConfigMap [run-securityadmin.sh]"
+  fi
+
+  # Need to retrieve these from secrets in case secrets pre-existed
+  export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
+  export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
+  export ES_METRICGETTER_USER=$(kubectl -n $LOG_NS get secret internal-user-metricgetter -o=jsonpath="{.data.username}" |base64 --decode)
+  export ES_METRICGETTER_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-metricgetter -o=jsonpath="{.data.password}" |base64 --decode)
+else
+ # hard-code admin credentials to preserve support (temporarily) for demo security
+ create_user_secret internal-user-admin admin admin
+ export ES_ADMIN_USER=admin
+ export ES_ADMIN_PASSWD=admin
 fi
 
 # Elasticsearch
@@ -166,9 +211,37 @@ if [ "$podready" != "TRUE" ]; then
    exit 14
 fi
 
+if [ "$ES_SECURITY_CONFIG_ENABLE" == "true" ]; then
 
-log_info "Waiting [4] minutes to allow Elasticsearch to initialize [$(date)]"
-sleep 240s
+  log_info "Waiting [2] minute to allow Elasticsearch to initialize [$(date)]"
+  sleep 120s
+
+  set +e
+
+  # Run the security admin script on the pod
+  kubectl -n $LOG_NS exec v4m-es-master-0 -it -- config/run_securityadmin.sh
+
+  # Retrieve log file from security admin script
+  kubectl -n $LOG_NS cp v4m-es-master-0:config/run_securityadmin.log $TMP_DIR/run_securityadmin.log
+
+  if [ "$(tail -n1  $TMP_DIR/run_securityadmin.log)" == "Done with success" ]; then
+    log_info "The run_securityadmin.log script appears to have run successfully; you can review its output below:"
+  else
+    log_warn "There may have been a problem with the run_securityadmin.log script; review the output below:"
+  fi
+
+  # show output from run_securityadmin.sh script
+  sed 's/^/   | /' $TMP_DIR/run_securityadmin.log
+
+  # Need to wait for completion?
+  log_info "Waiting [1] minute to allow Elasticsearch to complete initialization [$(date)]"
+  sleep 60s
+
+  set -e  
+else
+  log_info "Waiting [4] minutes to allow Elasticsearch to initialize [$(date)]"
+  sleep 240s
+fi
 
 
 # set up temporary port forwarding to allow curl access
@@ -201,7 +274,7 @@ else
 fi
 
 # Create Index Management (I*M) Policy  objects
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/viya_logs_idxmgmt_policy" -H 'Content-Type: application/json' -d @logging/es/odfe/es_viya_logs_idxmgmt_policy.json  --user admin:admin --insecure)
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/viya_logs_idxmgmt_policy" -H 'Content-Type: application/json' -d @logging/es/odfe/es_viya_logs_idxmgmt_policy.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 # Seems to return policy definition back to SSH window...NOT "true"?
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading index management policies into Elasticsearch [$response]"
@@ -213,7 +286,7 @@ else
 fi
 
 # Create Ingest Pipeline to "burst" incoming log messages to separate indexes based on namespace
-response=$(curl  -s -o /dev/null -w "%{http_code}"  -XPUT "https://localhost:$TEMP_PORT/_ingest/pipeline/viyaburstns" -H 'Content-Type: application/json' -d @logging/es/es_create_ns_burst_pipeline.json  --user admin:admin --insecure)
+response=$(curl  -s -o /dev/null -w "%{http_code}"  -XPUT "https://localhost:$TEMP_PORT/_ingest/pipeline/viyaburstns" -H 'Content-Type: application/json' -d @logging/es/es_create_ns_burst_pipeline.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 # TO DO/CHECK: this should return a message like this: {"acknowledged":true}
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading ingest pipeline into Elasticsearch [$response]"
@@ -224,7 +297,7 @@ else
 fi
 
 # Link index management policy and Ingest Pipeline to Index Template
-response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-logs-template "    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_logs.json --user admin:admin --insecure )
+response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-logs-template "    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_logs.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 # TO DO/CHECK: this should return a message like this: {"acknowledged":true}
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading index template settings into Elasticsearch [$response]"
@@ -244,7 +317,7 @@ else
 fi
 # ...index management policy automates the deletion of indexes after the specified time
 
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/viya_ops_idxmgmt_policy" -H 'Content-Type: application/json' -d @logging/es/odfe/es_viya_ops_idxmgmt_policy.json  --user admin:admin --insecure )
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/viya_ops_idxmgmt_policy" -H 'Content-Type: application/json' -d @logging/es/odfe/es_viya_ops_idxmgmt_policy.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 # TO DO/CHECK: this should return the JSON policy definition back rather than the simpler {"acknowledged":true}
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading monitoring index management policies into Elasticsearch [$response]"
@@ -254,7 +327,7 @@ else
    log_info "Monitoring index management policies loaded into Elasticsearch [$response]"
 fi
 
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-ops-template " -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_ops.json --user admin:admin --insecure)
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-ops-template " -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_ops.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 # TO DO/CHECK: this should return a message like this: {"acknowledged":true}
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading monitoring index template settings into Elasticsearch [$response]"
@@ -266,7 +339,7 @@ fi
 echo ""
 
 # Set ISM Job Interval to 120 minutes (from default 5 minutes)
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_cluster/settings" -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_job_interval.json --user admin:admin --insecure)
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_cluster/settings" -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_job_interval.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 # TODO: Check the result is a messsge like: {"acknowledged":true,"persistent":{"opendistro":{"index_state_management":{"job_interval":"120"}}},"transient":{}}
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading cluster setttings into Elasticsearch [$response]"
@@ -389,7 +462,7 @@ else
 fi
 
 # Import Kibana Searches, Visualizations and Dashboard Objects using curl
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.4.2_200405.ndjson  --user admin:admin --insecure )
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.4.2_200405.ndjson  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 
 # TO DO/CHECK: this should return a SUCCESS message like this: {"success":true,"successCount":20}
 if [[ $response != 2* ]]; then
@@ -417,7 +490,7 @@ else
   log_info "FLUENT_BIT_ENABLED=[$FLUENT_BIT_ENABLED] - Skipping Fluent Bit install"
 fi
 
-log_info "The deployment of logging components has completed"
+log_notice "The deployment of logging components has completed [$(date)]"
 echo ""
 
 # Print URL to access Kibana

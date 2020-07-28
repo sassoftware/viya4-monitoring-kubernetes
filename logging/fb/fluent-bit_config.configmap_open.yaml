@@ -760,8 +760,8 @@ data:
        Time_Key @timestamp
        Replace_Dots On
        Logstash_Prefix kubernetes_cluster
-       HTTP_User admin
-       HTTP_Passwd admin
+       HTTP_User ${ES_LOGCOLLECTOR_USER}
+       HTTP_Passwd ${ES_LOGCOLLECTOR_PASSWD}
        tls         on
        tls.debug   2
        tls.verify  off
@@ -783,8 +783,8 @@ data:
        Time_Key @timestamp
        Replace_Dots On
        Logstash_Prefix viya_ops
-       HTTP_User admin
-       HTTP_Passwd admin
+       HTTP_User ${ES_LOGCOLLECTOR_USER}
+       HTTP_Passwd ${ES_LOGCOLLECTOR_PASSWD}
        tls         on
        tls.debug   2
        tls.verify  off

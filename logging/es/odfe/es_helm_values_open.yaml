@@ -42,8 +42,8 @@ kibana:
 
     elasticsearch.hosts: https://v4m-es-client-service:9200
     elasticsearch.ssl.verificationMode: none
-    elasticsearch.username: kibanaserver
-    elasticsearch.password: kibanaserver
+    elasticsearch.username: ${ELASTICSEARCH_USERNAME}
+    elasticsearch.password: ${ELASTICSEARCH_PASSWORD}
 
     opendistro_security.multitenancy.enabled: false
     # opendistro_security.multitenancy.tenants.preferred: ["Global","Private"]
@@ -54,3 +54,9 @@ kibana:
     newsfeed.enabled: false
     telemetry.optIn: false
     telemetry.enabled: false
+  extraEnvs:
+   - name: ELASTICSEARCH_USERNAME
+     value: admin
+   - name: ELASTICSEARCH_PASSWORD
+     value: admin
+

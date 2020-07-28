@@ -49,6 +49,14 @@ service:
 ##   KEY_2: value2
 # env:
 
+extraEnvSecrets:
+   ES_USER:
+     secret:  internal-user-admin
+     key: username
+   ES_PASSWORD:
+     secret:  internal-user-admin
+     key: password
+
 es:
   ## Address (host and port) of the Elasticsearch node we should connect to.
   ## This could be a local node (localhost:9200, for instance), or the address
@@ -56,7 +64,8 @@ es:
   ## specify as: <proto>://<user>:<password>@<host>:<port>. e.g., http://admin:pass@localhost:9200.
   ##
   #uri: http://elasticsearch-master:9200
-  uri: https://admin:admin@v4m-es-client-service.logging:9200
+  #### GZS uri: https://admin:admin@v4m-es-client-service.logging:9200
+  uri: https://$(ES_USER):$(ES_PASSWORD)@v4m-es-client-service.logging:9200
 
   ## If true, query stats for all nodes in the cluster, rather than just the
   ## node we connect to.

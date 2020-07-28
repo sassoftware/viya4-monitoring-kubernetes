@@ -38,6 +38,22 @@ extraVolumes:
 fullConfigMap: false
 existingConfigMap: fb-fluent-bit-config
 
+env:
+#   - name: ES_LOGCOLLECTOR_USER
+#     value: admin
+#   - name: ES_LOGCOLLECTOR_PASSWD
+#     value: admin
+   - name: ES_LOGCOLLECTOR_USER
+     valueFrom:
+       secretKeyRef:
+         name: internal-user-admin
+         key: username
+   - name: ES_LOGCOLLECTOR_PASSWD
+     valueFrom:
+       secretKeyRef:
+         name: internal-user-admin
+         key: password
+
 # Be very tolerant
 tolerations:
 - operator: "Exists"
