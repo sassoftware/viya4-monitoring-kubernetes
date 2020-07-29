@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.1.9
+       Set  fb_configMap_version 0.1.9E
        #Set clusterID NOT_SET
     [FILTER]
        # NOTE: This kubernetes filter _only_ applies to the **METALOGGING** messages
@@ -160,6 +160,87 @@ data:
        Match          opsK.*
        Remove         JL__@timestamp
        Rename         JL__message message
+    #
+    # Kubernetes Events Handling - Start
+    #
+    [FILTER]
+       Alias events_lift_event
+       Name         nest
+       Match        kube.*
+       Operation    lift
+       Nested_under JL__event
+       Add_prefix   EVENT__
+    [FILTER]
+       Alias events_lift_meta
+       Name         nest
+       Match        kube.*
+       Operation    lift
+       Nested_under EVENT__metadata
+       Add_prefix   EV_META__
+    [FILTER]
+       Alias events_lift_source
+       Name         nest
+       Match        kube.*
+       Operation    lift
+       Nested_under EVENT__source
+       Add_prefix   EV_SOURCE__
+    [FILTER]
+       Alias events_lift_object
+       Name         nest
+       Match        kube.*
+       Operation    lift
+       Nested_under EVENT__involvedObject
+       Add_prefix   EV_OBJ__
+    [FILTER]
+       Alias events_renames
+       Name  modify
+       Match kube.*
+       Condition Key_value_equals  PROPS__appname eventrouter
+       set    logsource            KUBE_EVENT
+       rename JL__verb             PROPS__verb
+       rename EVENT__lastTimestamp timeStamp
+       rename EVENT__type          level
+       rename EVENT__message       message
+       rename EVENT__reason        PROPS__reason
+       rename EV_META__namespace   PROPS__namespace
+       rename EV_META__name        PROPS__name
+       rename EV_SOURCE__component PROPS__source_component
+       rename EV_SOURCE__host      PROPS__source_host
+       rename EV_OBJ__kind         PROPS__object_kind
+       rename EV_OBJ__namespace    PROPS__object_namespace
+       rename EV_OBJ__name         PROPS__object_name
+    # Re-construct EVENT structures (just in case)
+    [FILTER]
+       Alias events_nest_object
+       Name         nest
+       Match        kube.*
+       Operation    nest
+       Wildcard     EV_OBJ__*
+       Nest_under   EVENT__involvedObject
+    [FILTER]
+       Alias events_nest_meta
+       Name         nest
+       Match        kube.*
+       Operation    nest
+       Wildcard     EV_META__*
+       Nest_under   EVENT__metadata
+    [FILTER]
+       Alias events_nest_source
+       Name         nest
+       Match        kube.*
+       Operation    nest
+       Wildcard     EV_SOURCE__*
+       Nest_under   EVENT__source
+    [FILTER]
+       Alias events_nest_event
+       Name         nest
+       Match        kube.*
+       Operation    nest
+       Wildcard     EVENT__*
+       Nest_under   JL__event
+    #
+    # Kubernetes Events Handling - End
+    #
     [FILTER]
        Alias           lift_JL__
        Name            nest
