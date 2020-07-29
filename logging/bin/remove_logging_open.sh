@@ -39,7 +39,7 @@ if [ "$LOG_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
 fi
 
 log_info "Removing eventrouter..."
-kubectl delete --ignore-not-found -f monitoring/eventrouter.yaml
+kubectl delete --ignore-not-found -f logging/eventrouter.yaml
 
 log_info "Removing components from the [$LOG_NS] namespace..."
 
