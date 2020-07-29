@@ -15,7 +15,7 @@ spec:
       targetLabel: sas_deployment
     - sourceLabels: [__meta_kubernetes_pod_annotation_sas_com_tls_enabled_ports]
       action: replace
-      regex: .*metrics.*
+      regex: .*metrics.*|all
       targetLabel: __scheme__
       replacement: https
     - sourceLabels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
