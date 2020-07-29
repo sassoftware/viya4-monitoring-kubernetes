@@ -111,9 +111,16 @@ if [ "$ES_SECURITY_CONFIG_ENABLE" == "true" ]; then
 
   # Create ConfigMap for securityadmin script
   if [ -z "$(kubectl -n $LOG_NS get configmap run-securityadmin.sh -o name 2>/dev/null)" ]; then
-    kubectl -n $LOG_NS create configmap run-securityadmin.sh --from-file logging/es/odfe/run_securityadmin.sh
+    kubectl -n $LOG_NS create configmap run-securityadmin.sh --from-file logging/es/odfe/bin/run_securityadmin.sh
   else
     log_info "Using existing ConfigMap [run-securityadmin.sh]"
+  fi
+
+  # Create ConfigMap for set_user_password.sh script
+  if [ -z "$(kubectl -n $LOG_NS get configmap set_user_password.sh -o name 2>/dev/null)" ]; then
+    kubectl -n $LOG_NS create configmap set-user-password.sh --from-file logging/es/odfe/bin/set_user_password.sh
+  else
+    log_info "Using existing ConfigMap [set_user_password.sh]"
   fi
 
   # Need to retrieve these from secrets in case secrets pre-existed
@@ -122,10 +129,10 @@ if [ "$ES_SECURITY_CONFIG_ENABLE" == "true" ]; then
   export ES_METRICGETTER_USER=$(kubectl -n $LOG_NS get secret internal-user-metricgetter -o=jsonpath="{.data.username}" |base64 --decode)
   export ES_METRICGETTER_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-metricgetter -o=jsonpath="{.data.password}" |base64 --decode)
 else
- # hard-code admin credentials to preserve support (temporarily) for demo security
- create_user_secret internal-user-admin admin admin
- export ES_ADMIN_USER=admin
- export ES_ADMIN_PASSWD=admin
+  # hard-code admin credentials to preserve support (temporarily) for demo security
+  create_user_secret internal-user-admin admin admin
+  export ES_ADMIN_USER=admin
+  export ES_ADMIN_PASSWD=admin
 fi
 
 # Elasticsearch

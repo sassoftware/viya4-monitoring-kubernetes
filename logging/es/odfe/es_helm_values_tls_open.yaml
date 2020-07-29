@@ -90,6 +90,10 @@
           key: password
 
    extraVolumes:
+   - name: v4m-security-script2
+     configMap:
+       name: set-user-password.sh
+       defaultMode: 0755
    - name: v4m-security-script
      configMap:
         name: run-securityadmin.sh
@@ -99,6 +103,10 @@
      name: v4m-security-script
      readOnly: true
      subPath: run_securityadmin.sh
+   - mountPath: "/usr/share/elasticsearch/config/set_user_password.sh"
+     name: v4m-security-script2
+     readOnly: true
+     subPath: set_user_password.sh
 
 kibana:
    elasticsearchAcccount:
