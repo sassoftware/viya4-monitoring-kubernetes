@@ -755,7 +755,7 @@ data:
        Rename         flagged4parsing       DB__flagged4parsing
        Rename         fb_configMap_version  DB__fb_configMap_version
        Rename         log                   DB__log
-       Rename         orig_msg_level        DB_orig_msg_level
+       Rename         orig_msg_level        DB__orig_msg_level
     [FILTER]
        #
        # Move internal vars to DEBUG
