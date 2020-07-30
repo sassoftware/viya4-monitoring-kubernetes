@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.1.9E
+       Set  fb_configMap_version 0.1.10
        #Set clusterID NOT_SET
     [FILTER]
        # NOTE: This kubernetes filter _only_ applies to the **METALOGGING** messages
@@ -197,18 +197,19 @@ data:
        Match kube.*
        Condition Key_value_equals  PROPS__appname eventrouter
        set    logsource            KUBE_EVENT
+       copy   EVENT_type           level
        rename JL__verb             PROPS__verb
        rename EVENT__lastTimestamp timeStamp
-       rename EVENT__type          level
+       rename EVENT__type          PROPS__type
        rename EVENT__message       message
        rename EVENT__reason        PROPS__reason
        rename EV_META__namespace   PROPS__namespace
        rename EV_META__name        PROPS__name
        rename EV_SOURCE__component PROPS__source_component
        rename EV_SOURCE__host      PROPS__source_host
-       rename EV_OBJ__kind         PROPS__object_kind
+       rename EV_OBJ__kind         PROPS__object_type
        rename EV_OBJ__namespace    PROPS__object_namespace
-       rename EV_OBJ__name         PROPS__object_name
+       rename EV_OBJ__name         PROPS__object
     # Re-construct EVENT structures (just in case)
     [FILTER]
        Alias events_nest_object
@@ -754,6 +755,7 @@ data:
        Rename         flagged4parsing       DB__flagged4parsing
        Rename         fb_configMap_version  DB__fb_configMap_version
        Rename         log                   DB__log
+       Rename         orig_msg_level        DB_orig_msg_level
     [FILTER]
        #
        # Move internal vars to DEBUG
