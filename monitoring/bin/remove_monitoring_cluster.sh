@@ -45,6 +45,7 @@ log_info "Removing dashboards..."
 monitoring/bin/remove_dashboards.sh
 
 log_info "Removing service monitors..."
+kubectl delete --ignore-not-found podmonitor -n $MON_NS eventrouter
 kubectl delete --ignore-not-found servicemonitor -n $MON_NS elasticsearch
 kubectl delete --ignore-not-found servicemonitor -n $MON_NS fluent-bit
 

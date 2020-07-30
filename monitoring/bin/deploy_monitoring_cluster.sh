@@ -150,8 +150,13 @@ if [ "$nginxFound" == "true" ]; then
   log_info "NGINX found. Deploying podMonitor to [$NGINX_NS] namespace..."
   kubectl apply -n $NGINX_NS -f monitoring/monitors/kube/podMonitor-nginx.yaml 2>/dev/null
 fi
+
+# Eventrouter
+kubectl apply -n $MON_NS -f monitoring/monitors/kube/podMonitor-eventrouter.yaml 2>/dev/null
+
 # Elasticsearch
 kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-elasticsearch.yaml
+
 # Fluent Bit
 kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-fluent-bit.yaml
 
