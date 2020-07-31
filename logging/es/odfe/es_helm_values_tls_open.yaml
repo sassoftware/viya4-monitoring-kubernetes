@@ -108,7 +108,7 @@
      readOnly: true
      subPath: set_user_password.sh
 
-kibana:
+ kibana:
    elasticsearchAcccount:
      secret: internal-user-kibanaserver
    extraEnvs:

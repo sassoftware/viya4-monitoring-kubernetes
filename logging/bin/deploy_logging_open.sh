@@ -77,9 +77,12 @@ if [ "$TLS_ENABLE" == "true" ]; then
   apps=( es-transport es-rest es-admin kibana )
   create_tls_certs $LOG_NS logging ${apps[@]}
 else
-  # point to empty yaml files
+  # point to empty yaml file
   ES_OPEN_TLS_YAML=$TMP_DIR/empty.yaml
-  KB_OPEN_TLS_YAML=$TMP_DIR/empty.yaml
+
+  # point to yaml file w/ hard-coded admin credentials (needed for demo certs)
+  KB_OPEN_TLS_YAML=logging/es/odfe/es_helm_values_kb_notls_open.yaml
+
   # w/TLS: use HTTPS in curl commands
   KB_CURL_PROTOCOL=http
   log_debug "TLS not enabled for logging components. Skipping."

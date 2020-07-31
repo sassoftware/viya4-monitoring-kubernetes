@@ -54,9 +54,3 @@ kibana:
     newsfeed.enabled: false
     telemetry.optIn: false
     telemetry.enabled: false
-  extraEnvs:
-   - name: ELASTICSEARCH_USERNAME
-     value: admin
-   - name: ELASTICSEARCH_PASSWORD
-     value: admin
-
