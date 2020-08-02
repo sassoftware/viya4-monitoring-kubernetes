@@ -120,7 +120,7 @@ if [ "$ES_SECURITY_CONFIG_ENABLE" == "true" ]; then
   fi
 
   # Create ConfigMap for set_user_password.sh script
-  if [ -z "$(kubectl -n $LOG_NS get configmap set_user_password.sh -o name 2>/dev/null)" ]; then
+  if [ -z "$(kubectl -n $LOG_NS get configmap set-user-password.sh -o name 2>/dev/null)" ]; then
     kubectl -n $LOG_NS create configmap set-user-password.sh --from-file logging/es/odfe/bin/set_user_password.sh
   else
     log_info "Using existing ConfigMap [set_user_password.sh]"
