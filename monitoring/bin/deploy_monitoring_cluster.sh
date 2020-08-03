@@ -99,7 +99,7 @@ if [ "$TLS_ENABLE" == "true" ]; then
   kubectl label cm -n $MON_NS node-exporter-tls-web-config sas.com/monitoring-base=kube-viya-monitoring
 fi
 
-log_info "Deploying Prometheus Operator. This may take a few minutes (15min timeout)..."
+log_info "Deploying Prometheus Operator. This may take a few minutes (20min timeout)..."
 log_info "User response file: [$PROM_OPER_USER_YAML]"
 if [ "$HELM_VER_MAJOR" == "3" ]; then
   log_debug "Installing via Helm 3..."
@@ -110,7 +110,7 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     -f $genValuesFile \
     -f $PROM_OPER_USER_YAML \
     --atomic \
-    --timeout 15m \
+    --timeout 20m \
     stable/prometheus-operator
 else
   log_debug "Installing via Helm 2..."
@@ -121,7 +121,7 @@ else
     -f $genValuesFile \
     -f $PROM_OPER_USER_YAML \
     --atomic \
-    --timeout 900 \
+    --timeout 1200 \
     --set prometheusOperator.createCustomResource=$createPromCRDs \
     stable/prometheus-operator
 fi
