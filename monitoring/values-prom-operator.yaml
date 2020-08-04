@@ -21,9 +21,9 @@ commonLabels:
 prometheusOperator:
   # v0.39+ requires Kubernetes 1.16+
   image:
-    tag: v0.41.0
+    tag: v0.40.0
   prometheusConfigReloaderImage:
-    tag: v0.41.0
+    tag: v0.40.0
   logFormat: json
   logLevel: info
   createCustomResource: false
@@ -144,6 +144,8 @@ grafana:
       mode: console
     "log.console":
         format: json
+    dashboards:
+      default_home_dashboard_path: /tmp/dashboards/viya-welcome-dashboard.json
   service:
     type: NodePort
     nodePort: 31100

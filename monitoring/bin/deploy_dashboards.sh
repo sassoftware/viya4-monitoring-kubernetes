@@ -10,6 +10,7 @@ set -e
 
 DASH_NS="${DASH_NS:-$MON_NS}"
 
+WELCOME_DASH="${WELCOME_DASH:-true}"
 KUBE_DASH="${KUBE_DASH:-true}"
 VIYA_DASH="${VIYA_DASH:-true}"
 PGMONITOR_DASH="${PGMONITOR_DASH:-$VIYA_DASH}"
@@ -47,6 +48,11 @@ function deploy_dashboards {
 
 log_info "Deploying SAS dashboards to the [$DASH_NS] namespace..."
 log_message "--------------------------------"
+if [ "$WELCOME_DASH" == "true" ]; then
+  log_info "Deploying welcome dashboards..."
+  deploy_dashboards "welcome"
+fi
+
 if [ "$KUBE_DASH" == "true" ]; then
   log_info "Deploying Kubernetes cluster dashboards..."
   deploy_dashboards "kube"
