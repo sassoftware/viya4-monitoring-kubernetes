@@ -81,6 +81,10 @@ prometheus:
             requests:
               storage: 25Gi    
           volumeMode: Filesystem
+    tolerations:
+    - key: workload.sas.com/class
+      value: stateful
+      effect: NoSchedule
 
 # =======================
 # Prometheus AlertManager
@@ -106,6 +110,10 @@ alertmanager:
             requests:
               storage: 10Gi
           volumeMode: Filesystem
+    tolerations:
+    - key: workload.sas.com/class
+      value: stateful
+      effect: NoSchedule
 
 # =========
 # Exporters
@@ -158,6 +166,10 @@ grafana:
   - camptocamp-prometheus-alertmanager-datasource
   - flant-statusmap-panel
   - btplc-status-dot-panel
+  tolerations:
+  - key: workload.sas.com/class
+    value: stateful
+    effect: NoSchedule
   sidecar:
     dashboards:
       enabled: true

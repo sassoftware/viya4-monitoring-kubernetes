@@ -57,9 +57,15 @@ function checkDefaultStorageClass {
       if [ "$defaultStorageClass" ]; then
         log_debug "Found default storageClass: [$defaultStorageClass]"
       else
-        log_warn "This cluster does not have a default storageclass defined"
-        log_warn "This may cause errors unless storageclass values are explicitly defined"
-        defaultStorageClass=_NONE_
+        # Try again with beta storageclass annotation key
+        defaultStorageClass=$(kubectl get storageclass -o jsonpath="{range .items[*]}{.metadata.name}{'\t'}{.metadata.annotations..storageclass\.beta\.kubernetes\.io/is-default-class}{'\n'}{end}" | grep true | awk '{print $1}')
+        if [ "$defaultStorageClass" ]; then
+          log_debug "Found default storageClass: [$defaultStorageClass]"
+        else
+          log_warn "This cluster does not have a default storageclass defined"
+          log_warn "This may cause errors unless storageclass values are explicitly defined"
+          defaultStorageClass=_NONE_
+        fi
       fi
     fi
 }

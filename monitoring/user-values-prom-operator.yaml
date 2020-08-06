@@ -50,7 +50,7 @@
 #   enabled:true
 #   alertManagerSpec:
 #     externalUrl: http://host.mycluster.example.com:31091
-#      storageSpec:
+#      storage:
 #        volumeClaimTemplate:
 #          spec:
 #            storageClassName: myCustomStorageClass
