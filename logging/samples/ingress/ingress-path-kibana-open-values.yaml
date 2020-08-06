@@ -3,9 +3,14 @@
 
 kibana:
   extraEnvs:
+  # Username & password need to be set here since helm replaces array values
+  - name: ELASTICSEARCH_USERNAME
+    value: admin
+  - name: ELASTICSEARCH_PASSWORD
+    value: admin
   - name: SERVER_BASEPATH
     value: /kibana
-
+    
   service:
     type: ClusterIP
     nodePort: null
