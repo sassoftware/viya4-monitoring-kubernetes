@@ -27,6 +27,18 @@ prometheusOperator:
   logFormat: json
   logLevel: info
   createCustomResource: false
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "50Mi"
+    limits:
+      cpu: "200m"
+      memory: "100Mi"
+  tlsProxy:
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "25Mi"
 
 # ======================
 # kubelet ServiceMonitor
@@ -47,6 +59,13 @@ kubelet:
 kube-state-metrics:
   image:
     tag: v1.9.7
+  resources:
+    requests:
+      cpu: "20m"
+      memory: "10Mi"
+    limits:
+      cpu: "40m"
+      memory: "20Mi"
 
 # ==========
 # Prometheus
@@ -71,6 +90,12 @@ prometheus:
     retention: 7d
     retentionSize: 20GiB
     replicas: 1
+    resources:
+      # These values may very well need to be overridden to higher
+      # values depending on the scale of the cluster
+      requests:
+        cpu: "1000m"
+        memory: "2Gi"
     storageSpec:
       volumeClaimTemplate:
         spec:
@@ -100,6 +125,10 @@ alertmanager:
       tag: v0.21.0
     logFormat: json
     retention: 240h
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "50Mi"
     storage:
       volumeClaimTemplate:
         spec:
@@ -131,6 +160,13 @@ prometheus-node-exporter:
     # Override the default port of 9100 to avoid potential conflicts
     port: 9110
     targetPort: 9110
+  resources:
+    requests:
+      cpu: "30m"
+      memory: "100Mi"
+    limits:
+      cpu: "50m"
+      memory: "200Mi"
   # Be very tolerant
   tolerations:
   - operator: "Exists"
@@ -138,8 +174,7 @@ prometheus-node-exporter:
 # =======
 # Grafana
 # =======
-# https://github.com/helm/charts/tree/master/stable/grafana#configuration
-# https://grafana.com/
+# https://github.com/helm/charts/tree/master/stable/grafana
 grafana:
   image:
     tag: "7.1.1"
@@ -158,7 +193,7 @@ grafana:
     type: NodePort
     nodePort: 31100
   # TODO: Use secret for Grafana admin user/password
-  # See: https://github.com/helm/charts/tree/master/stable/grafana#configuration
+  # See: https://github.com/helm/charts/tree/master/stable/grafana
   adminPassword: admin
   plugins:
   - grafana-piechart-panel
@@ -166,6 +201,10 @@ grafana:
   - camptocamp-prometheus-alertmanager-datasource
   - flant-statusmap-panel
   - btplc-status-dot-panel
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "100Mi"
   tolerations:
   - key: workload.sas.com/class
     value: stateful
@@ -177,6 +216,11 @@ grafana:
     datasources:
       enabled: true
       label: grafana_datasource
+      resources:
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "100Mi"
   persistence:
     type: pvc
     enabled: true
