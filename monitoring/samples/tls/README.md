@@ -15,7 +15,7 @@ If you use this sample for HTTPS for ingress, the following secrets must be manu
 * kubernetes.io/tls secret - `grafana-ingress-tls-secret`
 
 Generating these certificates is outside the scope of this example. However, you can use the
-process documented in "Configure NGINX Ingress TLS for SAS Applications" in SAS Viya Administation documentation and specify the `monitoring` namespace.
+process documented in "Configure NGINX Ingress TLS for SAS Applications" in SAS Viya Administration documentation and specify the `monitoring` namespace.
 
 For in-cluster (east-west traffic) TLS for monitoring components,  
 [cert-manager](https://cert-manager.io/) populates these secrets that contain pod certificates. Existing secrets are not overwritten,
