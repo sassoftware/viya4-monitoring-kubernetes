@@ -7,7 +7,9 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 
-export LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-${TLS_ENABLE:-false}}
+EVENTROUTER_ENABLE=${EVENTROUTER_ENABLE:-true}
+
+LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-${TLS_ENABLE:-false}}
 source bin/tls-include.sh
 verify_cert_manager
 
@@ -48,12 +50,12 @@ fi
 
 set -e
 
+log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
+
 if [ "$EVENTROUTER_ENABLE" == "true" ]; then
   log_info "Deploying eventrouter..."
   kubectl apply -f logging/eventrouter.yaml
 fi
-
-log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 
 # Optional TLS Support
 if [ "$TLS_ENABLE" == "true" ]; then
@@ -97,7 +99,6 @@ if [ "$ES_SECURITY_CONFIG_ENABLE" == "true" ]; then
   export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD:-$(uuidgen)}
   export ES_LOGCOLLECTOR_PASSWD=${ES_LOGCOLLECTOR_PASSWD:-$(uuidgen)}
   export ES_METRICGETTER_PASSWD=${ES_METRICGETTER_PASSWD:-$(uuidgen)}
-
 
   # Create secrets containing SecurityConfig files
   create_secret_from_file securityconfig/action_groups.yml security-action-groups
