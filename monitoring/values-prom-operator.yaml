@@ -32,8 +32,8 @@ prometheusOperator:
       cpu: "100m"
       memory: "50Mi"
     limits:
-      cpu: "200m"
-      memory: "100Mi"
+      cpu: "250m"
+      memory: "150Mi"
   tlsProxy:
     resources:
       requests:
@@ -61,11 +61,11 @@ kube-state-metrics:
     tag: v1.9.7
   resources:
     requests:
-      cpu: "20m"
-      memory: "10Mi"
+      cpu: "25m"
+      memory: "30Mi"
     limits:
-      cpu: "40m"
-      memory: "20Mi"
+      cpu: "100m"
+      memory: "100Mi"
 
 # ==========
 # Prometheus
@@ -163,10 +163,10 @@ prometheus-node-exporter:
   resources:
     requests:
       cpu: "30m"
-      memory: "100Mi"
+      memory: "50Mi"
     limits:
-      cpu: "50m"
-      memory: "200Mi"
+      cpu: "100m"
+      memory: "100Mi"
   # Be very tolerant
   tolerations:
   - operator: "Exists"
@@ -177,7 +177,7 @@ prometheus-node-exporter:
 # https://github.com/helm/charts/tree/master/stable/grafana
 grafana:
   image:
-    tag: "7.1.1"
+    tag: "7.1.3"
   "grafana.ini":
     analytics:
       check_for_updates: false
@@ -204,7 +204,7 @@ grafana:
   resources:
     requests:
       cpu: "250m"
-      memory: "100Mi"
+      memory: "150Mi"
   tolerations:
   - key: workload.sas.com/class
     value: stateful
