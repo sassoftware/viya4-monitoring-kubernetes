@@ -41,7 +41,7 @@ function deploy_dashboards {
    for f in $dir/*.json; do
      name=$(basename $f .json)
      kubectl create cm -n $DASH_NS $name $dryRun --from-file $f -o yaml | kubectl apply -f -
-     kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard=true sas_dashboard=true sas.com/dashboardType=$type
+     kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring sas.com/dashboardType=$type
    done
    log_message "--------------------------------"
 }

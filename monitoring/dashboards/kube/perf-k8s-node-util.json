@@ -15,11 +15,9 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 40,
-  "iteration": 1586781240799,
-  "links": [
-    
-  ],
+  "id": 139,
+  "iteration": 1597075850655,
+  "links": [],
   "panels": [
     {
       "collapsed": false,
@@ -31,22 +29,25 @@
         "y": 0
       },
       "id": 10,
-      "panels": [
-        
-      ],
+      "panels": [],
       "repeat": null,
       "title": "CPU",
       "type": "row"
     },
     {
-      "aliasColors": {
-        
-      },
+      "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource",
       "decimals": 0,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 10,
       "fillGradient": 5,
       "gridPos": {
@@ -73,22 +74,14 @@
       },
       "lines": true,
       "linewidth": 1,
-      "links": [
-        
-      ],
+      "links": [],
       "nullPointMode": "null as zero",
-      "options": {
-        "dataLinks": [
-          
-        ]
-      },
       "percentage": false,
+      "pluginVersion": "7.1.3",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [
-        
-      ],
+      "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
@@ -104,13 +97,9 @@
           "step": 10
         }
       ],
-      "thresholds": [
-        
-      ],
+      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [
-        
-      ],
+      "timeRegions": [],
       "timeShift": null,
       "title": "CPU Utilization",
       "tooltip": {
@@ -124,9 +113,7 @@
         "mode": "time",
         "name": null,
         "show": true,
-        "values": [
-          
-        ]
+        "values": []
       },
       "yaxes": [
         {
@@ -153,14 +140,19 @@
       }
     },
     {
-      "aliasColors": {
-        
-      },
+      "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource",
       "decimals": 0,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 10,
       "fillGradient": 7,
       "gridPos": {
@@ -186,22 +178,14 @@
       },
       "lines": true,
       "linewidth": 1,
-      "links": [
-        
-      ],
+      "links": [],
       "nullPointMode": "null as zero",
-      "options": {
-        "dataLinks": [
-          
-        ]
-      },
       "percentage": false,
+      "pluginVersion": "7.1.3",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [
-        
-      ],
+      "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
@@ -217,13 +201,9 @@
           "step": 10
         }
       ],
-      "thresholds": [
-        
-      ],
+      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [
-        
-      ],
+      "timeRegions": [],
       "timeShift": null,
       "title": "CPU Saturation (load1 per CPU)",
       "tooltip": {
@@ -237,9 +217,7 @@
         "mode": "time",
         "name": null,
         "show": true,
-        "values": [
-          
-        ]
+        "values": []
       },
       "yaxes": [
         {
@@ -275,22 +253,25 @@
         "y": 8
       },
       "id": 11,
-      "panels": [
-        
-      ],
+      "panels": [],
       "repeat": null,
       "title": "Memory",
       "type": "row"
     },
     {
-      "aliasColors": {
-        
-      },
+      "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource",
       "decimals": 0,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 10,
       "fillGradient": 3,
       "gridPos": {
@@ -317,22 +298,14 @@
       },
       "lines": true,
       "linewidth": 1,
-      "links": [
-        
-      ],
+      "links": [],
       "nullPointMode": "null as zero",
-      "options": {
-        "dataLinks": [
-          
-        ]
-      },
       "percentage": false,
+      "pluginVersion": "7.1.3",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [
-        
-      ],
+      "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
@@ -348,13 +321,9 @@
           "step": 10
         }
       ],
-      "thresholds": [
-        
-      ],
+      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [
-        
-      ],
+      "timeRegions": [],
       "timeShift": null,
       "title": "Memory Utilisation",
       "tooltip": {
@@ -368,9 +337,7 @@
         "mode": "time",
         "name": null,
         "show": true,
-        "values": [
-          
-        ]
+        "values": []
       },
       "yaxes": [
         {
@@ -397,14 +364,19 @@
       }
     },
     {
-      "aliasColors": {
-        
-      },
+      "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource",
       "decimals": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 10,
       "fillGradient": 7,
       "gridPos": {
@@ -430,22 +402,14 @@
       },
       "lines": true,
       "linewidth": 1,
-      "links": [
-        
-      ],
+      "links": [],
       "nullPointMode": "null as zero",
-      "options": {
-        "dataLinks": [
-          
-        ]
-      },
       "percentage": false,
+      "pluginVersion": "7.1.3",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [
-        
-      ],
+      "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
@@ -461,13 +425,9 @@
           "step": 10
         }
       ],
-      "thresholds": [
-        
-      ],
+      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [
-        
-      ],
+      "timeRegions": [],
       "timeShift": null,
       "title": "Memory Saturation (Major Page Faults)",
       "tooltip": {
@@ -481,9 +441,7 @@
         "mode": "time",
         "name": null,
         "show": true,
-        "values": [
-          
-        ]
+        "values": []
       },
       "yaxes": [
         {
@@ -518,22 +476,25 @@
         "y": 16
       },
       "id": 12,
-      "panels": [
-        
-      ],
+      "panels": [],
       "repeat": null,
       "title": "Network",
       "type": "row"
     },
     {
-      "aliasColors": {
-        
-      },
+      "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource",
       "decimals": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 10,
       "fillGradient": 3,
       "gridPos": {
@@ -560,16 +521,10 @@
       },
       "lines": true,
       "linewidth": 1,
-      "links": [
-        
-      ],
+      "links": [],
       "nullPointMode": "null as zero",
-      "options": {
-        "dataLinks": [
-          
-        ]
-      },
       "percentage": false,
+      "pluginVersion": "7.1.3",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -609,13 +564,9 @@
           "step": 10
         }
       ],
-      "thresholds": [
-        
-      ],
+      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [
-        
-      ],
+      "timeRegions": [],
       "timeShift": null,
       "title": "Net Utilization (Bytes Receive/Transmit)",
       "tooltip": {
@@ -629,9 +580,7 @@
         "mode": "time",
         "name": null,
         "show": true,
-        "values": [
-          
-        ]
+        "values": []
       },
       "yaxes": [
         {
@@ -657,14 +606,19 @@
       }
     },
     {
-      "aliasColors": {
-        
-      },
+      "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource",
       "decimals": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 10,
       "fillGradient": 3,
       "gridPos": {
@@ -693,16 +647,10 @@
       },
       "lines": true,
       "linewidth": 1,
-      "links": [
-        
-      ],
+      "links": [],
       "nullPointMode": "null as zero",
-      "options": {
-        "dataLinks": [
-          
-        ]
-      },
       "percentage": false,
+      "pluginVersion": "7.1.3",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -742,13 +690,9 @@
           "step": 10
         }
       ],
-      "thresholds": [
-        
-      ],
+      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [
-        
-      ],
+      "timeRegions": [],
       "timeShift": null,
       "title": "Net Saturation (Drops Receive/Transmit)",
       "tooltip": {
@@ -762,9 +706,7 @@
         "mode": "time",
         "name": null,
         "show": true,
-        "values": [
-          
-        ]
+        "values": []
       },
       "yaxes": [
         {
@@ -799,21 +741,24 @@
         "y": 24
       },
       "id": 13,
-      "panels": [
-        
-      ],
+      "panels": [],
       "repeat": null,
       "title": "Disk IO",
       "type": "row"
     },
     {
-      "aliasColors": {
-        
-      },
+      "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 10,
       "fillGradient": 7,
       "gridPos": {
@@ -839,22 +784,14 @@
       },
       "lines": true,
       "linewidth": 1,
-      "links": [
-        
-      ],
+      "links": [],
       "nullPointMode": "null as zero",
-      "options": {
-        "dataLinks": [
-          
-        ]
-      },
       "percentage": false,
+      "pluginVersion": "7.1.3",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [
-        
-      ],
+      "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
@@ -870,13 +807,9 @@
           "step": 10
         }
       ],
-      "thresholds": [
-        
-      ],
+      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [
-        
-      ],
+      "timeRegions": [],
       "timeShift": null,
       "title": "Disk IO Utilization",
       "tooltip": {
@@ -890,9 +823,7 @@
         "mode": "time",
         "name": null,
         "show": true,
-        "values": [
-          
-        ]
+        "values": []
       },
       "yaxes": [
         {
@@ -919,13 +850,18 @@
       }
     },
     {
-      "aliasColors": {
-        
-      },
+      "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 10,
       "fillGradient": 7,
       "gridPos": {
@@ -949,22 +885,14 @@
       },
       "lines": true,
       "linewidth": 1,
-      "links": [
-        
-      ],
+      "links": [],
       "nullPointMode": "null as zero",
-      "options": {
-        "dataLinks": [
-          
-        ]
-      },
       "percentage": false,
+      "pluginVersion": "7.1.3",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [
-        
-      ],
+      "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
@@ -980,13 +908,9 @@
           "step": 10
         }
       ],
-      "thresholds": [
-        
-      ],
+      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [
-        
-      ],
+      "timeRegions": [],
       "timeShift": null,
       "title": "Disk IO Saturation",
       "tooltip": {
@@ -1000,9 +924,7 @@
         "mode": "time",
         "name": null,
         "show": true,
-        "values": [
-          
-        ]
+        "values": []
       },
       "yaxes": [
         {
@@ -1038,22 +960,25 @@
         "y": 32
       },
       "id": 14,
-      "panels": [
-        
-      ],
+      "panels": [],
       "repeat": null,
       "title": "Disk Space",
       "type": "row"
     },
     {
-      "aliasColors": {
-        
-      },
+      "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource",
       "decimals": 0,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 1,
       "gridPos": {
@@ -1079,22 +1004,14 @@
       },
       "lines": true,
       "linewidth": 1,
-      "links": [
-        
-      ],
+      "links": [],
       "nullPointMode": "null as zero",
-      "options": {
-        "dataLinks": [
-          
-        ]
-      },
       "percentage": false,
+      "pluginVersion": "7.1.3",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [
-        
-      ],
+      "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
@@ -1110,13 +1027,9 @@
           "step": 10
         }
       ],
-      "thresholds": [
-        
-      ],
+      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [
-        
-      ],
+      "timeRegions": [],
       "timeShift": null,
       "title": "Disk Space Utilization",
       "tooltip": {
@@ -1130,9 +1043,7 @@
         "mode": "time",
         "name": null,
         "show": true,
-        "values": [
-          
-        ]
+        "values": []
       },
       "yaxes": [
         {
@@ -1159,14 +1070,19 @@
       }
     },
     {
-      "aliasColors": {
-        
-      },
+      "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource",
       "decimals": 0,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 1,
       "gridPos": {
@@ -1192,22 +1108,14 @@
       },
       "lines": true,
       "linewidth": 1,
-      "links": [
-        
-      ],
+      "links": [],
       "nullPointMode": "null as zero",
-      "options": {
-        "dataLinks": [
-          
-        ]
-      },
       "percentage": false,
+      "pluginVersion": "7.1.3",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [
-        
-      ],
+      "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
@@ -1223,13 +1131,9 @@
           "step": 10
         }
       ],
-      "thresholds": [
-        
-      ],
+      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [
-        
-      ],
+      "timeRegions": [],
       "timeShift": null,
       "title": "Disk Space Utilization",
       "tooltip": {
@@ -1243,9 +1147,7 @@
         "mode": "time",
         "name": null,
         "show": true,
-        "values": [
-          
-        ]
+        "values": []
       },
       "yaxes": [
         {
@@ -1273,61 +1175,110 @@
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 22,
+  "schemaVersion": 26,
   "style": "dark",
-  "tags": [
-    "kubernetes-cluster"
-  ],
+  "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": false,
-          "text": "Prometheus",
-          "value": "Prometheus"
+          "selected": true,
+          "text": "default",
+          "value": "default"
         },
         "hide": 0,
         "includeAll": false,
         "label": null,
         "multi": false,
         "name": "datasource",
-        "options": [
-          
-        ],
+        "options": [],
         "query": "prometheus",
+        "queryValue": "",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
         "type": "datasource"
       },
       {
-        "allValue": null,
+        "allValue": ".*",
         "current": {
+          "selected": true,
           "text": "All",
           "value": [
             "$__all"
           ]
         },
         "datasource": "$datasource",
-        "definition": "label_values(up{job=\"node-exporter\"}, instance)",
+        "definition": "label_values(kube_node_labels,label_workload_sas_com_class)",
         "hide": 0,
         "includeAll": true,
-        "index": -1,
+        "label": "Node Class",
+        "multi": true,
+        "name": "NodeClass",
+        "options": [],
+        "query": "label_values(kube_node_labels,label_workload_sas_com_class)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "$datasource",
+        "definition": "label_values(kube_node_labels{label_workload_sas_com_class=~\"$NodeClass\"},node)",
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
+        "multi": true,
+        "name": "Node",
+        "options": [],
+        "query": "label_values(kube_node_labels{label_workload_sas_com_class=~\"$NodeClass\"},node)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "$datasource",
+        "definition": "label_values(node_uname_info{exported_nodename=~\"$Node\"}, instance)",
+        "hide": 2,
+        "includeAll": true,
         "label": "",
         "multi": true,
         "name": "instance",
-        "options": [
-          
-        ],
-        "query": "label_values(up{job=\"node-exporter\"}, instance)",
+        "options": [],
+        "query": "label_values(node_uname_info{exported_nodename=~\"$Node\"}, instance)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
         "sort": 2,
         "tagValuesQuery": "",
-        "tags": [
-          
-        ],
+        "tags": [],
         "tagsQuery": "",
         "type": "query",
         "useTags": false
@@ -1364,12 +1315,7 @@
     ]
   },
   "timezone": "",
-  "title": "EPD / Node Utilization",
+  "title": "Perf / Node Utilization",
   "uid": "3e97d1d02672cdd0861f4c97c64f89b3",
-  "variables": {
-    "list": [
-      
-    ]
-  },
-  "version": 10
+  "version": 11
 }

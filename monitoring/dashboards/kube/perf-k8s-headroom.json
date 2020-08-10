@@ -5,7 +5,7 @@
         "builtIn": 1,
         "datasource": "$datasource",
         "enable": false,
-        "expr": "time() == BOOL timestamp(rate(kube_pod_container_status_restarts_total{job=\"kube-state-metrics\", cluster=\"$cluster\", namespace=\"$namespace\", pod=\"$pod\"}[2m]) > 0)",
+        "expr": "time() == BOOL timestamp(rate(kube_pod_container_status_restarts_total{job=\"kube-state-metrics\", namespace=\"$namespace\", pod=\"$pod\"}[2m]) > 0)",
         "hide": false,
         "iconColor": "rgba(215, 44, 44, 1)",
         "name": "Restarts",
@@ -20,11 +20,9 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 45,
-  "iteration": 1593114955933,
-  "links": [
-    
-  ],
+  "id": 138,
+  "iteration": 1597075678678,
+  "links": [],
   "panels": [
     {
       "cacheTimeout": null,
@@ -40,13 +38,9 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            
-          }
+          "custom": {}
         },
-        "overrides": [
-          
-        ]
+        "overrides": []
       },
       "format": "none",
       "gauge": {
@@ -64,9 +58,7 @@
       },
       "id": 11,
       "interval": null,
-      "links": [
-        
-      ],
+      "links": [],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -104,7 +96,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(kube_node_status_allocatable_cpu_cores{cluster=\"$cluster\"})",
+          "expr": "sum(kube_node_status_allocatable_cpu_cores)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -141,15 +133,11 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            
-          }
+          "custom": {}
         },
-        "overrides": [
-          
-        ]
+        "overrides": []
       },
-      "format": "decbytes",
+      "format": "bytes",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -165,9 +153,7 @@
       },
       "id": 12,
       "interval": null,
-      "links": [
-        
-      ],
+      "links": [],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -205,7 +191,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "(sum(kube_node_status_allocatable_memory_bytes{cluster=\"$cluster\"})\r)",
+          "expr": "(sum(kube_node_status_allocatable_memory_bytes)\r)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -242,13 +228,9 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            
-          }
+          "custom": {}
         },
-        "overrides": [
-          
-        ]
+        "overrides": []
       },
       "format": "none",
       "gauge": {
@@ -266,9 +248,7 @@
       },
       "id": 14,
       "interval": null,
-      "links": [
-        
-      ],
+      "links": [],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -344,13 +324,9 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            
-          }
+          "custom": {}
         },
-        "overrides": [
-          
-        ]
+        "overrides": []
       },
       "format": "none",
       "gauge": {
@@ -368,9 +344,7 @@
       },
       "id": 7,
       "interval": null,
-      "links": [
-        
-      ],
+      "links": [],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -408,7 +382,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(kube_node_status_allocatable_cpu_cores{cluster=\"$cluster\"}) - sum(kube_pod_container_resource_requests_cpu_cores{cluster=\"$cluster\"})\r",
+          "expr": "sum(kube_node_status_allocatable_cpu_cores) - sum(kube_pod_container_resource_requests_cpu_cores)\r",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -445,15 +419,11 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            
-          }
+          "custom": {}
         },
-        "overrides": [
-          
-        ]
+        "overrides": []
       },
-      "format": "decbytes",
+      "format": "bytes",
       "gauge": {
         "maxValue": 100,
         "minValue": 0,
@@ -469,9 +439,7 @@
       },
       "id": 8,
       "interval": null,
-      "links": [
-        
-      ],
+      "links": [],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -509,7 +477,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "(sum(kube_node_status_allocatable_memory_bytes{cluster=\"$cluster\"}) - sum(kube_pod_container_resource_requests_memory_bytes{cluster=\"$cluster\"})\r)",
+          "expr": "(sum(kube_node_status_allocatable_memory_bytes) - sum(kube_pod_container_resource_requests_memory_bytes)\r)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -546,13 +514,9 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            
-          }
+          "custom": {}
         },
-        "overrides": [
-          
-        ]
+        "overrides": []
       },
       "format": "none",
       "gauge": {
@@ -570,9 +534,7 @@
       },
       "id": 15,
       "interval": null,
-      "links": [
-        
-      ],
+      "links": [],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -610,7 +572,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(kube_node_status_allocatable_pods{}) - sum(kubelet_running_pod_count{cluster=\"$cluster\", job=\"kubelet\", metrics_path=\"/metrics\"})\r",
+          "expr": "sum(kube_node_status_allocatable_pods{}) - sum(kubelet_running_pod_count{job=\"kubelet\", metrics_path=\"/metrics\"})\r",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -647,13 +609,9 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            
-          }
+          "custom": {}
         },
-        "overrides": [
-          
-        ]
+        "overrides": []
       },
       "format": "percent",
       "gauge": {
@@ -671,9 +629,7 @@
       },
       "id": 9,
       "interval": null,
-      "links": [
-        
-      ],
+      "links": [],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -711,7 +667,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "100 * (sum(kube_node_status_allocatable_cpu_cores{cluster=\"$cluster\"}) - sum(kube_pod_container_resource_requests_cpu_cores{cluster=\"$cluster\"})) / sum(kube_node_status_allocatable_cpu_cores{cluster=\"$cluster\"})",
+          "expr": "100 * (sum(kube_node_status_allocatable_cpu_cores) - sum(kube_pod_container_resource_requests_cpu_cores)) / sum(kube_node_status_allocatable_cpu_cores)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -748,13 +704,9 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            
-          }
+          "custom": {}
         },
-        "overrides": [
-          
-        ]
+        "overrides": []
       },
       "format": "percent",
       "gauge": {
@@ -772,9 +724,7 @@
       },
       "id": 10,
       "interval": null,
-      "links": [
-        
-      ],
+      "links": [],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -812,7 +762,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "100*(sum(kube_node_status_allocatable_memory_bytes{cluster=\"$cluster\"}) - sum(kube_pod_container_resource_requests_memory_bytes{cluster=\"$cluster\"})\r)/sum(kube_node_status_allocatable_memory_bytes{cluster=\"$cluster\"})",
+          "expr": "100*(sum(kube_node_status_allocatable_memory_bytes) - sum(kube_pod_container_resource_requests_memory_bytes)\r)/sum(kube_node_status_allocatable_memory_bytes)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -849,13 +799,9 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            
-          }
+          "custom": {}
         },
-        "overrides": [
-          
-        ]
+        "overrides": []
       },
       "format": "percent",
       "gauge": {
@@ -873,9 +819,7 @@
       },
       "id": 16,
       "interval": null,
-      "links": [
-        
-      ],
+      "links": [],
       "mappingType": 1,
       "mappingTypes": [
         {
@@ -913,7 +857,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "100 * (sum(kube_node_status_allocatable_pods{}) - sum(kubelet_running_pod_count{cluster=\"$cluster\", job=\"kubelet\", metrics_path=\"/metrics\"})) / sum(kube_node_status_allocatable_pods{})\r",
+          "expr": "100 * (sum(kube_node_status_allocatable_pods{}) - sum(kubelet_running_pod_count{job=\"kubelet\", metrics_path=\"/metrics\"})) / sum(kube_node_status_allocatable_pods{})\r",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -937,24 +881,18 @@
       "valueName": "avg"
     },
     {
-      "columns": [
-        
-      ],
+      "columns": [],
       "datasource": null,
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            
-          }
+          "custom": {}
         },
-        "overrides": [
-          
-        ]
+        "overrides": []
       },
       "fontSize": "100%",
       "gridPos": {
-        "h": 10,
+        "h": 13,
         "w": 15,
         "x": 0,
         "y": 6
@@ -988,15 +926,13 @@
           "decimals": 2,
           "mappingType": 1,
           "pattern": "namespace",
-          "thresholds": [
-            
-          ],
+          "thresholds": [],
           "type": "string",
           "unit": "none"
         },
         {
           "alias": "CPU Requests",
-          "align": "right",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1007,15 +943,13 @@
           "decimals": 3,
           "mappingType": 1,
           "pattern": "Value #C",
-          "thresholds": [
-            
-          ],
+          "thresholds": [],
           "type": "number",
           "unit": "none"
         },
         {
           "alias": "Mem Requests",
-          "align": "right",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1023,18 +957,16 @@
             "rgba(50, 172, 45, 0.97)"
           ],
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 3,
+          "decimals": 2,
           "mappingType": 1,
           "pattern": "Value #D",
-          "thresholds": [
-            
-          ],
+          "thresholds": [],
           "type": "number",
-          "unit": "decbytes"
+          "unit": "bytes"
         },
         {
           "alias": "cpu allocatable",
-          "align": "right",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1045,15 +977,13 @@
           "decimals": 3,
           "mappingType": 1,
           "pattern": "Value #E",
-          "thresholds": [
-            
-          ],
+          "thresholds": [],
           "type": "number",
           "unit": "none"
         },
         {
           "alias": "mem allocatable",
-          "align": "right",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1061,18 +991,16 @@
             "rgba(50, 172, 45, 0.97)"
           ],
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 3,
+          "decimals": 2,
           "mappingType": 1,
           "pattern": "Value #F",
-          "thresholds": [
-            
-          ],
+          "thresholds": [],
           "type": "number",
-          "unit": "decbytes"
+          "unit": "bytes"
         },
         {
           "alias": "Pods",
-          "align": "right",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1083,9 +1011,7 @@
           "decimals": 0,
           "mappingType": 1,
           "pattern": "Value #A",
-          "thresholds": [
-            
-          ],
+          "thresholds": [],
           "type": "number",
           "unit": "short"
         },
@@ -1102,16 +1028,14 @@
           "decimals": 0,
           "mappingType": 1,
           "pattern": "Value #B",
-          "thresholds": [
-            
-          ],
+          "thresholds": [],
           "type": "number",
           "unit": "short"
         }
       ],
       "targets": [
         {
-          "expr": "sum(kube_pod_container_resource_requests_cpu_cores{cluster=\"$cluster\"}) by (namespace)",
+          "expr": "sum(kube_pod_container_resource_requests_cpu_cores) by (namespace)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -1121,7 +1045,7 @@
           "refId": "C"
         },
         {
-          "expr": "sum(kube_node_status_allocatable_cpu_cores{cluster=\"$cluster\"})",
+          "expr": "sum(kube_node_status_allocatable_cpu_cores)",
           "format": "table",
           "hide": true,
           "instant": true,
@@ -1131,7 +1055,7 @@
           "refId": "E"
         },
         {
-          "expr": "sum(kube_pod_container_resource_requests_memory_bytes{cluster=\"$cluster\"}) by (namespace)",
+          "expr": "sum(kube_pod_container_resource_requests_memory_bytes) by (namespace)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -1141,7 +1065,7 @@
           "refId": "D"
         },
         {
-          "expr": "sum(kube_node_status_allocatable_memory_bytes{cluster=\"$cluster\"})",
+          "expr": "sum(kube_node_status_allocatable_memory_bytes)",
           "format": "table",
           "hide": true,
           "instant": true,
@@ -1151,7 +1075,7 @@
           "refId": "F"
         },
         {
-          "expr": "count(mixin_pod_workload{cluster=\"$cluster\"}) by (namespace)",
+          "expr": "count(mixin_pod_workload) by (namespace)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -1161,7 +1085,7 @@
           "refId": "A"
         },
         {
-          "expr": "count(avg(mixin_pod_workload{cluster=\"$cluster\"}) by (workload, namespace)) by (namespace)",
+          "expr": "count(avg(mixin_pod_workload) by (workload, namespace)) by (namespace)",
           "format": "table",
           "hide": true,
           "instant": true,
@@ -1178,27 +1102,21 @@
       "type": "table-old"
     },
     {
-      "columns": [
-        
-      ],
+      "columns": [],
       "datasource": null,
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {
-            
-          }
+          "custom": {}
         },
-        "overrides": [
-          
-        ]
+        "overrides": []
       },
       "fontSize": "100%",
       "gridPos": {
-        "h": 12,
+        "h": 19,
         "w": 15,
         "x": 0,
-        "y": 16
+        "y": 19
       },
       "id": 13,
       "pageSize": null,
@@ -1218,7 +1136,7 @@
         },
         {
           "alias": "Pods Count",
-          "align": "right",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1229,15 +1147,13 @@
           "decimals": null,
           "mappingType": 1,
           "pattern": "Value #A",
-          "thresholds": [
-            
-          ],
+          "thresholds": [],
           "type": "number",
           "unit": "short"
         },
         {
           "alias": "Pods Allocatable",
-          "align": "right",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1248,15 +1164,13 @@
           "decimals": null,
           "mappingType": 1,
           "pattern": "Value #B",
-          "thresholds": [
-            
-          ],
+          "thresholds": [],
           "type": "number",
           "unit": "short"
         },
         {
           "alias": "CPU Requests",
-          "align": "right",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1267,15 +1181,13 @@
           "decimals": 3,
           "mappingType": 1,
           "pattern": "Value #C",
-          "thresholds": [
-            
-          ],
+          "thresholds": [],
           "type": "number",
           "unit": "short"
         },
         {
           "alias": "CPU Allocatable",
-          "align": "right",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1286,15 +1198,13 @@
           "decimals": 3,
           "mappingType": 1,
           "pattern": "Value #D",
-          "thresholds": [
-            
-          ],
+          "thresholds": [],
           "type": "number",
           "unit": "short"
         },
         {
           "alias": "Mem Requests",
-          "align": "right",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1302,18 +1212,16 @@
             "rgba(50, 172, 45, 0.97)"
           ],
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 3,
+          "decimals": 2,
           "mappingType": 1,
           "pattern": "Value #E",
-          "thresholds": [
-            
-          ],
+          "thresholds": [],
           "type": "number",
-          "unit": "decbytes"
+          "unit": "bytes"
         },
         {
           "alias": "Mem Allocatable",
-          "align": "right",
+          "align": "auto",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -1321,19 +1229,17 @@
             "rgba(50, 172, 45, 0.97)"
           ],
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 3,
+          "decimals": 2,
           "mappingType": 1,
           "pattern": "Value #F",
-          "thresholds": [
-            
-          ],
+          "thresholds": [],
           "type": "number",
-          "unit": "decbytes"
+          "unit": "bytes"
         }
       ],
       "targets": [
         {
-          "expr": "sum(kubelet_running_pod_count{cluster=\"$cluster\", job=\"kubelet\", metrics_path=\"/metrics\"}) by (node)",
+          "expr": "sum(kubelet_running_pod_count{job=\"kubelet\", metrics_path=\"/metrics\"}) by (node)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -1397,7 +1303,7 @@
     }
   ],
   "refresh": false,
-  "schemaVersion": 25,
+  "schemaVersion": 26,
   "style": "dark",
   "tags": [
     "kubernetes-mixin"
@@ -1415,45 +1321,12 @@
         "label": null,
         "multi": false,
         "name": "datasource",
-        "options": [
-          
-        ],
+        "options": [],
         "query": "prometheus",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
         "type": "datasource"
-      },
-      {
-        "allValue": null,
-        "current": {
-          "isNone": true,
-          "selected": false,
-          "text": "None",
-          "value": ""
-        },
-        "datasource": "$datasource",
-        "definition": "label_values(kube_pod_info, cluster)",
-        "hide": 2,
-        "includeAll": false,
-        "label": "cluster",
-        "multi": false,
-        "name": "cluster",
-        "options": [
-          
-        ],
-        "query": "label_values(kube_pod_info, cluster)",
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "tagValuesQuery": "",
-        "tags": [
-          
-        ],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
       }
     ]
   },
@@ -1486,7 +1359,7 @@
     ]
   },
   "timezone": "",
-  "title": "EPD / Kubernetes Headroom",
+  "title": "Perf / Kubernetes Headroom",
   "uid": "ab4f13a9892a76a4d21ce8c2445bf4ec",
   "version": 3
 }
