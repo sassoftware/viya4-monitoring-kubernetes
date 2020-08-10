@@ -1177,7 +1177,10 @@
   "refresh": "10s",
   "schemaVersion": 26,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "kubernetes-cluster",
+    "welcome-cluster"
+  ],
   "templating": {
     "list": [
       {
@@ -1316,6 +1319,6 @@
   },
   "timezone": "",
   "title": "Perf / Node Utilization",
-  "uid": "3e97d1d02672cdd0861f4c97c64f89b3",
-  "version": 11
+  "uid": "hVNQ-oIGk",
+  "version": 1
 }

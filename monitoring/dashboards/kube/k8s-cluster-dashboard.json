@@ -2283,7 +2283,8 @@
   "schemaVersion": 26,
   "style": "dark",
   "tags": [
-    "kubernetes-cluster"
+    "kubernetes-cluster",
+    "welcome-cluster"
   ],
   "templating": {
     "list": [

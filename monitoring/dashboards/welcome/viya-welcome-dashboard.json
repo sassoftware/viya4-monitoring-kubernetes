@@ -1,4 +1,40 @@
 {
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "dashlist",
+      "name": "Dashboard list",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "7.1.3"
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "text",
+      "name": "Text",
+      "version": "7.1.0"
+    }
+  ],
   "annotations": {
     "list": [
       {
@@ -15,11 +51,11 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 43,
+  "id": null,
   "links": [],
   "panels": [
     {
-      "datasource": null,
+      "datasource": "${DS_PROMETHEUS}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -46,7 +82,7 @@
       "type": "text"
     },
     {
-      "datasource": null,
+      "datasource": "${DS_PROMETHEUS}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -73,7 +109,7 @@
       "type": "text"
     },
     {
-      "datasource": null,
+      "datasource": "${DS_PROMETHEUS}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -100,7 +136,61 @@
       "type": "text"
     },
     {
-      "datasource": null,
+      "datasource": "${DS_PROMETHEUS}",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 1,
+        "x": 0,
+        "y": 7
+      },
+      "id": 23,
+      "options": {
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "7.1.0",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": "${DS_PROMETHEUS}",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 21,
+        "x": 2,
+        "y": 7
+      },
+      "id": 8,
+      "options": {
+        "content": "## How to get help\n\n* [SAS Viya Monitoring on GitHub](https://github.com/sassoftware/kube-viya-monitoring)\n* [View open issues](https://github.com/sassoftware/kube-viya-monitoring/issues)\n* [Report a new issue](https://github.com/sassoftware/kube-viya-monitoring/issues/new)\n",
+        "mode": "markdown"
+      },
+      "pluginVersion": "7.1.0",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": "${DS_PROMETHEUS}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -112,7 +202,7 @@
         "h": 6,
         "w": 1,
         "x": 0,
-        "y": 7
+        "y": 11
       },
       "id": 19,
       "options": {
@@ -127,7 +217,7 @@
       "type": "text"
     },
     {
-      "datasource": null,
+      "datasource": "${DS_PROMETHEUS}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -152,24 +242,25 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 3,
         "w": 10,
         "x": 1,
-        "y": 7
+        "y": 11
       },
       "id": 9,
       "options": {
-        "content": "## SAS Viya dashboards\n\nIf you are a SAS administrator, these dashboards are especially useful for monitoring the performance of various components of SAS Viya.\n\n* [SAS CAS Overview](/d/Ofw6e__Wk/sas-cas-overview)\n* [SAS Go Services](/d/3j9N_AlZk/sas-go-service-details)\n* [SAS Java Service](/d/adoLetVMk/sas-java-services)\n* [RabbitMQ-Overview](/d/Kn5xm-gZk/rabbitmq-overview)",
+        "content": "## SAS Viya dashboards\n\nIf you are a SAS administrator, these dashboards are especially useful for monitoring the performance of various components of SAS Viya.",
         "mode": "markdown"
       },
       "pluginVersion": "7.1.0",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
+      "transparent": true,
       "type": "text"
     },
     {
-      "datasource": null,
+      "datasource": "${DS_PROMETHEUS}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -178,10 +269,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 1,
         "x": 12,
-        "y": 7
+        "y": 11
       },
       "id": 13,
       "options": {
@@ -196,7 +287,7 @@
       "type": "text"
     },
     {
-      "datasource": null,
+      "datasource": "${DS_PROMETHEUS}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -221,24 +312,25 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 3,
         "w": 10,
         "x": 13,
-        "y": 7
+        "y": 11
       },
       "id": 6,
       "options": {
-        "content": "## Kubernetes dashboards\n\nIf you are a Kubernetes cluster administator, these dashboards are especially useful for monitoring your Kubernetes cluster.\n\n* [Kubernetes Cluster](/d/0qo7Sq9Zz/kubernetes-cluster)\n* [Node Utilization](/d/3e97d1d02672cdd0861f4c97c64f89b3/epd-node-utilization)\n* [Container Utilization](/d/ab4f13a9892a76a4d21ce8c2445bf4ed/epd-container-utilization)\n* [API Server](/d/09ec8aa1e996d6ffcd6817bbaff4db1b/kubernetes-api-server)\n",
+        "content": "## Kubernetes dashboards\n\nIf you are a Kubernetes cluster administator, these dashboards are especially useful for monitoring your Kubernetes cluster.",
         "mode": "markdown"
       },
       "pluginVersion": "7.1.0",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
+      "transparent": true,
       "type": "text"
     },
     {
-      "datasource": null,
+      "datasource": "${DS_PROMETHEUS}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -246,29 +338,106 @@
         },
         "overrides": []
       },
-      "folderId": null,
       "gridPos": {
-        "h": 13,
+        "h": 5,
         "w": 10,
         "x": 1,
-        "y": 13
+        "y": 14
       },
-      "headings": true,
-      "id": 4,
-      "limit": 10,
+      "headings": false,
+      "id": 21,
+      "limit": 4,
       "pluginVersion": "7.1.1",
       "query": "",
-      "recent": true,
-      "search": false,
-      "starred": true,
-      "tags": [],
+      "recent": false,
+      "search": true,
+      "starred": false,
+      "tags": [
+        "welcome-viya"
+      ],
       "timeFrom": null,
       "timeShift": null,
       "title": "",
+      "transparent": true,
       "type": "dashlist"
     },
     {
-      "datasource": null,
+      "datasource": "${DS_PROMETHEUS}",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 10,
+        "x": 13,
+        "y": 14
+      },
+      "headings": false,
+      "id": 20,
+      "limit": 4,
+      "pluginVersion": "7.1.1",
+      "query": "",
+      "recent": false,
+      "search": true,
+      "starred": false,
+      "tags": [
+        "welcome-cluster"
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "dashlist"
+    },
+    {
+      "datasource": "${DS_PROMETHEUS}",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 10,
+        "x": 1,
+        "y": 19
+      },
+      "id": 22,
+      "options": {
+        "content": "## Other Dashboards\n",
+        "mode": "markdown"
+      },
+      "pluginVersion": "7.1.0",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": "${DS_PROMETHEUS}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -280,7 +449,7 @@
         "h": 4,
         "w": 1,
         "x": 12,
-        "y": 13
+        "y": 19
       },
       "id": 14,
       "options": {
@@ -295,7 +464,7 @@
       "type": "text"
     },
     {
-      "datasource": null,
+      "datasource": "${DS_PROMETHEUS}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -304,24 +473,55 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 14,
         "w": 10,
         "x": 13,
-        "y": 13
+        "y": 19
       },
-      "id": 8,
+      "id": 16,
       "options": {
-        "content": "## How to get help\n\n* [SAS Viya Monitoring on GitHub](https://github.com/sassoftware/kube-viya-monitoring)\n* [View open issues](https://github.com/sassoftware/kube-viya-monitoring/issues)\n* [Report a new issue](https://github.com/sassoftware/kube-viya-monitoring/issues/new)\n",
+        "content": "## Documentation and support\n\n[]()\n[]()\n\n### SAS Viya\n\n* [SAS Viya Operations](https://documentation.sas.com/?softwareId=mysas&softwareVersion=prod&docsetId=k8sag&docsetTarget=p1n1sa2fm6xpr3n18dppwdpv6pfr.htm)\n* [SAS Viya Administration](https://documentation.sas.com/?softwareId=viyaadmin&softwareVersion=prod&docsetId=calmonitoring&docsetTarget=titlepage.htm&locale=en)\n* [SAS Support](https://support.sas.com)\n\n### Grafana\n\n* [Documentation](https://grafana.com/docs/grafana/latest)\n* [Tutorials](https://grafana.com/tutorials)\n* [Community](https://community.grafana.com/)",
         "mode": "markdown"
       },
       "pluginVersion": "7.1.0",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
+      "transparent": true,
       "type": "text"
     },
     {
-      "datasource": null,
+      "datasource": "${DS_PROMETHEUS}",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 10,
+        "x": 1,
+        "y": 21
+      },
+      "headings": true,
+      "id": 4,
+      "limit": 10,
+      "pluginVersion": "7.1.1",
+      "query": "",
+      "recent": true,
+      "search": false,
+      "starred": true,
+      "tags": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "dashlist"
+    },
+    {
+      "datasource": "${DS_PROMETHEUS}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -333,7 +533,7 @@
         "h": 9,
         "w": 1,
         "x": 12,
-        "y": 17
+        "y": 23
       },
       "id": 15,
       "options": {
@@ -345,32 +545,6 @@
       "timeShift": null,
       "title": "",
       "transparent": true,
-      "type": "text"
-    },
-    {
-      "datasource": null,
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 10,
-        "x": 13,
-        "y": 17
-      },
-      "id": 16,
-      "options": {
-        "content": "## Documentation and support\n\n### SAS Viya\n\n* [SAS Viya Operations](https://documentation.sas.com/?softwareId=mysas&softwareVersion=prod&docsetId=k8sag&docsetTarget=p1n1sa2fm6xpr3n18dppwdpv6pfr.htm)\n* [SAS Viya Administration](https://documentation.sas.com/?softwareId=viyaadmin&softwareVersion=prod&docsetId=calmonitoring&docsetTarget=titlepage.htm&locale=en)\n* [SAS Support](https://support.sas.com)\n\n### Grafana\n\n* [Documentation](https://grafana.com/docs/grafana/latest)\n* [Tutorials](https://grafana.com/tutorials)\n* [Community](https://community.grafana.com/)",
-        "mode": "markdown"
-      },
-      "pluginVersion": "7.1.0",
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "",
       "type": "text"
     }
   ],
@@ -400,6 +574,6 @@
   },
   "timezone": "",
   "title": "SAS Viya Welcome",
-  "uid": "FHWFcA4Mz",
-  "version": 23
+  "uid": "Dye6UTIMz",
+  "version": 6
 }

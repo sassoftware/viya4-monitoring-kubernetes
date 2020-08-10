@@ -1306,7 +1306,8 @@
   "schemaVersion": 26,
   "style": "dark",
   "tags": [
-    "kubernetes-mixin"
+    "kubernetes-cluster",
+    "welcome-cluster"
   ],
   "templating": {
     "list": [
@@ -1360,6 +1361,6 @@
   },
   "timezone": "",
   "title": "Perf / Kubernetes Headroom",
-  "uid": "ab4f13a9892a76a4d21ce8c2445bf4ec",
-  "version": 3
+  "uid": "DTe_wTSMz",
+  "version": 1
 }

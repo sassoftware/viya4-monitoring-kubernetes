@@ -786,7 +786,8 @@
   "schemaVersion": 25,
   "style": "dark",
   "tags": [
-    "sas-viya"
+    "sas-viya",
+    "welcome-viya"
   ],
   "templating": {
     "list": [

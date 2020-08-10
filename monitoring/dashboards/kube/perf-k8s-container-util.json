@@ -2297,7 +2297,8 @@
   "schemaVersion": 26,
   "style": "dark",
   "tags": [
-    "kubernetes-cluster"
+    "kubernetes-cluster",
+    "welcome-cluster"
   ],
   "templating": {
     "list": [
@@ -2486,6 +2487,6 @@
   },
   "timezone": "",
   "title": "Perf / Container Utilization",
-  "uid": "ab4f13a9892a76a4d21ce8c2445bf4ed",
-  "version": 6
+  "uid": "z1qU-oSGk",
+  "version": 1
 }
