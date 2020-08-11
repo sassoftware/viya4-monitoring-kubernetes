@@ -977,7 +977,9 @@
   "refresh": "",
   "schemaVersion": 26,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "kubernetes-cluster"
+  ],
   "templating": {
     "list": [
       {

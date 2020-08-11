@@ -550,7 +550,10 @@
   ],
   "schemaVersion": 26,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "sas-viya",
+    "welcome"
+  ],
   "templating": {
     "list": []
   },

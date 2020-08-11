@@ -51,7 +51,7 @@ else
 fi
 
 # Elasticsearch Datasource for Grafana
-ELASTICSEARCH_DATASOURCE="${ELASTICSEARCH_DATASOURCE:-true}"
+ELASTICSEARCH_DATASOURCE="${ELASTICSEARCH_DATASOURCE:-false}"
 if [ "$ELASTICSEARCH_DATASOURCE" == "true" ]; then
   log_info "Provisioning Elasticsearch datasource for Grafana..."
   kubectl delete secret -n $MON_NS --ignore-not-found grafana-datasource-es
