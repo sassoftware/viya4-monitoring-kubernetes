@@ -49,6 +49,15 @@ InsightsMetrics
 | where parse_json(Tags).app == "sas-types"
 ```
 
+### Resident memory for a service in MB
+
+InsightsMetrics
+| extend T=parse_json(Tags)
+| where Namespace == "prometheus"
+| where Name == "process_resident_memory_bytes"
+| where T.app == "sas-types"
+| project TimeGenerated, Name, ResidentMemoryMB=Val/1024/1024
+
 ### Show a metric across multiple services
 
 ```text

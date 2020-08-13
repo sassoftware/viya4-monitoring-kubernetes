@@ -7,7 +7,7 @@ data:
   schema-version:
     v1
   config-version:
-    v0.1.0
+    ver1
   prometheus-data-collection-settings: |-
     [prometheus_data_collection_settings.cluster]
         interval = "1m"
