@@ -94,7 +94,7 @@ metric exporters, service monitors, and custom dashboards.
 ### Logging
 
 See the [logging README](logging/README.md) to deploy the logging components,
-including Fluent Bit, ElasticSearch, and Kibana.
+including Fluent Bit, Elasticsearch, and Kibana.
 
 ## Miscellaneous
 
