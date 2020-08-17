@@ -51,12 +51,14 @@ InsightsMetrics
 
 ### Resident memory for a service in MB
 
+```text
 InsightsMetrics
 | extend T=parse_json(Tags)
 | where Namespace == "prometheus"
 | where Name == "process_resident_memory_bytes"
 | where T.app == "sas-types"
 | project TimeGenerated, Name, ResidentMemoryMB=Val/1024/1024
+```text
 
 ### Show a metric across multiple services
 
