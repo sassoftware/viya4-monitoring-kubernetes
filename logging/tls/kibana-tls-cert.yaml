@@ -4,6 +4,8 @@ metadata:
   name: kibana-tls-cert
 spec:
   commonName: kibana
+  organization:
+  - cert-manager
   dnsNames:
   - localhost
   - prometheus-operator-kibana

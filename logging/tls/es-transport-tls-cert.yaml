@@ -4,6 +4,8 @@ metadata:
   name: es-transport-tls-cert
 spec:
   commonName: es-transport
+  organization:
+  - cert-manager
   dnsNames:
   - localhost
   - v4m-es-client-service

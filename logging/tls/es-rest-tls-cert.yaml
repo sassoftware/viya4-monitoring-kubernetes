@@ -4,6 +4,8 @@ metadata:
   name: es-rest-tls-cert
 spec:
   commonName: es-rest
+  organization:
+  - cert-manager
   dnsNames:
   - localhost
   - v4m-es-client-service

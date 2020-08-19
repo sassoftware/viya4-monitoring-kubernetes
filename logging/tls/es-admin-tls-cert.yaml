@@ -4,6 +4,8 @@ metadata:
   name: es-admin-tls-cert
 spec:
   commonName: es-admin
+  organization:
+  - cert-manager
   dnsNames:
   - localhost
   - v4m-es-client-service
