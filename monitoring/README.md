@@ -84,6 +84,8 @@ other helm charts such as Grafana and the Prometheus Node Exporter. Links
 to the charts and default values are included in the
 `user-values-prom-operator.yaml` file.
 
+**Note:** If you are using a cloud provider, you must deploy using ingress. Use the samples in the [monitoring/samples/ingress](https://github.com/sassoftware/kube-viya-monitoring/tree/master/monitoring/samples/ingress) area of this repository.
+
 ## Deploy Cluster Monitoring Components
 
 To deploy the monitoring components for the cluster, issue this command:
