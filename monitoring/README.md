@@ -84,7 +84,7 @@ other helm charts such as Grafana and the Prometheus Node Exporter. Links
 to the charts and default values are included in the
 `user-values-prom-operator.yaml` file.
 
-**Note:** If you are using a cloud provider, you must deploy using ingress. Use the samples in the [monitoring/samples/ingress](https://github.com/sassoftware/kube-viya-monitoring/tree/master/monitoring/samples/ingress) area of this repository.
+**Note:** If you are using a cloud provider, you must use ingress, rather than NodePorts. Use the samples in the [monitoring/samples/ingress](https://github.com/sassoftware/kube-viya-monitoring/tree/master/monitoring/samples/ingress) area of this repository to set up either host-based or path-based ingress.
 
 ## Deploy Cluster Monitoring Components
 
@@ -94,15 +94,6 @@ To deploy the monitoring components for the cluster, issue this command:
 # Deploy cluster monitoring (can be done before or after deploying Viya)
 monitoring/bin/deploy_monitoring_cluster.sh
 ```
-
-NodePorts are used by default at the moment, but this may change in the
-future. The applications are available on these ports by default:
-
-* Grafana - Port 31100 `http://master-node.yourcluster.example.com:31100`
-* Prometheus - Port 31090 `http://master-node.yourcluster.example.com:31090`
-* AlertManager - Port 31091 `http://master-node.yourcluster.example.com:31091`
-
-The default credentials for Grafana are `admin`:`admin`.
 
 ## Deploy SAS Viya Monitoring Components
 
@@ -120,6 +111,16 @@ VIYA_NS=<your_viya_namespace> monitoring/bin/deploy_monitoring_viya.sh
 ```
 
 By default, the components are deployed into the namespace `monitoring`.
+
+## Access Monitoring Applications
+
+NodePorts are used by default. If you deployed using NodePorts, the monitoring applications are available at these locations by default:
+
+* Grafana - Port 31100 `http://master-node.yourcluster.example.com:31100`
+* Prometheus - Port 31090 `http://master-node.yourcluster.example.com:31090`
+* AlertManager - Port 31091 `http://master-node.yourcluster.example.com:31091`
+
+The default credentials for Grafana are `admin`:`admin`.
 
 ## Update Monitoring Components
 
