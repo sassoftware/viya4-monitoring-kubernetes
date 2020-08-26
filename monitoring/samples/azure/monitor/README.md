@@ -35,18 +35,18 @@ kubectl apply -f /path/to/container-azm-ms-agentconfig.yaml
 It may take 3-5 minutes for the monitoring agents to restart and for data
 collection to begin.
 
-## Example Queries
+## Example Queries - Metrics
 
 The following are some sample queries to demonstrate how to visualize the newly
 collected Prometheus metric data.
 
-### go_threads for sas-types
+### go_threads for sas-folders
 
 ```text
 InsightsMetrics
 | where Namespace == "prometheus"
 | where Name == "go_threads"
-| where parse_json(Tags).app == "sas-types"
+| where parse_json(Tags).app == "sas-folders"
 ```
 
 ### Resident memory for a service in MB
@@ -54,10 +54,11 @@ InsightsMetrics
 ```text
 InsightsMetrics
 | extend T=parse_json(Tags)
+| extend App=tostring(T.app)
 | where Namespace == "prometheus"
 | where Name == "process_resident_memory_bytes"
-| where T.app == "sas-types"
-| project TimeGenerated, Name, ResidentMemoryMB=Val/1024/1024
+| project TimeGenerated, Name, App, ResidentMemoryMB=Val/1024/1024
+| render timechart
 ```text
 
 ### Show a metric across multiple services
@@ -76,9 +77,22 @@ InsightsMetrics
 InsightsMetrics
 | where Namespace == "prometheus"
 | where Name matches regex "sas_"
-| where parse_json(Tags).app == "sas-types"
+| where parse_json(Tags).app == "sas-folders"
 | extend App = tostring(App = parse_json(Tags).app)
 | project TimeGenerated, Name, App, Val
+| render timechart
+```
+
+### Used Memory for a SAS Go Service
+
+```text
+InsightsMetrics
+| extend App = tostring(App = parse_json(Tags).app)
+| where Namespace == "prometheus"
+| where Name == "go_memstats_alloc_bytes"
+| where App == "sas-folders"
+| extend Pod = tostring(parse_json(Tags).pod_name)
+| project TimeGenerated, Name, App, Tags, Pod, MemUsageMB=Val/1024.0/1024.0
 | render timechart
 ```
 
@@ -88,12 +102,37 @@ InsightsMetrics
 InsightsMetrics
 | extend App = tostring(App = parse_json(Tags).app)
 | where Namespace == "prometheus"
-| where Name == "go_memstats_alloc_bytes_total"
-| where App == "sas-types"
-| summarize Val=any(Val) by TimeGenerated=bin(TimeGenerated, 1m), Name, App
-| sort by TimeGenerated asc
-| project TimeGenerated, Name, App, Val - prev(Val)
+| where Name == "process_cpu_seconds_total"
+| where App == "sas-folders"
+| sort by TimeGenerated desc
+| extend nextVal = next(Val,1,-1)
+| extend diff=iif(nextVal==-1,0.0,Val - nextVal)
+| project TimeGenerated, Name, App, CPUCores=diff
 | render timechart
+```
+
+## Example Queries - Logs
+
+```text
+ContainerLog
+//KubePodInventory Contains namespace information
+| join(KubePodInventory| where TimeGenerated > startofday(ago(6h))) on ContainerID
+| extend L=parse_json(LogEntry)
+| where L.source matches regex "sas-.+"
+| where L.level == "warn" or L.level == "error" or L.level == "fatal"
+| where TimeGenerated > startofday(ago(3h))
+| project TimeGenerated ,Namespace, L.level, L.source, L.message
+```
+
+## Example Queries - Events
+
+```text
+KubeEvents
+| where TimeGenerated > ago(7d)
+| where not(isempty(Namespace))
+| where KubeEventType == "Warning"
+| project TimeGenerated, Namespace, ObjectKind, Name, Reason, Message, FirstSeen, LastSeen, Count, Computer, ClusterName
+| top 200 by TimeGenerated desc
 ```
 
 ## Links

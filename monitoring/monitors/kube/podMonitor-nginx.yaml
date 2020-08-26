@@ -2,6 +2,8 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: ingress-nginx
+  labels:
+    sas.com/monitoring-base: kube-viya-monitoring
 spec:
   selector: {}
   podMetricsEndpoints:
