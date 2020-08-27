@@ -9,7 +9,7 @@ source logging/bin/secrets-include.sh
 
 EVENTROUTER_ENABLE=${EVENTROUTER_ENABLE:-true}
 
-LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-${TLS_ENABLE:-false}}
+LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-false}
 source bin/tls-include.sh
 verify_cert_manager
 
@@ -53,11 +53,11 @@ set -e
 log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 
 if [ "$EVENTROUTER_ENABLE" == "true" ]; then
-  log_info "Deploying eventrouter..."
+  log_info "STEP 1: Deploying eventrouter..."
   kubectl apply -f logging/eventrouter.yaml
 fi
 
-# Optional TLS Support
+# TLS REQUIRED
 if [ "$TLS_ENABLE" == "true" ]; then
   # TLS-specific Helm chart values currently maintained in separate YAML file
   ES_OPEN_TLS_YAML=logging/es/odfe/es_helm_values_tls_open.yaml
@@ -91,7 +91,7 @@ else
 fi
 
 # FEATURE FLAG: configure Elasticsearch security configuration
-ES_SECURITY_CONFIG_ENABLE=${ES_SECURITY_CONFIG_ENABLE:-false}
+ES_SECURITY_CONFIG_ENABLE=${ES_SECURITY_CONFIG_ENABLE:-true}
 
 if [ "$ES_SECURITY_CONFIG_ENABLE" == "true" ]; then
   # Elasticsearch Passwords
@@ -99,6 +99,7 @@ if [ "$ES_SECURITY_CONFIG_ENABLE" == "true" ]; then
   export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD:-$(uuidgen)}
   export ES_LOGCOLLECTOR_PASSWD=${ES_LOGCOLLECTOR_PASSWD:-$(uuidgen)}
   export ES_METRICGETTER_PASSWD=${ES_METRICGETTER_PASSWD:-$(uuidgen)}
+
 
   # Create secrets containing SecurityConfig files
   create_secret_from_file securityconfig/action_groups.yml security-action-groups
@@ -140,7 +141,7 @@ else
 fi
 
 # Elasticsearch
-log_info "Step 1: Deploying Elasticsearch"
+log_info "STEP 2: Deploying Elasticsearch"
 
 odfe_tgz_file=opendistro-es-1.8.0.tgz
 
@@ -253,7 +254,7 @@ if [ "$ES_SECURITY_CONFIG_ENABLE" == "true" ]; then
   log_info "Waiting [1] minute to allow Elasticsearch to complete initialization [$(date)]"
   sleep 60s
 
-  set -e  
+  set -e
 else
   log_info "Waiting [4] minutes to allow Elasticsearch to initialize [$(date)]"
   sleep 240s
@@ -319,7 +320,7 @@ if [[ $response != 2* ]]; then
    log_error "There was an issue loading index template settings into Elasticsearch [$response]"
    kill -9 $pfPID
    exit 16
-else 
+else
    log_info "Index template settings loaded into Elasticsearch [$response]"
 fi
 
@@ -373,7 +374,7 @@ rm -f $tmpfile
 sleep 7s
 
 
-log_info "Step 1a: Deploying Elasticsearch metric exporter"
+log_info "STEP 3: Deploying Elasticsearch metric exporter"
 
 ELASTICSEARCH_EXPORTER_ENABLED=${ELASTICSEARCH_EXPORTER_ENABLED:-true}
 if [ "$ELASTICSEARCH_EXPORTER_ENABLED" == "true" ]; then
@@ -396,7 +397,7 @@ if [ "$ELASTICSEARCH_EXPORTER_ENABLED" == "true" ]; then
 fi
 
 # Kibana
-log_info "Step 2: Configuring Kibana"
+log_info "STEP 4: Configuring Kibana"
 
 # NOTE: For ODFE, Kibana is deployed as part of ES Helm chart
 
@@ -478,7 +479,7 @@ else
 fi
 
 # Import Kibana Searches, Visualizations and Dashboard Objects using curl
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.4.2_200405.ndjson  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.6.1_200807.ndjson  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 
 # TO DO/CHECK: this should return a SUCCESS message like this: {"success":true,"successCount":20}
 if [[ $response != 2* ]]; then
@@ -498,7 +499,7 @@ sleep 7s
 
 # Fluent Bit
 if [ "$FLUENT_BIT_ENABLED" == "true" ]; then
-   log_info "Step 3: Deploying Fluent Bit"
+   log_info "STEP 5: Deploying Fluent Bit"
 
    # Call separate Fluent Bit deployment script
    logging/bin/deploy_logging_fluentbit_open.sh

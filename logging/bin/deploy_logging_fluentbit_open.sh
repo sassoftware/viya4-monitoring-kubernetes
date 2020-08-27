@@ -15,10 +15,18 @@ if [ ! -f "$FB_OPEN_USER_YAML" ]; then
   FB_OPEN_USER_YAML=$TMP_DIR/empty.yaml
 fi
 
-# Fluent Bit
+if [ -f "$USER_DIR/logging/fluent-bit_config.configmap_open2.yaml" ]; then
+   # use copy in USER_DIR
+   FB_CONFIGMAP="$USER_DIR/logging/fluent-bit_config.configmap_open2.yaml"
+else
+   # use copy in repo
+   FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_open2.yaml"
+fi
+log_info "Using FB ConfigMap:" $FB_CONFIGMAP
 
+# Fluent Bit
 # Create ConfigMap containing Fluent Bit configuration
-kubectl -n $LOG_NS apply -f logging/fb/fluent-bit_config.configmap_open.yaml
+kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 
 # Create ConfigMap containing Viya-customized parsers (delete it first)
 kubectl -n $LOG_NS delete configmap fb-viya-parsers --ignore-not-found

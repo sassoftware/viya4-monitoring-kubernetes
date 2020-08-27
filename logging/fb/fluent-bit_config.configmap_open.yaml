@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.1.10
+       Set  fb_configMap_version 0.2.4
        #Set clusterID NOT_SET
     [FILTER]
        # NOTE: This kubernetes filter _only_ applies to the **METALOGGING** messages
@@ -47,6 +47,11 @@ data:
        Name           modify
        Match          *
        Copy           k8s_namespace_name temp_namespace
+       # Schema V. 2 changes
+       Rename         k8s_namespace_name k8s_namespace
+       Rename         k8s_pod_name       k8s_pod
+       Copy           k8s_container_name logsource
+       Rename         k8s_container_name k8s_container
     [FILTER]
        Name           nest
        Match          *
@@ -60,7 +65,6 @@ data:
        Name           modify
        Match          *
        Remove_regex   annotations_prometheus\.io.+
-       Copy           k8s_container_name  logsource
     [FILTER]
        Name           nest
        Match          *
@@ -113,7 +117,7 @@ data:
        Match          *
        Operation      nest
        Wildcard       k8s_*
-       Nest_under     kubernetes
+       Nest_under     kube
        Remove_prefix  k8s_
     [FILTER]
        Alias           Move_some_props
@@ -121,7 +125,6 @@ data:
        Match           *
        Rename          appname     PROPS__appname
        Rename          stream      PROPS__stream
-       Rename          kubernetes  PROPS__kubernetes
     [FILTER]
        Alias           lift_2_JL__
        Name            nest
@@ -754,7 +757,7 @@ data:
        Rename         unparsable            DB__unparsable
        Rename         flagged4parsing       DB__flagged4parsing
        Rename         fb_configMap_version  DB__fb_configMap_version
-       Rename         log                   DB__log
+       Rename         log                   DB__unparsed_message
        Rename         orig_msg_level        DB__orig_msg_level
     [FILTER]
        #
@@ -790,6 +793,7 @@ data:
        Whitelist_key  @timestamp
        Whitelist_key  debug
        Whitelist_key  level
+       Whitelist_key  kube
        Whitelist_key  logsource
        Whitelist_key  message
        Whitelist_key  messageKey
@@ -842,7 +846,8 @@ data:
        Type  _doc
        Time_Key @timestamp
        Replace_Dots On
-       Logstash_Prefix kubernetes_cluster
+       Logstash_Prefix viya_logs
+       #Logstash_Prefix kubernetes_cluster
        HTTP_User ${ES_LOGCOLLECTOR_USER}
        HTTP_Passwd ${ES_LOGCOLLECTOR_PASSWD}
        tls         on

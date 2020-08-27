@@ -33,5 +33,5 @@ ACTUAL_ES_PORT=$(kubectl -n $LOG_NS get service v4m-es-client-service -o=jsonpat
 # Print URL to access Kibana
 echo
 log_notice "=========================================================================================================="
-log_notice "== Access Elasticsearch using this URL: http://$NODE_NAME:$ACTUAL_ES_PORT/ =="
+log_notice "== Access Elasticsearch using this URL: https://$NODE_NAME:$ACTUAL_ES_PORT/ =="
 log_notice "=========================================================================================================="
