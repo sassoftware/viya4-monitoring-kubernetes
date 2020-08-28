@@ -15,12 +15,12 @@ if [ ! -f "$FB_OPEN_USER_YAML" ]; then
   FB_OPEN_USER_YAML=$TMP_DIR/empty.yaml
 fi
 
-if [ -f "$USER_DIR/logging/fluent-bit_config.configmap_open2.yaml" ]; then
+if [ -f "$USER_DIR/logging/fluent-bit_config.configmap_open.yaml" ]; then
    # use copy in USER_DIR
-   FB_CONFIGMAP="$USER_DIR/logging/fluent-bit_config.configmap_open2.yaml"
+   FB_CONFIGMAP="$USER_DIR/logging/fluent-bit_config.configmap_open.yaml"
 else
    # use copy in repo
-   FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_open2.yaml"
+   FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_open.yaml"
 fi
 log_info "Using FB ConfigMap:" $FB_CONFIGMAP
 
