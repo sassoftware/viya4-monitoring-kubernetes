@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 #
-# Creates one the following RBAC structures
+# Creates the following RBAC structures
 #
 #                                   /-- [ROLE: kibana_user]       (allows access to Kibana)
 # [BACKEND_ROLE: {NS}_kibana_user]<-
