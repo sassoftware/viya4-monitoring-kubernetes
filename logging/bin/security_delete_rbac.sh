@@ -19,9 +19,11 @@ this_script=`basename "$0"`
 NAMESPACE=${1}
 
 if [ -z "$NAMESPACE" ]; then
-  log_error "Required argument NAMESPACE no specified"
+  log_error "Required argument NAMESPACE not specified"
   log_info  ""
-  log_info  "Syntax: $this_script NAMESPACE"
+  log_info  "Usage: $this_script NAMESPACE"
+  log_info  ""
+  log_info  "Deletes access control artifacts (e.g. roles, role-mappings, etc.) previously created to limit access to the specified namespace."
   log_info  ""
   log_info  "        NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace for which access controls should be deleted"
 
@@ -33,6 +35,7 @@ fi
 
 ROLENAME=search_index_$NAMESPACE
 BACKENDROLE=${NAMESPACE}_kibana_users
+BACKENDROROLE=${NAMESPACE}_kibana_ro_users
 
 log_debug "NAMESPACE: $NAMESPACE ROLENAME: $ROLENAME BACKENDROLE: $BACKENDROLE"
 
@@ -74,14 +77,14 @@ fi
 
 
 
-# Delete role-mapping b/w Viya deployment-restricted role <==> backend-role
+# Delete role-mappings for Viya deployment-restricted role
 response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/$ROLENAME"   --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 if [[ $response != 2* ]]; then
-   log_error "There was an issue deleting the rolemapping between [$ROLENAME] and backend-role [$response]"
+   log_error "There was an issue deleting the rolemappings for [$ROLENAME] [$response]"
    kill -9 $pfPID
    exit 17
 else
-   log_info "Security rolemapping deleted between [$ROLENAME] and backend-role. [$response]"
+   log_info "Security rolemappings for [$ROLENAME]. [$response]"
 fi
 
 
@@ -96,6 +99,10 @@ else
 fi
 
 
+#
+# handle KIBANA_USER
+#
+
 # get existing rolemappings for kibana_user
 response=$(curl -s -o $TMP_DIR/ku_rm.json -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/kibana_user"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 
@@ -107,13 +114,12 @@ else
    log_info "Existing rolemappings for [kibana_user] obtained. [$response]"
 fi
 
-
 # Extract and reconstruct backend_roles array from rolemapping json
-newroles=$(grep -oP '"backend_roles":\[(.*)\],"h' $TMP_DIR/ku_rm.json | grep -oP '\[.*\]' | sed "s/\"$BACKENDROLE\"//; s/,,/,/; s/,]/]/" )
-log_debug "Updated Back-end Roles: $newroles"
+newroles=$(grep -oP '"backend_roles":\[(.*)\],"h' $TMP_DIR/ku_rm.json | grep -oP '\[.*\]' | sed "s/\"$BACKENDROLE\"//;s/\"$BACKENDROROLE\"//;s/,,,/,/;s/,,/,/; s/,]/]/" )
+log_debug "Updated Back-end Roles (kibana_user): $newroles"
 
 # Copy RBAC template
-cp logging/es/odfe/rbac/kibana_user_backend_rolemapping_delete.json $TMP_DIR
+cp logging/es/odfe/rbac/backend_rolemapping_delete.json $TMP_DIR/kibana_user_backend_rolemapping_delete.json
 
 #update json template file w/revised list of backend roles
 sed -i "s/xxBACKENDROLESxx/$newroles/gI"     $TMP_DIR/kibana_user_backend_rolemapping_delete.json # BACKENDROLES
@@ -121,13 +127,88 @@ sed -i "s/xxBACKENDROLESxx/$newroles/gI"     $TMP_DIR/kibana_user_backend_rolema
 # Replace the rolemappings for the kibana_user with the revised list of backend roles
 response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/kibana_user"  -H 'Content-Type: application/json' -d @$TMP_DIR/kibana_user_backend_rolemapping_delete.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 if [[ $response != 2* ]]; then
-   log_error "There was an issue updating the rolesmapping for [kibana_user] to remove link with backend-role [$BACKENDROLE]. [$response]"
+   log_error "There was an issue updating the rolesmapping for [kibana_user] to remove link with backend-role(s) [$BACKENDROLE]. [$response]"
    kill -9 $pfPID
    exit 17
 else
-   log_info "Security rolemapping deleted between [kibana_user] and backend-role [$BACKENDROLE]. [$response]"
+   log_info "Security rolemapping deleted between [kibana_user] and backend-role(s) [$BACKENDROLE]. [$response]"
 fi
 
+#
+# handle KIBANA_READ_ONLY
+#
+
+# get existing rolemappings for kibana_read_only
+response=$(curl -s -o $TMP_DIR/kr_rm.json -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/kibana_read_only"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+
+if [[ $response != 2* ]]; then
+   log_error "There was an issue getting the existing rolemappings for [kibana_read_only]. [$response]"
+   kill -9 $pfPID
+   exit 17
+else
+   log_info "Existing rolemappings for [kibana_read_only] obtained. [$response]"
+fi
+
+# Extract and reconstruct backend_roles array from rolemapping json
+newroles=$(grep -oP '"backend_roles":\[(.*)\],"h' $TMP_DIR/kr_rm.json | grep -oP '\[.*\]' | sed "s/\"$BACKENDROLE\"//;s/\"$BACKENDROROLE\"//;s/,,,/,/;s/,,/,/; s/,]/]/" )
+log_debug "Updated Back-end Roles (kibana_read_only): $newroles"
+
+# Copy RBAC template
+cp logging/es/odfe/rbac/backend_rolemapping_delete.json $TMP_DIR/kibana_ro_backend_rolemapping_delete.json
+
+#update json template file w/revised list of backend roles
+sed -i "s/xxBACKENDROLESxx/$newroles/gI"     $TMP_DIR/kibana_ro_backend_rolemapping_delete.json # BACKENDROLES
+
+# Replace the rolemappings for the kibana_user with the revised list of backend roles
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/kibana_read_only"  -H 'Content-Type: application/json' -d @$TMP_DIR/kibana_ro_backend_rolemapping_delete.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+if [[ $response != 2* ]]; then
+   log_error "There was an issue updating the rolesmapping for [kibana_read_only] to remove link with backend-role [$BACKENDROROLE]. [$response]"
+   kill -9 $pfPID
+   exit 17
+else
+   log_info "Security rolemapping deleted between [kibana_read_only] and backend-role [$BACKENDROROLE]. [$response]"
+fi
+
+#
+# handle CLUSTER_RO_PERMS
+#
+
+#Check if CLUSTER_RO_PERMS role exists 
+response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/roles/cluster_ro_perms"   --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+if [[ $response == 2* ]]; then
+
+  # get existing rolemappings for cluster_ro_perms
+  response=$(curl -s -o $TMP_DIR/cr_rm.json -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/cluster_ro_perms"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+
+  if [[ $response != 2* ]]; then
+     log_error "There was an issue getting the existing rolemappings for [cluster_ro_perms]. [$response]"
+     kill -9 $pfPID
+     exit 17
+  else
+     log_info "Existing rolemappings for [cluster_ro_perms] obtained. [$response]"
+  fi
+
+  # Extract and reconstruct backend_roles array from rolemapping json
+  newroles=$(grep -oP '"backend_roles":\[(.*)\],"h' $TMP_DIR/cr_rm.json | grep -oP '\[.*\]' | sed "s/\"$BACKENDROLE\"//;s/\"$BACKENDROROLE\"//;s/,,,/,/;s/,,/,/; s/,]/]/" )
+  log_debug "Updated Back-end Roles (cluster_ro_perms): $newroles"
+
+  # Copy RBAC template
+  cp logging/es/odfe/rbac/backend_rolemapping_delete.json $TMP_DIR/cluster_ro_rolemapping_delete.json
+
+  #update json template file w/revised list of backend roles
+  sed -i "s/xxBACKENDROLESxx/$newroles/gI"     $TMP_DIR/cluster_ro_rolemapping_delete.json # BACKENDROLES
+
+  # Replace the rolemappings for the cluster_ro with the revised list of backend roles
+  response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/cluster_ro_perms"  -H 'Content-Type: application/json' -d @$TMP_DIR/cluster_ro_rolemapping_delete.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+  if [[ $response != 2* ]]; then
+     log_error "There was an issue updating the rolesmapping for [cluster_ro_perms] to remove link with backend-role [$BACKENDROROLE]. [$response]"
+     kill -9 $pfPID
+     exit 17
+  else
+     log_info "Security rolemapping deleted between [cluster_ro_perms] and backend-role [$BACKENDROROLE]. [$response]"
+  fi
+
+fi # cluster_ro_perms role exists
 
 # terminate port-forwarding and remove tmpfile
 log_info "You may see a message below about a process being killed; it is expected and can be ignored."
