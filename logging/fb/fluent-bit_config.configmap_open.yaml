@@ -522,13 +522,13 @@ data:
        Copy            message   mixer_message
        Rename          message   unparsed_message
        Add             flagged4parsing mixer
-    [FILTER]
-       Alias           parse_mixer_msgs2
-       Name            parser
-       Match           XXXX*XXXX
-       Key_name        mixer_message
-       Parser          mixer
-       Reserve_Data    On
+    #[FILTER]
+    #   Alias           parse_mixer_msgs2
+    #   Name            parser
+    #   Match           XXXX*XXXX
+    #   Key_name        mixer_message
+    #   Parser          mixer
+    #   Reserve_Data    On
     [FILTER]
        Alias           flag_k8sdash
        Name            modify

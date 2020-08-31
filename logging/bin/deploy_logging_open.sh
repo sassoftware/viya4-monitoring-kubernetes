@@ -188,8 +188,8 @@ else
 fi
 
 # wait for pod to come up
-log_info "Waiting [30] seconds to allow Elasticsearch PVCs to matched with available PVs [$(date)]"
-sleep 30s
+log_info "Waiting [90] seconds to allow Elasticsearch PVCs to matched with available PVs [$(date)]"
+sleep 90s
 
 # Confirm PVC are "bound" (matched) to PVs
 for line in $(kubectl -n $LOG_NS get pvc -l 'role=master' -o=jsonpath="{range .items[*]}[{.metadata.name},{.status.phase}] {end}")
@@ -325,15 +325,7 @@ else
 fi
 
 # METALOGGING: Create index management policy object & link policy to index template
-if [[ $response != 2* ]]; then
-   log_error "There was an issue loading monitoring index template settings into Elasticsearch [$response]"
-   kill -9 $pfPID
-   exit 16
-else
-   log_info "Monitoring index template settings loaded into Elasticsearch [$response]"
-fi
 # ...index management policy automates the deletion of indexes after the specified time
-
 response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/viya_ops_idxmgmt_policy" -H 'Content-Type: application/json' -d @logging/es/odfe/es_viya_ops_idxmgmt_policy.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 # TO DO/CHECK: this should return the JSON policy definition back rather than the simpler {"acknowledged":true}
 if [[ $response != 2* ]]; then
