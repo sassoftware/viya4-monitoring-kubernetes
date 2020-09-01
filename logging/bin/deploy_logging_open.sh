@@ -293,12 +293,13 @@ fi
 # Create Index Management (I*M) Policy  objects
 response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/viya_logs_idxmgmt_policy" -H 'Content-Type: application/json' -d @logging/es/odfe/es_viya_logs_idxmgmt_policy.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 # Seems to return policy definition back to SSH window...NOT "true"?
-if [[ $response != 2* ]]; then
+if [[ $response == 409 ]]; then
+   log_info "Index management policies already exist in Elasticsearch. Skipping load." 
+elif [[ $response != 2* ]]; then
    log_error "There was an issue loading index management policies into Elasticsearch [$response]"
    kill -9 $pfPID
    exit 16
 else
-   # TODO: A '409 Conflict' response may be OK if the index policy is already loaded
    log_info "Index management policies loaded into Elasticsearch [$response]"
 fi
 
@@ -328,7 +329,9 @@ fi
 # ...index management policy automates the deletion of indexes after the specified time
 response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/viya_ops_idxmgmt_policy" -H 'Content-Type: application/json' -d @logging/es/odfe/es_viya_ops_idxmgmt_policy.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 # TO DO/CHECK: this should return the JSON policy definition back rather than the simpler {"acknowledged":true}
-if [[ $response != 2* ]]; then
+if [[ $response == 409 ]]; then
+   log_info "Monitoring index management policies already exist in Elasticsearch. Skipping load."
+elif [[ $response != 2* ]]; then
    log_error "There was an issue loading monitoring index management policies into Elasticsearch [$response]"
    kill -9 $pfPID
    exit 16
