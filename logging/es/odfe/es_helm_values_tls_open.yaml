@@ -88,6 +88,11 @@
         secretKeyRef:
           name: internal-user-logcollector
           key: password
+   - name: ES_METRICGETTER_PASSWD
+     valueFrom:
+        secretKeyRef:
+          name: internal-user-metricgetter
+          key: password
 
    extraVolumes:
    - name: v4m-security-script2
