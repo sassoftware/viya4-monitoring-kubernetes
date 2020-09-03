@@ -22,6 +22,18 @@ if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
 
+# Check for existing OpenDistro helm release
+existingODFE="false"
+if [ "$HELM_VER_MAJOR" == "3" ]; then
+  if [ helm status -n $LOG_NS odfe 1>/dev/null 2>&1 ]; then
+    existingODFE="true"
+  fi
+else
+  if [ helm status odfe-$LOG_NS 1>/dev/null 2>&1 ]; then
+    existingODFE="true"
+  fi
+fi
+
 # Elasticsearch user customizations
 ES_OPEN_USER_YAML="${ES_OPEN_USER_YAML:-$USER_DIR/logging/user-values-elasticsearch-open.yaml}"
 if [ ! -f "$ES_OPEN_USER_YAML" ]; then
@@ -67,13 +79,13 @@ if [ "$TLS_ENABLE" == "true" ]; then
      KB_OPEN_TLS_YAML=logging/es/odfe/es_helm_values_kb_tls_open.yaml
      # w/TLS: use HTTPS in curl commands
      KB_CURL_PROTOCOL=https
-     log_debug "TLS enabled for Kibana."
+     log_debug "TLS enabled for Kibana"
   else
      # point to an empty yaml file
      KB_OPEN_TLS_YAML=$TMP_DIR/empty.yaml
      # w/o TLS: use HTTP in curl commands
      KB_CURL_PROTOCOL=http
-     log_debug "TLS not enabled for Kibana. Skipping."
+     log_debug "TLS not enabled for Kibana"
   fi
 
   apps=( es-transport es-rest es-admin kibana )
@@ -87,7 +99,7 @@ else
 
   # w/TLS: use HTTPS in curl commands
   KB_CURL_PROTOCOL=http
-  log_debug "TLS not enabled for logging components. Skipping."
+  log_debug "TLS not enabled for logging components"
 fi
 
 # FEATURE FLAG: configure Elasticsearch security configuration
@@ -236,19 +248,21 @@ if [ "$ES_SECURITY_CONFIG_ENABLE" == "true" ]; then
   set +e
 
   # Run the security admin script on the pod
-  kubectl -n $LOG_NS exec v4m-es-master-0 -it -- config/run_securityadmin.sh
-
-  # Retrieve log file from security admin script
-  kubectl -n $LOG_NS cp v4m-es-master-0:config/run_securityadmin.log $TMP_DIR/run_securityadmin.log
-
-  if [ "$(tail -n1  $TMP_DIR/run_securityadmin.log)" == "Done with success" ]; then
-    log_info "The run_securityadmin.log script appears to have run successfully; you can review its output below:"
+  # Add some logic to find ES release
+  if [ "$existingODFE" == "false" ]; then
+    kubectl -n $LOG_NS exec v4m-es-master-0 -it -- config/run_securityadmin.sh
+    # Retrieve log file from security admin script
+    kubectl -n $LOG_NS cp v4m-es-master-0:config/run_securityadmin.log $TMP_DIR/run_securityadmin.log
+    if [ "$(tail -n1  $TMP_DIR/run_securityadmin.log)" == "Done with success" ]; then
+      log_info "The run_securityadmin.log script appears to have run successfully; you can review its output below:"
+    else
+      log_warn "There may have been a problem with the run_securityadmin.log script; review the output below:"
+    fi
+    # show output from run_securityadmin.sh script
+    sed 's/^/   | /' $TMP_DIR/run_securityadmin.log
   else
-    log_warn "There may have been a problem with the run_securityadmin.log script; review the output below:"
+    log_info "Existing OpenDistro release found. Skipping Elasticsearh security initialization."
   fi
-
-  # show output from run_securityadmin.sh script
-  sed 's/^/   | /' $TMP_DIR/run_securityadmin.log
 
   # Need to wait for completion?
   log_info "Waiting [1] minute to allow Elasticsearch to complete initialization [$(date)]"
@@ -259,7 +273,6 @@ else
   log_info "Waiting [4] minutes to allow Elasticsearch to initialize [$(date)]"
   sleep 240s
 fi
-
 
 # set up temporary port forwarding to allow curl access
 ES_PORT=$(kubectl -n $LOG_NS get service v4m-es-client-service -o=jsonpath='{.spec.ports[?(@.name=="http")].port}')
