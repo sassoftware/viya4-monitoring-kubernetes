@@ -1,6 +1,6 @@
 image:
   fluent_bit:
-    tag: 1.3.11
+    tag: 1.5.4
 podAnnotations: 
   fluentbit.io/parser: fluentbit
 backend:
@@ -42,12 +42,12 @@ env:
    - name: ES_LOGCOLLECTOR_USER
      valueFrom:
        secretKeyRef:
-         name: internal-user-admin
+         name: internal-user-logcollector
          key: username
    - name: ES_LOGCOLLECTOR_PASSWD
      valueFrom:
        secretKeyRef:
-         name: internal-user-admin
+         name: internal-user-logcollector
          key: password
 
 # Be very tolerant

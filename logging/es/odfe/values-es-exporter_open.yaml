@@ -51,10 +51,10 @@ service:
 
 extraEnvSecrets:
    ES_USER:
-     secret:  internal-user-admin
+     secret:  internal-user-metricgetter
      key: username
    ES_PASSWORD:
-     secret:  internal-user-admin
+     secret:  internal-user-metricgetter
      key: password
 
 es:

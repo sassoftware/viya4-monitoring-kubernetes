@@ -15,7 +15,7 @@ helm2ReleaseCheck es-exporter-$LOG_NS
 helm3ReleaseCheck odfe $LOG_NS
 helm3ReleaseCheck es-exporter $LOG_NS
 
-log_info "Removing logging components"
+log_info "Removing logging components [$(date)]"
 
 logging/bin/remove_logging_fluentbit_open.sh
 

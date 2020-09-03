@@ -9,22 +9,26 @@ _meta:
 
 admin:
   hash: ${envbc.ES_ADMIN_PASSWD}
-  reserved: true
+  reserved: false
   backend_roles:
   - "admin"
   description: "Admin user"
 
 kibanaserver:
   hash: ${envbc.ES_KIBANASERVER_PASSWD}
-  reserved: true
+  reserved: false
   description: "Kibanaserver user"
 
 logcollector:
   hash: ${envbc.ES_LOGCOLLECTOR_PASSWD}
-  reserved: true
+  reserved: false
   description: "Logcollector user"
+  opendistro_security_roles:
+  - log_collection
 
 metricgetter:
   hash: ${envbc.ES_METRICGETTER_PASSWD}
-  reserved: true
+  reserved: false
   description: "Metricgetter user"
+  opendistro_security_roles:
+  - metric_collector
