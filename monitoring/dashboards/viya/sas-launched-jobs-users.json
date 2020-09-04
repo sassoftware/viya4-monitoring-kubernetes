@@ -841,7 +841,7 @@
           "hide": false,
           "interval": "",
           "intervalFactor": 4,
-          "legendFormat": "{{label_launche r_sas_com_username}} - Reads",
+          "legendFormat": "{{label_launcher_sas_com_username}} - Reads",
           "refId": "C"
         },
         {
