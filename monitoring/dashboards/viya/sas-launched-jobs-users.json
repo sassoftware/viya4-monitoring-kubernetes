@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 64,
-  "iteration": 1599182775386,
+  "iteration": 1599182775406,
   "links": [],
   "panels": [
     {
@@ -159,7 +159,7 @@
       "pluginVersion": "7.1.4",
       "targets": [
         {
-          "expr": "sum(:sas_launcher_pod_mem_working_set_bytes:{pod=~\"$pod\"}) or vector(0)",
+          "expr": "sum(:sas_launcher_pod_mem_usage_bytes:{pod=~\"$pod\"}) or vector(0)",
           "instant": false,
           "interval": "",
           "legendFormat": "Total Memory Usage",
@@ -245,7 +245,7 @@
       "pluginVersion": "7.1.4",
       "targets": [
         {
-          "expr": "sum(kube_pod_status_phase{pod=~\"$pod\", phase=~\"Pending\"}) or vector(0)",
+          "expr": "sum(kube_pod_status_phase{pod=~\"$pod\", phase=~\"Pending\"})",
           "instant": false,
           "interval": "",
           "legendFormat": "Pending",
@@ -331,7 +331,7 @@
       "pluginVersion": "7.1.4",
       "targets": [
         {
-          "expr": "sum(kube_pod_status_phase{pod=~\"$pod\", phase=~\"Running\"}) or vector(0)",
+          "expr": "sum(kube_pod_status_phase{pod=~\"$pod\", phase=~\"Running\"})",
           "instant": false,
           "interval": "",
           "legendFormat": "Running",
@@ -716,7 +716,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "topk($top,:sas_launcher_pod_mem_working_set_bytes:{pod=~\"$pod\"})",
+          "expr": "topk($top,:sas_launcher_pod_mem_usage_bytes:{pod=~\"$pod\"})",
           "hide": true,
           "interval": "",
           "intervalFactor": 4,
@@ -724,7 +724,7 @@
           "refId": "A"
         },
         {
-          "expr": "topk($top,sum(:sas_launcher_pod_mem_working_set_bytes:{pod=~\"$pod\"}) by (label_launcher_sas_com_username))",
+          "expr": "topk($top,sum(:sas_launcher_pod_mem_usage_bytes:{pod=~\"$pod\"}) by (label_launcher_sas_com_username))",
           "interval": "",
           "intervalFactor": 4,
           "legendFormat": "{{label_launcher_sas_com_username}}",
@@ -824,32 +824,32 @@
       "targets": [
         {
           "expr": "topk($top,sum(kube_pod_labels{pod=~\"$pod\"} + on (pod) group_right(label_launcher_sas_com_username) rate(container_fs_reads_bytes_total{container=\"\",pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username))",
-          "hide": false,
+          "hide": true,
           "interval": "",
           "legendFormat": "{{label_launcher_sas_com_username}} - Reads",
           "refId": "A"
         },
         {
           "expr": "-(topk($top,sum(kube_pod_labels{pod=~\"$pod\"} + on (pod) group_right(label_launcher_sas_com_username) rate(container_fs_writes_bytes_total{container=\"\",pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username)))",
-          "hide": false,
+          "hide": true,
           "interval": "",
           "legendFormat": "{{label_launcher_sas_com_username}} - Writes",
           "refId": "B"
         },
         {
           "expr": "topk($top,sum(rate(:sas_launcher_pod_fs_read_bytes_total:{pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username))",
-          "hide": true,
+          "hide": false,
           "interval": "",
           "intervalFactor": 4,
-          "legendFormat": "{{label_launcher_sas_com_username}}",
+          "legendFormat": "{{label_launche r_sas_com_username}} - Reads",
           "refId": "C"
         },
         {
           "expr": "-topk($top,sum(rate(:sas_launcher_pod_fs_write_bytes_total:{pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username))",
-          "hide": true,
+          "hide": false,
           "interval": "",
           "intervalFactor": 4,
-          "legendFormat": "{{label_launcher_sas_com_username}}",
+          "legendFormat": "{{label_launcher_sas_com_username}} - Writes",
           "refId": "D"
         }
       ],
@@ -967,7 +967,7 @@
           "refId": "C"
         },
         {
-          "expr": "topk($top,sum(rate(:sas_launcher_pod_net_transmit_bytes_total:{pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username))",
+          "expr": "-topk($top,sum(rate(:sas_launcher_pod_net_transmit_bytes_total:{pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username))",
           "interval": "",
           "intervalFactor": 4,
           "legendFormat": "{{label_launcher_sas_com_username}} - Transmit",
@@ -1351,7 +1351,7 @@
               "refId": "A"
             },
             {
-              "expr": ":sas_launcher_pod_mem_working_set_bytes:{phase=~\"Pending|Running\",pod=~\"$pod\"}",
+              "expr": ":sas_launcher_pod_mem_usage_bytes:{phase=~\"Pending|Running\",pod=~\"$pod\"}",
               "format": "table",
               "hide": false,
               "instant": true,
@@ -1369,7 +1369,7 @@
               "refId": "C"
             },
             {
-              "expr": "sum(:sas_launcher_pod_mem_working_set_bytes:{phase=~\"Pending|Running\",pod=~\"$pod\"}) by (pod,namespace) / sum(kube_pod_container_resource_limits{resource=\"memory\",pod=~\"$pod\"}) by (pod,namespace)",
+              "expr": "sum(:sas_launcher_pod_mem_usage_bytes:{phase=~\"Pending|Running\",pod=~\"$pod\"}) by (pod,namespace) / sum(kube_pod_container_resource_limits{resource=\"memory\",pod=~\"$pod\"}) by (pod,namespace)",
               "format": "table",
               "hide": false,
               "instant": true,
@@ -1434,9 +1434,7 @@
   "refresh": "10s",
   "schemaVersion": 26,
   "style": "dark",
-  "tags": [
-    "sas-viya"
-  ],
+  "tags": [],
   "templating": {
     "list": [
       {
