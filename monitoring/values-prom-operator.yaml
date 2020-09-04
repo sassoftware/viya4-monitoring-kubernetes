@@ -187,7 +187,7 @@ nodeExporter:
 # https://github.com/helm/charts/tree/master/stable/grafana
 grafana:
   image:
-    tag: "7.1.4"
+    tag: "7.1.5"
   "grafana.ini":
     analytics:
       check_for_updates: false

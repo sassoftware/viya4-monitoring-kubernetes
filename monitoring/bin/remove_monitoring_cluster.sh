@@ -49,6 +49,13 @@ kubectl delete --ignore-not-found podmonitor -n $MON_NS eventrouter
 kubectl delete --ignore-not-found servicemonitor -n $MON_NS elasticsearch
 kubectl delete --ignore-not-found servicemonitor -n $MON_NS fluent-bit
 
+log_info "Removing Prometheus rules..."
+rules=( sas-launcher-job-rules )
+for rule in "${rules[@]}"
+do
+  kubectl delete --ignore-not-found -n $MON_NS prometheusrule $rule
+done
+
 log_info "Removing configmaps and secrets..."
 kubectl delete cm --ignore-not-found -n $MON_NS -l sas.com/monitoring-base=kube-viya-monitoring
 kubectl delete secret --ignore-not-found -n $MON_NS -l sas.com/monitoring-base=kube-viya-monitoring

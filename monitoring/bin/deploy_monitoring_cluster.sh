@@ -160,6 +160,12 @@ kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-elasticse
 # Fluent Bit
 kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-fluent-bit.yaml
 
+# Rules
+log_info "Adding Prometheus recording rules..."
+for f in monitoring/rules/viya/rules-*.yaml; do
+  kubectl apply -n $MON_NS -f $f
+done
+
 echo ""
 monitoring/bin/deploy_dashboards.sh
 
