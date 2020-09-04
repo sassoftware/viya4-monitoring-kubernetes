@@ -1,40 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_PROMETHEUS",
-      "label": "Prometheus",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
-  "__requires": [
-    {
-      "type": "panel",
-      "id": "dashlist",
-      "name": "Dashboard list",
-      "version": ""
-    },
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "7.1.3"
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "text",
-      "name": "Text",
-      "version": "7.1.0"
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -179,7 +143,7 @@
       },
       "id": 8,
       "options": {
-        "content": "## How to get help\n\n* [SAS Viya Monitoring on GitHub](https://github.com/sassoftware/kube-viya-monitoring)\n* [View open issues](https://github.com/sassoftware/kube-viya-monitoring/issues)\n* [Report a new issue](https://github.com/sassoftware/kube-viya-monitoring/issues/new)\n",
+        "content": "## How to get help\n\n* [SAS Viya Monitoring on GitHub](https://github.com/sassoftware/viya4-monitoring-kubernetes)\n* [View open issues](https://github.com/sassoftware/viya4-monitoring-kubernetes/issues)\n* [Report a new issue](https://github.com/sassoftware/viya4-monitoring-kubernetes/issues/new)\n",
         "mode": "markdown"
       },
       "pluginVersion": "7.1.0",
@@ -338,6 +302,7 @@
         },
         "overrides": []
       },
+      "folderId": null,
       "gridPos": {
         "h": 5,
         "w": 10,
@@ -370,6 +335,7 @@
         },
         "overrides": []
       },
+      "folderId": null,
       "gridPos": {
         "h": 5,
         "w": 10,
@@ -499,6 +465,7 @@
         },
         "overrides": []
       },
+      "folderId": null,
       "gridPos": {
         "h": 12,
         "w": 10,
@@ -519,33 +486,6 @@
       "title": "",
       "transparent": true,
       "type": "dashlist"
-    },
-    {
-      "datasource": "${DS_PROMETHEUS}",
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 1,
-        "x": 12,
-        "y": 23
-      },
-      "id": 15,
-      "options": {
-        "content": "![](https://support.sas.com/en/support-home/_jcr_content/par/styledcontainer_1511041706/par/styledcontainer/par/styledcontainer/par/image.img.png/1504883088640.png)\n",
-        "mode": "markdown"
-      },
-      "pluginVersion": "7.1.0",
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "",
-      "transparent": true,
-      "type": "text"
     }
   ],
   "schemaVersion": 26,
