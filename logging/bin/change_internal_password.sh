@@ -35,25 +35,145 @@ NEW_PASSWD="${2:-$(uuidgen)}"
 log_debug USER_NAME: $USER_NAME
 log_debug NEW_PASSWD: $NEW_PASSWD
 
-kubectl -n $LOG_NS exec v4m-es-master-0 -it -- ./config/set_user_password.sh $USER_NAME $NEW_PASSWD
+#get current credentials from Kubernetes secret
+ES_USER=$(kubectl -n $LOG_NS get secret internal-user-$USER_NAME -o=jsonpath="{.data.\username}" |base64 --decode)
+ES_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-$USER_NAME -o=jsonpath="{.data.password}" |base64 --decode)
+log_debug "ES_USER: $ES_USER ES_PASSWD: $ES_PASSWD"
 
-# Retrieve log file from security admin script
-kubectl -n $LOG_NS cp v4m-es-master-0:config/set_user_password.log $TMP_DIR/set_user_password.log
+# set up temporary port forwarding to allow curl access
+ES_PORT=$(kubectl -n $LOG_NS get service v4m-es-client-service -o=jsonpath='{.spec.ports[?(@.name=="http")].port}')
 
-if [ "$(tail -n1  $TMP_DIR/set_user_password.log)" == "Done with success" ]; then
-  log_info "The set_user_password.log script appears to have run successfully on the pod; you can review its output below:"
-  success=true
+# temp file used to capture command output
+tmpfile=$TMP_DIR/output.txt
+
+# command is sent to run in background
+kubectl -n $LOG_NS port-forward --address localhost svc/v4m-es-client-service :$ES_PORT > $tmpfile  &
+
+# get PID to allow us to kill process later
+pfPID=$!
+log_debug "pfPID: $pfPID"
+
+# pause to allow port-forwarding messages to appear
+sleep 5s
+
+# determine which port port-forwarding is using
+pfRegex='Forwarding from .+:([0-9]+)'
+myline=$(head -n1  $tmpfile)
+
+if [[ $myline =~ $pfRegex ]]; then
+   TEMP_PORT="${BASH_REMATCH[1]}";
+   log_debug "TEMP_PORT=${TEMP_PORT}"
 else
-  log_error "There was a problem running the set_user_password.sh script on the pod; review the output below:"
-  success=false
+   set +e
+   log_error "Unable to obtain or identify the temporary port used for port-forwarding; exiting script.";
+   kill -9 $pfPID
+   rm -f  $tmpfile
+   exit 18
 fi
 
-# show output from set_user_password.sh script
-sed 's/^/   | /' $TMP_DIR/set_user_password.log
+# Attempt to change password using current user credentials
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_security/api/account"   -H 'Content-Type: application/json' -d'{"current_password" : "'"$ES_PASSWD"'", "password" : "'"$NEW_PASSWD"'"}' --user "$ES_USER:$ES_PASSWD" --insecure)
+if [[ $response == 4* ]]; then
+   log_warn "The currently stored credentials for [$USER_NAME] do NOT appear to be up-to-date; unable to use them to change password.[$response]"
+
+   if [ "$USER_NAME" != "admin" ]; then
+
+      log_info "Will attempt to use admin credentials to change password for [$USER_NAME]"
+
+      ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
+      ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
+
+      # make sure hash utility is executable
+      kubectl -n $LOG_NS exec v4m-es-master-0 --  chmod +x /usr/share/elasticsearch/plugins/opendistro_security/tools/hash.sh
+      # get hash of new password
+      hashed_passwd=$(kubectl -n $LOG_NS exec v4m-es-master-0 --  /usr/share/elasticsearch/plugins/opendistro_security/tools/hash.sh -p $NEW_PASSWD)
+      rc=$?
+      if [ "$rc" == "0" ]; then
+
+         #try changing password using admin password
+         response=$(curl -s -o /dev/null -w "%{http_code}"  -XPATCH "https://localhost:$TEMP_PORT/_opendistro/_security/api/internalusers/$ES_USER"   -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "hash", "value" : "'"$hashed_passwd"'"}]'  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+         if [[ $response == 4* ]]; then
+            log_error "The Kubernetes secret containing credentials for the [admin] user appears to be out-of-date.[$response]"
+            echo ""
+            log_notice "+================================================================================================+"
+            log_notice "|                                *********** IMPORTANT NOTE ***********                          |"
+            log_notice "|                                                                                                |"
+            log_notice "| It is VERY IMPORTANT to ensure the credentials for the [admin] account and the corresponding   |"
+            log_notice "| Kubernetes secret [internal-user-admin] in the [$LOG_NS] namespace are ALWAYS synchronized.    |"
+            log_notice "| Re-run this script with the updated password for the [admin] account to update the secret with |"
+            log_notice "| the current password.                                                                          |"
+            log_notice "|                                                                                                |"
+            log_notice "| You may then run this script again to update the password for the [$USER_NAME] account.      |"
+            log_notice "+================================================================================================+"
+            echo ""
+            success="false"
+         elif [[ $response == 2* ]]; then
+            log_info "Password for [$USER_NAME] has been changed in Elasticsearch.[$response]"
+            success="true"
+         else
+            log_warn "Unable to change password for [$USER_NAME] using [admin] credentials. [$response]"
+            success="false"
+         fi
+      else
+         log_error "Unable to obtain a hash of the new password; password not changed. [rc: $rc]";
+      fi
+   else
+      log_info "Attempting to change password for user [admin] using the admin certs rather than cached password"
+
+      # make sure hash utility is executable
+      kubectl -n $LOG_NS exec v4m-es-master-0 --  chmod +x /usr/share/elasticsearch/plugins/opendistro_security/tools/hash.sh
+      # get hash of new password
+      hashed_passwd=$(kubectl -n $LOG_NS exec v4m-es-master-0 --  /usr/share/elasticsearch/plugins/opendistro_security/tools/hash.sh -p $NEW_PASSWD)
+
+      #obtain admin cert
+      rm -f $TMP_DIR/tls.crt
+      admin_tls_cert=$(kubectl -n logging get secrets es-admin-tls-secret -o "jsonpath={.data['tls\.crt']}")
+      if [ -z "$admin_tls_cert" ]; then
+         log_error "Unable to obtain admin certs from secret [es-admin-tls-secret] in the [$LOG_NS] namespace. Password for [$USER_NAME] has NOT been changed."
+         success="false"
+      else
+         log_debug "File tls.crt obtained from Kubernetes secret"
+         echo "$admin_tls_cert" |base64 --decode > $TMP_DIR/admin_tls.crt
+
+         #obtain admin TLS key
+         rm -f $TMP_DIR/tls.key
+         admin_tls_key=$(kubectl -n logging get secrets es-admin-tls-secret -o "jsonpath={.data['tls\.key']}")
+         if [ -z "$admin_tls_key" ]; then
+            log_error "Unable to obtain admin cert key from secret [es-admin-tls-secret] in the [$LOG_NS] namespace. Password for [$USER_NAME] has NOT been changed."
+            success="false"
+         else
+            log_debug "File tls.key obtained from Kubernetes secret"
+            echo "$admin_tls_key" |base64 --decode > $TMP_DIR/admin_tls.key
+
+            # Attempt to change password using admin certs
+            response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "https://localhost:$TEMP_PORT/_opendistro/_security/api/internalusers/$ES_USER"   -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "hash", "value" : "'"$hashed_passwd"'"}]'  --cert $TMP_DIR/admin_tls.crt --key $TMP_DIR/admin_tls.key  --insecure)
+            if [[ $response == 2* ]]; then
+               log_info "Password for [$USER_NAME] has been changed in Elasticsearch.[$response]"
+               success="true"
+            else
+               log_warn "Unable to change password for [$USER_NAME] using [admin] certificates.[$response]"
+               success="false"
+            fi
+         fi
+      fi
+   fi
+elif [[ $response == 2* ]]; then
+   log_info "Password change response [$response]"
+   success="true"
+else
+   log_error "An unexpected problem was encountered while attempting to update password for [$USER_NAME]; password not changed [$response]"
+   success="false"
+fi
+
+# terminate port-forwarding and remove tmpfile
+log_info "You may see a message below about a process being killed; it is expected and can be ignored."
+kill  -9 $pfPID
+rm -f $tmpfile
+sleep 7s
 
 if [ "$success" == "true" ]; then
-  log_info "Successfully changed the password for user [$USER_NAME] on the Elasticsearch pod."
-  log_info "Trying to store the updated credentials in a Kubernetes secret."
+  log_info "Successfully changed the password for [$USER_NAME] in Elasticsearch internal database."
+  log_info "Trying to store the updated credentials in the corresponding Kubernetes secret [internal-user-$USER_NAME]."
 
   kubectl -n $LOG_NS delete secret internal-user-$USER_NAME  --ignore-not-found
   create_user_secret internal-user-$USER_NAME $USER_NAME $NEW_PASSWD
@@ -62,7 +182,46 @@ if [ "$success" == "true" ]; then
     log_error "IMPORTANT! A Kubernetes secret holding the password for $USER_NAME no longer exists."
     log_error "This WILL cause problems when the Elasticsearch pods restart."
     log_error "Try re-running this script again OR manually creating the secret using the command: "
-    log_error "kubectl -n $LOG_NS create secret generic --from-literal=username=$username --from-literal=password=$password "
+    log_error "kubectl -n $LOG_NS create secret generic --from-literal=username=$USER_NAME --from-literal=password=$NEW_PASSWD"
+  else
+    case $USER_NAME in
+     admin)
+       ;;
+     logcollector)
+       echo ""
+       log_notice "+=============================================================================+"
+       log_notice "|                        *********** IMPORTANT NOTE ***********               |"
+       log_notice "|                                                                             |"
+       log_notice "| After changing the password for the [logcollector] user, you should restart |"
+       log_notice "| the Fluent Bit pods to ensure log collection is not interrupted.            |"
+       log_notice "|                                                                             |"
+       log_notice "| This can be done by submitting the following command:                       |"
+       log_notice "+=============================================================================+"
+       log_notice "|========== kubectl -n $LOG_NS delete pods -l 'app=fluent-bit' ===============|"
+       log_notice "+=============================================================================+"
+       echo ""
+       ;;
+     kibanaserver)
+       ;;
+     metricgetter)
+       echo ""
+       log_notice "+======================================================================================+"
+       log_notice "|                        *********** IMPORTANT NOTE ***********                        |"
+       log_notice "|                                                                                      |"
+       log_notice "| After changing the password for the [metricgetter] user, you should restart the      |"
+       log_notice "| Elasticsearch Exporter pod to ensure Elasticsearch metrics continue to be collected. |"
+       log_notice "|                                                                                      |"
+       log_notice "| This can be done by submitting the following command:                                |"
+       log_notice "+======================================================================================+"
+       log_notice "|========== kubectl -n $LOG_NS delete pod -l 'app=elasticsearch-exporter' =============|"
+       log_notice "+======================================================================================+"
+       echo ""
+       ;;
+     *)
+     log_error "The user name [$USER_NAME] you provided is not one of the supported internal users; exiting"
+     exit 2
+  esac
+
   fi
 else
   log_error "Unable to update the password for user [$USER_NAME] on the Elasticsearch pod; original password remains in place."
