@@ -6,6 +6,23 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
+this_script=`basename "$0"`
+
+function show_usage {
+   log_info  ""
+   log_info  "Usage: $this_script USERNAME [PASSWORD] "
+   log_info  ""
+   log_info  "Changes the password for one of the special internal user accounts used by other components of the monitoring system to communicate "
+   log_info  "with Elasticsearch.  In addition, the script upates the internal cache (i.e. corresponding Kubernetes secret) with the new value."
+   log_info  ""
+   log_info  "     USERNAME - REQUIRED; the internal username for which the password is be changed; "
+   log_info  "                MUST be one of: admin, kibanaserver, logcollector or metricgetter"
+   log_info  ""
+   log_info  "     PASSWORD - OPTIONAL; the new password.  If not provided, a 36-character UUID will be generated and used as the password"
+   log_info  ""
+   echo ""
+}
+
 
 USER_NAME=${1}
 
@@ -14,7 +31,7 @@ if [ "$USER_NAME" == "" ]; then
   log_error "Required argument [USER_NAME] not provided."
   exit 1
 else
-  case $USER_NAME in
+  case "$USER_NAME" in
    admin)
      ;;
    logcollector)
@@ -23,9 +40,15 @@ else
      ;;
    metricgetter)
      ;;
+   --help|-h)
+     show_usage
+     exit
+     ;;
    *)
      log_error "The user name [$USER_NAME] you provided is not one of the supported internal users; exiting"
+     show_usage
      exit 2
+     ;;
   esac
 fi
 
