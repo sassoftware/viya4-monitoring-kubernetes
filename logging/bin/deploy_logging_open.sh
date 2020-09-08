@@ -133,13 +133,6 @@ if [ "$ES_SECURITY_CONFIG_ENABLE" == "true" ]; then
     log_info "Using existing ConfigMap [run-securityadmin.sh]"
   fi
 
-  # Create ConfigMap for set_user_password.sh script
-  if [ -z "$(kubectl -n $LOG_NS get configmap set-user-password.sh -o name 2>/dev/null)" ]; then
-    kubectl -n $LOG_NS create configmap set-user-password.sh --from-file logging/es/odfe/bin/set_user_password.sh
-  else
-    log_info "Using existing ConfigMap [set_user_password.sh]"
-  fi
-
   # Need to retrieve these from secrets in case secrets pre-existed
   export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
   export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
