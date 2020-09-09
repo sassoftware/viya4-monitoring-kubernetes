@@ -170,17 +170,17 @@ if [ "$READONLY" == "true" ]; then
     log_debug "Role [cluster_ro_perms] already exists."
   fi
 
-  # Create role-mapping b/w CLUSTER_RO_PERMS <==> backend-role
+  # Create role-mapping b/w CLUSTER_RO_PERMS <==> read-only backend-role
   response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/cluster_ro_perms"  -H 'Content-Type: application/json' -d @$TMP_DIR/rbac/ro_role_backend_rolemapping.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
   if [[ $response != 2* ]]; then
      log_error "There was an issue creating the rolemapping between [cluster_ro_perms] and backend-role [$RO_BE_ROLENAME]. [$response]"
      kill -9 $pfPID
      exit 21
   else
-     log_info "Security rolemapping created between [cluster_ro_perms] and backend-role [$RO_ROLENAME]. [$response]"
+     log_info "Security rolemapping created between [cluster_ro_perms] and backend-role [$RO_BE_ROLENAME]. [$response]"
   fi
 
-  # Create role-mapping b/w KIBANA_READ_ONLY <==> backend-role
+  # Create role-mapping b/w KIBANA_READ_ONLY <==> read-only backend-role
   response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/kibana_read_only"   -H 'Content-Type: application/json' -d @$TMP_DIR/rbac/ro_role_backend_rolemapping.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
   if [[ $response != 2* ]]; then
      log_error "There was an issue creating the rolemapping between [kibana_read_only] and backend-role [$RO_BE_ROLENAME]. [$response]"

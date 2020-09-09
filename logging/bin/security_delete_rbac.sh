@@ -84,7 +84,7 @@ if [[ $response != 2* ]]; then
    kill -9 $pfPID
    exit 17
 else
-   log_info "Security rolemappings for [$ROLENAME]. [$response]"
+   log_info "Security rolemappings for [$ROLENAME] deleted. [$response]"
 fi
 
 
@@ -95,120 +95,74 @@ if [[ $response != 2* ]]; then
    kill -9 $pfPID
    exit 16
 else
-   log_info "Security role [$ROLENAME] deleted [$response]"
+   log_info "Security role [$ROLENAME] deleted. [$response]"
 fi
 
+function remove_rolemapping {
+ # removes $BACKENDROLE and $BACKENDROROLE from the
+ # rolemappings for $targetrole (if $targetrole exists)
 
+ targetrole=$1
+
+ #Check if $targetrole role exists
+ response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/roles/$targetrole"   --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+ if [[ $response == 2* ]]; then
+
+    # get existing rolemappings for $targetrole
+    response=$(curl -s -o $TMP_DIR/rolemapping.json -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/$targetrole"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+
+    if [[ $response == 404 ]]; then
+       log_debug "Rolemappings for [$targetrole] do not exist; nothing to do. [$response]"
+    elif [[ $response != 2* ]]; then
+       log_error "There was an issue getting the existing rolemappings for [$targetrole]. [$response]"
+       kill -9 $pfPID
+       exit 17
+    else
+       log_debug "Existing rolemappings for [$targetrole] obtained. [$response]"
+       log_debug "$(cat $TMP_DIR/rolemapping.json)"
+
+       if [ "$(grep '"backend_roles":\[\]' $TMP_DIR/rolemapping.json)" ]; then
+          log_debug "No backend roles to patch for [$targetrole]; moving on"
+       else
+          # Extract and reconstruct backend_roles array from rolemapping json
+          newroles=$(grep -oP '"backend_roles":\[(.*)\],"h' $TMP_DIR/rolemapping.json | grep -oP '\[.*\]' | sed "s/\"$BACKENDROLE\"//;s/\"$BACKENDROROLE\"//;s/,,,/,/;s/,,/,/; s/,]/]/" )
+          log_debug "Updated Back-end Roles ($targetrole): $newroles"
+
+          # Copy RBAC template
+          cp logging/es/odfe/rbac/backend_rolemapping_delete.json $TMP_DIR/${targetrole}_backend_rolemapping_delete.json
+
+          #update json template file w/revised list of backend roles
+          sed -i "s/xxBACKENDROLESxx/$newroles/gI"     $TMP_DIR/${targetrole}_backend_rolemapping_delete.json # BACKENDROLES
+
+          # Replace the rolemappings for the $targetrole with the revised list of backend roles
+          response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/$targetrole"  -H 'Content-Type: application/json' -d @$TMP_DIR/${targetrole}_backend_rolemapping_delete.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+          if [[ $response != 2* ]]; then
+             log_error "There was an issue updating the rolesmapping for [$targetrole] to remove link with backend-roles [$BACKENDROLE, $BACKENDROROLE]. [$response]"
+             kill -9 $pfPID
+             exit 17
+          else
+             log_info "Security rolemapping deleted between [$targetrole] and backend-roles [$BACKENDROLE, $BACKENDROROLE]. [$response]"
+          fi
+       fi
+    fi
+ else
+   log_debug "The role [$targetrole] does not exist; doing nothing. [$response]"
+ fi # role exists
+}
 #
 # handle KIBANA_USER
 #
-
-# get existing rolemappings for kibana_user
-response=$(curl -s -o $TMP_DIR/ku_rm.json -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/kibana_user"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-
-if [[ $response != 2* ]]; then
-   log_error "There was an issue getting the existing rolemappings for [kibana_user]. [$response]"
-   kill -9 $pfPID
-   exit 17
-else
-   log_info "Existing rolemappings for [kibana_user] obtained. [$response]"
-fi
-
-# Extract and reconstruct backend_roles array from rolemapping json
-newroles=$(grep -oP '"backend_roles":\[(.*)\],"h' $TMP_DIR/ku_rm.json | grep -oP '\[.*\]' | sed "s/\"$BACKENDROLE\"//;s/\"$BACKENDROROLE\"//;s/,,,/,/;s/,,/,/; s/,]/]/" )
-log_debug "Updated Back-end Roles (kibana_user): $newroles"
-
-# Copy RBAC template
-cp logging/es/odfe/rbac/backend_rolemapping_delete.json $TMP_DIR/kibana_user_backend_rolemapping_delete.json
-
-#update json template file w/revised list of backend roles
-sed -i "s/xxBACKENDROLESxx/$newroles/gI"     $TMP_DIR/kibana_user_backend_rolemapping_delete.json # BACKENDROLES
-
-# Replace the rolemappings for the kibana_user with the revised list of backend roles
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/kibana_user"  -H 'Content-Type: application/json' -d @$TMP_DIR/kibana_user_backend_rolemapping_delete.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-if [[ $response != 2* ]]; then
-   log_error "There was an issue updating the rolesmapping for [kibana_user] to remove link with backend-role(s) [$BACKENDROLE]. [$response]"
-   kill -9 $pfPID
-   exit 17
-else
-   log_info "Security rolemapping deleted between [kibana_user] and backend-role(s) [$BACKENDROLE]. [$response]"
-fi
+remove_rolemapping kibana_user
 
 #
 # handle KIBANA_READ_ONLY
 #
-
-# get existing rolemappings for kibana_read_only
-response=$(curl -s -o $TMP_DIR/kr_rm.json -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/kibana_read_only"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-
-if [[ $response != 2* ]]; then
-   log_error "There was an issue getting the existing rolemappings for [kibana_read_only]. [$response]"
-   kill -9 $pfPID
-   exit 17
-else
-   log_info "Existing rolemappings for [kibana_read_only] obtained. [$response]"
-fi
-
-# Extract and reconstruct backend_roles array from rolemapping json
-newroles=$(grep -oP '"backend_roles":\[(.*)\],"h' $TMP_DIR/kr_rm.json | grep -oP '\[.*\]' | sed "s/\"$BACKENDROLE\"//;s/\"$BACKENDROROLE\"//;s/,,,/,/;s/,,/,/; s/,]/]/" )
-log_debug "Updated Back-end Roles (kibana_read_only): $newroles"
-
-# Copy RBAC template
-cp logging/es/odfe/rbac/backend_rolemapping_delete.json $TMP_DIR/kibana_ro_backend_rolemapping_delete.json
-
-#update json template file w/revised list of backend roles
-sed -i "s/xxBACKENDROLESxx/$newroles/gI"     $TMP_DIR/kibana_ro_backend_rolemapping_delete.json # BACKENDROLES
-
-# Replace the rolemappings for the kibana_user with the revised list of backend roles
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/kibana_read_only"  -H 'Content-Type: application/json' -d @$TMP_DIR/kibana_ro_backend_rolemapping_delete.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-if [[ $response != 2* ]]; then
-   log_error "There was an issue updating the rolesmapping for [kibana_read_only] to remove link with backend-role [$BACKENDROROLE]. [$response]"
-   kill -9 $pfPID
-   exit 17
-else
-   log_info "Security rolemapping deleted between [kibana_read_only] and backend-role [$BACKENDROROLE]. [$response]"
-fi
+remove_rolemapping kibana_read_only
 
 #
 # handle CLUSTER_RO_PERMS
 #
-
-#Check if CLUSTER_RO_PERMS role exists 
-response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/roles/cluster_ro_perms"   --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-if [[ $response == 2* ]]; then
-
-  # get existing rolemappings for cluster_ro_perms
-  response=$(curl -s -o $TMP_DIR/cr_rm.json -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/cluster_ro_perms"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-
-  if [[ $response != 2* ]]; then
-     log_error "There was an issue getting the existing rolemappings for [cluster_ro_perms]. [$response]"
-     kill -9 $pfPID
-     exit 17
-  else
-     log_info "Existing rolemappings for [cluster_ro_perms] obtained. [$response]"
-  fi
-
-  # Extract and reconstruct backend_roles array from rolemapping json
-  newroles=$(grep -oP '"backend_roles":\[(.*)\],"h' $TMP_DIR/cr_rm.json | grep -oP '\[.*\]' | sed "s/\"$BACKENDROLE\"//;s/\"$BACKENDROROLE\"//;s/,,,/,/;s/,,/,/; s/,]/]/" )
-  log_debug "Updated Back-end Roles (cluster_ro_perms): $newroles"
-
-  # Copy RBAC template
-  cp logging/es/odfe/rbac/backend_rolemapping_delete.json $TMP_DIR/cluster_ro_rolemapping_delete.json
-
-  #update json template file w/revised list of backend roles
-  sed -i "s/xxBACKENDROLESxx/$newroles/gI"     $TMP_DIR/cluster_ro_rolemapping_delete.json # BACKENDROLES
-
-  # Replace the rolemappings for the cluster_ro with the revised list of backend roles
-  response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/cluster_ro_perms"  -H 'Content-Type: application/json' -d @$TMP_DIR/cluster_ro_rolemapping_delete.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-  if [[ $response != 2* ]]; then
-     log_error "There was an issue updating the rolesmapping for [cluster_ro_perms] to remove link with backend-role [$BACKENDROROLE]. [$response]"
-     kill -9 $pfPID
-     exit 17
-  else
-     log_info "Security rolemapping deleted between [cluster_ro_perms] and backend-role [$BACKENDROROLE]. [$response]"
-  fi
-
-fi # cluster_ro_perms role exists
+remove_rolemapping cluster_ro_perms
 
 # terminate port-forwarding and remove tmpfile
 log_info "You may see a message below about a process being killed; it is expected and can be ignored."
