@@ -1446,7 +1446,9 @@
   "refresh": "10s",
   "schemaVersion": 25,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "sas-viya"
+  ],
   "templating": {
     "list": [
       {
