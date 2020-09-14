@@ -64,9 +64,13 @@ fi
 INDEX_PREFIX=viya_logs
 ROLENAME=search_index_$NAMESPACE
 BE_ROLENAME=${NAMESPACE}_kibana_users
-RO_BE_ROLENAME=${NAMESPACE}_kibana_ro_users
+if [ "$READONLY" == "true" ]; then
+   RO_BE_ROLENAME=${NAMESPACE}_kibana_ro_users
+else
+   RO_BE_ROLENAME="null"
+fi
 
-log_debug "NAMESPACE: $NAMESPACE ROLENAME: $ROLENAME"
+log_debug "NAMESPACE: $NAMESPACE ROLENAME: $ROLENAME RO_BE_ROLENAME: $RO_BE_ROLENAME"
 
 # Copy RBAC templates
 cp logging/es/odfe/rbac $TMP_DIR -r
@@ -112,84 +116,100 @@ else
    exit 18
 fi
 
-#Check if role exists already
-response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/roles/$ROLENAME"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-if [[ $response != 2* ]]; then
+function add_rolemapping {
+ # adds $ROLENAME and $RO_BE_ROLENAME to the
+ # rolemappings for $targetrole (create $targetrole if it does NOT exists)
 
-  # Create Viya deployment-restricted role
-  response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_security/api/roles/$ROLENAME" -H 'Content-Type: application/json' -d @$TMP_DIR/rbac/index_role.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-  if [[ $response != 2* ]]; then
-     log_error "There was an issue creating the security role [$ROLENAME] [$response]"
+ targetrole=$1
+ berole=$2
+ targetrole_template=${3:-null}
+ log_debug "Parms passed to add_rolemapping function  targetrole=$targetrole  berole=$berole  targetrole_template=$targetrole_template"
+
+
+ #Check if $targetrole role exists
+ response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/roles/$targetrole"   --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+
+ if [[ $response == 404 && "$targetrole_template" != "null" ]]; then
+
+     # targetrole does NOT exist and we know how to create it
+     response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_security/api/roles/$targetrole"  -H 'Content-Type: application/json' -d @${targetrole_template}  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+
+     if [[ $response != 2* ]]; then
+        log_error "There was an issue creating the security role [$targetrole] [$response]"
+        log_debug "template contents: /n $(cat $targetrole_template)"
+        kill -9 $pfPID
+        exit 20
+     else
+        log_info "Security role [$targetrole] created [$response]"
+     fi
+ elif [[ $response == 2* ]]; then
+   log_debug "Confirmed [$targetrole] exists."
+ else
+   log_error "There was a problem obtaining information for role [$targetrole]. [$response]"
+   kill -9 $pfPID
+   exit 20
+ fi
+
+ # get existing rolemappings for $targetrole
+ response=$(curl -s -o $TMP_DIR/rolemapping.json -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/$targetrole"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+
+ if [[ $response == 404 ]]; then
+    log_debug "Rolemappings for [$targetrole] do not exist; creating rolemappings. [$response]"
+
+    json='{"backend_roles" : ["'"$berole"'"]}'
+    verb=PUT
+
+ elif [[ $response == 2* ]]; then
+    log_debug "Existing rolemappings for [$targetrole] obtained. [$response]"
+    log_debug "$(cat $TMP_DIR/rolemapping.json)"
+
+    if [ "$(grep $berole  $TMP_DIR/rolemapping.json)" ]; then
+       log_debug "A rolemapping between [$targetrole] and  back-end role [$berole] already appears to exist; leaving as-is."
+       return
+    else
+       json='[{"op": "add","path": "/backend_roles/-","value":"'"$berole"'"}]'
+       verb=PATCH
+    fi
+
+ else
+     log_error "There was an issue getting the existing rolemappings for [$targetrole]. [$response]"
      kill -9 $pfPID
-     exit 20
-  else
-     log_info "Security role [$ROLENAME] created [$response]"
-  fi
-else
-  log_info "The security role [$ROLENAME] already exists; using existing definition. [$response]"
-fi
+     exit 17
+ fi
 
-# Create role-mapping b/w Viya deployment-restricted role <==> backend-role(s)
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/$ROLENAME"  -H 'Content-Type: application/json' -d @$TMP_DIR/rbac/index_role_backend_rolemapping${READONLY_FLAG}.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-if [[ $response != 2* ]]; then
-   log_error "There was an issue creating the rolemapping between [$ROLENAME] and backend-role(s) [$response]"
-   kill -9 $pfPID
-   exit 21
-else
-   log_info "Security rolemapping created between [$ROLENAME] and backend-role(s). [$response]"
-fi
+ log_debug "JSON data passed to curl [$verb]: $json"
 
+ response=$(curl -s -o /dev/null -w "%{http_code}" -X${verb} "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/$targetrole"  -H 'Content-Type: application/json' -d "$json" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+ if [[ $response != 2* ]]; then
+    log_error "There was an issue creating the rolemapping between [$targetrole] and backend-role(s) ["$berole"]. [$response]"
+    kill -9 $pfPID
+    exit 22
+ else
+    log_info "Security rolemapping created between [$targetrole] and backend-role(s) ["$berole"]. [$response]"
+ fi
 
-# Create role-mapping b/w kibana_user <==> backend-role(s)
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping"  -H 'Content-Type: application/json' -d @$TMP_DIR/rbac/kibana_user_backend_rolemapping${READONLY_FLAG}.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-if [[ $response != 2* ]]; then
-   log_error "There was an issue creating the rolemapping between [kibana_user] and backend-role(s) [$response]"
-   kill -9 $pfPID
-   exit 22
-else
-   log_info "Security rolemapping created between [kibana_user] and backend-role(s). [$response]"
-fi
+}
+
+#index user
+add_rolemapping $ROLENAME $BE_ROLENAME $TMP_DIR/rbac/index_role.json
+
+#kibana_user
+add_rolemapping kibana_user $BE_ROLENAME null
 
 # Additional work needed for create deployment-restricted READ_ONLY Kibana role
 if [ "$READONLY" == "true" ]; then
 
-  #Check if CLUSTER_RO_PERMS role exists already
-  response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_security/api/roles/cluster_ro_perms"   --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-  if [[ $response != 2* ]]; then
+   #index user
+   add_rolemapping $ROLENAME $RO_BE_ROLENAME $TMP_DIR/rbac/index_role.json
 
-     # Create CLUSTER_RO_PERMS role
-     response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_security/api/roles/cluster_ro_perms"  -H 'Content-Type: application/json' -d @$TMP_DIR/rbac/cluster_ro_perms_role.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-     if [[ $response != 2* ]]; then
-        log_error "There was an issue creating the security role [$ROLENAME] [$response]"
-        kill -9 $pfPID
-        exit 20
-     else
-        log_info "Security role [cluster_ro_perms] created [$response]"
-     fi
-  else
-    log_debug "Role [cluster_ro_perms] already exists."
-  fi
+   #kibana_user
+   add_rolemapping kibana_user $RO_BE_ROLENAME null
 
-  # Create role-mapping b/w CLUSTER_RO_PERMS <==> read-only backend-role
-  response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/cluster_ro_perms"  -H 'Content-Type: application/json' -d @$TMP_DIR/rbac/ro_role_backend_rolemapping.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-  if [[ $response != 2* ]]; then
-     log_error "There was an issue creating the rolemapping between [cluster_ro_perms] and backend-role [$RO_BE_ROLENAME]. [$response]"
-     kill -9 $pfPID
-     exit 21
-  else
-     log_info "Security rolemapping created between [cluster_ro_perms] and backend-role [$RO_BE_ROLENAME]. [$response]"
-  fi
+   #cluster_ro_perms
+   add_rolemapping cluster_ro_perms $RO_BE_ROLENAME $TMP_DIR/rbac/cluster_ro_perms_role.json
 
-  # Create role-mapping b/w KIBANA_READ_ONLY <==> read-only backend-role
-  response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/kibana_read_only"   -H 'Content-Type: application/json' -d @$TMP_DIR/rbac/ro_role_backend_rolemapping.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-  if [[ $response != 2* ]]; then
-     log_error "There was an issue creating the rolemapping between [kibana_read_only] and backend-role [$RO_BE_ROLENAME]. [$response]"
-     kill -9 $pfPID
-     exit 21
-  else
-     log_info "Security rolemapping created between [kibana_read_only] and backend-role [$RO_BE_ROLENAME]. [$response]"
-  fi
-
+   #kibana_read_only
+   add_rolemapping kibana_read_only $RO_BE_ROLENAME null
 fi
 
 # terminate port-forwarding and remove tmpfile

@@ -125,7 +125,7 @@ function remove_rolemapping {
           log_debug "No backend roles to patch for [$targetrole]; moving on"
        else
           # Extract and reconstruct backend_roles array from rolemapping json
-          newroles=$(grep -oP '"backend_roles":\[(.*)\],"h' $TMP_DIR/rolemapping.json | grep -oP '\[.*\]' | sed "s/\"$BACKENDROLE\"//;s/\"$BACKENDROROLE\"//;s/,,,/,/;s/,,/,/; s/,]/]/" )
+          newroles=$(grep -oP '"backend_roles":\[(.*)\],"h' $TMP_DIR/rolemapping.json | grep -oP '\[.*\]' | sed "s/\"$BACKENDROLE\"//g;s/\"$BACKENDROROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/" )
           log_debug "Updated Back-end Roles ($targetrole): $newroles"
 
           # Copy RBAC template

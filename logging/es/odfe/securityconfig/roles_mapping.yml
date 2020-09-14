@@ -47,3 +47,13 @@ kibana_server:
   reserved: true
   users:
   - "kibanaserver"
+
+kibana_read_only:
+  reserved: false
+  backend_roles:
+  - "kibanareadonly"
+
+cluster_ro_perms:
+  reserved: false
+  backend_roles:
+  - "clusterroperms"
