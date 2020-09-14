@@ -15,8 +15,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 50,
-  "iteration": 1599681471122,
+  "id": 41,
+  "iteration": 1600096707671,
   "links": [],
   "panels": [
     {
@@ -78,7 +78,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "7.1.5",
       "targets": [
         {
           "expr": "sum (rate(container_cpu_usage_seconds_total{pod=~\"$pod\"}[1m]) * on(pod) group_left(phase) kube_pod_status_phase{pod=~\"$pod\", phase=\"Running\"})",
@@ -157,7 +157,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "7.1.5",
       "targets": [
         {
           "expr": "sum(:sas_launcher_pod_mem_working_set_bytes:{pod=~\"$pod\"}) or vector(0)",
@@ -244,7 +244,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "7.1.5",
       "targets": [
         {
           "expr": "sum(kube_pod_status_phase{pod=~\"$pod\", phase=~\"Pending\"}) or vector(0)",
@@ -330,7 +330,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "7.1.5",
       "targets": [
         {
           "expr": "sum(kube_pod_status_phase{pod=~\"$pod\", phase=~\"Running\"}) or vector(0)",
@@ -400,7 +400,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "7.1.5",
       "targets": [
         {
           "expr": "sum(rate(:sas_launcher_pod_net_transmit_bytes_total:{pod=~\"$pod\"}[1m])) + sum(rate(:sas_launcher_pod_net_receive_bytes_total:{pod=~\"$pod\"}[1m])) or vector(0)",
@@ -470,7 +470,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "7.1.5",
       "targets": [
         {
           "expr": "sum(rate(:sas_launcher_pod_fs_read_bytes_total:{pod=~\"$pod\"}[1m])) + sum(rate(:sas_launcher_pod_fs_write_bytes_total:{pod=~\"$pod\"}[1m])) or vector(0)",
@@ -533,7 +533,7 @@
         },
         "showUnfilled": true
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "7.1.5",
       "targets": [
         {
           "expr": "sort_desc(count(:sas_launcher_pod_status:{pod=~\"$pod\",phase=~\"Pending|Running\"}) by (node))",
@@ -573,7 +573,8 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {},
+          "links": []
         },
         "overrides": []
       },
@@ -602,12 +603,9 @@
       },
       "lines": true,
       "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
+      "nullPointMode": "connected",
       "percentage": false,
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -667,7 +665,7 @@
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": true
+          "show": false
         }
       ],
       "yaxis": {
@@ -684,7 +682,8 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {},
+          "links": []
         },
         "overrides": []
       },
@@ -712,11 +711,8 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
       "percentage": false,
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -792,7 +788,8 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {},
+          "links": []
         },
         "overrides": []
       },
@@ -822,11 +819,8 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
       "percentage": false,
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -918,7 +912,8 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {},
+          "links": []
         },
         "overrides": []
       },
@@ -948,11 +943,8 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
       "percentage": false,
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.1.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1153,11 +1145,11 @@
                         },
                         {
                           "color": "yellow",
-                          "value": 75
+                          "value": 0.75
                         },
                         {
                           "color": "red",
-                          "value": 90
+                          "value": 0.9
                         }
                       ]
                     }
@@ -1189,11 +1181,11 @@
                         },
                         {
                           "color": "yellow",
-                          "value": 75
+                          "value": 0.75
                         },
                         {
                           "color": "red",
-                          "value": 90
+                          "value": 0.9
                         }
                       ]
                     }
@@ -1355,7 +1347,7 @@
               }
             ]
           },
-          "pluginVersion": "7.1.4",
+          "pluginVersion": "7.1.5",
           "targets": [
             {
               "expr": ":sas_launcher_pod_cpu_core_usage:{phase=~\"Pending|Running\",pod=~\"$pod\"}",
@@ -1448,7 +1440,7 @@
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 25,
+  "schemaVersion": 26,
   "style": "dark",
   "tags": [
     "sas-viya"
@@ -1477,7 +1469,9 @@
         "allValue": null,
         "current": {
           "selected": true,
-          "text": "All",
+          "text": [
+            "All"
+          ],
           "value": [
             "$__all"
           ]
@@ -1505,7 +1499,9 @@
         "allValue": null,
         "current": {
           "selected": true,
-          "text": "All",
+          "text": [
+            "All"
+          ],
           "value": [
             "$__all"
           ]
@@ -1574,7 +1570,9 @@
         "allValue": null,
         "current": {
           "selected": true,
-          "text": "All",
+          "text": [
+            "All"
+          ],
           "value": [
             "$__all"
           ]
@@ -1602,7 +1600,9 @@
         "allValue": "",
         "current": {
           "selected": true,
-          "text": "All",
+          "text": [
+            "All"
+          ],
           "value": [
             "$__all"
           ]
@@ -1648,5 +1648,5 @@
   "timezone": "",
   "title": "SAS Launched Jobs - Node Activity",
   "uid": "aBDyaKNGk",
-  "version": 3
+  "version": 2
 }

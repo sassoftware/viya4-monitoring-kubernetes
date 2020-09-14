@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 44,
-  "iteration": 1600006058406,
+  "iteration": 1600096791939,
   "links": [],
   "panels": [
     {
@@ -595,7 +595,7 @@
       },
       "lines": true,
       "linewidth": 1,
-      "nullPointMode": "null",
+      "nullPointMode": "connected",
       "percentage": false,
       "pluginVersion": "7.1.5",
       "pointradius": 2,
@@ -1652,5 +1652,5 @@
   "timezone": "",
   "title": "SAS Launched Jobs - User Activity",
   "uid": "yMknIpvGk",
-  "version": 1
+  "version": 3
 }
