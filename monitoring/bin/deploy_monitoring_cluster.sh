@@ -35,6 +35,7 @@ log_notice "Deploying monitoring to the [$MON_NS] namespace..."
 
 log_info "Updating local helm repository..."
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
+# helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 
 # Create a temporary yaml file for optional components/settings
@@ -44,6 +45,7 @@ touch $genValuesFile
 
 # Istio - Federate data from Istio's Prometheus instance
 if [ "$ISTIO_ENABLED" == "true" ]; then
+  log_info "Including Istio metric federation"
   cat monitoring/values-prom-operator-istio.yaml >> $genValuesFile
 else
   log_debug "ISTIO_ENABLED flag not set"

@@ -5,18 +5,59 @@ prometheus:
   prometheusSpec:
     # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#kubernetes_sd_config
     additionalScrapeConfigs:
-    # Federate Istio Metrics from its Prometheus instance  
-    - job_name: 'federate'
-      scrape_interval: 20s
+    # Federate Istio Metrics from its Prometheus instance
+    - job_name: 'istio-federate-citadel'
+      scrape_interval: 45s
+      scrape_timeout: 25s
+      honor_labels: true
+      metrics_path: '/federate'
+      params:
+        'match[]':
+        - '{job="citadel"}'
+      static_configs:
+      - targets:
+        - 'prometheus.istio-system.svc.cluster.local:9090'
+    - job_name: 'istio-federate-envoy'
+      scrape_interval: 45s
+      scrape_timeout: 25s
       honor_labels: true
       metrics_path: '/federate'
       params:
         'match[]':
         - '{job=~"envoy-.*"}'
-        - '{job=~"istio-.*"}'
+      static_configs:
+      - targets:
+        - 'prometheus.istio-system.svc.cluster.local:9090'
+    - job_name: 'istio-federate-galley'
+      scrape_interval: 45s
+      scrape_timeout: 25s
+      honor_labels: true
+      metrics_path: '/federate'
+      params:
+        'match[]':
         - '{job="galley"}'
+      static_configs:
+      - targets:
+        - 'prometheus.istio-system.svc.cluster.local:9090'
+    - job_name: 'istio-federate'
+      scrape_interval: 45s
+      scrape_timeout: 25s
+      honor_labels: true
+      metrics_path: '/federate'
+      params:
+        'match[]':
+        - '{job=~"istio-.*"}'
+      static_configs:
+      - targets:
+        - 'prometheus.istio-system.svc.cluster.local:9090'
+    - job_name: 'istio-federate-pilot'
+      scrape_interval: 45s
+      scrape_timeout: 25s
+      honor_labels: true
+      metrics_path: '/federate'
+      params:
+        'match[]':
         - '{job="pilot"}'
-        - '{job="citadel"}'
       static_configs:
       - targets:
         - 'prometheus.istio-system.svc.cluster.local:9090'

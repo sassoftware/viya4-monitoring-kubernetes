@@ -14,13 +14,13 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "5.2.3"
+      "version": "6.4.3"
     },
     {
       "type": "panel",
       "id": "graph",
       "name": "Graph",
-      "version": "5.0.0"
+      "version": ""
     },
     {
       "type": "datasource",
@@ -30,9 +30,9 @@
     },
     {
       "type": "panel",
-      "id": "text",
-      "name": "Text",
-      "version": "5.0.0"
+      "id": "table",
+      "name": "Table",
+      "version": ""
     }
   ],
   "annotations": {
@@ -50,8 +50,9 @@
       }
     ]
   },
-  "editable": true,
-  "gnetId": null,
+  "description": "Istio Mixer Dashboard version 1.7.1",
+  "editable": false,
+  "gnetId": 7642,
   "graphTooltip": 1,
   "id": null,
   "iteration": 1543881232533,
