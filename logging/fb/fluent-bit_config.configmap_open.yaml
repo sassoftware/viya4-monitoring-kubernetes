@@ -4,8 +4,10 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.4
+       Set  fb_configMap_version 0.2.5.candidate
        #Set clusterID NOT_SET
+       # initialized to N to force level standardization
+       Set  __temp_level_fixed   N
     [FILTER]
        # NOTE: This kubernetes filter _only_ applies to the **METALOGGING** messages
        #       A separate instance of this filter exists for the **LOGGING** messages
@@ -110,16 +112,6 @@ data:
        Nest_under     k8s_labels
        Remove_prefix  labels_
     [FILTER]
-       #
-       # Re-constituting kubernetes map
-       #
-       Name           nest
-       Match          *
-       Operation      nest
-       Wildcard       k8s_*
-       Nest_under     kube
-       Remove_prefix  k8s_
-    [FILTER]
        Alias           Move_some_props
        Name            modify
        Match           *
@@ -200,19 +192,26 @@ data:
        Match kube.*
        Condition Key_value_equals  PROPS__appname eventrouter
        set    logsource            KUBE_EVENT
-       copy   EVENT_type           level
+       # Replace eventrouter k8s metadata w/metadata from source object
+       Remove_wildcard k8s_
+       copy   EVENT__type          level
        rename JL__verb             PROPS__verb
        rename EVENT__lastTimestamp timeStamp
        rename EVENT__type          PROPS__type
        rename EVENT__message       message
        rename EVENT__reason        PROPS__reason
-       rename EV_META__namespace   PROPS__namespace
        rename EV_META__name        PROPS__name
-       rename EV_SOURCE__component PROPS__source_component
-       rename EV_SOURCE__host      PROPS__source_host
        rename EV_OBJ__kind         PROPS__object_type
-       rename EV_OBJ__namespace    PROPS__object_namespace
        rename EV_OBJ__name         PROPS__object
+       Hard_rename EV_OBJ__namespace    k8s_namespace
+       Hard_rename EV_SOURCE__host      k8s_host
+    [FILTER]
+       Alias events_set_kube_fields
+       Name  modify
+       Match kube.*
+       Condition Key_value_equals  logsource  KUBE_EVENT
+       Condition Key_value_equals  PROPS__object_type  Pod
+       Hard_copy PROPS__object     k8s_pod
     # Re-construct EVENT structures (just in case)
     [FILTER]
        Alias events_nest_object
@@ -658,6 +657,17 @@ data:
        Remove_regex   .+_message
     [FILTER]
        #
+       # Create 'kube' map
+       # ...any k8s_ objects are included
+       #
+       Name           nest
+       Match          *
+       Operation      nest
+       Wildcard       k8s_*
+       Nest_under     kube
+       Remove_prefix  k8s_
+    [FILTER]
+       #
        # Create 'properties' map
        # ..any PROPS_ objects are included
        #
@@ -669,11 +679,11 @@ data:
        Nest_under      properties
        Remove_prefix   PROPS__
     [FILTER]
-       # "Standardize" Level: DEBUG (includes 'HINT')
+       # "Standardize" Level: DEBUG (includes 'HINT', 'FINE')
        Alias          fix_level_debug
        Name           modify
        Match          *
-       Condition      Key_value_matches level (?i:DEBUG)|(?:\AD\z)|(?i:hint)
+       Condition      Key_value_matches level (?i:DEBUG)|(?:\AD\z)|(?i:hint)|(?i:fine)
        Set            level DEBUG
        Set            __temp_level_fixed   Y
     [FILTER]
@@ -681,8 +691,8 @@ data:
        Alias          fix_level_err
        Name           modify
        Match          *
-       Condition      Key_value_does_not_match __temp_level_fixed Y
-       Condition      Key_value_matches level (?i:err*)|(?:\AE\z)|(?:eror)
+       Condition      Key_value_does_not_equal __temp_level_fixed Y
+       Condition      Key_value_matches level (?i:err\w*)|(?:\AE\z)|(?:eror)
        Set            level ERROR
        Set            __temp_level_fixed   Y
     [FILTER]
@@ -690,17 +700,17 @@ data:
        Alias          fix_level_fatal
        Name           modify
        Match          *
-       Condition      Key_value_does_not_match __temp_level_fixed Y
-       Condition      Key_value_matches level (?i:fatal*)|(?i:crit*)|(?:\AC\z)
+       Condition      Key_value_does_not_equal __temp_level_fixed Y
+       Condition      Key_value_matches level (?i:fatal\w*)|(?i:crit\w*)|(?:\AC\z)
        Set            level FATAL
        Set            __temp_level_fixed   Y
     [FILTER]
-       # "Standardize" Level: INFO (includes 'NOTE','LOG')
+       # "Standardize" Level: INFO (includes 'NOTE','LOG','NORMAL')
        Alias          fix_level_info
        Name           modify
        Match          *
-       Condition      Key_value_does_not_match __temp_level_fixed Y
-       Condition      Key_value_matches level (?i:info*)|(?i:note*)|(?i:log*)|(?:\AI\z)
+       Condition      Key_value_does_not_equal __temp_level_fixed Y
+       Condition      Key_value_matches level (?i:info\w*)|(?i:note\w*)|(?i:log\w*)|(?:\AI\z)|(?i:Normal)
        Set            level INFO
        Set            __temp_level_fixed   Y
     [FILTER]
@@ -708,7 +718,7 @@ data:
        Alias          fix_level_panic
        Name           modify
        Match          *
-       Condition      Key_value_does_not_match __temp_level_fixed Y
+       Condition      Key_value_does_not_equal __temp_level_fixed Y
        Condition      Key_value_matches level (?i:panic)
        Set            level PANIC
        Set            __temp_level_fixed   Y
@@ -717,7 +727,7 @@ data:
        Alias          fix_level_trace
        Name           modify
        Match          *
-       Condition      Key_value_does_not_match __temp_level_fixed Y
+       Condition      Key_value_does_not_equal __temp_level_fixed Y
        Condition      Key_value_matches level (?i:trace)|(?:\AT\t)
        Set            level TRACE
        Set            __temp_level_fixed   Y
@@ -726,8 +736,8 @@ data:
        Alias          fix_level_warn
        Name           modify
        Match          *
-       Condition      Key_value_does_not_match __temp_level_fixed Y
-       Condition      Key_value_matches level (?i:warn*)|(?:\AW\z)
+       Condition      Key_value_does_not_equal __temp_level_fixed Y
+       Condition      Key_value_matches level (?i:warn\w*)|(?:\AW\z)
        Set            level WARNING
        Set            __temp_level_fixed   Y
     [FILTER]
@@ -735,17 +745,10 @@ data:
        Alias          fix_level_none
        Name           modify
        Match          *
-       Condition      Key_does_not_exist level
+       Condition      Key_value_does_not_equal __temp_level_fixed Y
+       Rename         level  orig_msg_level
        Set            level NONE
        Set            __temp_level_fixed   Y
-    [FILTER]
-       Alias           fix_levels_other
-       Name            modify
-       Match           *
-       Condition       Key_does_not_exist  __temp_level_fixed
-       # Move orig_msg_level to PROPERTIES?
-       Rename          level  orig_msg_level
-       Set             level  INFO
     [FILTER]
        #
        # rename internal vars to move them under DEBUG
