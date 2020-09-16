@@ -480,7 +480,7 @@ else
 fi
 
 # Import Kibana Searches, Visualizations and Dashboard Objects using curl
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.6.1_200807.ndjson  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.6.1_200915.ndjson --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 
 # TO DO/CHECK: this should return a SUCCESS message like this: {"success":true,"successCount":20}
 if [[ $response != 2* ]]; then
