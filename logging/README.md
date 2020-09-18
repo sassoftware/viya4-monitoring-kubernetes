@@ -160,13 +160,12 @@ cd <kube-viya-monitoring repo directory>
 
 logging/bin/remove_logging_open.sh
 ```
+Note that this script does not remove all of the Kubernetes objects. If the namespace into which you deployed logging is used only for log monitoring, you can use a `kubectl delete namespaces` command to delete the namespace, which also removes these objects.
 
-Note that this script does not remove all logging components. If you want to completely remove all logging components, you must use `kubectl delete` commands to manually delete these Kubernetes objects:
+However, if you did not deploy logging into a dedicated namespace, you must delete the remaining Kubernetes objects manually. Use `kubectl delete` commands to manually delete these Kubernetes objects:
 - ConfigMaps
 - Secrets
 - PersistentVolumeClaims
-
-If the namespace into which you deployed logging is used only for log monitoring, you can use a `kubectl delete namespaces` command to delete the namespace, which also removes these objects.
 
 ## Validate Your Deployment
 
