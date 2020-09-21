@@ -180,7 +180,7 @@ if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
 fi
 
 # Make Elasticsearch repo available to Helm
-if [[ ! $(helm repo ls) =~ "stable " ]]; then
+if [[ ! $(helm repo list) =~ "stable " ]]; then
   log_info "Adding 'stable' helm repository"
   helm repo add stable https://kubernetes-charts.storage.googleapis.com
 else

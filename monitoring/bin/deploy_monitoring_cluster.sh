@@ -34,7 +34,7 @@ set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
 
 
-if [[ ! $(helm repo ls) =~ "stable " ]]; then
+if [[ ! $(helm repo list) =~ "stable " ]]; then
   log_info "Adding 'stable' helm repository"
   helm repo add stable https://kubernetes-charts.storage.googleapis.com
 else
