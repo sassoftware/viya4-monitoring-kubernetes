@@ -33,9 +33,15 @@ fi
 set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
 
-log_info "Updating local helm repository..."
-helm repo add stable https://kubernetes-charts.storage.googleapis.com
+
+if [[ ! $(helm repo ls) =~ "stable " ]]; then
+  log_info "Adding 'stable' helm repository"
+  helm repo add stable https://kubernetes-charts.storage.googleapis.com
+else
+  log_debug "'stable' helm repository already exists"
+fi
 # helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+log_info "Updating helm repositories..."
 helm repo update
 
 # Create a temporary yaml file for optional components/settings

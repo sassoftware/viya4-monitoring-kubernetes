@@ -180,7 +180,13 @@ if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
 fi
 
 # Make Elasticsearch repo available to Helm
-helm repo add stable https://kubernetes-charts.storage.googleapis.com
+if [[ ! $(helm repo ls) =~ "stable " ]]; then
+  log_info "Adding 'stable' helm repository"
+  helm repo add stable https://kubernetes-charts.storage.googleapis.com
+else
+  log_debug "'stable' helm repository already exists"
+fi
+log_info "Updating helm repositories..."
 helm repo update
 
 # Deploy Elasticsearch via Helm chart
