@@ -10,37 +10,42 @@ The basic steps are:
 cluster or SAS Viya monitoring
 * Deploy cluster monitoring and restrict it to use only cluster dashboards
 * Deploy standard SAS Viya monitoring to each SAS Viya namespace
-* Create Prometheus custom resources (CRs) that are configured to monitor only their respective SAS Viya namespaces
+* Create Prometheus custom resources (CRs) that are configured to monitor only
+their respective SAS Viya namespaces
 * Deploy Grafana to each SAS Viya namespace to provide visualization
 
 All resources in this sample are configured for host-based ingress.
 
 In this example, all three Prometheus instances share the same
-instance of AlertManager, mainly to demonstrate how to centralize alerts. You can use AlertManager CRs to deploy a separate AlertManager for each instance of Prometheus.
+instance of AlertManager, mainly to demonstrate how to centralize alerts. You
+can use AlertManager CRs to deploy a separate AlertManager for each instance
+of Prometheus.
 
-This sample assumes that you are deploying two SAS Viya namespaces, but it should be
-fairly straightforward to customize the files to deploy to any
+This sample assumes that you are deploying two SAS Viya namespaces, but it
+should be fairly straightforward to customize the files to deploy to any
 number of namespaces.
 
-## Deployment
+## Installation
+
+```bash
+export USER_DIR=/your/path/to/namespace-monitoring
+```
+
+Edit the copied files:
+
+* Replace the hostnames (`*.host.cluster.example.com`)
+* Replace the namespaces (`viya-one` and `viya-two`)
+* Further customize user.env/*.yaml files as needed
+
+Deploy the monitoring components:
 
 ```bash
 # cd to the base of this repository
 
-# Set USER_DIR to a working directory outside of this repo
-# (change path as desired)
-export USER_DIR=~/my-workspace/newdir
 # First SAS Viya namespace
 export VIYA_ONE_NS=viya-one
 # Second SAS Viya namespace
 export VIYA_TWO_NS=viya-two
-# Copy the sample
-cp -R monitoring/samples/namespace-monitoring/* $USER_DIR/
-
-# Edit the copied files:
-#   - Replace the hostnames (`*.host.cluster.example.com`)
-#   - Replace the namespaces (`viya-one` and `viya-two`)
-#   - Further customize user.env/*.yaml files as needed
 
 # Create and label namespaces
 kubectl create ns monitoring

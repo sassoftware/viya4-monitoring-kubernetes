@@ -65,17 +65,3 @@ grafana:
     hosts:
     - host.cluster.example.com
     path: /grafana
-
-prometheus-node-exporter:
-  service:
-    # Override the default port of 9100 to avoid potential conflicts
-    port: 9110
-    targetPort: 9110
-  # Allow pod to be scheduled on master nodes that otherwise
-  # wouldn't schedule normal pods
-  tolerations:
-  - key: node-role.kubernetes.io/master
-    effect: NoSchedule
-  - key: workload.sas.com/class
-    operator: Exists
-    effect: NoSchedule
