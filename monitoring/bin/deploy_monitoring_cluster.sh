@@ -33,13 +33,13 @@ fi
 set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
 
-
-if [[ ! $(helm repo list) =~ "stable " ]]; then
+if [[ ! $(helm repo list 2>/dev/null) =~ stable[[:space:]] ]]; then
   log_info "Adding 'stable' helm repository"
   helm repo add stable https://kubernetes-charts.storage.googleapis.com
 else
   log_debug "'stable' helm repository already exists"
 fi
+
 # helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 log_info "Updating helm repositories..."
 helm repo update
