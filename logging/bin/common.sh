@@ -14,10 +14,11 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
           export $userEnv
         fi
     fi
-    
+
     export LOG_NS="${LOG_NS:-logging}"
     export SAS_LOGGING_COMMON_SOURCED=true
-    export TLS_ENABLE="${LOG_TLS_ENABLE:-${TLS_ENABLE:-true}}"
+    # TLS is required for logging components
+    export TLS_ENABLE=true
     export TLS_CERT_MANAGER_ENABLE="${TLS_CERT_MANAGER_ENABLE:-$TLS_ENABLE}"
 fi
 echo ""
