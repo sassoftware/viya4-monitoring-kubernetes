@@ -1,22 +1,18 @@
 # Samples
 
-Several samples are available that demonstrate how to customize the deployment
-of the logging and monitoring stacks. Although each example is fairly specific
-and targeted to its individual purpose, multiple samples can be combined by
-merging the appropriate values in each file.
+Samples are provided to demonstrate how to customize the deployment
+of the logging and monitoring components for specific situations. The samples provide instructions and example yaml files that you can modify to fit your environment. Although each example focuses on a specific scenario, you can combine multiple samples by merging the appropriate values in each deployment file.
 
-The samples include:
+These samples are provided:
 
-* [azure-deployment](azure-deployment) - Deployment to Microsoft AKS
-* [azure-monitor](azure-monitor) - Enabling Azure Monitor to collect metrics
+* [azure-deployment](azure-deployment) - Deploys on Microsoft Azure Kubernetes Service (AKS)
+* [azure-monitor](azure-monitor) - Enables Azure Monitor to collect metrics
 from SAS Viya components
-* [external-alertmanager](external-alertmanager) - Configuring a central,
-external Alert Manager instance
-* [generic-base](generic-base) - Full set of cusomization files with comments
-* [ingress](ingress) - How to configure host-based or path-based ingress
-* [min-logging](min-logging) - Minimal logging configuration for dev or test
-environments
-* [namespace-monitoring](namespace-monitoring) - Separating cluster monitoring
+* [external-alertmanager](external-alertmanager) - Configures a central external Alert Manager instance
+* [generic-base](generic-base) - Does not support a specific scenario, but provides a full set of cusomization files with comments
+* [ingress](ingress) - Deploys using host-based or path-based ingress
+* [min-logging](min-logging) - Provides a minimal logging configuration for dev or test environments
+* [namespace-monitoring](namespace-monitoring) - Separates cluster monitoring
 from SAS Viya monitoring
-* [tls](tls) - Enabling TLS encryption for both ingress and in-cluster
+* [tls](tls) - Enables TLS encryption for both ingress and in-cluster
 communication

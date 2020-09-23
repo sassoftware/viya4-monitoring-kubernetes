@@ -1,20 +1,22 @@
 # Minimal Logging Sample
 
-This sample demonstrates a customization to the logging deployment
-to minimize resource usage by configuring single instances of each
-component. This configuration could save both CPU and memory resources
-in development and test environments, for example.
+This sample demonstrates how you can customize a logging deployment
+to minimize resource usage. The sample deployment configures single instances of each logging 
+component. This configuration could save CPU and memory resources, and could be useful in development and test environments.
 
 ## Installation
 
-Copy this directory to a separate local path then set the `USER_DIR`
-environment variable to this path:
+Follow these steps:
+
+1. Copy this sample directory to a separate local path.
+
+2. Set the `USER_DIR` environment variable to the local path:
 
 ```bash
 export USER_DIR=/your/path/to/min-logging
 ```
 
-Deploy logging normally:
+3. Deploy logging using the standard deployment script:
 
 ```bash
 logging/bin/deploy_logging_open.sh

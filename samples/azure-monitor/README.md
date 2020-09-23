@@ -3,22 +3,25 @@
 ## Scrape Prometheus Metrics Endpoints
 
 SAS Viya components are natively instrumented to expose a Prometheus-compatible
-HTTP(S) metrics endpoint. Azure Monitor can be configured to automatically
-discover and scrape these endpoints.
+HTTP(S) metrics endpoint. This sample shows how to configure Azure Monitor to automatically discover and scrape these endpoints. 
 
-See the [Azure documentation](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-prometheus-integration)
-to get started. After enabling Azure Montitor for your cluster, download the
+Follow these steps:
+
+1. See the [Azure documentation](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-prometheus-integration)
+to understand how Azure Monitor discovers and scrapes endpoints. 
+
+2. Enabling Azure Montitor for your cluster.
+
+3. Download the
 [template](https://github.com/microsoft/Docker-Provider/blob/ci_dev/kubernetes/container-azm-ms-agentconfig.yaml)
-ConfigMap yaml. Customize the `prometheus-data-collection-settings` section.
-Recommended changes include:
+ConfigMap yaml. 
+
+4. Customize the `prometheus-data-collection-settings` section. Use the yaml file provided in this sample [here](container-azm-ms-agentconfig.yaml) as a guide. Recommended changes include:
 
 * `interval` - Update from `1m` to `30s` (recommended, but not required)
 * `monitor_kubernetes_pods` - Set to `true`.
 
-A minimal sample yaml file is available [here](container-azm-ms-agentconfig.yaml).
-
-This enables auto-discovery of
-pods to monitor based on the standard Prometheus annotations. SAS Viya
+Setting `monitor_kubernetes_pods` to `true` enables Azure Monitor to auto-discover pods to monitor, based on the standard Prometheus annotations. SAS Viya
 components that expose metrics endpoints should include these annotations:
 
 * `promethues.io/scrape` - `true` or `false`
@@ -26,18 +29,18 @@ components that expose metrics endpoints should include these annotations:
 * `promethues.io/port`- metrics port
 * `promethues.io/scheme`- `http` or `https`
 
-After customizing the template, it simply needs to be applied to the cluster:
+5. After customizing the template,apply it to the cluster using this command:
 
 ```bash
 kubectl apply -f /path/to/container-azm-ms-agentconfig.yaml
 ```
 
-It may take 3-5 minutes for the monitoring agents to restart and for data
+It might take 3-5 minutes for the monitoring agents to restart and for data
 collection to begin.
 
 ## Example Queries - Metrics
 
-The following are some sample queries to demonstrate how to visualize the newly
+The following are some sample queries that demonstrate how you can visualize the newly
 collected Prometheus metric data.
 
 ### go_threads for sas-folders
@@ -49,7 +52,7 @@ InsightsMetrics
 | where parse_json(Tags).app == "sas-folders"
 ```
 
-### Resident memory for a service in MB
+### Show Resident Memory for a Service in MB
 
 ```text
 InsightsMetrics
@@ -59,9 +62,9 @@ InsightsMetrics
 | where Name == "process_resident_memory_bytes"
 | project TimeGenerated, Name, App, ResidentMemoryMB=Val/1024/1024
 | render timechart
-```text
+```
 
-### Show a metric across multiple services
+### Show a Metric Across Multiple Services
 
 ```text
 InsightsMetrics
@@ -71,7 +74,7 @@ InsightsMetrics
 | render timechart
 ```
 
-### Show sas_* metrics for a service
+### Show sas_* Metrics for a Service
 
 ```text
 InsightsMetrics
@@ -83,7 +86,7 @@ InsightsMetrics
 | render timechart
 ```
 
-### Used Memory for a SAS Go Service
+### Show Used Memory for a SAS Go Service
 
 ```text
 InsightsMetrics
@@ -135,7 +138,7 @@ KubeEvents
 | top 200 by TimeGenerated desc
 ```
 
-## Links
+## Additional Information
 
 * [Azure Prometheus Integration](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-prometheus-integration)
 * [Querying Azure Metrics](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-log-search#search-logs-to-analyze-data)

@@ -15,11 +15,10 @@ If you use this sample for HTTPS for ingress, the following secrets must be manu
 * kubernetes.io/tls secret - `grafana-ingress-tls-secret`
 
 Generating these certificates is outside the scope of this example. However, you can use the
-process documented in "Configure NGINX Ingress TLS for SAS Applications" in SAS Viya Administration documentation and specify the `monitoring` namespace.
+process documented in ["Configure NGINX Ingress TLS for SAS Applications"](https://go.documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calencryptmotion&docsetTarget=n1xdqv1sezyrahn17erzcunxwix9.htm&locale=en#n0oo2yu8440vmzn19g6xhx4kfbrq) in SAS Viya Administration documentation and specify the `monitoring` namespace.
 
 For in-cluster (east-west traffic) TLS for monitoring components,  
-[cert-manager](https://cert-manager.io/) populates these secrets that contain pod certificates. Existing secrets are not overwritten,
-so they can still be manually populated.
+[cert-manager](https://cert-manager.io/) populates these secrets that contain pod certificates. Because existing secrets are not overwritten, you can manually populate them.
 
 * kubernetes.io/tls secret - `prometheus-tls-secret`
 * kubernetes.io/tls secret - `alertmanager-tls-secret`
@@ -54,8 +53,7 @@ any sample hostnames with hostnames for your deployment. Specifically, you must 
 
 6. Specify any other customizations in `user-values-prom-operator.yaml`.
 
-7. After you have followed these steps to set up `USER_DIR`, deploy cluster
-monitoring normally:
+7. Deploy monitoring using the standard deployment script:
 
 ```bash
 path/to/this/repo/monitoring/bin/deploy_monitoring_cluster.sh
