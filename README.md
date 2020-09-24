@@ -38,6 +38,8 @@ This is an example of a Grafana dashboard for cluster monitoring.
 This is an example of a Grafana dashboard for SAS CAS monitoring.
 ![Grafana - SAS CAS Monitoring](img/screenshot-grafana-cas.png)
 
+See the documentation at [SAS Viya: Monitoring](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calmonitoring&docsetTarget=titlepage.htm) for more information about using the monitoring components.
+
 ## Logging - Aggregation, Searching, & Filtering
 
 The logging solution includes these components:
@@ -54,6 +56,8 @@ The logging solution includes these components:
   This is an example of a Kibana dashboard displaying log message volumes.
 
   ![Kibana - Log Message Volume Dashboard](img/screenshot-logs-dashboard.png)
+
+See the documentation at [SAS Viya: Logging](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=titlepage.htm) for more information about using the logging components.
 
 ## Prerequisites
 
