@@ -10,7 +10,7 @@ Follow these steps:
 1. See the [Azure documentation](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-prometheus-integration)
 to understand how Azure Monitor discovers and scrapes endpoints. 
 
-2. Enabling Azure Montitor for your cluster.
+2. Enabling Azure Monitor for your cluster.
 
 3. Download the
 [template](https://github.com/microsoft/Docker-Provider/blob/ci_dev/kubernetes/container-azm-ms-agentconfig.yaml)
@@ -29,7 +29,7 @@ components that expose metrics endpoints should include these annotations:
 * `promethues.io/port`- metrics port
 * `promethues.io/scheme`- `http` or `https`
 
-5. After customizing the template,apply it to the cluster using this command:
+5. After customizing the template, apply it to the cluster using this command:
 
 ```bash
 kubectl apply -f /path/to/container-azm-ms-agentconfig.yaml

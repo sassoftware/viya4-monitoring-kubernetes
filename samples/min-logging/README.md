@@ -2,7 +2,7 @@
 
 This sample demonstrates how you can customize a logging deployment
 to minimize resource usage. The sample deployment configures single instances of each logging 
-component. This configuration could save CPU and memory resources, and could be useful in development and test environments.
+component. This configuration could save CPU and memory resources and could be useful in development and test environments.
 
 ## Installation
 

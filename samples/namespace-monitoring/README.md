@@ -98,11 +98,13 @@ DASH_NS=$VIYA_ONE_NS KUBE_DASH=false LOGGING_DASH=false monitoring/bin/deploy_da
 DASH_NS=$VIYA_TWO_NS KUBE_DASH=false LOGGING_DASH=false monitoring/bin/deploy_dashboards.sh
 ```
 
-## URLs
+## Example Grafana URLs
 
-* [Cluster Grafana](http://grafana.host.cluster.example.com)
-* [Armstrong Grafana](http://grafana.viya-one.host.cluster.example.com)
-* [Aldrin Grafana](http://grafana.viya-two.host.cluster.example.com/)
+This sample produces three instances of Grafana - one that displays metrics for the entire cluster, one that displays metrics only from the `viya-one` namespace, and one that displays metrics only from the `viya-two` namespace. These are the sample URLs for the instances of Grafana. The URLs in your deployment depend on the values that you substitute for the namespace names and the host names.  
+
+* [Cluster Grafana - http://grafana.host.cluster.example.com](http://grafana.host.cluster.example.com)
+* [Viya-one Grafana - http://grafana.viya-one.host.cluster.example.com](http://grafana.viya-one.host.cluster.example.com)
+* [Viya-two Grafana - http://grafana.viya-two.host.cluster.example.com](http://grafana.viya-two.host.cluster.example.com/)
 
 ## References
 

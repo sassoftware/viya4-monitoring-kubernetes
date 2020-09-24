@@ -9,7 +9,7 @@ These samples are provided:
 * [azure-monitor](azure-monitor) - Enables Azure Monitor to collect metrics
 from SAS Viya components
 * [external-alertmanager](external-alertmanager) - Configures a central external Alert Manager instance
-* [generic-base](generic-base) - Does not support a specific scenario, but provides a full set of cusomization files with comments
+* [generic-base](generic-base) - Does not support a specific scenario, but provides a full set of customization files with comments
 * [ingress](ingress) - Deploys using host-based or path-based ingress
 * [min-logging](min-logging) - Provides a minimal logging configuration for dev or test environments
 * [namespace-monitoring](namespace-monitoring) - Separates cluster monitoring

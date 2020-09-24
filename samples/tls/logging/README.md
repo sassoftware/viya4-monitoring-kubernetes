@@ -16,9 +16,9 @@ you run any of the scripts in this repository:
 * kubernetes.io/tls secret - `kibana-ingress-tls-secret`
 * kubernetes.io/tls secret - `elasticsearch-ingress-tls-secret`
 
-Generating these certificates is outside the scope of this example.However, you
+Generating these certificates is outside the scope of this example. However, you
 can use the process documented in ["Configure NGINX Ingress TLS for SAS
-Applications"](https://go.documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calencryptmotion&docsetTarget=n1xdqv1sezyrahn17erzcunxwix9.htm&locale=en#n0oo2yu8440vmzn19g6xhx4kfbrq) in SAS Viya Administation documentation and specify the `logging` namespace.
+Applications"](https://go.documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calencryptmotion&docsetTarget=n1xdqv1sezyrahn17erzcunxwix9.htm&locale=en#n0oo2yu8440vmzn19g6xhx4kfbrq) in SAS Viya Administration documentation and specify the `logging` namespace.
 
 ## Instructions
 
