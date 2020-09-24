@@ -39,7 +39,8 @@ These components are deployed:
 If you have already cloned the repository, use the `git pull` command to ensure
 that you have the most recent updates.
 
-If you use TLS to encrypt network traffic, you must perform manual steps prior to deployment. See the **TLS Support** section below for more information.
+If you use TLS to encrypt network traffic, you must perform manual steps prior
+to deployment. See the **TLS Support** section below for more information.
 
 ## Customize the Deployment
 
@@ -51,7 +52,8 @@ to be stored outside of the directory structure of this repository. The default
 should include `user*` files in the same relative structure as they exist in
 this repository.
 
-The following files are automatically used by the monitoring scripts if they are present in `USER_DIR`:
+The following files are automatically used by the monitoring scripts if they
+are present in `USER_DIR`:
 
 * `user.env`
 * `monitoring/user.env`
@@ -84,7 +86,37 @@ other helm charts such as Grafana and the Prometheus Node Exporter. Links
 to the charts and default values are included in the
 `user-values-prom-operator.yaml` file.
 
-**Note:** If you are using a cloud provider, you must use ingress, rather than NodePorts. Use the samples in the [monitoring/samples/ingress](https://github.com/sassoftware/kube-viya-monitoring/tree/master/monitoring/samples/ingress) area of this repository to set up either host-based or path-based ingress.
+**Note:** If you are using a cloud provider, you must use ingress, rather than
+NodePorts. Use the samples in the
+[monitoring/samples/ingress](https://github.com/sassoftware/kube-viya-monitoring/tree/master/monitoring/samples/ingress)
+area of this repository to set up either host-based or path-based ingress.
+
+## Istio Integration
+
+This repository contains an optional set of dashboards for Istio. To use these
+dashboards, the install assumes:
+
+* Istio is installed in the `istio-system` namespace
+* The optional Prometheus instance included with Istio is deployed
+
+To enable Istio support, set `ISTIO_ENABLED=true` in `$USER_DIR/user.env`
+or `$USER_DIR/monitoring/user.env` prior to running
+`deploy_monitoring_cluster.sh`.
+
+### Recommendations
+
+The default configuration of the Prometheus instance included in Istio will
+monitor the entire Kubernetes cluster. This is generally not desirable if
+the monitoring stack included here is also being deployed.
+
+The Istio Prometheus instance will discover and scrape pods with the
+`prometheus.io/*` annotations. This includes SAS Viya components and will
+result in double-scraping and higher resource usage. Disabling the following
+jobs in the Istio Prometheus instance will prevent cluster-wide scraping of
+pods and services with the `prometheus.io/*` annotations:
+
+* `kubernetes-pods`
+* `kubernetes-service-endpoints`
 
 ## Deploy Cluster Monitoring Components
 
@@ -114,7 +146,8 @@ By default, the components are deployed into the namespace `monitoring`.
 
 ## Access Monitoring Applications
 
-NodePorts are used by default. If you deployed using NodePorts, the monitoring applications are available at these locations by default:
+NodePorts are used by default. If you deployed using NodePorts, the monitoring
+applications are available at these locations by default:
 
 * Grafana - Port 31100 `http://master-node.yourcluster.example.com:31100`
 * Prometheus - Port 31090 `http://master-node.yourcluster.example.com:31090`
@@ -151,7 +184,7 @@ collected monitoring data.
 
 ## TLS Support
 
-You can use the `TLS_ENABLE` or `MON_TLS_ENABLE` settings in user.env 
+You can use the `TLS_ENABLE` or `MON_TLS_ENABLE` settings in user.env
 to enable TLS support, which encrypts network traffic
 between pods for use by the monitoring pods.
 
