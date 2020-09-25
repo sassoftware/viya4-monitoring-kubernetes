@@ -93,27 +93,29 @@ area of this repository to set up either host-based or path-based ingress.
 
 ## Istio Integration
 
-This repository contains an optional set of dashboards for Istio. To use these
-dashboards, the install assumes:
+This repository contains an optional set of dashboards for Istio. These
+dashboards use these assumptions:
 
 * Istio is installed in the `istio-system` namespace
-* The optional Prometheus instance included with Istio is deployed
+* The optional Prometheus instance that is included with Istio is deployed
 
 To enable Istio support, set `ISTIO_ENABLED=true` in `$USER_DIR/user.env`
-or `$USER_DIR/monitoring/user.env` prior to running
-`deploy_monitoring_cluster.sh`.
+or `$USER_DIR/monitoring/user.env` before deploying monitoring using the 
+`deploy_monitoring_cluster.sh` script.
 
 ### Recommendations
 
-The default configuration of the Prometheus instance included in Istio will
-monitor the entire Kubernetes cluster. This is generally not desirable if
-the monitoring stack included here is also being deployed.
+The default configuration of the Prometheus instance that is included in Istio 
+monitors the entire Kubernetes cluster. This configuration is typically not preferred if 
+you are deploying the monitoring components in this repository.
 
-The Istio Prometheus instance will discover and scrape pods with the
-`prometheus.io/*` annotations. This includes SAS Viya components and will
-result in double-scraping and higher resource usage. Disabling the following
-jobs in the Istio Prometheus instance will prevent cluster-wide scraping of
-pods and services with the `prometheus.io/*` annotations:
+This is because the Prometheus instance that is included with Istio discovers and scrapes pods that have the
+`prometheus.io/*` annotations, including SAS Viya components. If you also deployed the Prometheus 
+instance in this repository, both instances of Prometheus are scraping the pods, which leads to higher resource usage. 
+
+To prevent this situation, disable cluster-wide scraping of
+pods and services that contain the `prometheus.io/*` annotations by disabling the following
+jobs in the Istio Prometheus instance:
 
 * `kubernetes-pods`
 * `kubernetes-service-endpoints`
