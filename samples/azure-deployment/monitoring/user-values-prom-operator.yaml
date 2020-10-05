@@ -12,12 +12,6 @@
 # Sample ingress configuration
 # NOTE: Edit hostnames and ingress port
 
-kubelet:
-  serviceMonitor:
-    # Azure uses http for kubelet metrics by default
-    # See issue: https://github.com/coreos/prometheus-operator/issues/926
-    https: false
-
 prometheus:
   service:
     type: ClusterIP
