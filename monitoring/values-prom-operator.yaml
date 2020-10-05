@@ -21,9 +21,9 @@ commonLabels:
 prometheusOperator:
   # v0.39+ requires Kubernetes 1.16+
   image:
-    tag: v0.40.0
+    tag: v0.42.1
   prometheusConfigReloaderImage:
-    tag: v0.40.0
+    tag: v0.42.1
   logFormat: json
   logLevel: info
   createCustomResource: false
@@ -187,7 +187,7 @@ nodeExporter:
 # https://github.com/helm/charts/tree/master/stable/grafana
 grafana:
   image:
-    tag: "7.1.5"
+    tag: "7.2.0"
   "grafana.ini":
     analytics:
       check_for_updates: false

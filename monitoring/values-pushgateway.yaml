@@ -26,3 +26,8 @@ serviceMonitor:
 
 persistentVolume:
   enabled: true
+
+tolerations:
+- key: workload.sas.com/class
+  value: stateful
+  effect: NoSchedule
