@@ -24,8 +24,7 @@ kibana:
       nginx.ingress.kubernetes.io/configuration-snippet: |
         rewrite (?i)/kibana/(.*) /$1 break;
         rewrite (?i)/kibana$ / break;
-      nginx.ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/rewrite-target: /kibana
     enabled: true
     hosts:
-    - host.mycluster.example.com
-    path: /kibana
+    - host.mycluster.example.com/kibana
