@@ -21,9 +21,9 @@ commonLabels:
 prometheusOperator:
   # v0.39+ requires Kubernetes 1.16+
   image:
-    tag: v0.42.1
+    tag: v0.40.0
   prometheusConfigReloaderImage:
-    tag: v0.42.1
+    tag: v0.40.0
   logFormat: json
   logLevel: info
   createCustomResource: false
