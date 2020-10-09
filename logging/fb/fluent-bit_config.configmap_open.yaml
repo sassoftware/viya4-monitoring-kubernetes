@@ -848,6 +848,7 @@ data:
        Retry_Limit 5
        Type  _doc
        Time_Key @timestamp
+       Generate_ID  On
        Replace_Dots On
        Logstash_Prefix viya_logs
        #Logstash_Prefix kubernetes_cluster
