@@ -7,9 +7,15 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 
+# Collect Kubernetes events as pseudo-log messages?
 EVENTROUTER_ENABLE=${EVENTROUTER_ENABLE:-true}
 
+# Use multi-purpose Elasticsearch nodes?
+ES_MULTIPURPOSE_NODES=${ES_MULTIPURPOSE_NODES:-false}
+
+# Require TLS into Kibana?
 LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-false}
+
 source bin/tls-include.sh
 verify_cert_manager
 
@@ -197,6 +203,33 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
 else
    helm3ReleaseCheck odfe $LOG_NS
    helm $helmDebug upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_TLS_YAML"  --values "$KB_OPEN_TLS_YAML"  --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
+fi
+
+# switch to multi-purpose ES nodes (if enabled)
+if [ "$ES_MULTIPURPOSE_NODES" == "true" ]; then
+
+   sleep 10s
+   log_debug "Configuring Elasticsearch to use multi-purpose nodes"
+
+   # Reconfigure 'master' nodes to be 'multipupose' nodes (i.e. support master, data and client roles)
+   log_debug "Patching statefulset [v4m-es-master]"
+   kubectl -n $LOG_NS patch statefulset v4m-es-master --patch "$(cat logging/es/odfe/es_multipurpose_nodes_patch.yml)"
+
+   # By default, there will be no single-purpose 'client' or 'data' nodes; but patching corresponding
+   # K8s objects to ensure their use in case user chooses to configure additional single-purpose nodes
+   log_debug "Patching deployment [v4m-es-client]"
+   kubectl -n $LOG_NS patch deployment v4m-es-client --type=json --patch '[{"op": "add","path": "/metadata/labels/esdata","value": "true" }]'
+
+   log_debug "Patching statefulset [v4m-es-data]"
+   kubectl -n $LOG_NS patch statefulset v4m-es-data  --type=json --patch '[{"op": "add","path": "/spec/template/metadata/labels/esdata","value": "true" }]'
+
+   # patching 'client' and 'data' _services_ to tie use new multipurpose labels for node selection
+   log_debug "Patching  service [v4m-es-client-service]"
+   kubectl -n $LOG_NS patch service v4m-es-client-service --type=json --patch '[{"op": "remove","path": "/spec/selector/role"},{"op": "add","path": "/spec/selector/esclient","value": "true" }]'
+
+   log_debug "Patching  service [v4m-es-data-service]"
+   kubectl -n $LOG_NS patch service v4m-es-data-svc --type=json --patch '[{"op": "remove","path": "/spec/selector/role"},{"op": "add","path": "/spec/selector/esdata","value": "true" }]'
+
 fi
 
 # wait for pod to come up
