@@ -1,9 +1,12 @@
-# Kibana helm chart overrides
-# Default values: https://github.com/elastic/helm-charts/blob/master/kibana/values.yaml
+# Chart: https://github.com/opendistro-for-elasticsearch/opendistro-build/tree/master/helm
+# Default values: https://github.com/opendistro-for-elasticsearch/opendistro-build/blob/master/helm/opendistro-es/values.yaml
 
 kibana:
   extraEnvs:
-  # Username & password need to be set here since helm replaces array values
+  # Needed for path-based ingress
+  - name: SERVER_BASEPATH
+    value: /kibana
+  # Username & password need to be set here since helm *replaces* array values
   - name: ELASTICSEARCH_USERNAME
     valueFrom:
        secretKeyRef:
@@ -14,6 +17,7 @@ kibana:
        secretKeyRef:
           name: internal-user-kibanaserver
           key: password
+
 
   service:
     type: ClusterIP
@@ -27,8 +31,7 @@ kibana:
       nginx.ingress.kubernetes.io/configuration-snippet: |
         rewrite (?i)/kibana/(.*) /$1 break;
         rewrite (?i)/kibana$ / break;
-      nginx.ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/rewrite-target: /kibana
     enabled: true
     hosts:
-    - host.mycluster.example.com
-    path: /kibana
+    - host.mycluster.example.com/kibana
