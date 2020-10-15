@@ -18,7 +18,6 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     export LOG_NS="${LOG_NS:-logging}"
     export SAS_LOGGING_COMMON_SOURCED=true
     # TLS is required for logging components
-    export TLS_ENABLE=true
-    export TLS_CERT_MANAGER_ENABLE="${TLS_CERT_MANAGER_ENABLE:-$TLS_ENABLE}"
+    export TLS_CERT_MANAGER_ENABLE="${TLS_CERT_MANAGER_ENABLE:-true}"
 fi
 echo ""
