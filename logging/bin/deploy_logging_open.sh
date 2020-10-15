@@ -75,81 +75,57 @@ if [ "$EVENTROUTER_ENABLE" == "true" ]; then
   kubectl apply -f logging/eventrouter.yaml
 fi
 
-# TLS REQUIRED
-if [ "$TLS_ENABLE" == "true" ]; then
-  # TLS-specific Helm chart values currently maintained in separate YAML file
-  ES_OPEN_TLS_YAML=logging/es/odfe/es_helm_values_tls_open.yaml
 
-  if [ "$LOG_KB_TLS_ENABLE" == "true" ]; then
-     # Kibana TLS-specific Helm chart values currently maintained in separate YAML file
-     KB_OPEN_TLS_YAML=logging/es/odfe/es_helm_values_kb_tls_open.yaml
-     # w/TLS: use HTTPS in curl commands
-     KB_CURL_PROTOCOL=https
-     log_debug "TLS enabled for Kibana"
-  else
-     # point to an empty yaml file
-     KB_OPEN_TLS_YAML=$TMP_DIR/empty.yaml
-     # w/o TLS: use HTTP in curl commands
-     KB_CURL_PROTOCOL=http
-     log_debug "TLS not enabled for Kibana"
-  fi
-
-  apps=( es-transport es-rest es-admin kibana )
-  create_tls_certs $LOG_NS logging ${apps[@]}
+if [ "$LOG_KB_TLS_ENABLE" == "true" ]; then
+   # Kibana TLS-specific Helm chart values currently maintained in separate YAML file
+   KB_OPEN_TLS_YAML=logging/es/odfe/es_helm_values_kb_tls_open.yaml
+   # w/TLS: use HTTPS in curl commands
+   KB_CURL_PROTOCOL=https
+   log_debug "TLS enabled for Kibana"
 else
-  # point to empty yaml file
-  ES_OPEN_TLS_YAML=$TMP_DIR/empty.yaml
-
-  # point to yaml file w/ hard-coded admin credentials (needed for demo certs)
-  KB_OPEN_TLS_YAML=logging/es/odfe/es_helm_values_kb_notls_open.yaml
-
-  # w/TLS: use HTTPS in curl commands
-  KB_CURL_PROTOCOL=http
-  log_debug "TLS not enabled for logging components"
+   # point to an empty yaml file
+   KB_OPEN_TLS_YAML=$TMP_DIR/empty.yaml
+   # w/o TLS: use HTTP in curl commands
+   KB_CURL_PROTOCOL=http
+   log_debug "TLS not enabled for Kibana"
 fi
 
-# FEATURE FLAG: configure Elasticsearch security configuration
-ES_SECURITY_CONFIG_ENABLE=${ES_SECURITY_CONFIG_ENABLE:-true}
+apps=( es-transport es-rest es-admin kibana )
+create_tls_certs $LOG_NS logging ${apps[@]}
 
-if [ "$ES_SECURITY_CONFIG_ENABLE" == "true" ]; then
-  # Elasticsearch Passwords
-  export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD:-admin}
-  export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD:-$(uuidgen)}
-  export ES_LOGCOLLECTOR_PASSWD=${ES_LOGCOLLECTOR_PASSWD:-$(uuidgen)}
-  export ES_METRICGETTER_PASSWD=${ES_METRICGETTER_PASSWD:-$(uuidgen)}
+# Elasticsearch Passwords
+export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD:-admin}
+export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD:-$(uuidgen)}
+export ES_LOGCOLLECTOR_PASSWD=${ES_LOGCOLLECTOR_PASSWD:-$(uuidgen)}
+export ES_METRICGETTER_PASSWD=${ES_METRICGETTER_PASSWD:-$(uuidgen)}
 
 
-  # Create secrets containing SecurityConfig files
-  create_secret_from_file securityconfig/action_groups.yml security-action-groups
-  create_secret_from_file securityconfig/config.yml security-config
-  create_secret_from_file securityconfig/internal_users.yml security-internal-users
-  create_secret_from_file securityconfig/roles.yml security-roles
-  create_secret_from_file securityconfig/roles_mapping.yml security-roles-mapping
+# Create secrets containing SecurityConfig files
+create_secret_from_file securityconfig/action_groups.yml security-action-groups
+create_secret_from_file securityconfig/config.yml security-config
+create_secret_from_file securityconfig/internal_users.yml security-internal-users
+create_secret_from_file securityconfig/roles.yml security-roles
+create_secret_from_file securityconfig/roles_mapping.yml security-roles-mapping
 
-  # Create secrets containing internal user credentials
-  create_user_secret internal-user-admin admin $ES_ADMIN_PASSWD
-  create_user_secret internal-user-kibanaserver kibanaserver $ES_KIBANASERVER_PASSWD
-  create_user_secret internal-user-logcollector logcollector $ES_LOGCOLLECTOR_PASSWD
-  create_user_secret internal-user-metricgetter metricgetter $ES_METRICGETTER_PASSWD
+# Create secrets containing internal user credentials
+create_user_secret internal-user-admin admin $ES_ADMIN_PASSWD
+create_user_secret internal-user-kibanaserver kibanaserver $ES_KIBANASERVER_PASSWD
+create_user_secret internal-user-logcollector logcollector $ES_LOGCOLLECTOR_PASSWD
+create_user_secret internal-user-metricgetter metricgetter $ES_METRICGETTER_PASSWD
 
-  # Create ConfigMap for securityadmin script
-  if [ -z "$(kubectl -n $LOG_NS get configmap run-securityadmin.sh -o name 2>/dev/null)" ]; then
-    kubectl -n $LOG_NS create configmap run-securityadmin.sh --from-file logging/es/odfe/bin/run_securityadmin.sh
-  else
-    log_info "Using existing ConfigMap [run-securityadmin.sh]"
-  fi
-
-  # Need to retrieve these from secrets in case secrets pre-existed
-  export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
-  export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
-  export ES_METRICGETTER_USER=$(kubectl -n $LOG_NS get secret internal-user-metricgetter -o=jsonpath="{.data.username}" |base64 --decode)
-  export ES_METRICGETTER_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-metricgetter -o=jsonpath="{.data.password}" |base64 --decode)
+# Create ConfigMap for securityadmin script
+if [ -z "$(kubectl -n $LOG_NS get configmap run-securityadmin.sh -o name 2>/dev/null)" ]; then
+  kubectl -n $LOG_NS create configmap run-securityadmin.sh --from-file logging/es/odfe/bin/run_securityadmin.sh
 else
-  # hard-code admin credentials to preserve support (temporarily) for demo security
-  create_user_secret internal-user-admin admin admin
-  export ES_ADMIN_USER=admin
-  export ES_ADMIN_PASSWD=admin
+  log_info "Using existing ConfigMap [run-securityadmin.sh]"
 fi
+
+# Need to retrieve these from secrets in case secrets pre-existed
+export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
+export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
+export ES_METRICGETTER_USER=$(kubectl -n $LOG_NS get secret internal-user-metricgetter -o=jsonpath="{.data.username}" |base64 --decode)
+export ES_METRICGETTER_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-metricgetter -o=jsonpath="{.data.password}" |base64 --decode)
+
 
 # Elasticsearch
 log_info "STEP 2: Deploying Elasticsearch"
@@ -199,10 +175,10 @@ helm repo update
 # Deploy Elasticsearch via Helm chart
 if [ "$HELM_VER_MAJOR" == "3" ]; then
    helm2ReleaseCheck odfe-$LOG_NS
-   helm $helmDebug upgrade --install odfe --namespace $LOG_NS  --values logging/es/odfe/es_helm_values_open.yaml  --values "$ES_OPEN_TLS_YAML" --values "$KB_OPEN_TLS_YAML" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
+   helm $helmDebug upgrade --install odfe --namespace $LOG_NS  --values logging/es/odfe/es_helm_values_open.yaml  --values "$KB_OPEN_TLS_YAML" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 else
    helm3ReleaseCheck odfe $LOG_NS
-   helm $helmDebug upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml --values "$ES_OPEN_TLS_YAML"  --values "$KB_OPEN_TLS_YAML"  --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
+   helm $helmDebug upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml  --values "$KB_OPEN_TLS_YAML"  --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 fi
 
 # switch to multi-purpose ES nodes (if enabled)
@@ -273,39 +249,33 @@ if [ "$podready" != "TRUE" ]; then
    exit 14
 fi
 
-if [ "$ES_SECURITY_CONFIG_ENABLE" == "true" ]; then
+log_info "Waiting [2] minute to allow Elasticsearch to initialize [$(date)]"
+sleep 120s
 
-  log_info "Waiting [2] minute to allow Elasticsearch to initialize [$(date)]"
-  sleep 120s
+set +e
 
-  set +e
-
-  # Run the security admin script on the pod
-  # Add some logic to find ES release
-  if [ "$existingODFE" == "false" ]; then
-    kubectl -n $LOG_NS exec v4m-es-master-0 -it -- config/run_securityadmin.sh
-    # Retrieve log file from security admin script
-    kubectl -n $LOG_NS cp v4m-es-master-0:config/run_securityadmin.log $TMP_DIR/run_securityadmin.log
-    if [ "$(tail -n1  $TMP_DIR/run_securityadmin.log)" == "Done with success" ]; then
-      log_info "The run_securityadmin.log script appears to have run successfully; you can review its output below:"
-    else
-      log_warn "There may have been a problem with the run_securityadmin.log script; review the output below:"
-    fi
-    # show output from run_securityadmin.sh script
-    sed 's/^/   | /' $TMP_DIR/run_securityadmin.log
+# Run the security admin script on the pod
+# Add some logic to find ES release
+if [ "$existingODFE" == "false" ]; then
+  kubectl -n $LOG_NS exec v4m-es-master-0 -it -- config/run_securityadmin.sh
+  # Retrieve log file from security admin script
+  kubectl -n $LOG_NS cp v4m-es-master-0:config/run_securityadmin.log $TMP_DIR/run_securityadmin.log
+  if [ "$(tail -n1  $TMP_DIR/run_securityadmin.log)" == "Done with success" ]; then
+    log_info "The run_securityadmin.log script appears to have run successfully; you can review its output below:"
   else
-    log_info "Existing OpenDistro release found. Skipping Elasticsearh security initialization."
+    log_warn "There may have been a problem with the run_securityadmin.log script; review the output below:"
   fi
-
-  # Need to wait for completion?
-  log_info "Waiting [1] minute to allow Elasticsearch to complete initialization [$(date)]"
-  sleep 60s
-
-  set -e
+  # show output from run_securityadmin.sh script
+  sed 's/^/   | /' $TMP_DIR/run_securityadmin.log
 else
-  log_info "Waiting [4] minutes to allow Elasticsearch to initialize [$(date)]"
-  sleep 240s
+  log_info "Existing OpenDistro release found. Skipping Elasticsearh security initialization."
 fi
+
+# Need to wait for completion?
+log_info "Waiting [1] minute to allow Elasticsearch to complete initialization [$(date)]"
+sleep 60s
+
+ set -e
 
 # set up temporary port forwarding to allow curl access
 ES_PORT=$(kubectl -n $LOG_NS get service v4m-es-client-service -o=jsonpath='{.spec.ports[?(@.name=="http")].port}')
