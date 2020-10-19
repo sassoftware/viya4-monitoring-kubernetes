@@ -52,8 +52,8 @@ subject= CN=<common_name>,OU=<organization_unit>,O=<organization>,L=<location>,C
 
 5. Modify the file `$USER_DIR\logging\user-values-elasticsearch-open.yaml`.
 
-For the value of the key `opendistro_security.nodes_dn`, specify the subject information that you obtained from the es-transport-tls certificate.
+- For the value of the key `opendistro_security.nodes_dn`, specify the subject information that you obtained from the es-transport-tls certificate.
 
-For the value of the key `opendistro_security.authcz.admin_dn`, specify the subject information that you obtained from the es-admin-tls-secret certificate.
+- For the value of the key `opendistro_security.authcz.admin_dn`, specify the subject information that you obtained from the es-admin-tls-secret certificate.
 
 *Note:* You must specify the subject information exactly as it was returned from the certificate (without any spaces after the commas). 
