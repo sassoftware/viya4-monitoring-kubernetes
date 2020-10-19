@@ -4,7 +4,7 @@
 
 TLS is required for communication between the Elasticsearch nodes and for accessing Elasticsearch from other components. It is also a best practice to use TLS (by using HTTPS) when accessing Kibana from a browser.
 
-TLS requires the use of digital security certificates. These certificates allow the Elasticsearch nodes to verify their identity when establishing communication connections. For SAS Viya Monitoring, these certificates are persisted as Kubernetes secrets. Kubernetes mounts these secrets onto the various Elasticsearch and Kibana pods where they appear as files on disk. The name and location of these files is fixed by the Open Distro for Elasticsearch Helm chart and cannot be changed.
+TLS requires the use of digital security certificates. These certificates allow the Elasticsearch nodes to verify their identity when establishing communication connections. For SAS Viya Monitoring, these certificates are persisted as Kubernetes secrets. Kubernetes mounts these secrets onto the various Elasticsearch and Kibana pods where they appear as files on disk. The name and location of these files is fixed by the Open Distro for Elasticsearch Helm chart and cannot be changed. 
 
 ## Configure TLS Using cert-manager
 
