@@ -49,11 +49,27 @@ This command returns the subject information that is specified in the certificat
 ```bash
 subject= CN=<common_name>,OU=<organization_unit>,O=<organization>,L=<location>,C=XX
 ```
+5. If you have not already set up your `USER_DIR` directory, set up an empty directory with a `logging` subdirectory to contain the customization files. Export a `USER_DIR` environment variable that points to this
+location. For example:
 
-5. Modify the file `$USER_DIR\logging\user-values-elasticsearch-open.yaml`.
+```bash
+mkdir -p ~/my-cluster-files/ops/user-dir/logging
+export USER_DIR=~/my-cluster-files/ops/user-dir
+```
+
+6. Modify the file `$USER_DIR\logging\user-values-elasticsearch-open.yaml`.
+
+   - Uncomment the line `#elasticsearch` as well as these lines:
+   
+     ```bash
+     #   config:
+     #     opendistro_security.authcz.admin_dn:
+     #     - "CN=es-admin,O=cert-manager"
+     #     opendistro_security.nodes_dn:
+     #     - "CN=es-transport,O=cert-manager"
+      ```
+   - For the value of the key `opendistro_security.authcz.admin_dn`, specify the subject information that you obtained from the `es-admin-tls` certificate.
 
    - For the value of the key `opendistro_security.nodes_dn`, specify the subject information that you obtained from the `es-transport-tls` certificate.
-
-   - For the value of the key `opendistro_security.authcz.admin_dn`, specify the subject information that you obtained from the `es-admin-tls` certificate.
 
 *Note:* You must specify the subject information exactly as it was returned from the certificate (without any spaces after the commas). 
