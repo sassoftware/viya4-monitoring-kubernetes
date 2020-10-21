@@ -49,8 +49,7 @@ This command returns the subject information that is specified in the certificat
 ```bash
 subject= CN=<common_name>,OU=<organization_unit>,O=<organization>,L=<location>,C=XX
 ```
-5. If you have not already set up your `USER_DIR` directory, set up an empty directory with a `logging` subdirectory to contain the customization files. Export a `USER_DIR` environment variable that points to this
-location. For example:
+5. If you have not already set up your `USER_DIR` directory (as discussed in the 'Customize the Deployment' section of the README.md file in the /logging directory), set up an empty directory with a `logging` subdirectory to contain the customization files. Export a `USER_DIR` environment variable that points to this location. For example:
 
 ```bash
 mkdir -p ~/my-cluster-files/ops/user-dir/logging
