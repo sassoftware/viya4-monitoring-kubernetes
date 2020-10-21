@@ -35,9 +35,6 @@ helm2ReleaseCheck v4m-promstack-$MON_NS
 helm3ReleaseCheck v4m-promstack $MON_NS
 checkDefaultStorageClass
 
-log_error "BRYAN - Exiting early"
-exit 1
-
 export HELM_DEBUG="${HELM_DEBUG:-false}"
 export NGINX_NS="${NGINX_NS:-ingress-nginx}"
 
@@ -118,11 +115,11 @@ if [ "$TLS_ENABLE" == "true" ]; then
   log_info "Provisioning TLS-enabled Prometheus datasource for Grafana..."
   cp monitoring/tls/grafana-datasource-prom-https.yaml $TMP_DIR/grafana-datasource-prom-https.yaml
   if [ "$HELM_VER_MAJOR" == "3" ]; then
-    kubectl delete cm -n $MON_NS --ignore-not-found prometheus-operator-grafana-datasource
-    echo "      url: https://prometheus-operator-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
+    kubectl delete cm -n $MON_NS --ignore-not-found v4m-promstack-grafana-datasource
+    echo "      url: https://v4m-promstack-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
   else
-    kubectl delete cm -n $MON_NS --ignore-not-found prometheus-$MON_NS-grafana-datasource
-    echo "      url: https://prometheus-$MON_NS-prom-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
+    kubectl delete cm -n $MON_NS --ignore-not-found v4m-promstack-$MON_NS-grafana-datasource
+    echo "      url: https://v4m-promstack-$MON_NS-prom-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
   fi
 
   kubectl delete cm -n $MON_NS --ignore-not-found grafana-datasource-prom-https
@@ -170,7 +167,7 @@ sleep 2
 
 if [ "$TLS_ENABLE" == "true" ]; then
   log_info "Patching Grafana ServiceMonitor for TLS..."
-  kubectl patch servicemonitor -n $MON_NS prometheus-operator-grafana --type=json \
+  kubectl patch servicemonitor -n $MON_NS v4m-promstack-grafana --type=json \
     -p='[{"op": "replace", "path": "/spec/endpoints/0/scheme", "value":"https"},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig", "value":{}},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig/insecureSkipVerify", "value":true}]'
 fi
 
