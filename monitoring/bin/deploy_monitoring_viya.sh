@@ -13,12 +13,7 @@ if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
 
-if [[ ! $(helm repo list 2>/dev/null) =~ prometheus-community[[:space:]] ]]; then
-  log_info "Adding 'prometheus-community' helm repository"
-  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-else
-  log_debug "'prometheus-community' helm repository already exists"
-fi
+helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
 
 log_info "Updating helm repositories..."
 helm repo update

@@ -76,8 +76,20 @@ function helm3ReleaseCheck {
   fi
 }
 
+function helmRepoAdd {
+  repo=$1
+  repoURL=$2
+  if [[ ! $(helm repo list 2>/dev/null) =~ $repo[[:space:]] ]]; then
+    log_info "Adding [$repo] helm repository"
+    helm repo add $repo $repoURL
+  else
+    log_debug "The helm repo [$repo] already exists"
+  fi
+}
+
 export HELM_VER_MAJOR HELM_VER_FULL HELM_SERVER_VER_FULL
 export -f helm2ReleaseExists
 export -f helm3ReleaseExists
 export -f helm2ReleaseCheck
 export -f helm3ReleaseCheck
+export -f helmRepoAdd

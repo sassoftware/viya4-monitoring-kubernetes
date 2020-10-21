@@ -12,7 +12,7 @@ verify_cert_manager
 if [ "$HELM_VER_MAJOR" == "3" ]; then
   if helm3ReleaseExists prometheus-operator $MON_NS; then
     log_error "The helm release of [prometheus-operator] is not supported for in-place upgrade"
-    log_error "Run monitoring/bin/remove_monitoring/cluster.sh to remove the existing components"
+    log_error "Run monitoring/bin/remove_monitoring_cluster.sh to remove the existing components"
     log_error "Either remove the existing Persistent Volume Claims in the [$MON_NS] namespace"
     log_error "or follow the instructions at https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#migrating-from-stableprometheus-operator-chart"
     log_error "to reuse the existing Persistent Volumes."
@@ -22,7 +22,7 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
 else
   if helm2ReleaseExists prometheus-operator-$MON_NS; then
     log_error "The helm release of [prometheus-operator-$MON_NS] is not supported for in-place upgrade"
-    log_error "Run monitoring/bin/remove_monitoring/cluster.sh to remove the existing components"
+    log_error "Run monitoring/bin/remove_monitoring_cluster.sh to remove the existing components"
     log_error "Either remove the existing Persistent Volume Claims in the [$MON_NS] namespace"
     log_error "or follow the instructions at https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#migrating-from-stableprometheus-operator-chart"
     log_error "to reuse the existing Persistent Volumes."
@@ -31,8 +31,8 @@ else
   fi
 fi
 
-helm2ReleaseCheck v4m-promstack-$MON_NS
-helm3ReleaseCheck v4m-promstack $MON_NS
+helm2ReleaseCheck v4m-$MON_NS
+helm3ReleaseCheck v4m $MON_NS
 checkDefaultStorageClass
 
 export HELM_DEBUG="${HELM_DEBUG:-false}"
@@ -55,18 +55,8 @@ fi
 set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
 
-if [[ ! $(helm repo list 2>/dev/null) =~ stable[[:space:]] ]]; then
-  log_info "Adding 'stable' helm repository"
-  helm repo add stable https://kubernetes-charts.storage.googleapis.com
-else
-  log_debug "'stable' helm repository already exists"
-fi
-if [[ ! $(helm repo list 2>/dev/null) =~ prometheus-community[[:space:]] ]]; then
-  log_info "Adding 'prometheus-community' helm repository"
-  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-else
-  log_debug "'prometheus-community' helm repository already exists"
-fi
+helmRepoAdd stable https://kubernetes-charts.storage.googleapis.com
+helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
 
 log_info "Updating helm repositories..."
 helm repo update
@@ -115,11 +105,11 @@ if [ "$TLS_ENABLE" == "true" ]; then
   log_info "Provisioning TLS-enabled Prometheus datasource for Grafana..."
   cp monitoring/tls/grafana-datasource-prom-https.yaml $TMP_DIR/grafana-datasource-prom-https.yaml
   if [ "$HELM_VER_MAJOR" == "3" ]; then
-    kubectl delete cm -n $MON_NS --ignore-not-found v4m-promstack-grafana-datasource
-    echo "      url: https://v4m-promstack-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
+    kubectl delete cm -n $MON_NS --ignore-not-found v4m-grafana-datasource
+    echo "      url: https://v4m-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
   else
-    kubectl delete cm -n $MON_NS --ignore-not-found v4m-promstack-$MON_NS-grafana-datasource
-    echo "      url: https://v4m-promstack-$MON_NS-prom-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
+    kubectl delete cm -n $MON_NS --ignore-not-found v4m-$MON_NS-grafana-datasource
+    echo "      url: https://v4m-$MON_NS-prom-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
   fi
 
   kubectl delete cm -n $MON_NS --ignore-not-found grafana-datasource-prom-https
@@ -138,7 +128,7 @@ log_info "Deploying Prometheus Operator. This may take a few minutes (20min time
 log_info "User response file: [$PROM_OPER_USER_YAML]"
 if [ "$HELM_VER_MAJOR" == "3" ]; then
   log_debug "Installing via Helm 3...(timeout 20m)"
-  promRelease=v4m-promstack
+  promRelease=v4m
   helm $helmDebug upgrade --install $promRelease \
     --namespace $MON_NS \
     -f monitoring/values-prom-operator.yaml \
@@ -149,7 +139,7 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     prometheus-community/kube-prometheus-stack
 else
   log_debug "Installing via Helm 2...(timeout 20m)"
-  promRelease=v4m-promstack-$MON_NS
+  promRelease=v4m-$MON_NS
   helm $helmDebug upgrade --install $promRelease \
     --namespace $MON_NS \
     -f monitoring/values-prom-operator.yaml \
@@ -167,7 +157,7 @@ sleep 2
 
 if [ "$TLS_ENABLE" == "true" ]; then
   log_info "Patching Grafana ServiceMonitor for TLS..."
-  kubectl patch servicemonitor -n $MON_NS v4m-promstack-grafana --type=json \
+  kubectl patch servicemonitor -n $MON_NS v4m-grafana --type=json \
     -p='[{"op": "replace", "path": "/spec/endpoints/0/scheme", "value":"https"},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig", "value":{}},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig/insecureSkipVerify", "value":true}]'
 fi
 
