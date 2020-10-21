@@ -13,6 +13,16 @@ if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
 
+if [[ ! $(helm repo list 2>/dev/null) =~ prometheus-community[[:space:]] ]]; then
+  log_info "Adding 'prometheus-community' helm repository"
+  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+else
+  log_debug "'prometheus-community' helm repository already exists"
+fi
+
+log_info "Updating helm repositories..."
+helm repo update
+
 PUSHGATEWAY_USER_YAML="${PUSHGATEWAY_USER_YAML:-$USER_DIR/monitoring/user-values-pushgateway.yaml}"
 if [ ! -f "$PUSHGATEWAY_USER_YAML" ]; then
   log_debug "[$PUSHGATEWAY_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
@@ -39,14 +49,14 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
     --namespace $VIYA_NS \
     -f monitoring/values-pushgateway.yaml \
     -f $PUSHGATEWAY_USER_YAML \
-    stable/prometheus-pushgateway
+    prometheus-community/prometheus-pushgateway
   else
     helm2ReleaseCheck pushgateway-$VIYA_NS
     helm $helmDebug upgrade --install prometheus-pushgateway \
     --namespace $VIYA_NS \
     -f monitoring/values-pushgateway.yaml \
     -f $PUSHGATEWAY_USER_YAML \
-    stable/prometheus-pushgateway
+    prometheus-community/prometheus-pushgateway
   fi
 fi
 

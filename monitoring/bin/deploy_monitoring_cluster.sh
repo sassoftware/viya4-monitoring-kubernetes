@@ -9,9 +9,34 @@ source monitoring/bin/common.sh
 source bin/tls-include.sh
 verify_cert_manager
 
-helm2ReleaseCheck prometheus-$MON_NS
-helm3ReleaseCheck prometheus-operator $MON_NS
+if [ "$HELM_VER_MAJOR" == "3" ]; then
+  if helm3ReleaseExists prometheus-operator $MON_NS; then
+    log_error "The helm release of [prometheus-operator] is not supported for in-place upgrade"
+    log_error "Run monitoring/bin/remove_monitoring/cluster.sh to remove the existing components"
+    log_error "Either remove the existing Persistent Volume Claims in the [$MON_NS] namespace"
+    log_error "or follow the instructions at https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#migrating-from-stableprometheus-operator-chart"
+    log_error "to reuse the existing Persistent Volumes."
+    log_error "Then run a fresh install of monitoring/bin/deploy_monitoring_cluster.sh"
+    exit 1
+  fi
+else
+  if helm2ReleaseExists prometheus-operator-$MON_NS; then
+    log_error "The helm release of [prometheus-operator-$MON_NS] is not supported for in-place upgrade"
+    log_error "Run monitoring/bin/remove_monitoring/cluster.sh to remove the existing components"
+    log_error "Either remove the existing Persistent Volume Claims in the [$MON_NS] namespace"
+    log_error "or follow the instructions at https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#migrating-from-stableprometheus-operator-chart"
+    log_error "to reuse the existing Persistent Volumes."
+    log_error "Then run a fresh install of monitoring/bin/deploy_monitoring_cluster.sh"
+    exit 1
+  fi
+fi
+
+helm2ReleaseCheck v4m-promstack-$MON_NS
+helm3ReleaseCheck v4m-promstack $MON_NS
 checkDefaultStorageClass
+
+log_error "BRYAN - Exiting early"
+exit 1
 
 export HELM_DEBUG="${HELM_DEBUG:-false}"
 export NGINX_NS="${NGINX_NS:-ingress-nginx}"
@@ -39,8 +64,13 @@ if [[ ! $(helm repo list 2>/dev/null) =~ stable[[:space:]] ]]; then
 else
   log_debug "'stable' helm repository already exists"
 fi
+if [[ ! $(helm repo list 2>/dev/null) =~ prometheus-community[[:space:]] ]]; then
+  log_info "Adding 'prometheus-community' helm repository"
+  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+else
+  log_debug "'prometheus-community' helm repository already exists"
+fi
 
-# helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 log_info "Updating helm repositories..."
 helm repo update
 
@@ -110,8 +140,8 @@ fi
 log_info "Deploying Prometheus Operator. This may take a few minutes (20min timeout)..."
 log_info "User response file: [$PROM_OPER_USER_YAML]"
 if [ "$HELM_VER_MAJOR" == "3" ]; then
-  log_debug "Installing via Helm 3..."
-  promRelease=prometheus-operator
+  log_debug "Installing via Helm 3...(timeout 20m)"
+  promRelease=v4m-promstack
   helm $helmDebug upgrade --install $promRelease \
     --namespace $MON_NS \
     -f monitoring/values-prom-operator.yaml \
@@ -119,10 +149,10 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     -f $PROM_OPER_USER_YAML \
     --atomic \
     --timeout 20m \
-    stable/prometheus-operator
+    prometheus-community/kube-prometheus-stack
 else
-  log_debug "Installing via Helm 2..."
-  promRelease=prometheus-$MON_NS
+  log_debug "Installing via Helm 2...(timeout 20m)"
+  promRelease=v4m-promstack-$MON_NS
   helm $helmDebug upgrade --install $promRelease \
     --namespace $MON_NS \
     -f monitoring/values-prom-operator.yaml \
@@ -131,7 +161,7 @@ else
     --atomic \
     --timeout 1200 \
     --set prometheusOperator.createCustomResource=$createPromCRDs \
-    stable/prometheus-operator
+    prometheus-community/kube-prometheus-stack
 fi
 
 rm -f $genValuesFile

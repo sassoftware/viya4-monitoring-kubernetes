@@ -12,16 +12,26 @@ MON_DELETE_NAMESPACE_ON_REMOVE=${MON_DELETE_NAMESPACE_ON_REMOVE:-false}
 # Check for existing incompatible helm releases up front
 helm2ReleaseCheck prometheus-$MON_NS
 helm3ReleaseCheck prometheus-operator $MON_NS
+helm2ReleaseCheck v4m-promstack-$MON_NS
+helm3ReleaseCheck v4m-promstack $MON_NS
 
 log_info "Removing the Prometheus Operator..."
 if [ "$HELM_VER_MAJOR" == "3" ]; then
-  promRelease=prometheus-operator
+  if helm3ReleaseExists prometheus-operator $MON_NS; then
+    promRelease=prometheus-operator
+  else
+    promRelease=v4m-promstack
+  fi
   helm uninstall --namespace $MON_NS $promRelease
   if [ $? != 0 ]; then
     log_warn "Uninstall of [$promRelease] was not successful. Check output above for details."
   fi
 else
-  promRelease=prometheus-$MON_NS
+  if helm2ReleaseExists prometheus-operator-$MON_NS; then
+    promRelease=prometheus-operator-$MON_NS
+  else
+    promRelease=v4m-promstack-$MON_NS
+  fi
   helm delete --purge $promRelease
   if [ $? != 0 ]; then
     log_warn "Deletion of [$promRelease] was not successful. Check output above for details."
