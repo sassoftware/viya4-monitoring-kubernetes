@@ -9,28 +9,6 @@ source monitoring/bin/common.sh
 source bin/tls-include.sh
 verify_cert_manager
 
-if [ "$HELM_VER_MAJOR" == "3" ]; then
-  if helm3ReleaseExists prometheus-operator $MON_NS; then
-    log_error "The helm release of [prometheus-operator] is not supported for in-place upgrade"
-    log_error "Run monitoring/bin/remove_monitoring_cluster.sh to remove the existing components"
-    log_error "Either remove the existing Persistent Volume Claims in the [$MON_NS] namespace"
-    log_error "or follow the instructions at https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#migrating-from-stableprometheus-operator-chart"
-    log_error "to reuse the existing Persistent Volumes."
-    log_error "Then run a fresh install of monitoring/bin/deploy_monitoring_cluster.sh"
-    exit 1
-  fi
-else
-  if helm2ReleaseExists prometheus-operator-$MON_NS; then
-    log_error "The helm release of [prometheus-operator-$MON_NS] is not supported for in-place upgrade"
-    log_error "Run monitoring/bin/remove_monitoring_cluster.sh to remove the existing components"
-    log_error "Either remove the existing Persistent Volume Claims in the [$MON_NS] namespace"
-    log_error "or follow the instructions at https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#migrating-from-stableprometheus-operator-chart"
-    log_error "to reuse the existing Persistent Volumes."
-    log_error "Then run a fresh install of monitoring/bin/deploy_monitoring_cluster.sh"
-    exit 1
-  fi
-fi
-
 helm2ReleaseCheck v4m-$MON_NS
 helm3ReleaseCheck v4m $MON_NS
 checkDefaultStorageClass
@@ -124,11 +102,17 @@ if [ "$TLS_ENABLE" == "true" ]; then
   kubectl label cm -n $MON_NS node-exporter-tls-web-config sas.com/monitoring-base=kube-viya-monitoring
 fi
 
-log_info "Deploying Prometheus Operator. This may take a few minutes (20min timeout)..."
+log_info "Deploying the Kube Prometheus Stack. This may take a few minutes..."
 log_info "User response file: [$PROM_OPER_USER_YAML]"
 if [ "$HELM_VER_MAJOR" == "3" ]; then
   log_debug "Installing via Helm 3...(timeout 20m)"
-  promRelease=v4m
+  if helm3ReleaseExists prometheus-operator $MON_NS; then
+    promRelease=prometheus-operator
+    promName=prometheus-operator
+  else
+    promRelease=v4m-prometheus-operator
+    promName=v4m
+  fi
   helm $helmDebug upgrade --install $promRelease \
     --namespace $MON_NS \
     -f monitoring/values-prom-operator.yaml \
@@ -136,10 +120,22 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     -f $PROM_OPER_USER_YAML \
     --atomic \
     --timeout 20m \
+    --set nameOverride=$promName \
+    --set fullnameOverride=$promName \
+    --set prometheus-node-exporter.fullnameOverride=$promName-node-exporter \
+    --set kube-state-metrics.fullnameOverride=$promName-kube-state-metrics \
+    --set grafana.fullnameOverride=$promName-grafana \
     prometheus-community/kube-prometheus-stack
 else
   log_debug "Installing via Helm 2...(timeout 20m)"
-  promRelease=v4m-$MON_NS
+  
+  if helm3ReleaseExists prometheus-operator $MON_NS; then
+    promRelease=prometheus-$MON_NS
+    promName=prometheus-$MON_NS
+  else
+    promRelease=v4m-prometheus-$MON_NS
+    promName=v4m
+  fi
   helm $helmDebug upgrade --install $promRelease \
     --namespace $MON_NS \
     -f monitoring/values-prom-operator.yaml \
@@ -148,6 +144,11 @@ else
     --atomic \
     --timeout 1200 \
     --set prometheusOperator.createCustomResource=$createPromCRDs \
+    --set nameOverride=$promName \
+    --set fullnameOverride=$promName \
+    --set prometheus-node-exporter.fullnameOverride=$promName-node-exporter \
+    --set kube-state-metrics.fullnameOverride=$promName-kube-state-metrics \
+    --set grafana.fullnameOverride=$promName-grafana \
     prometheus-community/kube-prometheus-stack
 fi
 

@@ -20,10 +20,10 @@ commonLabels:
 # https://github.com/coreos/prometheus-operator
 prometheusOperator:
   # v0.39+ requires Kubernetes 1.16+
-  # image:
-  #   tag: v0.40.0
-  # prometheusConfigReloaderImage:
-  #   tag: v0.40.0
+  image:
+    tag: v0.42.1
+  prometheusConfigReloaderImage:
+    tag: v0.42.1
   logFormat: json
   logLevel: info
   createCustomResource: false

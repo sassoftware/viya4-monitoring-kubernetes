@@ -15,12 +15,12 @@ helm3ReleaseCheck prometheus-operator $MON_NS
 helm2ReleaseCheck v4m-$MON_NS
 helm3ReleaseCheck v4m $MON_NS
 
-log_info "Removing the Prometheus Operator..."
+log_info "Removing the Kube Prometheus Stack..."
 if [ "$HELM_VER_MAJOR" == "3" ]; then
   if helm3ReleaseExists prometheus-operator $MON_NS; then
     promRelease=prometheus-operator
   else
-    promRelease=v4m
+    promRelease=v4m-prometheus-operator
   fi
   helm uninstall --namespace $MON_NS $promRelease
   if [ $? != 0 ]; then
@@ -28,9 +28,9 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
   fi
 else
   if helm2ReleaseExists prometheus-operator-$MON_NS; then
-    promRelease=prometheus-operator-$MON_NS
+    promRelease=prometheus-$MON_NS
   else
-    promRelease=v4m-$MON_NS
+    promRelease=v4m-prometheus-$MON_NS
   fi
   helm delete --purge $promRelease
   if [ $? != 0 ]; then
