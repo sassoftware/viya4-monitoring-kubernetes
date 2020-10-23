@@ -309,51 +309,46 @@ fi
 # Create Index Management (I*M) Policy  objects
 function set_retention_period {
 
-   policy_target=$1                   # Short text to clarify which index policy in user messages
-   retention_period_env_var_name=$2   # Name of env var that can be used to specify retention period
-   retention_period=$3                # Retention Period (i.e. number of days)
-   policy_name=$4                     # Name of policy...also, used to construct nane of json file to load
-   default_retention_period=$5        # Default retention period for this policy (used if retention_period is invalid)
+   #Arguments
+   policy_name=$1                                            # Name of policy...also, used to construct nane of json file to load
+   retention_period_env_var_name=$2                          # Name of env var that can be used to specify retention period
 
-   log_debug "ARGS: $@"
+   log_debug "Function called: set_retention_perid ARGS: $@"
+
+   retention_period=${!retention_period_env_var_name}        # Retention Period (i.e. number of days)
 
    digits_re='^[0-9]+$'
 
    cp logging/es/odfe/es_${policy_name}.json $TMP_DIR/$policy_name.json
 
-   if [ "$retention_period" != "$default_retention_period" ]; then
-
-      # confirm value is number
-      if ! [[ $retention_period =~ $digits_re ]]; then
-         log_warn "An invalid valid was provided for [$retention_period_env_var_name]; using default value [$default_retention_period] instead"
-         retention_period=$default_retention_period
-      fi
-
-      #Update retention period in json file prior to loading it
-      sed -i "s/\"min_index_age\": \"${default_retention_period}d\"/\"min_index_age\": \"${retention_period}d\"/gI" $TMP_DIR/$policy_name.json 
-      log_debug "$(cat $TMP_DIR/$policy_name.json)"
-   else
-      log_debug "Using default log retention period for [$policy_target] [presumed to be: $default_retention_period days]"
+   # confirm value is number
+   if ! [[ $retention_period =~ $digits_re ]]; then
+      log_error "An invalid valid was provided for [$retention_period_env_var_name]; exiting."
+      kill -9 $pfPID
+      exit 122
    fi
+
+   #Update retention period in json file prior to loading it
+   sed -i "s/\"min_index_age\": \"xxxRETENTION_PERIODxxx\"/\"min_index_age\": \"${retention_period}d\"/gI" $TMP_DIR/$policy_name.json 
+
+   log_debug "Contents of $policy_name.json after substitution:"
+   log_debug "$(cat $TMP_DIR/${policy_name}.json)"
 
    # Load policy into Elasticsearch via API
    response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/$policy_name" -H 'Content-Type: application/json' -d @$TMP_DIR/$policy_name.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
    if [[ $response == 409 ]]; then
-      log_info "The index management policy for [$policy_target] already exist in Elasticsearch. Skipping load."
+      log_info "The index management policy [$policy_name] already exist in Elasticsearch; skipping load and using existing policy."
    elif [[ $response != 2* ]]; then
-      log_error "There was an issue loading index management policy for [$policy_target] into Elasticsearch [$response]"
+      log_error "There was an issue loading index management policy [$policy_name] into Elasticsearch [$response]"
       kill -9 $pfPID
       exit 16
    else
-      log_info "Index management policy for [$policy_target] loaded into Elasticsearch [$response]"
+      log_info "Index management policy [$policy_name] loaded into Elasticsearch [$response]"
    fi
 }
 
-default_log_retention=3
-LOGS_RETENTION_PERIOD="${LOGS_RETENTION_PERIOD:-$default_log_retention}"
-
-set_retention_period "Viya Logs" LOGS_RETENTION_PERIOD $LOGS_RETENTION_PERIOD viya_logs_idxmgmt_policy $default_log_retention
-
+LOG_RETENTION_PERIOD="${LOG_RETENTION_PERIOD:-3}"
+set_retention_period viya_logs_idxmgmt_policy LOG_RETENTION_PERIOD
 
 # Create Ingest Pipeline to "burst" incoming log messages to separate indexes based on namespace
 response=$(curl  -s -o /dev/null -w "%{http_code}"  -XPUT "https://localhost:$TEMP_PORT/_ingest/pipeline/viyaburstns" -H 'Content-Type: application/json' -d @logging/es/es_create_ns_burst_pipeline.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
@@ -380,10 +375,8 @@ fi
 # METALOGGING: Create index management policy object & link policy to index template
 # ...index management policy automates the deletion of indexes after the specified time
 
-default_ops_logs_retention=1
-OPS_LOGS_RETENTION_PERIOD="${OPS_LOGS_RETENTION_PERIOD:-$default_ops_logs_retention}"
-
-set_retention_period "Operational Logs" OPS_LOGS_RETENTION_PERIOD $OPS_LOGS_RETENTION_PERIOD viya_ops_idxmgmt_policy $default_ops_logs_retention
+OPS_LOG_RETENTION_PERIOD="${OPS_LOG_RETENTION_PERIOD:-1}"
+set_retention_period viya_ops_idxmgmt_policy OPS_LOG_RETENTION_PERIOD
 
 # Load template
 response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-ops-template " -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_ops.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
