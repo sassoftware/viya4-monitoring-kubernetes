@@ -310,12 +310,12 @@ fi
 function set_retention_period {
 
    #Arguments
-   policy_name=$1                                            # Name of policy...also, used to construct nane of json file to load
-   retention_period_env_var_name=$2                          # Name of env var that can be used to specify retention period
+   policy_name=$1                                   # Name of policy...also, used to construct name of json file to load
+   retention_period_var=$2                          # Name of env var that can be used to specify retention period
 
    log_debug "Function called: set_retention_perid ARGS: $@"
 
-   retention_period=${!retention_period_env_var_name}        # Retention Period (i.e. number of days)
+   retention_period=${!retention_period_var}        # Retention Period (unit: days)
 
    digits_re='^[0-9]+$'
 
@@ -323,7 +323,7 @@ function set_retention_period {
 
    # confirm value is number
    if ! [[ $retention_period =~ $digits_re ]]; then
-      log_error "An invalid valid was provided for [$retention_period_env_var_name]; exiting."
+      log_error "An invalid valid was provided for [$retention_period_var]; exiting."
       kill -9 $pfPID
       exit 122
    fi
