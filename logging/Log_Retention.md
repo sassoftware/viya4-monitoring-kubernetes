@@ -4,7 +4,13 @@ These are the default log retention periods:
   - Messages from SAS Viya and from other Kubernetes pods on the cluster are retained for three days.
   - Messages from logging components are retained for one day.
 
-After the retention period has passed for a message, the message is deleted and can no longer be found by searching.
+An incoming messages is loaded into memory and placed in the "hot' state, which makes it available to be searched. After the retention period has passed for the message, the message is set to the "doomed" state, which deletes it from memory and prevents it from being found by searching.
+
+These actions and retention periods are defined by these index management policies:
+  - SAS Viya and Kubernetes pods: `/logging/es/odfe/es_viya_logs_idxmgmt_policy.json`
+  - Logging components: `/logging/es/odfe/es_viya_logs_idxmgmt_policy.json`
+
+You can modify these policies or create your own. For information about index management, see [Index State Management](https://opendistro.github.io/for-elasticsearch-docs/docs/ism/) in the Open Distro for Elasticsearch documentaiton.
 
 If you want to change either of these retention periods, follow these steps:
 
@@ -17,3 +23,5 @@ If you want to change either of these retention periods, follow these steps:
   2. Modify the file `$USER_DIR\logging\user.env`.
      - To change the retention period for messages from SAS Viya and Kubernetes pods on the cluster, change the value of the environment variable `LOG_RETENTION_PERIOD`.
      - To change the retention period for messages from logging components, change the value of the environment variable `OPS_LOG_RETENTION_PERIOD`. 
+
+  3. Save the `user.env` file and run the `deploy_logging_open.sh` script to redeploy the logging components.
