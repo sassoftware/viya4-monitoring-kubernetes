@@ -119,7 +119,7 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     -f $genValuesFile \
     -f $PROM_OPER_USER_YAML \
     --atomic \
-    --timeout 20m \
+    --timeout 10m \
     --set nameOverride=$promName \
     --set fullnameOverride=$promName \
     --set prometheus-node-exporter.fullnameOverride=$promName-node-exporter \

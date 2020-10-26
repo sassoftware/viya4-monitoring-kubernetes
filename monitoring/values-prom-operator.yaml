@@ -106,10 +106,6 @@ prometheus:
             requests:
               storage: 25Gi    
           volumeMode: Filesystem
-    tolerations:
-    - key: workload.sas.com/class
-      value: stateful
-      effect: NoSchedule
 
 # =======================
 # Prometheus AlertManager
@@ -139,10 +135,6 @@ alertmanager:
             requests:
               storage: 10Gi
           volumeMode: Filesystem
-    tolerations:
-    - key: workload.sas.com/class
-      value: stateful
-      effect: NoSchedule
 
 # =========
 # Exporters
@@ -187,7 +179,7 @@ nodeExporter:
 # https://github.com/helm/charts/tree/master/stable/grafana
 grafana:
   image:
-    tag: "7.2.0"
+    tag: "7.2.2"
   "grafana.ini":
     analytics:
       check_for_updates: false
@@ -215,10 +207,6 @@ grafana:
     requests:
       cpu: "250m"
       memory: "150Mi"
-  tolerations:
-  - key: workload.sas.com/class
-    value: stateful
-    effect: NoSchedule
   sidecar:
     dashboards:
       enabled: true
