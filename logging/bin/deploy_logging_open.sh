@@ -307,17 +307,48 @@ else
 fi
 
 # Create Index Management (I*M) Policy  objects
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/viya_logs_idxmgmt_policy" -H 'Content-Type: application/json' -d @logging/es/odfe/es_viya_logs_idxmgmt_policy.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-# Seems to return policy definition back to SSH window...NOT "true"?
-if [[ $response == 409 ]]; then
-   log_info "Index management policies already exist in Elasticsearch. Skipping load." 
-elif [[ $response != 2* ]]; then
-   log_error "There was an issue loading index management policies into Elasticsearch [$response]"
-   kill -9 $pfPID
-   exit 16
-else
-   log_info "Index management policies loaded into Elasticsearch [$response]"
-fi
+function set_retention_period {
+
+   #Arguments
+   policy_name=$1                                   # Name of policy...also, used to construct name of json file to load
+   retention_period_var=$2                          # Name of env var that can be used to specify retention period
+
+   log_debug "Function called: set_retention_perid ARGS: $@"
+
+   retention_period=${!retention_period_var}        # Retention Period (unit: days)
+
+   digits_re='^[0-9]+$'
+
+   cp logging/es/odfe/es_${policy_name}.json $TMP_DIR/$policy_name.json
+
+   # confirm value is number
+   if ! [[ $retention_period =~ $digits_re ]]; then
+      log_error "An invalid valid was provided for [$retention_period_var]; exiting."
+      kill -9 $pfPID
+      exit 122
+   fi
+
+   #Update retention period in json file prior to loading it
+   sed -i "s/\"min_index_age\": \"xxxRETENTION_PERIODxxx\"/\"min_index_age\": \"${retention_period}d\"/gI" $TMP_DIR/$policy_name.json 
+
+   log_debug "Contents of $policy_name.json after substitution:"
+   log_debug "$(cat $TMP_DIR/${policy_name}.json)"
+
+   # Load policy into Elasticsearch via API
+   response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/$policy_name" -H 'Content-Type: application/json' -d @$TMP_DIR/$policy_name.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+   if [[ $response == 409 ]]; then
+      log_info "The index management policy [$policy_name] already exist in Elasticsearch; skipping load and using existing policy."
+   elif [[ $response != 2* ]]; then
+      log_error "There was an issue loading index management policy [$policy_name] into Elasticsearch [$response]"
+      kill -9 $pfPID
+      exit 16
+   else
+      log_info "Index management policy [$policy_name] loaded into Elasticsearch [$response]"
+   fi
+}
+
+LOG_RETENTION_PERIOD="${LOG_RETENTION_PERIOD:-3}"
+set_retention_period viya_logs_idxmgmt_policy LOG_RETENTION_PERIOD
 
 # Create Ingest Pipeline to "burst" incoming log messages to separate indexes based on namespace
 response=$(curl  -s -o /dev/null -w "%{http_code}"  -XPUT "https://localhost:$TEMP_PORT/_ingest/pipeline/viyaburstns" -H 'Content-Type: application/json' -d @logging/es/es_create_ns_burst_pipeline.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
@@ -343,18 +374,11 @@ fi
 
 # METALOGGING: Create index management policy object & link policy to index template
 # ...index management policy automates the deletion of indexes after the specified time
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/viya_ops_idxmgmt_policy" -H 'Content-Type: application/json' -d @logging/es/odfe/es_viya_ops_idxmgmt_policy.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
-# TO DO/CHECK: this should return the JSON policy definition back rather than the simpler {"acknowledged":true}
-if [[ $response == 409 ]]; then
-   log_info "Monitoring index management policies already exist in Elasticsearch. Skipping load."
-elif [[ $response != 2* ]]; then
-   log_error "There was an issue loading monitoring index management policies into Elasticsearch [$response]"
-   kill -9 $pfPID
-   exit 16
-else
-   log_info "Monitoring index management policies loaded into Elasticsearch [$response]"
-fi
 
+OPS_LOG_RETENTION_PERIOD="${OPS_LOG_RETENTION_PERIOD:-1}"
+set_retention_period viya_ops_idxmgmt_policy OPS_LOG_RETENTION_PERIOD
+
+# Load template
 response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-ops-template " -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_ops.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 # TO DO/CHECK: this should return a message like this: {"acknowledged":true}
 if [[ $response != 2* ]]; then
