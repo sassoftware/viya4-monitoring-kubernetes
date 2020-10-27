@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.5
+       Set  fb_configMap_version 0.2.5.2
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -322,7 +322,7 @@ data:
        Name            modify
        Match           kube.*
        Condition       Key_value_equals   temp_vendor  crunchydata
-       Condition       Key_value_matches  logsource apiserver|collect|backrest|operator|scheduler
+       Condition       Key_value_matches  logsource apiserver|collect|backrest|operator|scheduler|exporter
        Condition       Key_does_not_exist flagged4parsing
        Copy            message   collectapi_message
        Rename          message   unparsed_message
@@ -337,6 +337,38 @@ data:
        Parser          crunchy_green
        Parser          misc5
        Reserve_Data    On
+    [FILTER]
+       Alias           post_collectapi
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_equals   flagged4parsing collectapi
+       Condition       Key_exists message2
+       Copy            message2 PROPS__oth_info
+       # This rename will ONLY happen if message field does NOT exist
+       Rename          message2 message
+    [FILTER]
+       Alias           flag_cdevent_msgs
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_equals   temp_vendor  crunchydata
+       Condition       Key_value_equals   logsource event
+       Condition       Key_does_not_exist flagged4parsing
+       Copy            message   cdevent_message
+       Rename          message   unparsed_message
+       Add             flagged4parsing crunchy_event
+    [FILTER]
+       Alias           parse_cdevent_msgs
+       Name            parser
+       Match           kube.*
+       Key_name        cdevent_message
+       Parser          crunchy_event
+       Reserve_Data    On
+    [FILTER]
+       Alias           post_cdevent
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_equals   flagged4parsing crunchy_event
+       Rename          caller   PROPS__caller
     [FILTER]
        # MUST come last to ensure "special" cases are handled first
        Alias           flag_crunchy_msgs
@@ -358,6 +390,7 @@ data:
        Parser          crunchy_database
        Parser          crunchy_green
        Parser          crunchy_stderr2
+       Parser          consul
        Reserve_Data    On
        #
        # CRUNCHY DATA HANDLING -- end
@@ -636,6 +669,8 @@ data:
        Parser          misc5
        Parser          misc6
        Parser          misc7
+       Parser          collectapiT
+       Parser          collectapi
        Parser          gopanic
        Reserve_Data    On
     [FILTER]
@@ -687,7 +722,7 @@ data:
        Set            level DEBUG
        Set            __temp_level_fixed   Y
     [FILTER]
-       # "Standardize" Level: ERROR
+       # "Standardize" Level: ERROR (includes "ERR*","EROR")
        Alias          fix_level_err
        Name           modify
        Match          *
@@ -705,25 +740,25 @@ data:
        Set            level FATAL
        Set            __temp_level_fixed   Y
     [FILTER]
-       # "Standardize" Level: INFO (includes 'NOTE','LOG','NORMAL')
+       # "Standardize" Level: INFO (includes 'INF*','NOTE*','LOG*','I','NORMAL')
        Alias          fix_level_info
        Name           modify
        Match          *
        Condition      Key_value_does_not_equal __temp_level_fixed Y
-       Condition      Key_value_matches level (?i:info\w*)|(?i:note\w*)|(?i:log\w*)|(?:\AI\z)|(?i:Normal)
+       Condition      Key_value_matches level (?i:inf\w*)|(?i:note\w*)|(?i:log\w*)|(?:\AI\z)|(?i:Normal)
        Set            level INFO
        Set            __temp_level_fixed   Y
     [FILTER]
-       # "Standardize" Level: PANIC
+       # "Standardize" Level: PANIC (includes 'PANIC','EMERG*')
        Alias          fix_level_panic
        Name           modify
        Match          *
        Condition      Key_value_does_not_equal __temp_level_fixed Y
-       Condition      Key_value_matches level (?i:panic)
+       Condition      Key_value_matches level (?i:panic)|(?i:emerg\w*)
        Set            level PANIC
        Set            __temp_level_fixed   Y
     [FILTER]
-       # "Standardize" Level: TRACE
+       # "Standardize" Level: TRACE (includes 'TRACE','T')
        Alias          fix_level_trace
        Name           modify
        Match          *
@@ -732,12 +767,12 @@ data:
        Set            level TRACE
        Set            __temp_level_fixed   Y
     [FILTER]
-       # "Standardize" Level: WARN
+       # "Standardize" Level: WARN (includes 'WAR*',"W","WRN*")
        Alias          fix_level_warn
        Name           modify
        Match          *
        Condition      Key_value_does_not_equal __temp_level_fixed Y
-       Condition      Key_value_matches level (?i:warn\w*)|(?:\AW\z)
+       Condition      Key_value_matches level (?i:war\w*)|(?:\AW\z)|(?i:wrn\w*)
        Set            level WARNING
        Set            __temp_level_fixed   Y
     [FILTER]
