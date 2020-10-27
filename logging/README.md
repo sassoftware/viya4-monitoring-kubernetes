@@ -57,7 +57,7 @@ in `USER_DIR`:
 The `logging/user.env` file contains flags to customize the components that are
 deployed as well as to specify some script behavior (such as enabling debug).
 
-You can also modify values in the file to change the retention period for log messages. By default, messages from SAS Viya and Kubernetes pods are retained for three days and messages from logging components are retained for one day. See `Log_Retention.md` for information about changing the log retention period. 
+You can also modify values in the file to change the retention period for log messages. By default, messages from SAS Viya and Kubernetes pods are retained for three days and messages from logging components are retained for one day. See [Log_Retention.md](Log_Retention.md) for information about changing the log retention period. 
 
 #### Modify user-values-*.yaml
 
