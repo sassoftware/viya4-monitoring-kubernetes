@@ -1,6 +1,15 @@
 # Chart: https://github.com/opendistro-for-elasticsearch/opendistro-build/tree/master/helm
 # Default values: https://github.com/opendistro-for-elasticsearch/opendistro-build/blob/master/helm/opendistro-es/values.yaml
 
+elasticsearch:
+  master:
+    persistence:
+      storageClass: azuredisk-v4m
+
+  data:
+    persistence:
+      storageClass: azuredisk-v4m
+
 kibana:
   extraEnvs:
   # Needed for path-based ingress
@@ -17,7 +26,6 @@ kibana:
        secretKeyRef:
           name: internal-user-kibanaserver
           key: password
-
 
   service:
     type: ClusterIP

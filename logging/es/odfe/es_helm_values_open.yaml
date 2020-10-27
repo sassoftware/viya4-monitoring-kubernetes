@@ -105,10 +105,6 @@ elasticsearch:
       enabled: true
       #storageClass: alt-storage
       size: 8Gi
-    tolerations:
-    - key: workload.sas.com/class
-      value: stateful
-      effect: NoSchedule
 
   data:
     enabled: true
@@ -119,10 +115,6 @@ elasticsearch:
       enabled: true
       #storageClass: alt-storage
       size: 30Gi
-    tolerations:
-    - key: workload.sas.com/class
-      value: stateful
-      effect: NoSchedule
 
   client:
     enabled: true

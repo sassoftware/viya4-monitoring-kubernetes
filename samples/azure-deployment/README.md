@@ -20,13 +20,12 @@ and `logging` subdirectories to match your environment's actual hostname(s)
 
 ## Access the Applications
 
-The monitoring and logging applications re available at these locations
-(hostnames are replaced with those in the actual environment):
+The monitoring and logging applications in this sample are configured for
+path-based ingress and will be available at (replace the hostnames):
 
-* `http://host.cluster.example.com/grafana`
-* `http://host.cluster.example.com/prometheus`
-* `http://host.cluster.example.com/alertmanager`
-* `http://host.cluster.example.com/kibana`
+* `http://host.mycluster.example.com/grafana`
+* `http://host.mycluster.example.com/prometheus`
+* `http://host.mycluster.example.com/alertmanager`
+* `http://host.mycluster.example.com/kibana`
 
-This sample uses path-based ingress, but you can use the
-[ingress sample](../ingress) to modify it to use host-based ingress.
+For an example of using host-based ingress, see the [ingress sample](../ingress).
