@@ -105,7 +105,7 @@ fi
 log_info "Deploying the Kube Prometheus Stack. This may take a few minutes..."
 log_info "User response file: [$PROM_OPER_USER_YAML]"
 if [ "$HELM_VER_MAJOR" == "3" ]; then
-  log_debug "Installing via Helm 3...(timeout 20m)"
+  log_debug "Installing via Helm 3...($(date) - timeout 20m)"
   if helm3ReleaseExists prometheus-operator $MON_NS; then
     promRelease=prometheus-operator
     promName=prometheus-operator
@@ -119,7 +119,7 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     -f $genValuesFile \
     -f $PROM_OPER_USER_YAML \
     --atomic \
-    --timeout 10m \
+    --timeout 20m \
     --set nameOverride=$promName \
     --set fullnameOverride=$promName \
     --set prometheus-node-exporter.fullnameOverride=$promName-node-exporter \
@@ -127,9 +127,9 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     --set grafana.fullnameOverride=$promName-grafana \
     prometheus-community/kube-prometheus-stack
 else
-  log_debug "Installing via Helm 2...(timeout 20m)"
+  log_debug "Installing via Helm 2...($(date) timeout 20m)"
   
-  if helm3ReleaseExists prometheus-operator $MON_NS; then
+  if helm2ReleaseExists prometheus-$MON_NS; then
     promRelease=prometheus-$MON_NS
     promName=prometheus-$MON_NS
   else
