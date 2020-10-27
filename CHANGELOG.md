@@ -1,5 +1,9 @@
 # SAS® Viya® Monitoring for Kuberneteses
 
+## Version 0.1.3 (11NOV20)
+* **Monitoring**
+* **Logging**
+  * Support for Crunchy Data 4.5
 ## Version 0.1.2 (20OCT20)
 
 * **Monitoring**
