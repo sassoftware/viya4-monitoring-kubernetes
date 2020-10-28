@@ -79,11 +79,21 @@ function helm3ReleaseCheck {
 function helmRepoAdd {
   repo=$1
   repoURL=$2
+  HELM_FORCE_REPO_UPDATE=${HELM_FORCE_REPO_UPDATE:-true}
   if [[ ! $(helm repo list 2>/dev/null) =~ $repo[[:space:]] ]]; then
     log_info "Adding [$repo] helm repository"
     helm repo add $repo $repoURL
   else
     log_debug "The helm repo [$repo] already exists"
+    if [ "$HELM_FORCE_REPO_UPDATE" == "true" ]; then
+      log_debug "Forcing update of [$repo] helm repo to [$repoURL]"
+      if [ "$HELM_VER_MAJOR" == "3" ]; then
+        helm repo add --force-update $repo $repoURL
+      else
+        # Helm 2.x behavior is to replace by default
+        helm repo add $repo $repoURL
+      fi
+    fi
   fi
 }
 

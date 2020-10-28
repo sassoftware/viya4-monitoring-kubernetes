@@ -33,7 +33,7 @@ fi
 set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
 
-helmRepoAdd stable https://kubernetes-charts.storage.googleapis.com
+helmRepoAdd stable https://charts.helm.sh/stable
 helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
 
 log_info "Updating helm repositories..."
