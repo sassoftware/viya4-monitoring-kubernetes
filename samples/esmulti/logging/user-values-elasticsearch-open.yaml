@@ -1,0 +1,32 @@
+# Chart: https://github.com/opendistro-for-elasticsearch/opendistro-build/tree/master/helm
+# Default values: https://github.com/opendistro-for-elasticsearch/opendistro-build/blob/master/helm/opendistro-es/values.yaml
+
+# NOTES:
+#     * When "master" nodes are also serving as "data" nodes they will need more disk space than needed when they are
+#       only  serving as "master" nodes.  The value of the master.persistence.size value shown below takes this into
+#       account.  However, you should review the setting and adjust it as necessary.
+#
+#     * When multi-purpose Elasticsearch nodes are used, there is generally no reason to deploy additional nodes
+#       performing only a single capability.  However, if that is necessary for your particular use-case it is
+#       possible to adjust the configuration below to do so.
+#
+#            * If adding "data" nodes, uncomment the data stanza below and update the replicas value to specify
+#              the number of _additional_ data nodes needed.  Remember that the master nodes will continue to
+#              serve as data nodes as well.
+#
+#            * If adding "client" nodes, uncomment the client stanza below and update the replicas value to specify
+#              the number of _additional_ client nodes needed.  Remember that the master nodes will continue to
+#              serve as client nodes as well.
+#
+
+
+elasticsearch:
+   master:
+     replicas: 5
+     persistence:
+       size: 30Gi
+
+#   data:
+#     replicas: 0
+#   client:
+#     replicas: 0

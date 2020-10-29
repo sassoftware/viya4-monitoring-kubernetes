@@ -199,7 +199,7 @@ if [ "$ES_MULTIPURPOSE_NODES" == "true" ]; then
    log_debug "Patching statefulset [v4m-es-data]"
    kubectl -n $LOG_NS patch statefulset v4m-es-data  --type=json --patch '[{"op": "add","path": "/spec/template/metadata/labels/esdata","value": "true" }]'
 
-   # patching 'client' and 'data' _services_ to tie use new multipurpose labels for node selection
+   # patching 'client' and 'data' _services_ to use new multipurpose labels for node selection
    log_debug "Patching  service [v4m-es-client-service]"
    kubectl -n $LOG_NS patch service v4m-es-client-service --type=json --patch '[{"op": "remove","path": "/spec/selector/role"},{"op": "add","path": "/spec/selector/esclient","value": "true" }]'
 
