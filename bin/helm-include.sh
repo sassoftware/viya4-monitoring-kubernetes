@@ -102,6 +102,7 @@ function helmRepoAdd {
           fi
         else # HELM_VER_MINOR > 3
           helm repo add --force-update $repo $repoURL
+        fi
       else
         # Helm 2.x behavior is to replace by default
         helm repo add $repo $repoURL
