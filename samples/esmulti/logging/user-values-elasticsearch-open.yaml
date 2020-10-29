@@ -26,7 +26,7 @@ elasticsearch:
      persistence:
        size: 30Gi
 
-#   data:
-#     replicas: 0
-#   client:
-#     replicas: 0
+   data:
+     replicas: 0
+   client:
+     replicas: 0
