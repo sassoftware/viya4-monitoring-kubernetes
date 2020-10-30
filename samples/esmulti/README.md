@@ -1,15 +1,14 @@
-# Multi-purpose Elasticsearch Nodes
+# Multi-Role Elasticsearch Nodes
 
-This sample demonstrates how to deploy Elasticsearch with its nodes performing all three roles: master, data and
-client/ingest rather than using the differentiated (single-role) configuration we are currently using.  While
-multi-role Elasticsearch nodes are widely used, they are not natively supported by the Open Distro for Elasticsearch
-Helm chart we use as part of our deployment.  This means we have to patch various Kubernetes objects during the
-deployment process to enable them. We are still are still evaluating things, including performance, before making them
-part of our default configuration.
+This sample demonstrates how to deploy Elasticsearch so that each of its nodes perform all three roles: primary (also known as master), data and
+client/ingest. The sample deploys the nodes as primary nodes and updates them to include the data and client roles. In a standard configuration, each role is performed be a separate node. 
 
-## Preparation for Deployment
+Although multi-role Elasticsearch nodes are widely used, they are not natively supported by the Open Distro for Elasticsearch
+Helm chart that is used to deploy the logging components. In order to enable multi-role Elasticsearch nodes, the deployment process must patch various Kubernetes objects. Because performance and other criteria are being evaluated, this process is experimental and is not yet an option in the standard configuration.
 
-1. Copy this sample directory (including sub-directories) to a separate local path.
+## Preparation and Deployment
+
+1. Copy the `../samples/esmulti` sample directory (including sub-directories) to a separate local path.
 
 See the [main README](../../README.md#customization) for information about the customization process.
 
@@ -19,29 +18,24 @@ See the [main README](../../README.md#customization) for information about the c
 export USER_DIR=/path/to/my/copy/esmulti
 ```
 
-3. To enable multi-purpose Elasticsearch nodes, the `ES_MULTIPURPOSE_NODES` environment variable has
-been set to `true` in the `$USER_DIR/logging/user.env` file.
+3. Note that the `ES_MULTIPURPOSE_NODES` environment variable has
+been set to `true` in the `$USER_DIR/logging/user.env` file in order to enable multi-role Elasticsearch nodes.
 
 
-4. Review the contents of the `$USER_DIR/logging/user-values-elasticsearch-open.yaml` file and make any
-adjustments necessary. Information on some possible things that you may want to adjust are described in the ***'Things to Consider'*** section below below.
+4. Review the contents of the `$USER_DIR/logging/user-values-elasticsearch-open.yaml` file and make any changes needed for your environment. These are two areas that could be customized:
+
+ **Storage:** When primary nodes also serve as data nodes, they need more disk space than when they serve only as primary nodes.  The `master.persistence.size` property specifies the amount of storage that is assigned to the primary nodes. Review this setting and adjust it as necessary. 
+
+ **Additional data or client nodes:** If you are using multi-role Elasticsearch nodes, you usually do not need to deploy additional nodes that perform only a data or client role. However, if additional nodes are required for your scenario, make these changes:
+   - To add data nodes, uncomment the `data` stanza and update the `replicas` value to specify the number of _additional_ data nodes needed. When determining the total number of data nodes needed, remember that all of the primary nodes also continue to serve as data nodes.
+   - To add client nodes, uncomment the `client` stanza and update the `replicas` value to specify the number of _additional_ client nodes needed. When determining the totla number of client nodes needed, remember that all of the primary nodes also continue to serve as client nodes.
+
+ Note that you cannot add additional nodes that perform only the primary role. You also cannot deploy nodes that use different combinations of roles 
 
 5. Deploy logging using the standard deployment script:
 
 ```bash
 /path/to/this/repo/logging/bin/deploy_logging_open.sh
 ```
-## Things to Consider
 
-### Storage
-* When "master" nodes are also serving as "data" nodes they will need more disk space than needed when they are only serving as "master" nodes.  The master.persistence.size property in the user-values-elasticsearch-open.yaml mentioned above
-can be used to control how much storage is assigned to the master nodes.  You should review the setting and adjust it as necessary.
-
-### Deploying additional "Data" and/or "Client" nodes
-
-* When multi-purpose Elasticsearch nodes are used, there is generally no reason to deploy additional nodes performing only a single capability.  However, if that is necessary for your particular use-case it is possible to adjust the configuration to do so.
-  * If adding "data" nodes, uncomment the data stanza in the user values yaml file and update the replicas value to specify the number of _additional_ data nodes needed.  Remember that the master nodes will continue to serve as data nodes as well.
-  * If adding "client" nodes, uncomment the client stanza in the user values yaml file and update the replicas value to specify the number of _additional_ *client* nodes needed.  Remember that the master nodes will continue to serve as client nodes as well.
-
-* This sample deploys "master" nodes and updates them to also take on the "data" and "client" roles.  While it is possible to add additional single-purpose "data" and "client" nodes (as discussed above), it is not possible to add additional single-purpose "master" nodes.  Deploying nodes with other combinations of roles  is also not supported.
 
