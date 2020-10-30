@@ -6,24 +6,25 @@
 #       only  serving as "master" nodes.  The value of the master.persistence.size value shown below takes this into
 #       account.  However, you should review the setting and adjust it as necessary.
 #
-#     * When multi-purpose Elasticsearch nodes are used, there is generally no reason to deploy additional nodes
-#       performing only a single capability.  However, if that is necessary for your particular use-case it is
+#     * When multi-role Elasticsearch nodes are used, there is generally no reason to deploy additional nodes
+#       performing only a single role.  However, if that is necessary for your particular use-case it is
 #       possible to adjust the configuration below to do so.
 #
-#            * If adding "data" nodes, uncomment the data stanza below and update the replicas value to specify
+#            * If adding "data" nodes, update the replicas value in the data stanza below to specify
 #              the number of _additional_ data nodes needed.  Remember that the master nodes will continue to
-#              serve as data nodes as well.
+#              serve as data nodes as well (i.e. the total # of data nodes = # of master nodes + # of data nodes).
 #
-#            * If adding "client" nodes, uncomment the client stanza below and update the replicas value to specify
+#            * If adding "client" nodes, update the replicas value in the client stanza below to specify
 #              the number of _additional_ client nodes needed.  Remember that the master nodes will continue to
-#              serve as client nodes as well.
+#              serve as client nodes as well (i.e. the total # of client nodes = # of master nodes + # of client nodes).
 #
-
+#
 
 elasticsearch:
    master:
      replicas: 5
      persistence:
+       # Size of PVC per master node
        size: 30Gi
 
    data:
