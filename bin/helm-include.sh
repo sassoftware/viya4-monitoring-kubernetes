@@ -113,7 +113,7 @@ function helmRepoAdd {
 
 function helm2Fail {
   if [ "$HELM_VER_MAJOR" == "2" ]; then
-    if [ "$HELM2_ALlOW" != "true" ]; then
+    if [ "$HELM2_ALLOW" != "true" ]; then
       log_error "Helm 2.x has reached end of life as of 11/13/2020 and is no longer supported"
       log_error "See: https://github.com/helm/helm/releases/tag/v2.17.0 for details"
       log_error "Please upgrade to Helm 3.x at https://github.com/helm/helm/releases"
