@@ -5,6 +5,9 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
+
+helm2Fail
+
 source logging/bin/secrets-include.sh
 
 # Collect Kubernetes events as pseudo-log messages?

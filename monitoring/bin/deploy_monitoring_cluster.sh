@@ -6,6 +6,8 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 
+helm2Fail
+
 source bin/tls-include.sh
 verify_cert_manager
 

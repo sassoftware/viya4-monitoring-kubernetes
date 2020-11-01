@@ -6,6 +6,8 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
+helm2Fail
+
 HELM_DEBUG="${HELM_DEBUG:-false}"
 
 # Fluent Bit user customizations

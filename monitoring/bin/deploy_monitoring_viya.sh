@@ -6,6 +6,8 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 
+helm2Fail
+
 checkDefaultStorageClass
 
 HELM_DEBUG="${HELM_DEBUG:-false}"
