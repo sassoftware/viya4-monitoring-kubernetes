@@ -62,30 +62,8 @@ See the documentation at [SAS Viya: Logging](https://documentation.sas.com/?cdcI
 ## Prerequisites
 
 - A Kubernetes cluster that meets the prerequisites for SAS Viya
-- [Helm](https://helm.sh) (version 3.x recommended)
+- [Helm](https://helm.sh) version 3.x
 - `kubectl` with cluster-admin access
-
-### Helm
-
-[Helm](https://helm.sh) 2.x and 3.x are both supported. The scripts
-should auto-detect the Helm version on the `PATH`.
-
-**NOTE:** You cannot use Helm 3.x to upgrade a monitoring or logging
-deployment that you originally installed with Helm 2.x. You must use
-the original Helm 2.x version to remove the monitoring or logging
-deployment and then use the new Helm 3.x version for a fresh deployment.
-
-#### Recommendation: Use Helm 3.x if possible
-
-Although both Helm 2.x and Helm 3.x are currently supported, Helm 3.x is
-recommended.
-
-If you are using Helm 2.x, run `helm init --upgrade` to make sure your
-local Helm version matches the version of Tiller in your cluster. Helm 3.x
-does not require Tiller or a `helm init` command.
-
-You can safely ignore the `NOTES` sections that you see when a Helm chart
-deploys successfully.
 
 ## Installation
 
