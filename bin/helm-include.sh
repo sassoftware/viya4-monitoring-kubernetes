@@ -111,9 +111,24 @@ function helmRepoAdd {
   fi
 }
 
+function helm2Fail {
+  if [ "$HELM_VER_MAJOR" == "2" ]; then
+    if [ "$HELM2_ALLOW" != "true" ]; then
+      log_error "Helm 2.x has reached end of life as of 11/13/2020 and is no longer supported"
+      log_error "See: https://github.com/helm/helm/releases/tag/v2.17.0 for details"
+      log_error "Please upgrade to Helm 3.x at https://github.com/helm/helm/releases"
+      exit 1
+    else
+      log_warn "HELM2_ALLOW set. Allowing Helm 2.x"
+      log_warn "Helm 2.x is unsupported and may not deploy properly"
+    fi
+  fi
+}
+
 export HELM_VER_MAJOR HELM_VER_FULL HELM_SERVER_VER_FULL
 export -f helm2ReleaseExists
 export -f helm3ReleaseExists
 export -f helm2ReleaseCheck
 export -f helm3ReleaseCheck
 export -f helmRepoAdd
+export -f helm2Fail
