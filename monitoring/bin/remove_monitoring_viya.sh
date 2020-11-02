@@ -30,6 +30,12 @@ for mon in "${monitors[@]}"
 do
   kubectl delete --ignore-not-found -n $VIYA_NS servicemonitor $mon
 done
+log_info "Removing PodMonitors in the [$VIYA_NS] namespace..."
+monitors=( sas-java-pods sas-go-pods )
+for mon in "${monitors[@]}"
+do
+  kubectl delete --ignore-not-found -n $VIYA_NS podmonitor $mon
+done
 
 # Catch-all
 kubectl delete all --ignore-not-found -n $VIYA_NS -l 'sas.com/monitoring-base=kube-viya-monitoring'

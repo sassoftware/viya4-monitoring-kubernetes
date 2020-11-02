@@ -58,11 +58,18 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
 fi
 
 if [ "$(kubectl get crd servicemonitors.monitoring.coreos.com -o name 2>/dev/null)" ]; then
-  log_info "Adding ServiceMonitors for resources in the [$VIYA_NS] namespace..."
+  log_info "Adding monitors for resources in the [$VIYA_NS] namespace..."
   for f in monitoring/monitors/viya/serviceMonitor-*.yaml; do
     kubectl apply -n $VIYA_NS -f $f
   done
+  for f in monitoring/monitors/viya/podMonitor-*.yaml; do
+    kubectl apply -n $VIYA_NS -f $f
+  done
   log_notice "Monitoring components successfully deployed into the [$VIYA_NS] namespace"
+
+  # Temporary - Remove obsolete ServiceMonitors
+  kubectl delete --ignore-not-found ServiceMonitor -n $VIYA_NS sas-java-services
+  kubectl delete --ignore-not-found ServiceMonitor -n $VIYA_NS sas-go-services
 else
   log_warn "Prometheus Operator not found. Skipping deployment of ServiceMonitors."
 fi
