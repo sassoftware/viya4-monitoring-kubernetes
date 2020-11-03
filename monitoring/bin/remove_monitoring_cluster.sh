@@ -27,7 +27,7 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     log_warn "Uninstall of [$promRelease] was not successful. Check output above for details."
   fi
 else
-  if helm2ReleaseExists prometheus-operator-$MON_NS; then
+  if helm2ReleaseExists prometheus-$MON_NS; then
     promRelease=prometheus-$MON_NS
   else
     promRelease=v4m-prometheus-$MON_NS

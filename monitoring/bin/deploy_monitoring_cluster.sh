@@ -72,6 +72,7 @@ PROM_OPERATOR_CRD_UPDATE=${PROM_OPERATOR_CRD_UPDATE:-true}
 PROM_OPERATOR_CRD_VERSION=${PROM_OPERATOR_CRD_VERSION:-v0.43.0}
 if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
   log_info "Updating Prometheus Operator custom resource definitions"
+  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml
   kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml
   kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
   kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml
@@ -124,6 +125,7 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     promRelease=v4m-prometheus-operator
     promName=v4m
   fi
+  KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-11.0.0}
   helm $helmDebug upgrade --install $promRelease \
     --namespace $MON_NS \
     -f monitoring/values-prom-operator.yaml \
@@ -136,6 +138,7 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     --set prometheus-node-exporter.fullnameOverride=$promName-node-exporter \
     --set kube-state-metrics.fullnameOverride=$promName-kube-state-metrics \
     --set grafana.fullnameOverride=$promName-grafana \
+    --version $KUBE_PROM_STACK_CHART_VERSION \
     prometheus-community/kube-prometheus-stack
 else
   log_info "Installing via Helm 2...($(date) timeout 20m)"

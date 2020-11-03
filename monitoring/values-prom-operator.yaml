@@ -19,10 +19,6 @@ commonLabels:
 # ===================
 # https://github.com/coreos/prometheus-operator
 prometheusOperator:
-  image:
-    tag: v0.43.0
-  prometheusConfigReloaderImage:
-    tag: v0.43.0
   logFormat: json
   logLevel: info
   createCustomResource: false
