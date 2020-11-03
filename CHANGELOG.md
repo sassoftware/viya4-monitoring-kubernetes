@@ -3,7 +3,11 @@
 ## Version 0.1.3 (11NOV20)
 * **Monitoring**
 * **Logging**
-  * Support for Crunchy Data 4.5
+  * Support for Crunchy Data 4.5 [PR: #10]
+  * Support for Changing Retention Period of Log Messages [PR: #11,#12]
+  * Support for Multi-Role Elasticsearch Nodes (including sample to demonstrate usage) [PR: #16]
+  * Additional Documentation on using TLS [PR: #8]
+  * Removed traces of support for ODFE Demo Security Configuration [PR: #5]
 ## Version 0.1.2 (20OCT20)
 
 * **Monitoring**
