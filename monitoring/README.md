@@ -73,11 +73,11 @@ is treated as a comment.
 The monitoring stack uses the following Helm charts:
 
 * **Prometheus Operator** - used by `deploy_monitoring_cluster.sh`
-  * [Chart](https://github.com/helm/charts/blob/master/stable/prometheus-operator/README.md)
-  * [Default values](https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml)
+  * [Chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
+  * [Default values](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml)
 * **Prometheus Pushgateway** - used by `deploy_monitoring_viya.sh`
-  * [Chart](https://github.com/helm/charts/tree/master/stable/prometheus-pushgateway)
-  * [Default values](https://github.com/helm/charts/blob/master/stable/prometheus-pushgateway/values.yaml)
+  * [Chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway)
+  * [Default values](https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-pushgateway/values.yaml)
 
 These charts are highly customizable. Although the default values might be
 suitable, you might need to customize some values (such as for ingress,

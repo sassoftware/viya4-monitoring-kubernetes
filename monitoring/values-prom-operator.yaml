@@ -1,16 +1,15 @@
 # Override values for the Prometheus Operator helm chart
 #
 # Prometheus Operator Helm Chart
-# https://github.com/helm/charts/blob/master/stable/prometheus-operator/README.md
+# https://https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 #
 # CRDs
 # https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md
 #
 # Default Values
-# https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml
+# https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
 
 
-# https://github.com/helm/charts/tree/master/stable/prometheus-operator#prometheus-operator-1
 commonLabels:
   sas.com/monitoring-base: kube-viya-monitoring
 
@@ -65,8 +64,6 @@ kube-state-metrics:
 # ==========
 # Prometheus
 # ==========
-# https://github.com/helm/charts/tree/master/stable/prometheus-operator#prometheus
-# https://prometheus.io/
 prometheus:
   serviceAccount:
     name: sas-ops-acct
@@ -105,8 +102,6 @@ prometheus:
 # =======================
 # Prometheus AlertManager
 # =======================
-# https://github.com/helm/charts/tree/master/stable/prometheus-operator#alertmanager
-# https://prometheus.io/docs/alerting/alertmanager/
 alertmanager:
   service:
     type: NodePort
@@ -131,15 +126,9 @@ alertmanager:
               storage: 10Gi
           volumeMode: Filesystem
 
-# =========
-# Exporters
-# =========
-# https://github.com/helm/charts/tree/master/stable/prometheus-operator#exporters
-
 # Prometheus Node Exporter
 # https://github.com/prometheus/node_exporter
-# https://github.com/helm/charts/tree/master/stable/prometheus-node-exporter
-
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
 prometheus-node-exporter:
   image:
     tag: v1.0.1

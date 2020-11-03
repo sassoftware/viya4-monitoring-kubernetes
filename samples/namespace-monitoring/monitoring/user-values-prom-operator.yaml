@@ -1,13 +1,13 @@
 # Place overrides for the Prometheus Operator Helm Chart Here
 
 # Prometheus Operator Helm Chart
-# https://github.com/helm/charts/blob/master/stable/prometheus-operator/README.md
+# https://https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 #
 # CRDs
 # https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md
 #
 # Default Values
-# https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml
+# https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
 
 # Sample Cluster-only monitoring
 # This configuration will not find servicemonitors/podmonitors in Viya namespaces
