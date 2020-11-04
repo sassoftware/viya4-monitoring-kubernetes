@@ -72,23 +72,23 @@ is treated as a comment.
 
 The monitoring stack uses the following Helm charts:
 
-* **Prometheus Operator** - used by `deploy_monitoring_cluster.sh`
-  * [Chart](https://github.com/helm/charts/blob/master/stable/prometheus-operator/README.md)
-  * [Default values](https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml)
-* **Prometheus Pushgateway** - used by `deploy_monitoring_viya.sh`
-  * [Chart](https://github.com/helm/charts/tree/master/stable/prometheus-pushgateway)
-  * [Default values](https://github.com/helm/charts/blob/master/stable/prometheus-pushgateway/values.yaml)
+* **kube-prometheus-stack** - used by `deploy_monitoring_cluster.sh`
+  * [Chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
+  * [Default values](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml)
+* **prometheus-pushgateway** - used by `deploy_monitoring_viya.sh`
+  * [Chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway)
+  * [Default values](https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-pushgateway/values.yaml)
 
 These charts are highly customizable. Although the default values might be
 suitable, you might need to customize some values (such as for ingress,
-for example). The Prometheus Operator helm chart, in particular, aggregates
-other helm charts such as Grafana and the Prometheus Node Exporter. Links
-to the charts and default values are included in the
+for example). The kube-prometheus-stack helm chart includes the Prometheus
+Operator and aggregates other helm charts such as Grafana and the Prometheus
+Node Exporter. Links to the charts and default values are included in the
 `user-values-prom-operator.yaml` file.
 
 **Note:** If you are using a cloud provider, you must use ingress, rather than
 NodePorts. Use the samples in the
-[monitoring/samples/ingress](https://github.com/sassoftware/kube-viya-monitoring/tree/master/monitoring/samples/ingress)
+[monitoring/samples/ingress](samples/ingress)
 area of this repository to set up either host-based or path-based ingress.
 
 ## Istio Integration
@@ -100,22 +100,24 @@ dashboards use these assumptions:
 * The optional Prometheus instance that is included with Istio is deployed
 
 To enable Istio support, set `ISTIO_ENABLED=true` in `$USER_DIR/user.env`
-or `$USER_DIR/monitoring/user.env` before deploying monitoring using the 
+or `$USER_DIR/monitoring/user.env` before deploying monitoring using the
 `deploy_monitoring_cluster.sh` script.
 
 ### Recommendations
 
-The default configuration of the Prometheus instance that is included in Istio 
-monitors the entire Kubernetes cluster. This configuration is typically not preferred if 
-you are deploying the monitoring components in this repository.
+The default configuration of the Prometheus instance that is included in Istio
+monitors the entire Kubernetes cluster. This configuration is typically not
+preferred if you are deploying the monitoring components in this repository.
 
-This is because the Prometheus instance that is included with Istio discovers and scrapes pods that have the
-`prometheus.io/*` annotations, including SAS Viya components. If you also deployed the Prometheus 
-instance in this repository, both instances of Prometheus are scraping the pods, which leads to higher resource usage. 
+This is because the Prometheus instance that is included with Istio discovers
+and scrapes pods that have the `prometheus.io/*` annotations, including SAS
+Viya components. If you also deployed the Prometheus instance in this
+repository, both instances of Prometheus are scraping the pods, which leads
+to higher resource usage.
 
 To prevent this situation, disable cluster-wide scraping of
-pods and services that contain the `prometheus.io/*` annotations by disabling the following
-jobs in the Istio Prometheus instance:
+pods and services that contain the `prometheus.io/*` annotations by disabling
+the following jobs in the Istio Prometheus instance:
 
 * `kubernetes-pods`
 * `kubernetes-service-endpoints`

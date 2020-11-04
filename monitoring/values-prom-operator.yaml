@@ -1,16 +1,15 @@
 # Override values for the Prometheus Operator helm chart
 #
 # Prometheus Operator Helm Chart
-# https://github.com/helm/charts/blob/master/stable/prometheus-operator/README.md
+# https://https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 #
 # CRDs
 # https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md
 #
 # Default Values
-# https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml
+# https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
 
 
-# https://github.com/helm/charts/tree/master/stable/prometheus-operator#prometheus-operator-1
 commonLabels:
   sas.com/monitoring-base: kube-viya-monitoring
 
@@ -19,11 +18,6 @@ commonLabels:
 # ===================
 # https://github.com/coreos/prometheus-operator
 prometheusOperator:
-  # v0.39+ requires Kubernetes 1.16+
-  image:
-    tag: v0.40.0
-  prometheusConfigReloaderImage:
-    tag: v0.40.0
   logFormat: json
   logLevel: info
   createCustomResource: false
@@ -70,8 +64,6 @@ kube-state-metrics:
 # ==========
 # Prometheus
 # ==========
-# https://github.com/helm/charts/tree/master/stable/prometheus-operator#prometheus
-# https://prometheus.io/
 prometheus:
   serviceAccount:
     name: sas-ops-acct
@@ -106,16 +98,10 @@ prometheus:
             requests:
               storage: 25Gi    
           volumeMode: Filesystem
-    tolerations:
-    - key: workload.sas.com/class
-      value: stateful
-      effect: NoSchedule
 
 # =======================
 # Prometheus AlertManager
 # =======================
-# https://github.com/helm/charts/tree/master/stable/prometheus-operator#alertmanager
-# https://prometheus.io/docs/alerting/alertmanager/
 alertmanager:
   service:
     type: NodePort
@@ -139,20 +125,10 @@ alertmanager:
             requests:
               storage: 10Gi
           volumeMode: Filesystem
-    tolerations:
-    - key: workload.sas.com/class
-      value: stateful
-      effect: NoSchedule
-
-# =========
-# Exporters
-# =========
-# https://github.com/helm/charts/tree/master/stable/prometheus-operator#exporters
 
 # Prometheus Node Exporter
 # https://github.com/prometheus/node_exporter
-# https://github.com/helm/charts/tree/master/stable/prometheus-node-exporter
-
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
 prometheus-node-exporter:
   image:
     tag: v1.0.1
@@ -187,7 +163,7 @@ nodeExporter:
 # https://github.com/helm/charts/tree/master/stable/grafana
 grafana:
   image:
-    tag: "7.2.0"
+    tag: "7.2.2"
   "grafana.ini":
     analytics:
       check_for_updates: false
@@ -215,10 +191,6 @@ grafana:
     requests:
       cpu: "250m"
       memory: "150Mi"
-  tolerations:
-  - key: workload.sas.com/class
-    value: stateful
-    effect: NoSchedule
   sidecar:
     dashboards:
       enabled: true

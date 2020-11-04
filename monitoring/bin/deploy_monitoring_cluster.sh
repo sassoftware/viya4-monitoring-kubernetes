@@ -6,10 +6,14 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 
+helm2Fail
+
 source bin/tls-include.sh
 verify_cert_manager
 
+helm2ReleaseCheck v4m-$MON_NS
 helm2ReleaseCheck prometheus-$MON_NS
+helm3ReleaseCheck v4m-prometheus-operator $MON_NS
 helm3ReleaseCheck prometheus-operator $MON_NS
 checkDefaultStorageClass
 
@@ -33,14 +37,9 @@ fi
 set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
 
-if [[ ! $(helm repo list 2>/dev/null) =~ stable[[:space:]] ]]; then
-  log_info "Adding 'stable' helm repository"
-  helm repo add stable https://kubernetes-charts.storage.googleapis.com
-else
-  log_debug "'stable' helm repository already exists"
-fi
+helmRepoAdd stable https://charts.helm.sh/stable
+helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
 
-# helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 log_info "Updating helm repositories..."
 helm repo update
 
@@ -71,10 +70,20 @@ else
 fi
 
 # Check if Prometheus Operator CRDs are already installed
-createPromCRDs=true
-if [ "$(kubectl get crd prometheuses.monitoring.coreos.com -o name 2>/dev/null)" ]; then
-  log_debug "Found existing Prometheus CRDs. Skipping creation."
-  createPromCRDs=false
+PROM_OPERATOR_CRD_UPDATE=${PROM_OPERATOR_CRD_UPDATE:-true}
+PROM_OPERATOR_CRD_VERSION=${PROM_OPERATOR_CRD_VERSION:-v0.43.0}
+if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
+  log_info "Updating Prometheus Operator custom resource definitions"
+  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml
+  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml
+  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
+  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml
+  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml
+  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
+  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml
+  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml
+else
+  log_debug "Prometheus Operator CRD update disabled"
 fi
 
 # Optional TLS Support
@@ -88,11 +97,11 @@ if [ "$TLS_ENABLE" == "true" ]; then
   log_info "Provisioning TLS-enabled Prometheus datasource for Grafana..."
   cp monitoring/tls/grafana-datasource-prom-https.yaml $TMP_DIR/grafana-datasource-prom-https.yaml
   if [ "$HELM_VER_MAJOR" == "3" ]; then
-    kubectl delete cm -n $MON_NS --ignore-not-found prometheus-operator-grafana-datasource
-    echo "      url: https://prometheus-operator-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
+    kubectl delete cm -n $MON_NS --ignore-not-found v4m-grafana-datasource
+    echo "      url: https://v4m-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
   else
-    kubectl delete cm -n $MON_NS --ignore-not-found prometheus-$MON_NS-grafana-datasource
-    echo "      url: https://prometheus-$MON_NS-prom-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
+    kubectl delete cm -n $MON_NS --ignore-not-found v4m-$MON_NS-grafana-datasource
+    echo "      url: https://v4m-$MON_NS-prom-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
   fi
 
   kubectl delete cm -n $MON_NS --ignore-not-found grafana-datasource-prom-https
@@ -107,11 +116,18 @@ if [ "$TLS_ENABLE" == "true" ]; then
   kubectl label cm -n $MON_NS node-exporter-tls-web-config sas.com/monitoring-base=kube-viya-monitoring
 fi
 
-log_info "Deploying Prometheus Operator. This may take a few minutes (20min timeout)..."
+log_info "Deploying the Kube Prometheus Stack. This may take a few minutes..."
 log_info "User response file: [$PROM_OPER_USER_YAML]"
 if [ "$HELM_VER_MAJOR" == "3" ]; then
-  log_debug "Installing via Helm 3..."
-  promRelease=prometheus-operator
+  log_info "Installing via Helm 3...($(date) - timeout 20m)"
+  if helm3ReleaseExists prometheus-operator $MON_NS; then
+    promRelease=prometheus-operator
+    promName=prometheus-operator
+  else
+    promRelease=v4m-prometheus-operator
+    promName=v4m
+  fi
+  KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-11.0.0}
   helm $helmDebug upgrade --install $promRelease \
     --namespace $MON_NS \
     -f monitoring/values-prom-operator.yaml \
@@ -119,10 +135,23 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     -f $PROM_OPER_USER_YAML \
     --atomic \
     --timeout 20m \
-    stable/prometheus-operator
+    --set nameOverride=$promName \
+    --set fullnameOverride=$promName \
+    --set prometheus-node-exporter.fullnameOverride=$promName-node-exporter \
+    --set kube-state-metrics.fullnameOverride=$promName-kube-state-metrics \
+    --set grafana.fullnameOverride=$promName-grafana \
+    --version $KUBE_PROM_STACK_CHART_VERSION \
+    prometheus-community/kube-prometheus-stack
 else
-  log_debug "Installing via Helm 2..."
-  promRelease=prometheus-$MON_NS
+  log_info "Installing via Helm 2...($(date) timeout 20m)"
+  
+  if helm2ReleaseExists prometheus-$MON_NS; then
+    promRelease=prometheus-$MON_NS
+    promName=prometheus-$MON_NS
+  else
+    promRelease=v4m-prometheus-$MON_NS
+    promName=v4m
+  fi
   helm $helmDebug upgrade --install $promRelease \
     --namespace $MON_NS \
     -f monitoring/values-prom-operator.yaml \
@@ -131,7 +160,12 @@ else
     --atomic \
     --timeout 1200 \
     --set prometheusOperator.createCustomResource=$createPromCRDs \
-    stable/prometheus-operator
+    --set nameOverride=$promName \
+    --set fullnameOverride=$promName \
+    --set prometheus-node-exporter.fullnameOverride=$promName-node-exporter \
+    --set kube-state-metrics.fullnameOverride=$promName-kube-state-metrics \
+    --set grafana.fullnameOverride=$promName-grafana \
+    prometheus-community/kube-prometheus-stack
 fi
 
 rm -f $genValuesFile
@@ -140,7 +174,7 @@ sleep 2
 
 if [ "$TLS_ENABLE" == "true" ]; then
   log_info "Patching Grafana ServiceMonitor for TLS..."
-  kubectl patch servicemonitor -n $MON_NS prometheus-operator-grafana --type=json \
+  kubectl patch servicemonitor -n $MON_NS v4m-grafana --type=json \
     -p='[{"op": "replace", "path": "/spec/endpoints/0/scheme", "value":"https"},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig", "value":{}},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig/insecureSkipVerify", "value":true}]'
 fi
 

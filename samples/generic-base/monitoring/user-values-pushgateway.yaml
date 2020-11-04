@@ -1,5 +1,5 @@
-# Chart: https://github.com/helm/charts/tree/master/stable/prometheus-pushgateway
-# Default values: https://github.com/helm/charts/blob/master/stable/prometheus-pushgateway/values.yaml
+# Chart: https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway
+# Default values: https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-pushgateway/values.yaml
 
 # image:
 #   repository: prom/pushgateway

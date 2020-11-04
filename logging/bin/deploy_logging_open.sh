@@ -5,6 +5,9 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
+
+helm2Fail
+
 source logging/bin/secrets-include.sh
 
 # Collect Kubernetes events as pseudo-log messages?
@@ -161,13 +164,7 @@ if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
    rm -rf $TMP_DIR/opendistro-build
 fi
 
-# Make Elasticsearch repo available to Helm
-if [[ ! $(helm repo list 2>/dev/null) =~ stable[[:space:]] ]]; then
-  log_info "Adding 'stable' helm repository"
-  helm repo add stable https://kubernetes-charts.storage.googleapis.com
-else
-  log_debug "'stable' helm repository already exists"
-fi
+helmRepoAdd stable https://charts.helm.sh/stable
 
 log_info "Updating helm repositories..."
 helm repo update
