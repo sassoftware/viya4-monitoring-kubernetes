@@ -12,7 +12,9 @@ source bin/tls-include.sh
 verify_cert_manager
 
 helm2ReleaseCheck v4m-$MON_NS
-helm3ReleaseCheck v4m $MON_NS
+helm2ReleaseCheck prometheus-$MON_NS
+helm3ReleaseCheck v4m-prometheus-operator $MON_NS
+helm3ReleaseCheck prometheus-operator $MON_NS
 checkDefaultStorageClass
 
 export HELM_DEBUG="${HELM_DEBUG:-false}"
