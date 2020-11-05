@@ -48,11 +48,21 @@ script.  The connection information needed is summarized below:
 |AZMONITOR_SHARED_KEY| Primary Shared Key|
 
 This information is available via the Azure Portal or from the Azure CLI.
-The following commands show how this information can be obtained. 
-Remember to use replace the sample resource group name and workspace
-names shown below with the names of the resource group and workspace
-you have created. The Azure CLI may be acccessed via a different name or
-alias in your environment.
+
+Note that the deployment script will create a Kubernetes secret to ensure
+the connection information is available in case the Fluent Bit pods are
+restarted and/or new nodes are added to the cluster.  This secret is created
+in the same namespace into which the Fluent Bit pods are deployed and
+is called **connection-info-azmonitor**.  If this secret already exists
+when the deployment script is called, the connection information will
+be obtained from the secret and you do ***not*** need to set the environment
+varibles listed above.
+
+The following commands show how this connection information can be obtained
+via the Azure CLI. Remember to use replace the sample resource group name
+and workspace names shown below with the names of the resource group and
+workspace you have created. The Azure CLI may be acccessed via a different
+name or alias in your environment.
 ### Obtaining the Customer ID via the Azure CLI
 ```
 az monitor log-analytics workspace show --resource-group myresourcegroup-rg --workspace-name myworkspace --query customerId
