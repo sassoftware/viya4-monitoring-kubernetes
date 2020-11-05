@@ -46,6 +46,7 @@ script.  The connection information needed is summarized below:
 |--------------------|-----------------------------------|
 |AZMONITOR_CUSTOMER_ID| Customer ID |
 |AZMONITOR_SHARED_KEY| Primary Shared Key|
+
 This information is available via the Azure Portal or from the Azure CLI.
 The following commands show how this information can be obtained. 
 Remember to use replace the sample resource group name and workspace
