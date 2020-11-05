@@ -36,7 +36,32 @@ messages collected by Fluent Bit.
 Removing this alternate technology stack by running the **remove_logging_azmonitor.sh**
 script located in the **logging/bin** directory.  By default, this
 script does NOT delete the namespace.
-
+## Required Connection Information
+The deployment script assumes a Log Analytics Workspace has *already* been
+created.  Consult the Azure documentation for how the specifics of how this
+can be done.  Once the Log Analytics Workspace has been created, you will need
+pass connection information (via environment varibles) about it to the deployment
+script.  The connection information needed is summarized below:
+|Environment Variable|Log Analytics Workspace Information|
+|--------------------|-----------------------------------|
+|AZMONITOR_CUSTOMER_ID| Customer ID |
+|AZMONITOR_SHARED_KEY| Primary Shared Key|
+This information is available via the Azure Portal or from the Azure CLI.
+The following commands show how this information can be obtained. 
+Remember to use replace the sample resource group name and workspace
+names shown below with the names of the resource group and workspace
+you have created. The Azure CLI may be acccessed via a different name or
+alias in your environment.
+### Obtaining the Customer ID via the Azure CLI
+```
+az monitor log-analytics workspace show --resource-group myresourcegroup-rg --workspace-name myworkspace --query customerId
+```
+### Obtaining the Shared Keys via the Azure CLI
+```
+ az monitor log-analytics workspace get-shared-keys --resource-group myresourcegroup-rg --workspace-name myworkspace
+```
+Note: Two shared keys, labeled ***"primarySharedKey"*** and ***"secondarySharedKey"*** will be returned;
+use the value of the ***primarySharedKey*** to set the approprite environment variable.
 ## Table and Variable Naming
 After deploying this technology stack, collected log messages will appear as
 a new table, **viya_logs_CL**, in the ***Custom Logs*** grouping within the
