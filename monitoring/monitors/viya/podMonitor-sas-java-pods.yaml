@@ -10,7 +10,7 @@ spec:
     - key: sas.com/deployment
       operator: Exists
   podMetricsEndpoints:
-  - port: http
+  - port: http-internal
     path: /internal/metrics
     tlsConfig:
       insecureSkipVerify: true
