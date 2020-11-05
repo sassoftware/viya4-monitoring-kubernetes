@@ -58,16 +58,18 @@ when the deployment script is called, the connection information will
 be obtained from the secret and you do ***not*** need to set the environment
 varibles listed above.
 
+### Obtaining the Connection Information via the Azure CLI
+
 The following commands show how this connection information can be obtained
 via the Azure CLI. Remember to use replace the sample resource group name
 and workspace names shown below with the names of the resource group and
 workspace you have created. The Azure CLI may be acccessed via a different
 name or alias in your environment.
-### Obtaining the Customer ID via the Azure CLI
+#### Obtaining the Customer ID
 ```
 az monitor log-analytics workspace show --resource-group myresourcegroup-rg --workspace-name myworkspace --query customerId
 ```
-### Obtaining the Shared Keys via the Azure CLI
+#### Obtaining the Shared Keys
 ```
  az monitor log-analytics workspace get-shared-keys --resource-group myresourcegroup-rg --workspace-name myworkspace
 ```
