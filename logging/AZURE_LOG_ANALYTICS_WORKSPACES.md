@@ -95,4 +95,4 @@ viya_logs_CL
 | project TimeGenerated, Level, logsource_s
 | summarize msgcount=count() by Level, logsource_s
 ```
-![Azure Log Analytics Workspace - Kusto Query](img/screenshot-kustoquery-chart.png)
+![Azure Log Analytics Workspace - Kusto Query](../img/screenshot-kustoquery-chart.png)
