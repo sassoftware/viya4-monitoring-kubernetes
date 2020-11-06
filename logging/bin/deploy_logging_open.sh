@@ -191,7 +191,7 @@ if [ "$ES_MULTIROLE_NODES" == "true" ]; then
    # By default, there will be no single-role 'client' or 'data' nodes; but patching corresponding
    # K8s objects to ensure proper labels are used in case user chooses to configure additional single-role nodes
    log_debug "Patching deployment [v4m-es-client]"
-   kubectl -n $LOG_NS patch deployment v4m-es-client --type=json --patch '[{"op": "add","path": "/metadata/labels/esdata","value": "true" }]'
+   kubectl -n $LOG_NS patch deployment v4m-es-client --type=json --patch '[{"op": "add","path": "/spec/template/metadata/labels/esclient","value": "true" }]'
 
    log_debug "Patching statefulset [v4m-es-data]"
    kubectl -n $LOG_NS patch statefulset v4m-es-data  --type=json --patch '[{"op": "add","path": "/spec/template/metadata/labels/esdata","value": "true" }]'
