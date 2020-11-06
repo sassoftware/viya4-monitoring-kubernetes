@@ -146,7 +146,7 @@ By default, the components are deployed into the namespace `logging`.
 
 ## Update Logging Components
 
-Updates in place are supported in Helm 3.x. To update, re-run the
+Updates in place are supported. To update, re-run the
 `deploy_logging_open.sh` script to install the latest versions of the
 applications, indexes, and dashboards.
 
