@@ -66,13 +66,13 @@ export USER_DIR=~/my-cluster-files/ops/user-dir
 
 4. Modify the file `$USER_DIR\logging\user.env`.
 
-  - Specify the value you obtained for `CustomerId` for the `AZMONITOR_CUSTOMER_ID` environment
-    variable.
+  - Specify the value you obtained for `CustomerId` for the `AZMONITOR_CUSTOMER_ID` environment variable.
+
     ```bash
     AZMONITOR_CUSTOMER_ID=<CustomerId>
     ```
-  - Specify the value you obtained for `primarySharedKey` for the `AZMONITOR_SHARED_KEY` environment
-    varaible.
+  - Specify the value you obtained for `primarySharedKey` for the `AZMONITOR_SHARED_KEY` environment varaible.
+
     ```bash
     AZMONITOR_SHARED_KEY=<primarySharedKey>
     ```
@@ -166,11 +166,10 @@ The following query also returns the number of log messages generated over the l
 five minutes, but also summarizes the messages by message severity (**Level**) and source (**logsource_s**).
 The query returns the results in the form of a table. To view the results as 
 a chart, click **Chart** item in the menu above the results output.  
-Note that this query and the results in chart form are shown in the screenshot above.
 ```
 viya_logs_CL
 | where TimeGenerated > ago(5m)
 | project TimeGenerated, Level, logsource_s
 | summarize msgcount=count() by Level, logsource_s
 ```
-
+Note that this query and the results in chart form are shown in the screenshot above.
