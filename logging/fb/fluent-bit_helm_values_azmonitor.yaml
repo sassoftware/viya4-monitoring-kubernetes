@@ -23,10 +23,10 @@ extraVolumeMounts:
 extraVolumes:
 - configMap:
     defaultMode: 420
-    name: fb-viya-parsers
+    name: fbaz-viya-parsers
   name: parsers-config
 fullConfigMap: false
-existingConfigMap: fb-fluent-bit-config
+existingConfigMap: fbaz-fluent-bit-config
 
 env:
    - name: AZMONITOR_CUSTOMER_ID

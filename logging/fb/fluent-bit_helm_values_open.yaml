@@ -3,6 +3,8 @@ image:
     tag: 1.5.4
 podAnnotations: 
   fluentbit.io/parser: fluentbit
+podLabels:
+  fbout: es
 backend:
   type: es 
   es:

@@ -60,11 +60,11 @@ fi
 kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 
 # Create ConfigMap containing Viya-customized parsers (delete it first)
-kubectl -n $LOG_NS delete configmap fb-viya-parsers --ignore-not-found
-kubectl -n $LOG_NS create configmap fb-viya-parsers  --from-file=logging/fb/viya-parsers.conf
+kubectl -n $LOG_NS delete configmap fbaz-viya-parsers --ignore-not-found
+kubectl -n $LOG_NS create configmap fbaz-viya-parsers  --from-file=logging/fb/viya-parsers.conf
 
 # Delete any existing Fluent Bit pods in the $LOG_NS namepace (otherwise Helm chart may assume an upgrade w/o reloading updated config
-kubectl -n $LOG_NS delete pods -l "app=fluent-bit"
+kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=azuremonitor"
 
 # Deploy Fluent Bit via Helm chart
 if [ "$HELM_VER_MAJOR" == "3" ]; then

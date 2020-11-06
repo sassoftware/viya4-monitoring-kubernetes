@@ -899,4 +899,4 @@ kind: ConfigMap
 metadata:
   labels:
     app: fluent-bit
-  name: fb-fluent-bit-config
+  name: fbaz-fluent-bit-config
