@@ -146,19 +146,17 @@ By default, the components are deployed into the namespace `logging`.
 
 ## Update Logging Components
 
-Updates in place are supported if you use Helm 3.x. To update, re-run the
+Updates in place are supported in Helm 3.x. To update, re-run the
 `deploy_logging_open.sh` script to install the latest versions of the
 applications, indexes, and dashboards.
 
-If you use Helm 2.x, you must remove and re-install the logging components in
-order to update them.
 
 ## Remove Logging Components
 
 To remove logging components, run the following command:
 
 ```bash
-cd <kube-viya-monitoring repo directory>
+cd <viya4-monitoring-kubernetes repo directory>
 
 logging/bin/remove_logging_open.sh
 ```
