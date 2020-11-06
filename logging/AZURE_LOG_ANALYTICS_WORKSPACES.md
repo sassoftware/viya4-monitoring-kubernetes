@@ -2,7 +2,7 @@
 
 ## Introduction
 
-If you use Microsoft Azure and want to use Azure Monitor instead of Elasticsearch 
+If you use Microsoft Azure and want to use Azure Monitor *instead* of Elasticsearch 
 to explore, filter, and report on log messages from a SAS Viya environment, you 
 can deploy the logging solution described in this document. This solution uses a 
 combination of Fluent Bit and an Azure Log Analytics workspace to handle log 
@@ -19,7 +19,7 @@ deploy the solution described in this document.**
 
 In this solution, log messages are collected by the Fluent Bit
 pods that are part of the standard logging solution and that are deployed 
-cluster-wide by using a Kubernetes DaemonSet. These Fluent Bit pods can  
+cluster-wide by using a Kubernetes DaemonSet. These Fluent Bit pods can 
 parse and process log messages from all SAS Viya components, including 
 third-party products. As a result, log messages are handled consistently, 
 regardless of the original source. 
@@ -54,7 +54,10 @@ Use this command to obtain the `primarySharedKey`. Replace the values of `myreso
 
 This command returns two shared keys, labeled ***"primarySharedKey"*** and ***"secondarySharedKey"***. You only need to use the ***"primarySharedKey"***.
 
-4. If you have not already set up your `USER_DIR` directory (as discussed in the 'Customize the Deployment' section of the README.md file in the /logging directory), set up an empty directory with a `logging` subdirectory to contain the customization files. Export a `USER_DIR` environment variable that points to this location. For example:
+4. If you have not already set up your `USER_DIR` directory (as discussed in the 'Customize the Deployment' 
+section of the [README.md](README.md) file in the /logging directory), set up an empty directory with a `logging` 
+subdirectory to contain the customization files. Export a `USER_DIR` environment variable that points to this location.
+For example:
 
 ```bash
 mkdir -p ~/my-cluster-files/ops/user-dir/logging
@@ -88,8 +91,8 @@ By default, this script does NOT delete the namespace.
 
 ## Using Connection Information From Kubernetes Secret
 
-The deployment script creates a Kubernetes secret named `connection-info-azmonitor`, 
-which ensures that the connection information is available in case the Fluent Bit pods are
+The deployment script creates a Kubernetes secret named `connection-info-azmonitor`containing the connection information. 
+This ensures that the connection information is available in case the Fluent Bit pods are
 restarted or new nodes are added to the cluster. This secret is created
 in the same namespace into which the Fluent Bit pods are deployed.  If this secret already exists
 when you run the deployment script, the script obtains the connection information from the secret and you do not need to specify  the environment variables in the `user.env` file.
@@ -131,9 +134,11 @@ The query window enables you perform these actions:
   - Enter Kusto queries.
   - Display query results as charts or graphs.
   - Export the query results.
-  - Add query results to an Azure dashboard.  
+  - Add query results to an Azure dashboard. 
 
 You can also use Kusto queries as part of Azure Monitor workbooks.
+
+See the [Microsoft Kusto documentation](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/concepts) for information.
 
 Here are some sample Kusto queries.
 
@@ -160,7 +165,8 @@ viya_logs_CL
 The following query also returns the number of log messages generated over the last
 five minutes, but also summarizes the messages by message severity (**Level**) and source (**logsource_s**).
 The query returns the results in the form of a table. To view the results as 
-a chart, click **Chart** item in the menu above the results output.
+a chart, click **Chart** item in the menu above the results output.  
+Note that this query and the results in chart form are shown in the screenshot above.
 ```
 viya_logs_CL
 | where TimeGenerated > ago(5m)
