@@ -156,7 +156,7 @@ applications, indexes, and dashboards.
 To remove logging components, run the following command:
 
 ```bash
-cd <kube-viya-monitoring repo directory>
+cd <viya4-monitoring-kubernetes repo directory>
 
 logging/bin/remove_logging_open.sh
 ```

@@ -1,0 +1,32 @@
+# Chart: https://github.com/helm/charts/tree/master/stable/fluent-bit
+# Default values: https://github.com/helm/charts/blob/master/stable/fluent-bit/values.yaml
+
+# NOTE: Customizations intended to alter the contents of the Fluent Bit Configuration Files
+#       MUST be made by altering contents of the fluent-bit_config.configmap_azmonitor.yaml file.
+#       Use this file to customize other Helm chart settings.
+
+# image:
+#   fluent_bit:
+#     tag: 1.5.4
+
+#env:
+# IMPORTANT: Do NOT set the values for the environment variables
+#            AZMONITOR_CUSTOMER_ID and AZMONITOR_SHARED_KEY
+#            here; set their values in the user.env file in
+#            your USER_DIR directory.  If you must add additional
+#            environment variables, uncomment the following lines
+#            to ensure these two environment variables continue to
+#            be set correctly and then add lines defining your
+#            additional environment variables after them.
+#
+#   - name: AZMONITOR_CUSTOMER_ID
+#     valueFrom:
+#       secretKeyRef:
+#         name: connection-info-azmonitor
+#         key: customer_id
+#   - name: AZMONITOR_SHARED_KEY
+#     valueFrom:
+#       secretKeyRef:
+#         name: connection-info-azmonitor
+#         key: shared_key
+
