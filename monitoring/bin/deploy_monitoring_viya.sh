@@ -31,6 +31,16 @@ if [ "$VIYA_NS" == "" ]; then
   exit 1
 fi
 
+# Optional workload node placement support
+MON_NODE_PLACEMENT_ENABLE=${MON_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
+if [ "$MON_NODE_PLACEMENT_ENABLE" == "true" ]; then
+  log_info "Enabling monitoring components for workload node placement"
+  wnpValuesFile="monitoring/node-placement/values-pushgateway-wnp.yaml"
+else
+  log_debug "Workload node placement support is disabled"
+  wnpValuesFile="$TMP_DIR/empty.yaml"
+fi
+
 log_notice "Enabling the [$VIYA_NS] namespace for SAS Viya monitoring"
 
 # Exit on failure
@@ -45,6 +55,7 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
     helm $helmDebug upgrade --install pushgateway-$VIYA_NS \
     --namespace $VIYA_NS \
     -f monitoring/values-pushgateway.yaml \
+    -f $wnpValuesFile \
     -f $PUSHGATEWAY_USER_YAML \
     prometheus-community/prometheus-pushgateway
   else
@@ -52,6 +63,7 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
     helm $helmDebug upgrade --install prometheus-pushgateway \
     --namespace $VIYA_NS \
     -f monitoring/values-pushgateway.yaml \
+    -f $wnpValuesFile \
     -f $PUSHGATEWAY_USER_YAML \
     prometheus-community/prometheus-pushgateway
   fi

@@ -86,6 +86,16 @@ else
   log_debug "Prometheus Operator CRD update disabled"
 fi
 
+# Optional workload node placement support
+MON_NODE_PLACEMENT_ENABLE=${MON_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
+if [ "$MON_NODE_PLACEMENT_ENABLE" == "true" ]; then
+  log_info "Enabling monitoring components for workload node placement"
+  wnpValuesFile="monitoring/node-placement/values-prom-operator-wnp.yaml"
+else
+  log_debug "Workload node placement support is disabled"
+  wnpValuesFile="$TMP_DIR/empty.yaml"
+fi
+
 # Optional TLS Support
 if [ "$TLS_ENABLE" == "true" ]; then
   apps=( prometheus alertmanager grafana )
@@ -132,6 +142,7 @@ if [ "$HELM_VER_MAJOR" == "3" ]; then
     --namespace $MON_NS \
     -f monitoring/values-prom-operator.yaml \
     -f $genValuesFile \
+    -f $wnpValuesFile \
     -f $PROM_OPER_USER_YAML \
     --atomic \
     --timeout 20m \
@@ -156,6 +167,7 @@ else
     --namespace $MON_NS \
     -f monitoring/values-prom-operator.yaml \
     -f $genValuesFile \
+    -f $wnpValuesFile \
     -f $PROM_OPER_USER_YAML \
     --atomic \
     --timeout 1200 \

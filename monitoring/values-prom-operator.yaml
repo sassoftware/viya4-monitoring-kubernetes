@@ -75,6 +75,7 @@ prometheus:
       tag: v2.21.0
     logLevel: info
     logFormat: json
+    podAntiAffinity: soft
     # Don't restrict ServiceMonitor namespace selection by default
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
@@ -110,6 +111,7 @@ alertmanager:
     image:
       tag: v0.21.0
     logFormat: json
+    podAntiAffinity: soft
     retention: 240h
     resources:
       requests:

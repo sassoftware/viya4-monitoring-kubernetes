@@ -88,8 +88,20 @@ Node Exporter. Links to the charts and default values are included in the
 
 **Note:** If you are using a cloud provider, you must use ingress, rather than
 NodePorts. Use the samples in the
-[monitoring/samples/ingress](samples/ingress)
+[samples/ingress](/samples/ingress)
 area of this repository to set up either host-based or path-based ingress.
+
+## Workload Node Placement
+
+By default, monitoring components get deployed to cluster nodes **not**
+with `workload.sas.com/class` taints. On Microsoft Azure, this will result
+in pods being deployed on nodes in the `system` nodepool. This is
+the recommended approach so monitoring and logging components will continue
+to function even if `workload.sas.com/class`-tainted nodes are scaled to zero.
+
+To enable monitoring components to participate in the SAS Viya workload node
+placement strategy, set `NODE_PLACEMENT_ENABLE` or `MON_NODE_PLACEMENT_ENABLE`
+to `true` in `$USER_DIR/monitoring/user.env`.
 
 ## Istio Integration
 

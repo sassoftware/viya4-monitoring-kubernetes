@@ -1,0 +1,27 @@
+affinity:
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      preference:
+        matchExpressions:
+        - key: workload.sas.com/class
+          operator: In
+          values:
+          - stateless
+    - weight: 50
+      preference:
+        matchExpressions:
+        - key: workload.sas.com/class
+          operator: NotIn
+          values:
+          - compute
+          - cas
+          - stateful
+          - connect
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.azure.com/mode
+          operator: NotIn
+          values:
+          - system
