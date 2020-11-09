@@ -42,29 +42,21 @@ Follow these steps to deploy this solution:
 Use this command to obtain the `CustomerId`. Replace the values of `myresourcegroup` and `myworkspace` with the values for your workspace. Note that you might access the Azure CLI using a different name or alias in your environment.
 
 ```
-az monitor log-analytics workspace show --resource-group <myresourcegroup>-rg --workspace-name <myworkspace> --query customerId
+az monitor log-analytics workspace show --resource-group <myresourcegroup> --workspace-name <myworkspace> --query customerId
 ```
 3. Obtain the `primarySharedKey` for the workspace. You can obtain this information either from the Azure Portal or the Azure CLI.
 
 Use this command to obtain the `primarySharedKey`. Replace the values of `myresourcegroup` and `myworkspace` with the values for your workspace. Note that you might access the Azure CLI using a different name or alias in your environment.
 
 ```
- az monitor log-analytics workspace get-shared-keys --resource-group <myresourcegroup>-rg --workspace-name <myworkspace>
+ az monitor log-analytics workspace get-shared-keys --resource-group <myresourcegroup> --workspace-name <myworkspace>
 ```
 
 This command returns two shared keys, labeled ***"primarySharedKey"*** and ***"secondarySharedKey"***. You only need to use the ***"primarySharedKey"***.
 
-4. If you have not already set up your `USER_DIR` directory (as discussed in the 'Customize the Deployment' 
-section of the [README.md](README.md) file in the /logging directory), set up an empty directory with a `logging` 
-subdirectory to contain the customization files. Export a `USER_DIR` environment variable that points to this location.
-For example:
+4. Set up your `USER_DIR` directory for an Azure deployment and export a `USER_DIR` environment variable that points to this location. See [/samples/azure-deployment/README.md](../samples/azure-deployment/README.md) for information.
 
-```bash
-mkdir -p ~/my-cluster-files/ops/user-dir/logging
-export USER_DIR=~/my-cluster-files/ops/user-dir
-```
-
-4. Modify the file `$USER_DIR\logging\user.env`.
+5. Modify the file `$USER_DIR\logging\user.env`.
 
   - Specify the value you obtained for `CustomerId` for the `AZMONITOR_CUSTOMER_ID` environment variable.
 
@@ -76,7 +68,7 @@ export USER_DIR=~/my-cluster-files/ops/user-dir
     ```bash
     AZMONITOR_SHARED_KEY=<primarySharedKey>
     ```
-5. Run this command to deploy this logging solution:
+6. Run this command to deploy this logging solution:
 
 ```bash
 /logging/bin/deploy_logging_azmonitor.sh
