@@ -188,6 +188,9 @@ if [ "$ES_MULTIROLE_NODES" == "true" ]; then
    log_debug "Patching statefulset [v4m-es-master]"
    kubectl -n $LOG_NS patch statefulset v4m-es-master --patch "$(cat logging/es/odfe/es_multirole_nodes_patch.yml)"
 
+   # Delete existing (unpatched) master pod
+   kubectl -n $LOG_NS delete pod v4m-es-master-0 --ignore-not-found
+
    # By default, there will be no single-role 'client' or 'data' nodes; but patching corresponding
    # K8s objects to ensure proper labels are used in case user chooses to configure additional single-role nodes
    log_debug "Patching deployment [v4m-es-client]"
@@ -326,7 +329,7 @@ function set_retention_period {
    fi
 
    #Update retention period in json file prior to loading it
-   sed -i "s/\"min_index_age\": \"xxxRETENTION_PERIODxxx\"/\"min_index_age\": \"${retention_period}d\"/gI" $TMP_DIR/$policy_name.json 
+   sed -i'.bak' "s/\"min_index_age\": \"xxxRETENTION_PERIODxxx\"/\"min_index_age\": \"${retention_period}d\"/gI" $TMP_DIR/$policy_name.json 
 
    log_debug "Contents of $policy_name.json after substitution:"
    log_debug "$(cat $TMP_DIR/${policy_name}.json)"

@@ -132,7 +132,7 @@ function remove_rolemapping {
           cp logging/es/odfe/rbac/backend_rolemapping_delete.json $TMP_DIR/${targetrole}_backend_rolemapping_delete.json
 
           #update json template file w/revised list of backend roles
-          sed -i "s/xxBACKENDROLESxx/$newroles/gI"     $TMP_DIR/${targetrole}_backend_rolemapping_delete.json # BACKENDROLES
+          sed -i'.bak' "s/xxBACKENDROLESxx/$newroles/gI"     $TMP_DIR/${targetrole}_backend_rolemapping_delete.json # BACKENDROLES
 
           # Replace the rolemappings for the $targetrole with the revised list of backend roles
           response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "https://localhost:$TEMP_PORT/_opendistro/_security/api/rolesmapping/$targetrole"  -H 'Content-Type: application/json' -d @$TMP_DIR/${targetrole}_backend_rolemapping_delete.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
