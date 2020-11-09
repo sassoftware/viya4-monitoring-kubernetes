@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
+kind: PodMonitor
 metadata:
-  name: sas-go-services
+  name: sas-go-pods
   labels:
     sas.com/monitoring-base: kube-viya-monitoring
 spec:
@@ -10,37 +10,35 @@ spec:
     - key: sas.com/deployment
       operator: Exists
       values: []
-  endpoints:
+  podMetricsEndpoints:
   - port: http
     path: /internal/metrics
+    tlsConfig:
+      insecureSkipVerify: true
     relabelings:
     # Enable this when a critical mass of Go services have been rebuilt to provide the
     # correct value for the sas.com/kustomize-base annotation
     # - sourceLabels: [__meta_kubernetes_pod_annotation_sas_com_kustomize_base]
     #   regex: golang
     #   action: keep
-    - sourceLabels: [__meta_kubernetes_service_annotation_app_kubernetes_io_name]
+    - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
       regex: "sas-arke|sas-launcher"
       action: drop
     - sourceLabels: [__meta_kubernetes_pod_annotation_sas_com_kustomize_base]
       regex: "golang"
       action: keep
+    - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+      targetLabel: sas_service_base
+      replacement: golang
+    - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+      targetLabel: service
+    - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+      targetLabel: job
     - sourceLabels: [__meta_kubernetes_pod_label_sas_com_deployment]
       targetLabel: sas_deployment
     - sourceLabels: [__meta_kubernetes_pod_node_name]
       targetLabel: node
-    - sourceLabels: [service]
-      regex: .+
-      targetLabel: sas_service_base
-      replacement: golang
-    - sourceLabels: [__meta_kubernetes_pod_annotation_sas_com_tls_enabled_ports]
-      action: replace
-      regex: all|.*http.*
-      targetLabel: __scheme__
-      replacement: https
-    - sourceLabels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+    - sourceLabels: [__meta_kubernetes_pod_annotation_prometheus_io_scheme]
       action: replace
       regex: (https?)
       targetLabel: __scheme__
-    tlsConfig:
-      insecureSkipVerify: true
