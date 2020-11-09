@@ -103,6 +103,18 @@ elasticsearch:     # Uncommented b/c 'master' is uncommented
       storageClass: alt-storage  # Uncommented to direct ES to alt-storage storageClass
 ```
 
+### Workload Node Placement
+
+By default, logging components get deployed to cluster nodes **not**
+with `workload.sas.com/class` taints. On Microsoft Azure, this will result
+in pods being deployed on nodes in the `system` nodepool. This is
+the recommended approach so logging components will continue to function even
+if `workload.sas.com/class`-tainted nodes are scaled to zero.
+
+To enable logging components to participate in the SAS Viya workload node
+placement strategy, set `NODE_PLACEMENT_ENABLE` or `MON_NODE_PLACEMENT_ENABLE`
+to `true` in `$USER_DIR/logging/user.env`.
+
 ### Evaluate Storage Considerations
 
 #### Provision Persistent Volumes or Persistent Volume Claims
@@ -156,7 +168,7 @@ applications, indexes, and dashboards.
 To remove logging components, run the following command:
 
 ```bash
-cd <kube-viya-monitoring repo directory>
+cd <viya4-monitoring-kubernetes repo directory>
 
 logging/bin/remove_logging_open.sh
 ```
