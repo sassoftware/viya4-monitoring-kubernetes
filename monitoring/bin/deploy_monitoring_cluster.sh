@@ -174,7 +174,7 @@ sleep 2
 
 if [ "$TLS_ENABLE" == "true" ]; then
   log_info "Patching Grafana ServiceMonitor for TLS..."
-  kubectl patch servicemonitor -n $MON_NS v4m-grafana --type=json \
+  kubectl patch servicemonitor -n $MON_NS $promName-grafana --type=json \
     -p='[{"op": "replace", "path": "/spec/endpoints/0/scheme", "value":"https"},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig", "value":{}},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig/insecureSkipVerify", "value":true}]'
 fi
 
