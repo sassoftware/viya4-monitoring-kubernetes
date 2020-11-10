@@ -93,11 +93,15 @@ area of this repository to set up either host-based or path-based ingress.
 
 ## Workload Node Placement
 
-By default, monitoring components are deployed to cluster nodes that do **not**
+SAS Viya is deployed using a workload node placement strategy, which uses the 
+`workload.sas.com/class` taint to optimize the placement of its components on 
+Kubernetes nodes. By default, the monitoring components do **not** participate in the 
+workload node placement strategy. This is the recommended approach, because it enables the 
+monitoring components to function even if `workload.sas.com/class`-tainted nodes 
+are scaled to zero (in other words, are shut down). Therefore, by default, 
+most of the monitoring components are deployed to cluster nodes that do not
 have `workload.sas.com/class` taints. On Microsoft Azure, this results
-in pods being deployed on nodes in the `system` nodepool. This is
-the recommended deployment, because it enables monitoring components to 
-continue to function even if `workload.sas.com/class`-tainted nodes are scaled to zero.
+in pods being deployed on nodes in the `system` nodepool. 
 
 To deploy the monitoring components so that they participate in the SAS Viya workload node
 placement strategy rather than use this recommended deployment, set `MON_NODE_PLACEMENT_ENABLE`

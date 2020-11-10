@@ -105,11 +105,15 @@ elasticsearch:     # Uncommented b/c 'master' is uncommented
 
 ### Workload Node Placement
 
-By default, logging components are deployed to cluster nodes that do **not**
+SAS Viya is deployed using a workload node placement strategy, which uses the 
+`workload.sas.com/class` taint to optimize the placement of its components on 
+Kubernetes nodes. By default, the logging components do **not** participate in the 
+workload node placement strategy. This is the recommended approach, because it enables the 
+logging components to function even if `workload.sas.com/class`-tainted nodes 
+are scaled to zero (in other words, are shut down). Therefore, by default, 
+most of the logging components are deployed to cluster nodes that do not
 have `workload.sas.com/class` taints. On Microsoft Azure, this results
-in pods being deployed on nodes in the `system` nodepool. This is
-the recommended deployment, because it enables logging components to continue to function even
-if `workload.sas.com/class`-tainted nodes are scaled to zero.
+in pods being deployed on nodes in the `system` nodepool. 
 
 To deploy the logging components so that they participate in the SAS Viya workload node
 placement strategy rather than use this recommended deployment, set `NODE_PLACEMENT_ENABLE` to `true` in `$USER_DIR/logging/user.env`.
