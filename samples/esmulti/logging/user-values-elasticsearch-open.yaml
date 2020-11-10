@@ -1,0 +1,33 @@
+# Chart: https://github.com/opendistro-for-elasticsearch/opendistro-build/tree/master/helm
+# Default values: https://github.com/opendistro-for-elasticsearch/opendistro-build/blob/master/helm/opendistro-es/values.yaml
+
+# NOTES:
+#     * When "master" nodes are also serving as "data" nodes they will need more disk space than needed when they are
+#       only  serving as "master" nodes.  The value of the master.persistence.size value shown below takes this into
+#       account.  However, you should review the setting and adjust it as necessary.
+#
+#     * When multi-role Elasticsearch nodes are used, there is generally no reason to deploy additional nodes
+#       performing only a single role.  However, if that is necessary for your particular use-case it is
+#       possible to adjust the configuration below to do so.
+#
+#            * If adding "data" nodes, update the replicas value in the data stanza below to specify
+#              the number of _additional_ data nodes needed.  Remember that the master nodes will continue to
+#              serve as data nodes as well (i.e. the total # of data nodes = # of master nodes + # of data nodes).
+#
+#            * If adding "client" nodes, update the replicas value in the client stanza below to specify
+#              the number of _additional_ client nodes needed.  Remember that the master nodes will continue to
+#              serve as client nodes as well (i.e. the total # of client nodes = # of master nodes + # of client nodes).
+#
+#
+
+elasticsearch:
+   master:
+     replicas: 5
+     persistence:
+       # Size of PVC per master node
+       size: 30Gi
+
+   data:
+     replicas: 0
+   client:
+     replicas: 0

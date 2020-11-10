@@ -1,6 +1,5 @@
 # Optional snippit for federating data from Istio's instance of Prometheus
 
-# https://github.com/helm/charts/tree/master/stable/prometheus-operator#prometheus
 prometheus:
   prometheusSpec:
     # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#kubernetes_sd_config

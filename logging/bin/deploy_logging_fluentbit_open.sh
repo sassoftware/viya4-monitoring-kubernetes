@@ -6,6 +6,8 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
+helm2Fail
+
 HELM_DEBUG="${HELM_DEBUG:-false}"
 
 # Fluent Bit user customizations
@@ -33,7 +35,7 @@ kubectl -n $LOG_NS delete configmap fb-viya-parsers --ignore-not-found
 kubectl -n $LOG_NS create configmap fb-viya-parsers  --from-file=logging/fb/viya-parsers.conf
 
 # Delete any existing Fluent Bit pods in the $LOG_NS namepace (otherwise Helm chart may assume an upgrade w/o reloading updated config
-kubectl -n $LOG_NS delete pods -l "app=fluent-bit"
+kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=es"
 
 # Deploy Fluent Bit via Helm chart
 if [ "$HELM_VER_MAJOR" == "3" ]; then

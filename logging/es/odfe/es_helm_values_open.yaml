@@ -101,34 +101,100 @@ elasticsearch:
     podAnnotations: 
       fluentbit.io/parser: elasticsearch
     replicas: 3
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - v4m-es
+              - key: role
+                operator: In
+                values:
+                - master
+            topologyKey: kubernetes.io/hostname
+          weight: 100
     persistence:
       enabled: true
       #storageClass: alt-storage
       size: 8Gi
-    tolerations:
-    - key: workload.sas.com/class
-      value: stateful
-      effect: NoSchedule
 
   data:
     enabled: true
     podAnnotations:
       fluentbit.io/parser: elasticsearch
     replicas: 3
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - v4m-es
+              - key: role
+                operator: In
+                values:
+                - data
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - v4m-es
+              - key: esdata
+                operator: In
+                values:
+                - "true"
+            topologyKey: kubernetes.io/hostname
+          weight: 50
     persistence:
       enabled: true
       #storageClass: alt-storage
       size: 30Gi
-    tolerations:
-    - key: workload.sas.com/class
-      value: stateful
-      effect: NoSchedule
 
   client:
     enabled: true
     podAnnotations:
       fluentbit.io/parser: elasticsearch
     replicas: 2
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - v4m-es
+              - key: role
+                operator: In
+                values:
+                - client
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - v4m-es
+              - key: esclient
+                operator: In
+                values:
+                - "true"
+            topologyKey: kubernetes.io/hostname
+          weight: 25
 
 kibana:
   imageTag: 1.7.0

@@ -216,14 +216,14 @@ if [ "$success" == "true" ]; then
      logcollector)
        echo ""
        log_notice "+=============================================================================+"
-       log_notice "|                        *********** IMPORTANT NOTE ***********               |"
+       log_notice "|                    *********** IMPORTANT NOTE ***********                   |"
        log_notice "|                                                                             |"
        log_notice "| After changing the password for the [logcollector] user, you should restart |"
        log_notice "| the Fluent Bit pods to ensure log collection is not interrupted.            |"
        log_notice "|                                                                             |"
        log_notice "| This can be done by submitting the following command:                       |"
        log_notice "+=============================================================================+"
-       log_notice "|========== kubectl -n $LOG_NS delete pods -l 'app=fluent-bit' ===============|"
+       log_notice "|======== kubectl -n $LOG_NS delete pods -l 'app=fluent-bit, fbout=es' =======|"
        log_notice "+=============================================================================+"
        echo ""
        ;;

@@ -1,7 +1,7 @@
 # Place overrides for the Prometheus Operator Helm Chart Here
 
-# Chart: https://github.com/helm/charts/blob/master/stable/prometheus-operator/README.md
-# Default values: https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml
+# Chart: https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+# Default values: https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
 
 # Subcharts ued by the Prometheus Operator chart
 # Grafana
@@ -10,7 +10,7 @@
 
 # Prometheus Node Exporter
 # https://github.com/prometheus/node_exporter
-# https://github.com/helm/charts/tree/master/stable/prometheus-node-exporter
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
 
 # kube-state-metrics
 # https://github.com/kubernetes/kube-state-metrics

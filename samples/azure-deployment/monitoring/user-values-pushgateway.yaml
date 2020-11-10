@@ -5,7 +5,7 @@
 #   repository: prom/pushgateway
 #   tag: v1.2.0
 
-# persistentVolume:
-#   enabled: true
-#   size: 2Gi
-#   storageClass: myStorageClass
+persistentVolume:
+  # enabled: true
+  # size: 2Gi
+  storageClass: azuredisk-v4m

@@ -5,6 +5,9 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
+
+helm2Fail
+
 source logging/bin/secrets-include.sh
 
 # Collect Kubernetes events as pseudo-log messages?
@@ -161,13 +164,7 @@ if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
    rm -rf $TMP_DIR/opendistro-build
 fi
 
-# Make Elasticsearch repo available to Helm
-if [[ ! $(helm repo list 2>/dev/null) =~ stable[[:space:]] ]]; then
-  log_info "Adding 'stable' helm repository"
-  helm repo add stable https://kubernetes-charts.storage.googleapis.com
-else
-  log_debug "'stable' helm repository already exists"
-fi
+helmRepoAdd stable https://charts.helm.sh/stable
 
 log_info "Updating helm repositories..."
 helm repo update
@@ -181,25 +178,28 @@ else
    helm $helmDebug upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml  --values "$KB_OPEN_TLS_YAML"  --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 fi
 
-# switch to multi-purpose ES nodes (if enabled)
-if [ "$ES_MULTIPURPOSE_NODES" == "true" ]; then
+# switch to multi-role ES nodes (if enabled)
+if [ "$ES_MULTIROLE_NODES" == "true" ]; then
 
    sleep 10s
-   log_debug "Configuring Elasticsearch to use multi-purpose nodes"
+   log_debug "Configuring Elasticsearch to use multi-role nodes"
 
-   # Reconfigure 'master' nodes to be 'multipupose' nodes (i.e. support master, data and client roles)
+   # Reconfigure 'master' nodes to be 'multi-role' nodes (i.e. support master, data and client roles)
    log_debug "Patching statefulset [v4m-es-master]"
-   kubectl -n $LOG_NS patch statefulset v4m-es-master --patch "$(cat logging/es/odfe/es_multipurpose_nodes_patch.yml)"
+   kubectl -n $LOG_NS patch statefulset v4m-es-master --patch "$(cat logging/es/odfe/es_multirole_nodes_patch.yml)"
 
-   # By default, there will be no single-purpose 'client' or 'data' nodes; but patching corresponding
-   # K8s objects to ensure their use in case user chooses to configure additional single-purpose nodes
+   # Delete existing (unpatched) master pod
+   kubectl -n $LOG_NS delete pod v4m-es-master-0 --ignore-not-found
+
+   # By default, there will be no single-role 'client' or 'data' nodes; but patching corresponding
+   # K8s objects to ensure proper labels are used in case user chooses to configure additional single-role nodes
    log_debug "Patching deployment [v4m-es-client]"
-   kubectl -n $LOG_NS patch deployment v4m-es-client --type=json --patch '[{"op": "add","path": "/metadata/labels/esdata","value": "true" }]'
+   kubectl -n $LOG_NS patch deployment v4m-es-client --type=json --patch '[{"op": "add","path": "/spec/template/metadata/labels/esclient","value": "true" }]'
 
    log_debug "Patching statefulset [v4m-es-data]"
    kubectl -n $LOG_NS patch statefulset v4m-es-data  --type=json --patch '[{"op": "add","path": "/spec/template/metadata/labels/esdata","value": "true" }]'
 
-   # patching 'client' and 'data' _services_ to tie use new multipurpose labels for node selection
+   # patching 'client' and 'data' _services_ to use new multi-role labels for node selection
    log_debug "Patching  service [v4m-es-client-service]"
    kubectl -n $LOG_NS patch service v4m-es-client-service --type=json --patch '[{"op": "remove","path": "/spec/selector/role"},{"op": "add","path": "/spec/selector/esclient","value": "true" }]'
 

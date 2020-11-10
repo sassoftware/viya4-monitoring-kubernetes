@@ -9,6 +9,7 @@
   * Additional Documentation on using TLS [PR: #8]
   * Removed traces of support for ODFE Demo Security Configuration [PR: #5]
   * Alternate solution: Fluent Bit ==> Azure Monitor (Log Analytics workspace) [PR: #18, #21]
+
 ## Version 0.1.2 (20OCT20)
 
 * **Monitoring**

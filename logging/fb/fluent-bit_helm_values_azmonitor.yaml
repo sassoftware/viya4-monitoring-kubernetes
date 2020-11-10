@@ -1,0 +1,45 @@
+image:
+  fluent_bit:
+    tag: 1.5.4
+podAnnotations: 
+  fluentbit.io/parser: fluentbit
+podLabels:
+  fbout: azuremonitor
+#backend:
+  #currently ignored/overwritten by configmap
+  #type: azure
+  #customer_id:  NOT_SET
+  #shared_key: NOT_SET
+metrics:
+  enabled: true
+  service:
+    port: 2020
+  serviceMonitor:
+    enabled: false
+extraVolumeMounts:
+- mountPath: /fluent-bit/etc/viya-parsers.conf
+  name: parsers-config
+  subPath: viya-parsers.conf
+extraVolumes:
+- configMap:
+    defaultMode: 420
+    name: fbaz-viya-parsers
+  name: parsers-config
+fullConfigMap: false
+existingConfigMap: fbaz-fluent-bit-config
+
+env:
+   - name: AZMONITOR_CUSTOMER_ID
+     valueFrom:
+       secretKeyRef:
+         name: connection-info-azmonitor
+         key: customer_id
+   - name: AZMONITOR_SHARED_KEY
+     valueFrom:
+       secretKeyRef:
+         name: connection-info-azmonitor
+         key: shared_key
+
+# Be very tolerant
+tolerations:
+- operator: "Exists"

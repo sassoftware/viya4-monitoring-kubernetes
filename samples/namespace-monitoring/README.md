@@ -108,6 +108,6 @@ This sample produces three instances of Grafana - one that displays metrics for 
 
 ## References
 
-* [Prometheus Operator Helm Chart](https://github.com/helm/charts/tree/master/stable/prometheus-operator)
+* [kube-prometheus-stack Helm Chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
 * [Prometheus Operator Custom Resource Definitions](https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md)
 * [Grafana Helm Chart](https://github.com/helm/charts/tree/master/stable/grafana)
