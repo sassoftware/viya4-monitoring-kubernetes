@@ -74,6 +74,10 @@ spec:
         operator: "Equal"
         value: "stateless"
         effect: "NoSchedule"
+      - key: "workload.sas.com/class"
+        operator: "Equal"
+        value: "stateful"
+        effect: "NoSchedule"
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

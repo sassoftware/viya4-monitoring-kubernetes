@@ -6,6 +6,10 @@ prometheusOperator:
         operator: "Equal"
         value: "stateless"
         effect: "NoSchedule"
+      - key: "workload.sas.com/class"
+        operator: "Equal"
+        value: "stateful"
+        effect: "NoSchedule"
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -38,6 +42,10 @@ prometheusOperator:
     operator: "Equal"
     value: "stateless"
     effect: "NoSchedule"
+  - key: "workload.sas.com/class"
+    operator: "Equal"
+    value: "stateful"
+    effect: "NoSchedule"
   affinity:
     nodeAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -68,6 +76,10 @@ prometheusOperator:
 alertmanager:
   alertmanagerSpec:
     tolerations:
+    - key: "workload.sas.com/class"
+      operator: "Equal"
+      value: "stateless"
+      effect: "NoSchedule"
     - key: "workload.sas.com/class"
       operator: "Equal"
       value: "stateful"
@@ -102,6 +114,10 @@ alertmanager:
 prometheus:
   prometheusSpec:
     tolerations:
+    - key: "workload.sas.com/class"
+      operator: "Equal"
+      value: "stateless"
+      effect: "NoSchedule"
     - key: "workload.sas.com/class"
       operator: "Equal"
       value: "stateful"
@@ -139,6 +155,10 @@ kube-state-metrics:
     operator: "Equal"
     value: "stateless"
     effect: "NoSchedule"
+  - key: "workload.sas.com/class"
+    operator: "Equal"
+    value: "stateful"
+    effect: "NoSchedule"
   affinity:
     nodeAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -168,6 +188,10 @@ kube-state-metrics:
             - system
 grafana:
   tolerations:
+  - key: "workload.sas.com/class"
+    operator: "Equal"
+    value: "stateless"
+    effect: "NoSchedule"
   - key: "workload.sas.com/class"
     operator: "Equal"
     value: "stateful"
