@@ -206,11 +206,11 @@ case "$action" in
       cp logging/es/odfe/rbac $TMP_DIR -r
 
       # Replace PLACEHOLDERS
-      sed -i'.bak' "s/xxIDXPREFI|--/$INDEX_PREFIX/gI"  $TMP_DIR/rbac/*.json                  # IDXPREFIX
-      sed -i'.bak' "s/xxNAMESPACExx/$NAMESPACE/gI"     $TMP_DIR/rbac/*.json                  # NAMESPACE
-      sed -i'.bak' "s/xxPASSWORDxx/$PASSWORD/gI"       $TMP_DIR/rbac/*.json                  # PASSWORD
-      sed -i'.bak' "s/xxCREATEDBYxx/$this_script/gI"   $TMP_DIR/rbac/*.json                  # CREATEDBY
-      sed -i'.bak' "s/xxDATETIMExx/$(date)/gI"         $TMP_DIR/rbac/*.json                  # DATE
+      sed -i'.bak' "s/xxIDXPREFIXxx/$INDEX_PREFIX/g"  $TMP_DIR/rbac/*.json                  # IDXPREFIX
+      sed -i'.bak' "s/xxNAMESPACExx/$NAMESPACE/g"     $TMP_DIR/rbac/*.json                  # NAMESPACE
+      sed -i'.bak' "s/xxPASSWORDxx/$PASSWORD/g"       $TMP_DIR/rbac/*.json                  # PASSWORD
+      sed -i'.bak' "s/xxCREATEDBYxx/$this_script/g"   $TMP_DIR/rbac/*.json                  # CREATEDBY
+      sed -i'.bak' "s/xxDATETIMExx/$(date)/g"         $TMP_DIR/rbac/*.json                  # DATE
 
       log_debug "Contents of user.json template file after substitutions: \n $(cat $TMP_DIR/rbac/user.json)"
 

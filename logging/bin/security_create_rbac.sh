@@ -76,8 +76,8 @@ log_debug "NAMESPACE: $NAMESPACE ROLENAME: $ROLENAME RO_BE_ROLENAME: $RO_BE_ROLE
 cp logging/es/odfe/rbac $TMP_DIR -r
 
 # Replace PLACEHOLDERS
-sed -i'.bak' "s/xxIDXPREFIXxx/$INDEX_PREFIX/gI"  $TMP_DIR/rbac/*.json                  # IDXPREFIX
-sed -i'.bak' "s/xxNAMESPACExx/$NAMESPACE/gI"     $TMP_DIR/rbac/*.json                  # NAMESPACE
+sed -i'.bak' "s/xxIDXPREFIXxx/$INDEX_PREFIX/g"  $TMP_DIR/rbac/*.json                  # IDXPREFIX
+sed -i'.bak' "s/xxNAMESPACExx/$NAMESPACE/g"     $TMP_DIR/rbac/*.json                  # NAMESPACE
 
 
 # get admin credentials
