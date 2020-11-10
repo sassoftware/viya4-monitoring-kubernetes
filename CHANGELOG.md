@@ -4,11 +4,11 @@
 * **Monitoring**
 * **Logging**
   * Support for Crunchy Data 4.5 [PR: #10](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/10)
-  * Support for Changing Retention Period of Log Messages [PR: #11](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/11) [PR:#12](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/12)
+  * Support for Changing Retention Period of Log Messages [PR: #11](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/11), [PR:#12](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/12)
   * Support for Multi-Role Elasticsearch Nodes (including [sample](samples/esmulti/README.md) to demonstrate usage) [PR: #16](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/16),[PR: #19](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/19)
   * Additional Documentation on using TLS [PR: #8](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/8)
   * Removed traces of support for ODFE Demo Security Configuration [PR: #5](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/5)
-  * Alternate solution: Fluent Bit ==> Azure Monitor (Log Analytics workspace) [PR: #18](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/18), PR: #21(https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/21)
+  * Alternate solution: Fluent Bit ==> Azure Monitor (Log Analytics workspace) [PR: #18](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/18), [PR: #21](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/21)
 
 ## Version 0.1.2 (20OCT20)
 
