@@ -5,9 +5,10 @@
 * **Logging**
   * Support for Crunchy Data 4.5 [PR: #10]
   * Support for Changing Retention Period of Log Messages [PR: #11,#12]
-  * Support for Multi-Role Elasticsearch Nodes (including sample to demonstrate usage) [PR: #16]
+  * Support for Multi-Role Elasticsearch Nodes (including sample to demonstrate usage) [PR: #16, #19]
   * Additional Documentation on using TLS [PR: #8]
   * Removed traces of support for ODFE Demo Security Configuration [PR: #5]
+  * Alternate solution: Fluent Bit ==> Azure Monitor (Log Analytics workspace) [PR: #18, #21]
 ## Version 0.1.2 (20OCT20)
 
 * **Monitoring**
