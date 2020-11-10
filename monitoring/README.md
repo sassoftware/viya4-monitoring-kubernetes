@@ -93,14 +93,14 @@ area of this repository to set up either host-based or path-based ingress.
 
 ## Workload Node Placement
 
-By default, monitoring components get deployed to cluster nodes **not**
-with `workload.sas.com/class` taints. On Microsoft Azure, this will result
+By default, monitoring components are deployed to cluster nodes that do **not**
+have `workload.sas.com/class` taints. On Microsoft Azure, this results
 in pods being deployed on nodes in the `system` nodepool. This is
-the recommended approach so monitoring and logging components will continue
-to function even if `workload.sas.com/class`-tainted nodes are scaled to zero.
+the recommended deployment, because it enables monitoring components to 
+continue to function even if `workload.sas.com/class`-tainted nodes are scaled to zero.
 
-To enable monitoring components to participate in the SAS Viya workload node
-placement strategy, set `NODE_PLACEMENT_ENABLE` or `MON_NODE_PLACEMENT_ENABLE`
+To deploy the monitoring components so that they participate in the SAS Viya workload node
+placement strategy rather than use this recommended deployment, set `MON_NODE_PLACEMENT_ENABLE`
 to `true` in `$USER_DIR/monitoring/user.env`.
 
 ## Istio Integration
