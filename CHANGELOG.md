@@ -1,4 +1,4 @@
-# SAS Viya Monitoring for Kuberneteses
+# SAS Viya Monitoring for Kubernetes
 
 ## Version 0.1.3 (11NOV20)
 
@@ -20,18 +20,18 @@
   support merged services
 
 * **Logging**
-  * Support for Crunchy Data 4.5 [PR: #10](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/10)
-  * Support for Changing Retention Period of Log Messages
+  * Support for SAS Viya move to Crunchy Data 4.5 [PR: #10](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/10)
+  * Support for [changing retention period](logging/Log_Retention.md) of log messages
   [PR: #11](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/11),
   [PR:#12](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/12)
   * Node anti-affinity for Elasticsearch replicas
   [PR: #15](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/15)
-  * Support for Multi-Role Elasticsearch Nodes (including [sample](samples/esmulti/README.md)
+  * Support for multi-role Elasticsearch nodes (including [sample](samples/esmulti/README.md)
   to demonstrate usage) [PR: #16](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/16),
   [PR: #19](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/19)
-  * Additional Documentation on using TLS [PR: #8](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/8)
-  * Removed traces of support for ODFE Demo Security Configuration [PR: #5](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/5)
-  * [Alternate solution](logging/AZURE_LOG_ANALYTICS_WORKSPACES.md): Fluent Bit
+  * Additional documentation on using TLS [PR: #8](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/8)
+  * Removed traces of support for ODFE "demo" security configuration [PR: #5](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/5)
+  * [Alternate monitoring solution](proof-of-concept)(logging/AZURE_LOG_ANALYTICS_WORKSPACES.md): Fluent Bit
   ==> Azure Monitor (Log Analytics workspace) [PR: #18](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/18),
   [PR: #21](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/21)
 
