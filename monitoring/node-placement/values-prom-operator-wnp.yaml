@@ -1,0 +1,225 @@
+prometheusOperator:
+  admissionWebhooks:
+    patch:
+      tolerations:
+      - key: "workload.sas.com/class"
+        operator: "Equal"
+        value: "stateless"
+        effect: "NoSchedule"
+      - key: "workload.sas.com/class"
+        operator: "Equal"
+        value: "stateful"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: workload.sas.com/class
+                operator: In
+                values:
+                - stateless
+          - weight: 50
+            preference:
+              matchExpressions:
+              - key: workload.sas.com/class
+                operator: NotIn
+                values:
+                - compute
+                - cas
+                - stateful
+                - connect
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.azure.com/mode
+                operator: NotIn
+                values:
+                - system
+  tolerations:
+  - key: "workload.sas.com/class"
+    operator: "Equal"
+    value: "stateless"
+    effect: "NoSchedule"
+  - key: "workload.sas.com/class"
+    operator: "Equal"
+    value: "stateful"
+    effect: "NoSchedule"
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+          - key: workload.sas.com/class
+            operator: In
+            values:
+            - stateless
+      - weight: 50
+        preference:
+          matchExpressions:
+          - key: workload.sas.com/class
+            operator: NotIn
+            values:
+            - compute
+            - cas
+            - stateful
+            - connect
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.azure.com/mode
+            operator: NotIn
+            values:
+            - system
+alertmanager:
+  alertmanagerSpec:
+    tolerations:
+    - key: "workload.sas.com/class"
+      operator: "Equal"
+      value: "stateless"
+      effect: "NoSchedule"
+    - key: "workload.sas.com/class"
+      operator: "Equal"
+      value: "stateful"
+      effect: "NoSchedule"
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+            - key: workload.sas.com/class
+              operator: In
+              values:
+              - stateful
+        - weight: 50
+          preference:
+            matchExpressions:
+            - key: workload.sas.com/class
+              operator: NotIn
+              values:
+              - compute
+              - cas
+              - stateless
+              - connect
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: kubernetes.azure.com/mode
+              operator: NotIn
+              values:
+              - system
+prometheus:
+  prometheusSpec:
+    tolerations:
+    - key: "workload.sas.com/class"
+      operator: "Equal"
+      value: "stateless"
+      effect: "NoSchedule"
+    - key: "workload.sas.com/class"
+      operator: "Equal"
+      value: "stateful"
+      effect: "NoSchedule"
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+            - key: workload.sas.com/class
+              operator: In
+              values:
+              - stateful
+        - weight: 50
+          preference:
+            matchExpressions:
+            - key: workload.sas.com/class
+              operator: NotIn
+              values:
+              - compute
+              - cas
+              - stateless
+              - connect
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: kubernetes.azure.com/mode
+              operator: NotIn
+              values:
+              - system
+kube-state-metrics:
+  tolerations:
+  - key: "workload.sas.com/class"
+    operator: "Equal"
+    value: "stateless"
+    effect: "NoSchedule"
+  - key: "workload.sas.com/class"
+    operator: "Equal"
+    value: "stateful"
+    effect: "NoSchedule"
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+          - key: workload.sas.com/class
+            operator: In
+            values:
+            - stateless
+      - weight: 50
+        preference:
+          matchExpressions:
+          - key: workload.sas.com/class
+            operator: NotIn
+            values:
+            - compute
+            - cas
+            - stateful
+            - connect
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.azure.com/mode
+            operator: NotIn
+            values:
+            - system
+grafana:
+  tolerations:
+  - key: "workload.sas.com/class"
+    operator: "Equal"
+    value: "stateless"
+    effect: "NoSchedule"
+  - key: "workload.sas.com/class"
+    operator: "Equal"
+    value: "stateful"
+    effect: "NoSchedule"
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+          - key: workload.sas.com/class
+            operator: In
+            values:
+            - stateful
+      - weight: 50
+        preference:
+          matchExpressions:
+          - key: workload.sas.com/class
+            operator: NotIn
+            values:
+            - compute
+            - cas
+            - stateless
+            - connect
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.azure.com/mode
+            operator: NotIn
+            values:
+            - system

@@ -19,6 +19,9 @@ ES_MULTIPURPOSE_NODES=${ES_MULTIPURPOSE_NODES:-false}
 # Require TLS into Kibana?
 LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-false}
 
+# Enable workload node placement?
+LOG_NODE_PLACEMENT_ENABLE=${LOG_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
+
 source bin/tls-include.sh
 verify_cert_manager
 
@@ -75,9 +78,14 @@ log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 
 if [ "$EVENTROUTER_ENABLE" == "true" ]; then
   log_info "STEP 1: Deploying eventrouter..."
-  kubectl apply -f logging/eventrouter.yaml
+  if [ "$LOG_NODE_PLACEMENT_ENABLE" == "true" ]; then
+    log_info "Enabling eventrouter for workload node placement"
+    kubectl apply -f logging/node-placement/eventrouter-wnp.yaml
+  else
+    log_debug "Workload node placement support is disabled for eventrouter"
+    kubectl apply -f logging/eventrouter.yaml
+  fi
 fi
-
 
 if [ "$LOG_KB_TLS_ENABLE" == "true" ]; then
    # Kibana TLS-specific Helm chart values currently maintained in separate YAML file
@@ -169,13 +177,22 @@ helmRepoAdd stable https://charts.helm.sh/stable
 log_info "Updating helm repositories..."
 helm repo update
 
+# Optional workload node placement support
+if [ "$LOG_NODE_PLACEMENT_ENABLE" == "true" ]; then
+  log_info "Enabling elasticsearch for workload node placement"
+  wnpValuesFile="logging/node-placement/values-elasticsearch-open-wnp.yaml"
+else
+  log_debug "Workload node placement support is disabled for elasticsearch"
+  wnpValuesFile="$TMP_DIR/empty.yaml"
+fi
+
 # Deploy Elasticsearch via Helm chart
 if [ "$HELM_VER_MAJOR" == "3" ]; then
    helm2ReleaseCheck odfe-$LOG_NS
-   helm $helmDebug upgrade --install odfe --namespace $LOG_NS  --values logging/es/odfe/es_helm_values_open.yaml  --values "$KB_OPEN_TLS_YAML" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
+   helm $helmDebug upgrade --install odfe --namespace $LOG_NS  --values logging/es/odfe/es_helm_values_open.yaml  --values "$KB_OPEN_TLS_YAML" --values "$wnpValuesFile" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 else
    helm3ReleaseCheck odfe $LOG_NS
-   helm $helmDebug upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml  --values "$KB_OPEN_TLS_YAML"  --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
+   helm $helmDebug upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml  --values "$KB_OPEN_TLS_YAML"  --values "$wnpValuesFile" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 fi
 
 # switch to multi-role ES nodes (if enabled)
@@ -408,6 +425,14 @@ rm -f $tmpfile
 
 sleep 7s
 
+# Optional workload node placement support
+if [ "$LOG_NODE_PLACEMENT_ENABLE" == "true" ]; then
+  log_info "Enabling elasticsearch exporter for workload node placement"
+  wnpValuesFile="logging/node-placement/values-elasticsearch-exporter-wnp.yaml"
+else
+  log_debug "Workload node placement support is disabled for the elasticsearch exporter"
+  wnpValuesFile="$TMP_DIR/empty.yaml"
+fi
 
 log_info "STEP 3: Deploying Elasticsearch metric exporter"
 
@@ -419,6 +444,7 @@ if [ "$ELASTICSEARCH_EXPORTER_ENABLED" == "true" ]; then
       helm $helmDebug upgrade --install es-exporter \
       --namespace $LOG_NS \
       -f logging/es/odfe/values-es-exporter_open.yaml \
+      -f $wnpValuesFile \
       -f $ES_OPEN_EXPORTER_USER_YAML \
       stable/elasticsearch-exporter
    else
@@ -426,6 +452,7 @@ if [ "$ELASTICSEARCH_EXPORTER_ENABLED" == "true" ]; then
       helm upgrade --install es-exporter-$LOG_NS \
       --namespace $LOG_NS \
       -f logging/es/odfe/values-es-exporter_open.yaml \
+      -f wnpValuesFile \
       -f $ES_OPEN_EXPORTER_USER_YAML \
       stable/elasticsearch-exporter
    fi

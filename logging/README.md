@@ -103,12 +103,27 @@ elasticsearch:     # Uncommented b/c 'master' is uncommented
       storageClass: alt-storage  # Uncommented to direct ES to alt-storage storageClass
 ```
 
+### Workload Node Placement
+
+SAS Viya is deployed using a workload node placement strategy, which uses the 
+`workload.sas.com/class` taint to optimize the placement of its components on 
+Kubernetes nodes. By default, the logging components do **not** participate in the 
+workload node placement strategy. This is the recommended approach, because it enables the 
+logging components to function even if `workload.sas.com/class`-tainted nodes 
+are scaled to zero (in other words, are shut down). Therefore, by default, 
+most of the logging components are deployed to cluster nodes that do not
+have `workload.sas.com/class` taints. On Microsoft Azure, this results
+in pods being deployed on nodes in the `system` nodepool. 
+
+To deploy the logging components so that they participate in the SAS Viya workload node
+placement strategy rather than use this recommended deployment, set `NODE_PLACEMENT_ENABLE` to `true` in `$USER_DIR/logging/user.env`.
+
 ### Evaluate Storage Considerations
 
 #### Provision Persistent Volumes or Persistent Volume Claims
 
 Multiple persistent volume claims (PVCs) are created when Elasticsearch is
-installed. The depoyment script assumes that your cluster has some form of
+installed. The deployment script assumes that your cluster has some form of
 dynamic volume provisioning in place that will automatically provision
 storage to support PVCs. However, if your cluster
 does not have such a provisioner, you must manually create the
@@ -186,7 +201,7 @@ are working, access Kibana and review the log messages that are collected.
 
 __Note:__ The displayed URL for Kibana might not be correct if you defined
 ingress objects or if your networking rules alter how hosts are accessed. If
-this is the case, contact your Kubernetes administator to determine the proper
+this is the case, contact your Kubernetes administrator to determine the proper
 host, port and/or path to access Kibana.
 
 ### Use Kibana to Validate Logging

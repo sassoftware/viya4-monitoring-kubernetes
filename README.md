@@ -38,7 +38,8 @@ This is an example of a Grafana dashboard for cluster monitoring.
 This is an example of a Grafana dashboard for SAS CAS monitoring.
 ![Grafana - SAS CAS Monitoring](img/screenshot-grafana-cas.png)
 
-See the documentation at [SAS Viya: Monitoring](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calmonitoring&docsetTarget=titlepage.htm) for more information about using the monitoring components.
+See the documentation at [SAS Viya: Monitoring](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calmonitoring&docsetTarget=titlepage.htm)
+for more information about using the monitoring components.
 
 ## Logging - Aggregation, Searching, & Filtering
 
@@ -57,7 +58,8 @@ The logging solution includes these components:
 
   ![Kibana - Log Message Volume Dashboard](img/screenshot-logs-dashboard.png)
 
-See the documentation at [SAS Viya: Logging](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=titlepage.htm) for more information about using the logging components.
+See the documentation at [SAS Viya: Logging](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=titlepage.htm)
+for more information about using the logging components.
 
 ## Prerequisites
 
@@ -82,10 +84,11 @@ including Fluent Bit, Elasticsearch, and Kibana.
 
 ### Customization
 
-The components that are deployed are highly customizable. The recommended approach for customization is
-to set a `USER_DIR` environment variable. `USER_DIR` points to a directory
-containing user-modified customization files which can exist outside of your repository.
-You can use customization files to check in environment-specific customizations into a separate Git repository, for example.
+The components that are deployed are highly customizable. The recommended
+approach for customization is to set a `USER_DIR` environment variable. `USER_DIR`
+points to a directory containing user-modified customization files which can exist
+outside of your repository. You can use customization files to check in
+environment-specific customizations into a separate Git repository, for example.
 
 `USER_DIR` must refer to a directory. The directory can include any or all of
 the following files in the structure below. Additional content is allowed, but
@@ -107,7 +110,7 @@ will be ignored.
 ### Default StorageClass
 
 The default cluster StorageClass is used for both monitoring and logging
-unless the value is specifically set in `user-*.yaml` files for monitoring or logging. The
-deployment scripts issue a warning if no default StorageClass is
+unless the value is specifically set in `user-*.yaml` files for monitoring or
+logging. The deployment scripts issue a warning if no default StorageClass is
 available, even if the value is properly set by the user. In this case,
 you can safely ignore the warning.
