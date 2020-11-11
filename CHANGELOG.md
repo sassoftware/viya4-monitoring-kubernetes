@@ -20,20 +20,15 @@
   support merged services
 
 * **Logging**
-  * Support for SAS Viya move to Crunchy Data 4.5 [PR: #10](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/10)
+  * Support for SAS Viya move to Crunchy Data 4.5
   * Support for [changing retention period](logging/Log_Retention.md) of log messages
-  [PR: #11](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/11),
-  [PR:#12](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/12)
   * Node anti-affinity for Elasticsearch replicas
-  [PR: #15](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/15)
   * Support for multi-role Elasticsearch nodes (including [sample](samples/esmulti/README.md)
-  to demonstrate usage) [PR: #16](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/16),
-  [PR: #19](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/19)
-  * Additional documentation on using TLS [PR: #8](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/8)
-  * Removed traces of support for ODFE "demo" security configuration [PR: #5](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/5)
+  to demonstrate usage) 
+  * Additional documentation on using TLS
+  * Removed traces of support for ODFE "demo" security configuration
   * [Alternate monitoring solution](proof-of-concept)(logging/AZURE_LOG_ANALYTICS_WORKSPACES.md): Fluent Bit
-  ==> Azure Monitor (Log Analytics workspace) [PR: #18](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/18),
-  [PR: #21](https://github.com/sassoftware/viya4-monitoring-kubernetes/pull/21)
+  ==> Azure Monitor (Log Analytics workspace)
 
 ## Version 0.1.2 (20OCT20)
 
