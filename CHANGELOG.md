@@ -27,7 +27,7 @@
   to demonstrate usage) 
   * Additional documentation on using TLS
   * Removed traces of support for ODFE "demo" security configuration
-  * [Alternate monitoring solution](proof-of-concept)(logging/AZURE_LOG_ANALYTICS_WORKSPACES.md): Fluent Bit
+  * [Alternate monitoring solution](logging/AZURE_LOG_ANALYTICS_WORKSPACES.md)(proof-of-concept): Fluent Bit
   ==> Azure Monitor (Log Analytics workspace)
 
 ## Version 0.1.2 (20OCT20)
