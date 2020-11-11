@@ -3,12 +3,12 @@
 ## Version 0.1.3 (11NOV20)
 
 * **Overall**
+  * [Helm 2.x has reached end-of-life](https://github.com/helm/helm/releases/tag/v2.17.0)
+  and is no longer supported. Helm 3.x is now required.
   * Support added for the [SAS Viya Workload Node Placement](https://go.documentation.sas.com/?cdcId=itopscdc&cdcVersion=default&docsetId=dplyml0phy0dkr&docsetTarget=p0om33z572ycnan1c1ecfwqntf24.htm&locale=en)
     * By default, monitoring and logging pods are deployed to untainted nodes
     * A new flag, `NODE_PLACEMENT_ENABLE` supports deploying pods to appropriate
     workload node placement nodes
-  * [Helm 2.x has reached end-of-life](https://github.com/helm/helm/releases/tag/v2.17.0)
-  and is no longer supported. Helm 3.x is now required.
 
 * **Monitoring**
   * Several helm charts have moved from [stable](https://charts.helm.sh/stable)
