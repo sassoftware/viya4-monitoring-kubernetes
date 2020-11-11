@@ -102,7 +102,7 @@ done
 # set positional arguments in their proper place
 eval set -- "$POS_PARMS"
 
-action=${1^^}
+action=$(echo $1|tr '[a-z]' '[A-Z]')
 shift
 
 log_debug "Action: $action"
