@@ -101,12 +101,8 @@ if [ "$TLS_ENABLE" == "true" ]; then
   cat monitoring/tls/values-prom-operator-tls.yaml >> $genValuesFile
 
   log_info "Provisioning TLS-enabled Prometheus datasource for Grafana..."
-  cp monitoring/tls/grafana-datasource-prom-https.yaml $TMP_DIR/grafana-datasource-prom-https.yaml
-  kubectl delete cm -n $MON_NS --ignore-not-found v4m-grafana-datasource
-  echo "      url: https://v4m-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
-  
   kubectl delete cm -n $MON_NS --ignore-not-found grafana-datasource-prom-https
-  kubectl create cm -n $MON_NS grafana-datasource-prom-https --from-file $TMP_DIR/grafana-datasource-prom-https.yaml
+  kubectl create cm -n $MON_NS grafana-datasource-prom-https --from-file monitoring/tls/grafana-datasource-prom-https.yaml
   kubectl label cm -n $MON_NS grafana-datasource-prom-https grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
 
   # node-exporter TLS
