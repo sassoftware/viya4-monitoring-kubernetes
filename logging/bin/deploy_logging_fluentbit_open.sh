@@ -6,9 +6,12 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
-helm2Fail
-
 HELM_DEBUG="${HELM_DEBUG:-false}"
+if [ "$HELM_DEBUG" == "true" ]; then
+  helmDebug="--debug"
+fi
+
+helm2ReleaseCheck fb-$LOG_NS
 
 # Fluent Bit user customizations
 FB_OPEN_USER_YAML="${FB_OPEN_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-open.yaml}"
@@ -38,10 +41,4 @@ kubectl -n $LOG_NS create configmap fb-viya-parsers  --from-file=logging/fb/viya
 kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=es"
 
 # Deploy Fluent Bit via Helm chart
-if [ "$HELM_VER_MAJOR" == "3" ]; then
-   helm2ReleaseCheck fb-$LOG_NS
-   helm $helmDebug upgrade --install --namespace $LOG_NS fb --values logging/fb/fluent-bit_helm_values_open.yaml --values $FB_OPEN_USER_YAML  --set fullnameOverride=v4m-fb stable/fluent-bit
-else
-   helm3ReleaseCheck fb $LOG_NS
-   helm $helmDebug upgrade --install fb-$LOG_NS --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_open.yaml   --values $FB_OPEN_USER_YAML --set fullnameOverride=v4m-fb stable/fluent-bit
-fi
+helm $helmDebug upgrade --install --namespace $LOG_NS fb --values logging/fb/fluent-bit_helm_values_open.yaml --values $FB_OPEN_USER_YAML  --set fullnameOverride=v4m-fb stable/fluent-bit

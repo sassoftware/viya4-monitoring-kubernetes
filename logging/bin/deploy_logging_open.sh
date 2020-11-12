@@ -6,8 +6,6 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
-helm2Fail
-
 source logging/bin/secrets-include.sh
 
 # Collect Kubernetes events as pseudo-log messages?
@@ -34,16 +32,12 @@ if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
 
+helm2ReleaseCheck odfe-$LOG_NS
+
 # Check for existing OpenDistro helm release
 existingODFE="false"
-if [ "$HELM_VER_MAJOR" == "3" ]; then
-  if [ helm status -n $LOG_NS odfe 1>/dev/null 2>&1 ]; then
-    existingODFE="true"
-  fi
-else
-  if [ helm status odfe-$LOG_NS 1>/dev/null 2>&1 ]; then
-    existingODFE="true"
-  fi
+if [ helm status -n $LOG_NS odfe 1>/dev/null 2>&1 ]; then
+   existingODFE="true"
 fi
 
 # Elasticsearch user customizations
@@ -187,13 +181,7 @@ else
 fi
 
 # Deploy Elasticsearch via Helm chart
-if [ "$HELM_VER_MAJOR" == "3" ]; then
-   helm2ReleaseCheck odfe-$LOG_NS
-   helm $helmDebug upgrade --install odfe --namespace $LOG_NS  --values logging/es/odfe/es_helm_values_open.yaml  --values "$KB_OPEN_TLS_YAML" --values "$wnpValuesFile" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
-else
-   helm3ReleaseCheck odfe $LOG_NS
-   helm $helmDebug upgrade --install odfe-$LOG_NS --namespace $LOG_NS --values logging/es/odfe/es_helm_values_open.yaml  --values "$KB_OPEN_TLS_YAML"  --values "$wnpValuesFile" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
-fi
+helm $helmDebug upgrade --install odfe --namespace $LOG_NS  --values logging/es/odfe/es_helm_values_open.yaml  --values "$KB_OPEN_TLS_YAML" --values "$wnpValuesFile" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 
 # switch to multi-role ES nodes (if enabled)
 if [ "$ES_MULTIROLE_NODES" == "true" ]; then
@@ -439,23 +427,15 @@ log_info "STEP 3: Deploying Elasticsearch metric exporter"
 ELASTICSEARCH_EXPORTER_ENABLED=${ELASTICSEARCH_EXPORTER_ENABLED:-true}
 if [ "$ELASTICSEARCH_EXPORTER_ENABLED" == "true" ]; then
    # Elasticsearch metric exporter
-   if [ "$HELM_VER_MAJOR" == "3" ]; then
-      helm2ReleaseCheck es-exporter-$LOG_NS
-      helm $helmDebug upgrade --install es-exporter \
-      --namespace $LOG_NS \
-      -f logging/es/odfe/values-es-exporter_open.yaml \
-      -f $wnpValuesFile \
-      -f $ES_OPEN_EXPORTER_USER_YAML \
-      stable/elasticsearch-exporter
-   else
-      helm3ReleaseCheck es-exporter $LOG_NS
-      helm upgrade --install es-exporter-$LOG_NS \
-      --namespace $LOG_NS \
-      -f logging/es/odfe/values-es-exporter_open.yaml \
-      -f wnpValuesFile \
-      -f $ES_OPEN_EXPORTER_USER_YAML \
-      stable/elasticsearch-exporter
-   fi
+   helm2ReleaseCheck es-exporter-$LOG_NS
+   helm $helmDebug upgrade --install es-exporter \
+   --namespace $LOG_NS \
+   -f logging/es/odfe/values-es-exporter_open.yaml \
+   -f $wnpValuesFile \
+   -f $ES_OPEN_EXPORTER_USER_YAML \
+   stable/elasticsearch-exporter
+else
+  log_debug "Elasticsearch exporter deployment disabled"
 fi
 
 # Kibana

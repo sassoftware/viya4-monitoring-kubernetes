@@ -14,15 +14,10 @@ if [ "$VIYA_NS" == "" ]; then
 fi
 
 helm2ReleaseCheck pushgateway-$VIYA_NS
-helm3ReleaseCheck prometheus-pushgateway $VIYA_NS
 
 # Delete the old names (will be removed in the future)
 log_info "Removing third-party exporters..."
-if [ "$HELM_VER_MAJOR" == "2" ]; then
-  helm delete --purge pushgateway-$VIYA_NS 2>/dev/null
-else
-  helm delete --namespace $VIYA_NS prometheus-pushgateway 2>/dev/null
-fi
+helm delete --namespace $VIYA_NS prometheus-pushgateway 2>/dev/null
 
 log_info "Removing ServiceMonitors in the [$VIYA_NS] namespace..."
 monitors=( sas-java-services sas-go-services sas-arke sas-cas-server sas-deployment-operator sas-cas-operator sas-postgres sas-rabbitmq-server pushgateway )
