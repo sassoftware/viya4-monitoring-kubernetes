@@ -5,6 +5,7 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
+source logging/bin/buildcharts.sh
 
 set -e
 
@@ -15,6 +16,9 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   log_error "The specified namespace [$LOG_NS] does not exist."
   exit 9
 fi
+
+# build Fluent Bit helm chart
+build_chart fluent-bit fluent-bit-2.10.3.tgz
 
 
 # Fluent Bit user customizations
@@ -69,10 +73,10 @@ kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=azuremonitor"
 # Deploy Fluent Bit via Helm chart
 if [ "$HELM_VER_MAJOR" == "3" ]; then
    helm2ReleaseCheck fb-$LOG_NS
-   helm $helmDebug upgrade --install fbaz         --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_azmonitor.yaml --values $FB_AZMONITOR_USER_YAML  --set fullnameOverride=v4m-fbaz stable/fluent-bit
+   helm $helmDebug upgrade --install fbaz         --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_azmonitor.yaml --values $FB_AZMONITOR_USER_YAML  --set fullnameOverride=v4m-fbaz  fluent-bit-2.10.3.tgz
 else
    helm3ReleaseCheck fb $LOG_NS
-   helm $helmDebug upgrade --install fbaz-$LOG_NS --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_azmonitor.yaml   --values $FB_AZMONITOR_USER_YAML --set fullnameOverride=v4m-fbaz stable/fluent-bit
+   helm $helmDebug upgrade --install fbaz-$LOG_NS --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_azmonitor.yaml   --values $FB_AZMONITOR_USER_YAML --set fullnameOverride=v4m-fbaz  fluent-bit-2.10.3.tgz
 fi
 
 log_info "Fluent Bit deployment completed"

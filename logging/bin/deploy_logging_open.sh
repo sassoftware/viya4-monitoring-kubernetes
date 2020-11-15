@@ -5,6 +5,7 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
+source logging/bin/buildcharts.sh
 
 helm2Fail
 
@@ -435,6 +436,9 @@ else
 fi
 
 log_info "STEP 3: Deploying Elasticsearch metric exporter"
+
+# build Fluent Bit helm chart
+build_chart elasticsearch-exporter elasticsearch-exporter-3.7.1.tgz
 
 ELASTICSEARCH_EXPORTER_ENABLED=${ELASTICSEARCH_EXPORTER_ENABLED:-true}
 if [ "$ELASTICSEARCH_EXPORTER_ENABLED" == "true" ]; then
