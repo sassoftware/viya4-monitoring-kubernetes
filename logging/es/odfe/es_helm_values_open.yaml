@@ -98,6 +98,7 @@ elasticsearch:
 
   master:
     enabled: true
+    javaOpts: "-Xms1024m -Xmx1024m"
     podAnnotations: 
       fluentbit.io/parser: elasticsearch
     replicas: 3
@@ -124,6 +125,7 @@ elasticsearch:
 
   data:
     enabled: true
+    javaOpts: "-Xms1024m -Xmx1024m"
     podAnnotations:
       fluentbit.io/parser: elasticsearch
     replicas: 3
