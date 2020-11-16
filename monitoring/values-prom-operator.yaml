@@ -162,7 +162,7 @@ nodeExporter:
 # =======
 # Grafana
 # =======
-# https://github.com/helm/charts/tree/master/stable/grafana
+# https://github.com/grafana/helm-charts/tree/main/charts/grafana
 grafana:
   image:
     tag: "7.2.2"
@@ -181,7 +181,7 @@ grafana:
     type: NodePort
     nodePort: 31100
   # TODO: Use secret for Grafana admin user/password
-  # See: https://github.com/helm/charts/tree/master/stable/grafana
+  # See: https://github.com/grafana/helm-charts/tree/main/charts/grafana
   adminPassword: admin
   plugins:
   - grafana-piechart-panel

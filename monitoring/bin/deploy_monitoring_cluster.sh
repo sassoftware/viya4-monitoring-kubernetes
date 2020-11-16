@@ -33,6 +33,7 @@ fi
 set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
 
+# The stable repo is used indirectly by prometheus-community/kube-prometheus-stack
 helmRepoAdd stable https://charts.helm.sh/stable
 helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
 
