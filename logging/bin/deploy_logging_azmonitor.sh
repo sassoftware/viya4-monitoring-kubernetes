@@ -12,14 +12,6 @@ EVENTROUTER_ENABLE=${EVENTROUTER_ENABLE:-true}
 # Deploy Fluent Bit?
 FLUENT_BIT_ENABLED=${FLUENT_BIT_ENABLED:-true}
 
-# enable debug on Helm via env var
-export HELM_DEBUG="${HELM_DEBUG:-false}"
-
-if [ "$HELM_DEBUG" == "true" ]; then
-  helmDebug="--debug"
-fi
-
-
 # temp file used to capture command output
 tmpfile=$TMP_DIR/output.txt
 rm -f tmpfile

@@ -7,4 +7,4 @@
       jsonData:
         tlsSkipVerify: true
       editable: true
-      # url: appened by script
+      url: https://v4m-prometheus

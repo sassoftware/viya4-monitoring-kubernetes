@@ -25,9 +25,6 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     log_debug "Working directory: $(pwd)"
     log_debug "User directory: $USER_DIR"
     log_info "Helm client version: $HELM_VER_FULL"
-    if [ "$HELM_VER_MAJOR" == "2" ] && [ "$HELM_SERVER_VER_FULL" != "" ]; then
-      log_info "Helm server version: $HELM_SERVER_VER_FULL"
-    fi
 
     log_info Kubernetes client version: "$KUBE_CLIENT_VER"
     log_info Kubernetes server version: "$KUBE_SERVER_VER"

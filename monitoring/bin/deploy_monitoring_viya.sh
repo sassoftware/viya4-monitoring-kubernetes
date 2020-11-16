@@ -6,8 +6,6 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 
-helm2Fail
-
 checkDefaultStorageClass
 
 HELM_DEBUG="${HELM_DEBUG:-false}"
@@ -50,23 +48,13 @@ set -e
 PUSHGATEWAY_ENABLED=${PUSHGATEWAY_ENABLED:-true}
 if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
   log_info "Installing the Prometheus Pushgateway to the [$VIYA_NS] namespace"
-  if [ "$HELM_VER_MAJOR" == "2" ]; then
-    helm3ReleaseCheck prometheus-pushgateway $VIYA_NS
-    helm $helmDebug upgrade --install pushgateway-$VIYA_NS \
-    --namespace $VIYA_NS \
-    -f monitoring/values-pushgateway.yaml \
-    -f $wnpValuesFile \
-    -f $PUSHGATEWAY_USER_YAML \
-    prometheus-community/prometheus-pushgateway
-  else
-    helm2ReleaseCheck pushgateway-$VIYA_NS
-    helm $helmDebug upgrade --install prometheus-pushgateway \
-    --namespace $VIYA_NS \
-    -f monitoring/values-pushgateway.yaml \
-    -f $wnpValuesFile \
-    -f $PUSHGATEWAY_USER_YAML \
-    prometheus-community/prometheus-pushgateway
-  fi
+  helm2ReleaseCheck pushgateway-$VIYA_NS
+  helm $helmDebug upgrade --install prometheus-pushgateway \
+  --namespace $VIYA_NS \
+  -f monitoring/values-pushgateway.yaml \
+  -f $wnpValuesFile \
+  -f $PUSHGATEWAY_USER_YAML \
+  prometheus-community/prometheus-pushgateway
 fi
 
 if [ "$(kubectl get crd servicemonitors.monitoring.coreos.com -o name 2>/dev/null)" ]; then

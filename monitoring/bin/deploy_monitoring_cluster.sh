@@ -6,15 +6,11 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 
-helm2Fail
-
 source bin/tls-include.sh
 verify_cert_manager
 
 helm2ReleaseCheck v4m-$MON_NS
 helm2ReleaseCheck prometheus-$MON_NS
-helm3ReleaseCheck v4m-prometheus-operator $MON_NS
-helm3ReleaseCheck prometheus-operator $MON_NS
 checkDefaultStorageClass
 
 export HELM_DEBUG="${HELM_DEBUG:-false}"
@@ -37,6 +33,7 @@ fi
 set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
 
+# The stable repo is used indirectly by prometheus-community/kube-prometheus-stack
 helmRepoAdd stable https://charts.helm.sh/stable
 helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
 
@@ -105,17 +102,8 @@ if [ "$TLS_ENABLE" == "true" ]; then
   cat monitoring/tls/values-prom-operator-tls.yaml >> $genValuesFile
 
   log_info "Provisioning TLS-enabled Prometheus datasource for Grafana..."
-  cp monitoring/tls/grafana-datasource-prom-https.yaml $TMP_DIR/grafana-datasource-prom-https.yaml
-  if [ "$HELM_VER_MAJOR" == "3" ]; then
-    kubectl delete cm -n $MON_NS --ignore-not-found v4m-grafana-datasource
-    echo "      url: https://v4m-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
-  else
-    kubectl delete cm -n $MON_NS --ignore-not-found v4m-$MON_NS-grafana-datasource
-    echo "      url: https://v4m-$MON_NS-prom-prometheus" >> $TMP_DIR/grafana-datasource-prom-https.yaml
-  fi
-
   kubectl delete cm -n $MON_NS --ignore-not-found grafana-datasource-prom-https
-  kubectl create cm -n $MON_NS grafana-datasource-prom-https --from-file $TMP_DIR/grafana-datasource-prom-https.yaml
+  kubectl create cm -n $MON_NS grafana-datasource-prom-https --from-file monitoring/tls/grafana-datasource-prom-https.yaml
   kubectl label cm -n $MON_NS grafana-datasource-prom-https grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
 
   # node-exporter TLS
@@ -126,59 +114,32 @@ if [ "$TLS_ENABLE" == "true" ]; then
   kubectl label cm -n $MON_NS node-exporter-tls-web-config sas.com/monitoring-base=kube-viya-monitoring
 fi
 
-log_info "Deploying the Kube Prometheus Stack. This may take a few minutes..."
 log_info "User response file: [$PROM_OPER_USER_YAML]"
-if [ "$HELM_VER_MAJOR" == "3" ]; then
-  log_info "Installing via Helm 3...($(date) - timeout 20m)"
-  if helm3ReleaseExists prometheus-operator $MON_NS; then
-    promRelease=prometheus-operator
-    promName=prometheus-operator
-  else
-    promRelease=v4m-prometheus-operator
-    promName=v4m
-  fi
-  KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-11.0.0}
-  helm $helmDebug upgrade --install $promRelease \
-    --namespace $MON_NS \
-    -f monitoring/values-prom-operator.yaml \
-    -f $genValuesFile \
-    -f $wnpValuesFile \
-    -f $PROM_OPER_USER_YAML \
-    --atomic \
-    --timeout 20m \
-    --set nameOverride=$promName \
-    --set fullnameOverride=$promName \
-    --set prometheus-node-exporter.fullnameOverride=$promName-node-exporter \
-    --set kube-state-metrics.fullnameOverride=$promName-kube-state-metrics \
-    --set grafana.fullnameOverride=$promName-grafana \
-    --version $KUBE_PROM_STACK_CHART_VERSION \
-    prometheus-community/kube-prometheus-stack
+log_info "Deploying the Kube Prometheus Stack. This may take a few minutes..."
+log_info "Installing via Helm...($(date) - timeout 20m)"
+if helm3ReleaseExists prometheus-operator $MON_NS; then
+  promRelease=prometheus-operator
+  promName=prometheus-operator
 else
-  log_info "Installing via Helm 2...($(date) timeout 20m)"
-  
-  if helm2ReleaseExists prometheus-$MON_NS; then
-    promRelease=prometheus-$MON_NS
-    promName=prometheus-$MON_NS
-  else
-    promRelease=v4m-prometheus-$MON_NS
-    promName=v4m
-  fi
-  helm $helmDebug upgrade --install $promRelease \
-    --namespace $MON_NS \
-    -f monitoring/values-prom-operator.yaml \
-    -f $genValuesFile \
-    -f $wnpValuesFile \
-    -f $PROM_OPER_USER_YAML \
-    --atomic \
-    --timeout 1200 \
-    --set prometheusOperator.createCustomResource=$createPromCRDs \
-    --set nameOverride=$promName \
-    --set fullnameOverride=$promName \
-    --set prometheus-node-exporter.fullnameOverride=$promName-node-exporter \
-    --set kube-state-metrics.fullnameOverride=$promName-kube-state-metrics \
-    --set grafana.fullnameOverride=$promName-grafana \
-    prometheus-community/kube-prometheus-stack
+  promRelease=v4m-prometheus-operator
+  promName=v4m
 fi
+KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-11.1.3}
+helm $helmDebug upgrade --install $promRelease \
+  --namespace $MON_NS \
+  -f monitoring/values-prom-operator.yaml \
+  -f $genValuesFile \
+  -f $wnpValuesFile \
+  -f $PROM_OPER_USER_YAML \
+  --atomic \
+  --timeout 20m \
+  --set nameOverride=$promName \
+  --set fullnameOverride=$promName \
+  --set prometheus-node-exporter.fullnameOverride=$promName-node-exporter \
+  --set kube-state-metrics.fullnameOverride=$promName-kube-state-metrics \
+  --set grafana.fullnameOverride=$promName-grafana \
+  --version $KUBE_PROM_STACK_CHART_VERSION \
+  prometheus-community/kube-prometheus-stack
 
 rm -f $genValuesFile
 

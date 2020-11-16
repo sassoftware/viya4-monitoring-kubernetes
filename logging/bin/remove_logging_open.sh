@@ -12,20 +12,13 @@ LOG_DELETE_NAMESPACE_ON_REMOVE=${LOG_DELETE_NAMESPACE_ON_REMOVE:-false}
 # Check for existing incompatible helm releases up front
 helm2ReleaseCheck odfe-$LOG_NS
 helm2ReleaseCheck es-exporter-$LOG_NS
-helm3ReleaseCheck odfe $LOG_NS
-helm3ReleaseCheck es-exporter $LOG_NS
 
 log_info "Removing logging components [$(date)]"
 
 logging/bin/remove_logging_fluentbit_open.sh
 
-if [ "$HELM_VER_MAJOR" == "3" ]; then
-    helm delete -n $LOG_NS es-exporter
-    helm delete -n $LOG_NS odfe
-else
-    helm delete --purge es-exporter-$LOG_NS
-    helm delete --purge odfe-$LOG_NS
-fi
+helm delete -n $LOG_NS es-exporter
+helm delete -n $LOG_NS odfe
 
 if [ "$LOG_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
   log_info "Deleting the [$LOG_NS] namespace..."
