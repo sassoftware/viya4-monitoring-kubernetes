@@ -68,7 +68,7 @@ fi
 
 # Check if Prometheus Operator CRDs are already installed
 PROM_OPERATOR_CRD_UPDATE=${PROM_OPERATOR_CRD_UPDATE:-true}
-PROM_OPERATOR_CRD_VERSION=${PROM_OPERATOR_CRD_VERSION:-v0.43.0}
+PROM_OPERATOR_CRD_VERSION=${PROM_OPERATOR_CRD_VERSION:-v0.43.2}
 if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
   log_info "Updating Prometheus Operator custom resource definitions"
   kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml
