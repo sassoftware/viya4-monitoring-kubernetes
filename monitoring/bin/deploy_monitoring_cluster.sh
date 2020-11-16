@@ -114,10 +114,9 @@ if [ "$TLS_ENABLE" == "true" ]; then
   kubectl label cm -n $MON_NS node-exporter-tls-web-config sas.com/monitoring-base=kube-viya-monitoring
 fi
 
-log_info "Deploying the Kube Prometheus Stack. This may take a few minutes..."
 log_info "User response file: [$PROM_OPER_USER_YAML]"
-
-log_info "Installing via Helm 3...($(date) - timeout 20m)"
+log_info "Deploying the Kube Prometheus Stack. This may take a few minutes..."
+log_info "Installing via Helm...($(date) - timeout 20m)"
 if helm3ReleaseExists prometheus-operator $MON_NS; then
   promRelease=prometheus-operator
   promName=prometheus-operator
@@ -125,7 +124,7 @@ else
   promRelease=v4m-prometheus-operator
   promName=v4m
 fi
-KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-11.0.0}
+KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-11.1.3}
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
   -f monitoring/values-prom-operator.yaml \
