@@ -1,5 +1,18 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.0.0 (18Nov20)
+
+This is the first public release.
+
+* **Overall**
+  * Minor edits and cleanup to README files and sample user response files
+
+* **Monitoring**
+  * Grafana version bumped to 7.3.1
+  * Prometheus Operator version bumped to 0.43.2
+  * Prometheus version bumped to 2.22.2
+  * Prometheus Pushgateway version bumped to 1.3.0
+
 ## Version 0.1.3 (11NOV20)
 
 * **Overall**
