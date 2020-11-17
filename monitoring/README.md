@@ -227,7 +227,7 @@ You must perform manual steps prior to deployment in order to enable TLS.
 In addition, configuring HTTPS ingress involves a separate set of
 steps, which are similar to those needed for SAS Viya.
 
-See the [TLS Sample](/samples/tls) for more information.
+See the [TLS Sample](../samples/tls) for more information.
 
 ## Miscellaneous Notes and Troubleshooting
 
