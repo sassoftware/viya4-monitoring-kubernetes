@@ -3,7 +3,7 @@
 ## Introduction
 
 This document outlines the steps needed to deploy a set of monitoring
-components that provide the ability to monitor resources in a SAS Viya 
+components that provide the ability to monitor resources in a SAS Viya
 environment. These components support monitoring of SAS Viya resources
 for each SAS Viya namespace as well as monitoring for Kubernetes cluster
 resources.
@@ -29,7 +29,8 @@ These components are deployed:
 
 ## Perform Pre-Deployment Tasks
 
-Before deploying, you must select the release that you want to deploy, then create a local copy of the repository. 
+Before deploying, you must select the release that you want to deploy, then
+create a local copy of the repository.
 
 If you use TLS to encrypt network traffic, you must also perform manual steps prior
 to deployment. See the **TLS Support** section below for more information.
@@ -37,30 +38,33 @@ to deployment. See the **TLS Support** section below for more information.
 ### Select the Release to Copy
 
 1. Click on **tags** above the repository tree.
-2. On the **Tags** page, click [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) to view the list of available releases.
+2. On the **Tags** page, click [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases)
+to view the list of available releases.
 3. Use the release notes to determine the release you want to deploy.
 
 ### Create a Local Copy of the Repository
 
-There are two methods to create a local copy of the repository: 
-- download a compressed copy 
-- clone the repository
+There are two methods to create a local copy of the repository:
+
+* download a compressed copy
+* clone the repository
 
 #### Download a Compressed Copy of the Repository
 
-1. On the [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) page, locate the release that you want to deploy.
+1. On the [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases)
+page, locate the release that you want to deploy.
 2. Expand **Assets** for the release, which is located below the release notes.
-3. Select either **Source code (.zip)** or **Source code (.tar.gz)** to download the repository 
-as a compressed file.
-4. Expand the downloaded file to create a local copy of the repository. The repository is created
-in a directory named `viya4-monitoring-kubernetes-<release_number>`. 
+3. Select either **Source code (.zip)** or **Source code (.tar.gz)** to download
+the repository as a compressed file.
+4. Expand the downloaded file to create a local copy of the repository. The
+repository is created in a directory named `viya4-monitoring-kubernetes-<release_number>`.
 
 #### Clone the Repository
 
 1. From the main page for the repository, click **Code**.
 2. Copy the HTTPS URL for the repository.
-3. From a directory where you want to create the local copy, enter the 
-command `git clone <https_url>`. 
+3. From a directory where you want to create the local copy, enter the
+command `git clone <https_url>`.
 4. Change to the `viya4-monitoring-kubernetes` directory.
 5. Enter the command `git checkout <release_number>`
 
@@ -223,7 +227,7 @@ You must perform manual steps prior to deployment in order to enable TLS.
 In addition, configuring HTTPS ingress involves a separate set of
 steps, which are similar to those needed for SAS Viya.
 
-See the [TLS Sample](samples/tls) for more information.
+See the [TLS Sample](/samples/tls) for more information.
 
 ## Miscellaneous Notes and Troubleshooting
 
