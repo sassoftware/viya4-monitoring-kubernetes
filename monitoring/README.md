@@ -49,7 +49,7 @@ compressed copy.
 3. From a directory where you want to create the local copy, enter the 
 command `git clone <https_url>`. 
 4. Change to the `viya4-monitoring-kubernetes` directory.
-5. Enter the command `git checkout --track origin/<release_number>`
+5. Enter the command `git checkout <release_number>`
 
 #### Download a Compressed Copy of the Repository
 

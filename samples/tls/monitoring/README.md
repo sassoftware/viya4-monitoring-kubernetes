@@ -26,7 +26,7 @@ For in-cluster (east-west traffic) TLS for monitoring components,
 
 ## Instructions
 
-1. Set up an empty directory with a `monitoring` subdirectory to contain the customization files. 
+1. Set up an empty directory with a `/monitoring` subdirectory to contain the customization files. 
 
 2. Export a `USER_DIR` environment variable that points to this
 location. For example:

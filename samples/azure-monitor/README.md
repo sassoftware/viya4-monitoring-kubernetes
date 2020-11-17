@@ -21,7 +21,7 @@ ConfigMap yaml.
 * `interval` - Update from `1m` to `30s` (recommended, but not required)
 * `monitor_kubernetes_pods` - Set to `true`.
 
-Setting `monitor_kubernetes_pods` to `true` enables Azure Monitor to auto-discover pods to monitor, based on the standard Prometheus annotations. SAS Viya
+Set `monitor_kubernetes_pods` to `true` to enable Azure Monitor to auto-discover pods to monitor, based on the standard Prometheus annotations. SAS Viya
 components that expose metrics endpoints should include these annotations:
 
 * `promethues.io/scrape` - `true` or `false`

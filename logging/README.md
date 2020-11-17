@@ -33,17 +33,8 @@ Before deploying, you must select the release that you want to deploy, then crea
 
 ### Create a Local Copy of the Repository
 
-There are two methods to create a local copy of the repository: cloning or downloading a 
-compressed copy.
-
-#### Clone the Repository
-
-1. From the main page for the repository, click **Code**.
-2. Copy the HTTPS URL for the repository.
-3. From a directory where you want to create the local copy, enter the 
-command `git clone <https_url>`. 
-4. Change to the `viya4-monitoring-kubernetes` directory.
-5. Enter the command `git checkout --track origin/<release_number>`
+There are two methods to create a local copy of the repository: downloading a 
+compressed copy or cloning the repository.
 
 #### Download a Compressed Copy of the Repository
 
@@ -53,6 +44,16 @@ command `git clone <https_url>`.
 as a compressed file.
 4. Expand the downloaded file to create a local copy of the repository. The repository is created
 in a directory named `viya4-monitoring-kubernetes-<release_number>`.
+
+#### Clone the Repository
+
+1. From the main page for the repository, click **Code**.
+2. Copy the HTTPS URL for the repository.
+3. From a directory where you want to create the local copy, enter the 
+command `git clone <https_url>`. 
+4. Change to the `viya4-monitoring-kubernetes` directory.
+5. Enter the command `git checkout <release_number>`
+
 ### Customize the Deployment
 
 ### USER_DIR
