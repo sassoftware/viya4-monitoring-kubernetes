@@ -113,8 +113,7 @@ Node Exporter. Links to the charts and default values are included in the
 `user-values-prom-operator.yaml` file.
 
 **Note:** If you are using a cloud provider, you must use ingress, rather than
-NodePorts. Use the samples in the
-[samples/ingress](/samples/ingress)
+NodePorts. Use the samples in the [samples/ingress](/samples/ingress)
 area of this repository to set up either host-based or path-based ingress.
 
 ## Workload Node Placement
@@ -227,7 +226,7 @@ You must perform manual steps prior to deployment in order to enable TLS.
 In addition, configuring HTTPS ingress involves a separate set of
 steps, which are similar to those needed for SAS Viya.
 
-See the [TLS Sample](../samples/tls) for more information.
+See the [TLS Sample](/samples/tls) for more information.
 
 ## Miscellaneous Notes and Troubleshooting
 
