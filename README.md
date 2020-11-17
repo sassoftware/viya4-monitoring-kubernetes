@@ -12,7 +12,7 @@ The monitoring solution includes these components:
 
 - [Prometheus Operator](https://github.com/coreos/prometheus-operator)
   - [Prometheus](https://prometheus.io/docs/introduction/overview/)
-  - [Alert Manager](https://prometheus.io/docs/alerting/alertmanager/)
+  - [Alertmanager](https://prometheus.io/docs/alerting/alertmanager/)
   - [Grafana](https://grafana.com/)
 - Prometheus Exporters
   - [node-exporter](https://github.com/prometheus/node_exporter)
@@ -72,7 +72,7 @@ for more information about using the logging components.
 ### Monitoring
 
 See the [monitoring README](monitoring/README.md) to deploy the monitoring
-components, including Prometheus Operator, Prometheus, Alert Manager, Grafana,
+components, including Prometheus Operator, Prometheus, Alertmanager, Grafana,
 metric exporters, service monitors, and custom dashboards.
 
 ### Logging

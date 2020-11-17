@@ -18,7 +18,7 @@ These components are deployed:
 
 * Prometheus Operator
 * Prometheus
-* Alert Manager
+* Alertmanager
 * Grafana
 * node-exporter
 * kube-state-metrics
@@ -102,7 +102,7 @@ The monitoring stack uses the following Helm charts:
 
 These charts are highly customizable. Although the default values might be
 suitable, you might need to customize some values (such as for ingress,
-for example). The kube-prometheus-stack helm chart includes the Prometheus
+for example). The `kube-prometheus-stack` helm chart includes the Prometheus
 Operator and aggregates other helm charts such as Grafana and the Prometheus
 Node Exporter. Links to the charts and default values are included in the
 `user-values-prom-operator.yaml` file.

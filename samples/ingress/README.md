@@ -66,7 +66,7 @@ locations (with hostnames replaced with those in the actual environment that you
 
 * Grafana - `https://grafana.host.mycluster.example.com`
 * Prometheus - `https://prometheus.host.mycluster.example.com`
-* AlertManager - `https://alertmanager.host.mycluster.example.com`
+* Alertmanager - `https://alertmanager.host.mycluster.example.com`
 * Kibana - `https://kibana.host.mycluster.example.com`
 
 If you deploy using path-based ingress, the applications are available at these
@@ -74,7 +74,7 @@ locations (with hostnames replaced with those in the actual environment that you
 
 * Grafana - `http://host.mycluster.example.com/grafana`
 * Prometheus - `http://host.mycluster.example.com/prometheus`
-* AlertManager - `http://host.mycluster.example.com/alertManager`
+* Alertmanager - `http://host.mycluster.example.com/alertManager`
 * Kibana - `http://host.mycluster.example.com/kibana`
 
 The default credentials for Grafana and Kibana are `admin`:`admin`.

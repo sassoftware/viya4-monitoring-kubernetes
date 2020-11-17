@@ -17,8 +17,8 @@ their respective SAS Viya namespaces.
 All resources in this sample are configured for host-based ingress.
 
 In this example, all three Prometheus instances share the same
-instance of AlertManager, in order to demonstrate how you can centralize alerts. You
-can use AlertManager CRs to deploy a separate AlertManager for each instance
+instance of Alertmanager, in order to demonstrate how you can centralize alerts. You
+can use Alertmanager CRs to deploy a separate Alertmanager for each instance
 of Prometheus.
 
 This sample assumes that you are deploying two SAS Viya namespaces, but you can 
