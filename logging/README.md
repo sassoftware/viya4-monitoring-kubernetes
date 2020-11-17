@@ -23,16 +23,36 @@ These components are deployed:
 Provides detailed Elasticsearch performance information for Prometheus
 
 ## Perform Pre-Deployment Tasks
+Before deploying, you must select the release that you want to deploy, then create a local copy of the repository. 
 
-### Clone the Repository
+### Select the Release to Copy
 
-* From a command line, create a directory to contain the cloned repository.
-* Change to the directory you created.
-* Clone the repository
-* `cd` to the repository directory
-* If you have already cloned the repository, use the `git pull` command to
-ensure that you have the most recent updates.
+1. Click on **tags** above the repository tree.
+2. On the **Tags** page, click [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) to view the list of available releases.
+3. Use the release notes to determine the release you want to deploy.
 
+### Create a Local Copy of the Repository
+
+There are two methods to create a local copy of the repository: cloning or downloading a 
+compressed copy.
+
+#### Clone the Repository
+
+1. From the main page for the repository, click **Code**.
+2. Copy the HTTPS URL for the repository.
+3. From a directory where you want to create the local copy, enter the 
+command `git clone <https_url>`. 
+4. Change to the `viya4-monitoring-kubernetes` directory.
+5. Enter the command `git checkout --track origin/<release_number>`
+
+#### Download a Compressed Copy of the Repository
+
+1. On the [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) page, locate the release that you want to deploy.
+2. Expand **Assets** for the release, which is located below the release notes.
+3. Select either **Source code (.zip)** or **Source code (.tar.gz)** to download the repository 
+as a compressed file.
+4. Expand the downloaded file to create a local copy of the repository. The repository is created
+in a directory named `viya4-monitoring-kubernetes-<release_number>`.
 ### Customize the Deployment
 
 ### USER_DIR

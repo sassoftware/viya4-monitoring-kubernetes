@@ -4,7 +4,7 @@ This sample demonstrates how to deploy Elasticsearch so that each of its nodes p
 client/ingest. The sample deploys the nodes as primary (master) nodes and updates them to include the data and client roles. While it is possible to deploy additional data and client nodes, these additional nodes cannot be made multi-role; this sample only supports enabling multi-role for primary nodes.  In the standard configuration of this project, each node performs a single node.  
 
 Although multi-role Elasticsearch nodes are widely used, they are not natively supported by the Open Distro for Elasticsearch
-Helm chart that is used to deploy the logging components of this project. In order to enable multi-role Elasticsearch nodes, our  deployment process must patch various Kubernetes objects. Because performance and other criteria are still being evaluated, this use of multi-role nodes is experimental and is not yet part of our standard configuration.
+Helm chart that is used to deploy the logging components of this project. In order to enable multi-role Elasticsearch nodes, the deployment process must patch various Kubernetes objects. Because performance and other criteria are still being evaluated, this use of multi-role nodes is experimental and is not yet part of our standard configuration.
 
 ## Preparation and Deployment
 
