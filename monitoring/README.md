@@ -93,31 +93,20 @@ area of this repository to set up either host-based or path-based ingress.
 
 ## Workload Node Placement
 
-SAS Viya is deployed using a workload node placement strategy, which uses the 
-`workload.sas.com/class` taint to optimize the placement of its components on 
-Kubernetes nodes. By default, the monitoring components do **not** participate in the 
-workload node placement strategy. This is the recommended approach, because it enables the 
-monitoring components to function even if `workload.sas.com/class`-tainted nodes 
-are scaled to zero (in other words, are shut down). Therefore, by default, 
-most of the monitoring components are deployed to cluster nodes that do not
-have `workload.sas.com/class` taints. On Microsoft Azure, this results
-in pods being deployed on nodes in the `system` nodepool. 
+SAS Viya is deployed using a workload node placement strategy, which uses the
+`workload.sas.com/class` taint to optimize the placement of its components on
+Kubernetes nodes. By default, the monitoring components do **not** participate
+in the workload node placement strategy. This is the recommended approach,
+because it enables the monitoring components to function even if
+`workload.sas.com/class`-tainted nodes are scaled to zero (in other words, are
+shut down). Therefore, by default, most of the monitoring components are
+deployed to cluster nodes that do not have `workload.sas.com/class` taints. On
+Microsoft Azure, this results in pods being deployed on nodes in the `system`
+nodepool.
 
-To deploy the monitoring components so that they participate in the SAS Viya workload node
-placement strategy rather than use this recommended deployment, set `MON_NODE_PLACEMENT_ENABLE`
-to `true` in `$USER_DIR/monitoring/user.env`.
-
-## Istio Integration
-
-This repository contains an optional set of dashboards for Istio. These
-dashboards use these assumptions:
-
-* Istio is installed in the `istio-system` namespace
-* The optional Prometheus instance that is included with Istio is deployed
-
-To enable Istio support, set `ISTIO_ENABLED=true` in `$USER_DIR/user.env`
-or `$USER_DIR/monitoring/user.env` before deploying monitoring using the
-`deploy_monitoring_cluster.sh` script.
+To deploy the monitoring components so that they participate in the SAS Viya
+workload node placement strategy rather than use this recommended deployment,
+set `MON_NODE_PLACEMENT_ENABLE` to `true` in `$USER_DIR/monitoring/user.env`.
 
 ### Recommendations
 
