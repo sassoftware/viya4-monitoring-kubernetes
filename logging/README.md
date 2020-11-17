@@ -3,9 +3,9 @@
 ## Introduction
 
 This document outlines the steps needed to deploy a set of log collection and
-monitoring components for SAS Viya 4.x. These components provide a
+monitoring components for SAS Viya. These components provide a
 comprehensive solution for collecting, transforming and surfacing all of the
-log messages generated throughout SAS Viya 4.x. These components collect logs
+log messages generated throughout SAS Viya. These components collect logs
 from all pods in a Kubernetes cluster, not only the pods used for SAS Viya.
 
 You must have cluster-admin access to any cluster in which you deploy these
@@ -33,8 +33,9 @@ Before deploying, you must select the release that you want to deploy, then crea
 
 ### Create a Local Copy of the Repository
 
-There are two methods to create a local copy of the repository: downloading a 
-compressed copy or cloning the repository.
+There are two methods to create a local copy of the repository: 
+- download a compressed copy 
+- clone the repository
 
 #### Download a Compressed Copy of the Repository
 

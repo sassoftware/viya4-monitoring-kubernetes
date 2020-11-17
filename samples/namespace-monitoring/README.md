@@ -70,7 +70,7 @@ kubectl label ns $VIYA_TWO_NS sas.com/viya-namespace=$VIYA_TWO_NS
 VIYA_DASH=false monitoring/bin/deploy_monitoring_cluster.sh
 ```
 
-8. Deploy standard SAS Viya monitoring components each Viya namespace.
+8. Deploy standard SAS Viya monitoring components each SAS Viya namespace.
 ```bash
 VIYA_NS=$VIYA_ONE_NS monitoring/bin/deploy_monitoring_viya.sh
 VIYA_NS=$VIYA_ONE_NS monitoring/bin/deploy_monitoring_viya.sh

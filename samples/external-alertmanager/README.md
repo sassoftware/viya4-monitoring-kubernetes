@@ -8,7 +8,7 @@ Follow these steps:
 
 1. Copy the directory in the sample to a separate local path.
 
-2. Set the `USER_DIR` environment variable to the local path:
+2. Run this command to set the `USER_DIR` environment variable to your local path:
 
 ```bash
 export USER_DIR=/your/path/to/external-alertmanager
@@ -17,16 +17,18 @@ export USER_DIR=/your/path/to/external-alertmanager
 3. Define a service that points to the Alertmanager instance that you want to use.
 
 4. Edit `alertmanager-endpoint.yaml` to point to the existing Alertmanager
-instance, then deploy the yaml file to the monitoring namespace:
+instance. 
+
+5. Deploy the yaml file to the monitoring namespace:
 
 ```bash
 kubectl apply -n monitoring -f $USER_DIR/alertmanager-endpoint.yaml
 ```
 
-5. If you changed the service name `my-alertmanager`, make the same change
+6. If you changed the service name `my-alertmanager`, make the same change
 to your copy of `user-values-prom-operator.yaml`.
 
-6. Deploy monitoring using the standard deployment script:
+7. Deploy monitoring using the standard deployment script:
 
 ```bash
 monitoring/bin/deploy_monitoring_cluster.sh

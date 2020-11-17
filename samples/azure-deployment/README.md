@@ -7,21 +7,33 @@ modify it for other solutions.
 ## Instructions
 
 1. Copy this directory to a local directory.
-2. Edit `azuredisk-v4m.yaml` file if necessary to customize the
+
+2. If necessary, edit the `azuredisk-v4m.yaml` file to customize the
 storage class that will be used for the deployment.
+
 3. Edit the hostnames in the sample yaml files in both the `monitoring`
 and `logging` subdirectories to match your environment's actual hostnames.
+
 4. Add additional customization as desired.
-5. Run the command (adjust to local path created in step 1):
-`export USER_DIR=path/to/my/copy/azure-deployment`
-6. Run the command:
+
+5. Run this command to set the `USER_DIR` environment variable to the local path (change the command to use local path that you created in step 1):
+
+```bash
+export USER_DIR=path/to/my/copy/azure-deployment
+```
+
+6. Run this command:
+
+```bash
 `kubectl apply -f $USER_DIR/azuredisk-v4m.yaml`
-7. Run the scripts to deploy monitoring and logging components in Azure.
+```
+
+7. Run the standard deployment scripts to deploy monitoring and logging components in Azure.
 
 ## Access the Applications
 
 The monitoring and logging applications in this sample are configured for
-path-based ingress and are available at (replace the hostnames):
+path-based ingress and are available at (replace the hostnames for your deployment):
 
 * `http://host.mycluster.example.com/grafana`
 * `http://host.mycluster.example.com/prometheus`

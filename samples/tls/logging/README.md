@@ -23,8 +23,7 @@ can use the process documented in ["Configure NGINX Ingress TLS for SAS Applicat
 
 1. Set up an empty directory with a `/logging` subdirectory to contain the customization files. 
 
-2. Export a `USER_DIR` environment variable that points to this
-location. For example:
+2. Set the `USER_DIR` environment variable to your local path:
 
 ```bash
 mkdir -p ~/my-cluster-files/ops/user-dir/logging

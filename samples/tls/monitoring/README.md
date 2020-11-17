@@ -28,8 +28,7 @@ For in-cluster (east-west traffic) TLS for monitoring components,
 
 1. Set up an empty directory with a `/monitoring` subdirectory to contain the customization files. 
 
-2. Export a `USER_DIR` environment variable that points to this
-location. For example:
+2. Set the `USER_DIR` environment variable to your local path:
 
 ```bash
 mkdir -p ~/my-cluster-files/ops/user-dir/monitoring
@@ -49,7 +48,7 @@ cp path/to/this/repo/monitoring/samples/tls/user-values-prom-operator.yaml $USER
 
 5. Edit `$USER_DIR/monitoring/user-values-prom-operator.yaml` and replace
 any sample hostnames with hostnames for your deployment. Specifically, you must replace
-`host.cluster.example.com` with the name of the ingress node. Often, the ingress node is the cluster master node, but environments vary.
+`host.cluster.example.com` with the name of the ingress node. Often, the ingress node is the cluster master node, but your environment might be different.
 
 6. Specify any other customizations in `user-values-prom-operator.yaml`.
 
@@ -68,7 +67,7 @@ supported for Alertmanager at the ingress level, but it is not supported for the
 
 * The Prometheus node exporter and kube-state-metrics exporters do not currently
 support TLS. These components are not exposed over ingress, so in-cluster
-access will be over HTTP and not HTTPS.
+access is over HTTP and not HTTPS.
 
 * If needed, a self-signed cert-manager issuer is created that generates
 self-signed certificates when TLS is enabled and the secrets do not already
