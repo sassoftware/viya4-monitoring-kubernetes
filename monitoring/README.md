@@ -3,8 +3,8 @@
 ## Introduction
 
 This document outlines the steps needed to deploy a set of monitoring
-components that provide the ability to monitor resources in a SAS Viya 4.x
-environment. These components support monitoring of SAS Viya 4.x resources
+components that provide the ability to monitor resources in a SAS Viya
+environment. These components support monitoring of SAS Viya resources
 for each SAS Viya namespace as well as monitoring for Kubernetes cluster
 resources.
 
@@ -18,7 +18,7 @@ These components are deployed:
 
 * Prometheus Operator
 * Prometheus
-* Alert Manager
+* Alertmanager
 * Grafana
 * node-exporter
 * kube-state-metrics
@@ -29,18 +29,44 @@ These components are deployed:
 
 ## Perform Pre-Deployment Tasks
 
-### Clone the Repository
+Before deploying, you must select the release that you want to deploy, then
+create a local copy of the repository.
 
-* From a command line, create a directory to contain the cloned repository.
-* Change to the directory you created.
-* Clone the repository
-* `cd` to the repository directory
-
-If you have already cloned the repository, use the `git pull` command to ensure
-that you have the most recent updates.
-
-If you use TLS to encrypt network traffic, you must perform manual steps prior
+If you use TLS to encrypt network traffic, you must also perform manual steps prior
 to deployment. See the **TLS Support** section below for more information.
+
+### Select the Release to Copy
+
+1. Click on **tags** above the repository tree.
+2. On the **Tags** page, click [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases)
+to view the list of available releases.
+3. Use the release notes to determine the release you want to deploy.
+
+### Create a Local Copy of the Repository
+
+There are two methods to create a local copy of the repository:
+
+* download a compressed copy
+* clone the repository
+
+#### Download a Compressed Copy of the Repository
+
+1. On the [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases)
+page, locate the release that you want to deploy.
+2. Expand **Assets** for the release, which is located below the release notes.
+3. Select either **Source code (.zip)** or **Source code (.tar.gz)** to download
+the repository as a compressed file.
+4. Expand the downloaded file to create a local copy of the repository. The
+repository is created in a directory named `viya4-monitoring-kubernetes-<release_number>`.
+
+#### Clone the Repository
+
+1. From the main page for the repository, click **Code**.
+2. Copy the HTTPS URL for the repository.
+3. From a directory where you want to create the local copy, enter the
+command `git clone <https_url>`.
+4. Change to the `viya4-monitoring-kubernetes` directory.
+5. Enter the command `git checkout <release_number>`
 
 ## Customize the Deployment
 
@@ -81,43 +107,31 @@ The monitoring stack uses the following Helm charts:
 
 These charts are highly customizable. Although the default values might be
 suitable, you might need to customize some values (such as for ingress,
-for example). The kube-prometheus-stack helm chart includes the Prometheus
+for example). The `kube-prometheus-stack` Helm chart includes the Prometheus
 Operator and aggregates other helm charts such as Grafana and the Prometheus
 Node Exporter. Links to the charts and default values are included in the
 `user-values-prom-operator.yaml` file.
 
 **Note:** If you are using a cloud provider, you must use ingress, rather than
-NodePorts. Use the samples in the
-[samples/ingress](/samples/ingress)
+NodePorts. Use the samples in the [samples/ingress](/samples/ingress)
 area of this repository to set up either host-based or path-based ingress.
 
 ## Workload Node Placement
 
-SAS Viya is deployed using a workload node placement strategy, which uses the 
-`workload.sas.com/class` taint to optimize the placement of its components on 
-Kubernetes nodes. By default, the monitoring components do **not** participate in the 
-workload node placement strategy. This is the recommended approach, because it enables the 
-monitoring components to function even if `workload.sas.com/class`-tainted nodes 
-are scaled to zero (in other words, are shut down). Therefore, by default, 
-most of the monitoring components are deployed to cluster nodes that do not
-have `workload.sas.com/class` taints. On Microsoft Azure, this results
-in pods being deployed on nodes in the `system` nodepool. 
+SAS Viya is deployed using a workload node placement strategy, which uses the
+`workload.sas.com/class` taint to optimize the placement of its components on
+Kubernetes nodes. By default, the monitoring components do **not** participate
+in the workload node placement strategy. This is the recommended approach,
+because it enables the monitoring components to function even if
+`workload.sas.com/class`-tainted nodes are scaled to zero (in other words, are
+shut down). Therefore, by default, most of the monitoring components are
+deployed to cluster nodes that do not have `workload.sas.com/class` taints. On
+Microsoft Azure, this results in pods being deployed on nodes in the `system`
+nodepool.
 
-To deploy the monitoring components so that they participate in the SAS Viya workload node
-placement strategy rather than use this recommended deployment, set `MON_NODE_PLACEMENT_ENABLE`
-to `true` in `$USER_DIR/monitoring/user.env`.
-
-## Istio Integration
-
-This repository contains an optional set of dashboards for Istio. These
-dashboards use these assumptions:
-
-* Istio is installed in the `istio-system` namespace
-* The optional Prometheus instance that is included with Istio is deployed
-
-To enable Istio support, set `ISTIO_ENABLED=true` in `$USER_DIR/user.env`
-or `$USER_DIR/monitoring/user.env` before deploying monitoring using the
-`deploy_monitoring_cluster.sh` script.
+To deploy the monitoring components so that they participate in the SAS Viya
+workload node placement strategy rather than use this recommended deployment,
+set `MON_NODE_PLACEMENT_ENABLE` to `true` in `$USER_DIR/monitoring/user.env`.
 
 ### Recommendations
 
@@ -212,7 +226,7 @@ You must perform manual steps prior to deployment in order to enable TLS.
 In addition, configuring HTTPS ingress involves a separate set of
 steps, which are similar to those needed for SAS Viya.
 
-See the [TLS Sample](samples/tls) for more information.
+See the [TLS Sample](/samples/tls) for more information.
 
 ## Miscellaneous Notes and Troubleshooting
 

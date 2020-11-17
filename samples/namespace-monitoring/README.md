@@ -17,8 +17,8 @@ their respective SAS Viya namespaces.
 All resources in this sample are configured for host-based ingress.
 
 In this example, all three Prometheus instances share the same
-instance of AlertManager, to demonstrate how you can centralize alerts. You
-can use AlertManager CRs to deploy a separate AlertManager for each instance
+instance of Alertmanager, in order to demonstrate how you can centralize alerts. You
+can use Alertmanager CRs to deploy a separate Alertmanager for each instance
 of Prometheus.
 
 This sample assumes that you are deploying two SAS Viya namespaces, but you can 
@@ -70,7 +70,7 @@ kubectl label ns $VIYA_TWO_NS sas.com/viya-namespace=$VIYA_TWO_NS
 VIYA_DASH=false monitoring/bin/deploy_monitoring_cluster.sh
 ```
 
-8. Deploy standard SAS Viya monitoring components each Viya namespace.
+8. Deploy standard SAS Viya monitoring components each SAS Viya namespace.
 ```bash
 VIYA_NS=$VIYA_ONE_NS monitoring/bin/deploy_monitoring_viya.sh
 VIYA_NS=$VIYA_ONE_NS monitoring/bin/deploy_monitoring_viya.sh

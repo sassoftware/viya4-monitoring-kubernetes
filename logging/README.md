@@ -3,9 +3,9 @@
 ## Introduction
 
 This document outlines the steps needed to deploy a set of log collection and
-monitoring components for SAS Viya 4.x. These components provide a
+monitoring components for SAS Viya. These components provide a
 comprehensive solution for collecting, transforming and surfacing all of the
-log messages generated throughout SAS Viya 4.x. These components collect logs
+log messages generated throughout SAS Viya. These components collect logs
 from all pods in a Kubernetes cluster, not only the pods used for SAS Viya.
 
 You must have cluster-admin access to any cluster in which you deploy these
@@ -23,15 +23,37 @@ These components are deployed:
 Provides detailed Elasticsearch performance information for Prometheus
 
 ## Perform Pre-Deployment Tasks
+Before deploying, you must select the release that you want to deploy, then create a local copy of the repository. 
 
-### Clone the Repository
+### Select the Release to Copy
 
-* From a command line, create a directory to contain the cloned repository.
-* Change to the directory you created.
-* Clone the repository
-* `cd` to the repository directory
-* If you have already cloned the repository, use the `git pull` command to
-ensure that you have the most recent updates.
+1. Click on **tags** above the repository tree.
+2. On the **Tags** page, click [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) to view the list of available releases.
+3. Use the release notes to determine the release you want to deploy.
+
+### Create a Local Copy of the Repository
+
+There are two methods to create a local copy of the repository: 
+- download a compressed copy 
+- clone the repository
+
+#### Download a Compressed Copy of the Repository
+
+1. On the [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) page, locate the release that you want to deploy.
+2. Expand **Assets** for the release, which is located below the release notes.
+3. Select either **Source code (.zip)** or **Source code (.tar.gz)** to download the repository 
+as a compressed file.
+4. Expand the downloaded file to create a local copy of the repository. The repository is created
+in a directory named `viya4-monitoring-kubernetes-<release_number>`.
+
+#### Clone the Repository
+
+1. From the main page for the repository, click **Code**.
+2. Copy the HTTPS URL for the repository.
+3. From a directory where you want to create the local copy, enter the 
+command `git clone <https_url>`. 
+4. Change to the `viya4-monitoring-kubernetes` directory.
+5. Enter the command `git checkout <release_number>`
 
 ### Customize the Deployment
 

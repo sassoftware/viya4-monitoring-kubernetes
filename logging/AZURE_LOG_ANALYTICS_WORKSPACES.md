@@ -81,7 +81,7 @@ To remove this solution, run this command:
 ```
 By default, this script does NOT delete the namespace.
 
-## Using Connection Information From Kubernetes Secret
+## Using Connection Information From a Kubernetes Secret
 
 The deployment script creates a Kubernetes secret named `connection-info-azmonitor`containing the connection information. 
 This ensures that the connection information is available in case the Fluent Bit pods are

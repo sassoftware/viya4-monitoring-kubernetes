@@ -26,10 +26,9 @@ For in-cluster (east-west traffic) TLS for monitoring components,
 
 ## Instructions
 
-1. Set up an empty directory with a `monitoring` subdirectory to contain the customization files. 
+1. Set up an empty directory with a `/monitoring` subdirectory to contain the customization files. 
 
-2. Export a `USER_DIR` environment variable that points to this
-location. For example:
+2. Set the `USER_DIR` environment variable to your local path:
 
 ```bash
 mkdir -p ~/my-cluster-files/ops/user-dir/monitoring
@@ -39,7 +38,7 @@ export USER_DIR=~/my-cluster-files/ops/user-dir
 3. Create `$USER_DIR/monitoring/user.env`. Specify this value in the file:
 
 * `MON_TLS_ENABLE=true` - This flag modifies the deployment of Prometheus,
-Grafana, and AlertManager to be TLS-enabled.
+Grafana, and Alertmanager to be TLS-enabled.
 
 4. Copy the sample TLS Helm user response file to your `USER_DIR`:
 
@@ -49,7 +48,7 @@ cp path/to/this/repo/monitoring/samples/tls/user-values-prom-operator.yaml $USER
 
 5. Edit `$USER_DIR/monitoring/user-values-prom-operator.yaml` and replace
 any sample hostnames with hostnames for your deployment. Specifically, you must replace
-`host.cluster.example.com` with the name of the ingress node. Often, the ingress node is the cluster master node, but environments vary.
+`host.cluster.example.com` with the name of the ingress node. Often, the ingress node is the cluster master node, but your environment might be different.
 
 6. Specify any other customizations in `user-values-prom-operator.yaml`.
 
@@ -61,16 +60,16 @@ path/to/this/repo/monitoring/bin/deploy_monitoring_cluster.sh
 
 ## Limitations and Known Issues
 
-* There is a [bug in the AlertManager Helm template](https://github.com/helm/charts/issues/22939)
-that prevents mounting the TLS certificates for the reverse proxy sidecar.
-It is expected that this issue will be addressed before general availability of SAS Viya 4. HTTPS is still
-supported for AlertManager at the ingress level, but it is not supported for the pod (in-cluster).
+* There is a [bug in the Prometheus template](https://github.com/prometheus-community/helm-charts/issues/152)
+that prevents mounting the TLS certificates for the reverse proxy sidecar for Alertmanager.
+HTTPS is still
+supported for Alertmanager at the ingress level, but it is not supported for the pod (in-cluster).
 
 * The Prometheus node exporter and kube-state-metrics exporters do not currently
 support TLS. These components are not exposed over ingress, so in-cluster
-access will be over HTTP and not HTTPS.
+access is over HTTP and not HTTPS.
 
-* If needed, a self-signed cert-manager Issuer is created that generates
+* If needed, a self-signed cert-manager issuer is created that generates
 self-signed certificates when TLS is enabled and the secrets do not already
 exist. By default, in-cluster traffic between monitoring components (not ingress) is
 configured to skip TLS CA verification.

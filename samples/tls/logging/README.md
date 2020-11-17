@@ -17,15 +17,13 @@ you run any of the scripts in this repository:
 * kubernetes.io/tls secret - `elasticsearch-ingress-tls-secret`
 
 Generating these certificates is outside the scope of this example. However, you
-can use the process documented in ["Configure NGINX Ingress TLS for SAS
-Applications"](https://go.documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calencryptmotion&docsetTarget=n1xdqv1sezyrahn17erzcunxwix9.htm&locale=en#n0oo2yu8440vmzn19g6xhx4kfbrq) in SAS Viya Administration documentation and specify the `logging` namespace.
+can use the process documented in ["Configure NGINX Ingress TLS for SAS Applications"](https://go.documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calencryptmotion&docsetTarget=n1xdqv1sezyrahn17erzcunxwix9.htm&locale=en#n0oo2yu8440vmzn19g6xhx4kfbrq) in SAS Viya Administration documentation and specify the `logging` namespace.
 
 ## Instructions
 
-1. Set up an empty directory with a `logging` subdirectory to contain the customization files. 
+1. Set up an empty directory with a `/logging` subdirectory to contain the customization files. 
 
-2. Export a `USER_DIR` environment variable that points to this
-location. For example:
+2. Set the `USER_DIR` environment variable to your local path:
 
 ```bash
 mkdir -p ~/my-cluster-files/ops/user-dir/logging
@@ -44,7 +42,7 @@ cp path/to/this/repo/loggingsamples/tls/user-values-elasticsearch-open.yaml $USE
 
 5. Edit `$USER_DIR/monitoring/user-values-elasticsearch-open.yaml` and replace
 any sample hostnames with hostnames for your deployment. Specifically, you must replace
-`host.cluster.example.com` with the name of the ingress node. Often, the ingress node is the cluster master node, but environments vary.
+`host.cluster.example.com` with the name of the ingress node. Often, the ingress node is the cluster master node, but your environment might be different.
 
 6. Specify any other customizations in `user-values-elasticsearch-open.yaml`.
 
