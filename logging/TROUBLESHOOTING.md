@@ -19,7 +19,7 @@ See the [main README](../../README.md#customization) for information about the c
 export USER_DIR=/path/to/my/copy/generic-base
 ```
 
-3. Edit `$USER_DIR/samples/generic-base/logging/user-values-fluent-bit-open.yaml` and uncomment these lines:
+3. Edit `$USER_DIR/logging/user-values-fluent-bit-open.yaml` and uncomment these lines:
 ```bash
 #extraVolumeMounts:
 #- mountPath: /fluent-bit/etc/viya-parsers.conf
