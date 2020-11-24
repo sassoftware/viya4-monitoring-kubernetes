@@ -36,7 +36,7 @@ if [ "$FLUENT_BIT_ENABLED" == "true" ]; then
    log_info "STEP 2: Deploying Fluent Bit"
 
    # Call separate Fluent Bit deployment script
-   logging/bin/deploy_logging_fluentbit_azmonitor.sh
+   logging/bin/deploy_fluentbit_azmonitor.sh
 else
   log_info "FLUENT_BIT_ENABLED=[$FLUENT_BIT_ENABLED] - Skipping Fluent Bit install"
 fi

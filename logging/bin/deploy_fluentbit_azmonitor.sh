@@ -61,6 +61,13 @@ fi
 
 
 # Fluent Bit
+# TO DO: Discuss; needed? better? works?
+# Remove existing Helm chart, if it exists
+#if [ helm status -n $LOG_NS fbaz 1>/dev/null 2>&1 ]; then
+#   log_debug "Remove Existing Fluent Bit Release"
+#   helm delete -n $LOG_NS fbaz
+#fi
+
 # Create ConfigMap containing Fluent Bit configuration
 kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 
@@ -68,6 +75,7 @@ kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 kubectl -n $LOG_NS delete configmap fbaz-viya-parsers --ignore-not-found
 kubectl -n $LOG_NS create configmap fbaz-viya-parsers  --from-file=logging/fb/viya-parsers.conf
 
+# TO DO: Replace with Helm release removal?
 # Delete any existing Fluent Bit pods in the $LOG_NS namepace (otherwise Helm chart may assume an upgrade w/o reloading updated config
 kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=azuremonitor"
 

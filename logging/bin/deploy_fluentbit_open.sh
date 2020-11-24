@@ -73,6 +73,14 @@ fi
 log_info "Using FB ConfigMap:" $FB_CONFIGMAP
 
 # Fluent Bit
+
+# TO DO: Discuss; needed? better? works?
+# Remove existing Helm chart, if it exists
+#if [ helm status -n $LOG_NS fb 1>/dev/null 2>&1 ]; then
+#   log_debug "Remove Existing Fluent Bit Release"
+#   helm delete -n $LOG_NS fb
+#fi
+
 # Create ConfigMap containing Fluent Bit configuration
 kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 
