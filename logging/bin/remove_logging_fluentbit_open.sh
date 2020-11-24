@@ -6,8 +6,20 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
-helm2ReleaseCheck fb-$LOG_NS
+this_script=`basename "$0"`
 
-log_info "Removing Fluent Bit components from the [$LOG_NS] namespace [$(date)]"
+log_debug "Script [$this_script] has started [$(date)]"
 
-helm delete -n $LOG_NS fb
+# DEPRECATION NOTICE
+log_notice "* This script [remove_logging_fluentbit_open.sh] is deprecated and will be removed in the future. *"
+log_notice "* Moving forward, please use the [remove_fluentbit_open.sh] script to remove Fluent Bit instead.  *"
+echo ""
+
+log_info  "Calling the [remove_fluentbit_open.sh] script..."
+
+# Call replacement script
+logging/bin/remove_fluentbit_open.sh
+
+
+log_debug "Script [$this_script] has completed [$(date)]"
+echo ""

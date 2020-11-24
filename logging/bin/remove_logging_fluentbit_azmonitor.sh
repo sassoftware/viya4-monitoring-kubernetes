@@ -6,18 +6,20 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
-helm2ReleaseCheck fb-$LOG_NS
+this_script=`basename "$0"`
 
-log_info "Removing Fluent Bit (Azure Monitor output) components from the [$LOG_NS] namespace [$(date)]"
+log_debug "Script [$this_script] has started [$(date)]"
 
-helm delete -n $LOG_NS fbaz
+# DEPRECATION NOTICE
+log_notice "* This script [remove_logging_fluentbit_azmonitor.sh] is deprecated and will be removed in the future. *"
+log_notice "* Moving forward, please use the [remove_fluentbit_azmonitor.sh] script to remove Fluent Bit instead.  *"
+echo ""
 
-log_info "Removing ConfigMaps"
-kubectl -n $LOG_NS delete configmap fbaz-fluent-bit-config   --ignore-not-found
-kubectl -n $LOG_NS delete configmap fbaz-viya-parsers        --ignore-not-found
+log_info  "Calling the [remove_fluentbit_azmonitor.sh] script..."
+
+# Call replacement script
+logging/bin/remove_fluentbit_azmonitor.sh
 
 
-# Should we leave secret in place?
-log_info "Removing Connection information  (secret)"
-kubectl -n $LOG_NS delete secret connection-info-azmonitor --ignore-not-found
-
+log_debug "Script [$this_script] has completed [$(date)]"
+echo ""

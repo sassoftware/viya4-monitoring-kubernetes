@@ -1,0 +1,160 @@
+#! /bin/bash
+
+# Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+cd "$(dirname $BASH_SOURCE)/../.."
+source logging/bin/common.sh
+this_script=`basename "$0"`
+
+log_debug "Script [$this_script] has started [$(date)]"
+
+# temp file used to capture command output
+tmpfile=$TMP_DIR/output.txt
+rm -f tmpfile
+
+# Confirm namespace exists
+if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
+  log_error "Namespace [$LOG_NS] does NOT exist."
+  exit 98
+fi
+
+# Require TLS into Kibana?
+LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-false}
+
+if [ "$LOG_KB_TLS_ENABLE" == "true" ]; then
+   # w/TLS: use HTTPS in curl commands
+   KB_CURL_PROTOCOL=https
+   log_debug "TLS enabled for Kibana"
+else
+   # w/o TLS: use HTTP in curl commands
+   KB_CURL_PROTOCOL=http
+   log_debug "TLS not enabled for Kibana"
+fi
+
+export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
+export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
+
+# TO DO: NEED TO CONFIRM WE HAVE USER/PASSWORD?
+set -e
+
+
+log_info "Configuring Kibana"
+
+#### TEMP?  Remove when defining nodePort via HELM chart?
+SVC=v4m-es-kibana-svc
+SVC_TYPE=$(kubectl get svc -n $LOG_NS $SVC -o jsonpath='{.spec.type}')
+if [ "$SVC_TYPE" == "NodePort" ]; then
+  KIBANA_PORT=31033
+  kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
+  log_info "Set Kibana service NodePort to 31033"
+fi
+
+
+# construct URL to access Kibana
+# Use existing NODE_NAME or find one
+NODE_NAME=${NODE_NAME:-$(kubectl get node --selector='node-role.kubernetes.io/master' | awk 'NR==2 { print $1 }')}
+if [ "$NODE_NAME" == "" ]; then
+  # Get first node
+  NODE_NAME=$(kubectl get nodes | awk 'NR==2 { print $1 }')
+fi
+
+
+# Need to wait 2-3 minutes for kibana to come up and
+# and be ready to accept the curl commands below
+# wait for pod to show as "running" and "ready"
+
+log_info "Checking status of Kibana pod"
+podready="FALSE"
+
+for pause in 40 30 20 15 10 10 10 15 15 15 30 30 30 30
+do
+   if [[ "$( kubectl -n $LOG_NS get pod -l 'role=kibana' -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}')" == *"True"* ]]; then
+      log_info "Pod is ready...continuing"
+      podready="TRUE"
+      break
+   else
+      log_info "Pod is not ready yet...sleeping for [$pause] more seconds before checking again."
+      sleep ${pause}s
+   fi
+done
+
+if [ "$podready" != "TRUE" ]; then
+   log_error "The kibana pod has NOT reached [Ready] status in the expected time; exiting."
+   log_error "Review pod's events and log to identify the issue and resolve it; run the remove_logging.sh script and try again."
+   exit 15
+fi
+
+# set up temporary port forwarding to allow curl access
+K_PORT=$(kubectl -n $LOG_NS get service v4m-es-kibana-svc -o=jsonpath='{.spec.ports[?(@.name=="kibana-svc")].port}')
+
+# command is sent to run in background
+kubectl -n $LOG_NS port-forward  --address localhost svc/v4m-es-kibana-svc :$K_PORT > $tmpfile &
+
+# get PID to allow us to kill process later
+pfPID=$!
+log_debug "pfPID: $pfPID"
+
+# pause to allow port-forwarding messages to appear
+sleep 5s
+
+# determine which port port-forwarding is using
+pfRegex='Forwarding from .+:([0-9]+)'
+myline=$(head -n1  $tmpfile)
+
+if [[ $myline =~ $pfRegex ]]; then
+   TEMP_PORT="${BASH_REMATCH[1]}";
+   log_debug "TEMP_PORT=${TEMP_PORT}"
+else
+   set +e
+   log_error "Unable to obtain or identify the temporary port used for port-forwarding; exiting script.";
+   kill -9 $pfPID
+   rm -f $tmpfile
+  exit 18
+fi
+
+# Confirm Kibana is ready
+# returns 503 (and outputs "Kibana server is not ready yet") when Kibana isn't ready yet
+response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
+
+# TO DO: Change to a looping/repeated check?
+# TO DO: And/or check for 503 specifically?
+if [[ $response != 2* ]]; then
+   log_info "Kibana does not appear to be quite ready; waiting [2] minutes.[$response]"
+   sleep 120
+else
+   log_debug "Kibana status check successful [$response]"
+fi
+
+# Import Kibana Searches, Visualizations and Dashboard Objects using curl
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.6.1_200915.ndjson --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+
+# TO DO/CHECK: this should return a SUCCESS message like this: {"success":true,"successCount":20}
+if [[ $response != 2* ]]; then
+   log_error "There was an issue loading content into Kibana [$response]"
+   kill -9 $pfPID
+   exit 17
+else
+   log_info "Content loaded into Kibana [$response]"
+fi
+
+# terminate port-forwarding and delete tmpfile
+log_info "You may see a message below about a process being killed; it is expected and can be ignored."
+kill  -9 $pfPID
+rm -f $tmpfile
+
+sleep 7s
+
+
+# Print URL to access Kibana
+log_notice "================================================================================"
+log_notice "== Access Kibana using this URL:                                              =="
+log_notice "==                                                                            =="
+log_notice "==    $KB_CURL_PROTOCOL://$NODE_NAME:$KIBANA_PORT/app/kibana    =="
+log_notice "==                                                                            =="
+log_notice "== Note: If you have configured INGRESS, this URL may be incorrect; review    =="
+log_notice "==       the INGRESS configuration to determine correct URL to access Kibana. =="
+log_notice "================================================================================"
+
+log_debug "Script [$this_script] has completed [$(date)]"
+echo ""
