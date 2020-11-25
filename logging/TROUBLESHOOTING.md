@@ -9,18 +9,22 @@ which are present only as links. Because Fluent Bit can see the directory, it do
 message, but it does not process any logs to be displayed in Kibana.
 
 ### Solution
-1. If you have not already deployed the logging components, copy the `../samples/generic-base` sample directory (including sub-directories) to a separate local path. If you have already deployed logging, this 
-directory should already be in your local path. 
+1. If you have not already deployed the logging components, copy the `../samples/generic-base` sample directory (including the `/logging` and `/monitoring` sub-directories) to a separate local path. Do not create the local directory before copying the sample directory.
+```bash
+cp samples/generic-base <my_directory> -R
+```
+
+The logging and monitoring components require this directory structure:
+```bash
+<my_directory>/logging
+<my_directory>/monitoring
+```
+If you have already deployed logging, this directory and its contents should already be in your local path, so 
+you do not need to copy the directory again. 
 
 See the [main README](../README.md#customization) for information about the customization process.
 
-2. Set the `USER_DIR` environment variable to the `/generic-base` directory in your local path:
-
-```bash
-export USER_DIR=/path/to/my/copy/generic-base
-```
-
-3. Edit `$USER_DIR/logging/user-values-fluent-bit-open.yaml` and uncomment these lines:
+2. Edit `<my_directory>/logging/user-values-fluent-bit-open.yaml` and uncomment these lines:
 ```bash
 #extraVolumeMounts:
 #- mountPath: /fluent-bit/etc/viya-parsers.conf
@@ -41,7 +45,7 @@ export USER_DIR=/path/to/my/copy/generic-base
 ```
 Add the uncommented lines if they are not present in your copy of `user-values-fluent-bit-open.yaml`.
 
-4. Replace the `mountPath` and `hostPath: path` values with the location to which your Docker root directory has been mapped.
+3. Replace the `mountPath` and `hostPath: path` values with the location to which your Docker root directory has been mapped.
 ```bash
 - mountPath: /<my_Docker_root_directory>/containers
 
@@ -50,14 +54,21 @@ Add the uncommented lines if they are not present in your copy of `user-values-f
 - hostPath:
     path: /<my_Docker_root_directory>/containers
 ```
+
+4. Set the `USER_DIR` environment variable to your local directory into which you copied the `/generic-base` sample. For example, if you copied the files from the `/generic_base` directory to `/home/my_directory/logging`, you would issue this command:
+
+```bash
+export USER_DIR=/home/my_directory
+```
+
 5. If you previously deployed the logging components, run the Fluent Bit deployment script to redeploy only the Fluent Bit pods:
 
 ```bash
-/path/to/this/repo/logging/bin/deploy_logging_fluentbit_open.sh
+./logging/bin/deploy_logging_fluentbit_open.sh
 ```
 
 If you have not yet deployed the logging components, run the standard deployment script:
 
 ```bash
-/path/to/this/repo/logging/bin/deploy_logging_open.sh
+./logging/bin/deploy_logging_open.sh
 ```
