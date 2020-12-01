@@ -181,6 +181,9 @@ for f in monitoring/rules/viya/rules-*.yaml; do
   kubectl apply -n $MON_NS -f $f
 done
 
+log_info "Patching KubeHpaMaxedOut rule..."
+kubectl patch prometheusrule --type='json' -n monitoring v4m-kubernetes-apps --patch "$(cat monitoring/kube-hpa-alert-patch.json)"
+
 echo ""
 monitoring/bin/deploy_dashboards.sh
 
