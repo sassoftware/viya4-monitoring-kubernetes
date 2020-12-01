@@ -5,45 +5,40 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
+source logging/bin/secrets-include.sh
 
 this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
 
+ES_CONTENT_DEPLOY=${ES_CONTENT_DEPLOY:-${ELASTICSEARCH_ENABLE:-true}}
+
+if [ "$ES_CONTENT_DEPLOY" != "true" ]; then
+  log_info "Environment variable [ES_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into Open Distro for Elasticsearch"
+  exit 0
+fi
+
+
 # temp file used to capture command output
 tmpfile=$TMP_DIR/output.txt
-rm -f tmpfile
 
 set -e
 
 # check for pre-reqs
 
-# TO DO: Confirm ES is deployed?  Check for a new ES_SUCCESS env var?
-
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   log_error "Namespace [$LOG_NS] does NOT exist."
-  exit 98
+  exit 1
 fi
+
+# TO DO: Confirm ES is deployed?  Check for a new ES_SUCCESS env var?
 
 # get credentials
-if [ "$ES_ADMIN_USER" == "" ] || [ "$ES_ADMIN_PASSWD" == "" ] ; then
-
-   log_debug "No crendentials passed in; attempting to load credentials from secret"
-   export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" 2>/dev/null |base64 --decode)
-   export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" 2>/dev/null |base64 --decode)
-
-   if [ "$ES_ADMIN_USER" == "" ] || [ "$ES_ADMIN_PASSWD" == "" ] ; then
-      log_error "Required credentials for the [ADMIN] user have not been provided."
-      exit 99
-   else
-      log_debug "Required credentials loaded from secret"
-   fi
-else
-   # Use credentials passed in
-   log_debug "Required credentials have been supplied"
-fi
+get_credentials_from_secret admin
+rc=$?
+if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
 
 
 # set up temporary port forwarding to allow curl access
@@ -72,7 +67,7 @@ else
    log_error "Unable to obtain or identify the temporary port used for port-forwarding; exiting script.";
    kill -9 $pfPID
    rm -f  $tmpfile
-   exit 18
+   exit 1
 fi
 
 # Create Index Management (I*M) Policy  objects
@@ -94,7 +89,7 @@ function set_retention_period {
    if ! [[ $retention_period =~ $digits_re ]]; then
       log_error "An invalid valid was provided for [$retention_period_var]; exiting."
       kill -9 $pfPID
-      exit 122
+      exit 1
    fi
 
    #Update retention period in json file prior to loading it
@@ -110,7 +105,7 @@ function set_retention_period {
    elif [[ $response != 2* ]]; then
       log_error "There was an issue loading index management policy [$policy_name] into Elasticsearch [$response]"
       kill -9 $pfPID
-      exit 16
+      exit 1
    else
       log_info "Index management policy [$policy_name] loaded into Elasticsearch [$response]"
    fi
@@ -125,7 +120,7 @@ response=$(curl  -s -o /dev/null -w "%{http_code}"  -XPUT "https://localhost:$TE
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading ingest pipeline into Elasticsearch [$response]"
    kill -9 $pfPID
-   exit 16
+   exit 1
 else
    log_info "Ingest pipeline definition loaded into Elasticsearch [$response]"
 fi
@@ -136,7 +131,7 @@ response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEM
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading index template settings into Elasticsearch [$response]"
    kill -9 $pfPID
-   exit 16
+   exit 1
 else
    log_info "Index template settings loaded into Elasticsearch [$response]"
 fi
@@ -153,7 +148,7 @@ response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading monitoring index template settings into Elasticsearch [$response]"
    kill -9 $pfPID
-   exit 16
+   exit 1
 else
    log_info "Monitoring index template template settings loaded into Elasticsearch [$response]"
 fi
@@ -164,7 +159,7 @@ response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading cluster setttings into Elasticsearch [$response]"
    kill -9 $pfPID
-   exit 16
+   exit 1
 else
    log_info "Cluster settings loaded into Elasticsearch [$response]"
 fi

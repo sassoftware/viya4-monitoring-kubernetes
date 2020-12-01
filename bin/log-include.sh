@@ -7,6 +7,18 @@ colorEnable=${LOG_COLOR_ENABLE:-true}
 levelEnable=${LOG_LEVEL_ENABLE:-true}
 logDebug=${LOG_DEBUG_ENABLE:-false}
 
+function add_notice {
+  if [ "$colorEnable" = "true" ]; then
+    whiteb "${bluebg}$*" >> $TMP_DIR/notices.txt
+  else
+    echo $*  >> $TMP_DIR/notices.txt
+  fi
+}
+
+function display_notices {
+  cat $TMP_DIR/notices.txt
+}
+
 function log_notice {
   if [ "$colorEnable" = "true" ]; then
     whiteb "${bluebg}$*"

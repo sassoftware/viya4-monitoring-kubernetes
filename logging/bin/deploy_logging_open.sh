@@ -7,6 +7,9 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source bin/tls-include.sh
 
+# set flag indicating wrapper/driver script being run
+export LOGGING_DRIVER=true
+
 ##################################
 # Check pre-reqs                 #
 ##################################
@@ -22,91 +25,58 @@ set -e
 
 log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 
+# initialize temp file for notice text
+touch $TMP_DIR/notices.txt
+
 
 ##################################
 # Event Router                   #
 ##################################
 
 # Collect Kubernetes events as pseudo-log messages?
-EVENTROUTER_ENABLE=${EVENTROUTER_ENABLE:-true}
 
-if [ "$EVENTROUTER_ENABLE" == "true" ]; then
-   log_info "STEP 1: Deploying Event Router"
-   logging/bin/deploy_eventrouter.sh
-else
-   log_info "Skipping Event Router install - EVENTROUTER_ENABLE=[$EVENTROUTER_ENABLE]"
-fi
-
+log_info "STEP 1: Event Router"
+logging/bin/deploy_eventrouter.sh
 
 ##################################
 # Open Distro for Elasticsearch  #
 ##################################
 
-# TO DO: Add enable/disable flag?
-
-log_info "STEP 2: Deploying Elasticsearch"
-
-logging/bin/deploy_odfe.sh
-
-# TO DO: NEED TO CHECK FOR SUCCESS?  CHECK FOR HEALTHY ES?  PAUSE FOR INITIALIZATION?
+log_info "STEP 2: Elasticsearch"
+logging/bin/deploy_elasticsearch_open.sh
 
 ##################################
-# ODFE Content                   #
+# Open Distro Content            #
 ##################################
-
-# TO DO: Add enable/disable flag?
 
 log_info "STEP 2a: Loading Content into Elasticsearch"
-
-logging/bin/deploy_odfe_content.sh
-
+logging/bin/deploy_elasticsearch_content_open.sh
 
 ##################################
 # Elasticsearch Metric Exporter  #
 ##################################
 
-ELASTICSEARCH_EXPORTER_ENABLED=${ELASTICSEARCH_EXPORTER_ENABLED:-true}
-if [ "$ELASTICSEARCH_EXPORTER_ENABLED" == "true" ]; then
-   log_info "STEP 3: Deploying Elasticsearch metric exporter"
-   logging/bin/deploy_esexporter.sh
-else
-   log_info "Skipping Fluent Bit install - ELASTICSEARCH_EXPORTER_ENABLED=[$ELASTICSEARCH_EXPORTER_ENABLED]"
-fi
-
+log_info "STEP 3: Elasticsearch metric exporter"
+logging/bin/deploy_esexporter.sh
 
 ##################################
 # Kibana Content                 #
 ##################################
 
-# TO DO: Add enable/disable flag?
-
-log_info "STEP 4: Configuring Kibana"
-
 # NOTE: For ODFE, Kibana is deployed as part of ES Helm chart
 
-# TO DO: Need to pause here?
-# Need to wait for Kibana to complete initialization after ES security script runs
-#log_msg "Waiting [3] minutes for Kibana to complete initialization before loading content"
-#sleep 180s
-
+log_info "STEP 4: Configuring Kibana"
 logging/bin/deploy_kibana_content.sh
-
 
 ##################################
 # Fluent Bit                     #
 ##################################
 
-# Enable Fluent Bit?
-FLUENT_BIT_ENABLED=${FLUENT_BIT_ENABLED:-true}
+log_info "STEP 5: Deploying Fluent Bit"
+logging/bin/deploy_fluentbit_open.sh
 
-if [ "$FLUENT_BIT_ENABLED" == "true" ]; then
-   log_info "STEP 5: Deploying Fluent Bit"
-
-   # Call separate Fluent Bit deployment script
-   logging/bin/deploy_fluentbit_open.sh
-else
-  log_info "Skipping Fluent Bit install - FLUENT_BIT_ENABLED=[$FLUENT_BIT_ENABLED]"
-fi
+# Write any "notices" to console
+cat $TMP_DIR/notices.txt
 
 log_notice "The deployment of logging components has completed [$(date)]"
 echo ""

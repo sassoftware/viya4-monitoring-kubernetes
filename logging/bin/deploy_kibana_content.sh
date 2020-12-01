@@ -5,18 +5,26 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
+source logging/bin/secrets-include.sh
+
 this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
+KIBANA_CONTENT_DEPLOY=${KIBANA_CONTENT_DEPLOY:-${ELASTICSEARCH_ENABLE:-true}}
+
+if [ "$KIBANA_CONTENT_DEPLOY" != "true" ]; then
+  log_info "Environment variable [KIBANA_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into Kibana"
+  exit 0
+fi
+
 # temp file used to capture command output
 tmpfile=$TMP_DIR/output.txt
-rm -f tmpfile
 
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   log_error "Namespace [$LOG_NS] does NOT exist."
-  exit 98
+  exit 1
 fi
 
 # Require TLS into Kibana?
@@ -32,10 +40,11 @@ else
    log_debug "TLS not enabled for Kibana"
 fi
 
-export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
-export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
+# get credentials
+get_credentials_from_secret admin
+rc=$?
+if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
 
-# TO DO: NEED TO CONFIRM WE HAVE USER/PASSWORD?
 set -e
 
 
@@ -82,7 +91,7 @@ done
 if [ "$podready" != "TRUE" ]; then
    log_error "The kibana pod has NOT reached [Ready] status in the expected time; exiting."
    log_error "Review pod's events and log to identify the issue and resolve it; run the remove_logging.sh script and try again."
-   exit 15
+   exit 1
 fi
 
 # set up temporary port forwarding to allow curl access
@@ -110,7 +119,7 @@ else
    log_error "Unable to obtain or identify the temporary port used for port-forwarding; exiting script.";
    kill -9 $pfPID
    rm -f $tmpfile
-  exit 18
+  exit 1
 fi
 
 # Confirm Kibana is ready
@@ -133,7 +142,7 @@ response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://lo
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading content into Kibana [$response]"
    kill -9 $pfPID
-   exit 17
+   exit 1
 else
    log_info "Content loaded into Kibana [$response]"
 fi
@@ -147,14 +156,19 @@ sleep 7s
 
 
 # Print URL to access Kibana
-log_notice "================================================================================"
-log_notice "== Access Kibana using this URL:                                              =="
-log_notice "==                                                                            =="
-log_notice "==    $KB_CURL_PROTOCOL://$NODE_NAME:$KIBANA_PORT/app/kibana    =="
-log_notice "==                                                                            =="
-log_notice "== Note: If you have configured INGRESS, this URL may be incorrect; review    =="
-log_notice "==       the INGRESS configuration to determine correct URL to access Kibana. =="
-log_notice "================================================================================"
+add_notice "================================================================================"
+add_notice "== Access Kibana using this URL:                                              =="
+add_notice "==                                                                            =="
+add_notice "==    $KB_CURL_PROTOCOL://$NODE_NAME:$KIBANA_PORT/app/kibana    =="
+add_notice "==                                                                            =="
+add_notice "== Note: If you have configured INGRESS, this URL may be incorrect; review    =="
+add_notice "==       the INGRESS configuration to determine correct URL to access Kibana. =="
+add_notice "================================================================================"
+
+LOGGING_DRIVER=${LOGGING_DRIVER:-false}
+if [ "$LOGGING_DRIVER" != "true" ]; then
+   display_notices
+fi
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""

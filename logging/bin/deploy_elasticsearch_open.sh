@@ -12,6 +12,13 @@ this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
+ELASTICSEARCH_ENABLE=${ELASTICSEARCH_ENABLE:-true}
+
+if [ "$ELASTICSEARCH_ENABLED" != "true" ]; then
+  log_info "Environment variable [ELASTICSEARCH_ENABLED] is not set to 'true'; exiting WITHOUT deploying Open Distro for Elasticsearch"
+  exit 0
+fi
+
 set -e
 
 # check for pre-reqs
@@ -25,7 +32,7 @@ verify_cert_manager
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   log_error "Namespace [$LOG_NS] does NOT exist."
-  exit 98
+  exit 1
 fi
 
 # get credentials
@@ -210,7 +217,7 @@ if [ "$pvc_status" != "Bound" ];  then
       log_error "It appears that the PVC [data-v4m-es-master-0] associated with the [v4m-es-master-0] node has not been bound to a PV."
       log_error "The status of the PVC is [$pvc_status]"
       log_error "After ensuring all claims shown as Pending can be satisfied; run the remove_logging.sh script and try again."
-      exit 12
+      exit 1
 fi
 log_info "The PVC [data-v4m-es-master-0] have been bound to PVs"
 
@@ -233,7 +240,7 @@ done
 if [ "$podready" != "TRUE" ]; then
    log_error "The Elasticsearch pod [v4m-es-master-0] has NOT reached [Ready] status in the expected time; exiting."
    log_error "Review pod's events and log to identify the issue and resolve it; run the remove_logging.sh script and try again."
-   exit 14
+   exit 1
 fi
 
 log_info "Waiting [3] minute to allow Elasticsearch to initialize [$(date)]"

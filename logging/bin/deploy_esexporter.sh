@@ -5,6 +5,7 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
+source logging/bin/secrets-include.sh
 
 this_script=`basename "$0"`
 
@@ -28,22 +29,9 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
 fi
 
 # get credentials
-if [ "$ES_METRICGETTER_USER" == "" ] || [ "$ES_METRICGETTER_PASSWD" == "" ] ; then
-
-   log_debug "No crendentials passed in; attempting to load credentials from secret"
-   export ES_METRICGETTER_USER=$(kubectl -n $LOG_NS get secret internal-user-metricgetter -o=jsonpath="{.data.username}" 2>/dev/null |base64 --decode)
-   export ES_METRICGETTER_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-metricgetter -o=jsonpath="{.data.password}" 2>/dev/null |base64 --decode)
-
-   if [ "$ES_METRICGETTER_USER" == "" ] || [ "$ES_METRICGETTER_PASSWD" == "" ] ; then
-      log_error "Required credentials for the [metricgetter] user have not been provided."
-      exit 99
-   else
-      log_debug "Required credentials loaded from secret"
-   fi
-else
-   # Use credentials passed in
-   log_debug "Required credentials have been supplied"
-fi
+get_credentials_from_secret metricgetter
+rc=$?
+if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
 
 
 # enable debug on Helm via env var
