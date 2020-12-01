@@ -25,7 +25,7 @@ set -e
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   log_error "Namespace [$LOG_NS] does NOT exist."
-  exit 98
+  exit 1
 fi
 
 # get credentials

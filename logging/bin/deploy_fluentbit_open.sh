@@ -27,26 +27,13 @@ set -e
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   log_error "Namespace [$LOG_NS] does NOT exist."
-  exit 98
+  exit 1
 fi
 
 # get credentials
-if [ "$ES_LOGCOLLECTOR_USER" == "" ] || [ "$ES_LOGCOLLECTOR_PASSWD" == "" ] ; then
-
-   log_debug "No credentials passed in; attempting to load credentials from secret"
-   export ES_LOGCOLLECTOR_USER=$(kubectl -n $LOG_NS get secret internal-user-logcollector -o=jsonpath="{.data.username}" 2>/dev/null |base64 --decode)
-   export ES_LOGCOLLECTOR_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-logcollector -o=jsonpath="{.data.password}" 2>/dev/null |base64 --decode)
-
-   if [ "$ES_LOGCOLLECTOR_USER" == "" ] || [ "$ES_LOGCOLLECTOR_PASSWD" == "" ] ; then
-      log_error "Required credentials for the [logcollector] user could not be obtained; exiting."
-      exit 99
-   else
-      log_debug "Required credentials loaded from secret"
-   fi
-else
-   create_user_secret internal-user-logcollector $ES_LOGCOLLECTOR_USER $ES_LOGCOLLECTOR_PASSWD
-   log_debug "Required credentials have been supplied"
-fi
+get_credentials_from_secret logcollector
+rc=$?
+if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
 
 
 HELM_DEBUG="${HELM_DEBUG:-false}"
@@ -72,14 +59,6 @@ else
 fi
 log_info "Using FB ConfigMap:" $FB_CONFIGMAP
 
-# Fluent Bit
-
-# TO DO: Discuss; needed? better? works?
-# Remove existing Helm chart, if it exists
-#if [ helm status -n $LOG_NS fb 1>/dev/null 2>&1 ]; then
-#   log_debug "Remove Existing Fluent Bit Release"
-#   helm delete -n $LOG_NS fb
-#fi
 
 # Create ConfigMap containing Fluent Bit configuration
 kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
@@ -89,7 +68,6 @@ kubectl -n $LOG_NS delete configmap fb-viya-parsers --ignore-not-found
 kubectl -n $LOG_NS create configmap fb-viya-parsers  --from-file=logging/fb/viya-parsers.conf
 
 # Delete any existing Fluent Bit pods in the $LOG_NS namepace (otherwise Helm chart may assume an upgrade w/o reloading updated config
-# TO DO: Replace w/an earlier call (prior to creating config maps) to remove_logging_fluentbit script?
 kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=es"
 
 # Deploy Fluent Bit via Helm chart

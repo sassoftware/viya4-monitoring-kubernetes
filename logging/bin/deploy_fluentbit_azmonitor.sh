@@ -6,6 +6,19 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
+this_script=`basename "$0"`
+
+log_debug "Script [$this_script] has started [$(date)]"
+
+# Enable Fluent Bit?
+FLUENT_BIT_ENABLED=${FLUENT_BIT_ENABLED:-true}
+
+if [ "$FLUENT_BIT_ENABLED" != "true" ]; then
+   log_warn "Environment variable [FLUENT_BIT_ENABLED] is not set to 'true'; existing WITHOUT deploying Fluent Bit"
+   exit
+fi
+
+
 set -e
 
 HELM_DEBUG="${HELM_DEBUG:-false}"
@@ -18,7 +31,7 @@ helm2ReleaseCheck fb-$LOG_NS
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   log_error "The specified namespace [$LOG_NS] does not exist."
-  exit 9
+  exit 1
 fi
 
 
@@ -51,7 +64,7 @@ if [ "$(kubectl -n $LOG_NS get secret connection-info-azmonitor -o name 2>/dev/n
    else
       log_error "Unable to create secret [$LOG_NS/connection-info-azmonitor] because missing required information: [AZMONITOR_CUSTOMER_ID: $AZMONITOR_CUSTOMER_ID ; AZMONITOR_SHARED_KEY: $AZMONITOR_SHARED_KEY]."
       log_error "You must provide this information via environment variables or create the secret [connection-info-azmonitor] before running this script."
-      exit 88
+      exit 1
    fi
 else
    log_info "Obtaining connection information from existing secret [$LOG_NS/connection-info-azmonitor]"
@@ -60,14 +73,6 @@ else
 fi
 
 
-# Fluent Bit
-# TO DO: Discuss; needed? better? works?
-# Remove existing Helm chart, if it exists
-#if [ helm status -n $LOG_NS fbaz 1>/dev/null 2>&1 ]; then
-#   log_debug "Remove Existing Fluent Bit Release"
-#   helm delete -n $LOG_NS fbaz
-#fi
-
 # Create ConfigMap containing Fluent Bit configuration
 kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 
@@ -75,7 +80,6 @@ kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 kubectl -n $LOG_NS delete configmap fbaz-viya-parsers --ignore-not-found
 kubectl -n $LOG_NS create configmap fbaz-viya-parsers  --from-file=logging/fb/viya-parsers.conf
 
-# TO DO: Replace with Helm release removal?
 # Delete any existing Fluent Bit pods in the $LOG_NS namepace (otherwise Helm chart may assume an upgrade w/o reloading updated config
 kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=azuremonitor"
 
