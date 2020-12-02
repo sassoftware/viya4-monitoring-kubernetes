@@ -54,6 +54,7 @@ create_tls_certs $LOG_NS logging ${apps[@]}
 # Create ConfigMap for securityadmin script
 if [ -z "$(kubectl -n $LOG_NS get configmap run-securityadmin.sh -o name 2>/dev/null)" ]; then
   kubectl -n $LOG_NS create configmap run-securityadmin.sh --from-file logging/es/odfe/bin/run_securityadmin.sh
+  kubectl -n $LOG_NS label  configmap run-securityadmin.sh managed-by=v4m-es-script
 else
   log_info "Using existing ConfigMap [run-securityadmin.sh]"
 fi
@@ -74,7 +75,7 @@ fi
 
 helm2ReleaseCheck odfe-$LOG_NS
 
-# Check for existing OpenDistro helm release
+# Check for existing Open Distro helm release
 existingODFE="false"
 if [ helm status -n $LOG_NS odfe 1>/dev/null 2>&1 ]; then
    existingODFE="true"
@@ -119,7 +120,6 @@ create_secret_from_file securityconfig/config.yml          security-config      
 create_secret_from_file securityconfig/internal_users.yml  security-internal-users  managed-by=v4m-es-script
 create_secret_from_file securityconfig/roles.yml           security-roles           managed-by=v4m-es-script
 create_secret_from_file securityconfig/roles_mapping.yml   security-roles-mapping   managed-by=v4m-es-script
-
 
 
 # Open Distro for Elasticsearch
@@ -262,7 +262,7 @@ if [ "$existingODFE" == "false" ]; then
   # show output from run_securityadmin.sh script
   sed 's/^/   | /' $TMP_DIR/run_securityadmin.log
 else
-  log_info "Existing OpenDistro release found. Skipping Elasticsearh security initialization."
+  log_info "Existing Open Distro release found. Skipping Elasticsearh security initialization."
 fi
 
 set -e

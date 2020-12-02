@@ -10,8 +10,12 @@ this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
-log_info "Removing Open Distro for Elasticsearch..."
+log_info "Removing Open Distro for Elasticsearch [$(date)]"
 helm delete -n $LOG_NS odfe
+
+
+log_info "Removing ConfigMaps"
+kubectl -n $LOG_NS delete configmap run-securityadmin.sh  --ignore-not-found
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""
