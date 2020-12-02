@@ -85,5 +85,5 @@ function log_error {
   fi
 }
 
-export -f log_notice log_message log_debug log_info log_warn log_error
+export -f log_notice log_message log_debug log_info log_warn log_error add_notice display_notices
 export colorEnable levelEnable logDebug

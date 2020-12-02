@@ -22,7 +22,7 @@ log_info "Removing Elasticsearch Metric Exporter..."
 logging/bin/remove_esexporter.sh
 
 log_info "Removing Open Distro for Elasticsearch..."
-logging/bin/remove_odfe.sh
+logging/bin/remove_elasticsearch_open.sh
 
 
 log_info "Removing eventrouter..."
@@ -31,6 +31,11 @@ logging/bin/remove_eventrouter.sh
 if [ "$LOG_DELETE_PVCS_ON_REMOVE" == "true" ]; then
   log_info "Removing known logging PVCs..."
   kubectl delete pvc --ignore-not-found -n $LOG_NS -l app=v4m-es
+fi
+
+if [ "$LOG_DELETE_SECRETS_ON_REMOVE" == "true" ]; then
+  log_info "Removing known logging secrets..."
+  kubectl delete secret --ignore-not-found -n $LOG_NS -l managed-by=v4m-es-script
 fi
 
 
@@ -49,17 +54,16 @@ log_info "Waiting 60 sec for resources to terminate..."
 sleep 60
 
 log_info "Checking contents of the [$LOG_NS] namespace:"
-# TO DO: Check for Secrets (e.g. internal-users-*, security config files?, TLS Certs?); ConfigMaps (run-securityadmin.sh) too?
-crds=( all pvc )
+objects=( all pvc secret configmap)
 empty="true"
-for crd in "${crds[@]}"
+for object in "${objects[@]}"
 do
-	out=$(kubectl get -n $LOG_NS $crd 2>&1)
+	out=$(kubectl get -n $LOG_NS $object 2>&1)
   if [[ "$out" =~ 'No resources found' ]]; then
     :
   else
     empty="false"
-    log_warn "Found [$crd] resources in the [$LOG_NS] namespace:"
+    log_warn "Found [$object] resources in the [$LOG_NS] namespace:"
     echo "$out"
   fi
 done

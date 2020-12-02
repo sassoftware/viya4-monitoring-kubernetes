@@ -10,6 +10,7 @@ function create_secret_from_file {
 
   file=$1
   secret_name=$2
+  label=$3
 
   if [ -z "$(kubectl -n $LOG_NS get secret $secret_name -o name 2>/dev/null)" ]; then
 
@@ -24,6 +25,12 @@ function create_secret_from_file {
 
     if [ "$(kubectl -n $LOG_NS create secret generic $secret_name --from-file=$filepath/$file)" == "secret/$secret_name created" ]; then
       log_info "Created secret for Elasticsearch config file [$file]"
+
+      if [ "$label" != "" ]; then
+         log_debug "Applying label [$label] to newly created secret [$secret_name]"
+         kubectl -n $LOG_NS label secret  $secret_name $label
+      fi
+
       return 0
     else
       log_error "Could not create secret for Elasticsearch config file [$file]"
@@ -39,13 +46,21 @@ function create_user_secret {
   secret_name=$1
   username=$2
   password=$3
+  label=$4
 
   if [ -z "$(kubectl -n $LOG_NS get secret $secret_name -o name 2>/dev/null)" ]; then
 
     log_debug "Will attempt to create secret [$secret_name]"
 
     if [ "$(kubectl -n $LOG_NS create secret generic $secret_name  --from-literal=username=$username --from-literal=password=$password)" == "secret/$secret_name created" ]; then
+
       log_info "Created secret for Elasticsearch user credentials [$username]"
+
+      if [ "$label" != "" ]; then
+         log_debug "Applying label [$label] to newly created secret [$secret_name]"
+         kubectl -n $LOG_NS label secret  $secret_name $label
+      fi
+
       return 0
     else
       log_error "Could not create secret for Elasticsearch user credentials [$username]"

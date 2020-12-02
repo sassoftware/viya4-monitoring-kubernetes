@@ -14,8 +14,8 @@ log_debug "Script [$this_script] has started [$(date)]"
 
 ELASTICSEARCH_ENABLE=${ELASTICSEARCH_ENABLE:-true}
 
-if [ "$ELASTICSEARCH_ENABLED" != "true" ]; then
-  log_info "Environment variable [ELASTICSEARCH_ENABLED] is not set to 'true'; exiting WITHOUT deploying Open Distro for Elasticsearch"
+if [ "$ELASTICSEARCH_ENABLE" != "true" ]; then
+  log_info "Environment variable [ELASTICSEARCH_ENABLE] is not set to 'true'; exiting WITHOUT deploying Open Distro for Elasticsearch"
   exit 0
 fi
 
@@ -42,10 +42,10 @@ export ES_LOGCOLLECTOR_PASSWD=${ES_LOGCOLLECTOR_PASSWD:-$(uuidgen)}
 export ES_METRICGETTER_PASSWD=${ES_METRICGETTER_PASSWD:-$(uuidgen)}
 
 # Create secrets containing internal user credentials
-create_user_secret internal-user-admin        admin        $ES_ADMIN_PASSWD
-create_user_secret internal-user-kibanaserver kibanaserver $ES_KIBANASERVER_PASSWD
-create_user_secret internal-user-logcollector logcollector $ES_LOGCOLLECTOR_PASSWD
-create_user_secret internal-user-metricgetter metricgetter $ES_METRICGETTER_PASSWD
+create_user_secret internal-user-admin        admin        $ES_ADMIN_PASSWD         managed-by=v4m-es-script
+create_user_secret internal-user-kibanaserver kibanaserver $ES_KIBANASERVER_PASSWD  managed-by=v4m-es-script
+create_user_secret internal-user-logcollector logcollector $ES_LOGCOLLECTOR_PASSWD  managed-by=v4m-es-script
+create_user_secret internal-user-metricgetter metricgetter $ES_METRICGETTER_PASSWD  managed-by=v4m-es-script
 
 # Create/Get necessary TLS certs
 apps=( es-transport es-rest es-admin kibana )
@@ -114,11 +114,11 @@ fi
 
 
 # Create secrets containing SecurityConfig files
-create_secret_from_file securityconfig/action_groups.yml security-action-groups
-create_secret_from_file securityconfig/config.yml security-config
-create_secret_from_file securityconfig/internal_users.yml security-internal-users
-create_secret_from_file securityconfig/roles.yml security-roles
-create_secret_from_file securityconfig/roles_mapping.yml security-roles-mapping
+create_secret_from_file securityconfig/action_groups.yml   security-action-groups   managed-by=v4m-es-script
+create_secret_from_file securityconfig/config.yml          security-config          managed-by=v4m-es-script
+create_secret_from_file securityconfig/internal_users.yml  security-internal-users  managed-by=v4m-es-script
+create_secret_from_file securityconfig/roles.yml           security-roles           managed-by=v4m-es-script
+create_secret_from_file securityconfig/roles_mapping.yml   security-roles-mapping   managed-by=v4m-es-script
 
 
 
