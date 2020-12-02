@@ -74,9 +74,6 @@ kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=es"
 helm $helmDebug upgrade --install --namespace $LOG_NS fb --values logging/fb/fluent-bit_helm_values_open.yaml --values $FB_OPEN_USER_YAML  --set fullnameOverride=v4m-fb stable/fluent-bit
 
 
-# TO DO: Confirm deployment? Set exit code success/failure?
-
-
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""
 

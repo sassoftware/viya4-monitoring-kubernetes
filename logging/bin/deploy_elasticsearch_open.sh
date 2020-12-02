@@ -23,8 +23,8 @@ set -e
 
 # check for pre-reqs
 
-# TO DO: Not sure this needs to be done here, commenting OUT for now
-#checkDefaultStorageClass
+#TO DO: Do here (since we use PVCs here) or only in deploy_logging_open.sh?
+checkDefaultStorageClass
 
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then

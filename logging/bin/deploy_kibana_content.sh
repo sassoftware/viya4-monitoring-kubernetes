@@ -123,16 +123,26 @@ else
 fi
 
 # Confirm Kibana is ready
-# returns 503 (and outputs "Kibana server is not ready yet") when Kibana isn't ready yet
-response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
+for pause in 30 30 30 30 30 30
+do
+   response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
+   # returns 503 (and outputs "Kibana server is not ready yet") when Kibana isn't ready yet
+   # TO DO: check for 503 specifically?
 
-# TO DO: Change to a looping/repeated check?
-# TO DO: And/or check for 503 specifically?
-if [[ $response != 2* ]]; then
-   log_info "Kibana does not appear to be quite ready; waiting [2] minutes.[$response]"
-   sleep 120
-else
-   log_debug "Kibana status check successful [$response]"
+   if [[ $response != 2* ]]; then
+      log_info "The Kibana REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
+      sleep ${pause}s
+   else
+      log_info "The Kibana REST endpoint appears to be ready...continuing"
+      kibanaready="TRUE"
+      break
+   fi
+done
+
+if [ "$kibanaready" != "TRUE" ]; then
+   log_error "The Kibana REST endpoint has NOT become accessible in the expected time; exiting."
+   log_error "Review the Kibana pod's events and log to identify the issue and resolve it before trying again."
+   exit 1
 fi
 
 # Import Kibana Searches, Visualizations and Dashboard Objects using curl
