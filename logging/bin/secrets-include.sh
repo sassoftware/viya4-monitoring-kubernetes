@@ -82,8 +82,8 @@ function get_credentials_from_secret {
    passwd_var="ES_${user_upper}_PASSWD"
 
 
-   if [ $(kubectl -n $LOG_NS get secret $secret_name 2>/dev/null 1>2) ] ; then
-      log_error "The secret [$secret_name] containing the required credentials for the [$user] identity was not found in namespace [$LOG_NS]"
+   if [ -z "$(kubectl -n $LOG_NS get secret $secret_name -o name 2>/dev/null)" ]; then
+      log_error "The expected secret [$secret_name], containing the required credentials for the [$user] identity, was not found in namespace [$LOG_NS]"
       return 1
    else
       export $user_var=$(kubectl -n $LOG_NS get secret $secret_name -o=jsonpath="{.data.username}" 2>/dev/null |base64 --decode)
