@@ -23,9 +23,6 @@ set -e
 
 # check for pre-reqs
 
-# TO DO: Not sure this needs to be done here, could be bringing their own certs
-verify_cert_manager
-
 # TO DO: Not sure this needs to be done here, commenting OUT for now
 #checkDefaultStorageClass
 
@@ -216,7 +213,7 @@ pvc_status=$(kubectl -n $LOG_NS get pvc  data-v4m-es-master-0  -o=jsonpath="{.st
 if [ "$pvc_status" != "Bound" ];  then
       log_error "It appears that the PVC [data-v4m-es-master-0] associated with the [v4m-es-master-0] node has not been bound to a PV."
       log_error "The status of the PVC is [$pvc_status]"
-      log_error "After ensuring all claims shown as Pending can be satisfied; run the remove_logging.sh script and try again."
+      log_error "After ensuring all claims shown as Pending can be satisfied; run the remove_elasticsearch_open.sh script and try again."
       exit 1
 fi
 log_info "The PVC [data-v4m-es-master-0] have been bound to PVs"
@@ -243,8 +240,11 @@ if [ "$podready" != "TRUE" ]; then
    exit 1
 fi
 
-log_info "Waiting [3] minute to allow Elasticsearch to initialize [$(date)]"
-sleep 180s
+# TO DO: Convert to curl command to detect ES is up?
+# hitting https:/host:port -u adminuser:adminpwd --insecure 
+# returns "Open Distro Security not initialized." and 503 when up
+log_info "Waiting [2] minute to allow Elasticsearch to initialize [$(date)]"
+sleep 120s
 
 set +e
 

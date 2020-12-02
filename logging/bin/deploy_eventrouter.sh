@@ -14,7 +14,7 @@ log_debug "Script [$this_script] has started [$(date)]"
 EVENTROUTER_ENABLE=${EVENTROUTER_ENABLE:-true}
 
 if [ "$EVENTROUTER_ENABLE" != "true" ]; then
-  log_warn "Environment variable [EVENTROUTER_ENABLE] is not set to 'true'; exiting WITHOUT deploying Event Router"
+  log_info "Environment variable [EVENTROUTER_ENABLE] is not set to 'true'; exiting WITHOUT deploying Event Router"
   exit
 fi
 

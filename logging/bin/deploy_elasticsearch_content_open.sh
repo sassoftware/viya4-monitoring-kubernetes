@@ -33,7 +33,6 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   exit 1
 fi
 
-# TO DO: Confirm ES is deployed?  Check for a new ES_SUCCESS env var?
 
 # get credentials
 get_credentials_from_secret admin
@@ -69,6 +68,22 @@ else
    rm -f  $tmpfile
    exit 1
 fi
+
+
+# Confirm Open Distro for Elasticsearch is ready
+# returns 503 (and outputs "Open Distro Security not initialized.") when ODFE isn't ready yet
+response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "https://localhost:$TEMP_PORT"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
+
+# TO DO: Change to a looping/repeated check?
+# TO DO: And/or check for 503 specifically?
+if [[ $response != 2* ]]; then
+   log_info "Open Distro for Elasticsearch does not appear to be quite ready; waiting [2] minutes.[$response]"
+   sleep 120
+else
+   log_debug "Open Distro for Elasticsearch status check successful [$response]"
+fi
+
+
 
 # Create Index Management (I*M) Policy  objects
 function set_retention_period {
@@ -116,7 +131,7 @@ set_retention_period viya_logs_idxmgmt_policy LOG_RETENTION_PERIOD
 
 # Create Ingest Pipeline to "burst" incoming log messages to separate indexes based on namespace
 response=$(curl  -s -o /dev/null -w "%{http_code}"  -XPUT "https://localhost:$TEMP_PORT/_ingest/pipeline/viyaburstns" -H 'Content-Type: application/json' -d @logging/es/es_create_ns_burst_pipeline.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-# TO DO/CHECK: this should return a message like this: {"acknowledged":true}
+# request returns: {"acknowledged":true}
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading ingest pipeline into Elasticsearch [$response]"
    kill -9 $pfPID
@@ -127,7 +142,7 @@ fi
 
 # Link index management policy and Ingest Pipeline to Index Template
 response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-logs-template "    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_logs.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
-# TO DO/CHECK: this should return a message like this: {"acknowledged":true}
+# request returns: {"acknowledged":true}
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading index template settings into Elasticsearch [$response]"
    kill -9 $pfPID
@@ -144,7 +159,8 @@ set_retention_period viya_ops_idxmgmt_policy OPS_LOG_RETENTION_PERIOD
 
 # Load template
 response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-ops-template " -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_ops.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-# TO DO/CHECK: this should return a message like this: {"acknowledged":true}
+# request returns: {"acknowledged":true}
+
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading monitoring index template settings into Elasticsearch [$response]"
    kill -9 $pfPID

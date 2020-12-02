@@ -78,5 +78,6 @@ logging/bin/deploy_fluentbit_open.sh
 # Write any "notices" to console
 cat $TMP_DIR/notices.txt
 
+echo ""
 log_notice "The deployment of logging components has completed [$(date)]"
 echo ""

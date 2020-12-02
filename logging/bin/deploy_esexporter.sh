@@ -14,7 +14,7 @@ log_debug "Script [$this_script] has started [$(date)]"
 ELASTICSEARCH_EXPORTER_ENABLED=${ELASTICSEARCH_EXPORTER_ENABLED:-true}
 
 if [ "$ELASTICSEARCH_EXPORTER_ENABLED" != "true" ]; then
-  log_warn "Environment variable [ELASTICSEARCH_EXPORTER_ENABLED] is not set to 'true'; exiting WITHOUT deploying Elasticsearch Exporter"
+  log_info "Environment variable [ELASTICSEARCH_EXPORTER_ENABLED] is not set to 'true'; exiting WITHOUT deploying Elasticsearch Exporter"
   exit
 fi
 
