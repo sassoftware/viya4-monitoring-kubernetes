@@ -50,7 +50,7 @@ set -e
 
 log_info "Configuring Kibana"
 
-#### TEMP?  Remove when defining nodePort via HELM chart?
+#### TEMP:  Remove if/when Helm chart supports defining nodePort
 SVC=v4m-es-kibana-svc
 SVC_TYPE=$(kubectl get svc -n $LOG_NS $SVC -o jsonpath='{.spec.type}')
 if [ "$SVC_TYPE" == "NodePort" ]; then

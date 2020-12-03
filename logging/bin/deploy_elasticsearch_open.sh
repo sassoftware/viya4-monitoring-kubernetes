@@ -21,9 +21,10 @@ fi
 
 set -e
 
+#
 # check for pre-reqs
+#
 
-#TO DO: Do here (since we use PVCs here) or only in deploy_logging_open.sh?
 checkDefaultStorageClass
 
 # Confirm namespace exists

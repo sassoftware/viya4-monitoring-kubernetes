@@ -8,10 +8,10 @@ levelEnable=${LOG_LEVEL_ENABLE:-true}
 logDebug=${LOG_DEBUG_ENABLE:-false}
 
 function add_notice {
-   if [ ! -f "$TMP_DIR/notices.txt" ]; then
-      # initialize temp file for notice text
-      touch $TMP_DIR/notices.txt
-   fi
+  if [ ! -f "$TMP_DIR/notices.txt" ]; then
+    # initialize temp file for notice text
+    touch $TMP_DIR/notices.txt
+  fi
 
   if [ "$colorEnable" = "true" ]; then
     whiteb "${bluebg}$*" >> $TMP_DIR/notices.txt
