@@ -180,7 +180,9 @@ add_notice_separator
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}
 if [ "$LOGGING_DRIVER" != "true" ]; then
+   echo ""
    display_notices
+   echo ""
 fi
 
 log_debug "Script [$this_script] has completed [$(date)]"
