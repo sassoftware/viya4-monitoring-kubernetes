@@ -91,6 +91,7 @@ done
 if [ "$podready" != "TRUE" ]; then
    log_error "The kibana pod has NOT reached [Ready] status in the expected time; exiting."
    log_error "Review pod's events and log to identify the issue and resolve it; run the remove_logging.sh script and try again."
+   kill -9 $pfPID
    exit 1
 fi
 
@@ -119,7 +120,7 @@ else
    log_error "Unable to obtain or identify the temporary port used for port-forwarding; exiting script.";
    kill -9 $pfPID
    rm -f $tmpfile
-  exit 1
+   exit 1
 fi
 
 # Confirm Kibana is ready
@@ -142,6 +143,7 @@ done
 if [ "$kibanaready" != "TRUE" ]; then
    log_error "The Kibana REST endpoint has NOT become accessible in the expected time; exiting."
    log_error "Review the Kibana pod's events and log to identify the issue and resolve it before trying again."
+   kill -9 $pfPID
    exit 1
 fi
 

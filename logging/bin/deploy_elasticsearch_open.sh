@@ -44,6 +44,25 @@ create_user_secret internal-user-kibanaserver kibanaserver $ES_KIBANASERVER_PASS
 create_user_secret internal-user-logcollector logcollector $ES_LOGCOLLECTOR_PASSWD  managed-by=v4m-es-script
 create_user_secret internal-user-metricgetter metricgetter $ES_METRICGETTER_PASSWD  managed-by=v4m-es-script
 
+# Print info about how to obtain admin password
+# TO DO: customize message based on how admin password was set?
+# a) passed value; b) existing secret; or, c) randomly-generated?
+add_notice "================================================================================"
+add_notice "== To obtain the 'admin' password, used to access Kibana, submit the          =="
+add_notice "== following command:                                                         =="
+add_notice "==                                                                            =="
+add_notice "==  kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath='{.data.username}' |base64 --decode    =="
+add_notice "==                                                                            =="
+add_notice "== NOTE: If you need to change the password for the 'admin' account, use the  =="
+add_notice "== change_internal_password.sh script found in the logging/bin directory.     =="
+add_notice "================================================================================"
+
+LOGGING_DRIVER=${LOGGING_DRIVER:-false}
+if [ "$LOGGING_DRIVER" != "true" ]; then
+   display_notices
+fi
+
+
 # Create/Get necessary TLS certs
 apps=( es-transport es-rest es-admin kibana )
 create_tls_certs $LOG_NS logging ${apps[@]}
