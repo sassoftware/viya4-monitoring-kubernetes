@@ -73,24 +73,24 @@ fi
 # and be ready to accept the curl commands below
 # wait for pod to show as "running" and "ready"
 
-log_info "Checking status of Kibana pod"
+log_debug "Checking status of Kibana pod"
 podready="FALSE"
 
 for pause in 40 30 20 15 10 10 10 15 15 15 30 30 30 30
 do
    if [[ "$( kubectl -n $LOG_NS get pod -l 'role=kibana' -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}')" == *"True"* ]]; then
-      log_info "Pod is ready...continuing"
+      log_info "The Kibana pod is ready...continuing"
       podready="TRUE"
       break
    else
-      log_info "Pod is not ready yet...sleeping for [$pause] more seconds before checking again."
+      log_info "The Kibana pod is not ready yet...sleeping for [$pause] more seconds before checking again."
       sleep ${pause}s
    fi
 done
 
 if [ "$podready" != "TRUE" ]; then
-   log_error "The kibana pod has NOT reached [Ready] status in the expected time; exiting."
-   log_error "Review pod's events and log to identify the issue and resolve it; run the remove_logging.sh script and try again."
+   log_error "The Kibana pod has NOT reached [Ready] status in the expected time; exiting."
+   log_error "Review the Kibana pod's events and log to identify the issue and resolve it; run the remove_logging.sh script and try again."
    kill -9 $pfPID
    exit 1
 fi
