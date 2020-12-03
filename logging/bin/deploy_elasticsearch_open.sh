@@ -48,6 +48,7 @@ create_user_secret internal-user-metricgetter metricgetter $ES_METRICGETTER_PASS
 # Print info about how to obtain admin password
 # TO DO: customize message based on how admin password was set?
 # a) passed value; b) existing secret; or, c) randomly-generated?
+add_notice " "
 add_notice "================================================================================"
 add_notice "== To obtain the 'admin' password, used to access Kibana, submit the          =="
 add_notice "== following command:                                                         =="
@@ -57,7 +58,7 @@ add_notice "==                                                                  
 add_notice "== NOTE: If you need to change the password for the 'admin' account, use the  =="
 add_notice "== change_internal_password.sh script found in the logging/bin directory.     =="
 add_notice "================================================================================"
-add_notice_separator
+add_notice " "
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}
 if [ "$LOGGING_DRIVER" != "true" ]; then

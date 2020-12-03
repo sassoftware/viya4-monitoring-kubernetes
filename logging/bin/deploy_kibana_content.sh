@@ -168,15 +168,16 @@ sleep 7s
 
 
 # Print URL to access Kibana
+add_notice ""
 add_notice "================================================================================"
-add_notice "== Access Kibana using this URL:                                              =="
+add_notice "==                        Access Kibana using this URL:                       =="
 add_notice "==                                                                            =="
-add_notice "==    $KB_CURL_PROTOCOL://$NODE_NAME:$KIBANA_PORT/app/kibana    =="
+add_notice "== $KB_CURL_PROTOCOL://$NODE_NAME:$KIBANA_PORT/app/kibana  =="
 add_notice "==                                                                            =="
 add_notice "== Note: If you have configured INGRESS, this URL may be incorrect; review    =="
 add_notice "==       the INGRESS configuration to determine correct URL to access Kibana. =="
 add_notice "================================================================================"
-add_notice_separator
+add_notice ""
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}
 if [ "$LOGGING_DRIVER" != "true" ]; then

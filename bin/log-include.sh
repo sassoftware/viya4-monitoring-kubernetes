@@ -8,24 +8,15 @@ levelEnable=${LOG_LEVEL_ENABLE:-true}
 logDebug=${LOG_DEBUG_ENABLE:-false}
 
 function add_notice {
-  if [ ! -f "$TMP_DIR/notices.txt" ]; then
-    # initialize temp file for notice text
-    touch $TMP_DIR/notices.txt
-  fi
-
-  if [ "$colorEnable" = "true" ]; then
-    whiteb "${bluebg}$*" >> $TMP_DIR/notices.txt
-  else
-    echo $*  >> $TMP_DIR/notices.txt
-  fi
-}
-
-function add_notice_separator {
-  echo ""  >> $TMP_DIR/notices.txt
+  echo "$*"  >> $TMP_DIR/notices.txt
 }
 
 function display_notices {
-  cat $TMP_DIR/notices.txt
+  IFS=''
+  cat $TMP_DIR/notices.txt | while read line || [[ -n "$line" ]];
+  do
+    log_notice "$line"
+  done
 }
 
 function log_notice {
