@@ -286,7 +286,5 @@ fi
 
 set -e
 
-# TO DO: Confirm ES up?
-
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""
