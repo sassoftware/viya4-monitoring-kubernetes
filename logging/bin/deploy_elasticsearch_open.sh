@@ -56,6 +56,7 @@ add_notice "==                                                                  
 add_notice "== NOTE: If you need to change the password for the 'admin' account, use the  =="
 add_notice "== change_internal_password.sh script found in the logging/bin directory.     =="
 add_notice "================================================================================"
+add_notice_separator
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}
 if [ "$LOGGING_DRIVER" != "true" ]; then

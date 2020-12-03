@@ -25,9 +25,6 @@ set -e
 
 log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 
-# initialize temp file for notice text
-touch $TMP_DIR/notices.txt
-
 
 ##################################
 # Event Router                   #

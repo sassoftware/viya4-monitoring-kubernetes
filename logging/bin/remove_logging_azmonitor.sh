@@ -13,7 +13,7 @@ log_info "Removing logging components [$(date)]"
 logging/bin/remove_fluentbit_azmonitor.sh
 
 log_info "Removing eventrouter..."
-kubectl delete --ignore-not-found -f logging/eventrouter.yaml
+logging/bin/remove_eventrouter.sh
 
 
 if [ "$LOG_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
