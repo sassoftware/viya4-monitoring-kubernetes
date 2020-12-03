@@ -69,20 +69,29 @@ else
    exit 1
 fi
 
-
 # Confirm Open Distro for Elasticsearch is ready
-# returns 503 (and outputs "Open Distro Security not initialized.") when ODFE isn't ready yet
-response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "https://localhost:$TEMP_PORT"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
+for pause in 30 30 30 30 30 30 60
+do
+   response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "https://localhost:$TEMP_PORT"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
+   # returns 503 (and outputs "Open Distro Security not initialized.") when ODFE isn't ready yet
+   # TO DO: check for 503 specifically?
 
-# TO DO: Change to a looping/repeated check?
-# TO DO: And/or check for 503 specifically?
-if [[ $response != 2* ]]; then
-   log_info "Open Distro for Elasticsearch does not appear to be quite ready; waiting [2] minutes.[$response]"
-   sleep 120
-else
-   log_debug "Open Distro for Elasticsearch status check successful [$response]"
+   if [[ $response != 2* ]]; then
+      log_info "The Elasticsearch REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
+      sleep ${pause}s
+   else
+      log_info "The Elasticsearch REST endpoint appears to be ready...continuing"
+      esready="TRUE"
+      break
+   fi
+done
+
+if [ "$esready" != "TRUE" ]; then
+   log_error "The Elasticsearch REST endpoint has NOT become accessible in the expected time; exiting."
+   log_error "Review the Elasticsearch pod's events and log to identify the issue and resolve it before trying again."
+   kill -9 $pfPID
+   exit 1
 fi
-
 
 
 # Create Index Management (I*M) Policy  objects

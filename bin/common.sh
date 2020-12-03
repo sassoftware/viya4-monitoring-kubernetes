@@ -66,3 +66,5 @@ function checkDefaultStorageClass {
       fi
     fi
 }
+
+export -f checkDefaultStorageClass
