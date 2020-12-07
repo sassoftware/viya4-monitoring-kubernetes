@@ -74,14 +74,20 @@ in `USER_DIR`:
 * `logging/user-values-es-exporter.yaml`
 * `logging/user-values-fluent-bit-open.yaml`
 
-#### Use user.env
+### Use user.env to Customize Deployment
 
-The `logging/user.env` file contains flags to customize the components that are
-deployed as well as to specify some script behavior (such as enabling debug).
+The `logging/user.env` file enables you to specify the default password for the Kibana admin user, customize the components that are
+deployed, and specify some script behavior (such as enabling debug).
 
-You can also modify values in the file to change the retention period for log messages. By default, messages from SAS Viya and Kubernetes pods are retained for three days and messages from logging components are retained for one day. See [Log_Retention.md](Log_Retention.md) for information about changing the log retention period. 
+#### Specify the Default Password for the Kibana admin User
 
-#### Modify user-values-*.yaml
+Specify the default password for the Kibana admin user in the `ES_ADMIN_PASSWD` environment variable in the `user.env` file. If you do not specify a password, one is randomly generated. 
+
+#### Specify the Log Message Retention Period
+
+You can also modify values in the `user.env` file to change the retention period for log messages. By default, messages from SAS Viya and Kubernetes pods are retained for three days and messages from logging components are retained for one day. See [Log_Retention.md](Log_Retention.md) for information about changing the log retention period. 
+
+### Modify user-values-*.yaml to Change Helm Chart Values
 
 The logging stack uses the following Helm charts:
 
@@ -228,15 +234,16 @@ host, port and/or path to access Kibana.
 
 ### Use Kibana to Validate Logging
 
+* Obtain the default password for the Kibana admin user. The password can be specified in the `user.env` file.
+If the password is not specified in the `user.env` file, it is randomly generated. Use this command to 
+obtain the password:
+```bash
+kubectl -n <logging> get secret internal-user-admin -o=jsonpath='{.data.username}' |base64 --decode
+```
+This command assumes that the logging components are deployed into the `logging` namespace. Change 
+`<logging>` in the command to the namespace in your environment into which the logging components were deployed.   
 * Start Kibana in a browser using the URL provided at the end of the
-deployment process. The default credentials for Kibana are `admin`:`admin`.
-* If you see a dialog prompting you to __"Try our sample data"__
-or __"Explore on my own"__, select __"Explore on my own"__
-* Click on the __Tenants__ icon in the toolbar on the left side of Kibana.
-  * On the Select Tenant page, click __Select__ in the __Global__ row, which
-  makes the Global tenant the active tenant. The text __Active tenant: Global__
-  appears above the list of tenants. You only need to perform this action the
-  first time you run Kibana.
+deployment process.
 * Click on the __Dashboard__ icon in the toolbar.
   * If the Dashboard page displays the header __Editing New Dashboard__, select
   the __Dashboard__ icon again. The Dashboards page appears and displays a list
