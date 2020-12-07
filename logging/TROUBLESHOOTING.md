@@ -31,7 +31,7 @@ See the [main README](../README.md#customization) for information about the cust
 #  name: parsers-config
 #  subPath: viya-parsers.conf
 #- mountPath: /data01/var/lib/docker/containers
-#  name: data01containers
+#  name: path2dockercontainers
 #  readOnly: true
 #extraVolumes:
 #- configMap:
@@ -41,7 +41,7 @@ See the [main README](../README.md#customization) for information about the cust
 #- hostPath:
 #    path: /data01/var/lib/docker/containers
 #    type: ""
-#  name: data01containers
+#  name: path2dockercontainers
 ```
 Add the uncommented lines if they are not present in your copy of `user-values-fluent-bit-open.yaml`.
 
