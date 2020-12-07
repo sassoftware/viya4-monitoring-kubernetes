@@ -128,8 +128,9 @@ if helm3ReleaseExists $promRelease $MON_NS; then
 else
   grafanaPwd="$GRAFANA_ADMIN_PASSWORD"
   if [ "$grafanaPwd" == "" ]; then
+    log_debug "Generating random Grafana admin password..."
     showPass="true"
-    grafanaPwd="$(date +%s | sha256sum | base64 | head -c 32 ; echo)"
+    grafanaPwd="$(randomPassword)"
   fi
   log_info "Installing via Helm...($(date) - timeout 20m)"
 fi
@@ -196,8 +197,11 @@ monitoring/bin/deploy_dashboards.sh
 
 log_notice "Successfully deployed components to the [$MON_NS] namespace"
 if [ "$showPass" == "true" ]; then
+  # Find the grafana pod
+  grafanaPod="$(kubectl get po -n $MON_NS -l app.kubernetes.io/name=grafana --template='{{range .items}}{{.metadata.name}}{{end}}')"
+
   log_notice ""
   log_notice "Generated Grafana admin password is: $grafanaPwd"
-  log_notice "Change the password at any time by running (replace pod name and password):"
-  log_notice "kubectl exec -n $MON_NS grafana-pod-name -- bin/grafana-cli admin reset-admin-password myNewPassword"
+  log_notice "Change the password at any time by running (replace password):"
+  log_notice "kubectl exec -n $MON_NS $grafanaPod -- bin/grafana-cli admin reset-admin-password myNewPassword"
 fi
