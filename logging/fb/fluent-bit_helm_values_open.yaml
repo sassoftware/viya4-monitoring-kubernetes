@@ -22,17 +22,10 @@ metrics:
   serviceMonitor:
     enabled: false
 extraVolumeMounts:
-- mountPath: /data01/var/lib/docker/containers
-  name: data01containers
-  readOnly: true
 - mountPath: /fluent-bit/etc/viya-parsers.conf
   name: parsers-config
   subPath: viya-parsers.conf
 extraVolumes:
-- hostPath:
-    path: /data01/var/lib/docker/containers
-    type: ""
-  name: data01containers
 - configMap:
     defaultMode: 420
     name: fb-viya-parsers
