@@ -112,9 +112,15 @@ Operator and aggregates other helm charts such as Grafana and the Prometheus
 Node Exporter. Links to the charts and default values are included in the
 `user-values-prom-operator.yaml` file.
 
-**Note:** If you are using a cloud provider, you must use ingress, rather than
+**Note 1:** If you are using a cloud provider, you must use ingress, rather than
 NodePorts. Use the samples in the [samples/ingress](/samples/ingress)
 area of this repository to set up either host-based or path-based ingress.
+
+**Note 2:** Although the Grafana helm chart supports a value to set the initial
+admin password, you must use the `GRAFANA_ADMIN_PASSWORD` value in
+`$USER_DIR/monitoring/user.env` to set this value. If not specified, the
+initial Grafana admin password will be randomly generated and logged during the
+initial deployment of the monitoring components.
 
 ## Workload Node Placement
 
@@ -187,7 +193,10 @@ applications are available at these locations by default:
 * Prometheus - Port 31090 `http://master-node.yourcluster.example.com:31090`
 * AlertManager - Port 31091 `http://master-node.yourcluster.example.com:31091`
 
-The default credentials for Grafana are `admin`:`admin`.
+The default Grafana admin user is `admin`. Unless otherwise specified,
+the default password is randomly generated. The value is logged only
+during the initial deployment of the monitoring components and not on
+an upgrade.
 
 ## Update Monitoring Components
 
