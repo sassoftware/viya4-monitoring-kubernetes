@@ -114,15 +114,24 @@ if [ "$TLS_ENABLE" == "true" ]; then
   kubectl label cm -n $MON_NS node-exporter-tls-web-config sas.com/monitoring-base=kube-viya-monitoring
 fi
 
-log_info "User response file: [$PROM_OPER_USER_YAML]"
-log_info "Deploying the Kube Prometheus Stack. This may take a few minutes..."
-log_info "Installing via Helm...($(date) - timeout 20m)"
 if helm3ReleaseExists prometheus-operator $MON_NS; then
   promRelease=prometheus-operator
   promName=prometheus-operator
 else
   promRelease=v4m-prometheus-operator
   promName=v4m
+fi
+log_info "User response file: [$PROM_OPER_USER_YAML]"
+log_info "Deploying the Kube Prometheus Stack. This may take a few minutes..."
+if helm3ReleaseExists $promRelease $MON_NS; then
+  log_info "Upgrading via Helm...($(date) - timeout 20m)"
+else
+  grafanaPwd="$GRAFANA_ADMIN_PASSWORD"
+  if [ "$grafanaPwd" == "" ]; then
+    showPass="true"
+    grafanaPwd="$(date +%s | sha256sum | base64 | head -c 32 ; echo)"
+  fi
+  log_info "Installing via Helm...($(date) - timeout 20m)"
 fi
 KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-11.1.3}
 helm $helmDebug upgrade --install $promRelease \
@@ -138,6 +147,7 @@ helm $helmDebug upgrade --install $promRelease \
   --set prometheus-node-exporter.fullnameOverride=$promName-node-exporter \
   --set kube-state-metrics.fullnameOverride=$promName-kube-state-metrics \
   --set grafana.fullnameOverride=$promName-grafana \
+  --set grafana.adminPassword="$grafanaPwd" \
   --version $KUBE_PROM_STACK_CHART_VERSION \
   prometheus-community/kube-prometheus-stack
 
@@ -166,13 +176,13 @@ if [ "$nginxFound" == "true" ]; then
   kubectl apply -n $NGINX_NS -f monitoring/monitors/kube/podMonitor-nginx.yaml 2>/dev/null
 fi
 
-# Eventrouter
+# Eventrouter ServiceMonitor
 kubectl apply -n $MON_NS -f monitoring/monitors/kube/podMonitor-eventrouter.yaml 2>/dev/null
 
-# Elasticsearch
+# Elasticsearch ServiceMonitor
 kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-elasticsearch.yaml
 
-# Fluent Bit
+# Fluent Bit ServiceMonitor
 kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-fluent-bit.yaml
 
 # Rules
@@ -181,16 +191,13 @@ for f in monitoring/rules/viya/rules-*.yaml; do
   kubectl apply -n $MON_NS -f $f
 done
 
-kubectl get prometheusrule -n $MON_NS v4m-kubernetes-apps 2>/dev/null
-if [ $? == 0 ]; then
-  log_info "Patching KubeHpaMaxedOut rule..."
-  # Fixes the issue of false positives when max replicas == 1
-  kubectl patch prometheusrule --type='json' -n $MON_NS v4m-kubernetes-apps --patch "$(cat monitoring/kube-hpa-alert-patch.json)"
-else
-  log_debug "PrometheusRule $MON_NS/v4m-kubernetes-apps does not exist"
-fi
-
 echo ""
 monitoring/bin/deploy_dashboards.sh
 
 log_notice "Successfully deployed components to the [$MON_NS] namespace"
+if [ "$showPass" == "true" ]; then
+  log_notice ""
+  log_notice "Generated Grafana admin password is: $grafanaPwd"
+  log_notice "Change the password at any time by running (replace pod name and password):"
+  log_notice "kubectl exec -n $MON_NS grafana-pod-name -- bin/grafana-cli admin reset-admin-password myNewPassword"
+fi
