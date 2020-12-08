@@ -196,7 +196,7 @@ The script creates the namespace into which the components are deployed. By defa
 
 You can use these environment variables to control whether individual logging components are installed:
 - Event Router: EVENTROUTER_ENABLE
-- Elasticsearch: ELASTICSEARCH_ENABLE
+- Open Distro for Elasticsearch: ELASTICSEARCH_ENABLE
 - Elasticsearch content: ES_CONTENT_DEPLOY
 - Elasticsearch metric exporter: ELASTICSEARCH_EXPORTER_ENABLED
 - Kibana content: KIBANA_CONTENT_DEPLOY
@@ -215,7 +215,7 @@ To deploy individual logging components, issue these commands:
 ```bash
 ./logging/bin/deploy_eventrouter.sh
 ```
-- Elasticsearch 
+- Open Distro for Elasticsearch 
 ```bash
 ./logging/bin/deploy_elasticsearch_open.sh
 ```
@@ -236,7 +236,7 @@ To deploy individual logging components, issue these commands:
 ./logging/bin/deploy_fluentbit_open.sh
 ```
 
-The the namespace into which the components are deployed must already exist. These scripts do not create the namespace. 
+The namespace into which the components are deployed must already exist. These scripts do not create the namespace. 
 
 
 ## Update Logging Components
@@ -270,7 +270,7 @@ To remove an individual component, issue the `cd <viya4-monitoring-kubernetes re
 ```bash
 ./logging/bin/remove_eventrouter.sh
 ```
-- Elasticsearch 
+- Open Distro for Elasticsearch 
 ```bash
 ./logging/bin/remove_elasticsearch_open.sh
 ```
