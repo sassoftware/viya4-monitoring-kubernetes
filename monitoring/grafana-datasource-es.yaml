@@ -15,5 +15,6 @@ datasources:
     logMessageField: message
     logLevelField: level
   secureJsonData:
-    basicAuthPassword: admin
+    # Change this value
+    basicAuthPassword: YOUR_PASSWORD_HERE
   editable: true
