@@ -76,14 +76,8 @@ in `USER_DIR`:
 
 ### Use user.env to Customize Deployment
 
-The `logging/user.env` file enables you to specify the default password for the Kibana admin user, customize the components that are
-deployed, and specify some script behavior (such as enabling debug).
-
-#### Specify the Default Password for the Kibana admin User
-
-Specify the default password for the Kibana admin user in the `ES_ADMIN_PASSWD` environment variable in the `user.env` file. If you do not specify a password, one is randomly generated. 
-
-#### Specify the Log Message Retention Period
+The `logging/user.env` file enables you to customize the components that are
+deployed and specify some script behavior (such as enabling debug).
 
 You can also modify values in the `user.env` file to change the retention period for log messages. By default, messages from SAS Viya and Kubernetes pods are retained for three days and messages from logging components are retained for one day. See [Log_Retention.md](Log_Retention.md) for information about changing the log retention period. 
 
@@ -317,14 +311,14 @@ host, port and/or path to access Kibana.
 
 ### Use Kibana to Validate Logging
 
-* Obtain the default password for the Kibana admin user. The password can be specified in the `user.env` file.
-If the password is not specified in the `user.env` file, it is randomly generated. Use this command to 
+* Specify or obtain the default password for the Kibana admin user. You can use the `ES_ADMIN_PASSWD` environment variable to specify the default password.
+If you do not specify a default password, it is randomly generated. Use this command to 
 obtain the password:
 ```bash
-kubectl -n <logging> get secret internal-user-admin -o=jsonpath='{.data.username}' |base64 --decode
+kubectl -n logging get secret internal-user-admin -o=jsonpath='{.data.username}' |base64 --decode
 ```
 This command assumes that the logging components are deployed into the `logging` namespace. Change 
-`<logging>` in the command to the namespace in your environment into which the logging components were deployed.   
+`logging` in the command to the namespace in your environment into which the logging components were deployed.   
 * Start Kibana in a browser using the URL provided at the end of the
 deployment process.
 * Click on the __Dashboard__ icon in the toolbar.
