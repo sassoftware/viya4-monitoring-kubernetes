@@ -68,18 +68,39 @@ This command returns two shared keys, labeled ***"primarySharedKey"*** and ***"s
     ```bash
     AZMONITOR_SHARED_KEY=<primarySharedKey>
     ```
-6. Run this command to deploy this logging solution:
+6. Run this command to deploy all components needed for logging with Azure Monitor:
 
 ```bash
 /logging/bin/deploy_logging_azmonitor.sh
 ```
+
+You can also deploy individual components:
+- Event Router
+```bash
+/logging/bin/deploy_eventroutersh
+```
+- Fluent Bit
+```bash
+/logging/bin/deploy_fluentbit_azmonitor.sh
+```
+
 ## Remove the Fluent Bit and Azure Log Analytics Solution
 
-To remove this solution, run this command:
+To remove all logging components for this solution, issue this command:
 ```bash
 /logging/bin/remove_logging_azmonitor.sh
 ```
-By default, this script does NOT delete the namespace.
+By default, this script does not delete the namespace, but it does delete configmaps and secrets that were created by the deployment script.
+
+To remove individual components, issue these commands:
+- Event Router
+```bash
+/logging/bin/remove_eventroutersh
+```
+- Fluent Bit
+```bash
+/logging/bin/remove_fluentbit_azmonitor.sh
+```
 
 ## Using Connection Information From a Kubernetes Secret
 

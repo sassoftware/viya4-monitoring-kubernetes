@@ -178,37 +178,120 @@ illustrates this change.
 
 ## Deploy SAS Viya Logging
 
+Scripts are provided to deploy all of 
+the logging components together or each logging component individually.  
+
+### Deploy All Logging Components
+
 To deploy the logging components, ensure that you are in the directory into
-which you cloned the repository and issue this command:
+which you cloned the repository. 
+
+To deploy all of the logging components, issue this command:
 
 ```bash
 ./logging/bin/deploy_logging_open.sh
 ```
 
-By default, the components are deployed into the namespace `logging`.
+The script creates the namespace into which the components are deployed. By default, the components are deployed into the namespace `logging`.
+
+You can use these environment variables to control whether individual logging components are installed:
+- Event Router: EVENTROUTER_ENABLE
+- Elasticsearch: ELASTICSEARCH_ENABLE
+- Elasticsearch content: ES_CONTENT_DEPLOY
+- Elasticsearch metric exporter: ELASTICSEARCH_EXPORTER_ENABLED
+- Kibana content: KIBANA_CONTENT_DEPLOY
+- Fluent Bit: FLUENT_BIT_ENABLED
+
+By default, these environment variables are set to `true`, so the components are deployed. If you set a 
+variable to `false`, the associated component is not deployed. 
+
+You can set these variable in your `user.env` file.
+
+### Deploy Individual Logging Components
+
+To deploy individual logging components, issue these commands:
+
+- Event Router
+```bash
+./logging/bin/deploy_eventrouter.sh
+```
+- Elasticsearch 
+```bash
+./logging/bin/deploy_elasticsearch_open.sh
+```
+- Elasticsearch content
+```bash
+./logging/bin/deploy_elasticsearch_content_open.sh
+```
+- Elasticsearch metric exporter
+```bash
+./logging/bin/deploy_esexporter.sh
+```
+- Kibana content
+```bash
+./logging/bin/deploy_kibana_content.sh
+```
+- Fluent Bit
+```bash
+./logging/bin/deploy_fluentbit_open.sh
+```
+
+The the namespace into which the components are deployed must already exist. These scripts do not create the namespace. 
+
 
 ## Update Logging Components
 
 Updates in place are supported. To update, re-run the
-`deploy_logging_open.sh` script to install the latest versions of the
-applications, indexes, and dashboards.
+`deploy_logging_open.sh` script to install the latest versions of all components, indexes, and dashboards.
+
+You can also re-run the appropriate script to deploy the latest version of an individual component.
 
 
 ## Remove Logging Components
 
-To remove logging components, run the following command:
+You can remove all logging components or individual components.
+
+### Remove All Logging Components
+
+To remove all logging components, run the following command:
 
 ```bash
 cd <viya4-monitoring-kubernetes repo directory>
 
 logging/bin/remove_logging_open.sh
 ```
-Note that this script does not remove all of the Kubernetes objects. If the namespace into which you deployed logging is used only for log monitoring, you can use a `kubectl delete namespaces` command to delete the namespace, which also removes these objects.
 
-However, if you did not deploy logging into a dedicated namespace, you must delete the remaining Kubernetes objects manually. Use `kubectl delete` commands to manually delete these Kubernetes objects:
-- ConfigMaps
-- Secrets
-- PersistentVolumeClaims
+The script removes configmaps and secrets that were created by the deployment script. PersistentVolumeClaims and Kubernetes secrets that were created manually are not removed.  
+
+### Remove Individual Logging Components
+
+To remove an individual component, issue the `cd <viya4-monitoring-kubernetes repo directory>` command, then issue one of these commands:
+- Event Router
+```bash
+./logging/bin/remove_eventrouter.sh
+```
+- Elasticsearch 
+```bash
+./logging/bin/remove_elasticsearch_open.sh
+```
+- Elasticsearch content
+```bash
+./logging/bin/remove_elasticsearch_content_open.sh
+```
+- Elasticsearch metric exporter
+```bash
+./logging/bin/remove_esexporter.sh
+```
+- Kibana content
+```bash
+./logging/bin/remove_kibana_content.sh
+```
+- Fluent Bit
+```bash
+./logging/bin/remove_fluentbit_open.sh
+```
+
+These scripts remove configmaps and secrets that were created by the deployment script. PersistentVolumeClaims and Kubernetes secrets that were created manually are not removed.  
 
 ## Validate Your Deployment
 
