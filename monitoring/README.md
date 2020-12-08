@@ -94,6 +94,10 @@ enable debug output). All values in `user.env` files are exported as environment
 variables available to the scripts. A `#` as the first character in a line
 is treated as a comment.
 
+### Specify a Default Password for Grafana
+
+You can use the `GRAFANA_ADMIN_PASSWORD` environment variable to specify the default password for Grafana. If you do not specify a default password, one is randomly generated and displayed during deployment.
+
 ### user-values-*.yaml
 
 The monitoring stack uses the following Helm charts:
@@ -193,10 +197,9 @@ applications are available at these locations by default:
 * Prometheus - Port 31090 `http://master-node.yourcluster.example.com:31090`
 * AlertManager - Port 31091 `http://master-node.yourcluster.example.com:31091`
 
-The default Grafana admin user is `admin`. Unless otherwise specified,
-the default password is randomly generated. The value is logged only
-during the initial deployment of the monitoring components and not on
-an upgrade.
+The default Grafana admin user is `admin`. Unless you specified a default password during deployment, the default password is randomly generated and displayed during deployment. If you want to randomly generate a new default password, use the `GRAFANA_ADMIN_PASSWORD` environment variable. 
+
+Teh randomly-generated password is displayed only during the initial deployment of the monitoring components.  It is not displayed if you redeploy the components.
 
 ## Update Monitoring Components
 
