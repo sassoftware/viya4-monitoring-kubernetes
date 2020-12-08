@@ -81,6 +81,10 @@ deployed and specify some script behavior (such as enabling debug).
 
 You can also modify values in the `user.env` file to change the retention period for log messages. By default, messages from SAS Viya and Kubernetes pods are retained for three days and messages from logging components are retained for one day. See [Log_Retention.md](Log_Retention.md) for information about changing the log retention period. 
 
+### Specify a Default Password for Kibana
+
+You can use the `ES_ADMIN_PASSWD` environment variable to specify the default password for Kibana. If you do not specify a default password, one is randomly generated.
+
 ### Modify user-values-*.yaml to Change Helm Chart Values
 
 The logging stack uses the following Helm charts:
@@ -311,9 +315,7 @@ host, port and/or path to access Kibana.
 
 ### Use Kibana to Validate Logging
 
-* Specify or obtain the default password for the Kibana admin user. You can use the `ES_ADMIN_PASSWD` environment variable to specify the default password.
-If you do not specify a default password, it is randomly generated. Use this command to 
-obtain the password:
+* Obtain the default password for the Kibana admin user. If you did not specify a default password during the deployment process, a password is randomly generated. Use this command to obtain the password:
 ```bash
 kubectl -n logging get secret internal-user-admin -o=jsonpath='{.data.username}' |base64 --decode
 ```
