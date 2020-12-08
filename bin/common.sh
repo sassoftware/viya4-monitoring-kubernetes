@@ -67,4 +67,9 @@ function checkDefaultStorageClass {
     fi
 }
 
+function randomPassword {
+  date +%s | sha256sum | base64 | head -c 32 ; echo
+}
+
 export -f checkDefaultStorageClass
+export -f randomPassword
