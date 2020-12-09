@@ -34,7 +34,7 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
 fi
 
 # get credentials
-export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD:-admin}
+export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD}
 export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD}
 export ES_LOGCOLLECTOR_PASSWD=${ES_LOGCOLLECTOR_PASSWD}
 export ES_METRICGETTER_PASSWD=${ES_METRICGETTER_PASSWD}
