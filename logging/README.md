@@ -81,9 +81,7 @@ deployed and specify some script behavior (such as enabling debug).
 
 You can also modify values in the `user.env` file to change the retention period for log messages. By default, messages from SAS Viya and Kubernetes pods are retained for three days and messages from logging components are retained for one day. See [Log_Retention.md](Log_Retention.md) for information about changing the log retention period. 
 
-### Specify a Default Password for Kibana
-
-You can use the `ES_ADMIN_PASSWD` environment variable to specify the default password for Kibana. If you do not specify a default password, one is randomly generated.
+You can set the `ES_ADMIN_PASSWD` environment variable to specify the default password for Kibana. If you do not specify a default password, one is randomly generated.
 
 ### Modify user-values-*.yaml to Change Helm Chart Values
 
@@ -315,12 +313,14 @@ host, port and/or path to access Kibana.
 
 ### Use Kibana to Validate Logging
 
-* Obtain the default password for the Kibana admin user. If you did not specify a default password during the deployment process, a password is randomly generated. Use this command to obtain the password:
+* Obtain the default password for the Kibana admin user. Unless you set the `ES_ADMIN_PASSWD` environment variable (either in the `user.env` file or on the command line) to specify a default password during deployment, the default password is randomly generated and displayed during deployment.
+
+If you want to change the password, issue this command:
+
 ```bash
-kubectl -n logging get secret internal-user-admin -o=jsonpath='{.data.username}' |base64 --decode
+logging/bin/change_internal_password.sh admin <newPassword>
 ```
-This command assumes that the logging components are deployed into the `logging` namespace. Change 
-`logging` in the command to the namespace in your environment into which the logging components were deployed.   
+  
 * Start Kibana in a browser using the URL provided at the end of the
 deployment process.
 * Click on the __Dashboard__ icon in the toolbar.
