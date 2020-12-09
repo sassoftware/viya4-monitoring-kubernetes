@@ -21,7 +21,7 @@ LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-false}
 LOG_NODE_PLACEMENT_ENABLE=${LOG_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
 
 source bin/tls-include.sh
-verify_cert_manager
+verify_cert_manager $LOG_NS es-transport es-rest es-admin kibana
 
 checkDefaultStorageClass
 

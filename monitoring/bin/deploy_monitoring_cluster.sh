@@ -7,7 +7,7 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 
 source bin/tls-include.sh
-verify_cert_manager
+verify_cert_manager $MON_NS prometheus alertmanager grafana
 
 helm2ReleaseCheck v4m-$MON_NS
 helm2ReleaseCheck prometheus-$MON_NS

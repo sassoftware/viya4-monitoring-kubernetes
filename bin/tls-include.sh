@@ -3,9 +3,9 @@
 # Determine if cert-manager is available
 
 if [ "$(kubectl get crd certificates.cert-manager.io -o name 2>/dev/null)" ]; then
-  export TLS_CERT_MANAGER_AVAILABLE="true"
+  certManagerAvailable="true"
 else
-  export TLS_CERT_MANAGER_AVAILABLE="false"
+  certManagerAvailable="false"
 fi
 
 function verify_cert_manager {
@@ -18,11 +18,31 @@ function verify_cert_manager {
   cert_manager_ok="true"
   if [ "$TLS_ENABLE" == "true" ]; then
     if [ "$TLS_CERT_MANAGER_ENABLE" == "true" ]; then
-      if [ "$TLS_CERT_MANAGER_AVAILABLE" == "true" ]; then
-        log_debug "cert-manager needed, enabled, and present"        
+      # Check if all secrets already exist
+      all_secrets_exist="true"
+      namespace="$1"
+      shift
+      apps=("$@")
+      for app in "${apps[@]}"; do
+        secretName=$app-tls-secret
+        if [ -z "$(kubectl get secret -n $namespace $secretName -o name 2>/dev/null)" ]; then
+            log_debug "Secret [$namespace/$secretName] not found. cert-manager is required."
+            all_secrets_exist="false"
+            break
+        else
+          log_debug "Found existing secret $namespace/$secretName"
+        fi
+      done
+
+      if [ "$all_secrets_exist" == "true" ]; then
+        log_debug "All required secrets exist. Skipping cert-manager check."
       else
-        log_error "Use of cert-manager is enabled, but cert-manager is not available"
-        cert_manager_ok="false"
+        if [ "$certManagerAvailable" == "true" ]; then
+          log_debug "cert-manager is available"        
+        else
+          log_error "cert-manager is not available"
+          cert_manager_ok="false"
+        fi
       fi
     else
       log_debug "Use of cert-manager is disabled"
@@ -31,6 +51,7 @@ function verify_cert_manager {
     log_debug "TLS is disabled. Skipping verification of cert-manager."
   fi
   
+  export cert_manager_ok
   if [ "$cert_manager_ok" == "true" ]; then
     return 0
   else
