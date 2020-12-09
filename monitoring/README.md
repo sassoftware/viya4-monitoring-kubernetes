@@ -86,15 +86,17 @@ are present in `USER_DIR`:
 * `monitoring/user-values-prom-operator.yaml`
 * `monitoring/user-values-pushgateway.yaml`
 
+You can modify two types of values to customize your deployment:
+- Environment variables: These variables contain uppercase characters and underscores (for example, `LOG_COLOR_ENABLE=`), and can be specified in the `user.env` file or on the command line. Specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments.
+- Helm chart parameters: These parameters are organized into a hierarchical structure and contain mixed case characters (for example, `persistentVolume:storageClass`). These parameters are specified in `.yaml` configuration files.
+
 ### user.env
 
-The `monitoring/user.env` file contains environment variable flags that customize
-the components that are deployed or to alter some script behavior (such as to
+The `monitoring/user.env` file contains environment variables that customize
+the components that are deployed or alter some script behavior (such as to
 enable debug output). All values in `user.env` files are exported as environment
 variables available to the scripts. A `#` as the first character in a line
 is treated as a comment.
-
-### Specify a Default Password for Grafana
 
 You can use the `GRAFANA_ADMIN_PASSWORD` environment variable to specify the default password for Grafana. If you do not specify a default password, one is randomly generated and displayed during deployment.
 
@@ -197,9 +199,14 @@ applications are available at these locations by default:
 * Prometheus - Port 31090 `http://master-node.yourcluster.example.com:31090`
 * AlertManager - Port 31091 `http://master-node.yourcluster.example.com:31091`
 
-The default Grafana admin user is `admin`. Unless you specified a default password during deployment, the default password is randomly generated and displayed during deployment. If you want to randomly generate a new default password, use the `GRAFANA_ADMIN_PASSWORD` environment variable. 
+The default Grafana admin user is `admin`. Unless you used the `GRAFANA_ADMIN_PASSWORD` environment variable (either in the `user.env` file or on the command line) to specify a default password during deployment, the default password is randomly generated and displayed during deployment. 
 
-Teh randomly-generated password is displayed only during the initial deployment of the monitoring components.  It is not displayed if you redeploy the components.
+If you want to change the password, issue this command:
+```bash
+kubectl exec -n <monitoring_namespace> <grafana_pod> -c grafana -- bin/grafana-cli admin reset-admin-password myNewPassword
+```
+
+The randomly-generated password is displayed only during the initial deployment of the monitoring components.  It is not displayed if you redeploy the components.
 
 ## Update Monitoring Components
 
