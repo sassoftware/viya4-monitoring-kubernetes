@@ -203,5 +203,5 @@ if [ "$showPass" == "true" ]; then
   log_notice ""
   log_notice "Generated Grafana admin password is: $grafanaPwd"
   log_notice "Change the password at any time by running (replace password):"
-  log_notice "kubectl exec -n $MON_NS $grafanaPod -- bin/grafana-cli admin reset-admin-password myNewPassword"
+  log_notice "kubectl exec -n $MON_NS $grafanaPod -c grafana -- bin/grafana-cli admin reset-admin-password myNewPassword"
 fi
