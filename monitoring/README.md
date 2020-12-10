@@ -87,18 +87,17 @@ are present in `USER_DIR`:
 * `monitoring/user-values-pushgateway.yaml`
 
 You can modify two types of values to customize your deployment:
-- Environment variables: These variables contain uppercase characters and underscores (for example, `LOG_COLOR_ENABLE=`), and can be specified in the `user.env` file or on the command line. Specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments.
-- Helm chart parameters: These parameters are organized into a hierarchical structure and contain mixed case characters (for example, `persistentVolume:storageClass`). These parameters are specified in `.yaml` configuration files.
+- Environment variables: These variables can be specified in the `user.env` file or on the command line. Specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments.
+- Helm chart parameters: These parameters are organized into a hierarchical structure (for example, `persistentVolume:storageClass`). These parameters are specified in `.yaml` configuration files.
 
 ### user.env
 
 The `monitoring/user.env` file contains environment variables that customize
 the components that are deployed or alter some script behavior (such as to
 enable debug output). All values in `user.env` files are exported as environment
-variables available to the scripts. A `#` as the first character in a line
-is treated as a comment.
+variables available to the scripts. Any line whose first character is `#` is treated as a comment and ignored.
 
-You can use the `GRAFANA_ADMIN_PASSWORD` environment variable to specify the default password for Grafana. If you do not specify a default password, one is randomly generated and displayed during deployment.
+You can set the `GRAFANA_ADMIN_PASSWORD` environment variable to specify the default password for Grafana. If you do not specify a default password, one is randomly generated and displayed during deployment.
 
 ### user-values-*.yaml
 
@@ -199,7 +198,7 @@ applications are available at these locations by default:
 * Prometheus - Port 31090 `http://master-node.yourcluster.example.com:31090`
 * AlertManager - Port 31091 `http://master-node.yourcluster.example.com:31091`
 
-The default Grafana admin user is `admin`. Unless you used the `GRAFANA_ADMIN_PASSWORD` environment variable (either in the `user.env` file or on the command line) to specify a default password during deployment, the default password is randomly generated and displayed during deployment. 
+The default Grafana admin user is `admin`. Unless you set the `GRAFANA_ADMIN_PASSWORD` environment variable (either in the `user.env` file or on the command line) to specify a default password during deployment, the default password is randomly generated and displayed during deployment. 
 
 If you want to change the password, issue this command:
 ```bash
