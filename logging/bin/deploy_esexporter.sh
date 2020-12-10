@@ -78,5 +78,7 @@ helm $helmDebug upgrade --install es-exporter \
  -f $ES_OPEN_EXPORTER_USER_YAML \
  stable/elasticsearch-exporter
 
+log_info "Elasticsearch metric exporter has been deployed"
+
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""

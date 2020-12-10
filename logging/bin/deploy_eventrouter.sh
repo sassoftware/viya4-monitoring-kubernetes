@@ -23,7 +23,7 @@ set -e
 # Enable workload node placement?
 LOG_NODE_PLACEMENT_ENABLE=${LOG_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
 
-log_info "Deploying eventrouter..."
+log_info "Deploying Event Router"
 
 if [ "$LOG_NODE_PLACEMENT_ENABLE" == "true" ]; then
    log_info "Enabling eventrouter for workload node placement"
@@ -32,6 +32,8 @@ else
    log_debug "Workload node placement support is disabled for eventrouter"
    kubectl apply -f logging/eventrouter.yaml
 fi
+
+log_info "Event Router has been deployed."
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""
