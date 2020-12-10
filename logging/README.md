@@ -74,14 +74,19 @@ in `USER_DIR`:
 * `logging/user-values-es-exporter.yaml`
 * `logging/user-values-fluent-bit-open.yaml`
 
+You can modify two types of values to customize your deployment:
+
+- Environment variables: These variables can be specified in the `user.env` file or on the command line. Specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments.
+- Helm chart parameters: These parameters are organized into a hierarchical structure (for example, `persistentVolume:storageClass`). These parameters are specified in `.yaml` configuration files.
+
 ### Use user.env to Customize Deployment
 
 The `logging/user.env` file enables you to customize the components that are
-deployed and specify some script behavior (such as enabling debug).
-
-You can also modify values in the `user.env` file to change the retention period for log messages. By default, messages from SAS Viya and Kubernetes pods are retained for three days and messages from logging components are retained for one day. See [Log_Retention.md](Log_Retention.md) for information about changing the log retention period. 
+deployed and specify some script behavior (such as enabling debug). All values in `user.env` files are exported as environment variables available to the scripts. Any line whose first character is `#` is treated as a comment and ignored.
 
 You can set the `ES_ADMIN_PASSWD` environment variable to specify the default password for Kibana. If you do not specify a default password, one is randomly generated.
+
+You can also modify values in the `user.env` file to change the retention period for log messages. By default, messages from SAS Viya and Kubernetes pods are retained for three days and messages from logging components are retained for one day. See [Log_Retention.md](Log_Retention.md) for information about changing the log retention period. 
 
 ### Modify user-values-*.yaml to Change Helm Chart Values
 
