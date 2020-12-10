@@ -8,6 +8,10 @@ source logging/bin/common.sh
 
 source logging/bin/secrets-include.sh
 
+# TLS_ENABLE is required for logging, so hard-code to 'true'
+TLS_ENABLE="true"
+LOG_TLS_ENABLE="true"
+
 # Collect Kubernetes events as pseudo-log messages?
 EVENTROUTER_ENABLE=${EVENTROUTER_ENABLE:-true}
 
