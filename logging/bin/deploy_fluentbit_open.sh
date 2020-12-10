@@ -43,6 +43,10 @@ fi
 
 helm2ReleaseCheck fb-$LOG_NS
 
+
+log_info "Deploying Fluent Bit"
+
+
 # Fluent Bit user customizations
 FB_OPEN_USER_YAML="${FB_OPEN_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-open.yaml}"
 if [ ! -f "$FB_OPEN_USER_YAML" ]; then
@@ -73,6 +77,7 @@ kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=es"
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install --namespace $LOG_NS fb --values logging/fb/fluent-bit_helm_values_open.yaml --values $FB_OPEN_USER_YAML  --set fullnameOverride=v4m-fb stable/fluent-bit
 
+log_info "Fluent Bit deployment completed"
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""

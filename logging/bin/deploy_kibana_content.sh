@@ -186,5 +186,7 @@ if [ "$LOGGING_DRIVER" != "true" ]; then
    echo ""
 fi
 
+log_info "Configuring Kibana has been completed"
+
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""

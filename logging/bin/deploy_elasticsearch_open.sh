@@ -106,11 +106,13 @@ fi
 helm2ReleaseCheck odfe-$LOG_NS
 
 # Check for existing Open Distro helm release
-existingODFE="false"
-if [ helm status -n $LOG_NS odfe 1>/dev/null 2>&1 ]; then
+if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
+   log_debug "A Helm release [odfe] exists; upgrading the release."
    existingODFE="true"
+else
+   log_debug "A Helm release [odfe] do NOT exist; deploying a new release."
+   existingODFE="false"
 fi
-
 
 # Elasticsearch user customizations
 ES_OPEN_USER_YAML="${ES_OPEN_USER_YAML:-$USER_DIR/logging/user-values-elasticsearch-open.yaml}"
@@ -299,6 +301,8 @@ else
 fi
 
 set -e
+
+log_info "Open Distro for Elasticsearch has been deployed"
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""

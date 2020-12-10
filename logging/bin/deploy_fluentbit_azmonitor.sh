@@ -34,6 +34,7 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   exit 1
 fi
 
+log_info "Deploying Fluent Bit (Azure Monitor)"
 
 # Fluent Bit user customizations
 FB_AZMONITOR_USER_YAML="${FB_AZMONITOR_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-azmonitor.yaml}"
@@ -86,4 +87,7 @@ kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=azuremonitor"
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install fbaz         --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_azmonitor.yaml --values $FB_AZMONITOR_USER_YAML  --set fullnameOverride=v4m-fbaz stable/fluent-bit
 
-log_info "Fluent Bit deployment completed"
+log_info "Fluent Bit deployment (Azure Monitor) completed"
+
+log_debug "Script [$this_script] has completed [$(date)]"
+echo ""
