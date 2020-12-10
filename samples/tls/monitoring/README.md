@@ -24,8 +24,8 @@ in SAS Viya Administration documentation and specify the `monitoring` namespace.
 
 ## In-Cluster TLS
 
-The monitoring components use the following secrets for the TLS certificates
-service-to-service (east-west) traffic:
+The monitoring components use these secrets for the TLS certificates that
+handle interactions between services:
 
 * `grafana-tls-secret`
 * `prometheus-tls-secret`
@@ -39,8 +39,8 @@ cert-manager is not required if TLS is disabled or if all of the TLS secrets
 exist prior to deployment.
 
 For in-cluster (east-west traffic) TLS for monitoring components,  
-[cert-manager](https://cert-manager.io/) populates these secrets that contain
-pod certificates.
+[cert-manager](https://cert-manager.io/) populates these secrets, which
+contain pod certificates:
 
 * kubernetes.io/tls secret - `prometheus-tls-secret`
 * kubernetes.io/tls secret - `alertmanager-tls-secret`
