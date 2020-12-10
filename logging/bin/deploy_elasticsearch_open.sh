@@ -45,6 +45,8 @@ create_user_secret internal-user-kibanaserver kibanaserver "$ES_KIBANASERVER_PAS
 create_user_secret internal-user-logcollector logcollector "$ES_LOGCOLLECTOR_PASSWD"  managed-by=v4m-es-script
 create_user_secret internal-user-metricgetter metricgetter "$ES_METRICGETTER_PASSWD"  managed-by=v4m-es-script
 
+# Verify cert-manager is available (if necessary)
+verify_cert_manager
 
 # Create/Get necessary TLS certs
 apps=( es-transport es-rest es-admin kibana )
