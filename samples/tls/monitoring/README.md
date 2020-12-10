@@ -31,12 +31,11 @@ handle interactions between services:
 * `prometheus-tls-secret`
 * `alertmanager-tls-secret`
 
-These secrets can be manually created, but if any
-do not exist, then [cert-manager](https://cert-manager.io/) is required to
-create the missing certificates.
-
-cert-manager is not required if TLS is disabled or if all of the TLS secrets
-exist prior to deployment.
+If any of the required certificates do not exist, the deployment process will
+attempt to use [cert-manager](https://cert-manager.io/) to generate the missing
+certificates. If the required certificates do not exist and cert-manager is
+not available, the deployment process will fail. cert-manager is not required
+if TLS is disabled or if all of the TLS secrets exist prior to deployment.
 
 For in-cluster (east-west traffic) TLS for monitoring components,  
 [cert-manager](https://cert-manager.io/) populates these secrets, which
