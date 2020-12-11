@@ -46,7 +46,12 @@ create_user_secret internal-user-logcollector logcollector "$ES_LOGCOLLECTOR_PAS
 create_user_secret internal-user-metricgetter metricgetter "$ES_METRICGETTER_PASSWD"  managed-by=v4m-es-script
 
 # Verify cert-manager is available (if necessary)
-verify_cert_manager
+if verify_cert_manager $LOG_NS es-transport es-rest es-admin kibana; then
+  log_debug "cert-manager check OK"
+else
+  log_error "One or more required TLS certs do not exist and cert-manager is not available to create the missing certs"
+  exit 1
+fi
 
 # Create/Get necessary TLS certs
 apps=( es-transport es-rest es-admin kibana )
