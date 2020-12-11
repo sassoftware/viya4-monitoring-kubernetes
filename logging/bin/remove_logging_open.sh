@@ -6,6 +6,8 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
+LOG_DELETE_CONFIGMAPS_ON_REMOVE=${LOG_DELETE_CONFIGMAPS_ON_REMOVE:-true}
+LOG_DELETE_SECRETS_ON_REMOVE=${LOG_DELETE_SECRETS_ON_REMOVE:-true}
 LOG_DELETE_PVCS_ON_REMOVE=${LOG_DELETE_PVCS_ON_REMOVE:-false}
 LOG_DELETE_NAMESPACE_ON_REMOVE=${LOG_DELETE_NAMESPACE_ON_REMOVE:-false}
 
@@ -15,10 +17,32 @@ helm2ReleaseCheck es-exporter-$LOG_NS
 
 log_info "Removing logging components [$(date)]"
 
-logging/bin/remove_logging_fluentbit_open.sh
+log_info "Removing Fluent Bit..."
+logging/bin/remove_fluentbit_open.sh
 
-helm delete -n $LOG_NS es-exporter
-helm delete -n $LOG_NS odfe
+log_info "Removing Elasticsearch Metric Exporter..."
+logging/bin/remove_esexporter.sh
+
+log_info "Removing Open Distro for Elasticsearch..."
+logging/bin/remove_elasticsearch_open.sh
+
+log_info "Removing eventrouter..."
+logging/bin/remove_eventrouter.sh
+
+if [ "$LOG_DELETE_PVCS_ON_REMOVE" == "true" ]; then
+  log_info "Removing known logging PVCs..."
+  kubectl delete pvc --ignore-not-found -n $LOG_NS -l app=v4m-es
+fi
+
+if [ "$LOG_DELETE_SECRETS_ON_REMOVE" == "true" ]; then
+  log_info "Removing known logging secrets..."
+  kubectl delete secret --ignore-not-found -n $LOG_NS -l managed-by=v4m-es-script
+fi
+
+if [ "$LOG_DELETE_CONFIGMAPS_ON_REMOVE" == "true" ]; then
+  log_info "Removing known logging configmaps..."
+  kubectl delete configmap --ignore-not-found -n $LOG_NS -l managed-by=v4m-es-script
+fi
 
 if [ "$LOG_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
   log_info "Deleting the [$LOG_NS] namespace..."
@@ -31,30 +55,20 @@ if [ "$LOG_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
   fi
 fi
 
-log_info "Removing eventrouter..."
-kubectl delete --ignore-not-found -f logging/eventrouter.yaml
-
-log_info "Removing components from the [$LOG_NS] namespace..."
-
-if [ "$LOG_DELETE_PVCS_ON_REMOVE" == "true" ]; then
-  log_info "Removing known logging PVCs..."
-  kubectl delete pvc --ignore-not-found -n $LOG_NS -l app=v4m-es
-fi
-
 log_info "Waiting 60 sec for resources to terminate..."
 sleep 60
 
 log_info "Checking contents of the [$LOG_NS] namespace:"
-crds=( all pvc )
+objects=( all pvc secret configmap)
 empty="true"
-for crd in "${crds[@]}"
+for object in "${objects[@]}"
 do
-	out=$(kubectl get -n $LOG_NS $crd 2>&1)
+	out=$(kubectl get -n $LOG_NS $object 2>&1)
   if [[ "$out" =~ 'No resources found' ]]; then
     :
   else
     empty="false"
-    log_warn "Found [$crd] resources in the [$LOG_NS] namespace:"
+    log_warn "Found [$object] resources in the [$LOG_NS] namespace:"
     echo "$out"
   fi
 done

@@ -74,14 +74,21 @@ in `USER_DIR`:
 * `logging/user-values-es-exporter.yaml`
 * `logging/user-values-fluent-bit-open.yaml`
 
-#### Use user.env
+You can modify two types of values to customize your deployment:
 
-The `logging/user.env` file contains flags to customize the components that are
-deployed as well as to specify some script behavior (such as enabling debug).
+- Environment variables: These variables can be specified in the `user.env` file or on the command line. Specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments.
+- Helm chart parameters: These parameters are organized into a hierarchical structure (for example, `persistentVolume:storageClass`). These parameters are specified in `.yaml` configuration files.
 
-You can also modify values in the file to change the retention period for log messages. By default, messages from SAS Viya and Kubernetes pods are retained for three days and messages from logging components are retained for one day. See [Log_Retention.md](Log_Retention.md) for information about changing the log retention period. 
+### Use user.env to Customize Deployment
 
-#### Modify user-values-*.yaml
+The `logging/user.env` file enables you to customize the components that are
+deployed and specify some script behavior (such as enabling debug). All values in `user.env` files are exported as environment variables available to the scripts. Any line whose first character is `#` is treated as a comment and ignored.
+
+You can set the `ES_ADMIN_PASSWD` environment variable to specify the default password for Kibana. If you do not specify a default password, one is randomly generated.
+
+You can also modify values in the `user.env` file to change the retention period for log messages. By default, messages from SAS Viya and Kubernetes pods are retained for three days and messages from logging components are retained for one day. See [Log_Retention.md](Log_Retention.md) for information about changing the log retention period. 
+
+### Modify user-values-*.yaml to Change Helm Chart Values
 
 The logging stack uses the following Helm charts:
 
@@ -179,30 +186,24 @@ which you cloned the repository and issue this command:
 ./logging/bin/deploy_logging_open.sh
 ```
 
-By default, the components are deployed into the namespace `logging`.
+The script creates the namespace into which the components are deployed. By default, the components are deployed into the namespace `logging`.
 
 ## Update Logging Components
 
 Updates in place are supported. To update, re-run the
-`deploy_logging_open.sh` script to install the latest versions of the
-applications, indexes, and dashboards.
-
+`deploy_logging_open.sh` script to install the latest versions of all components, indexes, and dashboards.
 
 ## Remove Logging Components
 
-To remove logging components, run the following command:
+To remove all logging components, run the following command:
 
 ```bash
 cd <viya4-monitoring-kubernetes repo directory>
 
 logging/bin/remove_logging_open.sh
 ```
-Note that this script does not remove all of the Kubernetes objects. If the namespace into which you deployed logging is used only for log monitoring, you can use a `kubectl delete namespaces` command to delete the namespace, which also removes these objects.
 
-However, if you did not deploy logging into a dedicated namespace, you must delete the remaining Kubernetes objects manually. Use `kubectl delete` commands to manually delete these Kubernetes objects:
-- ConfigMaps
-- Secrets
-- PersistentVolumeClaims
+The script removes configmaps and secrets that were created by the deployment script. PersistentVolumeClaims and Kubernetes secrets that were created manually are not removed.  
 
 ## Validate Your Deployment
 
@@ -228,15 +229,16 @@ host, port and/or path to access Kibana.
 
 ### Use Kibana to Validate Logging
 
+* Obtain the default password for the Kibana admin user. Unless you set the `ES_ADMIN_PASSWD` environment variable (either in the `user.env` file or on the command line) to specify a default password during deployment, the default password is randomly generated and displayed during deployment.
+
+If you want to change the password, issue this command:
+
+```bash
+logging/bin/change_internal_password.sh admin <newPassword>
+```
+  
 * Start Kibana in a browser using the URL provided at the end of the
-deployment process. The default credentials for Kibana are `admin`:`admin`.
-* If you see a dialog prompting you to __"Try our sample data"__
-or __"Explore on my own"__, select __"Explore on my own"__
-* Click on the __Tenants__ icon in the toolbar on the left side of Kibana.
-  * On the Select Tenant page, click __Select__ in the __Global__ row, which
-  makes the Global tenant the active tenant. The text __Active tenant: Global__
-  appears above the list of tenants. You only need to perform this action the
-  first time you run Kibana.
+deployment process.
 * Click on the __Dashboard__ icon in the toolbar.
   * If the Dashboard page displays the header __Editing New Dashboard__, select
   the __Dashboard__ icon again. The Dashboards page appears and displays a list

@@ -7,6 +7,18 @@ colorEnable=${LOG_COLOR_ENABLE:-true}
 levelEnable=${LOG_LEVEL_ENABLE:-true}
 logDebug=${LOG_DEBUG_ENABLE:-false}
 
+function add_notice {
+  echo "$*"  >> $TMP_DIR/notices.txt
+}
+
+function display_notices {
+  IFS=''
+  cat $TMP_DIR/notices.txt | while read line || [[ -n "$line" ]];
+  do
+    log_notice "$line"
+  done
+}
+
 function log_notice {
   if [ "$colorEnable" = "true" ]; then
     whiteb "${bluebg}$*"
@@ -73,5 +85,5 @@ function log_error {
   fi
 }
 
-export -f log_notice log_message log_debug log_info log_warn log_error
+export -f log_notice log_message log_debug log_info log_warn log_error add_notice display_notices
 export colorEnable levelEnable logDebug

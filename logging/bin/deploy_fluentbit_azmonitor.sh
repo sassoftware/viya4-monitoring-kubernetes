@@ -6,6 +6,19 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
+this_script=`basename "$0"`
+
+log_debug "Script [$this_script] has started [$(date)]"
+
+# Enable Fluent Bit?
+FLUENT_BIT_ENABLED=${FLUENT_BIT_ENABLED:-true}
+
+if [ "$FLUENT_BIT_ENABLED" != "true" ]; then
+   log_info "Environment variable [FLUENT_BIT_ENABLED] is not set to 'true'; existing WITHOUT deploying Fluent Bit"
+   exit
+fi
+
+
 set -e
 
 HELM_DEBUG="${HELM_DEBUG:-false}"
@@ -18,9 +31,10 @@ helm2ReleaseCheck fb-$LOG_NS
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   log_error "The specified namespace [$LOG_NS] does not exist."
-  exit 9
+  exit 1
 fi
 
+log_info "Deploying Fluent Bit (Azure Monitor)"
 
 # Fluent Bit user customizations
 FB_AZMONITOR_USER_YAML="${FB_AZMONITOR_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-azmonitor.yaml}"
@@ -51,7 +65,7 @@ if [ "$(kubectl -n $LOG_NS get secret connection-info-azmonitor -o name 2>/dev/n
    else
       log_error "Unable to create secret [$LOG_NS/connection-info-azmonitor] because missing required information: [AZMONITOR_CUSTOMER_ID: $AZMONITOR_CUSTOMER_ID ; AZMONITOR_SHARED_KEY: $AZMONITOR_SHARED_KEY]."
       log_error "You must provide this information via environment variables or create the secret [connection-info-azmonitor] before running this script."
-      exit 88
+      exit 1
    fi
 else
    log_info "Obtaining connection information from existing secret [$LOG_NS/connection-info-azmonitor]"
@@ -60,7 +74,6 @@ else
 fi
 
 
-# Fluent Bit
 # Create ConfigMap containing Fluent Bit configuration
 kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 
@@ -74,4 +87,7 @@ kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=azuremonitor"
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install fbaz         --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_azmonitor.yaml --values $FB_AZMONITOR_USER_YAML  --set fullnameOverride=v4m-fbaz stable/fluent-bit
 
-log_info "Fluent Bit deployment completed"
+log_info "Fluent Bit deployment (Azure Monitor) completed"
+
+log_debug "Script [$this_script] has completed [$(date)]"
+echo ""
