@@ -65,7 +65,7 @@ Grafana, and Alertmanager to be TLS-enabled.
 4. Copy the sample TLS Helm user response file to your `USER_DIR`:
 
 ```bash
-cp path/to/this/repo/monitoring/samples/tls/user-values-prom-operator.yaml $USER_DIR/monitoring/
+cp path/to/this/repo/samples/tls/monitoring/user-values-prom-operator.yaml $USER_DIR/monitoring/
 ```
 
 5. Edit `$USER_DIR/monitoring/user-values-prom-operator.yaml` and replace
