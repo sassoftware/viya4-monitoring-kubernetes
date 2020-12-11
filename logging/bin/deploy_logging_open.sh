@@ -8,6 +8,9 @@ source logging/bin/common.sh
 
 source logging/bin/secrets-include.sh
 
+# TLS_ENABLE is required for logging, so hard-code to 'true'
+TLS_ENABLE="true"
+
 # Collect Kubernetes events as pseudo-log messages?
 EVENTROUTER_ENABLE=${EVENTROUTER_ENABLE:-true}
 
@@ -21,7 +24,12 @@ LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-false}
 LOG_NODE_PLACEMENT_ENABLE=${LOG_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
 
 source bin/tls-include.sh
-verify_cert_manager
+if verify_cert_manager $LOG_NS es-transport es-rest es-admin kibana; then
+  log_debug "cert-manager check OK"
+else
+  log_error "cert-manager is required but is not available"
+  exit 1
+fi
 
 checkDefaultStorageClass
 

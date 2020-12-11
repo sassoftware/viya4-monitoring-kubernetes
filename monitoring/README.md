@@ -236,7 +236,8 @@ collected monitoring data.
 
 ## TLS Support
 
-You can use the `TLS_ENABLE` or `MON_TLS_ENABLE` settings in user.env
+You can use the `TLS_ENABLE` or `MON_TLS_ENABLE` settings in
+`$USER_DIR/user.env` or `$USER_DIR/monitoring/user.env`
 to enable TLS support, which encrypts network traffic
 between pods for use by the monitoring pods.
 
