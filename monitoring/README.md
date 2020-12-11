@@ -86,13 +86,18 @@ are present in `USER_DIR`:
 * `monitoring/user-values-prom-operator.yaml`
 * `monitoring/user-values-pushgateway.yaml`
 
+You can modify two types of values to customize your deployment:
+- Environment variables: These variables can be specified in the `user.env` file or on the command line. Specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments.
+- Helm chart parameters: These parameters are organized into a hierarchical structure (for example, `persistentVolume:storageClass`). These parameters are specified in `.yaml` configuration files.
+
 ### user.env
 
-The `monitoring/user.env` file contains environment variable flags that customize
-the components that are deployed or to alter some script behavior (such as to
+The `monitoring/user.env` file contains environment variables that customize
+the components that are deployed or alter some script behavior (such as to
 enable debug output). All values in `user.env` files are exported as environment
-variables available to the scripts. A `#` as the first character in a line
-is treated as a comment.
+variables available to the scripts. Any line whose first character is `#` is treated as a comment and ignored.
+
+You can set the `GRAFANA_ADMIN_PASSWORD` environment variable to specify the default password for Grafana. If you do not specify a default password, one is randomly generated and displayed during deployment.
 
 ### user-values-*.yaml
 
@@ -112,9 +117,15 @@ Operator and aggregates other helm charts such as Grafana and the Prometheus
 Node Exporter. Links to the charts and default values are included in the
 `user-values-prom-operator.yaml` file.
 
-**Note:** If you are using a cloud provider, you must use ingress, rather than
+**Note 1:** If you are using a cloud provider, you must use ingress, rather than
 NodePorts. Use the samples in the [samples/ingress](/samples/ingress)
 area of this repository to set up either host-based or path-based ingress.
+
+**Note 2:** Although the Grafana helm chart supports a value to set the initial
+admin password, you must use the `GRAFANA_ADMIN_PASSWORD` value in
+`$USER_DIR/monitoring/user.env` to set this value. If not specified, the
+initial Grafana admin password will be randomly generated and logged during the
+initial deployment of the monitoring components.
 
 ## Workload Node Placement
 
@@ -187,7 +198,14 @@ applications are available at these locations by default:
 * Prometheus - Port 31090 `http://master-node.yourcluster.example.com:31090`
 * AlertManager - Port 31091 `http://master-node.yourcluster.example.com:31091`
 
-The default credentials for Grafana are `admin`:`admin`.
+The default Grafana admin user is `admin`. Unless you set the `GRAFANA_ADMIN_PASSWORD` environment variable (either in the `user.env` file or on the command line) to specify a default password during deployment, the default password is randomly generated and displayed during deployment. 
+
+If you want to change the password, issue this command:
+```bash
+kubectl exec -n <monitoring_namespace> <grafana_pod> -c grafana -- bin/grafana-cli admin reset-admin-password myNewPassword
+```
+
+The randomly-generated password is displayed only during the initial deployment of the monitoring components.  It is not displayed if you redeploy the components.
 
 ## Update Monitoring Components
 
@@ -218,7 +236,8 @@ collected monitoring data.
 
 ## TLS Support
 
-You can use the `TLS_ENABLE` or `MON_TLS_ENABLE` settings in user.env
+You can use the `TLS_ENABLE` or `MON_TLS_ENABLE` settings in
+`$USER_DIR/user.env` or `$USER_DIR/monitoring/user.env`
 to enable TLS support, which encrypts network traffic
 between pods for use by the monitoring pods.
 

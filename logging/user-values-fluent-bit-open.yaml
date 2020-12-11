@@ -8,3 +8,47 @@
 # image:
 #   fluent_bit:
 #     tag: 1.5.4
+
+
+
+# ***** extraVolumeMounts/extraVolumes - START *****
+#
+# Resolving symbolic links/Relocated Docker Root Dir
+#
+# Uncomment the entire following section and edit
+# the extraVolumeMounts and extraVolumes stanzas to
+# ensure any symbolic links you have defined in your
+# environment affecting the location of the container
+# logs can be resolved.  This may include changes you
+# made to relocate the Docker Root Directory.
+#
+# For example, in the sample below, the Docker
+# Root Directory was mapped to: /data01/var/lib/docker
+#
+# If any symbolic links affecting the /var/log/containers
+# directory cannot be resolved, Fluent Bit
+# will run without ERRORs but NO log messages
+# will be collected.
+#
+# NOTE: The extraVolumeMounts and extraVolumes entries
+# related to parsers-config need to be uncommented as
+# well but should not be edited beyond that.
+
+#extraVolumeMounts:
+#- mountPath: /fluent-bit/etc/viya-parsers.conf
+#  name: parsers-config
+#  subPath: viya-parsers.conf
+#- mountPath: /data01/var/lib/docker/containers
+#  name: path2dockercontainers
+#  readOnly: true
+#extraVolumes:
+#- configMap:
+#    defaultMode: 420
+#    name: fb-viya-parsers
+#  name: parsers-config
+#- hostPath:
+#    path: /data01/var/lib/docker/containers
+#    type: ""
+#  name: path2dockercontainers
+
+# ***** extraVolumeMounts/extraVolumes - END *****

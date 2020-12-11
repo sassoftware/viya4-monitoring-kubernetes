@@ -3,9 +3,9 @@
 # Determine if cert-manager is available
 
 if [ "$(kubectl get crd certificates.cert-manager.io -o name 2>/dev/null)" ]; then
-  export TLS_CERT_MANAGER_AVAILABLE="true"
+  certManagerAvailable="true"
 else
-  export TLS_CERT_MANAGER_AVAILABLE="false"
+  certManagerAvailable="false"
 fi
 
 function verify_cert_manager {
@@ -17,20 +17,37 @@ function verify_cert_manager {
 
   cert_manager_ok="true"
   if [ "$TLS_ENABLE" == "true" ]; then
-    if [ "$TLS_CERT_MANAGER_ENABLE" == "true" ]; then
-      if [ "$TLS_CERT_MANAGER_AVAILABLE" == "true" ]; then
-        log_debug "cert-manager needed, enabled, and present"        
+    # Check if all secrets already exist
+    all_secrets_exist="true"
+    namespace="$1"
+    shift
+    apps=("$@")
+    for app in "${apps[@]}"; do
+      secretName=$app-tls-secret
+      if [ -z "$(kubectl get secret -n $namespace $secretName -o name 2>/dev/null)" ]; then
+          log_debug "Secret [$namespace/$secretName] not found. cert-manager is required."
+          all_secrets_exist="false"
+          break
       else
-        log_error "Use of cert-manager is enabled, but cert-manager is not available"
+        log_debug "Found existing secret $namespace/$secretName"
+      fi
+    done
+
+    if [ "$all_secrets_exist" == "true" ]; then
+      log_debug "All required secrets exist. Skipping cert-manager check."
+    else
+      if [ "$certManagerAvailable" == "true" ]; then
+        log_debug "cert-manager is available"        
+      else
+        log_error "Missing secret [$secretName] requires cert-manager, which is not available"
         cert_manager_ok="false"
       fi
-    else
-      log_debug "Use of cert-manager is disabled"
     fi
   else
     log_debug "TLS is disabled. Skipping verification of cert-manager."
   fi
   
+  export cert_manager_ok
   if [ "$cert_manager_ok" == "true" ]; then
     return 0
   else
@@ -85,16 +102,14 @@ function deploy_app_cert {
   namespace=$1
   context=$2
   app=$3
-
-  if [ "$TLS_CERT_MANAGER_ENABLE" == "true" ]; then
-    # Create the certificate using cert-manager
-    certyaml=$context/tls/$app-tls-cert.yaml
-    if [ -f "$USER_DIR/$context/tls/$app-tls-cert.yaml" ]; then
-      certyaml="$USER_DIR/$context/tls/$app-tls-cert.yaml"
-    fi
-    log_debug "Creating cert-manager certificate custom resource for [$app] using [$certyaml]"
-    kubectl apply -n $namespace -f "$certyaml"
+  
+  # Create the certificate using cert-manager
+  certyaml=$context/tls/$app-tls-cert.yaml
+  if [ -f "$USER_DIR/$context/tls/$app-tls-cert.yaml" ]; then
+    certyaml="$USER_DIR/$context/tls/$app-tls-cert.yaml"
   fi
+  log_debug "Creating cert-manager certificate custom resource for [$app] using [$certyaml]"
+  kubectl apply -n $namespace -f "$certyaml"
 }
 
 function create_tls_certs {
@@ -104,9 +119,7 @@ function create_tls_certs {
   apps=("$@")
 
   # Optional TLS Support
-  if [ "$TLS_CERT_MANAGER_ENABLE" == "true" ]; then
-    deploy_issuers $namespace $context
-  fi
+  deploy_issuers $namespace $context
   
   # Certs honor USER_DIR for overrides/customizations
   for app in "${apps[@]}"; do

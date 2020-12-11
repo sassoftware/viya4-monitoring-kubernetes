@@ -5,7 +5,6 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
-source bin/tls-include.sh
 
 # set flag indicating wrapper/driver script being run
 export LOGGING_DRIVER=true
