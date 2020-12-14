@@ -117,15 +117,17 @@ function create_tls_certs {
   context=$2
   shift 2
   apps=("$@")
-
-  # Optional TLS Support
-  deploy_issuers $namespace $context
-  
-  # Certs honor USER_DIR for overrides/customizations
+ 
+  deployedIssuers="false"
+    # Certs honor USER_DIR for overrides/customizations
   for app in "${apps[@]}"; do
     # Only create the secrets if they do not exist
     TLS_SECRET_NAME=$app-tls-secret
     if [ -z "$(kubectl get secret -n $namespace $TLS_SECRET_NAME -o name 2>/dev/null)" ]; then
+        if [ "$deployedIssuers" == "false"]; then
+          deploy_issuers $namespace $context
+          deployedIssuers="true"
+        fi
         deploy_app_cert "$namespace" "$context" "$app"
     else
       log_debug "Using existing $TLS_SECRET_NAME for [$app]"
