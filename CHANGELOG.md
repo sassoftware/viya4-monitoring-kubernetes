@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.0.2 (15Dec20)
+
+* Fixed breaking script error in TLS
+* Minor tweaks to SAS Java Services and Perf/Node Utilitzation dashboards
+
 ## Version 1.0.1 (14Dec20)
 
 * **Overall**
