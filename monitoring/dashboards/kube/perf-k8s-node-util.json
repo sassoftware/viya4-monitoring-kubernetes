@@ -91,7 +91,7 @@
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{instance}}",
+          "legendFormat": "{{nodename}}",
           "legendLink": "/dashboard/file/node-rsrc-use.json",
           "refId": "A",
           "step": 10
@@ -195,7 +195,7 @@
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{instance}}",
+          "legendFormat": "{{nodename}}",
           "legendLink": "/dashboard/file/node-rsrc-use.json",
           "refId": "A",
           "step": 10
@@ -315,7 +315,7 @@
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{instance}}",
+          "legendFormat": "{{nodename}}",
           "legendLink": "/dashboard/file/node-rsrc-use.json",
           "refId": "A",
           "step": 10
@@ -419,7 +419,7 @@
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{instance}}",
+          "legendFormat": "{{nodename}}",
           "legendLink": "/dashboard/file/node-rsrc-use.json",
           "refId": "A",
           "step": 10
@@ -548,7 +548,7 @@
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{instance}} Receive",
+          "legendFormat": "{{nodename}} Receive",
           "legendLink": "/dashboard/file/node-rsrc-use.json",
           "refId": "A",
           "step": 10
@@ -558,7 +558,7 @@
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{instance}} Transmit",
+          "legendFormat": "{{nodename}} Transmit",
           "legendLink": "/dashboard/file/node-rsrc-use.json",
           "refId": "B",
           "step": 10
@@ -674,7 +674,7 @@
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{instance}} Receive",
+          "legendFormat": "{{nodename}} Receive",
           "legendLink": "/dashboard/file/node-rsrc-use.json",
           "refId": "A",
           "step": 10
@@ -684,7 +684,7 @@
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{instance}} Transmit",
+          "legendFormat": "{{nodename}} Transmit",
           "legendLink": "/dashboard/file/node-rsrc-use.json",
           "refId": "B",
           "step": 10
@@ -801,7 +801,7 @@
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{instance}} {{device}}",
+          "legendFormat": "{{nodename}} {{device}}",
           "legendLink": "/dashboard/file/node-rsrc-use.json",
           "refId": "A",
           "step": 10
@@ -902,7 +902,7 @@
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{instance}} {{device}}",
+          "legendFormat": "{{nodename}} {{device}}",
           "legendLink": "/dashboard/file/node-rsrc-use.json",
           "refId": "A",
           "step": 10
@@ -1021,7 +1021,7 @@
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{instance}}",
+          "legendFormat": "{{nodename}}",
           "legendLink": "/dashboard/file/node-rsrc-use.json",
           "refId": "A",
           "step": 10
@@ -1125,7 +1125,7 @@
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{instance}} - {{mountpoint}}    ({{fstype}})",
+          "legendFormat": "{{nodename}} - {{mountpoint}}    ({{fstype}})",
           "legendLink": "/dashboard/file/node-rsrc-use.json",
           "refId": "A",
           "step": 10
