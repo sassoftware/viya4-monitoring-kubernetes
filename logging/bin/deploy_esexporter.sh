@@ -41,7 +41,7 @@ if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
 
-helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-chartsy
+helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
 
 log_info "Updating helm repositories..."
 helm repo update
