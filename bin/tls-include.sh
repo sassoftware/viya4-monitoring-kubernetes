@@ -124,7 +124,7 @@ function create_tls_certs {
     # Only create the secrets if they do not exist
     TLS_SECRET_NAME=$app-tls-secret
     if [ -z "$(kubectl get secret -n $namespace $TLS_SECRET_NAME -o name 2>/dev/null)" ]; then
-        if [ "$deployedIssuers" == "false"]; then
+        if [ "$deployedIssuers" == "false" ]; then
           deploy_issuers $namespace $context
           deployedIssuers="true"
         fi
