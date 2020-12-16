@@ -53,8 +53,13 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
 
     # Delete the temp directory on exit
     function cleanup {
-      rm -rf "$TMP_DIR"
-      log_debug "Deleted temporary directory: [$TMP_DIR]"
+      KEEP_TMP_DIR=${KEEP_TMP_DIR:-false}
+      if [ "$KEEP_TMP_DIR" != "true" ]; then
+        rm -rf "$TMP_DIR"
+        log_debug "Deleted temporary directory: [$TMP_DIR]"
+      else
+        log_info "TMP_DIR [$TMP_DIR] was not removed"
+      fi
     }
     trap cleanup EXIT
 
