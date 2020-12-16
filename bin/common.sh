@@ -29,6 +29,20 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     log_info Kubernetes client version: "$KUBE_CLIENT_VER"
     log_info Kubernetes server version: "$KUBE_SERVER_VER"
 
+    # Check that the current KUBECONFIG has admin access
+    CHECK_ADMIN=${CHECK_ADMIN:-true}
+    if [ "$CHECK_ADMIN" == "true" ]; then
+      if [ "$(kubectl auth can-i create namespace --all-namespaces)" == "no" ]; then
+        ctx=$(kubectl config current-context)
+        log_error "The current kubectl context [$ctx] does not have cluster admin access"
+        exit 1
+      else
+        log_debug "Cluster admin check OK"
+      fi
+    else
+      log_debug "Cluster admin check disabled"
+    fi
+
     export TMP_DIR=$(mktemp -d -t sas.mon.XXXXXXXX)
     if [ ! -d "$TMP_DIR" ]; then
       log_error "Could not create temporary directory [$TMP_DIR]"
