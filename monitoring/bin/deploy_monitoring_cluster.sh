@@ -73,7 +73,7 @@ fi
 
 # Check if Prometheus Operator CRDs are already installed
 PROM_OPERATOR_CRD_UPDATE=${PROM_OPERATOR_CRD_UPDATE:-true}
-PROM_OPERATOR_CRD_VERSION=${PROM_OPERATOR_CRD_VERSION:-v0.43.2}
+PROM_OPERATOR_CRD_VERSION=${PROM_OPERATOR_CRD_VERSION:-v0.44.1}
 if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
   log_info "Updating Prometheus Operator custom resource definitions"
   kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml
@@ -139,7 +139,7 @@ else
   fi
   log_info "Installing via Helm...($(date) - timeout 20m)"
 fi
-KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-11.1.3}
+KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-12.8.0}
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
   -f monitoring/values-prom-operator.yaml \
