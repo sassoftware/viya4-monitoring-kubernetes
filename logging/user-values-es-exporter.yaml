@@ -1,9 +1,11 @@
-# Chart: https://github.com/helm/charts/tree/master/stable/elasticsearch-exporter
-# Default values: https://github.com/helm/charts/blob/master/stable/elasticsearch-exporter/values.yaml
+## Helm Chart:     https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-elasticsearch-exporter
+## Default values: https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-elasticsearch-exporter/values.yaml
 
 # image:
 #   repository: justwatch/elasticsearch_exporter
 #   tag: 1.1.0
 
 # es:
-#   uri: https://admin:admin@v4m-es-client-service.logging:9200
+##  The env vars ES_USER and ES_PASSWORD are set, by default,
+##  based on the K8s secret internal-user-metricgetter
+#   uri: https://$(ES_USER):$(ES_PASSWORD)@v4m-es-client-service:9200

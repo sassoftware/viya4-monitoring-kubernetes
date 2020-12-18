@@ -41,7 +41,8 @@ if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
 
-helmRepoAdd stable https://charts.helm.sh/stable
+helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
+
 log_info "Updating helm repositories..."
 helm repo update
 
@@ -73,10 +74,11 @@ helm2ReleaseCheck es-exporter-$LOG_NS
 
 helm $helmDebug upgrade --install es-exporter \
  --namespace $LOG_NS \
- -f logging/es/odfe/values-es-exporter_open.yaml \
+ -f logging/esexporter/values-es-exporter_open.yaml \
  -f $wnpValuesFile \
  -f $ES_OPEN_EXPORTER_USER_YAML \
- stable/elasticsearch-exporter
+ prometheus-community/prometheus-elasticsearch-exporter \
+ --set fullnameOverride=v4m-es-exporter
 
 log_info "Elasticsearch metric exporter has been deployed"
 

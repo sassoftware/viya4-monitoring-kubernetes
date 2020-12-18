@@ -12,6 +12,10 @@ image:
   pullPolicy: Always
   pullSecret: ""
 
+# logfmt|json
+log:
+  format: json
+
 ## Set enabled to false if you don't want securityContext
 ## in your Deployment.
 ## The below values are the default for kubernetes.
@@ -32,7 +36,7 @@ priorityClassName: ""
 
 nodeSelector: {}
 
-tolerations: {}
+tolerations: []
 
 service:
   type: ClusterIP
