@@ -168,7 +168,7 @@ if [[ $response == 4* ]]; then
 
       #obtain admin cert
       rm -f $TMP_DIR/tls.crt
-      admin_tls_cert=$(kubectl -n logging get secrets es-admin-tls-secret -o "jsonpath={.data['tls\.crt']}")
+      admin_tls_cert=$(kubectl -n $LOG_NS get secrets es-admin-tls-secret -o "jsonpath={.data['tls\.crt']}")
       if [ -z "$admin_tls_cert" ]; then
          log_error "Unable to obtain admin certs from secret [es-admin-tls-secret] in the [$LOG_NS] namespace. Password for [$USER_NAME] has NOT been changed."
          success="false"
@@ -178,7 +178,7 @@ if [[ $response == 4* ]]; then
 
          #obtain admin TLS key
          rm -f $TMP_DIR/tls.key
-         admin_tls_key=$(kubectl -n logging get secrets es-admin-tls-secret -o "jsonpath={.data['tls\.key']}")
+         admin_tls_key=$(kubectl -n $LOG_NS get secrets es-admin-tls-secret -o "jsonpath={.data['tls\.key']}")
          if [ -z "$admin_tls_key" ]; then
             log_error "Unable to obtain admin cert key from secret [es-admin-tls-secret] in the [$LOG_NS] namespace. Password for [$USER_NAME] has NOT been changed."
             success="false"
