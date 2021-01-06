@@ -57,32 +57,31 @@ command `git clone <https_url>`.
 
 ### Customize the Deployment
 
-### USER_DIR
+The process of customizing the logging deployment consists of: 
+- creating the location for your local customization files
+- using the `USER_DIR` environment variable to specify the location of the customization files
+- specifying customization variables and parameters in the customization files
 
-Setting the `USER_DIR` environment variable allows for any user customizations
-to be stored outside of the directory structure of this repository. The default
-`USER_DIR` is the root of this repository. A directory referenced by `USER_DIR`
-should include `user*` files in the same relative structure as they exist in
-this repository.
+See the [main README](../README.md) to for information about the customization process.
 
-The following files are automatically used by the monitoring scripts if available
-in `USER_DIR`:
+After you create the location for your customization files, you can customize the components that you deploy for logging by specifying environment variables and Helm chart parameters in this set of customization files (in this example, contained in the *my-viya4mon-user-dir* root directory):
 
-* `user.env`
-* `logging/user.env`
-* `logging/user-values-elasticsearch-open.yaml`
-* `logging/user-values-es-exporter.yaml`
-* `logging/user-values-fluent-bit-open.yaml`
+```text
+/my-viya4mon-user-dir/user.env
 
-You can modify two types of values to customize your deployment:
+/my-viya4mon-user-dir/logging/user.env
+/my-viya4mon-user-dir/logging/user-values-elasticsearch-open.yaml
+/my-viya4mon-user-dir/logging/user-values-es-exporter.yaml
+/my-viya4mon-user-dir/logging/user-values-fluent-bit-open.yaml
+```
 
-- Environment variables: These variables can be specified in the `user.env` file or on the command line. Specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments.
-- Helm chart parameters: These parameters are organized into a hierarchical structure (for example, `persistentVolume:storageClass`). These parameters are specified in `.yaml` configuration files.
+You specify the environment variables in the `user.env` files and the Helm chart parameters in the `*.yaml` configuration files. 
 
-### Use user.env to Customize Deployment
+#### Specifying Environment Variables in user.env Files
 
-The `logging/user.env` file enables you to customize the components that are
-deployed and specify some script behavior (such as enabling debug). All values in `user.env` files are exported as environment variables available to the scripts. Any line whose first character is `#` is treated as a comment and ignored.
+Environment variables control script behavior and high-level options such as TLS and workload node placement. Note that you can also specify environment variables on a command line, but specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments. The values in the top-level `user.env` file (`/my-viya4mon-user-dir/user.env`) apply to both the monitoring and logging deployments. The values in `/my-viya4mon-user-dir/logging/user.env` apply only to the logging deployment.
+
+Any line whose first character is `#` is treated as a comment and ignored.
 
 You can set the `ES_ADMIN_PASSWD` environment variable to specify the default password for Kibana. If you do not specify a default password, one is randomly generated.
 

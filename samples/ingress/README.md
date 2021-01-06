@@ -5,23 +5,31 @@ configured with ingress instead of node ports. You can choose to use host-based 
 
 If you are using a cloud provider, you must deploy using ingress.
 
-## Preparation for Deployment
+## Using This Sample
 
-1. Copy this sample directory to a separate local path.
+You customize your deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. The configuration files in this sample provide a starting point for the configuration files for a deployment that supports ingress instead of node ports. See the 
+[main README](../../README.md#customization) to for information about the customization process.
 
-2. Set the `USER_DIR` environment variable to the local path:
+In order to use the values in this sample in the customization files for your deployment, copy the configuration files from this sample to your local configuration directory, then modify the files further as needed.
+If you also need to use values from another sample, manually copy the values to your configuration files after you add the values in this sample. 
+
+After you finish modifying the configuration files, deploy monitoring and logging using the standard deployment scripts:
 
 ```bash
-export USER_DIR=/path/to/my/copy/ingress
+/path/to/this/repo/monitoring/bin/deploy_monitoring_cluster.sh
 ```
 
-3. To enable TLS, edit `$USER_DIR/user.env` and set `TLS_ENABLED` to `true`
+```bash
+/my_repository_path/logging/bin/deploy_logging_open.sh
+```
+
+## Notes On Configuration Values
+
+To enable TLS, edit `$USER_DIR/user.env` and set `TLS_ENABLED` to `true`
 
 ### Monitoring 
 
-Follow these steps to deploy monitoring using ingress:
-
-1. The monitoring deployment process requires that the user response file be
+The monitoring deployment process requires that the user response file be
 named `$USER_DIR/monitoring/user-values-prom-operator.yaml`.
 
   - If you are using host-based routing, rename the
@@ -29,20 +37,12 @@ named `$USER_DIR/monitoring/user-values-prom-operator.yaml`.
 
   - If you are using path-based routing, rename the `user-values-prom-path.yaml` to `user-values-prom-operator.yaml`.
 
-2. Edit `$USER_DIR/monitoring/user-values-prom-operator.yaml` and replace
+Edit `$USER_DIR/monitoring/user-values-prom-operator.yaml` and replace
 all instances of `host.cluster.example.com` with hostnames that match your cluster.
-
-3. Deploy monitoring using the standard deployment script:
-
-```bash
-/path/to/this/repo/monitoring/bin/deploy_monitoring_cluster.sh
-```
 
 ### Logging
 
-Follow these steps to deploy logging using ingress:
-
-1. The logging deployment process requires that the user response file be
+The logging deployment process requires that the user response file be
 named `$USER_DIR/logging/user-values-elasticsearch-open.yaml`.
 
   - If you are using host-based routing, rename the
@@ -50,14 +50,8 @@ named `$USER_DIR/logging/user-values-elasticsearch-open.yaml`.
 
   - If you are using path-based routing, rename the `user-values-elasticsearch-path.yaml` to `user-values-elasticsearch-open.yaml`.
 
-2. Edit `$USER_DIR/logging/user-values-elasticsearch-open.yaml` and replace
+Edit `$USER_DIR/logging/user-values-elasticsearch-open.yaml` and replace
 all instances of `host.cluster.example.com` with hostnames that match your cluster
-
-3. Deploy logging using the standard deployment script:
-
-```bash
-/path/to/this/repo/logging/bin/deploy_logging_open.sh
-```
 
 ## Access the Applications
 
@@ -77,4 +71,4 @@ locations (with hostnames replaced with those in the actual environment that you
 * Alertmanager - `http://host.mycluster.example.com/alertManager`
 * Kibana - `http://host.mycluster.example.com/kibana`
 
-The default credentials for Grafana and Kibana are `admin`:`admin`.
+

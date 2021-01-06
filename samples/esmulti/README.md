@@ -6,22 +6,29 @@ client/ingest. The sample deploys the nodes as primary (master) nodes and update
 Although multi-role Elasticsearch nodes are widely used, they are not natively supported by the Open Distro for Elasticsearch
 Helm chart that is used to deploy the logging components of this project. In order to enable multi-role Elasticsearch nodes, the deployment process must patch various Kubernetes objects. Because performance and other criteria are still being evaluated, this use of multi-role nodes is experimental and is not yet part of our standard configuration.
 
-## Preparation and Deployment
+## Using This Sample
 
-1. Copy the `../samples/esmulti` sample directory (including sub-directories) to a separate local path.
+You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. The configuration files in this sample provide a starting point for the configuration files for a deployment that supports multi-role Elasticsearch nodes. See the 
+[main README](../../README.md#customization) to for information about the customization process.
 
-See the [main README](../../README.md#customization) for information about the customization process.
+In order to use the values in this sample in the customization files for your deployment, you can use one of these approaches:
 
-2. Set the `USER_DIR` environment variable to the local path:
+- Copy the configuration files from this sample to your local configuration directory, then modify the files further as needed.
+- Copy the configuration files from the `generic-base` sample to your local configuration directory to provide a known basic configuration, then manually copy the contents from the files in this sample to your local configuration files.
+
+If you also need to use values from another sample, manually copy the values to your configuration files after you add the values in this sample. 
+
+After you finish modifying the configuration files, deploy logging using the standard deployment script:
 
 ```bash
-export USER_DIR=/path/to/my/copy/esmulti
+/my_repository_path/logging/bin/deploy_logging_open.sh
 ```
 
-3. Note that the `ES_MULTIROLE_NODES` environment variable has
-been set to `true` in the `$USER_DIR/logging/user.env` file in order to enable multi-role Elasticsearch nodes.
+## Notes On Configuration Values
 
-4. Review the contents of the `$USER_DIR/logging/user-values-elasticsearch-open.yaml` file and make any changes needed for your environment. These are two areas that could be customized:
+The `ES_MULTIROLE_NODES` environment variable is set to `true` in the `user.env` file in order to enable multi-role Elasticsearch nodes.
+
+You must review the contents of the `user-values-elasticsearch-open.yaml` file and make any changes needed for your environment. These are two areas that you could customize:
 
  **Storage:** When primary nodes also serve as data nodes, they need more disk space than when they serve only as primary nodes.  The `master.persistence.size` property specifies the amount of storage that is assigned to the primary nodes. Review this setting and adjust it as necessary. 
 
@@ -31,9 +38,5 @@ been set to `true` in the `$USER_DIR/logging/user.env` file in order to enable m
  
  Note that you cannot add additional nodes that perform only the primary role. You also cannot deploy nodes that perform different combinations of roles. 
 
-5. Deploy logging using the standard deployment script:
 
-```bash
-/path/to/this/repo/logging/bin/deploy_logging_open.sh
-```
 

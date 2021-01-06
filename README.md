@@ -84,57 +84,67 @@ including Fluent Bit, Elasticsearch, and Kibana.
 
 The process of customizing the monitoring and logging deployments consists of: 
 - creating the location for your local customization files
-- specifying customization variables and parameters in the customization files
 - using the `USER_DIR` environment variable to specify the location of the customization files
+- specifying customization variables and parameters in the customization files
 
-### Create the Location for Customization Files
+### Creating the Location for Customization Files
 
-The `USER_DIR` environment variable enables you to use a directory outside of the local repository to contain the customization files. By using a location outside of the repository, you can preserve your customizations when you deploy new versions of the monitoring and logging applications. You could also put the customization files in a location that is under version control.
+The `USER_DIR` environment variable enables you to use a directory outside of the local repository to contain the customization files. By using a location outside of the repository, you can put the customization files in a location that is under version control, and you can preserve your customizations when you deploy new versions of the monitoring and logging applications. You could also create different sets of configuration files for different cluster types, and then use the `USER_DIR` variable to specify the configuration files to use based on the cluster type on which you were deploying.
 
-For example, to create a customization directory named *my_custom_files* that contains directories for monitoring and logging customization files:
+For example, to create a customization directory named *my-viya4mon-user-dir* that contains directories for monitoring and logging customization files:
 
 ```bash
-mkdir -p ~/my_custom_files/monitoring
-mkdir -p ~/my_custom_files/logging
+mkdir -p ~/my-viya4mon-user-dir/monitoring
+mkdir -p ~/my-viya4mon-user-dir/logging
 ```
 
-### Specifying Customization Variables and Parameters
-
-After you create the location for your customization files, you can customize the components that you deploy for monitoring and logging by specifying environment variables and Helm chart parameters in this set of customization files (in this example, contained in the *my_custom_files* root directory):
-
-```text
-/my_custom_files/user.env
-
-/my_custom_files/monitoring/user.env
-/my_custom_files/monitoring/user-values-prom-operator.yaml
-/my_custom_files/monitoring/user-values-pushgateway.yaml
-
-/my_custom_files/logging/user.env
-/my_custom_files/logging/user-values-elasticsearch-open.yaml
-/my_custom_files/logging/user-values-es-exporter.yaml
-/my_custom_files/logging/user-values-fluent-bit-open.yaml
-```
-
-You specify the environment variables in the `user.env` files and the Helm chart parameters in the `*.yaml` configuration files. Note that you can also specify environment variables on a command line, but specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments. 
-
-You do not have to specify values in all of these files. The deployment process ignores any files other than these.
-
-This repository contains several sample configuration files which provide values for specific situations. You can copy the configuration files for a sample from the repository to your customization file directory  in order to provide you with a set of customizations that are valid for the situation. You can then make further modifications to the files. 
-
-If more than one sample applies to your environment, you can manually copy the values from the other sample files to the files in your customization directory.
-
-The [monitoring README](monitoring/README.md) and [logging README](logging/README.md) for information about determining valid values for the `user.env` and `*.yaml` files.
+Note that these commands create directories under your root directory.
 
 ### Using USER_DIR to Specify the Location of Customization Files
 
 Use the `USER_DIR` environment variable to specify the root location of your local customization files.
 
-This example sets the `USER_DIR` environment variable to the *my_custom_files* directory:
+This example sets the `USER_DIR` environment variable to the *my-viya4mon-user-dir* directory:
 
 ```bash
-export USER_DIR=~/my_custom_files
+export USER_DIR=~/my-viya4mon-user-dir
 ```
 The monitoring and logging deployment scripts use the customization files contained in the directories user the `USER_DIR` location.
+
+### <a name="customization"></a>Specifying Customization Variables and Parameters
+
+After you create the location for your customization files, you can customize the components that you deploy for monitoring and logging by specifying environment variables and Helm chart parameters in this set of customization files (in this example, contained in the *my-viya4mon-user-dir* root directory):
+
+```text
+/my-viya4mon-user-dir/user.env
+
+/my-viya4mon-user-dir/monitoring/user.env
+/my-viya4mon-user-dir/monitoring/user-values-prom-operator.yaml
+/my-viya4mon-user-dir/monitoring/user-values-pushgateway.yaml
+
+/my-viya4mon-user-dir/logging/user.env
+/my-viya4mon-user-dir/logging/user-values-elasticsearch-open.yaml
+/my-viya4mon-user-dir/logging/user-values-es-exporter.yaml
+/my-viya4mon-user-dir/logging/user-values-fluent-bit-open.yaml
+```
+
+You specify the environment variables in the `user.env` files and the Helm chart parameters in the `*.yaml` configuration files. 
+
+You do not have to specify values in all of these files. The deployment process ignores any files in the `USER_DIR` other than these.
+
+#### Specifying Environment Variables in user.env Files
+
+Environment variables control script behavior and high-level options such as TLS and workload node placement. Note that you can also specify environment variables on a command line, but specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments. The values in the top-level `user.env` file (`/my-viya4mon-user-dir/user.env`) apply to both the monitoring and logging deployments. The values in `/my-viya4mon-user-dir/monitoring/user.env` apply only to the monitoring deployment and the values in `/my-viya4mon-user-dir/logging/user.env` apply only to the logging deployment.
+
+#### Using Sample Configuration Files
+
+This repository contains several sample configuration files which provide values for specific situations. The `generic-base` sample contains a complete set of customization files and comments in each of the files to enable you to understand the how the values are used. A best practice is to use the files in the `generic-base` sample as a base for your customization files, and then change the values or copy values from other samples to match your situation.  
+
+ Alternatively, you can copy the configuration files for the sample that most closely matches your environment from the repository to your customization file directory. This enables you to start your customization with a set of values that are valid for your situation. You can then make further modifications to the files. 
+
+If more than one sample applies to your environment, you can manually copy the values from the other sample files to the files in your customization directory.
+
+See the [monitoring README](monitoring/README.md) and [logging README](logging/README.md) for information about determining valid values for the `user.env` and `*.yaml` files.
 
 ### Default StorageClass
 
