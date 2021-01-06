@@ -3,6 +3,18 @@
 Samples are provided to demonstrate how to customize the deployment
 of the logging and monitoring components for specific situations. The samples provide instructions and example yaml files that you can modify to fit your environment. Although each example focuses on a specific scenario, you can combine multiple samples by merging the appropriate values in each deployment file.
 
+You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. The configuration files in each sample provide a starting point for the configuration files for a deployment that supports a specific situation. See the 
+[main README](../README.md#customization) to for information about the customization process.
+
+In order to use the values in a sample in the customization files for your deployment, you can use one of these approaches:
+
+- Copy the configuration files from the sample to your local configuration directory, then modify the files further as needed.
+- Copy the configuration files from the `generic-base` sample to your local configuration directory to provide a known basic configuration, then manually copy the contents from the files in this sample to your local configuration files.
+
+If you also need to use values from another sample, manually copy the values to your configuration files after you add the values in this sample. 
+
+After you finish modifying the configuration files, deploy monitoring and logging using the standard deployment scripts.
+
 These samples are provided:
 
 * [azure-deployment](azure-deployment) - Deploys on Microsoft Azure Kubernetes Service (AKS)
