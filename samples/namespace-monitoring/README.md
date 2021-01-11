@@ -74,7 +74,7 @@ VIYA_DASH=false monitoring/bin/deploy_monitoring_cluster.sh
 6. Deploy standard SAS Viya monitoring components each SAS Viya namespace.
 ```bash
 VIYA_NS=$VIYA_ONE_NS monitoring/bin/deploy_monitoring_viya.sh
-VIYA_NS=$VIYA_ONE_NS monitoring/bin/deploy_monitoring_viya.sh
+VIYA_NS=$VIYA_TWO_NS monitoring/bin/deploy_monitoring_viya.sh
 ```
 
 7. Deploy Prometheus to each SAS Viya namespace

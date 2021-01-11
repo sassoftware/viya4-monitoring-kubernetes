@@ -6,12 +6,13 @@ of the logging and monitoring components for specific situations. The samples pr
 You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. The configuration files in each sample provide a starting point for the configuration files for a deployment that supports a specific situation. See the 
 [main README](../README.md#customization) to for information about the customization process.
 
-In order to use the values in a sample in the customization files for your deployment, you can use one of these approaches:
+In order to minimize the potential for errors, you should not manually create the customization files, but use one of these sample files as the starting point for your own customizations. 
 
-- Copy the configuration files from the sample to your local configuration directory, then modify the files further as needed.
-- Copy the configuration files from the `generic-base` sample to your local configuration directory to provide a known basic configuration, then manually copy the contents from the files in this sample to your local configuration files.
+If your situation matches one of the specialized samples, you can copy the configuration files for the sample that most closely matches your environment from the repository to your customization file directory. This enables you to start your customization with a set of values that are valid for your situation. You can then make further modifications to the files.
 
-If you also need to use values from another sample, manually copy the values to your configuration files after you add the values in this sample. 
+If your situation does not match any of the specialized samples, copy the `generic-base` sample as a base for your customization files, and then change the values or copy values from other samples to match your environment. 
+
+If more than one sample applies to your environment, you can manually copy the values from the other sample files to the files in your customization directory.
 
 After you finish modifying the configuration files, deploy monitoring and logging using the standard deployment scripts.
 
@@ -20,7 +21,7 @@ These samples are provided:
 * [azure-deployment](azure-deployment) - Deploys on Microsoft Azure Kubernetes Service (AKS)
 * [azure-monitor](azure-monitor) - Enables Azure Monitor to collect metrics
 from SAS Viya components
-* [external-alertmanager](external-alertmanager) - Configures a central external Alert Manager instance
+* [external-alertmanager](external-alertmanager) - Configures a central external Alertmanager instance
 * [generic-base](generic-base) - Does not support a specific scenario, but provides a full set of customization files with comments
 * [ingress](ingress) - Deploys using host-based or path-based ingress
 * [min-logging](min-logging) - Provides a minimal logging configuration for dev or test environments

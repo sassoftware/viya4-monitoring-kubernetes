@@ -9,10 +9,7 @@ component. This configuration could save CPU and memory resources and could be u
 You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. The configuration files in this sample provide a starting point for the configuration files for a deployment that supports multi-role Elasticsearch nodes. See the 
 [main README](../../README.md#customization) to for information about the customization process.
 
-In order to use the values in this sample in the customization files for your deployment, you can use one of these approaches:
-
-- Copy the configuration files from this sample to your local configuration directory, then modify the files further as needed.
-- Copy the configuration files from the `generic-base` sample to your local configuration directory to provide a known basic configuration, then manually copy the contents from the files in this sample to your local configuration files.
+In order to use the values in this sample in the customization files for your deployment, copy the configuration files from this sample to your local configuration directory, then modify the files further as needed.
 
 If you also need to use values from another sample, manually copy the values to your configuration files after you add the values in this sample. 
 

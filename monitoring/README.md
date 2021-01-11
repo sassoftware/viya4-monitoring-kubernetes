@@ -73,27 +73,32 @@ command `git clone <https_url>`.
 The process of customizing the monitoring deployment consists of: 
 - creating the location for your local customization files
 - using the `USER_DIR` environment variable to specify the location of the customization files
+- copying the customization files from one of the provided samples to your local directory
 - specifying customization variables and parameters in the customization files
 
-See the [main README](../README.md) to for information about the customization process.
+See the [main README](../README.md#customization) to for information about the customization process.
 
 After you create the location for your customization files, you can customize the components that you deploy for monitoring by specifying environment variables and Helm chart parameters in this set of customization files (in this example, contained in the *my-viya4mon-user-dir* root directory):
 
 ```text
-/my-viya4mon-user-dir/user.env
+my-viya4mon-user-dir/user.env
 
-/my-viya4mon-user-dir/monitoring/user.env
-/my-viya4mon-user-dir/monitoring/user-values-prom-operator.yaml
-/my-viya4mon-user-dir/monitoring/user-values-pushgateway.yaml
+my-viya4mon-user-dir/monitoring/user.env
+my-viya4mon-user-dir/monitoring/user-values-prom-operator.yaml
+my-viya4mon-user-dir/monitoring/user-values-pushgateway.yaml
 ```
 
 You specify the environment variables in the `user.env` files and the Helm chart parameters in the `*.yaml` configuration files. 
 
+In order to minimize the potential for errors, you should not manually create the customization files, but use one of the set of sample files as the starting point for your own customizations. 
+
 #### Specifying Environment Variables in user.env Files
 
-Environment variables control script behavior and high-level options such as TLS and workload node placement. Note that you can also specify environment variables on a command line, but specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments. The values in the top-level `user.env` file (`/my-viya4mon-user-dir/user.env`) apply to both the monitoring and logging deployments. The values in `/my-viya4mon-user-dir/monitoring/user.env` apply only to the monitoring deployment.
+Environment variables control script behavior and high-level options such as TLS and workload node placement. Note that you can also specify environment variables on a command line, but specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments. The values in the top-level `user.env` file (`my-viya4mon-user-dir/user.env`) apply to both the monitoring and logging deployments. The values in `my-viya4mon-user-dir/monitoring/user.env` apply only to the monitoring deployment.
 
 Any line whose first character is `#` is treated as a comment and ignored.
+
+#### Specifying the Default Grafana Password 
 
 You can set the `GRAFANA_ADMIN_PASSWORD` environment variable to specify the default password for Grafana. If you do not specify a default password, one is randomly generated and displayed during deployment.
 

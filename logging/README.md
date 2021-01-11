@@ -60,30 +60,37 @@ command `git clone <https_url>`.
 The process of customizing the logging deployment consists of: 
 - creating the location for your local customization files
 - using the `USER_DIR` environment variable to specify the location of the customization files
+- copying the customization files from one of the provided samples to your local directory
 - specifying customization variables and parameters in the customization files
 
-See the [main README](../README.md) to for information about the customization process.
+See the [main README](../README.md#customization) to for information about the customization process.
 
 After you create the location for your customization files, you can customize the components that you deploy for logging by specifying environment variables and Helm chart parameters in this set of customization files (in this example, contained in the *my-viya4mon-user-dir* root directory):
 
 ```text
-/my-viya4mon-user-dir/user.env
+my-viya4mon-user-dir/user.env
 
-/my-viya4mon-user-dir/logging/user.env
-/my-viya4mon-user-dir/logging/user-values-elasticsearch-open.yaml
-/my-viya4mon-user-dir/logging/user-values-es-exporter.yaml
-/my-viya4mon-user-dir/logging/user-values-fluent-bit-open.yaml
+my-viya4mon-user-dir/logging/user.env
+my-viya4mon-user-dir/logging/user-values-elasticsearch-open.yaml
+my-viya4mon-user-dir/logging/user-values-es-exporter.yaml
+my-viya4mon-user-dir/logging/user-values-fluent-bit-open.yaml
 ```
 
 You specify the environment variables in the `user.env` files and the Helm chart parameters in the `*.yaml` configuration files. 
 
+In order to minimize the potential for errors, you should not manually create the customization files, but use one of the set of sample files as the starting point for your own customizations. 
+
 #### Specifying Environment Variables in user.env Files
 
-Environment variables control script behavior and high-level options such as TLS and workload node placement. Note that you can also specify environment variables on a command line, but specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments. The values in the top-level `user.env` file (`/my-viya4mon-user-dir/user.env`) apply to both the monitoring and logging deployments. The values in `/my-viya4mon-user-dir/logging/user.env` apply only to the logging deployment.
+Environment variables control script behavior and high-level options such as TLS and workload node placement. Note that you can also specify environment variables on a command line, but specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments. The values in the top-level `user.env` file (`my-viya4mon-user-dir/user.env`) apply to both the monitoring and logging deployments. The values in `my-viya4mon-user-dir/logging/user.env` apply only to the logging deployment.
 
 Any line whose first character is `#` is treated as a comment and ignored.
 
+#### Specifying the Default Kibana Password
+
 You can set the `ES_ADMIN_PASSWD` environment variable to specify the default password for Kibana. If you do not specify a default password, one is randomly generated.
+
+#### Specifying the Retention Period for Log Messages
 
 You can also modify values in the `user.env` file to change the retention period for log messages. By default, messages from SAS Viya and Kubernetes pods are retained for three days and messages from logging components are retained for one day. See [Log_Retention.md](Log_Retention.md) for information about changing the log retention period. 
 
