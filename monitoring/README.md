@@ -88,7 +88,7 @@ my-viya4mon-user-dir/monitoring/user-values-prom-operator.yaml
 my-viya4mon-user-dir/monitoring/user-values-pushgateway.yaml
 ```
 
-You specify the environment variables in the `user.env` files and the Helm chart parameters in the `*.yaml` configuration files. 
+You specify the environment variables in the `user.env` files and the Helm chart parameters in the `*.yaml` customization files. 
 
 In order to minimize the potential for errors, you should not manually create the customization files, but use one of the set of sample files as the starting point for your own customizations. 
 

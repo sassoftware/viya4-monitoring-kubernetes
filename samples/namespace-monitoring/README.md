@@ -26,14 +26,18 @@ customize the files to deploy to any number of namespaces.
 
 ## Using This Sample
 
-You customize your monitoring deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. The configuration files in this sample provide a starting point for the configuration files for a deployment that supports namespace monitoring. See the 
+You customize your monitoring deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
 [main README](../../README.md#customization) to for information about the customization process.
 
-If you also need to use values from another sample, manually copy the values to your configuration files after you specify the values in this sample. 
+The customization files in this sample provide a starting point for the customization files for a deployment that supports namespace monitoring. 
 
-## Notes On Configuration Values
+In order to use the values in this sample in the customization files for your deployment, copy the customization files from this sample to your local customization directory, then modify the files further as needed.
 
-After you copy the configuration files from this sample to a local path and set the `USER_DIR` environment variable to the local path, follow these steps:
+If you also need to use values from another sample, manually copy the values to your customization files after you specify the values in this sample. 
+
+## Notes On Customization Values
+
+After you copy the customization files from this sample to a local path and set the `USER_DIR` environment variable to the local path, follow these steps:
 
 1. Edit the `.yaml` files that provide values for Grafana, Prometheus and the Prometheus Operator and make these modifications
 

@@ -8,18 +8,22 @@ Helm chart that is used to deploy the logging components of this project. In ord
 
 ## Using This Sample
 
-You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. The configuration files in this sample provide a starting point for the configuration files for a deployment that supports multi-role Elasticsearch nodes. See the 
+You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
 [main README](../../README.md#customization) to for information about the customization process.
 
-If you also need to use values from another sample, manually copy the values to your configuration files after you add the values in this sample. 
+The customization files in this sample provide a starting point for the customization files for a deployment that supports multi-role Elasticsearch nodes. 
 
-After you finish modifying the configuration files, deploy logging using the standard deployment script:
+In order to use the values in this sample in the customization files for your deployment, copy the customization files from this sample to your local customization directory, then modify the files further as needed.
+
+If you also need to use values from another sample, manually copy the values to your customization files after you add the values in this sample. 
+
+After you finish modifying the customization files, deploy logging using the standard deployment script:
 
 ```bash
-/my_repository_path/logging/bin/deploy_logging_open.sh
+my_repository_path/logging/bin/deploy_logging_open.sh
 ```
 
-## Notes On Configuration Values
+## Notes On Customization Values
 
 The `ES_MULTIROLE_NODES` environment variable is set to `true` in the `user.env` file in order to enable multi-role Elasticsearch nodes.
 

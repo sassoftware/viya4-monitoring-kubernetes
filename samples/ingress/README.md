@@ -7,23 +7,26 @@ If you are using a cloud provider, you must deploy using ingress.
 
 ## Using This Sample
 
-You customize your deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. The configuration files in this sample provide a starting point for the configuration files for a deployment that supports ingress instead of node ports. See the 
+You customize your deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
 [main README](../../README.md#customization) to for information about the customization process.
 
-In order to use the values in this sample in the customization files for your deployment, copy the configuration files from this sample to your local configuration directory, then modify the files further as needed.
-If you also need to use values from another sample, manually copy the values to your configuration files after you add the values in this sample. 
+The customization files in this sample provide a starting point for the customization files for a deployment that supports ingress instead of node ports. 
+
+In order to use the values in this sample in the customization files for your deployment, copy the customization files from this sample to your local customization directory, then modify the files further as needed.
+
+If you also need to use values from another sample, manually copy the values to your customization files after you add the values in this sample. 
 
 After you finish modifying the configuration files, deploy monitoring and logging using the standard deployment scripts:
 
 ```bash
-/path/to/this/repo/monitoring/bin/deploy_monitoring_cluster.sh
+my_repository_path/monitoring/bin/deploy_monitoring_cluster.sh
 ```
 
 ```bash
-/my_repository_path/logging/bin/deploy_logging_open.sh
+my_repository_path/logging/bin/deploy_logging_open.sh
 ```
 
-## Notes On Configuration Values
+## Notes On Customization Values
 
 To enable TLS, edit `$USER_DIR/user.env` and set `TLS_ENABLED` to `true`
 

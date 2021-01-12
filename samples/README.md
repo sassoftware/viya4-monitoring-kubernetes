@@ -3,12 +3,14 @@
 Samples are provided to demonstrate how to customize the deployment
 of the logging and monitoring components for specific situations. The samples provide instructions and example yaml files that you can modify to fit your environment. Although each example focuses on a specific scenario, you can combine multiple samples by merging the appropriate values in each deployment file.
 
-You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. The configuration files in each sample provide a starting point for the configuration files for a deployment that supports a specific situation. See the 
+You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
 [main README](../README.md#customization) to for information about the customization process.
+
+The customization files in each sample provide a starting point for the customization files for a deployment that supports a specific situation. 
 
 In order to minimize the potential for errors, you should not manually create the customization files, but use one of these sample files as the starting point for your own customizations. 
 
-If your situation matches one of the specialized samples, you can copy the configuration files for the sample that most closely matches your environment from the repository to your customization file directory. This enables you to start your customization with a set of values that are valid for your situation. You can then make further modifications to the files.
+If your situation matches one of the specialized samples, you can copy the customization files for the sample that most closely matches your environment from the repository to your customization file directory. This enables you to start your customization with a set of values that are valid for your situation. You can then make further modifications to the files.
 
 If your situation does not match any of the specialized samples, copy the `generic-base` sample as a base for your customization files, and then change the values or copy values from other samples to match your environment. 
 
