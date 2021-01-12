@@ -2,34 +2,34 @@
 
 In a typical deployment, each cluster uses a separate instance of Alertmanager. If you have multiple clusters, you might want alerts from all clusters to come from a single instance of Alertmanager. You might also have an existing instance of Alertmanager and want alerts to come from the existing instance. Use this sample to configure monitoring to use an external instance of Alertmanager.
 
-## Installation
+## Using This Sample
 
-Follow these steps:
+You customize your monitoring deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
+[main README](../../README.md#customization) to for information about the customization process.
 
-1. Copy the directory in the sample to a separate local path.
+The customization files in this sample provide a starting point for the customization files for a deployment that supports an external instance of Alertmanager. 
 
-2. Run this command to set the `USER_DIR` environment variable to your local path:
+In order to use the values in this sample in the customization files for your deployment, copy the customization files from this sample to your local customization directory, then modify the files further as needed.
+
+If you also need to use values from another sample, manually copy the values to your customization files after you add the values in this sample. 
+
+1. The sample uses the value of `my-alertmanager` for the external Alertmanager instance. If you use a name other than `my-alertmanager`, change `alertmanager-endpoint.yaml` and `$USER_DIR/monitoring/user-values-prom-operator.yaml` to specify the name of your Alertmanager instance.
+
+2. Define a service that points to the Alertmanager instance that you want to use.
+
+3. Deploy monitoring using the standard deployment script:
 
 ```bash
-export USER_DIR=/your/path/to/external-alertmanager
-```
+my_repository_path/monitoring/bin/deploy_monitoring_cluster.sh
+VIYA_NS=<your_viya_namespace> monitoring/bin/deploy_monitoring_viya.sh
+``` 
 
-3. Define a service that points to the Alertmanager instance that you want to use.
-
-4. Edit `alertmanager-endpoint.yaml` to point to the existing Alertmanager
-instance. 
-
-5. Deploy the yaml file to the monitoring namespace:
+4. Deploy the `alertmanager-endpoint.yaml` file to the monitoring namespace:
 
 ```bash
 kubectl apply -n monitoring -f $USER_DIR/alertmanager-endpoint.yaml
 ```
 
-6. If you changed the service name `my-alertmanager`, make the same change
-to your copy of `user-values-prom-operator.yaml`.
 
-7. Deploy monitoring using the standard deployment script:
 
-```bash
-monitoring/bin/deploy_monitoring_cluster.sh
-```
+

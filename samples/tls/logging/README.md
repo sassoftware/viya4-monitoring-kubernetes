@@ -19,35 +19,27 @@ you run any of the scripts in this repository:
 Generating these certificates is outside the scope of this example. However, you
 can use the process documented in ["Configure NGINX Ingress TLS for SAS Applications"](https://go.documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calencryptmotion&docsetTarget=n1xdqv1sezyrahn17erzcunxwix9.htm&locale=en#n0oo2yu8440vmzn19g6xhx4kfbrq) in SAS Viya Administration documentation and specify the `logging` namespace.
 
-## Instructions
+## Using This Sample
 
-1. Set up an empty directory with a `/logging` subdirectory to contain the customization files. 
+You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
+[main README](../../README.md#customization) to for information about the customization process.
 
-2. Set the `USER_DIR` environment variable to your local path:
+The customization files in this sample provide a starting point for the customization files for a deployment that supports logging with TLS enabled. 
 
-```bash
-mkdir -p ~/my-cluster-files/ops/user-dir/logging
-export USER_DIR=~/my-cluster-files/ops/user-dir
-```
+In order to use the values in this sample in the customization files for your deployment, copy the customization files from this sample to your local customization directory, then modify the files further as needed.
 
-3. Create `$USER_DIR/logging/user.env`. Specify this value in the file:
+If you also need to use values from another sample, manually copy the values to your customization files after you add the values in this sample. 
 
-* `MON_TLS_ENABLE=true` - This flag modifies the deployment of Open Distro for Elasticsearch to be TLS-enabled.
-
-4. Copy the sample TLS Helm user response file to your `USER_DIR`:
+After you finish modifying the customization files, deploy logging using the standard deployment script:
 
 ```bash
-cp path/to/this/repo/loggingsamples/tls/user-values-elasticsearch-open.yaml $USER_DIR/logging/
+my_repository_path/logging/bin/deploy_logging_open.sh
 ```
+## Notes On Customization Values
 
-5. Edit `$USER_DIR/monitoring/user-values-elasticsearch-open.yaml` and replace
+Set `MON_TLS_ENABLE=true` in the `$USER_DIR/logging/user.env` file. This variable modifies the deployment of Open Distro for Elasticsearch to be TLS-enabled.
+
+Edit `$USER_DIR/logging/user-values-elasticsearch-open.yaml` and replace
 any sample hostnames with hostnames for your deployment. Specifically, you must replace
 `host.cluster.example.com` with the name of the ingress node. Often, the ingress node is the cluster master node, but your environment might be different.
 
-6. Specify any other customizations in `user-values-elasticsearch-open.yaml`.
-
-7. Deploy logging using the standard deployment script:
-
-```bash
-path/to/this/repo/logging/bin/deploy_logging_cluster.sh
-```

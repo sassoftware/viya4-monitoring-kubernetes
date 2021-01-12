@@ -6,7 +6,7 @@ modify it for other solutions.
 
 ## Instructions
 
-1. Copy this directory to a local directory.
+1. Copy this directory to a local directory (for example, `my-viya4mon-user-dir/`).
 
 2. If necessary, edit the `azuredisk-v4m.yaml` file to customize the
 storage class that will be used for the deployment.
@@ -19,7 +19,7 @@ and `logging` subdirectories to match your environment's actual hostnames.
 5. Run this command to set the `USER_DIR` environment variable to the local path (change the command to use local path that you created in step 1):
 
 ```bash
-export USER_DIR=path/to/my/copy/azure-deployment
+export USER_DIR=my-viya4mon-user-dir/azure-deployment
 ```
 
 6. Run this command:
