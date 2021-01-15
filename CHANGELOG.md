@@ -1,5 +1,30 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.0.3 (15Jan21)
+
+* **Overall**
+  * Significantly improved documentation for deployment customization
+  * `KEEP_TMP_DIR` option added to keep the temporary working directory
+  around for troublshooting purposes
+  * There is now an early check for `kubectl` cluster admin capabilities
+
+* **Monitoring**
+  * Component versions upgraded
+    * Helm Chart: 11.1.3->12.8.0
+    * Prometheus Operator: 0.43.2->0.44.1
+    * Prometheus: v2.22.2-> v2.23.0
+    * Grafana: 7.3.1->7.3.6
+  * The application filter on the SAS Java Services dashboard is now sorted
+  * The Perf/Node Utilization dashboard now uses node names instead of IP
+  addresses to identify nodes
+  
+* **Logging**
+  * Moved Helm chart from deprecated `stable/elasticsearch-exporter` to
+  `prometheus-community/elasticsearch-exporter`
+  * Improved handling of log message fragment created due to excessively long
+  log messages (>16KB)
+  * FIX: Eliminated hard-coded namespace in change_internal_password.sh script
+
 ## Version 1.0.2 (15Dec20)
 
 * Fixed breaking script error in TLS
