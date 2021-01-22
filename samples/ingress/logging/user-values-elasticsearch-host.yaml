@@ -11,4 +11,4 @@ kibana:
       kubernetes.io/ingress.class: nginx
     enabled: true
     hosts:
-    - host.mycluster.example.com
+    - kibana.host.mycluster.example.com

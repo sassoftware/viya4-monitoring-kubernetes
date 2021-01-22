@@ -17,6 +17,11 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
 
     export LOG_NS="${LOG_NS:-logging}"
     export SAS_LOGGING_COMMON_SOURCED=true
+
+    #if TLS (w/in cluster; for all monitoring components) is requested, require TLS into Kibana pod, too
+    export TLS_ENABLE="${TLS_ENABLE:-false}"
+    log_debug "logging/common.sh (incoming): TLS_ENABLE=$TLS_ENABLE"
+    export LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-$TLS_ENABLE}
     # TLS is required for logging components so hard-code to 'true'
     export TLS_ENABLE="true"
 fi
