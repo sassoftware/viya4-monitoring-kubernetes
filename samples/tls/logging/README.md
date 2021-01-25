@@ -2,22 +2,9 @@
 
 ## Overview
 
-This sample demonstrates how to deploy logging components with TLS enabled.
-For now, only ingress is covered. In-cluster TLS will be supported in the
-future.
+This sample demonstrates how to deploy logging components with TLS enabled for connections to Kibana.
 
-All components have TLS enabled on ingress. Due to limitations in the
-underlying Helm charts, some components might not have TLS enabled in-cluster.
-
-If you use this sample for HTTPS for ingress, the following secrets must be
-manually populated in the `logging` namespace (or `LOG_NS` value) **BEFORE**
-you run any of the scripts in this repository:
-
-* kubernetes.io/tls secret - `kibana-ingress-tls-secret`
-* kubernetes.io/tls secret - `elasticsearch-ingress-tls-secret`
-
-Generating these certificates is outside the scope of this example. However, you
-can use the process documented in ["Configure NGINX Ingress TLS for SAS Applications"](https://go.documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calencryptmotion&docsetTarget=n1xdqv1sezyrahn17erzcunxwix9.htm&locale=en#n0oo2yu8440vmzn19g6xhx4kfbrq) in SAS Viya Administration documentation and specify the `logging` namespace.
+All logging components use TLS for connections between components within the cluster.
 
 ## Using This Sample
 
@@ -37,9 +24,26 @@ my_repository_path/logging/bin/deploy_logging_open.sh
 ```
 ## Notes On Customization Values
 
-Set `MON_TLS_ENABLE=true` in the `$USER_DIR/logging/user.env` file. This variable modifies the deployment of Open Distro for Elasticsearch to be TLS-enabled.
+### Ingress
 
-Edit `$USER_DIR/logging/user-values-elasticsearch-open.yaml` and replace
-any sample hostnames with hostnames for your deployment. Specifically, you must replace
-`host.cluster.example.com` with the name of the ingress node. Often, the ingress node is the cluster master node, but your environment might be different.
+* If you are using ingress, set the environment variable `TLS_ENABLED=true` in the `user.env` file in order to use TLS for connections between the user and Kibana.  
+
+* Manually populate these secrets in the `logging` namespace (or `LOG_NS` value) **before**
+you run the deployment script:
+
+  * kubernetes.io/tls secret - `kibana-ingress-tls-secret`
+  * kubernetes.io/tls secret - `elasticsearch-ingress-tls-secret`
+
+Generating these certificates is outside the scope of this example. However, you
+can use the process documented in ["Configure NGINX Ingress TLS for SAS Applications"](https://go.documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calencryptmotion&docsetTarget=n1xdqv1sezyrahn17erzcunxwix9.htm&locale=en#n0oo2yu8440vmzn19g6xhx4kfbrq) in SAS Viya Administration documentation and specify the `logging` namespace.
+
+If any of the required certificates do not exist, the deployment process attempts to use [cert-manager](https://cert-manager.io/) to generate the missing certificates.
+
+* If you are using an ingress controller other than NGINX, modify the annotation 
+`nginx.ingress.kubernetes.io/backend-protocol: HTTPS` in the `user-values-elasticsearch-open.yaml` file. Refer to the documentation for your ingress controller. 
+
+### Nodeports
+
+If you are using nodeports,  set the environment variable `TLS_ENABLED=true` in the `user.env` file in order to use TLS for connections between the user and Kibana. 
+
 
