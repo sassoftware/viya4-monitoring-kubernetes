@@ -4,10 +4,9 @@
 
 This sample demonstrates how to deploy monitoring components with TLS enabled.
 
-If you enable TLS, communications between the user and the monitoring components 
-use TLS. 
+If you enable TLS, in-cluster communications between monitoring components use TLS. 
 
-If you enable TLS and are using ingress, in-cluster communications between components also use TLS where supported (exceptions are noted in the file).
+If you enable TLS and are using nodeports, connections between the user and monitoring components also use TLS.
 
 ## Using This Sample
 
@@ -28,8 +27,7 @@ my_repository_path/monitoring/bin/deploy_monitoring_cluster.sh
 
 ## Notes On Customization Values
 
-* Set `TLS_ENABLE=true` in the `$USER_DIR/monitoring/user.env` file to specify that Prometheus, Grafana, and Alertmanager are deployed with TLS enabled for connections to these components. Due to limitations in the underlying Helm charts, some components might not have TLS enabled for in-cluster connections between components.
-See the **Limitations and Known Issues** section below for details.
+* Set `TLS_ENABLE=true` in the `$USER_DIR/monitoring/user.env` file to specify that Prometheus, Grafana, and Alertmanager are deployed with TLS enabled for connections to these components. Due to limitations in the underlying Helm charts, some components might not have TLS enabled for in-cluster connections between components. See the **Limitations and Known Issues** section below for details.
 
 * Edit `$USER_DIR/monitoring/user-values-prom-operator.yaml` and replace
 any sample hostnames with hostnames for your deployment. Specifically, you must replace
@@ -41,12 +39,10 @@ any sample hostnames with hostnames for your deployment. Specifically, you must 
 * kubernetes.io/tls secret - `alertmanager-ingress-tls-secret`
 * kubernetes.io/tls secret - `grafana-ingress-tls-secret`
 
-Generating these certificates is outside the scope of this example. However,
-you can use the process documented in ["Configure NGINX Ingress TLS for SAS Applications"](https://go.documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calencryptmotion&docsetTarget=n1xdqv1sezyrahn17erzcunxwix9.htm&locale=en#n0oo2yu8440vmzn19g6xhx4kfbrq)
-in SAS Viya Administration documentation and specify the `monitoring` namespace.
+Use cert-manager, if available, to create these certificates. If cert-manager is not available, you must create the certificates manually by using the `kubectl -n monitoring create secret` command.
 
 * If you are using ingress and are using an ingress controller other than NGINX, modify the annotation 
-`nginx.ingress.kubernetes.io/backend-protocol: HTTPS` in the `user-values-prom-operator.yaml` file. Refer to the documentation for your ingress controller. 
+`nginx.ingress.kubernetes.io/backend-protocol: HTTPS` as needed in the `user-values-prom-operator.yaml` file. Refer to the documentation for your ingress controller. 
 
 ### Secrets for In-Cluster TLS
 
@@ -63,12 +59,6 @@ not available, the deployment process fails. cert-manager is not required
 if TLS is disabled or if all of the TLS secrets exist prior to deployment.
 
 ### Limitations and Known Issues
-
-* A [bug in the Prometheus template](https://github.com/prometheus-community/helm-charts/issues/152)
-prevents mounting the TLS certificates for the reverse proxy sidecar for Alertmanager.
-HTTPS is still
-supported for Alertmanager at the ingress level, but it is not supported for
-the pod (in-cluster).
 
 * The Prometheus node exporter and kube-state-metrics exporters do not currently
 support TLS. These components are not exposed over ingress, so in-cluster

@@ -261,3 +261,13 @@ deployment process.
 * Select the __Discover__ icon in the toolbar to display the Discover page. Use
 this page to review the collected log messages. You can use the query box or
 __Add filter__ to filter the messages that are displayed.
+
+## Enable Users to Access Elasticsearch (optional)
+
+You can choose to enable users to access Elasticsearch so that they can issue queries using API calls or scripts. Run this command to enable nodeport connections to Elasticsearch:
+
+```bash
+./logging/bin/es_nodeport_enable.sh
+``` 
+
+User connections to Elasticsearch always use TLS.

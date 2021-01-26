@@ -2,9 +2,11 @@
 
 ## Overview
 
-This sample demonstrates how to deploy logging components with TLS enabled for connections to Kibana.
+This sample demonstrates how to deploy logging components with TLS enabled.
 
-All logging components use TLS for connections between components within the cluster.
+All communication within the cluster between the logging components takes place through TLS-enabled connections.
+
+The `TLS_ENABLE` environment variable controls whether connections from the user to Kibana use TLS.
 
 ## Using This Sample
 
@@ -26,7 +28,7 @@ my_repository_path/logging/bin/deploy_logging_open.sh
 
 ### Ingress
 
-* If you are using ingress, set the environment variable `TLS_ENABLED=true` in the `user.env` file in order to use TLS for connections between the user and Kibana.  
+* If you are using ingress, specify `TLS_ENABLED=true` in the `user.env` file to use TLS for communications between the ingress object and Kibana. Connections between the ingress object and Elasticsearch always use TLS, regardless of the value of `TLS_ENABLED`.
 
 * Manually populate these secrets in the `logging` namespace (or `LOG_NS` value) **before**
 you run the deployment script:
@@ -34,16 +36,26 @@ you run the deployment script:
   * kubernetes.io/tls secret - `kibana-ingress-tls-secret`
   * kubernetes.io/tls secret - `elasticsearch-ingress-tls-secret`
 
-Generating these certificates is outside the scope of this example. However, you
-can use the process documented in ["Configure NGINX Ingress TLS for SAS Applications"](https://go.documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calencryptmotion&docsetTarget=n1xdqv1sezyrahn17erzcunxwix9.htm&locale=en#n0oo2yu8440vmzn19g6xhx4kfbrq) in SAS Viya Administration documentation and specify the `logging` namespace.
-
-If any of the required certificates do not exist, the deployment process attempts to use [cert-manager](https://cert-manager.io/) to generate the missing certificates.
+Use cert-manager, if available, to create these certificates. If cert-manager is not available, you must create the certificates manually by using the `kubectl -n logging create secret` command.
 
 * If you are using an ingress controller other than NGINX, modify the annotation 
-`nginx.ingress.kubernetes.io/backend-protocol: HTTPS` in the `user-values-elasticsearch-open.yaml` file. Refer to the documentation for your ingress controller. 
+`nginx.ingress.kubernetes.io/backend-protocol: HTTPS` as needed in the `user-values-elasticsearch-open.yaml` file. Refer to the documentation for your ingress controller. 
 
 ### Nodeports
 
-If you are using nodeports,  set the environment variable `TLS_ENABLED=true` in the `user.env` file in order to use TLS for connections between the user and Kibana. 
+* If you are using nodeports, set the environment variable `TLS_ENABLED=true` in the `user.env` file to use TLS for connections between the user and Kibana.
 
+* If users need to directly connect to Elasticsearch, you must run the `es_enable_nodeport.sh` script to enable the connection. Direct connections to Elasticsearch always use TLS, regardless of the value of the `TLS_ENABLED` variable.
+
+### Secrets for In-Cluster TLS
+
+The standard deployment script for the logging components use these secrets for the TLS certificates that
+handle interactions between components:
+
+* kubernetes.io/tls secret - `es-rest-tls-secret`
+* kubernetes.io/tls secret - `es-transport-tls-secret`
+* kubernetes.io/tls secret - `kibana-tls-secret`
+
+By default, the deployment process uses [cert-manager](https://cert-manager.io/) to generate the certificates. If cert-manager is not available, you can manually generate the certificates using the process in [Notes on Using TLS](../../logging/NOTES_ON_USING_TLS.md). If the required certificates do not exist and cert-manager is not available, the deployment process fails. cert-manager is not required
+if TLS is disabled or if all of the TLS secrets exist prior to deployment.
 
