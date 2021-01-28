@@ -85,7 +85,7 @@ kubectl -n $LOG_NS create configmap fbaz-viya-parsers  --from-file=logging/fb/vi
 kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=azuremonitor"
 
 # Deploy Fluent Bit via Helm chart
-helm $helmDebug upgrade --install fbaz         --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_azmonitor.yaml --values $FB_AZMONITOR_USER_YAML  --set fullnameOverride=v4m-fbaz stable/fluent-bit
+helm $helmDebug upgrade --install fbaz         --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_azmonitor.yaml --values $FB_AZMONITOR_USER_YAML  --set fullnameOverride=v4m-fbaz fluent/fluent-bit
 
 log_info "Fluent Bit deployment (Azure Monitor) completed"
 
