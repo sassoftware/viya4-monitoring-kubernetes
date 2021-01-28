@@ -2,8 +2,6 @@ prometheus:
   # Disable default configuration of NodePort
   service:
     type: ClusterIP
-    port: 443
-    targetPort: 443
     nodePort: null
   # Define host-based ingress
   ingress:
