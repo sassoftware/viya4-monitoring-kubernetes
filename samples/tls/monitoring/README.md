@@ -33,25 +33,32 @@ my_repository_path/monitoring/bin/deploy_monitoring_cluster.sh
 any sample hostnames with hostnames for your deployment. Specifically, you must replace
 `host.cluster.example.com` with the name of the ingress node. Often, the ingress node is the cluster master node, but your environment might be different.
 
-* If you are using ingress, manually populate these secrets in the `monitoring` namespace (or `MON_NS` value) **before** you deploy cluster monitoring.
+* Manually populate these TLS secrets for ingress in the `monitoring` namespace (or `MON_NS` value) **before** you deploy cluster monitoring.
 
-* kubernetes.io/tls secret - `prometheus-ingress-tls-secret`
-* kubernetes.io/tls secret - `alertmanager-ingress-tls-secret`
-* kubernetes.io/tls secret - `grafana-ingress-tls-secret`
+* `prometheus-ingress-tls-secret`
+* `alertmanager-ingress-tls-secret`
+* `grafana-ingress-tls-secret`
 
-Use cert-manager, if available, to create these certificates. If cert-manager is not available, you must create the certificates manually by using the `kubectl -n monitoring create secret` command.
+After you have obtained the certificates for the secrets, use this command to generate the secrets:
+
+```bash
+kubectl create secret tls "$SECRET_NAME" -n "$NAMESPACE" --key "$CERT_KEY" --cert "$CERT_FILE"
+```
+
+Use `prometheus-ingress-tls-secret`, `alertmanager-ingress-tls-secret`, and `grafana-ingress-tls-secret` as values for `$SECRET_NAME`.
+
+The process of generating the certificates for these secrets is out of scope for this example.
 
 * If you are using ingress and are using an ingress controller other than NGINX, modify the annotation 
 `nginx.ingress.kubernetes.io/backend-protocol: HTTPS` as needed in the `user-values-prom-operator.yaml` file. Refer to the documentation for your ingress controller. 
 
 ### Secrets for In-Cluster TLS
 
-The standard deployment script for the monitoring components use these secrets for the TLS certificates that
-handle interactions between components:
+The standard deployment script for the monitoring components use these TLS secrets for the TLS certificates that handle interactions between components:
 
-* kubernetes.io/tls secret - `prometheus-tls-secret`
-* kubernetes.io/tls secret - `alertmanager-tls-secret`
-* kubernetes.io/tls secret - `grafana-tls-secret`
+* `prometheus-tls-secret`
+* `alertmanager-tls-secret`
+* `grafana-tls-secret`
 
 If any of the required certificates do not exist, the deployment process attempts to use [cert-manager](https://cert-manager.io/) to generate the missing
 certificates. If the required certificates do not exist and cert-manager is
@@ -62,7 +69,7 @@ if TLS is disabled or if all of the TLS secrets exist prior to deployment.
 
 * The Prometheus node exporter and kube-state-metrics exporters do not currently
 support TLS. These components are not exposed over ingress, so in-cluster
-access is over HTTP and not HTTPS.
+access uses HTTP rather than HTTPS.
 
 * If needed, a self-signed cert-manager issuer is created that generates
 self-signed certificates when TLS is enabled and the secrets do not already

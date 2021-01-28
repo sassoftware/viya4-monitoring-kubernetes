@@ -270,4 +270,21 @@ You can choose to enable users to access Elasticsearch so that they can issue qu
 ./logging/bin/es_nodeport_enable.sh
 ``` 
 
+When the script completes, a message appears that contains the URL to access Elasticsearch.
+```
+=============================================
+== Access Elasticsearch using this URL: https://<myK8snode>:<portnumber>/ ==
+=============================================
+```
+
+The message provides values for `<myK8snode>` and `<portnumber>` that are specific to your deployment.
+
 User connections to Elasticsearch always use TLS.
+
+To disable nodeport connections to Elasticsearch, run this command:
+```bash
+./logging/bin/es_nodeport_disable.sh
+```  
+
+You can use these scripts to temporarily enable user access to Elasticsearch.
+

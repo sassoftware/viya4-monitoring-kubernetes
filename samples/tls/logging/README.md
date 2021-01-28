@@ -26,36 +26,37 @@ my_repository_path/logging/bin/deploy_logging_open.sh
 ```
 ## Notes On Customization Values
 
+### TLS 
+
+Specify `TLS_ENABLE=true` in the `user.env` file to use TLS for communications between the ingress object and Kibana. Connections between the ingress object and Elasticsearch always use TLS, regardless of the value of `TLS_ENABLE`.
+
 ### Ingress
 
-* If you are using ingress, specify `TLS_ENABLED=true` in the `user.env` file to use TLS for communications between the ingress object and Kibana. Connections between the ingress object and Elasticsearch always use TLS, regardless of the value of `TLS_ENABLED`.
+* Manually populate these TLS secrets for ingress in the `logging` namespace (or `LOG_NS` value) **before** you run the deployment script.
 
-* Manually populate these secrets in the `logging` namespace (or `LOG_NS` value) **before**
-you run the deployment script:
+* `kibana-ingress-tls-secret`
+* `elasticsearch-ingress-tls-secret`
 
-  * kubernetes.io/tls secret - `kibana-ingress-tls-secret`
-  * kubernetes.io/tls secret - `elasticsearch-ingress-tls-secret`
+After you have obtained the certificates for the secrets, use this command to generate the secrets:
 
-Use cert-manager, if available, to create these certificates. If cert-manager is not available, you must create the certificates manually by using the `kubectl -n logging create secret` command.
+```bash
+kubectl create secret tls "$SECRET_NAME" -n "$NAMESPACE" --key "$CERT_KEY" --cert "$CERT_FILE"
+```
+
+Use `kibana-ingress-tls-secret` and `elasticsearch-ingress-tls-secret` as values for `$SECRET_NAME`.
+
+The process of generating the certificates for these secrets is out of scope for this example.
 
 * If you are using an ingress controller other than NGINX, modify the annotation 
 `nginx.ingress.kubernetes.io/backend-protocol: HTTPS` as needed in the `user-values-elasticsearch-open.yaml` file. Refer to the documentation for your ingress controller. 
 
-### Nodeports
-
-* If you are using nodeports, set the environment variable `TLS_ENABLED=true` in the `user.env` file to use TLS for connections between the user and Kibana.
-
-* If users need to directly connect to Elasticsearch, you must run the `es_enable_nodeport.sh` script to enable the connection. Direct connections to Elasticsearch always use TLS, regardless of the value of the `TLS_ENABLED` variable.
-
 ### Secrets for In-Cluster TLS
 
-The standard deployment script for the logging components use these secrets for the TLS certificates that
-handle interactions between components:
+The standard deployment script for the logging components use these TLS secrets for the TLS certificates that handle interactions between components:
 
-* kubernetes.io/tls secret - `es-rest-tls-secret`
-* kubernetes.io/tls secret - `es-transport-tls-secret`
-* kubernetes.io/tls secret - `kibana-tls-secret`
+* `es-rest-tls-secret`
+* `es-transport-tls-secret`
+* `kibana-tls-secret`
 
-By default, the deployment process uses [cert-manager](https://cert-manager.io/) to generate the certificates. If cert-manager is not available, you can manually generate the certificates using the process in [Notes on Using TLS](../../logging/NOTES_ON_USING_TLS.md). If the required certificates do not exist and cert-manager is not available, the deployment process fails. cert-manager is not required
-if TLS is disabled or if all of the TLS secrets exist prior to deployment.
+By default, the deployment process uses [cert-manager](https://cert-manager.io/) to generate the certificates. If cert-manager is not available, you can manually generate the certificates. If the required certificates do not exist and cert-manager is not available, the deployment process fails. cert-manager is not required if TLS is disabled or if all of the TLS secrets exist prior to deployment.
 
