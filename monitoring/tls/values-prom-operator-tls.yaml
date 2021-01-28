@@ -36,6 +36,9 @@ prometheus:
         secret:
           defaultMode: 420
           secretName: prometheus-tls-secret
+  service:
+    port: 443
+    targetPort: 443
   serviceMonitor:
     scheme: https
     tlsConfig:
