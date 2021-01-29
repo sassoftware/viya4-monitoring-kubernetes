@@ -73,6 +73,13 @@ else
    export AZMONITOR_SHARED_KEY=$(kubectl -n $LOG_NS get secret connection-info-azmonitor -o=jsonpath="{.data.shared_key}" |base64 --decode)
 fi
 
+# Check for an existing Helm release of stable/fluent-bit
+if helm3ReleaseExists fbaz $LOG_NS; then
+  log_info "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
+  helm  $helmDebug  delete -n $LOG_NS fbaz
+else
+  log_debug "No existing release of the deprecated stable/fluent-bit Helm chart was found"
+fi
 
 # Create ConfigMap containing Fluent Bit configuration
 kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
@@ -85,7 +92,7 @@ kubectl -n $LOG_NS create configmap fbaz-viya-parsers  --from-file=logging/fb/vi
 kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=azuremonitor"
 
 # Deploy Fluent Bit via Helm chart
-helm $helmDebug upgrade --install fbaz         --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_azmonitor.yaml --values $FB_AZMONITOR_USER_YAML  --set fullnameOverride=v4m-fbaz fluent/fluent-bit
+helm $helmDebug upgrade --install v4m-fbaz         --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_azmonitor.yaml --values $FB_AZMONITOR_USER_YAML  --set fullnameOverride=v4m-fbaz fluent/fluent-bit
 
 log_info "Fluent Bit deployment (Azure Monitor) completed"
 

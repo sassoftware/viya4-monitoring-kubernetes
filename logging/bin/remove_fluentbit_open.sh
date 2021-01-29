@@ -11,9 +11,16 @@ log_debug "Script [$this_script] has started [$(date)]"
 
 helm2ReleaseCheck fb-$LOG_NS
 
-log_info "Removing Fluent Bit components from the [$LOG_NS] namespace [$(date)]"
+if helm3ReleaseExists fb $LOG_NS; then
+  fbRelease=fb
+else
+  fbRelease=v4m-fb
+fi
 
-helm delete -n $LOG_NS fb
+
+log_info "Removing Fluent Bit components [$fbRelease] from the [$LOG_NS] namespace [$(date)]"
+
+helm delete -n $LOG_NS $fbRelease
 
 log_info "Removing ConfigMaps"
 kubectl -n $LOG_NS delete configmap fb-fluent-bit-config   --ignore-not-found
