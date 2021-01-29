@@ -28,7 +28,7 @@ my_repository_path/logging/bin/deploy_logging_open.sh
 
 ### TLS 
 
-Specify `TLS_ENABLE=true` in the `user.env` file to use TLS for communications between the ingress object and Kibana. Connections between the ingress object and Elasticsearch always use TLS, regardless of the value of `TLS_ENABLE`.
+Specify `TLS_ENABLE=true` in the `user.env` file to require TLS for connections to Kibana. Connections to Elasticsearch (when enabled) always use TLS, regardless of the value of `TLS_ENABLE`.
 
 ### Ingress
 
