@@ -2,16 +2,12 @@
 
 ## Overview
 
-This sample demonstrates how to deploy logging components with TLS enabled.
-
-All communication within the cluster between the logging components takes place through TLS-enabled connections.
-
-The `TLS_ENABLE` environment variable controls whether connections from the user to Kibana use TLS.
+Communication between the logging components within the cluster always takes place through TLS-enabled connections. This sample demonstrates how to deploy enable TLS for connections between the user (or an ingress object) and Kibana. The `TLS_ENABLE` environment variable controls whether connections to Kibana use TLS.
 
 ## Using This Sample
 
 You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
-[main README](../../README.md#customization) to for information about the customization process.
+[main README](../../../README.md#customization) to for information about the customization process.
 
 The customization files in this sample provide a starting point for the customization files for a deployment that supports logging with TLS enabled. 
 
@@ -32,7 +28,7 @@ Specify `TLS_ENABLE=true` in the `user.env` file to require TLS for connections 
 
 ### Ingress
 
-* Manually populate these TLS secrets for ingress in the `logging` namespace (or `LOG_NS` value) **before** you run the deployment script.
+* If you plan on using ingress, you must manually populate these Kubernetes secrets with TLS certificates before you run the deployment script:
 
 * `kibana-ingress-tls-secret`
 * `elasticsearch-ingress-tls-secret`
@@ -43,7 +39,7 @@ After you have obtained the certificates for the secrets, use this command to ge
 kubectl create secret tls "$SECRET_NAME" -n "$NAMESPACE" --key "$CERT_KEY" --cert "$CERT_FILE"
 ```
 
-Use `kibana-ingress-tls-secret` and `elasticsearch-ingress-tls-secret` as values for `$SECRET_NAME`.
+Use `kibana-ingress-tls-secret` and `elasticsearch-ingress-tls-secret` as values for `$SECRET_NAME`. Use `logging` for the value of `$NAMESPACE`.
 
 The process of generating the certificates for these secrets is out of scope for this example.
 
@@ -58,5 +54,7 @@ The standard deployment script for the logging components use these TLS secrets 
 * `es-transport-tls-secret`
 * `kibana-tls-secret`
 
-By default, the deployment process uses [cert-manager](https://cert-manager.io/) to generate the certificates. If cert-manager is not available, you can manually generate the certificates. If the required certificates do not exist and cert-manager is not available, the deployment process fails. cert-manager is not required if TLS is disabled or if all of the TLS secrets exist prior to deployment.
+See [NOTES_ON_USING_TLS](../../../logging/NOTES_ON_USING_TLS.md) for information about generating these secrets.
+
+By default, the deployment process uses [cert-manager](https://cert-manager.io/) to generate the certificates. If cert-manager is not available, you can manually generate the certificates. If the required certificates do not exist and cert-manager is not available, the deployment process fails. The cert-manager component is not required if all of the TLS secrets exist prior to deployment.
 
