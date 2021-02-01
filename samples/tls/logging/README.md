@@ -2,27 +2,12 @@
 
 ## Overview
 
-This sample demonstrates how to deploy logging components with TLS enabled.
-For now, only ingress is covered. In-cluster TLS will be supported in the
-future.
-
-All components have TLS enabled on ingress. Due to limitations in the
-underlying Helm charts, some components might not have TLS enabled in-cluster.
-
-If you use this sample for HTTPS for ingress, the following secrets must be
-manually populated in the `logging` namespace (or `LOG_NS` value) **BEFORE**
-you run any of the scripts in this repository:
-
-* kubernetes.io/tls secret - `kibana-ingress-tls-secret`
-* kubernetes.io/tls secret - `elasticsearch-ingress-tls-secret`
-
-Generating these certificates is outside the scope of this example. However, you
-can use the process documented in ["Configure NGINX Ingress TLS for SAS Applications"](https://go.documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=calencryptmotion&docsetTarget=n1xdqv1sezyrahn17erzcunxwix9.htm&locale=en#n0oo2yu8440vmzn19g6xhx4kfbrq) in SAS Viya Administration documentation and specify the `logging` namespace.
+Communication between the logging components within the cluster always takes place through TLS-enabled connections. This sample demonstrates how to deploy enable TLS for connections between the user (or an ingress object) and Kibana. The `TLS_ENABLE` environment variable controls whether connections to Kibana use TLS.
 
 ## Using This Sample
 
 You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
-[main README](../../README.md#customization) to for information about the customization process.
+[main README](../../../README.md#customization) to for information about the customization process.
 
 The customization files in this sample provide a starting point for the customization files for a deployment that supports logging with TLS enabled. 
 
@@ -37,9 +22,39 @@ my_repository_path/logging/bin/deploy_logging_open.sh
 ```
 ## Notes On Customization Values
 
-Set `MON_TLS_ENABLE=true` in the `$USER_DIR/logging/user.env` file. This variable modifies the deployment of Open Distro for Elasticsearch to be TLS-enabled.
+### TLS 
 
-Edit `$USER_DIR/logging/user-values-elasticsearch-open.yaml` and replace
-any sample hostnames with hostnames for your deployment. Specifically, you must replace
-`host.cluster.example.com` with the name of the ingress node. Often, the ingress node is the cluster master node, but your environment might be different.
+Specify `TLS_ENABLE=true` in the `user.env` file to require TLS for connections to Kibana. Connections to Elasticsearch (when enabled) always use TLS, regardless of the value of `TLS_ENABLE`.
+
+### Ingress
+
+* If you plan on using ingress, you must manually populate these Kubernetes secrets with TLS certificates before you run the deployment script:
+
+* `kibana-ingress-tls-secret`
+* `elasticsearch-ingress-tls-secret`
+
+After you have obtained the certificates for the secrets, use this command to generate the secrets:
+
+```bash
+kubectl create secret tls "$SECRET_NAME" -n "$NAMESPACE" --key "$CERT_KEY" --cert "$CERT_FILE"
+```
+
+Use `kibana-ingress-tls-secret` and `elasticsearch-ingress-tls-secret` as values for `$SECRET_NAME`. Use `logging` for the value of `$NAMESPACE`.
+
+The process of generating the certificates for these secrets is out of scope for this example.
+
+* If you are using an ingress controller other than NGINX, modify the annotation 
+`nginx.ingress.kubernetes.io/backend-protocol: HTTPS` as needed in the `user-values-elasticsearch-open.yaml` file. Refer to the documentation for your ingress controller. 
+
+### Secrets for In-Cluster TLS
+
+The standard deployment script for the logging components use these TLS secrets for the TLS certificates that handle interactions between components:
+
+* `es-rest-tls-secret`
+* `es-transport-tls-secret`
+* `kibana-tls-secret`
+
+See [NOTES_ON_USING_TLS](../../../logging/NOTES_ON_USING_TLS.md) for information about generating these secrets.
+
+By default, the deployment process uses [cert-manager](https://cert-manager.io/) to generate the certificates. If cert-manager is not available, you can manually generate the certificates. If the required certificates do not exist and cert-manager is not available, the deployment process fails. The cert-manager component is not required if all of the TLS secrets exist prior to deployment.
 
