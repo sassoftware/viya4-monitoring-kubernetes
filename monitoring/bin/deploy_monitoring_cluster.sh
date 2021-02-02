@@ -188,8 +188,9 @@ kubectl apply -n $MON_NS -f monitoring/monitors/kube/podMonitor-eventrouter.yaml
 # Elasticsearch ServiceMonitor
 kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-elasticsearch.yaml
 
-# Fluent Bit ServiceMonitor
+# Fluent Bit ServiceMonitors
 kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-fluent-bit.yaml
+kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-fluent-bit-v2.yaml
 
 # Rules
 log_info "Adding Prometheus recording rules..."

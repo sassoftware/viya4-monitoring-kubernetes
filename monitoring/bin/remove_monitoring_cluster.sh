@@ -44,6 +44,7 @@ log_info "Removing service monitors..."
 kubectl delete --ignore-not-found podmonitor -n $MON_NS eventrouter
 kubectl delete --ignore-not-found servicemonitor -n $MON_NS elasticsearch
 kubectl delete --ignore-not-found servicemonitor -n $MON_NS fluent-bit
+kubectl delete --ignore-not-found servicemonitor -n $MON_NS fluent-bit-v2
 
 log_info "Removing Prometheus rules..."
 rules=( sas-launcher-job-rules )
