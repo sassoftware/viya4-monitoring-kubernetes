@@ -28,6 +28,8 @@ fi
 
 helm2ReleaseCheck fb-$LOG_NS
 
+helmRepoAdd fluent https://fluent.github.io/helm-charts
+
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   log_error "The specified namespace [$LOG_NS] does not exist."
