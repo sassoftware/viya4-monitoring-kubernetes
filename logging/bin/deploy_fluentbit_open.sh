@@ -41,6 +41,12 @@ if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
 
+
+helmRepoAdd fluent https://fluent.github.io/helm-charts
+#log_info "Updating helm repositories..."
+#helm repo update
+
+
 helm2ReleaseCheck fb-$LOG_NS
 
 # Check for an existing Helm release of stable/fluent-bit
