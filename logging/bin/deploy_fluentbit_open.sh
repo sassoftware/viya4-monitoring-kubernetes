@@ -54,25 +54,14 @@ if helm3ReleaseExists fb $LOG_NS; then
    log_info "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
    helm  $helmDebug  delete -n $LOG_NS fb
 
-   add_notice ""
-   add_notice "================================================================================"
-   add_notice "==                                                                            =="
-   add_notice "== If you have deployed the metric monitoring components of Viya 4 Monitoring =="
-   add_notice "== for Kubernetes, you *MAY* need to deploy an updated serviceMonitor to      =="
-   add_notice "== collect metrics from Fluent Bit after this update.                         =="
-   add_notice "==                                                                            =="
-   add_notice "== Review the 'Logging - Fluent Bit' dashboard within Grafana to determine    =="
-   add_notice "== if metrics are still being collected.  If metrics are NOT being collected, =="
-   add_notice "== you should update your ServiceMonitors by running the following command:   =="
-   add_notice "==                                                                            =="
-   add_notice "==            monitoring/bin/deploy_monitoring_cluster.sh                     =="
-   add_notice "==                                                                            =="
-   add_notice "================================================================================"
-   add_notice ""
-   serviceMonitorNotice=true
+
+   if [ $(kubectl get servicemonitors -A |grep fluent-bit-v2 -c) -ge 1 ]; then
+      log_debug "Updated serviceMonitor [fluent-bit-v2] appears to be deployed."
+   else if [ $(kubectl get servicemonitors -A |grep fluent-bit -c) -ge 1 ]; then
+      log_warn "You appear to have an obsolete service monitor in place for monitoring Fluent Bit.  Run monitoring/bin/deploy_monitoring_cluster.sh to deploy the current set of service monitors."
+   fi
 else
   log_debug "No existing release of the deprecated stable/fluent-bit Helm chart was found"
-   serviceMonitorNotice=false
 fi
 
 log_info "Deploying Fluent Bit"
@@ -107,15 +96,6 @@ kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=es"
 
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb --values logging/fb/fluent-bit_helm_values_open.yaml --values $FB_OPEN_USER_YAML  --set fullnameOverride=v4m-fb fluent/fluent-bit
-
-if [ "$serviceMonitorNotice" == "true" ]; then
-   LOGGING_DRIVER=${LOGGING_DRIVER:-false}
-   if [ "$LOGGING_DRIVER" != "true" ]; then
-      echo ""
-      display_notices
-      echo ""
-   fi
-fi
 
 log_info "Fluent Bit deployment completed"
 
