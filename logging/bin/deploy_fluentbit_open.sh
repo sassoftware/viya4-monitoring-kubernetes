@@ -51,8 +51,32 @@ helm2ReleaseCheck fb-$LOG_NS
 
 # Check for an existing Helm release of stable/fluent-bit
 if helm3ReleaseExists fb $LOG_NS; then
-  log_info "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
-  helm  $helmDebug  delete -n $LOG_NS fb
+   log_info "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
+   helm  $helmDebug  delete -n $LOG_NS fb
+
+   add_notice ""
+   add_notice "================================================================================"
+   add_notice "==                                                                            =="
+   add_notice "== If you have deployed the metric monitoring components of Viya 4 Monitoring =="
+   add_notice "== for Kubernetes, you *MAY* need to deploy an updated serviceMonitor to      =="
+   add_notice "== collect metrics from Fluent Bit after this update.                         =="
+   add_notice "==                                                                            =="
+   add_notice "== Review the 'Logging - Fluent Bit' dashboard within Grafana to determine    =="
+   add_notice "== if metrics are still being collected.  If metrics are NOT being collected, =="
+   add_notice "== you should update your ServiceMonitors by running the following command:   =="
+   add_notice "==                                                                            =="
+   add_notice "==            monitoring/bin/deploy_monitoring_cluster.sh                     =="
+   add_notice "==                                                                            =="
+   add_notice "================================================================================"
+   add_notice ""
+
+   LOGGING_DRIVER=${LOGGING_DRIVER:-false}
+   if [ "$LOGGING_DRIVER" != "true" ]; then
+      echo ""
+      display_notices
+      echo ""
+   fi
+
 else
   log_debug "No existing release of the deprecated stable/fluent-bit Helm chart was found"
 fi
@@ -91,6 +115,7 @@ kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=es"
 helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb --values logging/fb/fluent-bit_helm_values_open.yaml --values $FB_OPEN_USER_YAML  --set fullnameOverride=v4m-fb fluent/fluent-bit
 
 log_info "Fluent Bit deployment completed"
+
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""
