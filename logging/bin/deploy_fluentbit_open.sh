@@ -69,16 +69,10 @@ if helm3ReleaseExists fb $LOG_NS; then
    add_notice "==                                                                            =="
    add_notice "================================================================================"
    add_notice ""
-
-   LOGGING_DRIVER=${LOGGING_DRIVER:-false}
-   if [ "$LOGGING_DRIVER" != "true" ]; then
-      echo ""
-      display_notices
-      echo ""
-   fi
-
+   serviceMonitorNotice=true
 else
   log_debug "No existing release of the deprecated stable/fluent-bit Helm chart was found"
+   serviceMonitorNotice=false
 fi
 
 log_info "Deploying Fluent Bit"
@@ -113,6 +107,15 @@ kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=es"
 
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb --values logging/fb/fluent-bit_helm_values_open.yaml --values $FB_OPEN_USER_YAML  --set fullnameOverride=v4m-fb fluent/fluent-bit
+
+if [ "$serviceMonitorNotice" == "true" ]; then
+   LOGGING_DRIVER=${LOGGING_DRIVER:-false}
+   if [ "$LOGGING_DRIVER" != "true" ]; then
+      echo ""
+      display_notices
+      echo ""
+   fi
+fi
 
 log_info "Fluent Bit deployment completed"
 
