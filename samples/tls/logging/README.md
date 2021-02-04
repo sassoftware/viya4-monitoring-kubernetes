@@ -2,7 +2,7 @@
 
 ## Overview
 
-Communication between the logging components within the cluster always takes place through TLS-enabled connections. This sample demonstrates how to deploy enable TLS for connections between the user (or an ingress object) and Kibana. The `TLS_ENABLE` environment variable controls whether connections to Kibana use TLS.
+Communication between the logging components within the cluster always takes place through TLS-enabled connections. This sample demonstrates how to deploy logging with TLS enabled for connections between the user (or an ingress object) and Kibana. The `TLS_ENABLE` environment variable controls whether connections to Kibana use TLS.
 
 ## Using This Sample
 
@@ -36,7 +36,7 @@ Specify `TLS_ENABLE=true` in the `user.env` file to require TLS for connections 
 After you have obtained the certificates for the secrets, use this command to generate the secrets:
 
 ```bash
-kubectl create secret tls "$SECRET_NAME" -n "$NAMESPACE" --key "$CERT_KEY" --cert "$CERT_FILE"
+kubectl create secret tls $SECRET_NAME -n $NAMESPACE --key $CERT_KEY --cert $CERT_FILE
 ```
 
 Use `kibana-ingress-tls-secret` and `elasticsearch-ingress-tls-secret` as values for `$SECRET_NAME`. Use `logging` for the value of `$NAMESPACE`.
