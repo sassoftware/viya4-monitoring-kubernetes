@@ -42,7 +42,7 @@ any sample hostnames with hostnames for your deployment. Specifically, you must 
 You can use the following command to generate the necessary secret for each set of TLS certificates:
 
 ```bash
-kubectl create secret tls "$SECRET_NAME" -n "$NAMESPACE" --key "$CERT_KEY" --cert "$CERT_FILE"
+kubectl create secret tls $SECRET_NAME -n $NAMESPACE --key $CERT_KEY --cert $CERT_FILE
 ```
 
 Use `prometheus-ingress-tls-secret`, `alertmanager-ingress-tls-secret`, and `grafana-ingress-tls-secret` as values for `$SECRET_NAME`. Use `monitoring` for the value of `$NAMESPACE`.
