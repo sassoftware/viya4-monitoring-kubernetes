@@ -28,7 +28,7 @@ my_repository_path/logging/bin/deploy_logging_open.sh
 
 ## Notes On Customization Values
 
-To enable TLS, edit `$USER_DIR/user.env` and set `TLS_ENABLED` to `true`
+To enable TLS, edit `$USER_DIR/user.env` and set `TLS_ENABLE` to `true`
 
 ### Monitoring 
 
