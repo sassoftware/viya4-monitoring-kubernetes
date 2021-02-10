@@ -1,26 +1,11 @@
 image:
-  fluent_bit:
-    tag: 1.5.4
+  tag: 1.5.4
 podAnnotations: 
   fluentbit.io/parser: fluentbit
 podLabels:
   fbout: es
-backend:
-  type: es 
-  es:
-    #currently ignored/overwritten by configmap
-    host: v4m-es-client-service
-    http_user: foo
-    http_passwd: bar
-    tls: "on"
-    tls_verify: "off"
-    tls_debug: 2
-metrics:
-  enabled: true
-  service:
-    port: 2020
-  serviceMonitor:
-    enabled: false
+serviceMonitor:
+  enabled: false
 extraVolumeMounts:
 - mountPath: /fluent-bit/etc/viya-parsers.conf
   name: parsers-config
