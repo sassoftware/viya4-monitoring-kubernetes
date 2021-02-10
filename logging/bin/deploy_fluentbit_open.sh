@@ -41,8 +41,28 @@ if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
 
+
+helmRepoAdd fluent https://fluent.github.io/helm-charts
+#log_info "Updating helm repositories..."
+#helm repo update
+
+
 helm2ReleaseCheck fb-$LOG_NS
 
+# Check for an existing Helm release of stable/fluent-bit
+if helm3ReleaseExists fb $LOG_NS; then
+   log_info "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
+   helm  $helmDebug  delete -n $LOG_NS fb
+
+   if [ $(kubectl get servicemonitors -A |grep fluent-bit-v2 -c) -ge 1 ]; then
+      log_debug "Updated serviceMonitor [fluent-bit-v2] appears to be deployed."
+   elif [ $(kubectl get servicemonitors -A |grep fluent-bit -c) -ge 1 ]; then
+      log_warn "You appear to have an obsolete service monitor in place for monitoring Fluent Bit."
+      log_warn "Run monitoring/bin/deploy_monitoring_cluster.sh to deploy the current set of service monitors."
+   fi
+else
+  log_debug "No existing release of the deprecated stable/fluent-bit Helm chart was found"
+fi
 
 log_info "Deploying Fluent Bit"
 
@@ -75,9 +95,10 @@ kubectl -n $LOG_NS create configmap fb-viya-parsers  --from-file=logging/fb/viya
 kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=es"
 
 # Deploy Fluent Bit via Helm chart
-helm $helmDebug upgrade --install --namespace $LOG_NS fb --values logging/fb/fluent-bit_helm_values_open.yaml --values $FB_OPEN_USER_YAML  --set fullnameOverride=v4m-fb stable/fluent-bit
+helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb --values logging/fb/fluent-bit_helm_values_open.yaml --values $FB_OPEN_USER_YAML  --set fullnameOverride=v4m-fb fluent/fluent-bit
 
 log_info "Fluent Bit deployment completed"
+
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""
