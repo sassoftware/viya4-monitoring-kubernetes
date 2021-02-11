@@ -282,7 +282,7 @@
       "pluginVersion": "7.1.3",
       "targets": [
         {
-          "expr": "sum (container_fs_usage_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$\",id=\"/\",node=~\"^$Node$\"}) / sum (container_fs_limit_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$\",id=\"/\",node=~\"^$Node$\"}) * 100",
+          "expr": "sum (container_fs_usage_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$|/dev/nvme.+\",id=\"/\",node=~\"^$Node$\"}) / sum (container_fs_limit_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$|/dev/nvme.+\",id=\"/\",node=~\"^$Node$\"}) * 100",
           "format": "time_series",
           "interval": "10s",
           "intervalFactor": 1,
@@ -746,7 +746,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum (container_fs_usage_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$\",id=\"/\",node=~\"^$Node$\"})",
+          "expr": "sum (container_fs_usage_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$|/dev/nvme.+\",id=\"/\",node=~\"^$Node$\"})",
           "format": "time_series",
           "interval": "10s",
           "intervalFactor": 1,
@@ -847,7 +847,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum (container_fs_limit_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$\",id=\"/\",node=~\"^$Node$\"})",
+          "expr": "sum (container_fs_limit_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$|/dev/nvme.+\",id=\"/\",node=~\"^$Node$\"})",
           "format": "time_series",
           "interval": "10s",
           "intervalFactor": 1,
