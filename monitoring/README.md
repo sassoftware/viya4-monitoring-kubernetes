@@ -27,22 +27,25 @@ These components are deployed:
 * Grafana dashboards
 * Kubernetes cluster alert definitions
 
+If you are using a cloud provider, you must use ingress, rather than
+NodePorts. Specify the information needed to use ingress during the customization process.
+
 ## Perform Pre-Deployment Tasks
 
-Before deploying, you must select the release that you want to deploy, then
-create a local copy of the repository.
+Before deploying, you must perform these tasks:
 
-If you use TLS to encrypt network traffic, you must also perform manual steps prior
-to deployment. See the **TLS Support** section below for more information.
+- [select the release that you want to deploy](#mon_sel_rel)
+- [create a local copy of the repository](#mon_loc_copy)
+- [customize your deployment](#mon_custom)
 
-### Select the Release to Copy
+### <a name="mon_sel_rel"></a>Select the Release to Copy
 
 1. Click on **tags** above the repository tree.
 2. On the **Tags** page, click [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases)
 to view the list of available releases.
 3. Use the release notes to determine the release you want to deploy.
 
-### Create a Local Copy of the Repository
+### <a name="mon_loc_copy"></a>Create a Local Copy of the Repository
 
 There are two methods to create a local copy of the repository:
 
@@ -68,7 +71,7 @@ command `git clone <https_url>`.
 4. Change to the `viya4-monitoring-kubernetes` directory.
 5. Enter the command `git checkout <release_number>`
 
-## Customize the Deployment
+### <a name="mon_custom"></a>Customize the Deployment
 
 The process of customizing the monitoring deployment consists of: 
 - creating the location for your local customization files
@@ -90,7 +93,19 @@ my-viya4mon-user-dir/monitoring/user-values-pushgateway.yaml
 
 You specify the environment variables in the `user.env` files and the Helm chart parameters in the `*.yaml` customization files. 
 
-In order to minimize the potential for errors, you should not manually create the customization files, but use one of the set of sample files as the starting point for your own customizations. 
+In order to minimize the potential for errors, you should not manually create the customization files, but use one of the sets of sample files as the starting point for your own customizations. 
+
+### Using Customization Samples
+
+The samples are provided to demonstrate how to customize the deployment of the monitoring components for specific situations. The samples provide instructions and example `*.yaml` files that you can modify to fit your environment. Although each example focuses on a specific scenario, you can combine multiple samples by merging the appropriate values in each deployment file.
+
+If your situation matches one of the specialized samples, you can copy the customization files for the sample that most closely matches your environment from the repository to your customization file directory. This enables you to start your customization with a set of values that are valid for your situation. You can then make further modifications to the files.
+
+If your situation does not match any of the specialized samples, copy the generic-base sample as a base for your customization files, and then change the values or copy values from other samples to match your environment.
+
+If more than one sample applies to your environment, you can manually copy the values from the other sample files to the files in your customization directory.
+
+See the [Samples page](/samples) for a list of provided samples.
 
 #### Specifying Environment Variables in user.env Files
 
@@ -100,9 +115,16 @@ Any line whose first character is `#` is treated as a comment and ignored.
 
 #### Specifying the Default Grafana Password 
 
-You can set the `GRAFANA_ADMIN_PASSWORD` environment variable to specify the default password for Grafana. If you do not specify a default password, one is randomly generated and displayed during deployment.
+Specify the `GRAFANA_ADMIN_PASSWORD` environment variable in
+`$USER_DIR/monitoring/user.env`to specify the default password for Grafana. If you do not specify a default password, one is randomly generated and displayed during deployment.
 
-### Modify user-values-*.yaml to Change Helm Chart Values
+#### Using Ingress for Cloud Providers
+
+If you are using a cloud provider, you must use ingress, rather than
+NodePorts. Use the samples in the [samples/ingress](/samples/ingress)
+area of this repository to set up either host-based or path-based ingress.
+
+#### Modify user-values-*.yaml to Change Helm Chart Values
 
 The monitoring stack uses the following Helm charts:
 
@@ -120,17 +142,11 @@ Operator and aggregates other helm charts such as Grafana and the Prometheus
 Node Exporter. Links to the charts and default values are included in the
 `user-values-prom-operator.yaml` file.
 
-**Note 1:** If you are using a cloud provider, you must use ingress, rather than
-NodePorts. Use the samples in the [samples/ingress](/samples/ingress)
-area of this repository to set up either host-based or path-based ingress.
+#### TLS Support
 
-**Note 2:** Although the Grafana helm chart supports a value to set the initial
-admin password, you must use the `GRAFANA_ADMIN_PASSWORD` value in
-`$USER_DIR/monitoring/user.env` to set this value. If not specified, the
-initial Grafana admin password will be randomly generated and logged during the
-initial deployment of the monitoring components.
+If you use ingress, connections between the user (or ingress object) and the monitoring components use TLS by default. The [TLS Monitoring sample](/samples/tls/monitoring) contains information about specifying the `TLS_ENABLE` environment variable to use TLS for in-cluster communications between the components and to use TLS for connections between the user and the monitoring components when using NodePorts. If you use ingress and also use TLS for communication between monitoring components, you must also manually populate Kubernetes secrets as listed in the sample. 
 
-## Workload Node Placement
+#### Workload Node Placement
 
 SAS Viya is deployed using a workload node placement strategy, which uses the
 `workload.sas.com/class` taint to optimize the placement of its components on
@@ -147,7 +163,7 @@ To deploy the monitoring components so that they participate in the SAS Viya
 workload node placement strategy rather than use this recommended deployment,
 set `MON_NODE_PLACEMENT_ENABLE` to `true` in `$USER_DIR/monitoring/user.env`.
 
-### Recommendations
+#### Workload Node Placement Recommendations
 
 The default configuration of the Prometheus instance that is included in Istio
 monitors the entire Kubernetes cluster. This configuration is typically not
@@ -236,19 +252,6 @@ Removing cluster monitoring does not remove persistent volume claims
 by default. A re-install after removal should retain existing data.
 Manually delete the PVCs or the namespace to delete previously
 collected monitoring data.
-
-## TLS Support
-
-You can use the `TLS_ENABLE` or `MON_TLS_ENABLE` settings in
-`$USER_DIR/user.env` or `$USER_DIR/monitoring/user.env`
-to enable TLS support, which encrypts network traffic
-between pods for use by the monitoring pods.
-
-You must perform manual steps prior to deployment in order to enable TLS.
-In addition, configuring HTTPS ingress involves a separate set of
-steps, which are similar to those needed for SAS Viya.
-
-See the [TLS Sample](/samples/tls) for more information.
 
 ## Miscellaneous Notes and Troubleshooting
 

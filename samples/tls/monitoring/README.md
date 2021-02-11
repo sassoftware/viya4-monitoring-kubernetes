@@ -8,6 +8,8 @@ If you enable TLS, in-cluster communications between monitoring components use T
 
 If you enable TLS and are using nodeports, connections between the user and monitoring components also use TLS.
 
+If you use ingress, connections between the user and monitoring components use TLS by default.
+
 ## Using This Sample
 
 You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
@@ -33,7 +35,7 @@ my_repository_path/monitoring/bin/deploy_monitoring_cluster.sh
 any sample hostnames with hostnames for your deployment. Specifically, you must replace
 `host.cluster.example.com` with the name of the ingress node. Often, the ingress node is the cluster master node, but your environment might be different.
 
-* If you plan on using ingress, you must manually populate these Kubernetes secrets with TLS certificates before you deploy cluster monitoring:
+* If you are using ingress, you must manually populate these Kubernetes secrets with TLS certificates before you deploy cluster monitoring:
 
 * `prometheus-ingress-tls-secret`
 * `alertmanager-ingress-tls-secret`
