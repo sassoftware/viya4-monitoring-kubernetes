@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.8.b
+       Set  fb_configMap_version 0.2.8.1610E
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -660,6 +660,15 @@ data:
        Rename          message   unparsed_message
        Add             flagged4parsing misc
     [FILTER]
+       Alias           flag_misc99
+       Name            modify
+       Match           kube.*
+       Condition       Key_does_not_exist log
+       Condition       Key_does_not_exist message
+       Copy            flagged4parsing  DB__orig_parser
+       Copy            unparsed_message misc2_message
+       Add             flagged4parsing misc99
+    [FILTER]
        Alias           parse_misc
        Name            parser
        Match           kube.*
@@ -673,6 +682,7 @@ data:
        Parser          misc8
        Parser          collectapiT
        Parser          collectapi
+       Parser          level_only
        Parser          truncatedjson
        Parser          gopanic
        Reserve_Data    On
@@ -844,14 +854,16 @@ data:
     [INPUT]
        Name             tail
        Path             /var/log/containers/*.log
-       Exclude_Path     /var/log/containers/v4m-*.log,/var/log/containers/es-exporter-elasticsearch*.log,/var/log/containers/rmq-exporter*.log
+       Exclude_Path     /var/log/containers/v4m-*.log
        Parser           docker
        Tag              kube.*
        Refresh_Interval    5
        Mem_Buf_Limit    5MB
        Skip_Long_Lines  On
+       Read_from_Head   On
        Ignore_Older     1d
        DB               /var/log/sas_viya_flb.db
+       DB.locking       On
     [INPUT]
        # NOTE: ** METALOGGING **
        Name             tail
@@ -861,19 +873,10 @@ data:
        Refresh_Interval    5
        Mem_Buf_Limit    5MB
        Skip_Long_Lines  On
+       Read_from_Head   On
        Ignore_Older     1d
        DB               /var/log/sas_viya_flb.db
-    [INPUT]
-       # NOTE: ** METALOGGING **
-       Name             tail
-       Path             /var/log/containers/fb-fluent-bit-*.log
-       Parser           docker
-       Tag              opsK.*
-       Refresh_Interval    5
-       Mem_Buf_Limit    5MB
-       Skip_Long_Lines  On
-       Ignore_Older     1d
-       DB               /var/log/sas_viya_flb.db
+       DB.locking       On
     [OUTPUT]
        Name  azure
        Alias azurelogs
