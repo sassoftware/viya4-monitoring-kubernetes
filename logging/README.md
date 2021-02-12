@@ -32,9 +32,10 @@ Before deploying, you must perform these tasks:
 
 ### <a name="log_sel_rel"></a>Select the Release to Copy
 
-1. Click on **tags** above the repository tree.
-2. On the **Tags** page, click [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) to view the list of available releases.
-3. Use the release notes to determine the release you want to deploy.
+1. Select the **stable** branch.
+2. Click on **tags** above the repository tree.
+3. On the **Tags** page, click [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) to view the list of available releases.
+4. Use the release notes to determine the release you want to deploy.
 
 ### <a name="log_loc_copy"></a>Create a Local Copy of the Repository
 
@@ -91,7 +92,7 @@ The samples are provided to demonstrate how to customize the deployment of the m
 
 If your situation matches one of the specialized samples, you can copy the customization files for the sample that most closely matches your environment from the repository to your customization file directory. This enables you to start your customization with a set of values that are valid for your situation. You can then make further modifications to the files.
 
-If your situation does not match any of the specialized samples, copy the generic-base sample as a base for your customization files, and then change the values or copy values from other samples to match your environment.
+If your situation does not match any of the specialized samples, copy the [generic-base sample](/samples/generic-base) as a base for your customization files, and then change the values or copy values from other samples to match your environment.
 
 If more than one sample applies to your environment, you can manually copy the values from the other sample files to the files in your customization directory.
 

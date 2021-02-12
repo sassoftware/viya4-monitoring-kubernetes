@@ -4,11 +4,11 @@
 
 This sample demonstrates how to deploy monitoring components with TLS enabled.
 
-If you enable TLS, in-cluster communications between monitoring components use TLS. 
+If you enable TLS by specifying the `TLS_ENABLE=true` environment variable, in-cluster communications between monitoring components use TLS. 
 
-If you enable TLS and are using nodeports, connections between the user and monitoring components also use TLS.
+If you enable TLS by specifying `TLS_ENABLE=true` and are using nodeports, connections between the user and the monitoring components also use TLS.
 
-If you use ingress, connections between the user and monitoring components use TLS by default.
+If you are using TLS with ingress, you do not need to specify `TLS_ENABLE=true` in order for connections between the ingress object and the monitoring components to use TLS. However, you do need to populate Kubernetes secrets. 
 
 ## Using This Sample
 
@@ -35,7 +35,7 @@ my_repository_path/monitoring/bin/deploy_monitoring_cluster.sh
 any sample hostnames with hostnames for your deployment. Specifically, you must replace
 `host.cluster.example.com` with the name of the ingress node. Often, the ingress node is the cluster master node, but your environment might be different.
 
-* If you are using ingress, you must manually populate these Kubernetes secrets with TLS certificates before you deploy cluster monitoring:
+* If you are using ingress with TLS (HTTPS), you must manually populate these Kubernetes secrets with TLS certificates before you deploy cluster monitoring:
 
 * `prometheus-ingress-tls-secret`
 * `alertmanager-ingress-tls-secret`
