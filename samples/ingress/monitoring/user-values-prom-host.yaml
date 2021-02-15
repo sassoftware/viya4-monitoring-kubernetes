@@ -6,11 +6,6 @@ prometheus:
   # Define host-based ingress
   ingress:
     enabled: true
-    # Comment out this tls section if monitoring was not deployed with TLS enabled
-    tls:
-    - hosts:
-      - prometheus.host.mycluster.example.com
-      secretName: prometheus-tls-secret
     hosts:
     - prometheus.host.mycluster.example.com
   prometheusSpec:
@@ -37,10 +32,5 @@ grafana:
   # Define host-based ingress
   ingress:
     enabled: true
-    # Comment out this tls section if monitoring was not deployed with TLS enabled
-    tls:
-    - hosts:
-      - grafana.host.mycluster.example.com
-      secretName: grafana-tls-secret
     hosts:
     - grafana.host.mycluster.example.com

@@ -18,14 +18,8 @@ prometheus:
   service:
     type: ClusterIP
     nodePort: null
-
   ingress:
     enabled: true
-    # Comment out this tls section if monitoring was not deployed with TLS enabled
-    tls:
-    - hosts:
-      - host.mycluster.example.com
-      secretName: prometheus-tls-secret
     hosts:
     - host.mycluster.example.com
   prometheusSpec:
@@ -37,7 +31,6 @@ alertmanager:
   service:
     type: ClusterIP
     nodePort: null
-
   ingress:
     enabled: true
     hosts:
@@ -62,11 +55,6 @@ grafana:
     nodePort: null
   ingress:
     enabled: true
-    # Comment out this tls section if monitoring was not deployed with TLS enabled
-    tls:
-    - hosts:
-      - host.mycluster.example.com
-      secretName: grafana-tls-secret
     hosts:
     - host.mycluster.example.com
     path: /grafana
