@@ -1,5 +1,21 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.0.4 (15FEB21)
+
+* **Overall**
+  * Improved documentation for overall deployment process
+  * Improved documentation related to use of TLS
+  * Removed references to TLS in ingress sample (samples/ingress); TLS enabled ingress shown in TLS sample (samples/tls)
+
+* **Monitoring**
+  * [FIX] ENABLE_TLS should set proper port and targetport for v4m-prometheus service
+  * [FIX] Remove memory limit on kube-state-metrics
+  * [FIX] Kubernetes Cluster Dashboard disk usage not working on EKS
+
+* **Logging**
+  * Moved Helm chart from deprecated `stable/fluent-bit` to `fluent/fluent-bit`
+  * Fluent Bit version upgraded from 1.5.4 to 1.6.10
+
 ## Version 1.0.3 (15Jan21)
 
 * **Overall**
