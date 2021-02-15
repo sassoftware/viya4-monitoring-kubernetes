@@ -54,9 +54,9 @@ in a directory named `viya4-monitoring-kubernetes-<release_number>`.
 2. From the main page for the repository, click **Code**.
 3. Copy the HTTPS URL for the repository.
 4. From a directory where you want to create the local copy, enter the 
-command `git clone <https_url>`. If you need to use a repeatable process to download a specific release of the repository, include the tag associated with the release in the `git clone` command. The tag for each release is displayed on the Releases page. 
+command `git clone <https_url>`. If you want to download a specific branch, release, or tag, use the `git clone --branch <my_branch> <https_url>` command. Use the `<my_branch>` parameter to specify the branch, release or tag.  If you are developing a repeatable process and need to ensure the same release of the repo is used each time, specify the tag associated with a specific release rather than **stable**. Note that the tag and release names are typically the same, but you should check the Releases page to verify the tag name. 
 5. Change to the `viya4-monitoring-kubernetes` directory.
-6. Enter the command `git checkout <release_number>`
+6. Enter the command `git checkout <release_number>`. If you used the command `git clone --branch <my_branch> <https_url>` in Step 4 to specify the branch, release, or tag, you do not have to perform this step
 
 ### <a name="log_custom"></a>Customize the Deployment
 
