@@ -60,8 +60,7 @@ repository is created in a directory named `viya4-monitoring-kubernetes-<release
 1. From the main page for the repository, select the **stable** branch, which is the most recent officially released version. The **master** branch is the branch under active development.
 2. From the main page for the repository, click **Code**.
 3. Copy the HTTPS URL for the repository.
-4. From a directory where you want to create the local copy, enter the
-command `git clone <https_url>`. If you want to download a specific branch, release, or tag, use the `git clone --branch <my_branch> <https_url>` command. Use the `<my_branch>` parameter to specify the branch, release or tag.  If you are developing a repeatable process and need to ensure the same release of the repo is used each time, specify the tag associated with a specific release rather than **stable**. Note that the tag and release names are typically the same, but you should check the Releases page to verify the tag name. 
+4. From a directory where you want to create the local copy, enter the command `git clone --branch stable <https_url>`. You can replace `stable` with the tag associated with a specific release if you need a version other than the current stable version. For example, if you are developing a repeatable process and need to ensure the same release of the repo is used every time, specify the tag associated with that specific release rather than stable. Note that the tag and release names are typically the same, but you should check the Releases page to verify the tag name. 
 5. Change to the `viya4-monitoring-kubernetes` directory.
 6. Enter the command `git checkout <release_number>`. If you used the command `git clone --branch <my_branch> <https_url>` in Step 4 to specify the branch, release, or tag, you do not have to perform this step.
 
