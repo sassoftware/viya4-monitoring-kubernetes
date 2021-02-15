@@ -26,11 +26,7 @@ my_repository_path/monitoring/bin/deploy_monitoring_cluster.sh
 my_repository_path/logging/bin/deploy_logging_open.sh
 ```
 
-## Notes On Customization Values
-
-To enable TLS, edit `$USER_DIR/user.env` and set `TLS_ENABLE` to `true`
-
-### Monitoring 
+### Monitoring
 
 The monitoring deployment process requires that the user response file be
 named `$USER_DIR/monitoring/user-values-prom-operator.yaml`.
@@ -61,10 +57,10 @@ all instances of `host.cluster.example.com` with hostnames that match your clust
 If you deploy using host-based ingress, the applications are available at these
 locations (with hostnames replaced with those in the actual environment that you specified):
 
-* Grafana - `https://grafana.host.mycluster.example.com`
-* Prometheus - `https://prometheus.host.mycluster.example.com`
-* Alertmanager - `https://alertmanager.host.mycluster.example.com`
-* Kibana - `https://kibana.host.mycluster.example.com`
+* Grafana - `http://grafana.host.mycluster.example.com`
+* Prometheus - `http://prometheus.host.mycluster.example.com`
+* Alertmanager - `http://alertmanager.host.mycluster.example.com`
+* Kibana - `http://kibana.host.mycluster.example.com`
 
 If you deploy using path-based ingress, the applications are available at these
 locations (with hostnames replaced with those in the actual environment that you specified):
@@ -73,5 +69,3 @@ locations (with hostnames replaced with those in the actual environment that you
 * Prometheus - `http://host.mycluster.example.com/prometheus`
 * Alertmanager - `http://host.mycluster.example.com/alertManager`
 * Kibana - `http://host.mycluster.example.com/kibana`
-
-

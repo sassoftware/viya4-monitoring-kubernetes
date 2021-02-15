@@ -22,16 +22,17 @@ These components are deployed:
 * [Prometheus Exporter for Elasticsearch](https://github.com/justwatchcom/elasticsearch_exporter) -
 Provides detailed Elasticsearch performance information for Prometheus
 
+If you are using a cloud provider, you must use ingress, rather than
+NodePorts. Specify the information needed to use ingress during the customization process.
+
 ## Perform Pre-Deployment Tasks
-Before deploying, you must select the release that you want to deploy, then create a local copy of the repository. 
 
-### Select the Release to Copy
+Before deploying, you must perform these tasks:
 
-1. Click on **tags** above the repository tree.
-2. On the **Tags** page, click [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) to view the list of available releases.
-3. Use the release notes to determine the release you want to deploy.
+- [create a local copy of the repository](#log_loc_copy)
+- [customize your deployment](#log_custom)
 
-### Create a Local Copy of the Repository
+### <a name="log_loc_copy"></a>Create a Local Copy of the Repository
 
 There are two methods to create a local copy of the repository: 
 - download a compressed copy 
@@ -39,23 +40,24 @@ There are two methods to create a local copy of the repository:
 
 #### Download a Compressed Copy of the Repository
 
-1. On the [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) page, locate the release that you want to deploy.
-2. Expand **Assets** for the release, which is located below the release notes.
-3. Select either **Source code (.zip)** or **Source code (.tar.gz)** to download the repository 
+1. On the main page of the repository, click on Releases (on the right side of the repository contents area) to display the [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) page. 
+2. Locate the release that you want to deploy. Typically, you should download the latest release, which is the first one listed.
+3. Expand **Assets** for the release, which is located below the release notes.
+4. Select either **Source code (.zip)** or **Source code (.tar.gz)** to download the repository 
 as a compressed file.
-4. Expand the downloaded file to create a local copy of the repository. The repository is created
+5. Expand the downloaded file to create a local copy of the repository. The repository is created
 in a directory named `viya4-monitoring-kubernetes-<release_number>`.
 
 #### Clone the Repository
 
-1. From the main page for the repository, click **Code**.
-2. Copy the HTTPS URL for the repository.
-3. From a directory where you want to create the local copy, enter the 
-command `git clone <https_url>`. 
-4. Change to the `viya4-monitoring-kubernetes` directory.
-5. Enter the command `git checkout <release_number>`
+1. From the main page for the repository, select the **stable** branch, which is the most recent officially released version. The **master** branch is the branch under active development.
+2. From the main page for the repository, click **Code**.
+3. Copy the HTTPS URL for the repository.
+4. From a directory where you want to create the local copy, enter the command `git clone --branch stable <https_url>`. You can replace `stable` with the tag associated with a specific release if you need a version other than the current stable version. For example, if you are developing a repeatable process and need to ensure the same release of the repo is used every time, specify the tag associated with that specific release rather than stable. Note that the tag and release names are typically the same, but you should check the Releases page to verify the tag name.
+5. Change to the `viya4-monitoring-kubernetes` directory.
+6. Enter the command `git checkout <release_number>`. If you used the command `git clone --branch <my_branch> <https_url>` in Step 4 to specify the branch, release, or tag, you do not have to perform this step
 
-### Customize the Deployment
+### <a name="log_custom"></a>Customize the Deployment
 
 The process of customizing the logging deployment consists of: 
 - creating the location for your local customization files
@@ -80,6 +82,18 @@ You specify the environment variables in the `user.env` files and the Helm chart
 
 In order to minimize the potential for errors, you should not manually create the customization files, but use one of the set of sample files as the starting point for your own customizations. 
 
+### Using Customization Samples
+
+The samples are provided to demonstrate how to customize the deployment of the monitoring components for specific situations. The samples provide instructions and example `*.yaml` files that you can modify to fit your environment. Although each example focuses on a specific scenario, you can combine multiple samples by merging the appropriate values in each deployment file.
+
+If your situation matches one of the specialized samples, you can copy the customization files for the sample that most closely matches your environment from the repository to your customization file directory. This enables you to start your customization with a set of values that are valid for your situation. You can then make further modifications to the files.
+
+If your situation does not match any of the specialized samples, copy the [generic-base sample](/samples/generic-base) as a base for your customization files, and then change the values or copy values from other samples to match your environment.
+
+If more than one sample applies to your environment, you can manually copy the values from the other sample files to the files in your customization directory.
+
+See the [Samples page](/samples) for a list of provided samples.
+
 #### Specifying Environment Variables in user.env Files
 
 Environment variables control script behavior and high-level options such as TLS and workload node placement. Note that you can also specify environment variables on a command line, but specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments. The values in the top-level `user.env` file (`my-viya4mon-user-dir/user.env`) apply to both the monitoring and logging deployments. The values in `my-viya4mon-user-dir/logging/user.env` apply only to the logging deployment.
@@ -90,11 +104,21 @@ Any line whose first character is `#` is treated as a comment and ignored.
 
 You can set the `ES_ADMIN_PASSWD` environment variable to specify the default password for Kibana. If you do not specify a default password, one is randomly generated.
 
+#### Using Ingress for Cloud Providers
+
+If you are using a cloud provider, you must use ingress, rather than
+NodePorts. Use the samples in the [samples/ingress](/samples/ingress)
+area of this repository to set up either host-based or path-based ingress.
+
 #### Specifying the Retention Period for Log Messages
 
 You can also modify values in the `user.env` file to change the retention period for log messages. By default, messages from SAS Viya and Kubernetes pods are retained for three days and messages from logging components are retained for one day. See [Log_Retention.md](Log_Retention.md) for information about changing the log retention period. 
 
-### Modify user-values-*.yaml to Change Helm Chart Values
+#### TLS Support
+
+The [TLS Logging sample](/samples/tls/logging) contains information about specifying the `TLS_ENABLE` environment variable to use TLS for connections between the user (or an ingress object) and the logging components. In-cluster communications between logging components always use TLS. If you use ingress and also use TLS for communication between the user and the logging components, you must also manually populate Kubernetes secrets as listed in the sample. 
+
+#### Modify user-values-*.yaml to Change Helm Chart Values
 
 The logging stack uses the following Helm charts:
 
@@ -138,7 +162,7 @@ elasticsearch:     # Uncommented b/c 'master' is uncommented
       storageClass: alt-storage  # Uncommented to direct ES to alt-storage storageClass
 ```
 
-### Workload Node Placement
+#### Workload Node Placement
 
 SAS Viya is deployed using a workload node placement strategy, which uses the 
 `workload.sas.com/class` taint to optimize the placement of its components on 
