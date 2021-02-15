@@ -22,20 +22,15 @@ These components are deployed:
 * [Prometheus Exporter for Elasticsearch](https://github.com/justwatchcom/elasticsearch_exporter) -
 Provides detailed Elasticsearch performance information for Prometheus
 
+If you are using a cloud provider, you must use ingress, rather than
+NodePorts. Specify the information needed to use ingress during the customization process.
+
 ## Perform Pre-Deployment Tasks
 
 Before deploying, you must perform these tasks:
 
-- [select the release that you want to deploy](#log_sel_rel)
 - [create a local copy of the repository](#log_loc_copy)
 - [customize your deployment](#log_custom)
-
-### <a name="log_sel_rel"></a>Select the Release to Copy
-
-1. Select the **stable** branch.
-2. Click on **tags** above the repository tree.
-3. On the **Tags** page, click [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) to view the list of available releases.
-4. Use the release notes to determine the release you want to deploy.
 
 ### <a name="log_loc_copy"></a>Create a Local Copy of the Repository
 
@@ -45,21 +40,23 @@ There are two methods to create a local copy of the repository:
 
 #### Download a Compressed Copy of the Repository
 
-1. On the [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) page, locate the release that you want to deploy.
-2. Expand **Assets** for the release, which is located below the release notes.
-3. Select either **Source code (.zip)** or **Source code (.tar.gz)** to download the repository 
+1. On the main page of the repository, click on Releases (on the right side of the repository contents area) to display the [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases) page. 
+2. Locate the release that you want to deploy. Typically, you should download the latest release, which is the first one listed.
+3. Expand **Assets** for the release, which is located below the release notes.
+4. Select either **Source code (.zip)** or **Source code (.tar.gz)** to download the repository 
 as a compressed file.
-4. Expand the downloaded file to create a local copy of the repository. The repository is created
+5. Expand the downloaded file to create a local copy of the repository. The repository is created
 in a directory named `viya4-monitoring-kubernetes-<release_number>`.
 
 #### Clone the Repository
 
-1. From the main page for the repository, click **Code**.
-2. Copy the HTTPS URL for the repository.
-3. From a directory where you want to create the local copy, enter the 
-command `git clone <https_url>`. 
-4. Change to the `viya4-monitoring-kubernetes` directory.
-5. Enter the command `git checkout <release_number>`
+1. From the main page for the repository, select the **stable** branch, which is the most recent officially released version. The **master** branch is the branch under active development.
+2. From the main page for the repository, click **Code**.
+3. Copy the HTTPS URL for the repository.
+4. From a directory where you want to create the local copy, enter the 
+command `git clone <https_url>`. If you need to use a repeatable process to download a specific release of the repository, include the tag associated with the release in the `git clone` command. The tag for each release is displayed on the Releases page. 
+5. Change to the `viya4-monitoring-kubernetes` directory.
+6. Enter the command `git checkout <release_number>`
 
 ### <a name="log_custom"></a>Customize the Deployment
 
@@ -98,7 +95,6 @@ If more than one sample applies to your environment, you can manually copy the v
 
 See the [Samples page](/samples) for a list of provided samples.
 
-
 #### Specifying Environment Variables in user.env Files
 
 Environment variables control script behavior and high-level options such as TLS and workload node placement. Note that you can also specify environment variables on a command line, but specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments. The values in the top-level `user.env` file (`my-viya4mon-user-dir/user.env`) apply to both the monitoring and logging deployments. The values in `my-viya4mon-user-dir/logging/user.env` apply only to the logging deployment.
@@ -108,6 +104,12 @@ Any line whose first character is `#` is treated as a comment and ignored.
 #### Specifying the Default Kibana Password
 
 You can set the `ES_ADMIN_PASSWD` environment variable to specify the default password for Kibana. If you do not specify a default password, one is randomly generated.
+
+#### Using Ingress for Cloud Providers
+
+If you are using a cloud provider, you must use ingress, rather than
+NodePorts. Use the samples in the [samples/ingress](/samples/ingress)
+area of this repository to set up either host-based or path-based ingress.
 
 #### Specifying the Retention Period for Log Messages
 

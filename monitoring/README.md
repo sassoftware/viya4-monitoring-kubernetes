@@ -34,17 +34,8 @@ NodePorts. Specify the information needed to use ingress during the customizatio
 
 Before deploying, you must perform these tasks:
 
-- [select the release that you want to deploy](#mon_sel_rel)
 - [create a local copy of the repository](#mon_loc_copy)
 - [customize your deployment](#mon_custom)
-
-### <a name="mon_sel_rel"></a>Select the Release to Copy
-
-1. Select the **stable** branch.
-2. Click on **tags** above the repository tree.
-3. On the **Tags** page, click [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases)
-to view the list of available releases.
-4. Use the release notes to determine the release you want to deploy.
 
 ### <a name="mon_loc_copy"></a>Create a Local Copy of the Repository
 
@@ -55,22 +46,24 @@ There are two methods to create a local copy of the repository:
 
 #### Download a Compressed Copy of the Repository
 
-1. On the [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases)
-page, locate the release that you want to deploy.
-2. Expand **Assets** for the release, which is located below the release notes.
-3. Select either **Source code (.zip)** or **Source code (.tar.gz)** to download
+1. On the main page of the repository, click on Releases (on the right side of the repository contents area) to display the [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases)
+page.
+2. Locate the release that you want to deploy. Typically, you should download the latest release, which is the first one listed.
+3. Expand **Assets** for the release, which is located below the release notes.
+4. Select either **Source code (.zip)** or **Source code (.tar.gz)** to download
 the repository as a compressed file.
-4. Expand the downloaded file to create a local copy of the repository. The
+5. Expand the downloaded file to create a local copy of the repository. The
 repository is created in a directory named `viya4-monitoring-kubernetes-<release_number>`.
 
 #### Clone the Repository
 
-1. From the main page for the repository, click **Code**.
-2. Copy the HTTPS URL for the repository.
-3. From a directory where you want to create the local copy, enter the
-command `git clone <https_url>`.
-4. Change to the `viya4-monitoring-kubernetes` directory.
-5. Enter the command `git checkout <release_number>`
+1. From the main page for the repository, select the **stable** branch, which is the most recent officially released version. The **master** branch is the branch under active development.
+2. From the main page for the repository, click **Code**.
+3. Copy the HTTPS URL for the repository.
+4. From a directory where you want to create the local copy, enter the
+command `git clone <https_url>`. If you need to use a repeatable process to download a specific release of the repository, include the tag associated with the release in the `git clone` command. The tag for each release is displayed on the Releases page. 
+5. Change to the `viya4-monitoring-kubernetes` directory.
+6. Enter the command `git checkout <release_number>`
 
 ### <a name="mon_custom"></a>Customize the Deployment
 
@@ -145,7 +138,7 @@ Node Exporter. Links to the charts and default values are included in the
 
 #### TLS Support
 
-The [TLS Monitoring sample](/samples/tls/monitoring) contains information about specifying the `TLS_ENABLE` environment variable to use TLS for in-cluster communications between the components and to use TLS for connections between the user and the monitoring components when using NodePorts. If you use ingress and also use TLS for communication between monitoring components, you do not have to specify the `TLS_ENABLE` environment variable, but you must manually populate Kubernetes secrets as listed in the sample. 
+The [TLS Monitoring sample](/samples/tls/monitoring) contains information about specifying the `TLS_ENABLE` environment variable to use TLS for in-cluster communications between the components and to use TLS for connections between the user and the monitoring components when using NodePorts. If you only use TLS (HTTPS) for ingress, you do not have to specify the environment variable `TLS_ENABLE=true`, but you must manually populate Kubernetes ingress secrets as specified in the [TLS Monitoring sample](/samples/tls/monitoring).
 
 #### Workload Node Placement
 
