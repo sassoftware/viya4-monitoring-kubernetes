@@ -8,7 +8,7 @@ If you enable TLS by specifying the `TLS_ENABLE=true` environment variable, in-c
 
 If you enable TLS by specifying `TLS_ENABLE=true` and are using nodeports, connections between the user and the monitoring components also use TLS.
 
-If you are using TLS with ingress, you do not need to specify `TLS_ENABLE=true` in order for connections between the ingress object and the monitoring components to use TLS. However, you do need to populate Kubernetes secrets. 
+If you only use TLS (HTTPS) for ingress, you do not have to specify the environment variable `TLS_ENABLE=true`, but you must manually populate Kubernetes ingress secrets as specified in the [TLS Monitoring sample](/samples/tls/monitoring). 
 
 ## Using This Sample
 

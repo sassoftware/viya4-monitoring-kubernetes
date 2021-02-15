@@ -133,7 +133,7 @@ suitable, you might need to customize some values (such as for ingress,
 for example). The `kube-prometheus-stack` Helm chart includes the Prometheus
 Operator and aggregates other helm charts such as Grafana and the Prometheus
 Node Exporter. Links to the charts and default values are included in the
-`user-values-prom-operator.yaml` file.
+`user-values-prom-operator.yaml` file. 
 
 #### TLS Support
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Communication between the logging components within the cluster always takes place through TLS-enabled connections. This sample demonstrates how to deploy logging with TLS enabled for connections between the user (or an ingress object) and Kibana. The `TLS_ENABLE` environment variable controls whether connections to Kibana use TLS.
+Communication between the logging components within the cluster always takes place through TLS-enabled connections. This sample demonstrates how to deploy logging with TLS enabled for connections between the user and Kibana. The `TLS_ENABLE` environment variable controls whether connections to Kibana use TLS.
 
 ## Using This Sample
 
