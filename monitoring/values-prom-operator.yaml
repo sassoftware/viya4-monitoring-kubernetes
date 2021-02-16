@@ -69,7 +69,7 @@ prometheus:
     nodePort: 31090
   prometheusSpec:
     image:
-      tag: v2.23.0
+      tag: v2.24.1
     logLevel: info
     logFormat: json
     podAntiAffinity: soft
@@ -162,7 +162,7 @@ nodeExporter:
 # https://github.com/grafana/helm-charts/tree/main/charts/grafana
 grafana:
   image:
-    tag: "7.3.6"
+    tag: "7.4.1"
   "grafana.ini":
     analytics:
       check_for_updates: false
