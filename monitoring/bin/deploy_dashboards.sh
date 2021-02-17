@@ -51,6 +51,31 @@ function deploy_dashboards {
    log_message "--------------------------------"
 }
 
+# Single argument supported. If specified, deploy either the specified .json
+# file as a dashboard or all .json files in the specified directory
+
+if [ "$1" != "" ]; then
+  if [ -f "$1" ] && [[ $1 =~ .+\.json ]]; then
+    # Deploy single dashboard
+    f=$1
+    log_info "Deploying Grafana dashboard [$f]..."
+    name=$(basename $f .json)
+    kubectl create cm -n $DASH_NS $name $dryRun --from-file $f -o yaml | kubectl apply -f -
+    kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring sas.com/dashboardType=manual
+    exit $?
+  fi
+
+  if [ -d "$1" ]; then
+    # Deploy specified directory of dashboards
+    log_info "Deploying Grafana dashboards in [$1]..."
+    deploy_dashboards "manual" "$1" 
+    exit $?
+  fi
+
+  log_error "The specified path [$1] does not exist"
+  exit 1
+fi
+
 log_info "Deploying SAS dashboards to the [$DASH_NS] namespace..."
 log_message "--------------------------------"
 if [ "$WELCOME_DASH" == "true" ]; then
