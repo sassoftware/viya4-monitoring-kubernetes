@@ -4,8 +4,6 @@ metadata:
   name: kibana-tls-cert
 spec:
   commonName: kibana
-  organization:
-  - cert-manager
   dnsNames:
   - localhost
   - prometheus-operator-kibana
@@ -13,7 +11,11 @@ spec:
     kind: Issuer
     name: namespace-issuer
   secretName: kibana-tls-secret
-  keyEncoding: pkcs8
+  privateKey:
+    encoding: PKCS8
+  subject:
+    organizations:
+    - cert-manager
   usages:
   - digital signature
   - key encipherment
