@@ -17,6 +17,7 @@ PGMONITOR_DASH="${PGMONITOR_DASH:-$VIYA_DASH}"
 RABBITMQ_DASH="${RABBITMQ_DASH:-$VIYA_DASH}"
 LOGGING_DASH="${LOGGING_DASH:-true}"
 ISTIO_DASH="${ISTIO_DASH:-${ISTIO_ENABLED:-false}}"
+USER_DASH="${USER_DASH:-true}"
 TEST_DASH="${TEST_DASH:-false}"
 
 DASH_BASE="${DASH_BASE:-monitoring/dashboards}"
@@ -35,7 +36,11 @@ fi
 
 function deploy_dashboards {
    type=$1
-   dir="$DASH_BASE/$type"
+   if [ -z "$2" ]; then
+     dir=$"$DASH_BASE/$type"
+   else
+     dir=$2
+   fi
    
    log_message "--------------------------------"
    for f in $dir/*.json; do
@@ -81,6 +86,14 @@ fi
 if [ "$RABBITMQ_DASH" == "true" ]; then
   log_info "Deploying RabbitMQ dashboards..."
   deploy_dashboards "rabbitmq"
+fi
+
+if [ "$USER_DASH" == "true" ]; then
+  userDashDir="$USER_DIR/monitoring/dashboards"
+  if [ -d "$userDashDir" ]; then
+    log_info "Deploying user dashboards from [$userDashDir] ..."
+    deploy_dashboards "user" "$userDashDir"
+  fi
 fi
 
 log_info "Deployed dashboards to the [$DASH_NS] namespace"
