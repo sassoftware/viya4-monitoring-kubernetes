@@ -4,8 +4,6 @@ metadata:
   name: es-rest-tls-cert
 spec:
   commonName: es-rest
-  organization:
-  - cert-manager
   dnsNames:
   - localhost
   - v4m-es-client-service
@@ -13,7 +11,11 @@ spec:
     kind: Issuer
     name: namespace-issuer
   secretName: es-rest-tls-secret
-  keyEncoding: pkcs8
+  privateKey:
+    encoding: PKCS8
+  subject:
+    organizations:
+    - cert-manager
   usages:
   - digital signature
   - key encipherment
