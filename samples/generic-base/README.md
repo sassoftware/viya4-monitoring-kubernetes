@@ -36,7 +36,6 @@ my_repository_path/logging/bin/deploy_logging_open.sh
 
 ## Grafana Dashboards
 
-In addition to customizing the deployment, additional user-provided content
-is supported. See this [Readme](monitoring/dashboards/README.md) for details
+In addition to customizing the deployment, you can also use this sample to add your own Grafana dashboards. See the [dashboard Readme](monitoring/dashboards/README.md) for details
 on supplying additional Grafana dashboards that will be deployed (and removed)
-with the monitoring stack.
+with the monitoring components.

@@ -1,7 +1,6 @@
 # Original Dashboard Sources
 
-All included dashboard were either created from scrator or
-based on public grafana.com community dashboards:
+These dashboards provided as part of the monitoring deployment are based on public community dashboards from grafana.com: 
 
 - [Istio](https://grafana.com/orgs/istio)
 - [Kubernetes Cluster](https://grafana.com/grafana/dashboards/8721)
@@ -13,3 +12,5 @@ based on public grafana.com community dashboards:
 - [RabbitMQ Overview](https://grafana.com/grafana/dashboards/10991)
 - [Java Micrometer](https://grafana.com/grafana/dashboards/4701)
 - [Postgres](https://grafana.com/grafana/dashboards/9628)
+
+All other provided dashboards were manually created by SAS.

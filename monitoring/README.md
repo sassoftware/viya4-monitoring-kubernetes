@@ -175,6 +175,34 @@ the following jobs in the Istio Prometheus instance:
 * `kubernetes-pods`
 * `kubernetes-service-endpoints`
 
+### Add Custom Dashboards
+
+The monitoring deployment includes a set of dashboards, but you can also add your own. Many dashboards are available at [Grafana's site of community dashboards](https://grafana.com/grafana/dashboards). Download the `.json` file for a dashboard and save it using a filename that is
+a [valid kubernetes resource name](https://kubernetes.io/docs/concepts/overview/working-with-objects/names). There are two methods to add dashboards:
+
+- manually import each dashboard into Grafana
+- add dashboards using a script
+
+#### Manually Import Dashboards
+
+You can use Grafana's import function to import dashboards. 
+
+The advantage of using the import function is that Grafana recognizes if the dashboard's data source is not valid for your environment and prompts you to select your environment's data source. 
+
+The disadvantage is that the process is not automated, so you must re-import the dashboards each time you redeploy the monitoring components. If you have many dashboards to import, the process could also be time-consuming. 
+
+### Add Dashboards Using a Script
+
+You can use the `deploy_dashboards.sh [dashboard | dashboard_directory]` script to deploy a single dashboard or a directory of dashboards.
+
+Grafana cannot validate the data source of dashboards that are deployed using this script, so you must manually change the data source to `Prometheus` in the dashboards' JSON files before you deploy them. For example:
+- Find: `"datasource": "${DS_PROMETHEUS}"`
+- Replace: `"datasource": "Prometheus"`
+
+The advantage of using the script is that the process can be automated, so you can automatically re-deploy all of your custom dashboards whenever you re-deploy the monitoring components.
+
+Some detailed dashboards might be too large to deploy using the script, and must be imported manually. 
+
 ## Deploy Cluster Monitoring Components
 
 To deploy the monitoring components for the cluster, issue this command:
