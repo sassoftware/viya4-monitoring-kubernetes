@@ -298,10 +298,10 @@ log_debug "QUERYFILE=$QUERY_FILE"
 log_debug "USERNAME: $USERNAME PASSWORD: $PASSWORD"
 
 DEBUG=${DEBUG:-false}
-HOST=${HOST:-"kepler-m1.opsmonitor.sashq-d.openstack.sas.com"}
-PORT=${PORT:-"30737"}
-USER=${USERNAME:-"admin"}
-PASSWORD=${PASSWORD:-"admin"}
+HOST=${HOST}
+PORT=${PORT}
+USER=${USERNAME}
+PASSWORD=${PASSWORD}
 LIMIT=${LIMIT:-10}
 FORMAT=${FORMAT:-csv}
 
@@ -389,7 +389,7 @@ if [ "$DEBUG" == "true" ]; then
    cat $query_file
 fi
 
-# curl -XPOST "https://gemini-m1.opsmonitor.sashq-d.openstack.sas.com:30295/_opendistro/_sql?format=csv" \
+# curl -XPOST "https://myserver.example.com:30295/_opendistro/_sql?format=csv" \
 #      -d '{"query": "select count(*)from viya_logs-d27885-2021-02-16 where logsource = \"database\"  and @timestamp between \"2021-02-16T01:00:00.000Z\" and \"2021-02-16T02:00:00.000Z\""}
 #' -k --user admin:admin -H 'Content-Type: application/json'
 
