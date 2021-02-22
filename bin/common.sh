@@ -8,8 +8,6 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     # Includes
     source bin/colors-include.sh
     source bin/log-include.sh
-    source bin/helm-include.sh
-    source bin/kube-include.sh
 
     export USER_DIR=${USER_DIR:-$(pwd)}
     if [ -f "$USER_DIR/user.env" ]; then
@@ -24,23 +22,33 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
 
     log_debug "Working directory: $(pwd)"
     log_debug "User directory: $USER_DIR"
-    log_info "Helm client version: $HELM_VER_FULL"
 
-    log_info Kubernetes client version: "$KUBE_CLIENT_VER"
-    log_info Kubernetes server version: "$KUBE_SERVER_VER"
+    CHECK_HELM=${CHECK_HELM:-true}
+    if [ "$CHECK_HELM" == "true" ]; then
+       source bin/helm-include.sh
+       log_info "Helm client version: $HELM_VER_FULL"
+    fi
 
-    # Check that the current KUBECONFIG has admin access
-    CHECK_ADMIN=${CHECK_ADMIN:-true}
-    if [ "$CHECK_ADMIN" == "true" ]; then
-      if [ "$(kubectl auth can-i create namespace --all-namespaces)" == "no" ]; then
-        ctx=$(kubectl config current-context)
-        log_error "The current kubectl context [$ctx] does not have cluster admin access"
-        exit 1
-      else
-        log_debug "Cluster admin check OK"
-      fi
-    else
-      log_debug "Cluster admin check disabled"
+    CHECK_KUBERNETES=${CHECK_KUBERNETES:-true}
+    if [ "$CHECK_KUBERNETES" == "true" ]; then
+       source bin/kube-include.sh
+
+       log_info Kubernetes client version: "$KUBE_CLIENT_VER"
+       log_info Kubernetes server version: "$KUBE_SERVER_VER"
+
+       # Check that the current KUBECONFIG has admin access
+       CHECK_ADMIN=${CHECK_ADMIN:-true}
+       if [ "$CHECK_ADMIN" == "true" ]; then
+          if [ "$(kubectl auth can-i create namespace --all-namespaces)" == "no" ]; then
+             ctx=$(kubectl config current-context)
+             log_error "The current kubectl context [$ctx] does not have cluster admin access"
+             exit 1
+          else
+             log_debug "Cluster admin check OK"
+          fi
+       else
+          log_debug "Cluster admin check disabled"
+       fi
     fi
 
     export TMP_DIR=$(mktemp -d -t sas.mon.XXXXXXXX)
