@@ -8,10 +8,16 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 CHECK_HELM=false
 CHECK_KUBERNETES=false
-source logging/bin/common.sh
+
+# NOTE: sourcing top-level common.sh
+#       NOT logging/bin/common.sh
+source bin/common.sh
+
 this_script=`basename "$0"`
 
 default_output_vars="@timestamp, level, logsource, kube.namespace, kube.pod, kube.container, message"
+VALID_OUTFMT="csv|json|jdbc|raw"
+VALID_LEVELS="PANIC|FATAL|ERROR|WARNING|INFO|DEBUG|NONE"
 
 function show_usage {
    log_info  ""
@@ -22,35 +28,37 @@ function show_usage {
    log_info  "NOTE: The NAMESPACE parameter (-ns|--namespace) is required."
    log_info  ""
    log_info  "     ** Query Parms **"
-   log_info  "     -ns, --namespace   NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace for which logs are sought"
+   log_info  "     -n,  --namespace   NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace for which logs are sought"
    log_info  "     -p,  --pod         POD       - The pod for which logs are sought"
    log_info  "     -c,  --container   CONTAINER - The container for which logs are sought"
    log_info  "     -s,  --logsource   LOGSOURCE - The logsource for which logs are sought"
-   log_info  "     -l,  --level       INFO|etc  - The message level for which logs are sought (default: _all_)"
+   log_info  "     -l,  --level       INFO|etc  - The message level for which logs are sought. Valid values: $VALID_LEVELS"
    log_info  "          --limit       integer   - The maximum number of log messsages to return (default: 10)"
    log_info  "          --count_only            - Only return count of messages meeting criteria"
    log_info  "     -q,  --query_file  filename  - Name of file containing search query (all other query parms ignored)."
+   log_info  '          NOTE: The POD, CONTAINER, LOGSOURCE and LEVEL parameters accept multiple, comma-separated, values (e.g. --level "INFO, NONE")'
    log_info  "     ** Output Info **"
    log_info  "          --out_vars    'var1,var2' - List (comma-separated) of fields to include in output (default: '$default_output_vars')."
-   log_info  "          --format      csv|json|raw - Format of output (default: csv)."
-   log_info  "     -o,  --out_file    filename  - Name of file to write results to (default: [stdout])."
+   log_info  "          --format      csv|json|raw - Format of output (default: csv). Valid values: $VALID_OUTFMT"
+   log_info  "     -o,  --out_file    filename  - Name of file to write results to (default: [stdout]). File should not exist already."
    log_info  "     ** Date/Time Range Info **"
    log_info  "     -s,  --start       datetime  - Datetime for start of period for which logs are sought (default: 1 hour ago)"
    log_info  "     -e,  --end         datetime  - Datetime for end of period for which logs are sought (default: now)"
-   log_info  "     -t,  --time        duration  - Length of time period for which logs are sought (default: -1 hour)"
+#   log_info  "     -t,  --time        duration  - Length of time period for which logs are sought (default: -1 hour)"
    log_info  "     ** Connection Info **"
-   log_info  "     -u,  --user        USERNAME  - Username for connecting to Elasticsearch/Kibana"
+   log_info  "     -us, --user        USERNAME  - Username for connecting to Elasticsearch/Kibana"
    log_info  "     -pw, --password    PASSWORD  - Password for connecting to Elasticsearh/Kibana"
    log_info  "     -ho, --host        hostname  - Hostname for connection to Elasticsearch/Kibana"
    log_info  "     -po, --port        port_num  - Port number for connection to Elasticsearch/Kibana"
-   log_info  "          --conn_file   filename  - Name of file containing connection information."
+   log_info  "          NOTE: Connection information can also be passed via environment vars (ESHOST, ESPORT, ESUSER and ESPASSWD)."
    log_info  "     ** Other **"
    log_info  "     -h,  --help                  - Display help information"
-   log_info  "     -d,  --debug                 - Display additonal debug messages during execution"
+   log_info  "     -d,  --debug                 - Display additonal debug messages (inc. actual query submitted)  during execution"
    echo ""
 }
 
 POS_PARMS=""
+log_debug "Number of Input Parms: $# Input Parms: $@"
 
 while (( "$#" )); do
   case "$1" in
@@ -128,6 +136,16 @@ while (( "$#" )); do
     --count_only)
       COUNTONLY_FLAG="true"
       shift
+      ;;
+    -q|--query_file)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        QUERY_FILE=$2
+        shift 2
+      else
+        log_error "Error: A value for parameter [Query File] has not been provided." >&2
+        show_usage
+        exit 2
+      fi
       ;;
     # datetime parms
     -s|--start)
@@ -234,28 +252,7 @@ while (( "$#" )); do
         exit 2
       fi
       ;;
-    --conn_file)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        CONN_FILE=$2
-        shift 2
-      else
-        log_error "Error: A value for parameter [Connection File] has not been provided." >&2
-        show_usage
-        exit 2
-      fi
-      ;;
-
     # misc parms
-    -q|--query_file)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        query_file=$2
-        shift 2
-      else
-        log_error "Error: A value for parameter [Query File] has not been provided." >&2
-        show_usage
-        exit 2
-      fi
-      ;;
     -d|--debug)
       DEBUG=true
       shift
@@ -287,37 +284,58 @@ fi
 
 # No positional parameters are supported
 if [ "$#" -ge 1 ]; then
-    log_error "Unexpected additional arguments were found; exiting."
+    log_error "Unexpected additional arguments [$POS_PARMS] were found; exiting."
     show_usage
     exit 1
 fi
 
+# validate values
+if [ ! -z "$QUERY_FILE" ] && [ ! -f "$QUERY_FILE" ]; then
+   log_error "Specified query file [$QUERY_FILE] does not exist; exiting"
+   exit 1
+fi
 
-log_debug "POS_PARMS: $POS_PARMS"
+if [ ! -z "$OUT_FILE" ] && [ -f "$OUT_FILE" ]; then
+   log_error "Specified output file [$OUT_FILE] already exists."
+   log_error "Delete the file (or specify an different output file) and re-run this command."
+   exit 1
+fi
 
+if [[ ! "$LIMIT" =~ ^[0-9]+$ ]]; then
+   log_error "The specified value for --limit parameter [$LIMIT] is not a valid integer."
+   exit 1
+fi
 
-log_debug "NAMESPACE: $NAMESPACE POD: $POD CONTAINER: $CONTAINER LIMIT: $LIMIT COUNTONLY_FLAG: $COUNTONLY_FLAG"
-log_debug "QUERYFILE=$QUERY_FILE"
-log_debug "USERNAME: $USERNAME PASSWORD: $PASSWORD"
+# TO DO: Validate LEVEL?
+# TO DO: Validate OUT_FORMAT
 
+# set default values
 DEBUG=${DEBUG:-false}
-HOST=${HOST}
-PORT=${PORT}
-USER=${USERNAME}
-PASSWORD=${PASSWORD}
+HOST=${HOST:-${ESHOST}}
+PORT=${PORT:-${ESPORT}}
+USERNAME=${USERNAME:-${ESUSER}}
+PASSWORD=${PASSWORD:-${ESPASSWD}}
 LIMIT=${LIMIT:-10}
 FORMAT=${FORMAT:-csv}
 
+log_debug "HOST: $HOST PORT: $PORT"
+
+
+
 #default output to screen?
-#OUT_FILE={$OUT_FILE:-mylogs.csv}
 if [ ! -z "$OUT_FILE" ]; then
-   output_txt="-s -o $OUT_FILE"
+   output_file_specified="true"
+else
+   OUT_FILE="$TMP_DIR/query_results.txt"
+   output_file_specified="false"
 fi
 
 # Date processing:
 #  if none provided, use last hour
 START=${START:-$(date -d '1 hour ago'  +"%Y-%m-%dT%H:%M:%SZ")}
 END=${END:-$(date +"%Y-%m-%dT%H:%M:%SZ")}
+
+# TO DO: Exit on invalid date values
 
 # ensure local timezone is added
 start_tz=$(date -d "$START" +"%Y-%m-%dT%H:%M:%S%Z")
@@ -334,8 +352,9 @@ OUTPUT_VARS=${OUTPUT_VARS:-$default_output_vars}
 
 #if LOGSOURCE then write LOGSOURCE clause to query file
 # use QUERY_FILE
-if [[ !  -z "$query_file" ]]; then
+if [[ !  -z "$QUERY_FILE" ]]; then
    log_info "Submitting query from file [$query_file] for processing."
+   query_file=$QUERY_FILE
 else
    query_file="$TMP_DIR/query.json"
 
@@ -365,10 +384,29 @@ else
    echo  -n " where 1 = 1 " >> $query_file  # dummy always true
 
    if [ ! -z "$NAMESPACE" ];  then echo -n ' and kube.namespace =\"'"$NAMESPACE"'\"' >> $query_file; fi;
-   if [ ! -z "$LOGSOURCE" ];  then echo -n ' and logsource =\"'"$LOGSOURCE"'\"' >> $query_file; fi;
-   if [ ! -z "$POD"       ];  then echo -n ' and kube.pod =\"'"$POD"'\"'              >> $query_file; fi;
-   if [ ! -z "$CONTAINER" ];  then echo -n ' and kube.container =\"'"$CONTAINERE"'\"'>> $query_file; fi;
-   if [ ! -z "$LEVEL"     ];  then echo -n ' and level =\"'"$LEVEL"'\"'              >> $query_file; fi;
+#   if [ ! -z "$LOGSOURCE" ];  then echo -n ' and logsource =\"'"$LOGSOURCE"'\"' >> $query_file; fi;
+#   if [ ! -z "$POD"       ];  then echo -n ' and kube.pod =\"'"$POD"'\"'              >> $query_file; fi;
+#   if [ ! -z "$CONTAINER" ];  then echo -n ' and kube.container =\"'"$CONTAINER"'\"'>> $query_file; fi;
+#   if [ ! -z "$LEVEL"     ];  then echo -n ' and level =\"'"$LEVEL"'\"'              >> $query_file; fi;
+
+function csvlist {
+   # this function parses the input
+   # (a comma separated list of values)
+   # and returns a comma separated
+   # list of escaped quoted values
+   # enclosed in parens.
+   local rawvalue values outvalue
+   rawvalue=$1
+   IFS=, read -a arr <<<"$rawvalue"
+   printf -v values ',\\"%s\\"' "${arr[@]}"
+   outvalue="(${values:1})"
+   echo "$outvalue"
+}
+
+   if [ ! -z "$LOGSOURCE" ];  then echo -n ' and logsource      in '"$(csvlist $LOGSOURCE)" >> $query_file; fi;
+   if [ ! -z "$POD"       ];  then echo -n ' and kube.pod       in '"$(csvlist $POD)"       >> $query_file; fi;
+   if [ ! -z "$CONTAINER" ];  then echo -n ' and kube.container in '"$(csvlist $CONTAINER)" >> $query_file; fi;
+   if [ ! -z "$LEVEL"     ];  then echo -n ' and level          in '"$(csvlist $LEVEL)"     >> $query_file; fi;
 
    if [ ! -z "$SEARCH_STRING" ];  then echo -n ' and multi_match(\"'"$SEARCH_STRING"'\")'>> $query_file; fi;
 
@@ -387,20 +425,34 @@ else
 fi
 
 if [ "$DEBUG" == "true" ]; then
-   log_info "Query:"
+   log_info "The following query will be submitted:"
    cat $query_file
 fi
 
-# curl -XPOST "https://myserver.example.com:30295/_opendistro/_sql?format=csv" \
-#      -d '{"query": "select count(*)from viya_logs-d27885-2021-02-16 where logsource = \"database\"  and @timestamp between \"2021-02-16T01:00:00.000Z\" and \"2021-02-16T02:00:00.000Z\""}
-#' -k --user admin:admin -H 'Content-Type: application/json'
+maxtime=${ESQUERY_MAXTIME:-180}
 
- curl -XPOST "https://$HOST:$PORT/_opendistro/_sql?format=$FORMAT" \
-      -H 'Content-Type: application/json' \
-      -d @$query_file  $output_txt\
-      --user $USERNAME:$PASSWORD -k
+log_info "Submitting query now... $(date)"
+response=$(curl -m $maxtime -s  -o $OUT_FILE -w "%{http_code}"  -XPOST "https://$HOST:$PORT/_opendistro/_sql?format=$FORMAT" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $USERNAME:$PASSWORD -k)
+log_debug "curl command response: [$response]"
 
-echo "" # add line break after any output
+if [[ "$response" == "000" ]]; then
+   log_error "The request for log messages did not complete within the permitted time [$maxtime] seconds."
+   log_error "If you provided an output destination, you may want check to see if partial results were returned."
+   exit 1
+elif [[ $response != 2* ]]; then
+   log_error "There was an issue getting the requested log messages; the REST call returned an unexpected response code: [$response]."
+   log_error "Response returned following message(s):"
+   cat $OUT_FILE
+   echo "" # add line break after any output
+   exit 1
+fi
+
+if [ "$output_file_specified" == "true" ]; then
+   log_info "Output results written to requested output file [$OUT_FILE]"
+else
+   cat $OUT_FILE
+   echo "" # add line break after any output
+fi
 
 
 
