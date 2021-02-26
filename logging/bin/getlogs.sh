@@ -28,32 +28,36 @@ function show_usage {
    log_info  "NOTE: The NAMESPACE parameter (-ns|--namespace) is required."
    log_info  ""
    log_info  "     ** Query Parms **"
-   log_info  "     -n,  --namespace   NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace for which logs are sought"
-   log_info  "     -p,  --pod         POD       - The pod for which logs are sought"
-   log_info  "     -c,  --container   CONTAINER - The container for which logs are sought"
-   log_info  "     -s,  --logsource   LOGSOURCE - The logsource for which logs are sought"
-   log_info  "     -l,  --level       INFO|etc  - The message level for which logs are sought. Valid values: $VALID_LEVELS"
-   log_info  "          --limit       integer   - The maximum number of log messsages to return (default: 10)"
-   log_info  "          --count_only            - Only return count of messages meeting criteria"
-   log_info  "     -q,  --query_file  filename  - Name of file containing search query (all other query parms ignored)."
+   log_info  "     -n,  --namespace         NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace for which logs are sought"
+   log_info  "     -p,  --pod               POD       - The pod(s) for which logs are sought"
+   log_info  "     -px, --pod-exclude       POD       - The pod(s) for which logs should be excluded from the output"
+   log_info  "     -c,  --container         CONTAINER - The container(s) for which logs are sought"
+   log_info  "     -cx, --container-exclude CONTAINER - The container(s) from which logs should be excluded from the output"
+   log_info  "     -s,  --logsource         LOGSOURCE - The logsource for which logs are sought"
+   log_info  "     -sx, --logsource-exclude LOGSOURCE - The logsource for which logs should be excluded from the output"
+   log_info  "     -l,  --level             INFO|etc  - The message level for which logs are sought. Valid values: $VALID_LEVELS"
+   log_info  "     -lx, --level-exclude     INFO|etc  - The message level for which logs should be excluded from the output."
+   log_info  "          --limit             integer   - The maximum number of log messsages to return (default: 10)"
+   log_info  "          --count-only                  - Only return count of messages meeting criteria"
+   log_info  "     -q,  --query-file        filename  - Name of file containing search query (all other query parms ignored)."
    log_info  '          NOTE: The POD, CONTAINER, LOGSOURCE and LEVEL parameters accept multiple, comma-separated, values (e.g. --level "INFO, NONE")'
    log_info  "     ** Output Info **"
-   log_info  "          --out_vars    'var1,var2' - List (comma-separated) of fields to include in output (default: '$default_output_vars')."
-   log_info  "          --format      csv|json|raw - Format of output (default: csv). Valid values: $VALID_OUTFMT"
-   log_info  "     -o,  --out_file    filename  - Name of file to write results to (default: [stdout]). File should not exist already."
+   log_info  "          --out-vars          'var1,var2' - List (comma-separated) of fields to include in output (default: '$default_output_vars')."
+   log_info  "          --format            csv|json|raw - Format of output (default: csv). Valid values: $VALID_OUTFMT"
+   log_info  "     -o,  --out-file          filename  - Name of file to write results to (default: [stdout]). File should not exist already."
    log_info  "     ** Date/Time Range Info **"
-   log_info  "     -s,  --start       datetime  - Datetime for start of period for which logs are sought (default: 1 hour ago)"
-   log_info  "     -e,  --end         datetime  - Datetime for end of period for which logs are sought (default: now)"
-#   log_info  "     -t,  --time        duration  - Length of time period for which logs are sought (default: -1 hour)"
+   log_info  "     -s,  --start             datetime  - Datetime for start of period for which logs are sought (default: 1 hour ago)"
+   log_info  "     -e,  --end               datetime  - Datetime for end of period for which logs are sought (default: now)"
+#   log_info  "     -t,  --time             duration  - Length of time period for which logs are sought (default: -1 hour)"
    log_info  "     ** Connection Info **"
-   log_info  "     -us, --user        USERNAME  - Username for connecting to Elasticsearch/Kibana"
-   log_info  "     -pw, --password    PASSWORD  - Password for connecting to Elasticsearh/Kibana"
-   log_info  "     -ho, --host        hostname  - Hostname for connection to Elasticsearch/Kibana"
-   log_info  "     -po, --port        port_num  - Port number for connection to Elasticsearch/Kibana"
+   log_info  '     -us, --user              USERNAME  - Username for connecting to Elasticsearch/Kibana (default: $ESUSER)'
+   log_info  '     -pw, --password          PASSWORD  - Password for connecting to Elasticsearh/Kibana  (default: $ESPASSWD)'
+   log_info  '     -ho, --host              hostname  - Hostname for connection to Elasticsearch/Kibana (default: $ESHOST)'
+   log_info  '     -po, --port              port_num  - Port number for connection to Elasticsearch/Kibana (default: $ESPORT)'
    log_info  "          NOTE: Connection information can also be passed via environment vars (ESHOST, ESPORT, ESUSER and ESPASSWD)."
    log_info  "     ** Other **"
-   log_info  "     -h,  --help                  - Display help information"
-   log_info  "     -d,  --debug                 - Display additonal debug messages (inc. actual query submitted)  during execution"
+   log_info  "     -h,  --help                        - Display help information"
+   log_info  "     -d,  --debug                       - Display additonal debug messages (inc. actual query submitted)  during execution"
    echo ""
 }
 
@@ -63,7 +67,7 @@ log_debug "Number of Input Parms: $# Input Parms: $@"
 while (( "$#" )); do
   case "$1" in
     # basic query parms
-    -ns|--namespace)
+    -n|--namespace)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         NAMESPACE=$2
         shift 2
@@ -83,6 +87,16 @@ while (( "$#" )); do
         exit 2
       fi
       ;;
+    -px|--pod-exclude|-xp)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        POD_EXCLUDE=$2
+        shift 2
+      else
+        log_error "Error: A value for parameter [--pod-exclude (Pods to Exclude)] has not been provided." >&2
+        show_usage
+        exit 2
+      fi
+      ;;
     -c|--container)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         CONTAINER=$2
@@ -93,12 +107,32 @@ while (( "$#" )); do
         exit 2
       fi
       ;;
+    -cx|--container-exclude|-xc)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        CONTAINER_EXCLUDE=$2
+        shift 2
+      else
+        log_error "Error: A value for parameter [--container-exclude (Containers to exclude)] has not been provided." >&2
+        show_usage
+        exit 2
+      fi
+      ;;
     -s|--logsource)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         LOGSOURCE=$2
         shift 2
       else
         log_error "Error: A value for parameter [Logsource] has not been provided." >&2
+        show_usage
+        exit 2
+      fi
+      ;;
+    -sx|--logsource-exclude|-xs)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        LOGSOURCE_EXCLUDE=$2
+        shift 2
+      else
+        log_error "Error: A value for parameter [--logsource-exclude (Logsources to exclude)] has not been provided." >&2
         show_usage
         exit 2
       fi
@@ -123,6 +157,16 @@ while (( "$#" )); do
         exit 2
       fi
       ;;
+    -lx|--level-exclude|-xl)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        LEVEL_EXCLUDE=$2
+        shift 2
+      else
+        log_error "Error: A value for parameter [--level-exclude (message levels to exclude)] has not been provided." >&2
+        show_usage
+        exit 2
+      fi
+      ;;
     --limit)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         LIMIT=$2
@@ -133,11 +177,11 @@ while (( "$#" )); do
         exit 2
       fi
       ;;
-    --count_only)
+    --count-only)
       COUNTONLY_FLAG="true"
       shift
       ;;
-    -q|--query_file)
+    -q|--query-file)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         QUERY_FILE=$2
         shift 2
@@ -190,7 +234,7 @@ while (( "$#" )); do
         exit 2
       fi
       ;;
-    -o|--out_file)
+    -o|--out-file)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         OUT_FILE=$2
         shift 2
@@ -200,7 +244,7 @@ while (( "$#" )); do
         exit 2
       fi
       ;;
-    --out_vars)
+    --out-vars)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         OUTPUT_VARS=$2
         shift 2
@@ -276,7 +320,7 @@ done
 # set positional arguments in their proper place
 eval set -- "$POS_PARMS"
 
-
+echo "GREG: $SHOW_USAGE"
 if [ "$SHOW_USAGE" == "1" ]; then
    show_usage
    exit
@@ -288,6 +332,16 @@ if [ "$#" -ge 1 ]; then
     show_usage
     exit 1
 fi
+
+# set default values
+DEBUG=${DEBUG:-false}
+HOST=${HOST:-${ESHOST}}
+PORT=${PORT:-${ESPORT}}
+USERNAME=${USERNAME:-${ESUSER}}
+PASSWORD=${PASSWORD:-${ESPASSWD}}
+LIMIT=${LIMIT:-10}
+FORMAT=${FORMAT:-csv}
+
 
 # validate values
 if [ ! -z "$QUERY_FILE" ] && [ ! -f "$QUERY_FILE" ]; then
@@ -301,28 +355,27 @@ if [ ! -z "$OUT_FILE" ] && [ -f "$OUT_FILE" ]; then
    exit 1
 fi
 
-if [[ ! "$LIMIT" =~ ^[0-9]+$ ]]; then
+if [ ! -z "$LIMIT" ] && [[ ! "$LIMIT" =~ ^[0-9]+$ ]]; then
    log_error "The specified value for --limit parameter [$LIMIT] is not a valid integer."
    exit 1
 fi
 
+if [ -z "$HOST" ]; then
+   log_error "The REQUIRED field [HOST] has not been specified."
+   exit 1
+fi
+
+if [ -z "$PORT" ]; then
+   log_error "The REQUIRED field [PORT] has not been specified."
+   exit 1
+fi
+
+
+
 # TO DO: Validate LEVEL?
 # TO DO: Validate OUT_FORMAT
 
-# set default values
-DEBUG=${DEBUG:-false}
-HOST=${HOST:-${ESHOST}}
-PORT=${PORT:-${ESPORT}}
-USERNAME=${USERNAME:-${ESUSER}}
-PASSWORD=${PASSWORD:-${ESPASSWD}}
-LIMIT=${LIMIT:-10}
-FORMAT=${FORMAT:-csv}
 
-log_debug "HOST: $HOST PORT: $PORT"
-
-
-
-#default output to screen?
 if [ ! -z "$OUT_FILE" ]; then
    output_file_specified="true"
 else
@@ -330,36 +383,52 @@ else
    output_file_specified="false"
 fi
 
-# Date processing:
-#  if none provided, use last hour
-START=${START:-$(date -d '1 hour ago'  +"%Y-%m-%dT%H:%M:%SZ")}
-END=${END:-$(date +"%Y-%m-%dT%H:%M:%SZ")}
-
-# TO DO: Exit on invalid date values
-
-# ensure local timezone is added
-start_tz=$(date -d "$START" +"%Y-%m-%dT%H:%M:%S%Z")
-end_tz=$(date -d "$END" +"%Y-%m-%dT%H:%M:%S%Z")
-
-# convert to UTC/GMT
-start_date=$(date -u -d "$start_tz" +"%Y-%m-%dT%H:%M:%SZ")
-end_date=$(date -u -d "$end_tz" +"%Y-%m-%dT%H:%M:%SZ")
-
-
-
 # Set default list of output variables
 OUTPUT_VARS=${OUTPUT_VARS:-$default_output_vars}
 
-#if LOGSOURCE then write LOGSOURCE clause to query file
+#TO DO: Invert logic...
+#       if NOT submitting a query file,
+#          loop through days,creating a query file for each
+#          add query_file name to an array of query_files to submit
+#       if user provided a query file,
+#          the query_files array has only a single element
+#
+#       Wrap curl command submission and output processing in a loop that loops through
+#       the query_files array, submitting each in turn and appending the results to the target output file
+#
+#
+
 # use QUERY_FILE
 if [[ !  -z "$QUERY_FILE" ]]; then
-   log_info "Submitting query from file [$query_file] for processing."
+   log_info "Submitting query from file [$QUERY_FILE] for processing."
    query_file=$QUERY_FILE
 else
+
+   # Date processing:
+   #  if none provided, use last hour
+   START=${START:-$(date -d '1 hour ago'  +"%Y-%m-%dT%H:%M:%SZ")}
+   END=${END:-$(date +"%Y-%m-%dT%H:%M:%SZ")}
+
+   # TO DO: Exit on invalid date values
+
+   # ensure local timezone is added
+   start_tz=$(date -d "$START" +"%Y-%m-%dT%H:%M:%S%Z")
+   end_tz=$(date -d "$END" +"%Y-%m-%dT%H:%M:%S%Z")
+
+   # convert to UTC/GMT
+   start_date=$(date -u -d "$start_tz" +"%Y-%m-%dT%H:%M:%SZ")
+   end_date=$(date -u -d "$end_tz" +"%Y-%m-%dT%H:%M:%SZ")
+
+
    query_file="$TMP_DIR/query.json"
+   #initialize query file
+   echo -n "" > $query_file
+
+   #TODO: loop through days b/w start_date and end_date
+   #      generate and submit query for each
 
    #start JSON
-   echo -n '{"query":"' > $query_file
+   echo -n '{"query":"' >> $query_file
 
    #build SELECT clause
    if [[ "$COUNTONLY_FLAG" == "true" ]]; then
@@ -374,6 +443,12 @@ else
       index_date=$(date -d "$end_date"  +"%Y.%m.%d")
       index_name="viya_ops-$index_date";
    else
+
+      if [ -z "$NAMESPACE" ]; then
+         log_error "The REQUIRED field [NAMESPACE] has not been specified."
+         exit 1
+      fi
+
       index_date=$(date -d "$end_date"  +"%Y-%m-%d")
       index_name="viya_logs-$NAMESPACE-$index_date";
    fi
@@ -403,17 +478,19 @@ function csvlist {
    echo "$outvalue"
 }
 
-   if [ ! -z "$LOGSOURCE" ];  then echo -n ' and logsource      in '"$(csvlist $LOGSOURCE)" >> $query_file; fi;
-   if [ ! -z "$POD"       ];  then echo -n ' and kube.pod       in '"$(csvlist $POD)"       >> $query_file; fi;
-   if [ ! -z "$CONTAINER" ];  then echo -n ' and kube.container in '"$(csvlist $CONTAINER)" >> $query_file; fi;
-   if [ ! -z "$LEVEL"     ];  then echo -n ' and level          in '"$(csvlist $LEVEL)"     >> $query_file; fi;
+   if [ ! -z "$LOGSOURCE" ];          then echo -n ' and logsource          in '"$(csvlist $LOGSOURCE)"         >> $query_file; fi;
+   if [ ! -z "$LOGSOURCE_EXCLUDE" ];  then echo -n ' and logsource      NOT in '"$(csvlist $LOGSOURCE_EXCLUDE)" >> $query_file; fi;
+   if [ ! -z "$POD" ];                then echo -n ' and kube.pod           in '"$(csvlist $POD)"               >> $query_file; fi;
+   if [ ! -z "$POD_EXCLUDE" ];        then echo -n ' and kube.pod       NOT in '"$(csvlist $POD_EXCLUDE)"       >> $query_file; fi;
+   if [ ! -z "$CONTAINER" ];          then echo -n ' and kube.container  in '"$(csvlist $CONTAINER)"            >> $query_file; fi;
+   if [ ! -z "$CONTAINER_EXCLUDE" ];  then echo -n ' and kube.container NOT in '"$(csvlist $CONTAINER_EXCLUDE)" >> $query_file; fi;
+   if [ ! -z "$LEVEL" ];              then echo -n ' and level              in '"$(csvlist $LEVEL)"             >> $query_file; fi;
+   if [ ! -z "$LEVEL_EXCLUDE" ];      then echo -n ' and level          NOT in '"$(csvlist $LEVEL_EXCLUDE)"     >> $query_file; fi;
 
    if [ ! -z "$SEARCH_STRING" ];  then echo -n ' and multi_match(\"'"$SEARCH_STRING"'\")'>> $query_file; fi;
 
    if [ ! -z "$start_date" ]; then echo -n ' and @timestamp >=\"'"$start_date"'\"' >> $query_file; fi;
    if [ ! -z "$end_date" ];   then echo -n ' and @timestamp < \"'"$end_date"'\"'    >> $query_file; fi;
-
-   #TO DO: Add support for search string
 
    echo "order by @timestamp DESC" >> $query_file; 
 
@@ -453,6 +530,3 @@ else
    cat $OUT_FILE
    echo "" # add line break after any output
 fi
-
-
-
