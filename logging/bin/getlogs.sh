@@ -15,6 +15,21 @@ source bin/common.sh
 
 this_script=`basename "$0"`
 
+function csvlist {
+   # this function parses the input
+   # (a comma separated list of values)
+   # and returns a comma separated
+   # list of escaped quoted values
+   # enclosed in parens.
+   local rawvalue values outvalue
+   rawvalue=$1
+   IFS=, read -a arr <<<"$rawvalue"
+   printf -v values ',\\"%s\\"' "${arr[@]}"
+   outvalue="(${values:1})"
+   echo "$outvalue"
+}
+
+
 default_output_vars="@timestamp, level, logsource, kube.namespace, kube.pod, kube.container, message"
 VALID_OUTFMT="csv|json|jdbc|raw"
 VALID_LEVELS="PANIC|FATAL|ERROR|WARNING|INFO|DEBUG|NONE"
@@ -320,7 +335,6 @@ done
 # set positional arguments in their proper place
 eval set -- "$POS_PARMS"
 
-echo "GREG: $SHOW_USAGE"
 if [ "$SHOW_USAGE" == "1" ]; then
    show_usage
    exit
@@ -386,23 +400,13 @@ fi
 # Set default list of output variables
 OUTPUT_VARS=${OUTPUT_VARS:-$default_output_vars}
 
-#TO DO: Invert logic...
-#       if NOT submitting a query file,
-#          loop through days,creating a query file for each
-#          add query_file name to an array of query_files to submit
-#       if user provided a query file,
-#          the query_files array has only a single element
-#
-#       Wrap curl command submission and output processing in a loop that loops through
-#       the query_files array, submitting each in turn and appending the results to the target output file
-#
-#
 
-# use QUERY_FILE
-if [[ !  -z "$QUERY_FILE" ]]; then
+if [[ ! -z "$QUERY_FILE" ]]; then
+   query_count=1
    log_info "Submitting query from file [$QUERY_FILE] for processing."
-   query_file=$QUERY_FILE
+   listofqueries[0]=$QUERY_FILE
 else
+   query_max_days=100
 
    # Date processing:
    #  if none provided, use last hour
@@ -419,114 +423,153 @@ else
    start_date=$(date -u -d "$start_tz" +"%Y-%m-%dT%H:%M:%SZ")
    end_date=$(date -u -d "$end_tz" +"%Y-%m-%dT%H:%M:%SZ")
 
+   # Reformat to allow string comparison
+   start_day=$(date -d "$start_date" +"%Y%m%d")
+   prevday=$(date -d "$end_date" +"%Y%m%d")
 
-   query_file="$TMP_DIR/query.json"
-   #initialize query file
-   echo -n "" > $query_file
+   query_count=0
 
-   #TODO: loop through days b/w start_date and end_date
-   #      generate and submit query for each
+   while [[ "$start_day" -le  "$prevday" ]]           # Loop in reverse data to get most recent data first
+   do
+      pdayfmt=$(date -d "$prevday" +"%Y-%m-%d")       # format used for index names
+      listofdays[query_count]="$pdayfmt"              # add to list of dates
 
-   #start JSON
-   echo -n '{"query":"' >> $query_file
+      prevday=$(date -d "$prevday - 1 day" +"%Y%m%d") # decrement by 1 day
 
-   #build SELECT clause
-   if [[ "$COUNTONLY_FLAG" == "true" ]]; then
-      echo -n "select count(*) " >> $query_file
-   else
-      echo -n "select $OUTPUT_VARS " >> $query_file
-   fi
+      ((query_count++))
+      if [[ $query_count -ge $query_max_days ]]; then
+         log_error "Number of days requested exceeds expected maximum; your query will be limited to maximum [$query_max_days] days"
+         break
+      fi
+   done
+   log_debug "Query Count:$query_count  List of Days: ${listofdays[@]}"
 
-   # TO DO: base index_date off of end_date
-   # TO DO: if date range spans multiple days, need to loop
-   if [ "$OPS_INDEX" == "true" ]; then
-      index_date=$(date -d "$end_date"  +"%Y.%m.%d")
-      index_name="viya_ops-$index_date";
-   else
+   for ((i=0; i < $query_count; i++));
+   do   # construct queries
 
-      if [ -z "$NAMESPACE" ]; then
-         log_error "The REQUIRED field [NAMESPACE] has not been specified."
-         exit 1
+      query_file="$TMP_DIR/query.$i.json"
+      listofqueries[i]="$query_file"
+
+      #initialize query file
+      echo -n "" > $query_file
+
+      #start JSON
+      echo -n '{"query":"' >> $query_file
+
+      #build SELECT clause
+      if [[ "$COUNTONLY_FLAG" == "true" ]]; then
+         echo -n "select count(*) " >> $query_file
+      else
+         echo -n "select $OUTPUT_VARS " >> $query_file
       fi
 
-      index_date=$(date -d "$end_date"  +"%Y-%m-%d")
-      index_name="viya_logs-$NAMESPACE-$index_date";
-   fi
+      if [ "$OPS_INDEX" == "true" ]; then
+         index_date=$(date -d "$end_date"  +"%Y.%m.%d")  # TO DO: convert '-' to '.'
+         index_name="viya_ops-$index_date";
+      else
+         # getting viya_logs
+         if [ -z "$NAMESPACE" ]; then
+            log_error "The REQUIRED field [NAMESPACE] has not been specified."
+            exit 1
+         fi
 
-   echo -n " from $index_name "  >> $query_file
+         index_name="viya_logs-$NAMESPACE-${listofdays[i]}";
+      fi
 
-   #WHERE clauses
-   echo  -n " where 1 = 1 " >> $query_file  # dummy always true
+      echo -n " from $index_name "  >> $query_file
 
-   if [ ! -z "$NAMESPACE" ];  then echo -n ' and kube.namespace =\"'"$NAMESPACE"'\"' >> $query_file; fi;
-#   if [ ! -z "$LOGSOURCE" ];  then echo -n ' and logsource =\"'"$LOGSOURCE"'\"' >> $query_file; fi;
-#   if [ ! -z "$POD"       ];  then echo -n ' and kube.pod =\"'"$POD"'\"'              >> $query_file; fi;
-#   if [ ! -z "$CONTAINER" ];  then echo -n ' and kube.container =\"'"$CONTAINER"'\"'>> $query_file; fi;
-#   if [ ! -z "$LEVEL"     ];  then echo -n ' and level =\"'"$LEVEL"'\"'              >> $query_file; fi;
+      #WHERE clauses
+      echo  -n " where 1 = 1 " >> $query_file  # dummy always true
 
-function csvlist {
-   # this function parses the input
-   # (a comma separated list of values)
-   # and returns a comma separated
-   # list of escaped quoted values
-   # enclosed in parens.
-   local rawvalue values outvalue
-   rawvalue=$1
-   IFS=, read -a arr <<<"$rawvalue"
-   printf -v values ',\\"%s\\"' "${arr[@]}"
-   outvalue="(${values:1})"
-   echo "$outvalue"
-}
+      if [ ! -z "$NAMESPACE" ];  then echo -n ' and kube.namespace =\"'"$NAMESPACE"'\"' >> $query_file; fi;
 
-   if [ ! -z "$LOGSOURCE" ];          then echo -n ' and logsource          in '"$(csvlist $LOGSOURCE)"         >> $query_file; fi;
-   if [ ! -z "$LOGSOURCE_EXCLUDE" ];  then echo -n ' and logsource      NOT in '"$(csvlist $LOGSOURCE_EXCLUDE)" >> $query_file; fi;
-   if [ ! -z "$POD" ];                then echo -n ' and kube.pod           in '"$(csvlist $POD)"               >> $query_file; fi;
-   if [ ! -z "$POD_EXCLUDE" ];        then echo -n ' and kube.pod       NOT in '"$(csvlist $POD_EXCLUDE)"       >> $query_file; fi;
-   if [ ! -z "$CONTAINER" ];          then echo -n ' and kube.container  in '"$(csvlist $CONTAINER)"            >> $query_file; fi;
-   if [ ! -z "$CONTAINER_EXCLUDE" ];  then echo -n ' and kube.container NOT in '"$(csvlist $CONTAINER_EXCLUDE)" >> $query_file; fi;
-   if [ ! -z "$LEVEL" ];              then echo -n ' and level              in '"$(csvlist $LEVEL)"             >> $query_file; fi;
-   if [ ! -z "$LEVEL_EXCLUDE" ];      then echo -n ' and level          NOT in '"$(csvlist $LEVEL_EXCLUDE)"     >> $query_file; fi;
+      if [ ! -z "$LOGSOURCE" ];          then echo -n ' and logsource          in '"$(csvlist $LOGSOURCE)"         >> $query_file; fi;
+      if [ ! -z "$LOGSOURCE_EXCLUDE" ];  then echo -n ' and logsource      NOT in '"$(csvlist $LOGSOURCE_EXCLUDE)" >> $query_file; fi;
+      if [ ! -z "$POD" ];                then echo -n ' and kube.pod           in '"$(csvlist $POD)"               >> $query_file; fi;
+      if [ ! -z "$POD_EXCLUDE" ];        then echo -n ' and kube.pod       NOT in '"$(csvlist $POD_EXCLUDE)"       >> $query_file; fi;
+      if [ ! -z "$CONTAINER" ];          then echo -n ' and kube.container  in '"$(csvlist $CONTAINER)"            >> $query_file; fi;
+      if [ ! -z "$CONTAINER_EXCLUDE" ];  then echo -n ' and kube.container NOT in '"$(csvlist $CONTAINER_EXCLUDE)" >> $query_file; fi;
+      if [ ! -z "$LEVEL" ];              then echo -n ' and level              in '"$(csvlist $LEVEL)"             >> $query_file; fi;
+      if [ ! -z "$LEVEL_EXCLUDE" ];      then echo -n ' and level          NOT in '"$(csvlist $LEVEL_EXCLUDE)"     >> $query_file; fi;
 
-   if [ ! -z "$SEARCH_STRING" ];  then echo -n ' and multi_match(\"'"$SEARCH_STRING"'\")'>> $query_file; fi;
+      if [ ! -z "$SEARCH_STRING" ];  then echo -n ' and multi_match(\"'"$SEARCH_STRING"'\")'>> $query_file; fi;
 
-   if [ ! -z "$start_date" ]; then echo -n ' and @timestamp >=\"'"$start_date"'\"' >> $query_file; fi;
-   if [ ! -z "$end_date" ];   then echo -n ' and @timestamp < \"'"$end_date"'\"'    >> $query_file; fi;
+      if [ ! -z "$start_date" ]; then echo -n ' and @timestamp >=\"'"$start_date"'\"' >> $query_file; fi;
+      if [ ! -z "$end_date" ];   then echo -n ' and @timestamp < \"'"$end_date"'\"'    >> $query_file; fi;
 
-   echo "order by @timestamp DESC" >> $query_file; 
+      echo "order by @timestamp DESC" >> $query_file;
 
-   if [ ! -z "$LIMIT" ];      then echo -n " limit $LIMIT" >> $query_file ; fi;
+      if [ ! -z "$LIMIT" ];      then echo -n " limit $LIMIT" >> $query_file ; fi;
 
-   echo -n '"}'>> $query_file  #close json
-   echo '' >> $query_file
+      echo -n '"}'>> $query_file  #close json
+      echo '' >> $query_file
 
-fi
-
-if [ "$DEBUG" == "true" ]; then
-   log_info "The following query will be submitted:"
-   cat $query_file
+   done # construct queries
 fi
 
 maxtime=${ESQUERY_MAXTIME:-180}
 
-log_info "Submitting query now... $(date)"
-response=$(curl -m $maxtime -s  -o $OUT_FILE -w "%{http_code}"  -XPOST "https://$HOST:$PORT/_opendistro/_sql?format=$FORMAT" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $USERNAME:$PASSWORD -k)
-log_debug "curl command response: [$response]"
+total_lines=0
 
-if [[ "$response" == "000" ]]; then
-   log_error "The request for log messages did not complete within the permitted time [$maxtime] seconds."
-   log_error "If you provided an output destination, you may want check to see if partial results were returned."
-   exit 1
-elif [[ $response != 2* ]]; then
-   log_error "There was an issue getting the requested log messages; the REST call returned an unexpected response code: [$response]."
-   log_error "Response returned following message(s):"
-   cat $OUT_FILE
-   echo "" # add line break after any output
-   exit 1
-fi
+for ((i=0; i < $query_count; i++));
+do # submit queries
+
+   query_file=${listofqueries[i]}
+   out_file="$TMP_DIR/query_results.$i.txt"
+   listofoutputs[i]="$out_file"
+
+   if [ "$DEBUG" == "true" ]; then
+      log_info "The following query will be submitted:"
+      cat $query_file
+   fi
+
+   log_info "Submitting query [$(($i+1))] of [$query_count] now... $(date)"
+   response=$(curl -m $maxtime -s  -o $out_file -w "%{http_code}"  -XPOST "https://$HOST:$PORT/_opendistro/_sql?format=$FORMAT" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $USERNAME:$PASSWORD -k)
+   log_debug "curl command response: [$response]"
+
+   if [[ "$response" == "000" ]]; then
+      # TO DO: This response can also indicate curl failed for other reasons
+      log_error "The request for log messages did not complete within the permitted time [$maxtime] seconds."
+      log_error "If you provided an output destination, you may want check to see if partial results were returned."
+      exit 1
+   elif [[ $response != 2* ]]; then
+      log_error "There was an issue getting the requested log messages; the REST call returned an unexpected response code: [$response]."
+      log_error "Response returned following message(s):"
+      cat $out_file
+      echo "" # add line break after any output
+      exit 1
+   else
+      log_debug "Response code[$response]"
+   fi
+
+   lines_returned=$(cat $out_file|wc -l);
+   total_lines=$((total_lines+lines_returned));
+   log_debug "Query [$i] returned [$lines_returned] lines; total lines returned so far [$total_lines]."
+
+   if [[ $total_lines -ge $LIMIT ]]; then
+      log_debug "Total number of lines returned [$lines_returned] is equal to or greater than the maximum requested (--limit) [$LIMIT]; skipping remaining queries"
+      query_count=$(($i+1));
+      break
+   fi
+
+done  # submit queries
+
+starting_row=1
+for ((i=0; i < $query_count; i++));
+do  # process output files
+
+   # TO DO: concatenate all output files together, max lines = limit?
+
+   if [ "$output_file_specified" == "true" ]; then
+      tail -n +$starting_row ${listofoutputs[i]} >> $OUT_FILE
+   else
+      tail -n +$starting_row ${listofoutputs[i]}
+   fi
+   starting_row=2 # for subsequent files, skip first (header) row
+done # process output files
 
 if [ "$output_file_specified" == "true" ]; then
    log_info "Output results written to requested output file [$OUT_FILE]"
 else
-   cat $OUT_FILE
    echo "" # add line break after any output
 fi
