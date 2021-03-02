@@ -62,7 +62,7 @@ The standard deployment script for the monitoring components use these TLS secre
 * `alertmanager-tls-secret`
 * `grafana-tls-secret`
 
-If any of the required certificates do not exist, the deployment process attempts to use [cert-manager](https://cert-manager.io/) to generate the missing
+If any of the required certificates do not exist, the deployment process attempts to use [cert-manager](https://cert-manager.io/) (version v1.0 or later) to generate the missing
 certificates. If the required certificates do not exist and cert-manager is
 not available, the deployment process fails. cert-manager is not required
 if TLS is disabled or if all of the TLS secrets exist prior to deployment.
