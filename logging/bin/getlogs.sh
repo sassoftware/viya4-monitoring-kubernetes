@@ -70,6 +70,7 @@ function show_usage {
    log_info  "     -e,  --end               datetime  - Datetime for end of period for which logs are sought (default: now)"
    log_info  '          NOTE: START and END values can be provided as dates or datetime values in the form "2021-03-17" or "2021-03-17T01:23" respectively.'
    log_info  "                Times are interpreted as server local time unless a timezone offset (e.g. -0400) or Z (indicating time is UTC/GMT) is included."
+   log_info  "                Date values without a time value are interpreted as referring to midnight on that date."
    log_info  ""
    log_info  "     ** Connection Options **"
    log_info  '     -us, --user              USERNAME  - Username for connecting to Elasticsearch/Kibana (default: $ESUSER)'
@@ -407,8 +408,9 @@ else
    start_date_epoch=$(date -d "$start_date" +"%s")
    end_date_epoch=$(date -d "$end_date" +"%s")
 
+   echo "start_date_epoch: $start_date_epoch end_date_epoch: $end_date_epoch"
    # Validate provided date range
-   if [[ "$end_date_epoch" -lt "$start_day_epoch" ]]; then
+   if [[ "$end_date_epoch" -lt "$start_date_epoch" ]]; then
       log_error "The end date provided [$END/$end_date] appears to before the start date provided [$START/$start_date]."
       exit 2
    fi
