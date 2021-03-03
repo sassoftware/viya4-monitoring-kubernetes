@@ -1,4 +1,12 @@
-# Original Dashboard Sources
+# Automatically Deployed Dashboards
+
+The dashboards in this directory are automatically deployed when you deploy the monitoring components. If you remove the monitoring components using the `remove_monitoring_cluster.sh` script, the dashboards are removed as well.
+
+## User-Provided Dashboards
+
+You can add dashboards to this directory so that they are also automatically deployed. The dashboards must be in `.json` format and must not be in a subdirectory under this directory. 
+
+## Original Dashboard Sources
 
 These dashboards provided as part of the monitoring deployment are based on public community dashboards from grafana.com: 
 

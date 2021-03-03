@@ -178,10 +178,11 @@ the following jobs in the Istio Prometheus instance:
 ### Add Custom Dashboards
 
 The monitoring deployment includes a set of dashboards, but you can also add your own. Many dashboards are available at [Grafana's site of community dashboards](https://grafana.com/grafana/dashboards). Download the `.json` file for a dashboard and save it using a filename that is
-a [valid kubernetes resource name](https://kubernetes.io/docs/concepts/overview/working-with-objects/names). There are two methods to add dashboards:
+a [valid kubernetes resource name](https://kubernetes.io/docs/concepts/overview/working-with-objects/names). There are three methods to add dashboards:
 
 - manually import each dashboard into Grafana
 - add dashboards using a script
+- automatically deploy dashboards stored in the `$USER_DIR/monitoring/dashboards` directory
 
 #### Manually Import Dashboards
 
@@ -202,6 +203,10 @@ Grafana cannot validate the data source of dashboards that are deployed using th
 The advantage of using the script is that the process can be automated, so you can automatically re-deploy all of your custom dashboards whenever you re-deploy the monitoring components.
 
 Some detailed dashboards might be too large to deploy using the script, and must be imported manually. 
+
+### Deploy Dashboards in the $USER_DIR/monitoring/dashboards Directory
+
+Dashboards that are stored in the `$USER_DIR/monitoring/dashboards` directory are automatically added when you deploy the monitoring components. The dashboards must be in `.json` format, and they cannot be in a subdirectory under `$USER_DIR/monitoring/dashboards`. If you remove the monitoring components using the `remove_monitoring_cluster.sh` script, the dashboards are removed as well.
 
 ## Deploy Cluster Monitoring Components
 
