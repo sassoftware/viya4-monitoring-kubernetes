@@ -303,8 +303,8 @@ while (( "$#" )); do
       fi
       ;;
     # misc parms
-    -d|--debug)
-      DEBUG=true
+    --show-query)
+      SHOWQUERY=true
       shift
       ;;
     -h|--help)
@@ -339,7 +339,7 @@ if [ "$#" -ge 1 ]; then
 fi
 
 # set default values
-DEBUG=${DEBUG:-false}
+SHOWQUERY=${SHOWQUERY:-false}
 OVERWRITE=${OVERWRITE:-false}
 HOST=${HOST:-${ESHOST}}
 PORT=${PORT:-${ESPORT}}
@@ -550,7 +550,7 @@ else
    done # construct queries
 fi
 
-if [ "$DEBUG" == "true" ]; then
+if [ "$SHOWQUERY" == "true" ]; then
    log_info "The following query is an example of the queries that will be submitted."
    log_info "More than one query may be submitted depending on the specified time range."
    cat ${listofqueries[0]}
