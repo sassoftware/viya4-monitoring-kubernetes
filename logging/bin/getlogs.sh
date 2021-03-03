@@ -55,6 +55,8 @@ function show_usage {
    log_info  "     -lx, --level-exclude     INFO|etc  - One or more message levels for which logs should be excluded from the output."
    log_info  '          NOTE: The POD*, CONTAINER*, LOGSOURCE* and LEVEL* parameters accept multiple, comma-separated, values (e.g. --level "INFO, NONE")'
    log_info  ""
+   log_info  '          --search            "joe smith"  - Word or phrase contained in log message.'
+   log_info  ""
    log_info  "     -m,  --maxrows           integer   - The maximum number of log messsages to return (default: 20)"
    log_info  "          NOTE: If --out_file is also provided, default: $default_maxrows"
    log_info  ""
