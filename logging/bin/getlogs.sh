@@ -63,7 +63,8 @@ function show_usage {
    log_info  "     ** Output Options **"
    log_info  "          --fields           'var1,var2' - List (comma-separated) of fields to include in output"
    log_info  "                                           (default: '$default_output_vars')."
-   log_info  "     -o,  --out-file          filename  - Name of file to write results to (default: [stdout]). File should not exist already."
+   log_info  "     -o,  --out-file          filename  - Name of file to write results to (default: [stdout]). If file exists, use --force to overwrite."
+   log_info  "     -f,  --force                       - Overwrite the output file if it already exists."
    log_info  ""
    log_info  "     ** Date/Time Range Options **"
    log_info  "     -s,  --start             datetime  - Datetime for start of period for which logs are sought (default: 1 hour ago)"
@@ -245,6 +246,10 @@ while (( "$#" )); do
         exit 2
       fi
       ;;
+    -f|--force)
+      OVERWRITE=true
+      shift
+      ;;
     --fields)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         OUTPUT_VARS=$2
@@ -257,7 +262,7 @@ while (( "$#" )); do
       ;;
 
     # connection info parms
-    -u|--username)
+    -us|--user)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         USERNAME=$2
         shift 2
@@ -335,6 +340,7 @@ fi
 
 # set default values
 DEBUG=${DEBUG:-false}
+OVERWRITE=${OVERWRITE:-false}
 HOST=${HOST:-${ESHOST}}
 PORT=${PORT:-${ESPORT}}
 USERNAME=${USERNAME:-${ESUSER}}
@@ -348,10 +354,21 @@ if [ ! -z "$QUERY_FILE" ] && [ ! -f "$QUERY_FILE" ]; then
    exit 1
 fi
 
-if [ ! -z "$OUT_FILE" ] && [ -f "$OUT_FILE" ]; then
-   log_error "Specified output file [$OUT_FILE] already exists."
-   log_error "Delete the file (or specify an different output file) and re-run this command."
-   exit 1
+if [ ! -z "$OUT_FILE" ]; then
+
+   dir=$(dirname $OUT_FILE)
+   if [ ! -d "$dir" ]; then
+      log_error "The directory [$dir] specified for the output file does not exist"
+      exit 1
+   fi
+
+   if [ -f "$OUT_FILE" ] && [ "$OVERWRITE" != "true" ]; then
+      log_error "Specified output file [$OUT_FILE] already exists."
+      log_error "Delete the file, use the --force option or specify an different output file and re-run this command."
+      exit 1
+   else
+      echo -n "" > $OUT_FILE
+   fi
 fi
 
 if [ ! -z "$MAXROWS" ] && [[ ! "$MAXROWS" =~ ^[0-9]+$ ]]; then
@@ -360,13 +377,44 @@ if [ ! -z "$MAXROWS" ] && [[ ! "$MAXROWS" =~ ^[0-9]+$ ]]; then
 fi
 
 if [ -z "$HOST" ]; then
-   log_error "The REQUIRED field [HOST] has not been specified."
+   log_error "REQUIRED connection information [HOST] is missing; please provide it via the --host option or via the ESHOST environment variable."
    exit 1
 fi
 
 if [ -z "$PORT" ]; then
-   log_error "The REQUIRED field [PORT] has not been specified."
+   log_error "REQUIRED connection information [PORT] is missing; please provide it via the --port option or via the ESPORT environment variable."
    exit 1
+fi
+
+if [ -z "$USERNAME" ]; then
+   log_error "REQUIRED connection information [USER] is missing; please provide it via the --user option or via the ESUSER environment variable."
+   exit 1
+fi
+
+if [ -z "$PASSWORD" ]; then
+   log_error "The REQUIRED field [PASSWORD] is missing; please provide it via the --password option or via the ESPASSWD environment variable."
+   exit 1
+fi
+
+# Validate Connection information
+response=$(curl -m 60 -s -o /dev/null  -w "%{http_code}"  -XGET "https://$HOST:$PORT/"  --user $USERNAME:$PASSWORD -k)
+rc=$?
+if [[ $response != 2* ]]; then
+
+   if [[ "$rc" == "28" ]]; then
+      log_error "Unable to validate connection to Elasticsearch within [60] seconds."
+      exit 1
+   elif [ "$response" == "401" ]; then
+      log_error "Unable to validate connection credentials. [$response] rc:[$rc]"
+      exit 1
+   elif [ "$response" == "403" ]; then
+      log_debug "Validation of connection information not completely successful; specified user may have limited permissions. [$response] rc:[$rc]"
+   else
+      log_error "Unable to validate connection to Elasticsearch. [$response] rc:[$rc]"
+      exit 1
+   fi
+else
+   log_debug "Validation of connection information succeeded  [$response] rc:[$rc]"
 fi
 
 
@@ -408,7 +456,6 @@ else
    start_date_epoch=$(date -d "$start_date" +"%s")
    end_date_epoch=$(date -d "$end_date" +"%s")
 
-   echo "start_date_epoch: $start_date_epoch end_date_epoch: $end_date_epoch"
    # Validate provided date range
    if [[ "$end_date_epoch" -lt "$start_date_epoch" ]]; then
       log_error "The end date provided [$END/$end_date] appears to before the start date provided [$START/$start_date]."
@@ -483,7 +530,7 @@ else
       if [ ! -z "$LOGSOURCE_EXCLUDE" ];  then echo -n ' and logsource      NOT in '"$(csvlist $LOGSOURCE_EXCLUDE)" >> $query_file; fi;
       if [ ! -z "$POD" ];                then echo -n ' and kube.pod           in '"$(csvlist $POD)"               >> $query_file; fi;
       if [ ! -z "$POD_EXCLUDE" ];        then echo -n ' and kube.pod       NOT in '"$(csvlist $POD_EXCLUDE)"       >> $query_file; fi;
-      if [ ! -z "$CONTAINER" ];          then echo -n ' and kube.container  in '"$(csvlist $CONTAINER)"            >> $query_file; fi;
+      if [ ! -z "$CONTAINER" ];          then echo -n ' and kube.container     in '"$(csvlist $CONTAINER)"         >> $query_file; fi;
       if [ ! -z "$CONTAINER_EXCLUDE" ];  then echo -n ' and kube.container NOT in '"$(csvlist $CONTAINER_EXCLUDE)" >> $query_file; fi;
       if [ ! -z "$LEVEL" ];              then echo -n ' and level              in '"$(csvlist $LEVEL)"             >> $query_file; fi;
       if [ ! -z "$LEVEL_EXCLUDE" ];      then echo -n ' and level          NOT in '"$(csvlist $LEVEL_EXCLUDE)"     >> $query_file; fi;
@@ -533,7 +580,7 @@ do # submit queries
 
       if [[ "$rc" == "28" ]]; then
          log_warn "Query [$(($i+1))] did not complete within the permitted time [$maxtime] seconds."
-         log_warn "This may result in you having fewer results than you should."
+         log_warn "This may indicate you do not have the right permissions to access this data.  Or, if you do have access, this may result in you having fewer results than you should."
       elif [ "$response" == "000" ]; then
          log_error "The curl command failed while attempting to submit query [$(($i+1))]; script exiting."
          exit 2
