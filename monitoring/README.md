@@ -192,21 +192,39 @@ The advantage of using the import function is that Grafana recognizes if the das
 
 The disadvantage is that the process is not automated, so you must re-import the dashboards each time you redeploy the monitoring components. If you have many dashboards to import, the process could also be time-consuming. 
 
-### Add Dashboards Using a Script
+#### Add Dashboards Using a Script
 
 You can use the `deploy_dashboards.sh [dashboard | dashboard_directory]` script to deploy a single dashboard or a directory of dashboards.
 
-Grafana cannot validate the data source of dashboards that are deployed using this script, so you must manually change the data source to `Prometheus` in the dashboards' JSON files before you deploy them. For example:
-- Find: `"datasource": "${DS_PROMETHEUS}"`
-- Replace: `"datasource": "Prometheus"`
+Grafana cannot validate the data source of dashboards that are deployed using this script, so you must either manually change the data source or use Grafana to create a dashboard file with the data source resolved. See [Resolve Dashboard Data Sources](#resolve-dashboard-data-sources) for information.
 
 The advantage of using the script is that the process can be automated, so you can automatically re-deploy all of your custom dashboards whenever you re-deploy the monitoring components.
 
-Some detailed dashboards might be too large to deploy using the script, and must be imported manually. 
+Some detailed dashboards might be too large to deploy using the script, and must be imported manually. If the dashboard is too large, a message is displayed during deployment.
 
-### Deploy Dashboards in the $USER_DIR/monitoring/dashboards Directory
+#### Deploy Dashboards in the $USER_DIR/monitoring/dashboards Directory
 
 Dashboards that are stored in the `$USER_DIR/monitoring/dashboards` directory are automatically added when you deploy the monitoring components. The dashboards must be in `.json` format, and they cannot be in a subdirectory under `$USER_DIR/monitoring/dashboards`. If you remove the monitoring components using the `remove_monitoring_cluster.sh` script, the dashboards are removed as well.
+
+Grafana cannot validate the data source of dashboards that are deployed using this directory, so you must either manually change the data source or use Grafana to create a dashboard file with the data source resolved. See [Resolve Dashboard Data Sources](#resolve-dashboard-data-sources) for information.
+
+#### Resolve Dashboard Data Sources
+
+Grafana cannot validate the data source of dashboards that are deployed using either the `deploy_dashboards` script or the `$USER_DIR/monitoring/dashboards` directory, so the dashboards will display incomplete information. 
+
+To specify the data source, you can either manually change the data source in the dashboard's .json file or manually import the dashboard into Grafana (which prompts you to select a data source) and export the dashboard with the valid data source specified.
+
+To manually change the data source, edit the dashboard's `.json` file and change the data source to `Prometheus`. For example:
+- Find: `"datasource": "${DS_PROMETHEUS}"`
+- Replace with: `"datasource": "Prometheus"`
+
+Follow these steps to use Grafana's import and export functions to create a `.json` file for the dashboard with data sources resolved: 
+
+1. Import the dashboard into Grafana and resolve the data source.
+2. In Grafana, select Share, then select the Export tab.
+3. Select the `Export for sharing externally` option.
+4. Select `Save to file` to save the `.json` file for the dashboard with the data source resolved.
+5. Use the script or directory to import the dashboard during future deployments.
 
 ## Deploy Cluster Monitoring Components
 
