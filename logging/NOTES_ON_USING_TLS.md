@@ -8,7 +8,7 @@ TLS requires the use of digital security certificates. These certificates allow 
 
 ## Configure TLS Using cert-manager
 
-By default, the deployment process for the SAS Viya Monitoring solution uses cert-manager to obtain and manage the digital security certificates.
+By default, the deployment process for the SAS Viya Monitoring solution uses cert-manager to obtain and manage the digital security certificates. Version v1.0 or later of cert-manager is required.
 
 The `deploy_logging_open.sh` deployment script automatically obtains the certificates from cert-manager and creates the Kubernetes secrets with the required structure and expected names. The script ensures that the certificates are mounted on the Elasticsearch and Kibana pods in the correct locations.
 
