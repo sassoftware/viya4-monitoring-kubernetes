@@ -222,7 +222,7 @@ Follow these steps to use Grafana's import and export functions to create a `.js
 
 1. Import the dashboard into Grafana and resolve the data source.
 2. In Grafana, select Share, then select the Export tab.
-3. Select the `Export for sharing externally` option.
+3. Ensure that the `Export for sharing externally` option is not selected.
 4. Select `Save to file` to save the `.json` file for the dashboard with the data source resolved.
 5. Use the script or directory to import the dashboard during future deployments.
 
