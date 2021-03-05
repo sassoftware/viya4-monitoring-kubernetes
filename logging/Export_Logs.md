@@ -11,7 +11,7 @@ To download the log messages, run the `getlogs.sh` script. This is the syntax fo
 
 The *`namespace`* parameter is required. This parameter specifies the Kubernetes namespace corresponding to the SAS Viya deployment for which you want to obtain log messages.
 
-Each query is cancelled if it does not complete within three minutes. If the script generates multiple queries, each query must complete within three minutes.
+A query is cancelled if it does not complete within three minutes. If the script generates multiple queries, each query must complete within three minutes.
 
 For parameters than accept multiple values, the values must be in quotes and must be separated by commas. 
 
@@ -77,11 +77,11 @@ specifies the fields that are included in the output. Specify the fields as a co
 fields that are returned by default are `@timestamp`, `level`, `logsource`, `kube.namespace`, 
 `kube.pod`, `kube.container`, and `message`.
 
-`-o|--out-file` *`output_filename`*
+`-o|--out-file` *`output-filename`*
 specifies a file to which the results are written. The default value is stdout. If the specified file exists, the script generates an error message and ends, unless you also specify the `--force` option.
 
 `-f|--force`
-overwrite the output file if it exists.
+overwrites the output file if it exists.
 
 ## Connection Parameters
 
@@ -93,7 +93,7 @@ If you are using ingress, the *`hostname`* and *`port-num`* are the host and por
 specifies the user name to use to connect to Elasticsearch and Kibana in order to return the log messages.
 
 `-pw|--password` *`password`*
-specifies the password to use to connect to Elasticsearch and Kibana and return log messages.
+specifies the password to use to connect to Elasticsearch and Kibana in order to return log messages.
 
 `-h|--host` *`hostname`*
 specifies the host name to use to connect to Elasticsearch and Kibana. If you are using ingress, the *`hostname`* is the host for the ingress object.
@@ -105,12 +105,12 @@ You can also specify these environment variables in order to provide connection 
 - `ESUSER=`*`username`*
 - `ESPASSWD=`*`password`*
 - `ESHOST=`*`hostname`*
-- `ESPORT=`*`port_num`* 
+- `ESPORT=`*`port-num`* 
 
 ## Other Options
 
 `--show-query`
-displays the query that is submitted to obtain log information. If the specified command generates multiple queries, only thr first query is displayed.
+displays the query that is submitted to obtain log information. If the specified command generates multiple queries, only the first query is displayed.
 
 `-h|--help`
 displays usage information for the script.
