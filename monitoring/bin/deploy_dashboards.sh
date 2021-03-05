@@ -17,6 +17,7 @@ PGMONITOR_DASH="${PGMONITOR_DASH:-$VIYA_DASH}"
 RABBITMQ_DASH="${RABBITMQ_DASH:-$VIYA_DASH}"
 LOGGING_DASH="${LOGGING_DASH:-true}"
 ISTIO_DASH="${ISTIO_DASH:-${ISTIO_ENABLED:-false}}"
+USER_DASH="${USER_DASH:-true}"
 TEST_DASH="${TEST_DASH:-false}"
 
 DASH_BASE="${DASH_BASE:-monitoring/dashboards}"
@@ -35,7 +36,11 @@ fi
 
 function deploy_dashboards {
    type=$1
-   dir="$DASH_BASE/$type"
+   if [ -z "$2" ]; then
+     dir=$"$DASH_BASE/$type"
+   else
+     dir=$2
+   fi
    
    log_message "--------------------------------"
    for f in $dir/*.json; do
@@ -45,6 +50,31 @@ function deploy_dashboards {
    done
    log_message "--------------------------------"
 }
+
+# Single argument supported. If specified, deploy either the specified .json
+# file as a dashboard or all .json files in the specified directory
+
+if [ "$1" != "" ]; then
+  if [ -f "$1" ] && [[ $1 =~ .+\.json ]]; then
+    # Deploy single dashboard
+    f=$1
+    log_info "Deploying Grafana dashboard [$f]..."
+    name=$(basename $f .json)
+    kubectl create cm -n $DASH_NS $name $dryRun --from-file $f -o yaml | kubectl apply -f -
+    kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring sas.com/dashboardType=manual
+    exit $?
+  fi
+
+  if [ -d "$1" ]; then
+    # Deploy specified directory of dashboards
+    log_info "Deploying Grafana dashboards in [$1]..."
+    deploy_dashboards "manual" "$1" 
+    exit $?
+  fi
+
+  log_error "The specified path [$1] does not exist"
+  exit 1
+fi
 
 log_info "Deploying SAS dashboards to the [$DASH_NS] namespace..."
 log_message "--------------------------------"
@@ -81,6 +111,14 @@ fi
 if [ "$RABBITMQ_DASH" == "true" ]; then
   log_info "Deploying RabbitMQ dashboards..."
   deploy_dashboards "rabbitmq"
+fi
+
+if [ "$USER_DASH" == "true" ]; then
+  userDashDir="$USER_DIR/monitoring/dashboards"
+  if [ -d "$userDashDir" ]; then
+    log_info "Deploying user dashboards from [$userDashDir] ..."
+    deploy_dashboards "user" "$userDashDir"
+  fi
 fi
 
 log_info "Deployed dashboards to the [$DASH_NS] namespace"
