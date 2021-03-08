@@ -42,13 +42,13 @@ specifies the log source or sources that you want to exclude when obtaining log 
 
 `-l|--level` *`"log-level[, log-level]"`*
 specifies the level or levels of the log messages that you want to obtain. Valid values for 
-*`"log_level"`* are PANIC, FATAL, ERROR, WARNING, INFO, DEBUG, and NONE.
+*`"log-level"`* are PANIC, FATAL, ERROR, WARNING, INFO, DEBUG, and NONE.
 
 `-lx|--level-exclude` *`"log-level[, log-level]"`*
 specifies the level or levels of the log messages that you want to exclude from the messages that are obtained. Valid values for *`"log_level"`* are the same as for the `--level` option.
 
 `--search` *`"search-text"`*
-specifies that only messages containing the specified *`"search_text"`* are returned.
+specifies that only messages containing the specified *`"search-text"`* are returned.
 
 `-m|--maxrows` *`max-messages`*
 specifies the maximum number of messages that are returned. The default value is 20. If the `--out-file` option is also specified, the default value is 500. If the script produces multiple queries, the value specified for `--maxrows` applies to each query. If the `--maxrows` value is reached before all queries have been submitted, the collected results are returned and the remaining queries are not run. For example, if you specify `--maxrows 100` and the script generates three queries, each query returns a maximum of 100 messages. If the first query returns 90 messages and the second query returns 100 messages, those 190 messages are returned (because the 100 message limit was not reached after the first query) and the third query does not run.
