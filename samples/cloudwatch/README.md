@@ -4,16 +4,11 @@ This sample describes how to configure Amazon CloudWatch to collect metrics
 from the services and components in SAS Viya. Completing the deployment
 and configuration steps here will enable Amazon CloudWatch to collect and
 visualize the metrics exposed by a SAS Viya deployment as well as the logging
-components of this project
+components of viya4-monitoring-kubernetes.
 
-* Microservices
-* CAS
-* CAS Operator
-* Deployment Operator
-* RabbitMQ
-* Postgres
-* Elasticsearch
-* Fluent Bit
+Note that this sample does **not** decribe how to enable CloudWatch for general
+use. That topic is covered extensively in
+[Amazon's online documentation](https://aws.amazon.com/cloudwatch/getting-started/).
 
 ## Deployment
 
@@ -22,10 +17,29 @@ components involves several steps:
 
 * Identify Cluster and Region
 * Deploy CloudWatch Prometheus Agent
-* Deploy CloudWatch Agent
 * Apply SAS Customizations
   * Customize the Prometheus scrape configuration
-  * Customize the mapping of Performance Log Events to CloudWatch metrics
+  * Customize the mapping of performance log events to CloudWatch metrics
+
+### Add IAM Role
+
+The CloudWatch Agent requires proper permissions to create Performance Log
+Events and CloudWatch metrics. AWS uses [IAM Roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html)
+to set these permissions.
+
+In the AWS console, navigate to IAM. From there:
+
+* Choose `Roles` in the left navigation pane
+* Start typing the cluster name to filter (e.g. `my-cluster`)
+* Click on the role with `AWS service: eks` under the `Trusted entities` column
+* Click `Attach Policies`
+* Search for `CloudWatchAgentServerPolicy`
+* Check the box next to `CloudWatchAgentServerPolicy`
+* Choose `Attach Policy`
+* Repeat for the role with `AWS service: ec2`
+
+If the `CloudWatchAgentServerPolicy` does not exist, see:
+[Creating IAM Roles for Use with the CloudWatch Agent](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/create-iam-roles-for-cloudwatch-agent-commandline.html).
 
 ### Identify Cluster and Region
 
@@ -45,35 +59,19 @@ sed "s/{{cluster_name}}/'${ClusterName}'/;s/{{region_name}}/'${RegionName}'/" |
 kubectl apply -f -
 ```
 
-### Deploy CloudWatch Agent
-
-```bash
-FluentBitHttpPort='2020'
-FluentBitReadFromHead='Off'
-[[ ${FluentBitReadFromHead} = 'On' ]] && FluentBitReadFromTail='Off'|| FluentBitReadFromTail='On'
-[[ -z ${FluentBitHttpPort} ]] && FluentBitHttpServer='Off' || FluentBitHttpServer='On'
-curl https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/daemonset/container-insights-monitoring/quickstart/cwagent-fluent-bit-quickstart.yaml | sed 's/{{cluster_name}}/'${ClusterName}'/;s/{{region_name}}/'${RegionName}'/;s/{{http_server_toggle}}/"'${FluentBitHttpServer}'"/;s/{{http_server_port}}/"'${FluentBitHttpPort}'"/;s/{{read_from_head}}/"'${FluentBitReadFromHead}'"/;s/{{read_from_tail}}/"'${FluentBitReadFromTail}'"/' | kubectl apply -f - 
-```
-
-#### Add tolerations for Cloudwatch daemonset
-
-The SAS Viya workload node placement strategy uses node taints and annotations
-to direct pods to and away from specific nodes. For the CloudWatch agent to
-successfully deploy on all nodes in the cluster, a toleration for the
-`workload.sas.com/class` taint must be added to the daemonset.
-
-```bash
-kubectl patch deployment -n amazon-cloudwatch --patch "$(cat cwagent-daemonset-tolerations.yaml)"
-```
-
 ### Apply SAS Configuration
 
 ```bash
 # Prometheus scrape config
-# Scraped metrics will become Performance Log Events
+# Scraped metrics will become performance log events
 kubectl apply -f sas-prom-config.yaml
-# Map Performance Log Events to CloudWatch metrics
+# Map performance log events to CloudWatch metrics
 kubectl apply -f sas-prom-cwagentconfig.yaml
+cat sas-prom-cwagentconfig.yaml \
+  | sed "s/{{cluster_name}}/${ClusterName}/;s/{{region_name}}/${RegionName}/" \
+  | kubectl apply -f -
+# Restart agent
+kubectl delete pod -n amazon-cloudwatch -l app=cwagent-prometheus
 ```
 
 ### Visualizing Metrics
@@ -96,7 +94,7 @@ to the graph at the top
 
 ## Limitations
 
-The mapping between Performance Log Events and CloudWatch metrics is defined
+The mapping between performance log events and CloudWatch metrics is defined
 in the `cwagentconfig` configmap in the `amazon-cloudwatch` namespace. That
 configmap is customized here in the file `sas-prom-cwagentconfig.yaml`. The
 dimentions (labels in Prometheus) available in the metrics is less flexible
@@ -106,4 +104,5 @@ to include more dimensions for more metrics.
 ## External Links
 
 * [Set up CloudWatch Agent](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights-Prometheus-Setup.html)
-* [Example Performance Log Events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-reference-performance-logs-EKS.html)
+* [Creating IAM Roles for Use with the CloudWatch Agent](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/create-iam-roles-for-cloudwatch-agent-commandline.html)
+* [Example performance log events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-reference-performance-logs-EKS.html)
