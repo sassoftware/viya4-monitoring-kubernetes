@@ -1,8 +1,0 @@
-## Add tolerations for 
-spec:
-  template:
-    spec:
-      tolerations:
-      - key: "workload.sas.com/class"
-        operator: Exists
-        effect: NoSchedule
