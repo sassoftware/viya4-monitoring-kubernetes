@@ -55,14 +55,19 @@ function deploy_dashboards {
 # file as a dashboard or all .json files in the specified directory
 
 if [ "$1" != "" ]; then
-  if [ -f "$1" ] && [[ $1 =~ .+\.json ]]; then
-    # Deploy single dashboard
-    f=$1
-    log_info "Deploying Grafana dashboard [$f]..."
-    name=$(basename $f .json)
-    kubectl create cm -n $DASH_NS $name $dryRun --from-file $f -o yaml | kubectl apply -f -
-    kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring sas.com/dashboardType=manual
-    exit $?
+  if [ -f "$1" ]; then
+    if [[ $1 =~ .+\.json ]]; then
+      # Deploy single dashboard
+      f=$1
+      log_info "Deploying Grafana dashboard [$f]..."
+      name=$(basename $f .json)
+      kubectl create cm -n $DASH_NS $name $dryRun --from-file $f -o yaml | kubectl apply -f -
+      kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring sas.com/dashboardType=manual
+      exit $?
+    else
+      log_error "[$1] is not a Grafana dashboard .json file"
+      exit 1
+    fi
   fi
 
   if [ -d "$1" ]; then
@@ -72,7 +77,7 @@ if [ "$1" != "" ]; then
     exit $?
   fi
 
-  log_error "The specified path [$1] does not exist"
+  log_error "The dashboard path [$1] does not exist"
   exit 1
 fi
 
