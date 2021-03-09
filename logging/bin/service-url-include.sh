@@ -56,11 +56,10 @@ function get_ingress_ports {
 
 function get_ingress_url {
 
-  local namespace name host path tls_info tls_enabled port protocol
+  local namespace name host path tls_info rc port porttxt protocol
 
   namespace=$1
   name=$2
-  path=$3
 
   if [ ! "$(kubectl -n $namespace  get ingress/$name 2>/dev/null)" ]; then
     # ingress object does not exist
@@ -78,8 +77,8 @@ function get_ingress_url {
   fi
 
   tls_info=$(get_k8s_info "$namespace" "ingress/$name" "tls")
-  tls_enabled=$?
-  if [ "$tls_enabled" == "1" ]; then
+  rc=$?
+  if [ "$rc" == "0" ]; then
      port=$ingress_https_port
      protocol=https
   else
@@ -149,7 +148,7 @@ function get_service_url {
 
      get_ingress_ports
 
-     url=$(get_ingress_url $namespace $ingress $path)
+     url=$(get_ingress_url $namespace $ingress)
 
      if [ -z "$url" ]; then
         return 1
