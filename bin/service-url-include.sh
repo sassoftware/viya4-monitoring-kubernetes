@@ -3,10 +3,6 @@
 source bin/common.sh
 
 declare -A json_paths
-# k8s object: endpoint
-#json_paths["ingress_http_port"]='{.subsets[0].ports[?(@.name=="http")].port}'
-#json_paths["ingress_https_port"]='{.subsets[0].ports[?(@.name=="https")].port}'
-# k8s object: ingress
 json_paths["host"]='{.spec.rules[0].host}'
 json_paths["path"]='{.spec.rules[0].http.paths[0].path}'
 json_paths["tls"]='{.spec.tls[0]}'
@@ -17,17 +13,17 @@ json_paths["service_http_port"]='{.spec.ports[?(@.name=="http")].port}'
 json_paths["service_https_port"]='{.spec.ports[?(@.name=="https")].port}'
 
 function get_k8s_info {
-  local namespace object info_item tempvar rc
+  local namespace object info_item info rc
 
   namespace=$1
   object=$2
   info_item=$3
 
-  tempvar=$(kubectl -n $namespace get $object  -o=jsonpath=${json_paths[$info_item]})
+  info=$(kubectl -n $namespace get $object  -o=jsonpath=${json_paths[$info_item]})
   rc=$?
 
   if [ "$rc" == "0" ]; then
-     echo "$tempvar"
+     echo "$info"
   else
      echo ""
      return 1
@@ -108,7 +104,8 @@ function get_nodeport_url {
   fi
 
 
-  # TO DO: retain support for NODE_NAME env var?
+  # DEPRECATION: use of the NODE_NAME env var to override the node name used in the Kibana URL has been 
+  #              deprecated with release 1.0.5 (09MAR21) and will support removed completely in an upcoming release
   host=${NODE_NAME:-$(kubectl get node --selector='node-role.kubernetes.io/master' | awk 'NR==2 { print $1 }')}
   if [ -z "$host" ]; then
      host=$(kubectl get nodes | awk 'NR==2 { print $1 }')  # use first node

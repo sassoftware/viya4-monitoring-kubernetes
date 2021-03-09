@@ -6,7 +6,7 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
-source logging/bin/service-url-include.sh
+source bin/service-url-include.sh
 
 this_script=`basename "$0"`
 
@@ -173,7 +173,7 @@ set +e
 get_ingress_ports
 
 # get URLs for Kibana and Elasticsearch REST api endpoint
-kb_url=$(get_service_url logging v4m-es-kibana-svc "/app/kibana" "$LOG_KB_TLS_ENABLE" "v4m-es-kibana")
+kb_url=$(get_service_url logging v4m-es-kibana-svc "/" "$LOG_KB_TLS_ENABLE" "v4m-es-kibana")
 es_url=$(get_service_url logging v4m-es-client-service "/" "true")
 set -e
 
