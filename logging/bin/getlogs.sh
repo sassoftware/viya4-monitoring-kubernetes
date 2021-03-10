@@ -31,7 +31,7 @@ function csvlist {
 
 default_maxrows=500
 default_output_vars="@timestamp, level, logsource, kube.namespace, kube.pod, kube.container, message"
-VALID_LEVELS="PANIC,FATAL,ERROR,WARNING,INFO,DEBUG,NONE"
+valid_levels="PANIC,FATAL,ERROR,WARNING,INFO,DEBUG,NONE"
 
 function show_usage {
    log_info  ""
@@ -51,7 +51,7 @@ function show_usage {
    log_info  "     -s,  --logsource         LOGSOURCE - One or more logsource for which logs are sought"
    log_info  "     -sx, --logsource-exclude LOGSOURCE - One or more logsource for which logs should be excluded from the output"
    log_info  "     -l,  --level             INFO|etc  - One or more message levels for which logs are sought."
-   log_info  "                                          Valid values for message level: $VALID_LEVELS"
+   log_info  "                                          Valid values for message level: $valid_levels"
    log_info  "     -lx, --level-exclude     INFO|etc  - One or more message levels for which logs should be excluded from the output."
    log_info  '          NOTE: The POD*, CONTAINER*, LOGSOURCE* and LEVEL* options accept multiple, comma-separated, values (e.g. --level "INFO, NONE")'
    log_info  ""
@@ -72,8 +72,8 @@ function show_usage {
    log_info  "     -f,  --force                       - Overwrite the output file if it already exists."
    log_info  ""
    log_info  "     ** Date/Time Range Options **"
-   log_info  "     -s,  --start             datetime  - Datetime for start of period for which logs are sought (default: 1 hour ago)"
-   log_info  "     -e,  --end               datetime  - Datetime for end of period for which logs are sought (default: now)"
+   log_info  "     --start                  datetime  - Datetime for start of period for which logs are sought (default: 1 hour ago)"
+   log_info  "     --end                    datetime  - Datetime for end of period for which logs are sought (default: now)"
    log_info  '          NOTE: START and END values can be provided as dates or datetime values in the form "2021-03-17" or "2021-03-17T01:23" respectively.'
    log_info  "                Times are interpreted as server local time unless a timezone offset (e.g. -0400) or Z (indicating time is UTC/GMT) is included."
    log_info  "                Date values without a time value are interpreted as referring to midnight on that date."
@@ -99,7 +99,7 @@ while (( "$#" )); do
     # basic query parms
     -n|--namespace)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        NAMESPACE=$2
+        namespace=$2
         shift 2
       else
         log_error "Option [--namespace] has been specified but no value was provided." >&2
@@ -109,7 +109,7 @@ while (( "$#" )); do
       ;;
     -p|--pod)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        POD=$2
+        pod=$2
         shift 2
       else
         log_error "Option [--pod] has been specified but no value was provided." >&2
@@ -119,7 +119,7 @@ while (( "$#" )); do
       ;;
     -px|--pod-exclude|-xp)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        POD_EXCLUDE=$2
+        pod_exclude=$2
         shift 2
       else
         log_error "Option [--pod-exclude (Pods to Exclude)] has been specified but no value was provided." >&2
@@ -129,7 +129,7 @@ while (( "$#" )); do
       ;;
     -c|--container)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        CONTAINER=$2
+        container=$2
         shift 2
       else
         log_error "Option [--container] has been specified but no value was provided." >&2
@@ -139,7 +139,7 @@ while (( "$#" )); do
       ;;
     -cx|--container-exclude|-xc)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        CONTAINER_EXCLUDE=$2
+        container_exclude=$2
         shift 2
       else
         log_error "Option [--container-exclude (Containers to exclude)] has been specified but no value was provided." >&2
@@ -149,7 +149,7 @@ while (( "$#" )); do
       ;;
     -s|--logsource)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        LOGSOURCE=$2
+        logsource=$2
         shift 2
       else
         log_error "Option [--logsource] has been specified but no value was provided." >&2
@@ -159,7 +159,7 @@ while (( "$#" )); do
       ;;
     -sx|--logsource-exclude|-xs)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        LOGSOURCE_EXCLUDE=$2
+        logsource_exclude=$2
         shift 2
       else
         log_error "Option [--logsource-exclude (logsources to exclude)] has been specified but no value was provided." >&2
@@ -169,7 +169,7 @@ while (( "$#" )); do
       ;;
     --search)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        SEARCH_STRING=$2
+        search_string=$2
         shift 2
       else
         log_error "Option [--search (search string)] has been specified but no value was provided." >&2
@@ -179,7 +179,7 @@ while (( "$#" )); do
       ;;
     -l|--level)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        LEVEL=$2
+        level=$2
         shift 2
       else
         log_error "Option [--level (message level)] has been specified but no value was provided." >&2
@@ -189,7 +189,7 @@ while (( "$#" )); do
       ;;
     -lx|--level-exclude|-xl)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        LEVEL_EXCLUDE=$2
+        level_exclude=$2
         shift 2
       else
         log_error "Option [--level-exclude (message levels to exclude)] has been specified but no value was provided." >&2
@@ -199,7 +199,7 @@ while (( "$#" )); do
       ;;
     -m|--max|--maxrows|--max-rows)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        MAXROWS=$2
+        maxrows=$2
         shift 2
       else
         log_error "Option [--maxrows (maximum number of rows returned)] has been specified but no value was provided." >&2
@@ -209,7 +209,7 @@ while (( "$#" )); do
       ;;
     -q|--query-file)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        QUERY_FILE=$2
+        query_file=$2
         shift 2
       else
         log_error "Option [--query-file] has been specified but no value was provided." >&2
@@ -220,7 +220,7 @@ while (( "$#" )); do
     # datetime parms
     -s|--start)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        START=$2
+        start_dt=$2
         shift 2
       else
         log_error "Option [--start] has been specified but no value was provided." >&2
@@ -230,7 +230,7 @@ while (( "$#" )); do
       ;;
     -e|--end)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        END=$2
+        end_dt=$2
         shift 2
       else
         log_error "Option [--end] has been specified but no value was provided." >&2
@@ -242,7 +242,7 @@ while (( "$#" )); do
     # output parms
     -o|--out-file)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        OUT_FILE=$2
+        out_file=$2
         shift 2
       else
         log_error "Option [--out-file] has been specified but no value was provided." >&2
@@ -251,12 +251,12 @@ while (( "$#" )); do
       fi
       ;;
     -f|--force)
-      OVERWRITE=true
+      overwrite=true
       shift
       ;;
     --fields)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        OUTPUT_VARS=$2
+        output_vars=$2
         shift 2
       else
         log_error "Option [--fields] has been specified but no value was provided." >&2
@@ -268,7 +268,7 @@ while (( "$#" )); do
     # connection info parms
     -us|--user)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        USERNAME=$2
+        username=$2
         shift 2
       else
         log_error "Option [--username] has been specified but no value was provided." >&2
@@ -278,7 +278,7 @@ while (( "$#" )); do
       ;;
     -pw|--password)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        PASSWORD=$2
+        password=$2
         shift 2
       else
         log_error "Option [--password] has been specified but no value was provided." >&2
@@ -288,7 +288,7 @@ while (( "$#" )); do
       ;;
     -ho|--host)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        HOST=$2
+        host=$2
         shift 2
       else
         log_error "Option [--host] has been specified but no value was provided." >&2
@@ -298,7 +298,7 @@ while (( "$#" )); do
       ;;
     -po|--port)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        PORT=$2
+        port=$2
         shift 2
       else
         log_error "Option [--port] has been specified but no value was provided." >&2
@@ -308,7 +308,7 @@ while (( "$#" )); do
       ;;
     -pr|--protocol)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        PROTOCOL=$2
+        protocol=$2
         shift 2
       else
         log_error "Option [--protocol] has been specified but no value was provided." >&2
@@ -317,11 +317,11 @@ while (( "$#" )); do
       fi
       ;;
     --show-query)
-      SHOWQUERY=true
+      showquery=true
       shift
       ;;
     -h|--help)
-      SHOW_USAGE=1
+      show_usage=1
       shift
       ;;
     -*|--*=) # unsupported flags
@@ -339,7 +339,7 @@ done
 # set positional arguments in their proper place
 eval set -- "$POS_PARMS"
 
-if [ "$SHOW_USAGE" == "1" ]; then
+if [ "$show_usage" == "1" ]; then
    show_usage
    exit
 fi
@@ -351,77 +351,78 @@ if [ "$#" -ge 1 ]; then
     exit 1
 fi
 
+
 # set default values
-SHOWQUERY=${SHOWQUERY:-false}
-OVERWRITE=${OVERWRITE:-false}
-PROTOCOL=${PROTOCOL:-${ESPROTOCOL}}
-HOST=${HOST:-${ESHOST}}
-PORT=${PORT:-${ESPORT}}
-USERNAME=${USERNAME:-${ESUSER}}
-PASSWORD=${PASSWORD:-${ESPASSWD}}
-FORMAT="csv"  # Only format supported at this time
+showquery=${showquery:-false}
+overwrite=${overwrite:-false}
+protocol=${protocol:-${ESPROTOCOL}}
+host=${host:-${ESHOST}}
+port=${port:-${ESPORT}}
+username=${username:-${ESUSER}}
+password=${password:-${ESPASSWD}}
+format="csv"  # Only format supported at this time
 
 
 # validate values
-if [ ! -z "$QUERY_FILE" ] && [ ! -f "$QUERY_FILE" ]; then
-   log_error "Specified query file [$QUERY_FILE] does not exist; exiting"
+if [ ! -z "$query_file" ] && [ ! -f "$query_file" ]; then
+   log_error "Specified query file [$query_file] does not exist; exiting"
    exit 1
 fi
 
-if [ ! -z "$OUT_FILE" ]; then
+if [ ! -z "$out_file" ]; then
 
-   dir=$(dirname $OUT_FILE)
+   dir=$(dirname $out_file)
    if [ ! -d "$dir" ]; then
       log_error "The directory [$dir] specified for the output file does not exist"
       exit 1
    fi
 
-   if [ -f "$OUT_FILE" ] && [ "$OVERWRITE" != "true" ]; then
-      log_error "Specified output file [$OUT_FILE] already exists."
+   if [ -f "$out_file" ] && [ "$overwrite" != "true" ]; then
+      log_error "Specified output file [$out_file] already exists."
       log_error "Delete the file, use the --force option or specify an different output file and re-run this command."
       exit 1
    else
-      echo -n "" > $OUT_FILE
+      echo -n "" > $out_file
    fi
 fi
 
-if [ ! -z "$MAXROWS" ] && [[ ! "$MAXROWS" =~ ^[0-9]+$ ]]; then
-   log_error "The specified value for --maxrows option [$MAXROWS] is not a valid integer."
+if [ ! -z "$maxrows" ] && [[ ! "$maxrows" =~ ^[0-9]+$ ]]; then
+   log_error "The specified value for --maxrows option [$maxrows] is not a valid integer."
    exit 1
 fi
 
-if [ -z "$HOST" ]; then
+if [ -z "$host" ]; then
    log_error "REQUIRED connection information [HOST] is missing; please provide it via the --host option or via the ESHOST environment variable."
    exit 1
 fi
 
-if [ -z "$PORT" ]; then
+if [ -z "$port" ]; then
    log_error "REQUIRED connection information [PORT] is missing; please provide it via the --port option or via the ESPORT environment variable."
    exit 1
 fi
 
-if [ -z "$USERNAME" ]; then
+if [ -z "$username" ]; then
    log_error "REQUIRED connection information [USER] is missing; please provide it via the --user option or via the ESUSER environment variable."
    exit 1
 fi
 
-if [ -z "$PASSWORD" ]; then
-   log_error "The REQUIRED field [PASSWORD] is missing; please provide it via the --password option or via the ESPASSWD environment variable."
+if [ -z "$password" ]; then
+   log_error "The REQUIRED field [password] is missing; please provide it via the --password option or via the ESPASSWD environment variable."
    exit 1
 fi
 
-if [ -z "$PROTOCOL" ]; then
-   PROTOCOL="https"
-elif [ "$PROTOCOL" != "http" ] && [ "$PROTOCOL" != "https" ]; then
-   log_error "An invalid value [$PROTOCOL] was provided for the --protocol option; allowed values are \"https\" or \"http\""
+if [ -z "$protocol" ]; then
+   protocol="https"
+elif [ "$protocol" != "http" ] && [ "$protocol" != "https" ]; then
+   log_error "An invalid value [$protocol] was provided for the --protocol option; allowed values are \"https\" or \"http\""
    exit 1
 fi
 
 
-log_debug "Connection options PROTOCOL: $PROTOCOL HOST: $HOST PORT: $PORT  USERNAME: $USERNAME"
+log_debug "Connection options PROTOCOL: $protocol HOST: $host PORT: $port  USERNAME: $username"
 
 # Validate Connection information
-response=$(curl -m 60 -s -o /dev/null  -w "%{http_code}"  -XGET "$PROTOCOL://$HOST:$PORT/"  --user $USERNAME:$PASSWORD -k)
+response=$(curl -m 60 -s -o /dev/null  -w "%{http_code}"  -XGET "$protocol://$host:$port/"  --user $username:$password -k)
 rc=$?
 if [[ $response != 2* ]]; then
 
@@ -444,33 +445,37 @@ fi
 
 # TO DO: Validate LEVEL?
 
-if [ ! -z "$OUT_FILE" ]; then
+if [ ! -z "$out_file" ]; then
    output_file_specified="true"
-   MAXROWS=${MAXROWS:-$default_maxrows}
+   maxrows=${maxrows:-$default_maxrows}
 else
-   OUT_FILE="$TMP_DIR/query_results.txt"
+   out_file="$TMP_DIR/query_results.txt"
    output_file_specified="false"
-   MAXROWS=${MAXROWS:-20}
+   maxrows=${maxrows:-20}
 fi
 
 # Set default list of output variables
-OUTPUT_VARS=${OUTPUT_VARS:-$default_output_vars}
+output_vars=${output_vars:-$default_output_vars}
 
-if [[ ! -z "$QUERY_FILE" ]]; then
+if [[ ! -z "$query_file" ]]; then
    query_count=1
-   log_info "Submitting query from file [$QUERY_FILE] for processing."
-   listofqueries[0]=$QUERY_FILE
+   log_info "Submitting query from file [$query_file] for processing."
+   listofqueries[0]=$query_file
 else
    query_max_days=100
 
    # Date processing:
    #  if none provided, use last hour
-   END=${END:-$(date +"%Y-%m-%dT%H:%M:%S%z")}
-   START=${START:-$(date -d "$END -1 hour"  +"%Y-%m-%dT%H:%M:%S%z")}
+   if [ -z "$end_dt" ]; then
+      end_dt=$(date +"%Y-%m-%dT%H:%M:%S%z")
+   fi
+   if [ -z "$start_dt" ]; then
+      start_dt=$(date -d "$end_dt -1 hour"  +"%Y-%m-%dT%H:%M:%S%z")
+   fi
 
    # ensure local timezone is added
-   start_tz=$(date -d "$START" +"%Y-%m-%dT%H:%M:%S%z")
-   end_tz=$(date -d "$END" +"%Y-%m-%dT%H:%M:%S%z")
+   start_tz=$(date -d "$start_dt" +"%Y-%m-%dT%H:%M:%S%z")
+   end_tz=$(date -d "$end_dt" +"%Y-%m-%dT%H:%M:%S%z")
 
    # convert to UTC/GMT
    start_date=$(date -u -d "$start_tz" +"%Y-%m-%dT%H:%M:%SZ")
@@ -482,7 +487,7 @@ else
 
    # Validate provided date range
    if [[ "$end_date_epoch" -lt "$start_date_epoch" ]]; then
-      log_error "The end date provided [$END/$end_date] appears to before the start date provided [$START/$start_date]."
+      log_error "The end date provided [$end_dt/$end_date] appears to before the start date provided [$start_dt/$start_date]."
       exit 2
    fi
 
@@ -528,19 +533,19 @@ else
       echo -n '{"query":"' >> $query_file
 
       #build SELECT clause
-      echo -n "select $OUTPUT_VARS " >> $query_file
+      echo -n "select $output_vars " >> $query_file
 
       if [ "$OPS_INDEX" == "true" ]; then
          index_date=$(date -d "$end_date"  +"%Y.%m.%d")  # TO DO: convert '-' to '.'
          index_name="viya_ops-$index_date";
       else
          # getting viya_logs
-         if [ -z "$NAMESPACE" ]; then
-            log_error "The REQUIRED field [NAMESPACE] has not been specified."
+         if [ -z "$namespace" ]; then
+            log_error "The REQUIRED option [--namespace] has not been specified."
             exit 1
          fi
 
-         index_name="viya_logs-$NAMESPACE-${listofdays[i]}";
+         index_name="viya_logs-$namespace-${listofdays[i]}";
       fi
 
       echo -n " from $index_name "  >> $query_file
@@ -548,25 +553,25 @@ else
       #WHERE clauses
       echo  -n " where 1 = 1 " >> $query_file  # dummy always true
 
-      if [ ! -z "$NAMESPACE" ];  then echo -n ' and kube.namespace =\"'"$NAMESPACE"'\"' >> $query_file; fi;
+      if [ ! -z "$namespace" ];  then echo -n ' and kube.namespace =\"'"$namespace"'\"' >> $query_file; fi;
 
-      if [ ! -z "$LOGSOURCE" ];          then echo -n ' and logsource          in '"$(csvlist $LOGSOURCE)"         >> $query_file; fi;
-      if [ ! -z "$LOGSOURCE_EXCLUDE" ];  then echo -n ' and logsource      NOT in '"$(csvlist $LOGSOURCE_EXCLUDE)" >> $query_file; fi;
-      if [ ! -z "$POD" ];                then echo -n ' and kube.pod           in '"$(csvlist $POD)"               >> $query_file; fi;
-      if [ ! -z "$POD_EXCLUDE" ];        then echo -n ' and kube.pod       NOT in '"$(csvlist $POD_EXCLUDE)"       >> $query_file; fi;
-      if [ ! -z "$CONTAINER" ];          then echo -n ' and kube.container     in '"$(csvlist $CONTAINER)"         >> $query_file; fi;
-      if [ ! -z "$CONTAINER_EXCLUDE" ];  then echo -n ' and kube.container NOT in '"$(csvlist $CONTAINER_EXCLUDE)" >> $query_file; fi;
-      if [ ! -z "$LEVEL" ];              then echo -n ' and level              in '"$(csvlist $LEVEL)"             >> $query_file; fi;
-      if [ ! -z "$LEVEL_EXCLUDE" ];      then echo -n ' and level          NOT in '"$(csvlist $LEVEL_EXCLUDE)"     >> $query_file; fi;
+      if [ ! -z "$logsource" ];          then echo -n ' and logsource          in '"$(csvlist $logsource)"         >> $query_file; fi;
+      if [ ! -z "$logsource_exclude" ];  then echo -n ' and logsource      NOT in '"$(csvlist $logsource_exclude)" >> $query_file; fi;
+      if [ ! -z "$pod" ];                then echo -n ' and kube.pod           in '"$(csvlist $pod)"               >> $query_file; fi;
+      if [ ! -z "$pod_exclude" ];        then echo -n ' and kube.pod       NOT in '"$(csvlist $pod_exclude)"       >> $query_file; fi;
+      if [ ! -z "$container" ];          then echo -n ' and kube.container     in '"$(csvlist $container)"         >> $query_file; fi;
+      if [ ! -z "$container_exclude" ];  then echo -n ' and kube.container NOT in '"$(csvlist $container_exclude)" >> $query_file; fi;
+      if [ ! -z "$level" ];              then echo -n ' and level              in '"$(csvlist $level)"             >> $query_file; fi;
+      if [ ! -z "$level_exclude" ];      then echo -n ' and level          NOT in '"$(csvlist $level_exclude)"     >> $query_file; fi;
 
-      if [ ! -z "$SEARCH_STRING" ];  then echo -n ' and multi_match(\"'"$SEARCH_STRING"'\")'>> $query_file; fi;
+      if [ ! -z "$search_string" ];  then echo -n ' and multi_match(\"'"$search_string"'\")'>> $query_file; fi;
 
       if [ ! -z "$start_date" ]; then echo -n ' and @timestamp >=\"'"$start_date"'\"' >> $query_file; fi;
       if [ ! -z "$end_date" ];   then echo -n ' and @timestamp < \"'"$end_date"'\"'    >> $query_file; fi;
 
       echo "order by @timestamp DESC" >> $query_file;
 
-      if [ ! -z "$MAXROWS" ];      then echo -n " limit $MAXROWS" >> $query_file ; fi;
+      if [ ! -z "$maxrows" ];      then echo -n " limit $maxrows" >> $query_file ; fi;
 
       echo -n '"}'>> $query_file  #close json
       echo '' >> $query_file
@@ -574,7 +579,7 @@ else
    done # construct queries
 fi
 
-if [ "$SHOWQUERY" == "true" ]; then
+if [ "$showquery" == "true" ]; then
    log_info "The following query is an example of the queries that will be submitted."
    log_info "More than one query may be submitted depending on the specified time range."
    cat ${listofqueries[0]}
@@ -593,7 +598,7 @@ do # submit queries
    out_file="$TMP_DIR/query_results.$i.txt"
 
    log_debug "Query [$(($i+1))] of [$query_count] $(date)"
-   response=$(curl -m $maxtime -s  -o $out_file -w "%{http_code}"  -XPOST "https://$HOST:$PORT/_opendistro/_sql?format=$FORMAT" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $USERNAME:$PASSWORD -k)
+   response=$(curl -m $maxtime -s  -o $out_file -w "%{http_code}"  -XPOST "https://$host:$port/_opendistro/_sql?format=$format" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $username:$password -k)
    rc=$?
    log_debug "curl command response: [$response] rc:[$rc]"
 
@@ -625,8 +630,8 @@ do # submit queries
       total_lines=$((total_lines+lines_returned));
       log_debug "Query [$(($i+1))] returned [$lines_returned] lines; total lines returned so far [$total_lines]."
 
-      if [[ $total_lines -ge $MAXROWS ]]; then
-         log_debug "Total number of lines returned [$lines_returned] is equal to or greater than the maximum requested (--maxrows) [$MAXROWS]; skipping remaining queries"
+      if [[ $total_lines -ge $maxrows ]]; then
+         log_debug "Total number of lines returned [$lines_returned] is equal to or greater than the maximum requested (--maxrows) [$maxrows]; skipping remaining queries"
          query_count=$(($i+1));
          break
       fi
@@ -650,7 +655,7 @@ do  # process output files
    elif [ "${listofoutputs[i]}" == "bad response" ];then
       log_debug "Output for query [$i] omitted since request exited with bad response code"
    elif [ "$output_file_specified" == "true" ]; then
-      tail -n +$starting_row ${listofoutputs[i]} >> $OUT_FILE
+      tail -n +$starting_row ${listofoutputs[i]} >> $out_file
       starting_row=2 # for subsequent files, skip first (header) row
    else
       tail -n +$starting_row ${listofoutputs[i]}
@@ -676,7 +681,7 @@ if [ $total_lines -eq 0 ]; then
 else
    # at least one good response
    if [ "$output_file_specified" == "true" ]; then
-      log_info "Output results (approx. $total_lines) written to requested output file [$OUT_FILE]"
+      log_info "Output results (approx. $total_lines) written to requested output file [$out_file]"
    else
       echo "" # add line break after any output
    fi
