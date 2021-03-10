@@ -68,7 +68,6 @@ kubectl apply -f -
 # Scraped metrics will become performance log events
 kubectl apply -f sas-prom-config.yaml
 # Map performance log events to CloudWatch metrics
-kubectl apply -f sas-prom-cwagentconfig.yaml
 cat sas-prom-cwagentconfig.yaml \
   | sed "s/{{cluster_name}}/${ClusterName}/;s/{{region_name}}/${RegionName}/" \
   | kubectl apply -f -
