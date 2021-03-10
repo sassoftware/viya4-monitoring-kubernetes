@@ -173,8 +173,8 @@ set +e
 get_ingress_ports
 
 # get URLs for Kibana and Elasticsearch REST api endpoint
-kb_url=$(get_service_url logging v4m-es-kibana-svc "/" "$LOG_KB_TLS_ENABLE" "v4m-es-kibana")
-es_url=$(get_service_url logging v4m-es-client-service "/" "true")
+kb_url=$(get_service_url $LOG_NS v4m-es-kibana-svc "/" "$LOG_KB_TLS_ENABLE" "v4m-es-kibana")
+es_url=$(get_service_url $LOG_NS v4m-es-client-service "/" "true")
 set -e
 
 # Print URL to access Kibana
