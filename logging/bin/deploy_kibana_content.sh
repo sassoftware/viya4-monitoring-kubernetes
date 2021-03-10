@@ -180,7 +180,7 @@ set -e
 # Print URL to access Kibana
 add_notice ""
 add_notice "================================================================================"
-add_notice "==                    Accessing the log monitoring applications               =="
+add_notice "==                    Accessing the monitoring applications                   =="
 add_notice "==                                                                            =="
 add_notice "== ***KIBANA***                                                               =="
 if [ ! -z "$kb_url" ]; then
@@ -193,15 +193,10 @@ else
    add_notice "== ingress or network access configuration that this script does not handle.  =="
    add_notice "==                                                                            =="
 fi
-add_notice "== ***Elasticsearch REST Endpoint***                                          =="
 if [ ! -z "$es_url" ]; then
+   add_notice "== ***Elasticsearch REST Endpoint***                                          =="
    add_notice "==  You can access Elasticsearch REST endpoint via the following URL:         =="
    add_notice "==   $es_url   =="
-   add_notice "==                                                                            =="
-else
-   add_notice "== The Elasticsearch REST endpoint is NOT configured to be reachable by       =="
-   add_notice "== default.  If you would like to make it accessible, configure ingress for   =="
-   add_notice "== it or run the es_nodeport_enable.sh to enable access via NodePort.         =="
    add_notice "==                                                                            =="
 fi
 add_notice "== Note: These URLs may be incorrect if your ingress and/or other network     =="
