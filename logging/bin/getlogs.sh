@@ -35,11 +35,11 @@ VALID_LEVELS="PANIC,FATAL,ERROR,WARNING,INFO,DEBUG,NONE"
 
 function show_usage {
    log_info  ""
-   log_info  "Usage: $this_script [QUERY PARAMETERS] [TIME PERIOD] [OUTPUT PARAMETERS] [CONNECTION PARAMETERS]"
+   log_info  "Usage: $this_script [QUERY OPTIONS] [TIME PERIOD] [OUTPUT OPTIONS] [CONNECTION OPTIONS]"
    log_info  ""
    log_info  "Submits a query to Elasticsearch for log messages meeting the specified criteria and directs results to stdout or specified file."
    log_info  "Results are returned in CSV (comma-separated value) format.  In most case, option values are expected to be a single value (exceptions noted below)."
-   log_info  "NOTE: The NAMESPACE parameter (-n|--namespace) is required.   Connection information is also required but may be provided via environment variables."
+   log_info  "NOTE: The NAMESPACE option (-n|--namespace) is required.   Connection information is also required but may be provided via environment variables."
    log_info  ""
    log_info  "     ** Query Options **"
    log_info  "     -n,  --namespace         NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace for which logs are sought"
@@ -53,7 +53,7 @@ function show_usage {
    log_info  "     -l,  --level             INFO|etc  - One or more message levels for which logs are sought."
    log_info  "                                          Valid values for message level: $VALID_LEVELS"
    log_info  "     -lx, --level-exclude     INFO|etc  - One or more message levels for which logs should be excluded from the output."
-   log_info  '          NOTE: The POD*, CONTAINER*, LOGSOURCE* and LEVEL* parameters accept multiple, comma-separated, values (e.g. --level "INFO, NONE")'
+   log_info  '          NOTE: The POD*, CONTAINER*, LOGSOURCE* and LEVEL* options accept multiple, comma-separated, values (e.g. --level "INFO, NONE")'
    log_info  ""
    log_info  '          --search            "joe smith"  - Word or phrase contained in log message.'
    log_info  ""
@@ -61,6 +61,9 @@ function show_usage {
    log_info  "          NOTE: If --out_file is also provided, default: $default_maxrows"
    log_info  ""
    log_info  "     -q,  --query-file        filename  - Name of file containing search query (ALL other query parmeters ignored)."
+   log_info  ""
+   log_info  "          --show-query                  - Display example of actual query that will be submitted during execution"
+   log_info  "          NOTE: The full request for logs will be executed and any results will be returned."
    log_info  ""
    log_info  "     ** Output Options **"
    log_info  "          --fields           'var1,var2' - List (comma-separated) of fields to include in output"
@@ -80,12 +83,11 @@ function show_usage {
    log_info  '     -pw, --password          PASSWORD  - Password for connecting to Elasticsearh/Kibana  (default: $ESPASSWD)'
    log_info  '     -ho, --host              hostname  - Hostname for connection to Elasticsearch/Kibana (default: $ESHOST)'
    log_info  '     -po, --port              port_num  - Port number for connection to Elasticsearch/Kibana (default: $ESPORT)'
-   log_info  "          NOTE: Connection information can also be passed via environment vars (ESHOST, ESPORT, ESUSER and ESPASSWD)."
+   log_info  "     -pr, --protocol          https     - Protocol (https|http) for connection to Elasticsearch (default: https)"
+   log_info  "          NOTE: Connection information can also be passed via environment vars (ESHOST, ESPORT, ESPROTOCOL, ESUSER and ESPASSWD)."
    log_info  ""
    log_info  "     ** Other Options **"
    log_info  "     -h,  --help                        - Display this usage information"
-   log_info  "          --show-query                  - Display example of actual query that will be submitted during execution"
-   log_info  "          NOTE: The full request for logs will be executed and any results will be returned."
    echo ""
 }
 
@@ -100,7 +102,7 @@ while (( "$#" )); do
         NAMESPACE=$2
         shift 2
       else
-        log_error "Parameter [--namespace] has been specified but no value was provided." >&2
+        log_error "Option [--namespace] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -110,7 +112,7 @@ while (( "$#" )); do
         POD=$2
         shift 2
       else
-        log_error "Parameter [--pod] has been specified but no value was provided." >&2
+        log_error "Option [--pod] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -120,7 +122,7 @@ while (( "$#" )); do
         POD_EXCLUDE=$2
         shift 2
       else
-        log_error "Parameter [--pod-exclude (Pods to Exclude)] has been specified but no value was provided." >&2
+        log_error "Option [--pod-exclude (Pods to Exclude)] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -130,7 +132,7 @@ while (( "$#" )); do
         CONTAINER=$2
         shift 2
       else
-        log_error "Parameter [--container] has been specified but no value was provided." >&2
+        log_error "Option [--container] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -140,7 +142,7 @@ while (( "$#" )); do
         CONTAINER_EXCLUDE=$2
         shift 2
       else
-        log_error "Parameter [--container-exclude (Containers to exclude)] has been specified but no value was provided." >&2
+        log_error "Option [--container-exclude (Containers to exclude)] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -150,7 +152,7 @@ while (( "$#" )); do
         LOGSOURCE=$2
         shift 2
       else
-        log_error "Parameter [--logsource] has been specified but no value was provided." >&2
+        log_error "Option [--logsource] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -160,7 +162,7 @@ while (( "$#" )); do
         LOGSOURCE_EXCLUDE=$2
         shift 2
       else
-        log_error "Parameter [--logsource-exclude (logsources to exclude)] has been specified but no value was provided." >&2
+        log_error "Option [--logsource-exclude (logsources to exclude)] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -170,7 +172,7 @@ while (( "$#" )); do
         SEARCH_STRING=$2
         shift 2
       else
-        log_error "Parameter [--search (search string)] has been specified but no value was provided." >&2
+        log_error "Option [--search (search string)] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -180,7 +182,7 @@ while (( "$#" )); do
         LEVEL=$2
         shift 2
       else
-        log_error "Parameter [--level (message level)] has been specified but no value was provided." >&2
+        log_error "Option [--level (message level)] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -190,7 +192,7 @@ while (( "$#" )); do
         LEVEL_EXCLUDE=$2
         shift 2
       else
-        log_error "Parameter [--level-exclude (message levels to exclude)] has been specified but no value was provided." >&2
+        log_error "Option [--level-exclude (message levels to exclude)] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -200,7 +202,7 @@ while (( "$#" )); do
         MAXROWS=$2
         shift 2
       else
-        log_error "Parameter [--maxrows (maximum number of rows returned)] has been specified but no value was provided." >&2
+        log_error "Option [--maxrows (maximum number of rows returned)] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -210,7 +212,7 @@ while (( "$#" )); do
         QUERY_FILE=$2
         shift 2
       else
-        log_error "Parameter [--query-file] has been specified but no value was provided." >&2
+        log_error "Option [--query-file] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -221,7 +223,7 @@ while (( "$#" )); do
         START=$2
         shift 2
       else
-        log_error "Parameter [--start] has been specified but no value was provided." >&2
+        log_error "Option [--start] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -231,7 +233,7 @@ while (( "$#" )); do
         END=$2
         shift 2
       else
-        log_error "Parameter [--end] has been specified but no value was provided." >&2
+        log_error "Option [--end] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -243,7 +245,7 @@ while (( "$#" )); do
         OUT_FILE=$2
         shift 2
       else
-        log_error "Parameter [--out-file] has been specified but no value was provided." >&2
+        log_error "Option [--out-file] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -257,7 +259,7 @@ while (( "$#" )); do
         OUTPUT_VARS=$2
         shift 2
       else
-        log_error "Parameter [--fields] has been specified but no value was provided." >&2
+        log_error "Option [--fields] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -269,7 +271,7 @@ while (( "$#" )); do
         USERNAME=$2
         shift 2
       else
-        log_error "Parameter [--username] has been specified but no value was provided." >&2
+        log_error "Option [--username] has been specified but no value was provided." >&2
         show_usage
       exit 2
       fi
@@ -279,7 +281,7 @@ while (( "$#" )); do
         PASSWORD=$2
         shift 2
       else
-        log_error "Parameter [--password] has been specified but no value was provided." >&2
+        log_error "Option [--password] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -289,7 +291,7 @@ while (( "$#" )); do
         HOST=$2
         shift 2
       else
-        log_error "Parameter [--host] has been specified but no value was provided." >&2
+        log_error "Option [--host] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
@@ -299,12 +301,21 @@ while (( "$#" )); do
         PORT=$2
         shift 2
       else
-        log_error "Parameter [--port] has been specified but no value was provided." >&2
+        log_error "Option [--port] has been specified but no value was provided." >&2
         show_usage
         exit 2
       fi
       ;;
-    # misc parms
+    -pr|--protocol)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        PROTOCOL=$2
+        shift 2
+      else
+        log_error "Option [--protocol] has been specified but no value was provided." >&2
+        show_usage
+        exit 2
+      fi
+      ;;
     --show-query)
       SHOWQUERY=true
       shift
@@ -335,7 +346,7 @@ fi
 
 # No positional parameters are supported
 if [ "$#" -ge 1 ]; then
-    log_error "Unexpected additional arguments [$POS_PARMS] were found; exiting."
+    log_error "Unexpected additional options [$POS_PARMS] were found; exiting."
     show_usage
     exit 1
 fi
@@ -343,6 +354,7 @@ fi
 # set default values
 SHOWQUERY=${SHOWQUERY:-false}
 OVERWRITE=${OVERWRITE:-false}
+PROTOCOL=${PROTOCOL:-${ESPROTOCOL}}
 HOST=${HOST:-${ESHOST}}
 PORT=${PORT:-${ESPORT}}
 USERNAME=${USERNAME:-${ESUSER}}
@@ -374,7 +386,7 @@ if [ ! -z "$OUT_FILE" ]; then
 fi
 
 if [ ! -z "$MAXROWS" ] && [[ ! "$MAXROWS" =~ ^[0-9]+$ ]]; then
-   log_error "The specified value for --maxrows parameter [$MAXROWS] is not a valid integer."
+   log_error "The specified value for --maxrows option [$MAXROWS] is not a valid integer."
    exit 1
 fi
 
@@ -398,8 +410,18 @@ if [ -z "$PASSWORD" ]; then
    exit 1
 fi
 
+if [ -z "$PROTOCOL" ]; then
+   PROTOCOL="https"
+elif [ "$PROTOCOL" != "http" ] && [ "$PROTOCOL" != "https" ]; then
+   log_error "An invalid value [$PROTOCOL] was provided for the --protocol option; allowed values are \"https\" or \"http\""
+   exit 1
+fi
+
+
+log_debug "Connection options PROTOCOL: $PROTOCOL HOST: $HOST PORT: $PORT  USERNAME: $USERNAME"
+
 # Validate Connection information
-response=$(curl -m 60 -s -o /dev/null  -w "%{http_code}"  -XGET "https://$HOST:$PORT/"  --user $USERNAME:$PASSWORD -k)
+response=$(curl -m 60 -s -o /dev/null  -w "%{http_code}"  -XGET "$PROTOCOL://$HOST:$PORT/"  --user $USERNAME:$PASSWORD -k)
 rc=$?
 if [[ $response != 2* ]]; then
 
