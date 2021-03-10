@@ -218,7 +218,7 @@ while (( "$#" )); do
       fi
       ;;
     # datetime parms
-    -s|--start)
+    --start)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         start_dt=$2
         shift 2
@@ -228,7 +228,7 @@ while (( "$#" )); do
         exit 2
       fi
       ;;
-    -e|--end)
+    --end)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         end_dt=$2
         shift 2
