@@ -44,9 +44,15 @@ function deploy_dashboards {
    
    log_message "--------------------------------"
    for f in $dir/*.json; do
-     name=$(basename $f .json)
-     kubectl create cm -n $DASH_NS $name $dryRun --from-file $f -o yaml | kubectl apply -f -
-     kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring sas.com/dashboardType=$type
+     # Need to check existence because if there are no matching files,
+     # f will include the wildcard character (*)
+     if [ -f "$f" ]; then
+       log_debug "Deploying dashboard from file [$f]"
+       name=$(basename $f .json)
+      
+       kubectl create cm -n $DASH_NS $name $dryRun --from-file $f -o yaml | kubectl apply -f -
+       kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring sas.com/dashboardType=$type
+     fi
    done
    log_message "--------------------------------"
 }
