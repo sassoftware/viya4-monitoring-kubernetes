@@ -66,7 +66,8 @@ function show_usage {
    log_info  "          NOTE: The full request for logs will be executed and any results will be returned."
    log_info  ""
    log_info  "     ** Output Options **"
-   log_info  "          --fields           'var1,var2' - List (comma-separated) of fields to include in output"
+#                        --fields is an currently an experimental/undocumented feature
+#   log_info  "          --fields           'var1,var2' - List (comma-separated) of fields to include in output"
    log_info  "                                           (default: '$default_output_vars')."
    log_info  "     -o,  --out-file          filename  - Name of file to write results to (default: [stdout]). If file exists, use --force to overwrite."
    log_info  "     -f,  --force                       - Overwrite the output file if it already exists."
@@ -179,7 +180,7 @@ while (( "$#" )); do
       ;;
     -l|--level)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        level=$2
+        msglevel=$2
         shift 2
       else
         log_error "Option [--level (message level)] has been specified but no value was provided." >&2
@@ -242,7 +243,7 @@ while (( "$#" )); do
     # output parms
     -o|--out-file)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        out_file=$2
+        target_file=$2
         shift 2
       else
         log_error "Option [--out-file] has been specified but no value was provided." >&2
@@ -369,20 +370,20 @@ if [ ! -z "$query_file" ] && [ ! -f "$query_file" ]; then
    exit 1
 fi
 
-if [ ! -z "$out_file" ]; then
+if [ ! -z "$target_file" ]; then
 
-   dir=$(dirname $out_file)
+   dir=$(dirname $target_file)
    if [ ! -d "$dir" ]; then
       log_error "The directory [$dir] specified for the output file does not exist"
       exit 1
    fi
 
-   if [ -f "$out_file" ] && [ "$overwrite" != "true" ]; then
-      log_error "Specified output file [$out_file] already exists."
+   if [ -f "$target_file" ] && [ "$overwrite" != "true" ]; then
+      log_error "Specified output file [$target_file] already exists."
       log_error "Delete the file, use the --force option or specify an different output file and re-run this command."
       exit 1
    else
-      echo -n "" > $out_file
+      echo -n "" > $target_file
    fi
 fi
 
@@ -442,14 +443,13 @@ else
    log_debug "Validation of connection information succeeded  [$response] rc:[$rc]"
 fi
 
+# TO DO: Validate msglevel?
 
-# TO DO: Validate LEVEL?
-
-if [ ! -z "$out_file" ]; then
+if [ ! -z "$target_file" ]; then
    output_file_specified="true"
    maxrows=${maxrows:-$default_maxrows}
 else
-   out_file="$TMP_DIR/query_results.txt"
+   target_file="$TMP_DIR/query_results.txt"
    output_file_specified="false"
    maxrows=${maxrows:-20}
 fi
@@ -561,7 +561,7 @@ else
       if [ ! -z "$pod_exclude" ];        then echo -n ' and kube.pod       NOT in '"$(csvlist $pod_exclude)"       >> $query_file; fi;
       if [ ! -z "$container" ];          then echo -n ' and kube.container     in '"$(csvlist $container)"         >> $query_file; fi;
       if [ ! -z "$container_exclude" ];  then echo -n ' and kube.container NOT in '"$(csvlist $container_exclude)" >> $query_file; fi;
-      if [ ! -z "$level" ];              then echo -n ' and level              in '"$(csvlist $level)"             >> $query_file; fi;
+      if [ ! -z "$msglevel" ];           then echo -n ' and level              in '"$(csvlist $msglevel)"          >> $query_file; fi;
       if [ ! -z "$level_exclude" ];      then echo -n ' and level          NOT in '"$(csvlist $level_exclude)"     >> $query_file; fi;
 
       if [ ! -z "$search_string" ];  then echo -n ' and multi_match(\"'"$search_string"'\")'>> $query_file; fi;
@@ -595,10 +595,10 @@ for ((i=0; i < $query_count; i++));
 do # submit queries
 
    query_file=${listofqueries[i]}
-   out_file="$TMP_DIR/query_results.$i.txt"
+   qresults_file="$TMP_DIR/query_results.$i.txt"
 
    log_debug "Query [$(($i+1))] of [$query_count] $(date)"
-   response=$(curl -m $maxtime -s  -o $out_file -w "%{http_code}"  -XPOST "https://$host:$port/_opendistro/_sql?format=$format" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $username:$password -k)
+   response=$(curl -m $maxtime -s  -o $qresults_file -w "%{http_code}"  -XPOST "https://$host:$port/_opendistro/_sql?format=$format" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $username:$password -k)
    rc=$?
    log_debug "curl command response: [$response] rc:[$rc]"
 
@@ -615,17 +615,17 @@ do # submit queries
          exit 2
       else
          # IndexNotFoundException should return 404 but doesn't
-         if [ $(grep -c "IndexNotFoundException" $out_file) -gt 0 ]; then
-            log_debug "IndexNotFoundException found in file [$out_file]"
+         if [ $(grep -c "IndexNotFoundException" $qresults_file) -gt 0 ]; then
+            log_debug "IndexNotFoundException found in file [$qresults_file]"
          else
             # problem is something more than no index found, keep output to show user
-            listofbadouts+=("$out_file")
+            listofbadouts+=("$qresults_file")
          fi # IndexNotFoundException
       fi  # handle non-200 responses
    else   # handle 2** response
-      listofoutputs[i]="$out_file"
+      listofoutputs[i]="$qresults_file"
 
-      lines_returned=$(cat $out_file|wc -l)
+      lines_returned=$(cat $qresults_file|wc -l)
       lines_returned=$((lines_returned-1))  # ignore header line
       total_lines=$((total_lines+lines_returned));
       log_debug "Query [$(($i+1))] returned [$lines_returned] lines; total lines returned so far [$total_lines]."
@@ -655,7 +655,7 @@ do  # process output files
    elif [ "${listofoutputs[i]}" == "bad response" ];then
       log_debug "Output for query [$i] omitted since request exited with bad response code"
    elif [ "$output_file_specified" == "true" ]; then
-      tail -n +$starting_row ${listofoutputs[i]} >> $out_file
+      tail -n +$starting_row ${listofoutputs[i]} >> $target_file
       starting_row=2 # for subsequent files, skip first (header) row
    else
       tail -n +$starting_row ${listofoutputs[i]}
@@ -681,7 +681,7 @@ if [ $total_lines -eq 0 ]; then
 else
    # at least one good response
    if [ "$output_file_specified" == "true" ]; then
-      log_info "Output results (approx. $total_lines) written to requested output file [$out_file]"
+      log_info "Output results (approx. $total_lines) written to requested output file [$target_file]"
    else
       echo "" # add line break after any output
    fi
