@@ -83,7 +83,6 @@ kubectl apply -f sas-prom-config.yaml
 Run these commands to map the performance log events that were created from Prometheus metrics to CloudWatch metrics and restart the agent in order to apply the configuration changes:
 
 ```bash
-kubectl apply -f sas-prom-cwagentconfig.yaml
 cat sas-prom-cwagentconfig.yaml \
   | sed "s/{{cluster_name}}/${ClusterName}/;s/{{region_name}}/${RegionName}/" \
   | kubectl apply -f -
@@ -96,15 +95,15 @@ kubectl delete pod -n amazon-cloudwatch -l app=cwagent-prometheus
 After you configure metric collection for CloudWatch, you can create dashboard widgets in CloudWatch to visualize the collected metric data. Metrics collected by the CloudWatch agent for Prometheus are stored in the
 `/aws/containerinsights/[cluster-name]/prometheus` log group.
 
-For example, these are the steps to create a graph of `go_memstates_alloc_bytes`
+For example, these are the steps to create a graph of `go_memstats_alloc_bytes`
 (memory usage) of SAS Viya microservices that are written in Go:
 
 1. From the AWS web console, navigate to CloudWatch.
 2. In the navigation bar on the left, choose `Metrics`.
 3. Select the `ContainerInsights/Prometheus` namespace.
 4. Select `ClusterName, job, namespace, pod, sas_service_base`.
-5. Locate the `go_memstates_alloc_bytes` metric.
-6. Right-click on the metric and select `Search for this only`.
+5. Locate the `go_memstats_alloc_bytes` metric.
+6. Click on the arrow next to the metric and select `Search for this only`.
 7. Select the checkbox for the SAS Viya services that you want to include in the graph.
 
 ## CloudWatch Agent Daemonset and Workload Node Placement<a name=wnp_tolerations></a>
