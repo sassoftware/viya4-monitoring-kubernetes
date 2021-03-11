@@ -30,7 +30,11 @@ function csvlist {
 }
 
 default_maxrows=500
-default_output_vars="@timestamp, level, logsource, kube.namespace, kube.pod, kube.container, message"
+
+# NOTE: the 'trim(foo.bar.keyword) as bar' syntax is needed to ensure nested fields appear
+#       as properly named columns rather than as nested fields "(e.g. foo={'bar'='baz'})"
+default_output_vars="@timestamp, level, logsource,trim(kube.namespace.keyword) as namespace, trim(kube.pod.keyword) as pod, trim(kube.container.keyword) as container, message"
+
 valid_levels="PANIC,FATAL,ERROR,WARNING,INFO,DEBUG,NONE"
 
 function show_usage {
@@ -656,6 +660,7 @@ do  # process output files
       log_debug "Output for query [$i] omitted since request exited with bad response code"
    elif [ "$output_file_specified" == "true" ]; then
       tail -n +$starting_row ${listofoutputs[i]} >> $target_file
+      echo ""  >> $target_file  #move to new line for next file
       starting_row=2 # for subsequent files, skip first (header) row
    else
       tail -n +$starting_row ${listofoutputs[i]}
