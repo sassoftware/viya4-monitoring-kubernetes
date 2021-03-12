@@ -72,7 +72,7 @@ function show_usage {
    log_info  "     ** Output Options **"
 #                        --fields is an currently an experimental/undocumented feature
 #   log_info  "          --fields           'var1,var2' - List (comma-separated) of fields to include in output"
-   log_info  "                                           (default: '$default_output_vars')."
+#   log_info  "                                           (default: '$default_output_vars')."
    log_info  "     -o,  --out-file          filename  - Name of file to write results to (default: [stdout]). If file exists, use --force to overwrite."
    log_info  "     -f,  --force                       - Overwrite the output file if it already exists."
    log_info  ""
