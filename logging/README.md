@@ -239,23 +239,13 @@ The script removes configmaps and secrets that were created by the deployment sc
 
 ### Access Kibana
 
-If the deployment process completes without errors, a message such as this
-appears in the console window:
+If the deployment process completes without errors, a message 
+appears in the console window containing the URL address for Kibana and the URL for Elasticsearch (if you enabled access to Elasticsearch). The URL for Kibana is different depending on whether you use nodeports or ingress to access Kibana. 
 
-```text
-=====================================================================
-== Access Kibana using this URL: http://myK8snode:31033/app/kibana ==
-=====================================================================
-```
-
-The message provides the URL address for the Kibana application. To validate
-that the deployment was successful and confirm that all of the logging components
+To validate that the deployment was successful and confirm that all of the logging components
 are working, access Kibana and review the log messages that are collected.
 
-__Note:__ The displayed URL for Kibana might not be correct if you defined
-ingress objects or if your networking rules alter how hosts are accessed. If
-this is the case, contact your Kubernetes administrator to determine the proper
-host, port and/or path to access Kibana.
+__Note:__ The displayed URL for Kibana might not be correct if your networking rules alter how hosts are accessed. If this is the case, contact your Kubernetes administrator to determine the proper host, port and/or path to access Kibana.
 
 ### Use Kibana to Validate Logging
 
