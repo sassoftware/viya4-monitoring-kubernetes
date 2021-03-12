@@ -33,11 +33,14 @@ default_maxrows=500
 
 # NOTE: the 'trim(foo.bar.keyword) as bar' syntax is needed to ensure nested fields appear
 #       as properly named columns rather than as nested fields "(e.g. foo={'bar'='baz'})"
+default_output_vars="@timestamp, level, logsource,kube.namespace, kube.pod, kube.container, message"
 default_output_vars="@timestamp, level, logsource,trim(kube.namespace.keyword) as namespace, trim(kube.pod.keyword) as pod, trim(kube.container.keyword) as container, message"
 
 valid_levels="PANIC,FATAL,ERROR,WARNING,INFO,DEBUG,NONE"
 
 function show_usage {
+   log_info  ""
+   log_info  "***Experimental - This script may be removed or undergo significant changes in the future***"
    log_info  ""
    log_info  "Usage: $this_script [QUERY OPTIONS] [TIME PERIOD] [OUTPUT OPTIONS] [CONNECTION OPTIONS]"
    log_info  ""
@@ -630,7 +633,7 @@ do # submit queries
       listofoutputs[i]="$qresults_file"
 
       lines_returned=$(cat $qresults_file|wc -l)
-      lines_returned=$((lines_returned-1))  # ignore header line
+      #lines_returned=$((lines_returned-1))  # ignore header line
       total_lines=$((total_lines+lines_returned));
       log_debug "Query [$(($i+1))] returned [$lines_returned] lines; total lines returned so far [$total_lines]."
 
