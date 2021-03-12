@@ -1,5 +1,9 @@
 # Export Logs
 
+```
+Note: This script is experimental, and might be significantly changed, replaced, or removed in later releases. Feedback is welcomed about the functionality represented by this script, including requirements, usage scenarios, and required options.
+``` 
+
 There might be instances when you need to collect a set of log messages in a file. For 
 example, you might need to send log messages collected during a specific time period or for a specific pod to SAS Technical Support to help diagnose a problem. The `getlogs.sh` script enables you to obtain log messages from a specified time period and from specified sources and save those messages to a file. 
 
