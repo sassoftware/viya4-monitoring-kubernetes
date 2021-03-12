@@ -22,8 +22,8 @@ function csvlist {
    # list of escaped quoted values
    # enclosed in parens.
    local rawvalue values outvalue
-   rawvalue=$1
-   IFS=, read -a arr <<<"$rawvalue"
+   rawvalue=$@
+   IFS=', ' read -a arr <<<"$rawvalue"
    printf -v values ',\\"%s\\"' "${arr[@]}"
    outvalue="(${values:1})"
    echo "$outvalue"
@@ -499,7 +499,7 @@ else
    start_day=$(date -d "$start_date" +"%Y%m%d")
    end_day=$(date -d "$end_date" +"%Y%m%d")
 
-   today=$(date +"%Y%m%d")
+   today=$(date -u +"%Y%m%d")
 
    if [[ "$end_day" -le "$today" ]]; then
       prevday="$end_day"
