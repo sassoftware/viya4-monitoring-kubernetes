@@ -6,6 +6,7 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
+source bin/service-url-include.sh
 
 this_script=`basename "$0"`
 
@@ -167,15 +168,39 @@ rm -f $tmpfile
 sleep 7s
 
 
+set +e
+# call function to get HTTP/HTTPS ports from ingress controller
+get_ingress_ports
+
+# get URLs for Kibana and Elasticsearch REST api endpoint
+kb_url=$(get_service_url $LOG_NS v4m-es-kibana-svc "/" "$LOG_KB_TLS_ENABLE" "v4m-es-kibana")
+es_url=$(get_service_url $LOG_NS v4m-es-client-service "/" "true")
+set -e
+
 # Print URL to access Kibana
 add_notice ""
 add_notice "================================================================================"
-add_notice "==                        Access Kibana using this URL:                       =="
+add_notice "==                    Accessing the monitoring applications                   =="
 add_notice "==                                                                            =="
-add_notice "== $KB_CURL_PROTOCOL://$NODE_NAME:$KIBANA_PORT/app/kibana  =="
-add_notice "==                                                                            =="
-add_notice "== Note: If you have configured INGRESS, this URL may be incorrect; review    =="
-add_notice "==       the INGRESS configuration to determine correct URL to access Kibana. =="
+add_notice "== ***KIBANA***                                                               =="
+if [ ! -z "$kb_url" ]; then
+   add_notice "==  You can access Kibana via the following URL:                              =="
+   add_notice "==   $kb_url  =="
+   add_notice "==                                                                            =="
+else
+   add_notice "== It was not possible to determine the URL needed to access Kibana. Note     =="
+   add_notice "== that this is not necessarily a sign of a problem; it may only reflect an   =="
+   add_notice "== ingress or network access configuration that this script does not handle.  =="
+   add_notice "==                                                                            =="
+fi
+if [ ! -z "$es_url" ]; then
+   add_notice "== ***Elasticsearch REST Endpoint***                                          =="
+   add_notice "==  You can access Elasticsearch REST endpoint via the following URL:         =="
+   add_notice "==   $es_url   =="
+   add_notice "==                                                                            =="
+fi
+add_notice "== Note: These URLs may be incorrect if your ingress and/or other network     =="
+add_notice "==       configuration includes options this script does not handle.          =="
 add_notice "================================================================================"
 add_notice ""
 

@@ -5,6 +5,7 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
+source bin/service-url-include.sh
 
 source bin/tls-include.sh
 if verify_cert_manager $MON_NS prometheus alertmanager grafana; then
@@ -201,6 +202,38 @@ done
 echo ""
 monitoring/bin/deploy_dashboards.sh
 
+set +e
+# call function to get HTTP/HTTPS ports from ingress controller
+get_ingress_ports
+
+# get URLs for Grafana, Prometheus and AlertManager
+gf_url=$(get_service_url $MON_NS v4m-grafana  "/" "false")
+# pr_url=$(get_url $MON_NS v4m-prometheus  "/" "false")
+# am_url=$(get_url $MON_NS v4m-alertmanager  "/" "false")
+set -e
+
+# Print URL to access web apps
+log_notice ""
+log_notice "================================================================================"
+log_notice "==                    Accessing the monitoring applications                   =="
+log_notice "==                                                                            =="
+log_notice "== ***GRAFANA***                                                              =="
+if [ ! -z "$gf_url" ]; then
+   log_notice "==  You can access Grafana via the following URL:                             =="
+   log_notice "==   $gf_url  =="
+   log_notice "==                                                                            =="
+else
+   log_notice "== It was not possible to determine the URL needed to access Grafana. Note    =="
+   log_notice "== that this is not necessarily a sign of a problem; it may only reflect an   =="
+   log_notice "== ingress or network access configuration that this script does not handle.  =="
+   log_notice "==                                                                            =="
+fi
+log_notice "== Note: These URLs may be incorrect if your ingress and/or other network     =="
+log_notice "==       configuration includes options this script does not handle.          =="
+log_notice "================================================================================"
+log_notice ""
+echo ""
+
 log_notice "Successfully deployed components to the [$MON_NS] namespace"
 if [ "$showPass" == "true" ]; then
   # Find the grafana pod
@@ -211,3 +244,5 @@ if [ "$showPass" == "true" ]; then
   log_notice "Change the password at any time by running (replace password):"
   log_notice "kubectl exec -n $MON_NS $grafanaPod -c grafana -- bin/grafana-cli admin reset-admin-password myNewPassword"
 fi
+
+

@@ -254,10 +254,11 @@ By default, the components are deployed into the namespace `monitoring`.
 
 ## Access Monitoring Applications
 
-NodePorts are used by default. If you deployed using NodePorts, the monitoring
-applications are available at these locations by default:
+If the deployment process completes without errors, a message 
+appears in the console window containing the URL address for Grafana. The URL for Grafana is different depending on whether you use nodeports or ingress to access Grafana. 
 
-* Grafana - Port 31100 `http://master-node.yourcluster.example.com:31100`
+NodePorts are used by default. If you deployed using NodePorts, Prometheus and AlertManager are available at these locations by default:
+
 * Prometheus - Port 31090 `http://master-node.yourcluster.example.com:31090`
 * AlertManager - Port 31091 `http://master-node.yourcluster.example.com:31091`
 
