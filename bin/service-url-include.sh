@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright © 20201, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 source bin/common.sh
