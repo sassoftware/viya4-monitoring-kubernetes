@@ -36,11 +36,11 @@
   now use 'v1' to align with their use in SAS Viya 4.x
 
 * **Logging**
-  * [FEATURE] The browser-accessible URL for Kibana is now included in the
-  output of `logging/bin/deploy_logging_open.sh` (including if ingress is
-  configured)
-  * [FEATURE] A new script [`logging/bin/getlogs.sh`](logging/Export_Logs.md)
-  allows exporting logs to CSV format
+  * [FEATURE] The browser-accessible URL for Kibana included in the output
+  of `logging/bin/deploy_logging_open.sh` now takes into account ingress 
+  configuration
+  * [FEATURE] A new _experimental_ script `logging/bin/getlogs.sh`
+  allows exporting logs to CSV format [`Documentation`](logging/Export_Logs.md)
   * [FIX] The `logging/bin/change_internal_password.sh` script no longer
   outputs passwords as debug messages
 
