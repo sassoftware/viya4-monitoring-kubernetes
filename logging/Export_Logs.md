@@ -79,11 +79,6 @@ The default value is the current date and time.
 
 The output options specify the format in which the log messages are returned.
 
-`--out-vars` *`var1[,var2,...varN]`*
-specifies the fields that are included in the output. Specify the fields as a comma-separated list. The 
-fields that are returned by default are `@timestamp`, `level`, `logsource`, `kube.namespace`, 
-`kube.pod`, `kube.container`, and `message`.
-
 `-o|--out-file` *`output-filename`*
 specifies a file to which the results are written. The default value is stdout. If the specified file exists, the script generates an error message and ends, unless you also specify the `--force` option.
 
