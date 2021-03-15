@@ -39,7 +39,7 @@
   * [FEATURE] The browser-accessible URL for Kibana included in the output
   of `logging/bin/deploy_logging_open.sh` now takes into account ingress 
   configuration
-  * [FEATURE] A new _experimental_ script `logging/bin/getlogs.sh`
+  * [EXPERIMENTAL] A new _experimental_ script `logging/bin/getlogs.sh`
   allows exporting logs to CSV format [`Documentation`](logging/Export_Logs.md)
   * [FIX] The `logging/bin/change_internal_password.sh` script no longer
   outputs passwords as debug messages
