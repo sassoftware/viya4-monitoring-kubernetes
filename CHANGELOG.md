@@ -1,11 +1,56 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.0.5 (15MAR21)
+
+* **Overall**
+  * There is a new document discussing support of various
+  [Cloud providers](Cloud_Providers.md)
+
+* **Monitoring**
+  * [FEATURE] The `monitoring/bin/deploy_dashboards.sh` script now accepts a
+  file or directory argument to deploy user-provided dashboards
+  * [FEATURE] A new `$USER_DIR/monitoring/dashboards` directory is now
+  supported to supply user-provided dashboards at deployment time
+  * [FEATURE] The new [CloudWatch sample](samples/cloudwatch) provides
+  instructions on configuring the CloudWatch agent to scrape metrics
+  from SAS Viya components
+  * [FEATURE] The browser-accessible URL for Grafana is now included in
+  the output of `monitoring/bin/deploy_monitoring_cluster.sh` (including
+  if ingress is configured)
+  * [CHANGE] Several component versions have been upgraded
+    * [Prometheus](https://github.com/prometheus/prometheus/blob/main/CHANGELOG.md#2240--2021-01-06):
+    v2.23.0 -> v2.24.0
+    * [Grafana](https://github.com/grafana/grafana/blob/master/CHANGELOG.md#741-2021-02-11):
+    7.3.6 -> 7.4.1
+    * [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator/blob/master/CHANGELOG.md#0450--2021-01-13):
+    0.44.1 -> 0.45.0
+    * [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack):
+    12.8.0 -> 13.7.2
+  * [CHANGE] The following optional Grafana plugins are no longer installed by default:
+    * grafana-piechart-panel
+    * grafana-clock-panel
+    * camptocamp-prometheus-alertmanager-datasource
+    * flant-statusmap-panel
+    * btplc-status-dot-panel
+  * [CHANGE] [cert-manager](https://cert-manager.io/docs/usage/certificate/) resources
+  now use 'v1' to align with their use in SAS Viya 4.x
+
+* **Logging**
+  * [FEATURE] The browser-accessible URL for Kibana included in the output
+  of `logging/bin/deploy_logging_open.sh` now takes into account ingress 
+  configuration
+  * [EXPERIMENTAL] A new _experimental_ script `logging/bin/getlogs.sh`
+  allows exporting logs to CSV format [`Documentation`](logging/Export_Logs.md)
+  * [FIX] The `logging/bin/change_internal_password.sh` script no longer
+  outputs passwords as debug messages
+
 ## Version 1.0.4 (15FEB21)
 
 * **Overall**
   * Improved documentation for overall deployment process
   * Improved documentation related to use of TLS
-  * Removed references to TLS in ingress sample (samples/ingress); TLS enabled ingress shown in TLS sample (samples/tls)
+  * Removed references to TLS in ingress sample (samples/ingress); TLS enabled
+  ingress shown in TLS sample (samples/tls)
 
 * **Monitoring**
   * [FIX] ENABLE_TLS should set proper port and targetport for v4m-prometheus service
@@ -101,10 +146,11 @@ This is the first public release.
   * Support for [changing retention period](logging/Log_Retention.md) of log messages
   * Node anti-affinity for Elasticsearch replicas
   * Support for multi-role Elasticsearch nodes (including [sample](samples/esmulti/README.md)
-  to demonstrate usage) 
+  to demonstrate usage)
   * Additional documentation on using TLS
   * Removed traces of support for ODFE "demo" security configuration
-  * [Alternate monitoring solution](logging/AZURE_LOG_ANALYTICS_WORKSPACES.md)(proof-of-concept): Fluent Bit
+  * [Alternate monitoring solution](logging/AZURE_LOG_ANALYTICS_WORKSPACES.md)(proof-of-concept):
+  Fluent Bit
   ==> Azure Monitor (Log Analytics workspace)
 
 ## Version 0.1.2 (20OCT20)
