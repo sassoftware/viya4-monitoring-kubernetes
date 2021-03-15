@@ -3,6 +3,7 @@
 source bin/common.sh
 
 declare -A json_paths
+# k8s object: ingress
 json_paths["host"]='{.spec.rules[0].host}'
 json_paths["path"]='{.spec.rules[0].http.paths[0].path}'
 json_paths["tls"]='{.spec.tls[0]}'
@@ -133,7 +134,7 @@ function get_service_url {
  local namespace service path use_tls ingress service_type url
 
  namespace=$1
- service=$2                 # name of service  (TO DO: always a service?  how to handle service name <> ingress name?
+ service=$2                 # name of service
  path=$3                    # only used for NodePort?  Appended to path returned by ingress objects
  use_tls=$4                 # use http or https (ingress properties over-ride)
  ingress=${5:-${service}}   # (optional) name of ingress object (default: $service)
