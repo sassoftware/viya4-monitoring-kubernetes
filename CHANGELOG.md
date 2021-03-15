@@ -3,10 +3,21 @@
 ## Version 1.0.5 (15MAR21)
 
 * **Overall**
-  * Cloud provider doc
+  * There is a new document discussing support of various
+  [Cloud providers](Cloud_Providers.md)
 
 * **Monitoring**
-  * Several component versions have been upgraded
+  * [FEATURE] The `monitoring/bin/deploy_dashboards.sh` script now accepts a
+  file or directory argument to deploy user-provided dashboards
+  * [FEATURE] A new `$USER_DIR/monitoring/dashboards` directory is now
+  supported to supply user-provided dashboards at deployment time
+  * [FEATURE] The new [CloudWatch sample](samples/cloudwatch) provides
+  instructions on configuring the CloudWatch agent to scrape metrics
+  from SAS Viya components
+  * [FEATURE] The browser-accessible URL for Grafana is now included in
+  the output of `monitoring/bin/deploy_monitoring_cluster.sh` (including
+  if ingress is configured)
+  * [CHANGE] Several component versions have been upgraded
     * [Prometheus](https://github.com/prometheus/prometheus/blob/main/CHANGELOG.md#2240--2021-01-06):
     v2.23.0 -> v2.24.0
     * [Grafana](https://github.com/grafana/grafana/blob/master/CHANGELOG.md#741-2021-02-11):
@@ -15,23 +26,23 @@
     0.44.1 -> 0.45.0
     * [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack):
     12.8.0 -> 13.7.2
-  * The following optional Grafana plugins are no longer installed by default:
+  * [CHANGE] The following optional Grafana plugins are no longer installed by default:
     * grafana-piechart-panel
     * grafana-clock-panel
     * camptocamp-prometheus-alertmanager-datasource
     * flant-statusmap-panel
     * btplc-status-dot-panel
-  * [cert-manager](https://cert-manager.io/docs/usage/certificate/) resources
+  * [CHANGE] [cert-manager](https://cert-manager.io/docs/usage/certificate/) resources
   now use 'v1' to align with their use in SAS Viya 4.x
-  * The `monitoring/bin/deploy_dashboards.sh` script now accepts a file or
-  directory argument to deploy user-provided dashboards
-  * A new `$USER_DIR/monitoring/dashboards` directory is now supported to
-  supply user-provided dashboards at deployment time
-  * The new [CloudWatch sample](samples/cloudwatch) provides instructions on
-  configuring the CloudWatch agent to scrape metrics from SAS Viya components
 
 * **Logging**
-  * xyz
+  * [FEATURE] The browser-accessible URL for Kibana is now included in the
+  output of `logging/bin/deploy_logging_open.sh` (including if ingress is
+  configured)
+  * [FEATURE] A new script [`logging/bin/getlogs.sh`](logging/Export_Logs.md)
+  allows exporting logs to CSV format
+  * [FIX] The `logging/bin/change_internal_password.sh` script no longer
+  outputs passwords as debug messages
 
 ## Version 1.0.4 (15FEB21)
 
