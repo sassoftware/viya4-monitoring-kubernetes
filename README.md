@@ -66,6 +66,8 @@ for more information about using the logging components.
 - A Kubernetes cluster that meets the prerequisites for SAS Viya
 - [Helm](https://helm.sh) version 3.x
 - `kubectl` with cluster-admin access
+- [Git](https://git-scm.com/) version 1.8 or later
+- [Bash](https://www.gnu.org/software/bash/)
 
 ## Installation
 
