@@ -32,6 +32,8 @@ Before deploying, you must perform these tasks:
 - [create a local copy of the repository](#log_loc_copy)
 - [customize your deployment](#log_custom)
 
+Note: If you are deploying in a highly secure environment (in which pods cannot connect to the internet and network traffic is routed through a proxy server), you must add `localhost` to the list of hosts that are not routed through the proxy server. If you do not, the Elasticsearch deployment fails.  
+
 ### <a name="log_loc_copy"></a>Create a Local Copy of the Repository
 
 There are two methods to create a local copy of the repository: 
