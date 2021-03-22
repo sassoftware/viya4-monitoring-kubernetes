@@ -40,7 +40,8 @@ spec:
     - \"--stackdriver.kubernetes.location=$GCP_REGION\"
     - \"--stackdriver.kubernetes.cluster-name=$GKE_CLUSTER\"
     - \"--prometheus.api-address=http://127.0.0.1:9090$PROM_PATH\"
-    - \"--include={__name__!~'.*:.*',__name__!=''}\"
+    - \"--include={__name__!~'.*:.*',__name__!='',job!='kube-state-metrics'}\"
+    - \"--include={job='kube-state-metrics',__name__!~'.+_labels',__name__!~'.+_info'}\" 
     ports:
     - name: sidecar
       containerPort: 9091
