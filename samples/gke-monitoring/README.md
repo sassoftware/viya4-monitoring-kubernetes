@@ -1,56 +1,54 @@
-# Google Clould Platform Monitoring Sample
+# Viewing SAS Viya Metrics using Google Cloud Operations
 
-The purpose of this sample is to demonstrate how to collect metrics from SAS
-services in [Google Cloud Operations](https://cloud.google.com/products/operations).
+Google GKE uses [Google Cloud Operations](https://cloud.google.com/products/operations) to view metric data. In order for Google Cloud Operations to view metric data collected in Prometheus, such as from SAS Viya services, that data must be collected from Prometheus, converted, and exported Google Cloud Operations.  
 
-## Prometheus Required
+Use this sample to deploy the components needed to enable Google Cloud Operations to view SAS Viya metric data.
 
-Metrics for SAS Viya components (including third-party technologies like
-Postgres and RabbitMQ) are exposed through Prometheus-compatible HTTP(S)
-metric endpoints.
+## Components
 
-Google [supports Prometheus metrics](https://cloud.google.com/stackdriver/docs/solutions/gke/prometheus)
-by watching data as it is collected by a running Prometheus server, then
-converting and exporting that data to Google Cloud Operations. This process
-relies on the deployment and configuration of a Prometheus server, like
-the one provided by this project.
+These components are required to view SAS Viya metric data in Google Cloud Operations:
 
-## Sidecar
+- Prometheus server
+- Stackdriver Prometheus sidecar
 
-The [Stackdriver Prometheus Sidecar](https://github.com/Stackdriver/stackdriver-prometheus-sidecar)
-is provided by Google to support exporting metrics collected by Prometheus
-to Google Cloud Operations. It is provided as a sidecar (extra container) that
-is added to the Prometheus pod with a shared volume mount so it can read the
-Prometheus server data directly.
+### Prometheus Server 
 
-## Deployment
+SAS Viya metrics are provided as HTTP/HTTPS metric endpoints that are read by a Prometheus server, such as the one deployed with the SAS Viya monitoring components. 
 
-Although the sidecar can be deployed in to Prometheus pods deployed in a
-variety of ways, this sample only directly supports
+Google [supports Prometheus metrics](https://cloud.google.com/stackdriver/docs/solutions/gke/prometheus) by watching data as it is collected by the Prometheus server, then
+converting and exporting that data to Google Cloud Operations. 
+
+Before using this sample, you must [deploy the SAS Viya monitoring components]((../README.md), including the Prometheus server.
+
+### Stackdriver Prometheus sidecar
+
+Google uses the [Stackdriver Prometheus sidecar](https://github.com/Stackdriver/stackdriver-prometheus-sidecar) to export metrics collected by Prometheus
+to Google Cloud Operations. The sidecar (or extra container) is added to the Prometheus pod with a shared volume mount so that the sidecar can directly read the Prometheus server data.
+
+Although there are several ways to deploy the sidecar to a Prometheus pod, this sample directly supports only
 [Prometheus custom resources](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#prometheus)
-such as those deployed in the monitoring stack of this project.
+such as those deployed by the SAS Viya monitoring components in this repository.
 
-The included `patch-prometheus.sh` script will add the sidecar to a deployed
-Prometheus custom resource. The script supports several environment variables,
-some of which are required, while others have reasonable defaults that can be
-overridden.
+## Using This Sample
 
-Required parameters:
+The `patch-prometheus.sh` script in this sample adds the sidecar to a deployed
+Prometheus custom resource. The script uses environment variables to customize the deployment for your environment. Required environment variables do not have a default value, so the script fails if they are not provided. 
 
-* `GCP_PROJECT` - The associated GCP project
-* `GCP_REGION` - The primary region of the cluster
-* `GKE_CLUSTER` - The name of the GKE cluster
+These environment variables are required:
 
-Optional parameters:
+* `GCP_PROJECT` - The Google Cloud Platform project
+* `GCP_REGION` - The primary region of the Google Cloud Platform cluster
+* `GKE_CLUSTER` - The name of the Google Kubernetes Environment cluster
+
+These environment variables are optional:
 
 * `MON_NS` - The namespace of the Prometheus custom resource (default `monitoring`)
 * `PROM_NAME` - The name of the Prometheus custom resource (default `v4m-prometheus`)
-* `PROM_PATH` - Used to indicate that Prometheus is served off of a subpath
-(default `/`). Make sure to end this value with a trailing `/`.
+* `PROM_PATH` - The sub-path to Prometheus from the Prometheus URL. This value must end with `/`, which is the default value. For example, if you are using host-based ingress, the Prometheus URL might be `http://prometheus.host.mycluster.example.com`, so you would use the default value of `/`. If you are using path-based ingress, the Prometheus URL might be `http://host.mycluster.example.com/prometheus`, so you would specify a value of `prometheus/`.
 * `GKE_SIDECAR_VERSION` - The version of the Stackdriver Prometheus Sidecar to
-use (default `0.8.2`). Releases can be found [here](https://github.com/Stackdriver/stackdriver-prometheus-sidecar/releases).
+use. The default value is `0.8.2`. See the list of releases on [Stackdriver Prometheus sidecar on GitHub](https://github.com/Stackdriver/stackdriver-prometheus-sidecar/releases).
 
-Example:
+This is an example deployment:
 
 ```bash
 cd samples/gke-monitoring
@@ -60,32 +58,34 @@ export GKE_CLUSTER=my-awesome-cluster
 ./patch-prometheus.sh
 ```
 
-The Prometheus pod will automatically restart. It will take 1-2 minutes for the
-sidecar to start exporting metrics to Google Cloud Operations.
+After you run the script, the Prometheus pod automatically restarts. The sidecar starts exporting metrics to Google Cloud Operations one to two minutes after the pod restarts.
 
 ## Viewing Metrics
 
-Once the sidecar is successfully exporting metrics, they will visible in the
-Metrics Explorter in Google Cloud Operations Monitoring. From the Google
-Cloud Platform Console, choose the top-left drop-down menu, then navigate to
-Operations->Monitoring->Metrics explorer.
+After the sidecar starts successfully exporting metrics, the metrics are visible in the
+Metrics Explorer in Google Cloud Operations Monitoring. 
 
-All metrics collected from Prometheus will start with
-`external.googleapis.com/prometheus`, but searching for the base metric name
-(e.g. `go_memstats_alloc_bytes`) works as well.
+To view the metrics, from the Google Cloud Platform Console, select **Operations** -> **Monitoring** -> **Metrics Explorer**.
 
-Building charts and dashboards using Metrics Explorer is outside the scope of
-this sample, but ample documentation is available online.
+All metrics collected from Prometheus begin with
+`external.googleapis.com/prometheus`. You can also search for the base metric name
+(such as `go_memstats_alloc_bytes`).
+
+You can create charts and dashboards for viewing the SAS Viya metric data. See the [Metric Explorer documentation](https://cloud.google.com/monitoring/charts/dashboards) for information about building charts and dashboards.
 
 ## Troubleshooting
 
-### Check pod status
+### Check Pod Status
+
+Use this command to check the status of the Prometheus pod and verify that it is running correctly:
 
 ```bash
 kubectl get po -n monitoring prometheus-v4m-prometheus-0
 ```
 
-### Check sidecar logs
+### Check Sidecar Logs
+
+Use this command to view the logs for the Stackdriver Prometheus sidecar:
 
 ```bash
 kubectl logs -n monitoring prometheus-v4m-prometheus-0 -c sidecar -f

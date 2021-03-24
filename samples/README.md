@@ -1,7 +1,14 @@
 # Samples
 
 Samples are provided to demonstrate how to customize the deployment
-of the logging and monitoring components for specific situations. The samples provide instructions and example yaml files that you can modify to fit your environment. Although each example focuses on a specific scenario, you can combine multiple samples by merging the appropriate values in each deployment file.
+of the logging and monitoring components for specific situations. The samples provide instructions, files, and scripts, as appropriate. 
+
+Some samples use the deployment customization process, while others deploy specialized components to support specific scenarios.
+
+## Customization-Based Samples
+
+Samples are provided to demonstrate how to customize the deployment
+of the logging and monitoring components for specific situations. The samples provide instructions, example yaml files that you can modify to fit your environment, and scripts, as appropriate. Although each example focuses on a specific scenario, you can combine multiple samples by merging the appropriate values in each deployment file.
 
 You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
 [main README](../README.md#customization) to for information about the customization process.
@@ -31,3 +38,8 @@ from SAS Viya components
 from SAS Viya monitoring
 * [tls](tls) - Enables TLS encryption for both ingress and in-cluster
 communication
+
+## Other Samples
+
+* [Cloudwatch](cloudwatch) - Configures Amazon Cloudwatch to collect SAS Viya metrics
+* [Google Cloud Operations](gke-monitoring) - Enables Google Cloud Operations to view SAS Viya metric data from Prometheus
