@@ -32,7 +32,7 @@ Before deploying, you must perform these tasks:
 - [create a local copy of the repository](#log_loc_copy)
 - [customize your deployment](#log_custom)
 
-Note: If you are deploying in a highly secure environment (in which pods cannot connect to the internet and network traffic is routed through a proxy server), ensure that `localhost` is included in the list of hosts that are not routed through the proxy server. If it is not included, the Elasticsearch deployment fails, because the deployment scripts use port forwarding to make REST API calls to Elasticsearch and Kibana.  
+Note: If you are deploying in a highly secure environment in which the deployment scripts are run on a machine whose network traffic is routed through a proxy server, ensure that `localhost` is included in the list of hosts that are not routed through the proxy server. If it is not included, the Elasticsearch deployment fails, because the deployment scripts use port forwarding to make REST API calls to Elasticsearch and Kibana.  
 
 ### <a name="log_loc_copy"></a>Create a Local Copy of the Repository
 
