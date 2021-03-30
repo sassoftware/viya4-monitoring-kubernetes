@@ -61,13 +61,40 @@ in a directory named `viya4-monitoring-kubernetes-<release_number>`.
 
 ### <a name="log_custom"></a>Customize the Deployment
 
-The process of customizing the logging deployment consists of: 
+For most deployment scenarios, the process of customizing the logging deployments consists of:
 - creating the location for your local customization files
 - using the `USER_DIR` environment variable to specify the location of the customization files
 - copying the customization files from one of the provided samples to your local directory
 - specifying customization variables and parameters in the customization files
 
-See the [main README](../README.md#customization) to for information about the customization process.
+Other scenarios use different customization steps that are specific to each scenario.
+
+[Samples](#lsample) are provided for several common deployment scenarios. Each sample includes detailed information about the customization process and values for the scenario. 
+
+#### Creating the Location for Customization Files
+
+The `USER_DIR` environment variable enables you to use a directory outside of the local repository to contain the customization files. By using a location outside of the repository, you can put the customization files in a location that is under version control, and you can preserve your customizations when you deploy new versions of the monitoring and logging applications. You could also create different sets of configuration files for different cluster types, and then use the `USER_DIR` variable to specify the configuration files to use based on the cluster type on which you were deploying.
+
+For example, to create a customization directory named *my-viya4mon-user-dir* that contains a directory for logging customization files:
+
+```bash
+mkdir -p ~/my-viya4mon-user-dir/logging
+```
+
+Note that these commands create a customization directory tree in the current user's home directory.
+
+#### Using USER_DIR to Specify the Location of Customization Files
+
+Use the `USER_DIR` environment variable to specify the root location of your local customization files.
+
+This example sets the `USER_DIR` environment variable to the *my-viya4mon-user-dir* directory:
+
+```bash
+export USER_DIR=~/my-viya4mon-user-dir
+```
+The monitoring and logging deployment scripts use the customization files contained in the directories under the `USER_DIR` location.
+
+#### <a name="lcustomization"></a>Specifying Customization Variables and Parameters
 
 After you create the location for your customization files, you can customize the components that you deploy for logging by specifying environment variables and Helm chart parameters in this set of customization files (in this example, contained in the *my-viya4mon-user-dir* root directory):
 
@@ -84,7 +111,7 @@ You specify the environment variables in the `user.env` files and the Helm chart
 
 In order to minimize the potential for errors, you should not manually create the customization files, but use one of the set of sample files as the starting point for your own customizations. 
 
-### Using Customization Samples
+#### <a name="lsample"></a>Using Customization Samples
 
 The samples are provided to demonstrate how to customize the deployment of the monitoring components for specific situations. The samples provide instructions and example `*.yaml` files that you can modify to fit your environment. Although each example focuses on a specific scenario, you can combine multiple samples by merging the appropriate values in each deployment file.
 
