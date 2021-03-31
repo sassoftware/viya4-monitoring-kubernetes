@@ -78,8 +78,8 @@ The `USER_DIR` environment variable enables you to use a directory outside of th
 For example, to create a root customization directory named *my-viya4mon-user-dir* (that can later be specified by the `USER_DIR` environment variable) and then create a directory for the logging customization files:
 
 ```bash
-mkdir -p ~/my-viya4mon-user-dir
-mkdir -p ~/my-viya4mon-user-dir/logging
+mkdir ~/my-viya4mon-user-dir
+mkdir ~/my-viya4mon-user-dir/logging
 ```
 
 Note that these commands create a customization directory tree in the current user's home directory.
