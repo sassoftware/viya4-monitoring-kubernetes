@@ -12,8 +12,8 @@ If you only use TLS (HTTPS) for ingress, you do not have to specify the environm
 
 ## Using This Sample
 
-You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
-[main README](../../../README.md#customization) to for information about the customization process.
+You customize your monitoring deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
+[monitoring README](../../../monitoring/README.md#mon_custom) for information about the customization process.
 
 The customization files in this sample provide a starting point for the customization files for a deployment that supports monitoring with TLS enabled. 
 

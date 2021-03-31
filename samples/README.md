@@ -11,7 +11,7 @@ Samples are provided to demonstrate how to customize the deployment
 of the logging and monitoring components for specific situations. The samples provide instructions, example yaml files that you can modify to fit your environment, and scripts, as appropriate. Although each example focuses on a specific scenario, you can combine multiple samples by merging the appropriate values in each deployment file.
 
 You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
-[main README](../README.md#customization) to for information about the customization process.
+[monitoring README](../monitoring/README.md#mon_custom) or the [logging README](../logging/README.md#log_custom) for information about the customization process.
 
 The customization files in each sample provide a starting point for the customization files for a deployment that supports a specific situation. 
 

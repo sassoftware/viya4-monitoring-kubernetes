@@ -8,7 +8,7 @@ If you are using a cloud provider, you must deploy using ingress.
 ## Using This Sample
 
 You customize your deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
-[main README](../../README.md#customization) to for information about the customization process.
+[monitoring README](../../monitoring/README.md#mon_custom) or the [logging README](../../logging/README.md#log_custom) for information about the customization process.
 
 The customization files in this sample provide a starting point for the customization files for a deployment that supports ingress instead of node ports. 
 

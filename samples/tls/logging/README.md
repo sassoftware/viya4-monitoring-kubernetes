@@ -7,7 +7,7 @@ Communication between the logging components within the cluster always takes pla
 ## Using This Sample
 
 You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
-[main README](../../../README.md#customization) to for information about the customization process.
+[logging README](../../../logging/README.md#log_custom) for information about the customization process.
 
 The customization files in this sample provide a starting point for the customization files for a deployment that supports logging with TLS enabled. 
 
