@@ -80,9 +80,10 @@ Other scenarios use different customization steps that are specific to each scen
 
 The `USER_DIR` environment variable enables you to use a directory outside of the local repository to contain the customization files. By using a location outside of the repository, you can put the customization files in a location that is under version control, and you can preserve your customizations when you deploy new versions of the monitoring and logging applications. You could also create different sets of configuration files for different cluster types, and then use the `USER_DIR` variable to specify the configuration files to use based on the cluster type on which you were deploying.
 
-For example, to create a customization directory named *my-viya4mon-user-dir* that contains a directory for monitoring customization files:
+For example, to create a root customization directory named *my-viya4mon-user-dir* (that can later be specified by the `USER_DIR` environment variable) and then create a directory for the monitoring customization files:
 
 ```bash
+mkdir -p ~/my-viya4mon-user-dir
 mkdir -p ~/my-viya4mon-user-dir/monitoring
 ```
 
