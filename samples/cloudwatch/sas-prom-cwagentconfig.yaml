@@ -286,13 +286,14 @@ data:
                       "namespace",
                       "node",
                       "pod",
-                      "quantile",
+                      "reason",
                       "sas_service_base",
+                      "schema",
                       "service"
                     ]
                   ],
                   "metric_selectors": [
-                    "^go_gc_duration_seconds$"
+                    "^sas_db_closed_total$"
                   ]
                 },
                 {
@@ -307,14 +308,109 @@ data:
                       "namespace",
                       "node",
                       "pod",
-                      "reason",
+                      "sas_service_base",
+                      "service",
+                      "state"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^sas_db_connections_max$",
+                    "^sas_db_pool_connections$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "sas_service_base"
+                  ],
+                  "label_matcher": "golang",
+                  "dimensions": [
+                    [
+                      "container",
+                      "job",
+                      "namespace",
+                      "node",
+                      "pod",
                       "sas_service_base",
                       "schema",
                       "service"
                     ]
                   ],
                   "metric_selectors": [
-                    "^sas_db_closed_total$"
+                    "^sas_db_wait_seconds$",
+                    "^sas_db_wait_total$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "sas_service_base"
+                  ],
+                  "label_matcher": "golang",
+                  "dimensions": [
+                    [
+                      "container",
+                      "job",
+                      "method",
+                      "namespace",
+                      "node",
+                      "pod",
+                      "sas_service_base",
+                      "service",
+                      "status"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^arke_recvmsg_total$",
+                    "^arke_request_elapsed_count$",
+                    "^arke_request_elapsed_sum$",
+                    "^arke_request_total$",
+                    "^arke_sendmsg_total$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "sas_service_base"
+                  ],
+                  "label_matcher": "golang",
+                  "dimensions": [
+                    [
+                      "container",
+                      "job",
+                      "namespace",
+                      "node",
+                      "pod",
+                      "sas_service_base",
+                      "schema",
+                      "service",
+                      "state"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^sas_db_connections_max$",
+                    "^sas_db_pool_connections$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "sas_service_base"
+                  ],
+                  "label_matcher": "golang",
+                  "dimensions": [
+                    [
+                      "ClientIdentitifer",
+                      "container",
+                      "job",
+                      "namespace",
+                      "node",
+                      "pod",
+                      "sas_service_base",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^arke_client_active_messages$",
+                    "^arke_client_consumed_total$",
+                    "^arke_client_produced_total$",
+                    "^arke_client_streams$"
                   ]
                 },
                 {
@@ -357,75 +453,6 @@ data:
                   ],
                   "metric_selectors": [
                     "^sas_db_closed_total$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "sas_service_base"
-                  ],
-                  "label_matcher": "golang",
-                  "dimensions": [
-                    [
-                      "container",
-                      "job",
-                      "namespace",
-                      "node",
-                      "pod",
-                      "sas_service_base",
-                      "schema",
-                      "service"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^sas_db_wait_seconds$",
-                    "^sas_db_wait_total$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "sas_service_base"
-                  ],
-                  "label_matcher": "golang",
-                  "dimensions": [
-                    [
-                      "ClientIdentitifer",
-                      "container",
-                      "job",
-                      "namespace",
-                      "node",
-                      "pod",
-                      "sas_service_base",
-                      "service"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^arke_client_active_messages$",
-                    "^arke_client_consumed_total$",
-                    "^arke_client_produced_total$",
-                    "^arke_client_streams$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "sas_service_base"
-                  ],
-                  "label_matcher": "golang",
-                  "dimensions": [
-                    [
-                      "container",
-                      "job",
-                      "method",
-                      "namespace",
-                      "node",
-                      "pod",
-                      "quantile",
-                      "sas_service_base",
-                      "service",
-                      "status"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^arke_request_elapsed$"
                   ]
                 },
                 {
@@ -491,8 +518,6 @@ data:
                     "^process_virtual_memory_max_bytes$",
                     "^runtime_alloc_bytes$",
                     "^runtime_free_count$",
-                    "^runtime_gc_pause_ns_count$",
-                    "^runtime_gc_pause_ns_sum$",
                     "^runtime_heap_objects$",
                     "^runtime_malloc_count$",
                     "^runtime_num_goroutines$",
@@ -520,15 +545,13 @@ data:
                       "namespace",
                       "node",
                       "pod",
+                      "quantile",
                       "sas_service_base",
-                      "schema",
-                      "service",
-                      "state"
+                      "service"
                     ]
                   ],
                   "metric_selectors": [
-                    "^sas_db_connections_max$",
-                    "^sas_db_pool_connections$"
+                    "^go_gc_duration_seconds$"
                   ]
                 },
                 {
@@ -544,85 +567,14 @@ data:
                       "namespace",
                       "node",
                       "pod",
+                      "quantile",
                       "sas_service_base",
                       "service",
                       "status"
                     ]
                   ],
                   "metric_selectors": [
-                    "^arke_recvmsg_total$",
-                    "^arke_request_elapsed_count$",
-                    "^arke_request_elapsed_sum$",
-                    "^arke_request_total$",
-                    "^arke_sendmsg_total$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "sas_service_base"
-                  ],
-                  "label_matcher": "golang",
-                  "dimensions": [
-                    [
-                      "container",
-                      "job",
-                      "namespace",
-                      "node",
-                      "pod",
-                      "sas_service_base",
-                      "service",
-                      "state"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^sas_db_connections_max$",
-                    "^sas_db_pool_connections$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "sas_service_base"
-                  ],
-                  "label_matcher": "spring",
-                  "dimensions": [
-                    [
-                      "container",
-                      "job",
-                      "name",
-                      "namespace",
-                      "node",
-                      "pod",
-                      "sas_service_base"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^jdbc_connections_active$",
-                    "^jdbc_connections_idle$",
-                    "^jdbc_connections_max$",
-                    "^jdbc_connections_min$",
-                    "^rabbitmq_acknowledged_published_total$",
-                    "^rabbitmq_acknowledged_total$",
-                    "^rabbitmq_channels$",
-                    "^rabbitmq_connections$",
-                    "^rabbitmq_consumed_total$",
-                    "^rabbitmq_failed_to_publish_total$",
-                    "^rabbitmq_not_acknowledged_published_total$",
-                    "^rabbitmq_published_total$",
-                    "^rabbitmq_rejected_total$",
-                    "^rabbitmq_unrouted_published_total$",
-                    "^tomcat_global_error_total$",
-                    "^tomcat_global_received_bytes_total$",
-                    "^tomcat_global_request_max_seconds$",
-                    "^tomcat_global_request_seconds_count$",
-                    "^tomcat_global_request_seconds_sum$",
-                    "^tomcat_global_sent_bytes_total$",
-                    "^tomcat_servlet_error_total$",
-                    "^tomcat_servlet_request_max_seconds$",
-                    "^tomcat_servlet_request_seconds_count$",
-                    "^tomcat_servlet_request_seconds_sum$",
-                    "^tomcat_threads_busy_threads$",
-                    "^tomcat_threads_config_max_threads$",
-                    "^tomcat_threads_current_threads$"
+                    "^arke_request_elapsed$"
                   ]
                 },
                 {
@@ -708,6 +660,26 @@ data:
                   "label_matcher": "spring",
                   "dimensions": [
                     [
+                      "container",
+                      "job",
+                      "namespace",
+                      "node",
+                      "pod",
+                      "sas_service_base",
+                      "state"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^jvm_threads_states_threads$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "sas_service_base"
+                  ],
+                  "label_matcher": "spring",
+                  "dimensions": [
+                    [
                       "clientName",
                       "container",
                       "job",
@@ -724,6 +696,26 @@ data:
                     "^http_client_requests_seconds_count$",
                     "^http_client_requests_seconds_max$",
                     "^http_client_requests_seconds_sum$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "sas_service_base"
+                  ],
+                  "label_matcher": "spring",
+                  "dimensions": [
+                    [
+                      "container",
+                      "job",
+                      "level",
+                      "namespace",
+                      "node",
+                      "pod",
+                      "sas_service_base"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^log_events_total$"
                   ]
                 },
                 {
@@ -759,30 +751,6 @@ data:
                   "dimensions": [
                     [
                       "container",
-                      "job",
-                      "listener_id",
-                      "namespace",
-                      "node",
-                      "pod",
-                      "queue",
-                      "result",
-                      "sas_service_base"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^spring_rabbitmq_listener_seconds_count$",
-                    "^spring_rabbitmq_listener_seconds_max$",
-                    "^spring_rabbitmq_listener_seconds_sum$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "sas_service_base"
-                  ],
-                  "label_matcher": "spring",
-                  "dimensions": [
-                    [
-                      "container",
                       "id",
                       "job",
                       "namespace",
@@ -795,6 +763,52 @@ data:
                     "^jvm_buffer_count_buffers$",
                     "^jvm_buffer_memory_used_bytes$",
                     "^jvm_buffer_total_capacity_bytes$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "sas_service_base"
+                  ],
+                  "label_matcher": "spring",
+                  "dimensions": [
+                    [
+                      "container",
+                      "job",
+                      "name",
+                      "namespace",
+                      "node",
+                      "pod",
+                      "sas_service_base"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^jdbc_connections_active$",
+                    "^jdbc_connections_idle$",
+                    "^jdbc_connections_max$",
+                    "^jdbc_connections_min$",
+                    "^rabbitmq_acknowledged_published_total$",
+                    "^rabbitmq_acknowledged_total$",
+                    "^rabbitmq_channels$",
+                    "^rabbitmq_connections$",
+                    "^rabbitmq_consumed_total$",
+                    "^rabbitmq_failed_to_publish_total$",
+                    "^rabbitmq_not_acknowledged_published_total$",
+                    "^rabbitmq_published_total$",
+                    "^rabbitmq_rejected_total$",
+                    "^rabbitmq_unrouted_published_total$",
+                    "^tomcat_global_error_total$",
+                    "^tomcat_global_received_bytes_total$",
+                    "^tomcat_global_request_max_seconds$",
+                    "^tomcat_global_request_seconds_count$",
+                    "^tomcat_global_request_seconds_sum$",
+                    "^tomcat_global_sent_bytes_total$",
+                    "^tomcat_servlet_error_total$",
+                    "^tomcat_servlet_request_max_seconds$",
+                    "^tomcat_servlet_request_seconds_count$",
+                    "^tomcat_servlet_request_seconds_sum$",
+                    "^tomcat_threads_busy_threads$",
+                    "^tomcat_threads_config_max_threads$",
+                    "^tomcat_threads_current_threads$"
                   ]
                 },
                 {
@@ -829,35 +843,87 @@ data:
                     [
                       "container",
                       "job",
+                      "listener_id",
                       "namespace",
                       "node",
                       "pod",
-                      "sas_service_base",
-                      "state"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^jvm_threads_states_threads$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "sas_service_base"
-                  ],
-                  "label_matcher": "spring",
-                  "dimensions": [
-                    [
-                      "container",
-                      "job",
-                      "level",
-                      "namespace",
-                      "node",
-                      "pod",
+                      "queue",
+                      "result",
                       "sas_service_base"
                     ]
                   ],
                   "metric_selectors": [
-                    "^log_events_total$"
+                    "^spring_rabbitmq_listener_seconds_count$",
+                    "^spring_rabbitmq_listener_seconds_max$",
+                    "^spring_rabbitmq_listener_seconds_sum$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-crunchy-data-postgres",
+                  "dimensions": [
+                    [
+                      "container",
+                      "exp_type",
+                      "filename",
+                      "hashsum",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^pg_exporter_user_queries_load_error$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-crunchy-data-postgres",
+                  "dimensions": [
+                    [
+                      "container",
+                      "exp_type",
+                      "interface",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "server",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^ccp_nodemx_network_rx_bytes$",
+                    "^ccp_nodemx_network_rx_packets$",
+                    "^ccp_nodemx_network_tx_bytes$",
+                    "^ccp_nodemx_network_tx_packets$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-crunchy-data-postgres",
+                  "dimensions": [
+                    [
+                      "container",
+                      "datname",
+                      "exp_type",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "server",
+                      "service",
+                      "state"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^pg_stat_activity_count$",
+                    "^pg_stat_activity_max_tx_duration$"
                   ]
                 },
                 {
@@ -874,35 +940,12 @@ data:
                       "pod",
                       "server",
                       "service",
-                      "stanza"
+                      "short_version",
+                      "version"
                     ]
                   ],
                   "metric_selectors": [
-                    "^ccp_backrest_last_diff_backup_time_since_completion_seconds$",
-                    "^ccp_backrest_last_full_backup_time_since_completion_seconds$",
-                    "^ccp_backrest_last_incr_backup_time_since_completion_seconds$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "job"
-                  ],
-                  "label_matcher": "sas-crunchy-data-postgres",
-                  "dimensions": [
-                    [
-                      "container",
-                      "exp_type",
-                      "job",
-                      "namespace",
-                      "pod",
-                      "replica",
-                      "replica_port",
-                      "server",
-                      "service"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^ccp_replication_lag_size_bytes$"
+                    "^pg_static$"
                   ]
                 },
                 {
@@ -1007,6 +1050,175 @@ data:
                   "dimensions": [
                     [
                       "container",
+                      "exp_type",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "server",
+                      "service",
+                      "stanza"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^ccp_backrest_last_diff_backup_time_since_completion_seconds$",
+                    "^ccp_backrest_last_full_backup_time_since_completion_seconds$",
+                    "^ccp_backrest_last_incr_backup_time_since_completion_seconds$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-crunchy-data-postgres",
+                  "dimensions": [
+                    [
+                      "container",
+                      "exp_type",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "replica",
+                      "replica_port",
+                      "server",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^ccp_replication_lag_size_bytes$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-crunchy-data-postgres",
+                  "dimensions": [
+                    [
+                      "container",
+                      "dbname",
+                      "exp_type",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "relname",
+                      "schemaname",
+                      "server",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^ccp_stat_user_tables_analyze_count$",
+                    "^ccp_stat_user_tables_autoanalyze_count$",
+                    "^ccp_stat_user_tables_autovacuum_count$",
+                    "^ccp_stat_user_tables_idx_scan$",
+                    "^ccp_stat_user_tables_idx_tup_fetch$",
+                    "^ccp_stat_user_tables_n_dead_tup$",
+                    "^ccp_stat_user_tables_n_live_tup$",
+                    "^ccp_stat_user_tables_n_tup_del$",
+                    "^ccp_stat_user_tables_n_tup_hot_upd$",
+                    "^ccp_stat_user_tables_n_tup_ins$",
+                    "^ccp_stat_user_tables_n_tup_upd$",
+                    "^ccp_stat_user_tables_seq_scan$",
+                    "^ccp_stat_user_tables_seq_tup_read$",
+                    "^ccp_stat_user_tables_vacuum_count$",
+                    "^ccp_table_size_size_bytes$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-crunchy-data-postgres",
+                  "dimensions": [
+                    [
+                      "container",
+                      "datid",
+                      "datname",
+                      "exp_type",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "server",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^pg_stat_database_blk_read_time$",
+                    "^pg_stat_database_blk_write_time$",
+                    "^pg_stat_database_blks_hit$",
+                    "^pg_stat_database_blks_read$",
+                    "^pg_stat_database_conflicts$",
+                    "^pg_stat_database_conflicts_confl_bufferpin$",
+                    "^pg_stat_database_conflicts_confl_deadlock$",
+                    "^pg_stat_database_conflicts_confl_lock$",
+                    "^pg_stat_database_conflicts_confl_snapshot$",
+                    "^pg_stat_database_conflicts_confl_tablespace$",
+                    "^pg_stat_database_deadlocks$",
+                    "^pg_stat_database_numbackends$",
+                    "^pg_stat_database_stats_reset$",
+                    "^pg_stat_database_temp_bytes$",
+                    "^pg_stat_database_temp_files$",
+                    "^pg_stat_database_tup_deleted$",
+                    "^pg_stat_database_tup_fetched$",
+                    "^pg_stat_database_tup_inserted$",
+                    "^pg_stat_database_tup_returned$",
+                    "^pg_stat_database_tup_updated$",
+                    "^pg_stat_database_xact_commit$",
+                    "^pg_stat_database_xact_rollback$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-crunchy-data-postgres",
+                  "dimensions": [
+                    [
+                      "container",
+                      "exp_type",
+                      "job",
+                      "mount_point",
+                      "namespace",
+                      "pod",
+                      "server",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^ccp_nodemx_disk_activity_sectors_read$",
+                    "^ccp_nodemx_disk_activity_sectors_written$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-crunchy-data-postgres",
+                  "dimensions": [
+                    [
+                      "container",
+                      "dbname",
+                      "exp_type",
+                      "job",
+                      "mode",
+                      "namespace",
+                      "pod",
+                      "server",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^ccp_locks_count$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-crunchy-data-postgres",
+                  "dimensions": [
+                    [
+                      "container",
                       "datname",
                       "exp_type",
                       "job",
@@ -1029,18 +1241,100 @@ data:
                   "dimensions": [
                     [
                       "container",
+                      "dbname",
+                      "exp_type",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "server",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^ccp_data_checksum_failure_time_since_last_failure_seconds$",
+                    "^ccp_database_size_bytes$",
+                    "^ccp_stat_database_blks_hit$",
+                    "^ccp_stat_database_blks_read$",
+                    "^ccp_stat_database_conflicts$",
+                    "^ccp_stat_database_deadlocks$",
+                    "^ccp_stat_database_temp_bytes$",
+                    "^ccp_stat_database_temp_files$",
+                    "^ccp_stat_database_tup_deleted$",
+                    "^ccp_stat_database_tup_fetched$",
+                    "^ccp_stat_database_tup_inserted$",
+                    "^ccp_stat_database_tup_returned$",
+                    "^ccp_stat_database_tup_updated$",
+                    "^ccp_stat_database_xact_commit$",
+                    "^ccp_stat_database_xact_rollback$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-crunchy-data-postgres",
+                  "dimensions": [
+                    [
+                      "container",
+                      "exp_type",
+                      "fs_type",
+                      "job",
+                      "mount_point",
+                      "namespace",
+                      "pod",
+                      "server",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^ccp_nodemx_data_disk_available_bytes$",
+                    "^ccp_nodemx_data_disk_free_file_nodes$",
+                    "^ccp_nodemx_data_disk_total_bytes$",
+                    "^ccp_nodemx_data_disk_total_file_nodes$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-crunchy-data-postgres",
+                  "dimensions": [
+                    [
+                      "container",
+                      "exp_type",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "quantile",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^go_gc_duration_seconds$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-crunchy-data-postgres",
+                  "dimensions": [
+                    [
+                      "backup_type",
+                      "container",
                       "exp_type",
                       "job",
                       "namespace",
                       "pod",
                       "server",
                       "service",
-                      "short_version",
-                      "version"
+                      "stanza"
                     ]
                   ],
                   "metric_selectors": [
-                    "^pg_static$"
+                    "^ccp_backrest_last_info_backup_runtime_seconds$",
+                    "^ccp_backrest_last_info_repo_backup_size_bytes$",
+                    "^ccp_backrest_last_info_repo_total_size_bytes$"
                   ]
                 },
                 {
@@ -1366,296 +1660,382 @@ data:
                   "source_labels": [
                     "job"
                   ],
-                  "label_matcher": "sas-crunchy-data-postgres",
+                  "label_matcher": "sas-rabbitmq",
                   "dimensions": [
                     [
+                      "alloc",
                       "container",
-                      "datid",
-                      "datname",
-                      "exp_type",
+                      "instance_no",
                       "job",
+                      "kind",
                       "namespace",
                       "pod",
-                      "server",
-                      "service"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^pg_stat_database_blk_read_time$",
-                    "^pg_stat_database_blk_write_time$",
-                    "^pg_stat_database_blks_hit$",
-                    "^pg_stat_database_blks_read$",
-                    "^pg_stat_database_conflicts$",
-                    "^pg_stat_database_conflicts_confl_bufferpin$",
-                    "^pg_stat_database_conflicts_confl_deadlock$",
-                    "^pg_stat_database_conflicts_confl_lock$",
-                    "^pg_stat_database_conflicts_confl_snapshot$",
-                    "^pg_stat_database_conflicts_confl_tablespace$",
-                    "^pg_stat_database_deadlocks$",
-                    "^pg_stat_database_numbackends$",
-                    "^pg_stat_database_stats_reset$",
-                    "^pg_stat_database_temp_bytes$",
-                    "^pg_stat_database_temp_files$",
-                    "^pg_stat_database_tup_deleted$",
-                    "^pg_stat_database_tup_fetched$",
-                    "^pg_stat_database_tup_inserted$",
-                    "^pg_stat_database_tup_returned$",
-                    "^pg_stat_database_tup_updated$",
-                    "^pg_stat_database_xact_commit$",
-                    "^pg_stat_database_xact_rollback$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "job"
-                  ],
-                  "label_matcher": "sas-crunchy-data-postgres",
-                  "dimensions": [
-                    [
-                      "container",
-                      "exp_type",
-                      "interface",
-                      "job",
-                      "namespace",
-                      "pod",
-                      "server",
-                      "service"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^ccp_nodemx_network_rx_bytes$",
-                    "^ccp_nodemx_network_rx_packets$",
-                    "^ccp_nodemx_network_tx_bytes$",
-                    "^ccp_nodemx_network_tx_packets$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "job"
-                  ],
-                  "label_matcher": "sas-crunchy-data-postgres",
-                  "dimensions": [
-                    [
-                      "container",
-                      "exp_type",
-                      "job",
-                      "namespace",
-                      "pod",
-                      "quantile",
-                      "service"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^go_gc_duration_seconds$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "job"
-                  ],
-                  "label_matcher": "sas-crunchy-data-postgres",
-                  "dimensions": [
-                    [
-                      "container",
-                      "datname",
-                      "exp_type",
-                      "job",
-                      "namespace",
-                      "pod",
-                      "server",
                       "service",
-                      "state"
+                      "usage"
                     ]
                   ],
                   "metric_selectors": [
-                    "^pg_stat_activity_count$",
-                    "^pg_stat_activity_max_tx_duration$"
+                    "^erlang_vm_allocators$"
                   ]
                 },
                 {
                   "source_labels": [
                     "job"
                   ],
-                  "label_matcher": "sas-crunchy-data-postgres",
+                  "label_matcher": "sas-rabbitmq",
                   "dimensions": [
                     [
                       "container",
-                      "dbname",
-                      "exp_type",
-                      "job",
-                      "mode",
-                      "namespace",
-                      "pod",
-                      "server",
-                      "service"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^ccp_locks_count$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "job"
-                  ],
-                  "label_matcher": "sas-crunchy-data-postgres",
-                  "dimensions": [
-                    [
-                      "container",
-                      "dbname",
-                      "exp_type",
+                      "id",
                       "job",
                       "namespace",
                       "pod",
-                      "relname",
-                      "schemaname",
-                      "server",
-                      "service"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^ccp_stat_user_tables_analyze_count$",
-                    "^ccp_stat_user_tables_autoanalyze_count$",
-                    "^ccp_stat_user_tables_autovacuum_count$",
-                    "^ccp_stat_user_tables_idx_scan$",
-                    "^ccp_stat_user_tables_idx_tup_fetch$",
-                    "^ccp_stat_user_tables_n_dead_tup$",
-                    "^ccp_stat_user_tables_n_live_tup$",
-                    "^ccp_stat_user_tables_n_tup_del$",
-                    "^ccp_stat_user_tables_n_tup_hot_upd$",
-                    "^ccp_stat_user_tables_n_tup_ins$",
-                    "^ccp_stat_user_tables_n_tup_upd$",
-                    "^ccp_stat_user_tables_seq_scan$",
-                    "^ccp_stat_user_tables_seq_tup_read$",
-                    "^ccp_stat_user_tables_vacuum_count$",
-                    "^ccp_table_size_size_bytes$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "job"
-                  ],
-                  "label_matcher": "sas-crunchy-data-postgres",
-                  "dimensions": [
-                    [
-                      "container",
-                      "exp_type",
-                      "fs_type",
-                      "job",
-                      "mount_point",
-                      "namespace",
-                      "pod",
-                      "server",
-                      "service"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^ccp_nodemx_data_disk_available_bytes$",
-                    "^ccp_nodemx_data_disk_free_file_nodes$",
-                    "^ccp_nodemx_data_disk_total_bytes$",
-                    "^ccp_nodemx_data_disk_total_file_nodes$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "job"
-                  ],
-                  "label_matcher": "sas-crunchy-data-postgres",
-                  "dimensions": [
-                    [
-                      "container",
-                      "exp_type",
-                      "filename",
-                      "hashsum",
-                      "job",
-                      "namespace",
-                      "pod",
-                      "service"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^pg_exporter_user_queries_load_error$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "job"
-                  ],
-                  "label_matcher": "sas-crunchy-data-postgres",
-                  "dimensions": [
-                    [
-                      "container",
-                      "dbname",
-                      "exp_type",
-                      "job",
-                      "namespace",
-                      "pod",
-                      "server",
-                      "service"
-                    ]
-                  ],
-                  "metric_selectors": [
-                    "^ccp_data_checksum_failure_time_since_last_failure_seconds$",
-                    "^ccp_database_size_bytes$",
-                    "^ccp_stat_database_blks_hit$",
-                    "^ccp_stat_database_blks_read$",
-                    "^ccp_stat_database_conflicts$",
-                    "^ccp_stat_database_deadlocks$",
-                    "^ccp_stat_database_temp_bytes$",
-                    "^ccp_stat_database_temp_files$",
-                    "^ccp_stat_database_tup_deleted$",
-                    "^ccp_stat_database_tup_fetched$",
-                    "^ccp_stat_database_tup_inserted$",
-                    "^ccp_stat_database_tup_returned$",
-                    "^ccp_stat_database_tup_updated$",
-                    "^ccp_stat_database_xact_commit$",
-                    "^ccp_stat_database_xact_rollback$"
-                  ]
-                },
-                {
-                  "source_labels": [
-                    "job"
-                  ],
-                  "label_matcher": "sas-crunchy-data-postgres",
-                  "dimensions": [
-                    [
-                      "backup_type",
-                      "container",
-                      "exp_type",
-                      "job",
-                      "namespace",
-                      "pod",
-                      "server",
                       "service",
-                      "stanza"
+                      "type"
                     ]
                   ],
                   "metric_selectors": [
-                    "^ccp_backrest_last_info_backup_runtime_seconds$",
-                    "^ccp_backrest_last_info_repo_backup_size_bytes$",
-                    "^ccp_backrest_last_info_repo_total_size_bytes$"
+                    "^erlang_vm_msacc_alloc_seconds_total$",
+                    "^erlang_vm_msacc_aux_seconds_total$",
+                    "^erlang_vm_msacc_bif_seconds_total$",
+                    "^erlang_vm_msacc_busy_wait_seconds_total$",
+                    "^erlang_vm_msacc_check_io_seconds_total$",
+                    "^erlang_vm_msacc_emulator_seconds_total$",
+                    "^erlang_vm_msacc_ets_seconds_total$",
+                    "^erlang_vm_msacc_gc_full_seconds_total$",
+                    "^erlang_vm_msacc_gc_seconds_total$",
+                    "^erlang_vm_msacc_nif_seconds_total$",
+                    "^erlang_vm_msacc_other_seconds_total$",
+                    "^erlang_vm_msacc_port_seconds_total$",
+                    "^erlang_vm_msacc_send_seconds_total$",
+                    "^erlang_vm_msacc_sleep_seconds_total$",
+                    "^erlang_vm_msacc_timers_seconds_total$"
                   ]
                 },
                 {
                   "source_labels": [
                     "job"
                   ],
-                  "label_matcher": "sas-crunchy-data-postgres",
+                  "label_matcher": "sas-rabbitmq",
                   "dimensions": [
                     [
                       "container",
-                      "exp_type",
                       "job",
-                      "mount_point",
+                      "kind",
                       "namespace",
                       "pod",
-                      "server",
                       "service"
                     ]
                   ],
                   "metric_selectors": [
-                    "^ccp_nodemx_disk_activity_sectors_read$",
-                    "^ccp_nodemx_disk_activity_sectors_written$"
+                    "^erlang_vm_memory_bytes_total$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-rabbitmq",
+                  "dimensions": [
+                    [
+                      "container",
+                      "content_type",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "registry",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^telemetry_scrape_duration_seconds_count$",
+                    "^telemetry_scrape_duration_seconds_sum$",
+                    "^telemetry_scrape_size_bytes_count$",
+                    "^telemetry_scrape_size_bytes_sum$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-rabbitmq",
+                  "dimensions": [
+                    [
+                      "container",
+                      "content_type",
+                      "encoding",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "registry",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^telemetry_scrape_encoded_size_bytes_count$",
+                    "^telemetry_scrape_encoded_size_bytes_sum$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-rabbitmq",
+                  "dimensions": [
+                    [
+                      "container",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "service",
+                      "usage"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^erlang_vm_memory_atom_bytes_total$",
+                    "^erlang_vm_memory_processes_bytes_total$",
+                    "^erlang_vm_memory_system_bytes_total$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-rabbitmq",
+                  "dimensions": [
+                    [
+                      "container",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "protocol",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^rabbitmq_auth_attempts_failed_total$",
+                    "^rabbitmq_auth_attempts_succeeded_total$",
+                    "^rabbitmq_auth_attempts_total$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-rabbitmq",
+                  "dimensions": [
+                    [
+                      "container",
+                      "job",
+                      "namespace",
+                      "pod",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^erlang_mnesia_committed_transactions$",
+                    "^erlang_mnesia_failed_transactions$",
+                    "^erlang_mnesia_held_locks$",
+                    "^erlang_mnesia_lock_queue$",
+                    "^erlang_mnesia_logged_transactions$",
+                    "^erlang_mnesia_restarted_transactions$",
+                    "^erlang_mnesia_transaction_coordinators$",
+                    "^erlang_mnesia_transaction_participants$",
+                    "^erlang_vm_atom_count$",
+                    "^erlang_vm_atom_limit$",
+                    "^erlang_vm_dirty_cpu_schedulers$",
+                    "^erlang_vm_dirty_cpu_schedulers_online$",
+                    "^erlang_vm_dirty_io_schedulers$",
+                    "^erlang_vm_ets_limit$",
+                    "^erlang_vm_logical_processors$",
+                    "^erlang_vm_logical_processors_available$",
+                    "^erlang_vm_logical_processors_online$",
+                    "^erlang_vm_memory_dets_tables$",
+                    "^erlang_vm_memory_ets_tables$",
+                    "^erlang_vm_port_count$",
+                    "^erlang_vm_port_limit$",
+                    "^erlang_vm_process_count$",
+                    "^erlang_vm_process_limit$",
+                    "^erlang_vm_schedulers$",
+                    "^erlang_vm_schedulers_online$",
+                    "^erlang_vm_smp_support$",
+                    "^erlang_vm_statistics_bytes_output_total$",
+                    "^erlang_vm_statistics_bytes_received_total$",
+                    "^erlang_vm_statistics_context_switches$",
+                    "^erlang_vm_statistics_dirty_cpu_run_queue_length$",
+                    "^erlang_vm_statistics_dirty_io_run_queue_length$",
+                    "^erlang_vm_statistics_garbage_collection_bytes_reclaimed$",
+                    "^erlang_vm_statistics_garbage_collection_number_of_gcs$",
+                    "^erlang_vm_statistics_garbage_collection_words_reclaimed$",
+                    "^erlang_vm_statistics_reductions_total$",
+                    "^erlang_vm_statistics_run_queues_length_total$",
+                    "^erlang_vm_statistics_runtime_milliseconds$",
+                    "^erlang_vm_statistics_wallclock_time_milliseconds$",
+                    "^erlang_vm_thread_pool_size$",
+                    "^erlang_vm_threads$",
+                    "^erlang_vm_time_correction$",
+                    "^erlang_vm_wordsize_bytes$",
+                    "^rabbitmq_channel_acks_uncommitted$",
+                    "^rabbitmq_channel_consumers$",
+                    "^rabbitmq_channel_get_ack_total$",
+                    "^rabbitmq_channel_get_empty_total$",
+                    "^rabbitmq_channel_get_total$",
+                    "^rabbitmq_channel_messages_acked_total$",
+                    "^rabbitmq_channel_messages_confirmed_total$",
+                    "^rabbitmq_channel_messages_delivered_ack_total$",
+                    "^rabbitmq_channel_messages_delivered_total$",
+                    "^rabbitmq_channel_messages_published_total$",
+                    "^rabbitmq_channel_messages_redelivered_total$",
+                    "^rabbitmq_channel_messages_unacked$",
+                    "^rabbitmq_channel_messages_uncommitted$",
+                    "^rabbitmq_channel_messages_unconfirmed$",
+                    "^rabbitmq_channel_messages_unroutable_dropped_total$",
+                    "^rabbitmq_channel_messages_unroutable_returned_total$",
+                    "^rabbitmq_channel_prefetch$",
+                    "^rabbitmq_channel_process_reductions_total$",
+                    "^rabbitmq_channels$",
+                    "^rabbitmq_channels_closed_total$",
+                    "^rabbitmq_channels_opened_total$",
+                    "^rabbitmq_connection_channels$",
+                    "^rabbitmq_connection_incoming_bytes_total$",
+                    "^rabbitmq_connection_incoming_packets_total$",
+                    "^rabbitmq_connection_outgoing_bytes_total$",
+                    "^rabbitmq_connection_outgoing_packets_total$",
+                    "^rabbitmq_connection_pending_packets$",
+                    "^rabbitmq_connection_process_reductions_total$",
+                    "^rabbitmq_connections$",
+                    "^rabbitmq_connections_closed_total$",
+                    "^rabbitmq_connections_opened_total$",
+                    "^rabbitmq_consumer_prefetch$",
+                    "^rabbitmq_consumers$",
+                    "^rabbitmq_disk_space_available_bytes$",
+                    "^rabbitmq_disk_space_available_limit_bytes$",
+                    "^rabbitmq_erlang_gc_reclaimed_bytes_total$",
+                    "^rabbitmq_erlang_gc_runs_total$",
+                    "^rabbitmq_erlang_net_ticktime_seconds$",
+                    "^rabbitmq_erlang_processes_limit$",
+                    "^rabbitmq_erlang_processes_used$",
+                    "^rabbitmq_erlang_scheduler_context_switches_total$",
+                    "^rabbitmq_erlang_scheduler_run_queue$",
+                    "^rabbitmq_erlang_uptime_seconds$",
+                    "^rabbitmq_io_open_attempt_ops_total$",
+                    "^rabbitmq_io_open_attempt_time_seconds_total$",
+                    "^rabbitmq_io_read_bytes_total$",
+                    "^rabbitmq_io_read_ops_total$",
+                    "^rabbitmq_io_read_time_seconds_total$",
+                    "^rabbitmq_io_reopen_ops_total$",
+                    "^rabbitmq_io_seek_ops_total$",
+                    "^rabbitmq_io_seek_time_seconds_total$",
+                    "^rabbitmq_io_sync_ops_total$",
+                    "^rabbitmq_io_sync_time_seconds_total$",
+                    "^rabbitmq_io_write_bytes_total$",
+                    "^rabbitmq_io_write_ops_total$",
+                    "^rabbitmq_io_write_time_seconds_total$",
+                    "^rabbitmq_msg_store_read_total$",
+                    "^rabbitmq_msg_store_write_total$",
+                    "^rabbitmq_process_max_fds$",
+                    "^rabbitmq_process_max_tcp_sockets$",
+                    "^rabbitmq_process_open_fds$",
+                    "^rabbitmq_process_open_tcp_sockets$",
+                    "^rabbitmq_process_resident_memory_bytes$",
+                    "^rabbitmq_queue_consumer_utilisation$",
+                    "^rabbitmq_queue_consumers$",
+                    "^rabbitmq_queue_disk_reads_total$",
+                    "^rabbitmq_queue_disk_writes_total$",
+                    "^rabbitmq_queue_index_journal_write_ops_total$",
+                    "^rabbitmq_queue_index_read_ops_total$",
+                    "^rabbitmq_queue_index_write_ops_total$",
+                    "^rabbitmq_queue_messages$",
+                    "^rabbitmq_queue_messages_bytes$",
+                    "^rabbitmq_queue_messages_paged_out$",
+                    "^rabbitmq_queue_messages_paged_out_bytes$",
+                    "^rabbitmq_queue_messages_persistent$",
+                    "^rabbitmq_queue_messages_published_total$",
+                    "^rabbitmq_queue_messages_ram$",
+                    "^rabbitmq_queue_messages_ram_bytes$",
+                    "^rabbitmq_queue_messages_ready$",
+                    "^rabbitmq_queue_messages_ready_bytes$",
+                    "^rabbitmq_queue_messages_ready_ram$",
+                    "^rabbitmq_queue_messages_unacked$",
+                    "^rabbitmq_queue_messages_unacked_bytes$",
+                    "^rabbitmq_queue_messages_unacked_ram$",
+                    "^rabbitmq_queue_process_memory_bytes$",
+                    "^rabbitmq_queue_process_reductions_total$",
+                    "^rabbitmq_queues$",
+                    "^rabbitmq_queues_created_total$",
+                    "^rabbitmq_queues_declared_total$",
+                    "^rabbitmq_queues_deleted_total$",
+                    "^rabbitmq_raft_entry_commit_latency_seconds$",
+                    "^rabbitmq_raft_log_commit_index$",
+                    "^rabbitmq_raft_log_last_applied_index$",
+                    "^rabbitmq_raft_log_last_written_index$",
+                    "^rabbitmq_raft_log_snapshot_index$",
+                    "^rabbitmq_raft_term_total$",
+                    "^rabbitmq_resident_memory_limit_bytes$",
+                    "^rabbitmq_schema_db_disk_tx_total$",
+                    "^rabbitmq_schema_db_ram_tx_total$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-rabbitmq",
+                  "dimensions": [
+                    [
+                      "container",
+                      "job",
+                      "namespace",
+                      "peer",
+                      "pod",
+                      "service"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^erlang_vm_dist_node_queue_size_bytes$",
+                    "^erlang_vm_dist_node_state$",
+                    "^erlang_vm_dist_port_input_bytes$",
+                    "^erlang_vm_dist_port_memory_bytes$",
+                    "^erlang_vm_dist_port_output_bytes$",
+                    "^erlang_vm_dist_port_queue_size_bytes$",
+                    "^erlang_vm_dist_recv_avg_bytes$",
+                    "^erlang_vm_dist_recv_bytes$",
+                    "^erlang_vm_dist_recv_cnt$",
+                    "^erlang_vm_dist_recv_dvi_bytes$",
+                    "^erlang_vm_dist_recv_max_bytes$",
+                    "^erlang_vm_dist_send_avg_bytes$",
+                    "^erlang_vm_dist_send_bytes$",
+                    "^erlang_vm_dist_send_cnt$",
+                    "^erlang_vm_dist_send_max_bytes$",
+                    "^erlang_vm_dist_send_pend_bytes$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": "sas-rabbitmq",
+                  "dimensions": [
+                    [
+                      "container",
+                      "job",
+                      "namespace",
+                      "peer",
+                      "pod",
+                      "service",
+                      "type"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^erlang_vm_dist_proc_heap_size_words$",
+                    "^erlang_vm_dist_proc_memory_bytes$",
+                    "^erlang_vm_dist_proc_message_queue_len$",
+                    "^erlang_vm_dist_proc_min_bin_vheap_size_words$",
+                    "^erlang_vm_dist_proc_min_heap_size_words$",
+                    "^erlang_vm_dist_proc_reductions$",
+                    "^erlang_vm_dist_proc_stack_size_words$",
+                    "^erlang_vm_dist_proc_status$",
+                    "^erlang_vm_dist_proc_total_heap_size_words$"
                   ]
                 }
               ]
