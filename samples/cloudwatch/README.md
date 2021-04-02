@@ -95,16 +95,28 @@ kubectl delete pod -n amazon-cloudwatch -l app=cwagent-prometheus
 After you configure metric collection for CloudWatch, you can create dashboard widgets in CloudWatch to visualize the collected metric data. Metrics collected by the CloudWatch agent for Prometheus are stored in the
 `/aws/containerinsights/[cluster-name]/prometheus` log group.
 
-For example, these are the steps to create a graph of `go_memstats_alloc_bytes`
-(memory usage) of SAS Viya microservices that are written in Go:
+To access the metrics:
 
 1. From the AWS web console, navigate to CloudWatch.
 2. In the navigation bar on the left, choose `Metrics`.
 3. Select the `ContainerInsights/Prometheus` namespace.
-4. Select `ClusterName, job, namespace, pod, sas_service_base`.
-5. Locate the `go_memstats_alloc_bytes` metric.
-6. Click on the arrow next to the metric and select `Search for this only`.
-7. Select the checkbox for the SAS Viya services that you want to include in the graph.
+
+In the **Metrics** view, the SAS Viya metrics are organized into tiles. Each tile corresponds to a set of dimensions for the collected metric data. You can hover over a tile's dimensions to display the complete list of dimensions associated with the tile. 
+
+Because a large number of SAS Viya metrics are collected for Cloudwatch, it can be difficult to find a specific metric or metrics from a specific source. Use the reference tables in [CloudWatch SAS Viya Metrics](reference.md) to locate SAS Viya metrics and identify the tile with which they are associated.
+
+After you find the metric you are interested in, you can create a graph from the metric data. For example, these are the steps to create a graph of `go_memstats_alloc_bytes`
+(memory usage) of SAS Viya microservices that are written in Go:
+
+1. Go to [CloudWatch SAS Viya Metrics](reference.md) and expand the **By Metric** table.
+2. Locate the `go_memstats_alloc_bytes` metric. The table indicates that it is associated with the `container,job,namespace,node,pod,sas_service_base,service` dimensions.  
+3. From the AWS web console, navigate to CloudWatch.
+4. In the navigation bar on the left, choose `Metrics`.
+5. Select the `ContainerInsights/Prometheus` namespace.
+6. Select the tile with the `container,job,namespace,node,pod,sas_service_base,service` dimension. A table appears that lists all of the metrics associated with that dimension.
+7. Locate the `go_memstats_alloc_bytes` metric.
+8. Click on the arrow next to the metric and select `Search for this only`.
+9. Select the checkbox for the SAS Viya services that you want to include in the graph.
 
 ## CloudWatch Agent Daemonset and Workload Node Placement<a name=wnp_tolerations></a>
 
