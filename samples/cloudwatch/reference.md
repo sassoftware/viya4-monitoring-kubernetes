@@ -4,8 +4,10 @@
 
 <details>
   <summary>Click to expand</summary
+
 | Dimensions | Metric | Source |
 | ---------- | ------ | ------ |
+|cas_node cas_node_type cas_server connected container job namespace pod service uuid|cas_nodes|sas-cas|
 |cas_server container job namespace pod service|cas_grid_idle_seconds|sas-cas|
 |cas_server container job namespace pod service|cas_grid_sessions_created_total|sas-cas|
 |cas_server container job namespace pod service|cas_grid_sessions_current|sas-cas|
@@ -24,20 +26,13 @@
 |cas_node cas_node_type cas_server container job namespace pod service|cas_node_max_open_files|sas-cas|
 |cas_node cas_node_type cas_server container job namespace pod service|cas_node_one_minute_cpu_load_avg|sas-cas|
 |cas_node cas_node_type cas_server container job namespace pod service|cas_node_open_files|sas-cas|
-|cas_node cas_node_type cas_server connected container job namespace pod service uuid|cas_nodes|sas-cas|
-|container job method namespace node pod quantile sas_service_base service status|arke_request_elapsed|sas-go|
-|container job namespace node pod quantile sas_service_base service|go_gc_duration_seconds|sas-go|
-|container job namespace node pod quantile sas_service_base service|runtime_gc_pause_ns|sas-go|
-|container job namespace node pod sas_service_base service state|sas_db_connections_max|sas-go|
-|container job namespace node pod sas_service_base service state|sas_db_pool_connections|sas-go|
-|container job namespace node pod sas_service_base schema service state|sas_db_connections_max|sas-go|
-|container job namespace node pod sas_service_base schema service state|sas_db_pool_connections|sas-go|
+|container job level namespace node pod sas_service_base service|log_events_total|sas-go|
+|container job namespace node pod reason sas_service_base service|sas_db_closed_total|sas-go|
 |container job namespace node pod sas_service_base schema service|sas_db_wait_seconds|sas-go|
 |container job namespace node pod sas_service_base schema service|sas_db_wait_total|sas-go|
-|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_active_messages|sas-go|
-|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_consumed_total|sas-go|
-|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_produced_total|sas-go|
-|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_streams|sas-go|
+|container job namespace node pod quantile sas_service_base service|go_gc_duration_seconds|sas-go|
+|container job namespace node pod quantile sas_service_base service|runtime_gc_pause_ns|sas-go|
+|container job method namespace node pod quantile sas_service_base service status|arke_request_elapsed|sas-go|
 |container job namespace node pod sas_service_base service|arke_client_active_messages|sas-go|
 |container job namespace node pod sas_service_base service|arke_client_consumed_total|sas-go|
 |container job namespace node pod sas_service_base service|arke_client_produced_total|sas-go|
@@ -99,28 +94,61 @@
 |container job namespace node pod sas_service_base service|sas_maps_report_polling_attempts_total|sas-go|
 |container job namespace node pod sas_service_base service|sas_maps_report_query_duration_seconds_count|sas-go|
 |container job namespace node pod sas_service_base service|sas_maps_report_query_duration_seconds_sum|sas-go|
+|container job namespace node pod sas_service_base schema service state|sas_db_connections_max|sas-go|
+|container job namespace node pod sas_service_base schema service state|sas_db_pool_connections|sas-go|
+|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_active_messages|sas-go|
+|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_consumed_total|sas-go|
+|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_produced_total|sas-go|
+|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_streams|sas-go|
 |container job method namespace node pod sas_service_base service status|arke_recvmsg_total|sas-go|
 |container job method namespace node pod sas_service_base service status|arke_request_elapsed_count|sas-go|
 |container job method namespace node pod sas_service_base service status|arke_request_elapsed_sum|sas-go|
 |container job method namespace node pod sas_service_base service status|arke_request_total|sas-go|
 |container job method namespace node pod sas_service_base service status|arke_sendmsg_total|sas-go|
 |container job namespace node pod reason sas_service_base schema service|sas_db_closed_total|sas-go|
-|container job level namespace node pod sas_service_base service|log_events_total|sas-go|
-|container job namespace node pod reason sas_service_base service|sas_db_closed_total|sas-go|
-|action cause container job namespace node pod sas_service_base|jvm_gc_pause_seconds_count|sas-java|
-|action cause container job namespace node pod sas_service_base|jvm_gc_pause_seconds_max|sas-java|
-|action cause container job namespace node pod sas_service_base|jvm_gc_pause_seconds_sum|sas-java|
-|container job level namespace node pod sas_service_base|log_events_total|sas-java|
-|container job listener_id namespace node pod queue result sas_service_base|spring_rabbitmq_listener_seconds_count|sas-java|
-|container job listener_id namespace node pod queue result sas_service_base|spring_rabbitmq_listener_seconds_max|sas-java|
-|container job listener_id namespace node pod queue result sas_service_base|spring_rabbitmq_listener_seconds_sum|sas-java|
+|container job namespace node pod sas_service_base service state|sas_db_connections_max|sas-go|
+|container job namespace node pod sas_service_base service state|sas_db_pool_connections|sas-go|
 |container job namespace node pod sas_service_base state|jvm_threads_states_threads|sas-java|
-|area container id job namespace node pod sas_service_base|jvm_memory_committed_bytes|sas-java|
-|area container id job namespace node pod sas_service_base|jvm_memory_max_bytes|sas-java|
-|area container id job namespace node pod sas_service_base|jvm_memory_used_bytes|sas-java|
+|clientName container job method namespace node pod sas_service_base status uri|http_client_requests_seconds_count|sas-java|
+|clientName container job method namespace node pod sas_service_base status uri|http_client_requests_seconds_max|sas-java|
+|clientName container job method namespace node pod sas_service_base status uri|http_client_requests_seconds_sum|sas-java|
+|container job name namespace node pod sas_service_base|jdbc_connections_active|sas-java|
+|container job name namespace node pod sas_service_base|jdbc_connections_idle|sas-java|
+|container job name namespace node pod sas_service_base|jdbc_connections_max|sas-java|
+|container job name namespace node pod sas_service_base|jdbc_connections_min|sas-java|
+|container job name namespace node pod sas_service_base|rabbitmq_acknowledged_published_total|sas-java|
+|container job name namespace node pod sas_service_base|rabbitmq_acknowledged_total|sas-java|
+|container job name namespace node pod sas_service_base|rabbitmq_channels|sas-java|
+|container job name namespace node pod sas_service_base|rabbitmq_connections|sas-java|
+|container job name namespace node pod sas_service_base|rabbitmq_consumed_total|sas-java|
+|container job name namespace node pod sas_service_base|rabbitmq_failed_to_publish_total|sas-java|
+|container job name namespace node pod sas_service_base|rabbitmq_not_acknowledged_published_total|sas-java|
+|container job name namespace node pod sas_service_base|rabbitmq_published_total|sas-java|
+|container job name namespace node pod sas_service_base|rabbitmq_rejected_total|sas-java|
+|container job name namespace node pod sas_service_base|rabbitmq_unrouted_published_total|sas-java|
+|container job name namespace node pod sas_service_base|tomcat_global_error_total|sas-java|
+|container job name namespace node pod sas_service_base|tomcat_global_received_bytes_total|sas-java|
+|container job name namespace node pod sas_service_base|tomcat_global_request_max_seconds|sas-java|
+|container job name namespace node pod sas_service_base|tomcat_global_request_seconds_count|sas-java|
+|container job name namespace node pod sas_service_base|tomcat_global_request_seconds_sum|sas-java|
+|container job name namespace node pod sas_service_base|tomcat_global_sent_bytes_total|sas-java|
+|container job name namespace node pod sas_service_base|tomcat_servlet_error_total|sas-java|
+|container job name namespace node pod sas_service_base|tomcat_servlet_request_max_seconds|sas-java|
+|container job name namespace node pod sas_service_base|tomcat_servlet_request_seconds_count|sas-java|
+|container job name namespace node pod sas_service_base|tomcat_servlet_request_seconds_sum|sas-java|
+|container job name namespace node pod sas_service_base|tomcat_threads_busy_threads|sas-java|
+|container job name namespace node pod sas_service_base|tomcat_threads_config_max_threads|sas-java|
+|container job name namespace node pod sas_service_base|tomcat_threads_current_threads|sas-java|
+|container job level namespace node pod sas_service_base|log_events_total|sas-java|
 |container id job namespace node pod sas_service_base|jvm_buffer_count_buffers|sas-java|
 |container id job namespace node pod sas_service_base|jvm_buffer_memory_used_bytes|sas-java|
 |container id job namespace node pod sas_service_base|jvm_buffer_total_capacity_bytes|sas-java|
+|container job listener_id namespace node pod queue result sas_service_base|spring_rabbitmq_listener_seconds_count|sas-java|
+|container job listener_id namespace node pod queue result sas_service_base|spring_rabbitmq_listener_seconds_max|sas-java|
+|container job listener_id namespace node pod queue result sas_service_base|spring_rabbitmq_listener_seconds_sum|sas-java|
+|container job method namespace node outcome pod sas_service_base status uri|http_server_requests_seconds_count|sas-java|
+|container job method namespace node outcome pod sas_service_base status uri|http_server_requests_seconds_max|sas-java|
+|container job method namespace node outcome pod sas_service_base status uri|http_server_requests_seconds_sum|sas-java|
 |container job namespace node pod sas_service_base|jvm_classes_loaded_classes|sas-java|
 |container job namespace node pod sas_service_base|jvm_classes_unloaded_classes_total|sas-java|
 |container job namespace node pod sas_service_base|jvm_gc_live_data_size_bytes|sas-java|
@@ -156,68 +184,22 @@
 |container job namespace node pod sas_service_base|zipkin_reporter_spans_bytes_total|sas-java|
 |container job namespace node pod sas_service_base|zipkin_reporter_spans_dropped_total|sas-java|
 |container job namespace node pod sas_service_base|zipkin_reporter_spans_total|sas-java|
-|container job method namespace node outcome pod sas_service_base status uri|http_server_requests_seconds_count|sas-java|
-|container job method namespace node outcome pod sas_service_base status uri|http_server_requests_seconds_max|sas-java|
-|container job method namespace node outcome pod sas_service_base status uri|http_server_requests_seconds_sum|sas-java|
-|container job name namespace node pod sas_service_base|jdbc_connections_active|sas-java|
-|container job name namespace node pod sas_service_base|jdbc_connections_idle|sas-java|
-|container job name namespace node pod sas_service_base|jdbc_connections_max|sas-java|
-|container job name namespace node pod sas_service_base|jdbc_connections_min|sas-java|
-|container job name namespace node pod sas_service_base|rabbitmq_acknowledged_published_total|sas-java|
-|container job name namespace node pod sas_service_base|rabbitmq_acknowledged_total|sas-java|
-|container job name namespace node pod sas_service_base|rabbitmq_channels|sas-java|
-|container job name namespace node pod sas_service_base|rabbitmq_connections|sas-java|
-|container job name namespace node pod sas_service_base|rabbitmq_consumed_total|sas-java|
-|container job name namespace node pod sas_service_base|rabbitmq_failed_to_publish_total|sas-java|
-|container job name namespace node pod sas_service_base|rabbitmq_not_acknowledged_published_total|sas-java|
-|container job name namespace node pod sas_service_base|rabbitmq_published_total|sas-java|
-|container job name namespace node pod sas_service_base|rabbitmq_rejected_total|sas-java|
-|container job name namespace node pod sas_service_base|rabbitmq_unrouted_published_total|sas-java|
-|container job name namespace node pod sas_service_base|tomcat_global_error_total|sas-java|
-|container job name namespace node pod sas_service_base|tomcat_global_received_bytes_total|sas-java|
-|container job name namespace node pod sas_service_base|tomcat_global_request_max_seconds|sas-java|
-|container job name namespace node pod sas_service_base|tomcat_global_request_seconds_count|sas-java|
-|container job name namespace node pod sas_service_base|tomcat_global_request_seconds_sum|sas-java|
-|container job name namespace node pod sas_service_base|tomcat_global_sent_bytes_total|sas-java|
-|container job name namespace node pod sas_service_base|tomcat_servlet_error_total|sas-java|
-|container job name namespace node pod sas_service_base|tomcat_servlet_request_max_seconds|sas-java|
-|container job name namespace node pod sas_service_base|tomcat_servlet_request_seconds_count|sas-java|
-|container job name namespace node pod sas_service_base|tomcat_servlet_request_seconds_sum|sas-java|
-|container job name namespace node pod sas_service_base|tomcat_threads_busy_threads|sas-java|
-|container job name namespace node pod sas_service_base|tomcat_threads_config_max_threads|sas-java|
-|container job name namespace node pod sas_service_base|tomcat_threads_current_threads|sas-java|
-|clientName container job method namespace node pod sas_service_base status uri|http_client_requests_seconds_count|sas-java|
-|clientName container job method namespace node pod sas_service_base status uri|http_client_requests_seconds_max|sas-java|
-|clientName container job method namespace node pod sas_service_base status uri|http_client_requests_seconds_sum|sas-java|
-|container exp_type job namespace pod quantile service|go_gc_duration_seconds|sas-postgres|
-|container datname exp_type job mode namespace pod server service|pg_locks_count|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_blk_read_time|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_blk_write_time|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_blks_hit|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_blks_read|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_conflicts|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_deadlocks|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_numbackends|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_stats_reset|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_temp_bytes|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_temp_files|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_tup_deleted|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_tup_fetched|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_tup_inserted|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_tup_returned|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_tup_updated|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_xact_commit|sas-postgres|
-|container datid exp_type job namespace pod server service|pg_stat_database_xact_rollback|sas-postgres|
+|action cause container job namespace node pod sas_service_base|jvm_gc_pause_seconds_count|sas-java|
+|action cause container job namespace node pod sas_service_base|jvm_gc_pause_seconds_max|sas-java|
+|action cause container job namespace node pod sas_service_base|jvm_gc_pause_seconds_sum|sas-java|
+|area container id job namespace node pod sas_service_base|jvm_memory_committed_bytes|sas-java|
+|area container id job namespace node pod sas_service_base|jvm_memory_max_bytes|sas-java|
+|area container id job namespace node pod sas_service_base|jvm_memory_used_bytes|sas-java|
+|container exp_type job mount_point namespace pod server service|ccp_nodemx_disk_activity_sectors_read|sas-postgres|
+|container exp_type job mount_point namespace pod server service|ccp_nodemx_disk_activity_sectors_written|sas-postgres|
+|container exp_type job namespace pod server service short_version version|pg_static|sas-postgres|
 |container exp_type job namespace pod server service stanza|ccp_backrest_last_diff_backup_time_since_completion_seconds|sas-postgres|
 |container exp_type job namespace pod server service stanza|ccp_backrest_last_full_backup_time_since_completion_seconds|sas-postgres|
 |container exp_type job namespace pod server service stanza|ccp_backrest_last_incr_backup_time_since_completion_seconds|sas-postgres|
-|container exp_type job mount_point namespace pod server service|ccp_nodemx_disk_activity_sectors_read|sas-postgres|
-|container exp_type job mount_point namespace pod server service|ccp_nodemx_disk_activity_sectors_written|sas-postgres|
-|container exp_type interface job namespace pod server service|ccp_nodemx_network_rx_bytes|sas-postgres|
-|container exp_type interface job namespace pod server service|ccp_nodemx_network_rx_packets|sas-postgres|
-|container exp_type interface job namespace pod server service|ccp_nodemx_network_tx_bytes|sas-postgres|
-|container exp_type interface job namespace pod server service|ccp_nodemx_network_tx_packets|sas-postgres|
-|container dbname exp_type job mode namespace pod server service|ccp_locks_count|sas-postgres|
+|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_available_bytes|sas-postgres|
+|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_free_file_nodes|sas-postgres|
+|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_total_bytes|sas-postgres|
+|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_total_file_nodes|sas-postgres|
 |container exp_type job namespace pod server service|ccp_archive_command_status_seconds_since_last_fail|sas-postgres|
 |container exp_type job namespace pod server service|ccp_connection_stats_active|sas-postgres|
 |container exp_type job namespace pod server service|ccp_connection_stats_idle|sas-postgres|
@@ -518,13 +500,31 @@
 |container exp_type job namespace pod server service|pg_stat_bgwriter_checkpoints_timed|sas-postgres|
 |container exp_type job namespace pod server service|pg_stat_bgwriter_maxwritten_clean|sas-postgres|
 |container exp_type job namespace pod server service|pg_stat_bgwriter_stats_reset|sas-postgres|
-|container exp_type job namespace pod replica replica_port server service|ccp_replication_lag_size_bytes|sas-postgres|
 |container datname exp_type job namespace pod server service state|pg_stat_activity_count|sas-postgres|
 |container datname exp_type job namespace pod server service state|pg_stat_activity_max_tx_duration|sas-postgres|
-|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_available_bytes|sas-postgres|
-|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_free_file_nodes|sas-postgres|
-|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_total_bytes|sas-postgres|
-|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_total_file_nodes|sas-postgres|
+|container datname exp_type job mode namespace pod server service|pg_locks_count|sas-postgres|
+|container dbname exp_type job mode namespace pod server service|ccp_locks_count|sas-postgres|
+|container exp_type job namespace pod replica replica_port server service|ccp_replication_lag_size_bytes|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_data_checksum_failure_time_since_last_failure_seconds|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_database_size_bytes|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_stat_database_blks_hit|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_stat_database_blks_read|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_stat_database_conflicts|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_stat_database_deadlocks|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_stat_database_temp_bytes|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_stat_database_temp_files|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_deleted|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_fetched|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_inserted|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_returned|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_updated|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_stat_database_xact_commit|sas-postgres|
+|container dbname exp_type job namespace pod server service|ccp_stat_database_xact_rollback|sas-postgres|
+|container exp_type interface job namespace pod server service|ccp_nodemx_network_rx_bytes|sas-postgres|
+|container exp_type interface job namespace pod server service|ccp_nodemx_network_rx_packets|sas-postgres|
+|container exp_type interface job namespace pod server service|ccp_nodemx_network_tx_bytes|sas-postgres|
+|container exp_type interface job namespace pod server service|ccp_nodemx_network_tx_packets|sas-postgres|
+|container exp_type filename hashsum job namespace pod service|pg_exporter_user_queries_load_error|sas-postgres|
 |container exp_type job namespace pod service|go_gc_duration_seconds_count|sas-postgres|
 |container exp_type job namespace pod service|go_gc_duration_seconds_sum|sas-postgres|
 |container exp_type job namespace pod service|go_goroutines|sas-postgres|
@@ -564,24 +564,6 @@
 |container exp_type job namespace pod service|process_start_time_seconds|sas-postgres|
 |container exp_type job namespace pod service|process_virtual_memory_bytes|sas-postgres|
 |container exp_type job namespace pod service|process_virtual_memory_max_bytes|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_data_checksum_failure_time_since_last_failure_seconds|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_database_size_bytes|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_stat_database_blks_hit|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_stat_database_blks_read|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_stat_database_conflicts|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_stat_database_deadlocks|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_stat_database_temp_bytes|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_stat_database_temp_files|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_deleted|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_fetched|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_inserted|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_returned|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_updated|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_stat_database_xact_commit|sas-postgres|
-|container dbname exp_type job namespace pod server service|ccp_stat_database_xact_rollback|sas-postgres|
-|backup_type container exp_type job namespace pod server service stanza|ccp_backrest_last_info_backup_runtime_seconds|sas-postgres|
-|backup_type container exp_type job namespace pod server service stanza|ccp_backrest_last_info_repo_backup_size_bytes|sas-postgres|
-|backup_type container exp_type job namespace pod server service stanza|ccp_backrest_last_info_repo_total_size_bytes|sas-postgres|
 |container dbname exp_type job namespace pod relname schemaname server service|ccp_stat_user_tables_analyze_count|sas-postgres|
 |container dbname exp_type job namespace pod relname schemaname server service|ccp_stat_user_tables_autoanalyze_count|sas-postgres|
 |container dbname exp_type job namespace pod relname schemaname server service|ccp_stat_user_tables_autovacuum_count|sas-postgres|
@@ -597,7 +579,6 @@
 |container dbname exp_type job namespace pod relname schemaname server service|ccp_stat_user_tables_seq_tup_read|sas-postgres|
 |container dbname exp_type job namespace pod relname schemaname server service|ccp_stat_user_tables_vacuum_count|sas-postgres|
 |container dbname exp_type job namespace pod relname schemaname server service|ccp_table_size_size_bytes|sas-postgres|
-|container exp_type filename hashsum job namespace pod service|pg_exporter_user_queries_load_error|sas-postgres|
 |container datid datname exp_type job namespace pod server service|pg_stat_database_blk_read_time|sas-postgres|
 |container datid datname exp_type job namespace pod server service|pg_stat_database_blk_write_time|sas-postgres|
 |container datid datname exp_type job namespace pod server service|pg_stat_database_blks_hit|sas-postgres|
@@ -620,41 +601,49 @@
 |container datid datname exp_type job namespace pod server service|pg_stat_database_tup_updated|sas-postgres|
 |container datid datname exp_type job namespace pod server service|pg_stat_database_xact_commit|sas-postgres|
 |container datid datname exp_type job namespace pod server service|pg_stat_database_xact_rollback|sas-postgres|
-|container exp_type job namespace pod server service short_version version|pg_static|sas-postgres|
+|backup_type container exp_type job namespace pod server service stanza|ccp_backrest_last_info_backup_runtime_seconds|sas-postgres|
+|backup_type container exp_type job namespace pod server service stanza|ccp_backrest_last_info_repo_backup_size_bytes|sas-postgres|
+|backup_type container exp_type job namespace pod server service stanza|ccp_backrest_last_info_repo_total_size_bytes|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_blk_read_time|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_blk_write_time|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_blks_hit|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_blks_read|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_conflicts|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_deadlocks|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_numbackends|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_stats_reset|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_temp_bytes|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_temp_files|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_tup_deleted|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_tup_fetched|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_tup_inserted|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_tup_returned|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_tup_updated|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_xact_commit|sas-postgres|
+|container datid exp_type job namespace pod server service|pg_stat_database_xact_rollback|sas-postgres|
+|container exp_type job namespace pod quantile service|go_gc_duration_seconds|sas-postgres|
 |container job namespace pod protocol service|rabbitmq_auth_attempts_failed_total|sas-rabbitmq|
 |container job namespace pod protocol service|rabbitmq_auth_attempts_succeeded_total|sas-rabbitmq|
 |container job namespace pod protocol service|rabbitmq_auth_attempts_total|sas-rabbitmq|
 |container content_type encoding job namespace pod registry service|telemetry_scrape_encoded_size_bytes_count|sas-rabbitmq|
 |container content_type encoding job namespace pod registry service|telemetry_scrape_encoded_size_bytes_sum|sas-rabbitmq|
-|container job namespace peer pod service type|erlang_vm_dist_proc_heap_size_words|sas-rabbitmq|
-|container job namespace peer pod service type|erlang_vm_dist_proc_memory_bytes|sas-rabbitmq|
-|container job namespace peer pod service type|erlang_vm_dist_proc_message_queue_len|sas-rabbitmq|
-|container job namespace peer pod service type|erlang_vm_dist_proc_min_bin_vheap_size_words|sas-rabbitmq|
-|container job namespace peer pod service type|erlang_vm_dist_proc_min_heap_size_words|sas-rabbitmq|
-|container job namespace peer pod service type|erlang_vm_dist_proc_reductions|sas-rabbitmq|
-|container job namespace peer pod service type|erlang_vm_dist_proc_stack_size_words|sas-rabbitmq|
-|container job namespace peer pod service type|erlang_vm_dist_proc_status|sas-rabbitmq|
-|container job namespace peer pod service type|erlang_vm_dist_proc_total_heap_size_words|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_alloc_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_aux_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_bif_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_busy_wait_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_check_io_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_emulator_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_ets_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_gc_full_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_gc_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_nif_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_other_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_port_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_send_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_sleep_seconds_total|sas-rabbitmq|
-|container id job namespace pod service type|erlang_vm_msacc_timers_seconds_total|sas-rabbitmq|
 |alloc container instance_no job kind namespace pod service usage|erlang_vm_allocators|sas-rabbitmq|
-|container job namespace pod service usage|erlang_vm_memory_atom_bytes_total|sas-rabbitmq|
-|container job namespace pod service usage|erlang_vm_memory_processes_bytes_total|sas-rabbitmq|
-|container job namespace pod service usage|erlang_vm_memory_system_bytes_total|sas-rabbitmq|
-|container job kind namespace pod service|erlang_vm_memory_bytes_total|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_node_queue_size_bytes|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_node_state|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_port_input_bytes|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_port_memory_bytes|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_port_output_bytes|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_port_queue_size_bytes|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_recv_avg_bytes|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_recv_bytes|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_recv_cnt|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_recv_dvi_bytes|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_recv_max_bytes|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_send_avg_bytes|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_send_bytes|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_send_cnt|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_send_max_bytes|sas-rabbitmq|
+|container job namespace peer pod service|erlang_vm_dist_send_pend_bytes|sas-rabbitmq|
 |container content_type job namespace pod registry service|telemetry_scrape_duration_seconds_count|sas-rabbitmq|
 |container content_type job namespace pod registry service|telemetry_scrape_duration_seconds_sum|sas-rabbitmq|
 |container content_type job namespace pod registry service|telemetry_scrape_size_bytes_count|sas-rabbitmq|
@@ -800,30 +789,45 @@
 |container job namespace pod service|rabbitmq_resident_memory_limit_bytes|sas-rabbitmq|
 |container job namespace pod service|rabbitmq_schema_db_disk_tx_total|sas-rabbitmq|
 |container job namespace pod service|rabbitmq_schema_db_ram_tx_total|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_node_queue_size_bytes|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_node_state|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_port_input_bytes|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_port_memory_bytes|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_port_output_bytes|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_port_queue_size_bytes|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_recv_avg_bytes|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_recv_bytes|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_recv_cnt|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_recv_dvi_bytes|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_recv_max_bytes|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_send_avg_bytes|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_send_bytes|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_send_cnt|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_send_max_bytes|sas-rabbitmq|
-|container job namespace peer pod service|erlang_vm_dist_send_pend_bytes|sas-rabbitmq|
+|container job namespace pod service usage|erlang_vm_memory_atom_bytes_total|sas-rabbitmq|
+|container job namespace pod service usage|erlang_vm_memory_processes_bytes_total|sas-rabbitmq|
+|container job namespace pod service usage|erlang_vm_memory_system_bytes_total|sas-rabbitmq|
+|container job kind namespace pod service|erlang_vm_memory_bytes_total|sas-rabbitmq|
+|container job namespace peer pod service type|erlang_vm_dist_proc_heap_size_words|sas-rabbitmq|
+|container job namespace peer pod service type|erlang_vm_dist_proc_memory_bytes|sas-rabbitmq|
+|container job namespace peer pod service type|erlang_vm_dist_proc_message_queue_len|sas-rabbitmq|
+|container job namespace peer pod service type|erlang_vm_dist_proc_min_bin_vheap_size_words|sas-rabbitmq|
+|container job namespace peer pod service type|erlang_vm_dist_proc_min_heap_size_words|sas-rabbitmq|
+|container job namespace peer pod service type|erlang_vm_dist_proc_reductions|sas-rabbitmq|
+|container job namespace peer pod service type|erlang_vm_dist_proc_stack_size_words|sas-rabbitmq|
+|container job namespace peer pod service type|erlang_vm_dist_proc_status|sas-rabbitmq|
+|container job namespace peer pod service type|erlang_vm_dist_proc_total_heap_size_words|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_alloc_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_aux_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_bif_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_busy_wait_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_check_io_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_emulator_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_ets_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_gc_full_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_gc_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_nif_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_other_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_port_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_send_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_sleep_seconds_total|sas-rabbitmq|
+|container id job namespace pod service type|erlang_vm_msacc_timers_seconds_total|sas-rabbitmq|
+
 </details>
 
 ## By Source
 
 <details>
   <summary>Click to expand</summary
+
 | Dimensions | Metric | Source |
 | ---------- | ------ | ------ |
+|sas-cas|cas_node cas_node_type cas_server connected container job namespace pod service uuid|cas_nodes|
 |sas-cas|cas_server container job namespace pod service|cas_grid_idle_seconds|
 |sas-cas|cas_server container job namespace pod service|cas_grid_sessions_created_total|
 |sas-cas|cas_server container job namespace pod service|cas_grid_sessions_current|
@@ -842,20 +846,13 @@
 |sas-cas|cas_node cas_node_type cas_server container job namespace pod service|cas_node_max_open_files|
 |sas-cas|cas_node cas_node_type cas_server container job namespace pod service|cas_node_one_minute_cpu_load_avg|
 |sas-cas|cas_node cas_node_type cas_server container job namespace pod service|cas_node_open_files|
-|sas-cas|cas_node cas_node_type cas_server connected container job namespace pod service uuid|cas_nodes|
-|sas-go|container job method namespace node pod quantile sas_service_base service status|arke_request_elapsed|
-|sas-go|container job namespace node pod quantile sas_service_base service|go_gc_duration_seconds|
-|sas-go|container job namespace node pod quantile sas_service_base service|runtime_gc_pause_ns|
-|sas-go|container job namespace node pod sas_service_base service state|sas_db_connections_max|
-|sas-go|container job namespace node pod sas_service_base service state|sas_db_pool_connections|
-|sas-go|container job namespace node pod sas_service_base schema service state|sas_db_connections_max|
-|sas-go|container job namespace node pod sas_service_base schema service state|sas_db_pool_connections|
+|sas-go|container job level namespace node pod sas_service_base service|log_events_total|
+|sas-go|container job namespace node pod reason sas_service_base service|sas_db_closed_total|
 |sas-go|container job namespace node pod sas_service_base schema service|sas_db_wait_seconds|
 |sas-go|container job namespace node pod sas_service_base schema service|sas_db_wait_total|
-|sas-go|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_active_messages|
-|sas-go|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_consumed_total|
-|sas-go|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_produced_total|
-|sas-go|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_streams|
+|sas-go|container job namespace node pod quantile sas_service_base service|go_gc_duration_seconds|
+|sas-go|container job namespace node pod quantile sas_service_base service|runtime_gc_pause_ns|
+|sas-go|container job method namespace node pod quantile sas_service_base service status|arke_request_elapsed|
 |sas-go|container job namespace node pod sas_service_base service|arke_client_active_messages|
 |sas-go|container job namespace node pod sas_service_base service|arke_client_consumed_total|
 |sas-go|container job namespace node pod sas_service_base service|arke_client_produced_total|
@@ -917,28 +914,61 @@
 |sas-go|container job namespace node pod sas_service_base service|sas_maps_report_polling_attempts_total|
 |sas-go|container job namespace node pod sas_service_base service|sas_maps_report_query_duration_seconds_count|
 |sas-go|container job namespace node pod sas_service_base service|sas_maps_report_query_duration_seconds_sum|
+|sas-go|container job namespace node pod sas_service_base schema service state|sas_db_connections_max|
+|sas-go|container job namespace node pod sas_service_base schema service state|sas_db_pool_connections|
+|sas-go|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_active_messages|
+|sas-go|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_consumed_total|
+|sas-go|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_produced_total|
+|sas-go|ClientIdentitifer container job namespace node pod sas_service_base service|arke_client_streams|
 |sas-go|container job method namespace node pod sas_service_base service status|arke_recvmsg_total|
 |sas-go|container job method namespace node pod sas_service_base service status|arke_request_elapsed_count|
 |sas-go|container job method namespace node pod sas_service_base service status|arke_request_elapsed_sum|
 |sas-go|container job method namespace node pod sas_service_base service status|arke_request_total|
 |sas-go|container job method namespace node pod sas_service_base service status|arke_sendmsg_total|
 |sas-go|container job namespace node pod reason sas_service_base schema service|sas_db_closed_total|
-|sas-go|container job level namespace node pod sas_service_base service|log_events_total|
-|sas-go|container job namespace node pod reason sas_service_base service|sas_db_closed_total|
-|sas-java|action cause container job namespace node pod sas_service_base|jvm_gc_pause_seconds_count|
-|sas-java|action cause container job namespace node pod sas_service_base|jvm_gc_pause_seconds_max|
-|sas-java|action cause container job namespace node pod sas_service_base|jvm_gc_pause_seconds_sum|
-|sas-java|container job level namespace node pod sas_service_base|log_events_total|
-|sas-java|container job listener_id namespace node pod queue result sas_service_base|spring_rabbitmq_listener_seconds_count|
-|sas-java|container job listener_id namespace node pod queue result sas_service_base|spring_rabbitmq_listener_seconds_max|
-|sas-java|container job listener_id namespace node pod queue result sas_service_base|spring_rabbitmq_listener_seconds_sum|
+|sas-go|container job namespace node pod sas_service_base service state|sas_db_connections_max|
+|sas-go|container job namespace node pod sas_service_base service state|sas_db_pool_connections|
 |sas-java|container job namespace node pod sas_service_base state|jvm_threads_states_threads|
-|sas-java|area container id job namespace node pod sas_service_base|jvm_memory_committed_bytes|
-|sas-java|area container id job namespace node pod sas_service_base|jvm_memory_max_bytes|
-|sas-java|area container id job namespace node pod sas_service_base|jvm_memory_used_bytes|
+|sas-java|clientName container job method namespace node pod sas_service_base status uri|http_client_requests_seconds_count|
+|sas-java|clientName container job method namespace node pod sas_service_base status uri|http_client_requests_seconds_max|
+|sas-java|clientName container job method namespace node pod sas_service_base status uri|http_client_requests_seconds_sum|
+|sas-java|container job name namespace node pod sas_service_base|jdbc_connections_active|
+|sas-java|container job name namespace node pod sas_service_base|jdbc_connections_idle|
+|sas-java|container job name namespace node pod sas_service_base|jdbc_connections_max|
+|sas-java|container job name namespace node pod sas_service_base|jdbc_connections_min|
+|sas-java|container job name namespace node pod sas_service_base|rabbitmq_acknowledged_published_total|
+|sas-java|container job name namespace node pod sas_service_base|rabbitmq_acknowledged_total|
+|sas-java|container job name namespace node pod sas_service_base|rabbitmq_channels|
+|sas-java|container job name namespace node pod sas_service_base|rabbitmq_connections|
+|sas-java|container job name namespace node pod sas_service_base|rabbitmq_consumed_total|
+|sas-java|container job name namespace node pod sas_service_base|rabbitmq_failed_to_publish_total|
+|sas-java|container job name namespace node pod sas_service_base|rabbitmq_not_acknowledged_published_total|
+|sas-java|container job name namespace node pod sas_service_base|rabbitmq_published_total|
+|sas-java|container job name namespace node pod sas_service_base|rabbitmq_rejected_total|
+|sas-java|container job name namespace node pod sas_service_base|rabbitmq_unrouted_published_total|
+|sas-java|container job name namespace node pod sas_service_base|tomcat_global_error_total|
+|sas-java|container job name namespace node pod sas_service_base|tomcat_global_received_bytes_total|
+|sas-java|container job name namespace node pod sas_service_base|tomcat_global_request_max_seconds|
+|sas-java|container job name namespace node pod sas_service_base|tomcat_global_request_seconds_count|
+|sas-java|container job name namespace node pod sas_service_base|tomcat_global_request_seconds_sum|
+|sas-java|container job name namespace node pod sas_service_base|tomcat_global_sent_bytes_total|
+|sas-java|container job name namespace node pod sas_service_base|tomcat_servlet_error_total|
+|sas-java|container job name namespace node pod sas_service_base|tomcat_servlet_request_max_seconds|
+|sas-java|container job name namespace node pod sas_service_base|tomcat_servlet_request_seconds_count|
+|sas-java|container job name namespace node pod sas_service_base|tomcat_servlet_request_seconds_sum|
+|sas-java|container job name namespace node pod sas_service_base|tomcat_threads_busy_threads|
+|sas-java|container job name namespace node pod sas_service_base|tomcat_threads_config_max_threads|
+|sas-java|container job name namespace node pod sas_service_base|tomcat_threads_current_threads|
+|sas-java|container job level namespace node pod sas_service_base|log_events_total|
 |sas-java|container id job namespace node pod sas_service_base|jvm_buffer_count_buffers|
 |sas-java|container id job namespace node pod sas_service_base|jvm_buffer_memory_used_bytes|
 |sas-java|container id job namespace node pod sas_service_base|jvm_buffer_total_capacity_bytes|
+|sas-java|container job listener_id namespace node pod queue result sas_service_base|spring_rabbitmq_listener_seconds_count|
+|sas-java|container job listener_id namespace node pod queue result sas_service_base|spring_rabbitmq_listener_seconds_max|
+|sas-java|container job listener_id namespace node pod queue result sas_service_base|spring_rabbitmq_listener_seconds_sum|
+|sas-java|container job method namespace node outcome pod sas_service_base status uri|http_server_requests_seconds_count|
+|sas-java|container job method namespace node outcome pod sas_service_base status uri|http_server_requests_seconds_max|
+|sas-java|container job method namespace node outcome pod sas_service_base status uri|http_server_requests_seconds_sum|
 |sas-java|container job namespace node pod sas_service_base|jvm_classes_loaded_classes|
 |sas-java|container job namespace node pod sas_service_base|jvm_classes_unloaded_classes_total|
 |sas-java|container job namespace node pod sas_service_base|jvm_gc_live_data_size_bytes|
@@ -974,68 +1004,22 @@
 |sas-java|container job namespace node pod sas_service_base|zipkin_reporter_spans_bytes_total|
 |sas-java|container job namespace node pod sas_service_base|zipkin_reporter_spans_dropped_total|
 |sas-java|container job namespace node pod sas_service_base|zipkin_reporter_spans_total|
-|sas-java|container job method namespace node outcome pod sas_service_base status uri|http_server_requests_seconds_count|
-|sas-java|container job method namespace node outcome pod sas_service_base status uri|http_server_requests_seconds_max|
-|sas-java|container job method namespace node outcome pod sas_service_base status uri|http_server_requests_seconds_sum|
-|sas-java|container job name namespace node pod sas_service_base|jdbc_connections_active|
-|sas-java|container job name namespace node pod sas_service_base|jdbc_connections_idle|
-|sas-java|container job name namespace node pod sas_service_base|jdbc_connections_max|
-|sas-java|container job name namespace node pod sas_service_base|jdbc_connections_min|
-|sas-java|container job name namespace node pod sas_service_base|rabbitmq_acknowledged_published_total|
-|sas-java|container job name namespace node pod sas_service_base|rabbitmq_acknowledged_total|
-|sas-java|container job name namespace node pod sas_service_base|rabbitmq_channels|
-|sas-java|container job name namespace node pod sas_service_base|rabbitmq_connections|
-|sas-java|container job name namespace node pod sas_service_base|rabbitmq_consumed_total|
-|sas-java|container job name namespace node pod sas_service_base|rabbitmq_failed_to_publish_total|
-|sas-java|container job name namespace node pod sas_service_base|rabbitmq_not_acknowledged_published_total|
-|sas-java|container job name namespace node pod sas_service_base|rabbitmq_published_total|
-|sas-java|container job name namespace node pod sas_service_base|rabbitmq_rejected_total|
-|sas-java|container job name namespace node pod sas_service_base|rabbitmq_unrouted_published_total|
-|sas-java|container job name namespace node pod sas_service_base|tomcat_global_error_total|
-|sas-java|container job name namespace node pod sas_service_base|tomcat_global_received_bytes_total|
-|sas-java|container job name namespace node pod sas_service_base|tomcat_global_request_max_seconds|
-|sas-java|container job name namespace node pod sas_service_base|tomcat_global_request_seconds_count|
-|sas-java|container job name namespace node pod sas_service_base|tomcat_global_request_seconds_sum|
-|sas-java|container job name namespace node pod sas_service_base|tomcat_global_sent_bytes_total|
-|sas-java|container job name namespace node pod sas_service_base|tomcat_servlet_error_total|
-|sas-java|container job name namespace node pod sas_service_base|tomcat_servlet_request_max_seconds|
-|sas-java|container job name namespace node pod sas_service_base|tomcat_servlet_request_seconds_count|
-|sas-java|container job name namespace node pod sas_service_base|tomcat_servlet_request_seconds_sum|
-|sas-java|container job name namespace node pod sas_service_base|tomcat_threads_busy_threads|
-|sas-java|container job name namespace node pod sas_service_base|tomcat_threads_config_max_threads|
-|sas-java|container job name namespace node pod sas_service_base|tomcat_threads_current_threads|
-|sas-java|clientName container job method namespace node pod sas_service_base status uri|http_client_requests_seconds_count|
-|sas-java|clientName container job method namespace node pod sas_service_base status uri|http_client_requests_seconds_max|
-|sas-java|clientName container job method namespace node pod sas_service_base status uri|http_client_requests_seconds_sum|
-|sas-postgres|container exp_type job namespace pod quantile service|go_gc_duration_seconds|
-|sas-postgres|container datname exp_type job mode namespace pod server service|pg_locks_count|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_blk_read_time|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_blk_write_time|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_blks_hit|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_blks_read|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_conflicts|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_deadlocks|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_numbackends|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_stats_reset|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_temp_bytes|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_temp_files|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_tup_deleted|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_tup_fetched|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_tup_inserted|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_tup_returned|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_tup_updated|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_xact_commit|
-|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_xact_rollback|
+|sas-java|action cause container job namespace node pod sas_service_base|jvm_gc_pause_seconds_count|
+|sas-java|action cause container job namespace node pod sas_service_base|jvm_gc_pause_seconds_max|
+|sas-java|action cause container job namespace node pod sas_service_base|jvm_gc_pause_seconds_sum|
+|sas-java|area container id job namespace node pod sas_service_base|jvm_memory_committed_bytes|
+|sas-java|area container id job namespace node pod sas_service_base|jvm_memory_max_bytes|
+|sas-java|area container id job namespace node pod sas_service_base|jvm_memory_used_bytes|
+|sas-postgres|container exp_type job mount_point namespace pod server service|ccp_nodemx_disk_activity_sectors_read|
+|sas-postgres|container exp_type job mount_point namespace pod server service|ccp_nodemx_disk_activity_sectors_written|
+|sas-postgres|container exp_type job namespace pod server service short_version version|pg_static|
 |sas-postgres|container exp_type job namespace pod server service stanza|ccp_backrest_last_diff_backup_time_since_completion_seconds|
 |sas-postgres|container exp_type job namespace pod server service stanza|ccp_backrest_last_full_backup_time_since_completion_seconds|
 |sas-postgres|container exp_type job namespace pod server service stanza|ccp_backrest_last_incr_backup_time_since_completion_seconds|
-|sas-postgres|container exp_type job mount_point namespace pod server service|ccp_nodemx_disk_activity_sectors_read|
-|sas-postgres|container exp_type job mount_point namespace pod server service|ccp_nodemx_disk_activity_sectors_written|
-|sas-postgres|container exp_type interface job namespace pod server service|ccp_nodemx_network_rx_bytes|
-|sas-postgres|container exp_type interface job namespace pod server service|ccp_nodemx_network_rx_packets|
-|sas-postgres|container exp_type interface job namespace pod server service|ccp_nodemx_network_tx_bytes|
-|sas-postgres|container exp_type interface job namespace pod server service|ccp_nodemx_network_tx_packets|
-|sas-postgres|container dbname exp_type job mode namespace pod server service|ccp_locks_count|
+|sas-postgres|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_available_bytes|
+|sas-postgres|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_free_file_nodes|
+|sas-postgres|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_total_bytes|
+|sas-postgres|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_total_file_nodes|
 |sas-postgres|container exp_type job namespace pod server service|ccp_archive_command_status_seconds_since_last_fail|
 |sas-postgres|container exp_type job namespace pod server service|ccp_connection_stats_active|
 |sas-postgres|container exp_type job namespace pod server service|ccp_connection_stats_idle|
@@ -1336,13 +1320,31 @@
 |sas-postgres|container exp_type job namespace pod server service|pg_stat_bgwriter_checkpoints_timed|
 |sas-postgres|container exp_type job namespace pod server service|pg_stat_bgwriter_maxwritten_clean|
 |sas-postgres|container exp_type job namespace pod server service|pg_stat_bgwriter_stats_reset|
-|sas-postgres|container exp_type job namespace pod replica replica_port server service|ccp_replication_lag_size_bytes|
 |sas-postgres|container datname exp_type job namespace pod server service state|pg_stat_activity_count|
 |sas-postgres|container datname exp_type job namespace pod server service state|pg_stat_activity_max_tx_duration|
-|sas-postgres|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_available_bytes|
-|sas-postgres|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_free_file_nodes|
-|sas-postgres|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_total_bytes|
-|sas-postgres|container exp_type fs_type job mount_point namespace pod server service|ccp_nodemx_data_disk_total_file_nodes|
+|sas-postgres|container datname exp_type job mode namespace pod server service|pg_locks_count|
+|sas-postgres|container dbname exp_type job mode namespace pod server service|ccp_locks_count|
+|sas-postgres|container exp_type job namespace pod replica replica_port server service|ccp_replication_lag_size_bytes|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_data_checksum_failure_time_since_last_failure_seconds|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_database_size_bytes|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_blks_hit|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_blks_read|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_conflicts|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_deadlocks|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_temp_bytes|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_temp_files|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_deleted|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_fetched|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_inserted|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_returned|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_updated|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_xact_commit|
+|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_xact_rollback|
+|sas-postgres|container exp_type interface job namespace pod server service|ccp_nodemx_network_rx_bytes|
+|sas-postgres|container exp_type interface job namespace pod server service|ccp_nodemx_network_rx_packets|
+|sas-postgres|container exp_type interface job namespace pod server service|ccp_nodemx_network_tx_bytes|
+|sas-postgres|container exp_type interface job namespace pod server service|ccp_nodemx_network_tx_packets|
+|sas-postgres|container exp_type filename hashsum job namespace pod service|pg_exporter_user_queries_load_error|
 |sas-postgres|container exp_type job namespace pod service|go_gc_duration_seconds_count|
 |sas-postgres|container exp_type job namespace pod service|go_gc_duration_seconds_sum|
 |sas-postgres|container exp_type job namespace pod service|go_goroutines|
@@ -1382,24 +1384,6 @@
 |sas-postgres|container exp_type job namespace pod service|process_start_time_seconds|
 |sas-postgres|container exp_type job namespace pod service|process_virtual_memory_bytes|
 |sas-postgres|container exp_type job namespace pod service|process_virtual_memory_max_bytes|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_data_checksum_failure_time_since_last_failure_seconds|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_database_size_bytes|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_blks_hit|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_blks_read|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_conflicts|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_deadlocks|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_temp_bytes|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_temp_files|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_deleted|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_fetched|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_inserted|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_returned|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_tup_updated|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_xact_commit|
-|sas-postgres|container dbname exp_type job namespace pod server service|ccp_stat_database_xact_rollback|
-|sas-postgres|backup_type container exp_type job namespace pod server service stanza|ccp_backrest_last_info_backup_runtime_seconds|
-|sas-postgres|backup_type container exp_type job namespace pod server service stanza|ccp_backrest_last_info_repo_backup_size_bytes|
-|sas-postgres|backup_type container exp_type job namespace pod server service stanza|ccp_backrest_last_info_repo_total_size_bytes|
 |sas-postgres|container dbname exp_type job namespace pod relname schemaname server service|ccp_stat_user_tables_analyze_count|
 |sas-postgres|container dbname exp_type job namespace pod relname schemaname server service|ccp_stat_user_tables_autoanalyze_count|
 |sas-postgres|container dbname exp_type job namespace pod relname schemaname server service|ccp_stat_user_tables_autovacuum_count|
@@ -1415,7 +1399,6 @@
 |sas-postgres|container dbname exp_type job namespace pod relname schemaname server service|ccp_stat_user_tables_seq_tup_read|
 |sas-postgres|container dbname exp_type job namespace pod relname schemaname server service|ccp_stat_user_tables_vacuum_count|
 |sas-postgres|container dbname exp_type job namespace pod relname schemaname server service|ccp_table_size_size_bytes|
-|sas-postgres|container exp_type filename hashsum job namespace pod service|pg_exporter_user_queries_load_error|
 |sas-postgres|container datid datname exp_type job namespace pod server service|pg_stat_database_blk_read_time|
 |sas-postgres|container datid datname exp_type job namespace pod server service|pg_stat_database_blk_write_time|
 |sas-postgres|container datid datname exp_type job namespace pod server service|pg_stat_database_blks_hit|
@@ -1438,41 +1421,49 @@
 |sas-postgres|container datid datname exp_type job namespace pod server service|pg_stat_database_tup_updated|
 |sas-postgres|container datid datname exp_type job namespace pod server service|pg_stat_database_xact_commit|
 |sas-postgres|container datid datname exp_type job namespace pod server service|pg_stat_database_xact_rollback|
-|sas-postgres|container exp_type job namespace pod server service short_version version|pg_static|
+|sas-postgres|backup_type container exp_type job namespace pod server service stanza|ccp_backrest_last_info_backup_runtime_seconds|
+|sas-postgres|backup_type container exp_type job namespace pod server service stanza|ccp_backrest_last_info_repo_backup_size_bytes|
+|sas-postgres|backup_type container exp_type job namespace pod server service stanza|ccp_backrest_last_info_repo_total_size_bytes|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_blk_read_time|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_blk_write_time|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_blks_hit|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_blks_read|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_conflicts|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_deadlocks|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_numbackends|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_stats_reset|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_temp_bytes|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_temp_files|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_tup_deleted|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_tup_fetched|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_tup_inserted|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_tup_returned|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_tup_updated|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_xact_commit|
+|sas-postgres|container datid exp_type job namespace pod server service|pg_stat_database_xact_rollback|
+|sas-postgres|container exp_type job namespace pod quantile service|go_gc_duration_seconds|
 |sas-rabbitmq|container job namespace pod protocol service|rabbitmq_auth_attempts_failed_total|
 |sas-rabbitmq|container job namespace pod protocol service|rabbitmq_auth_attempts_succeeded_total|
 |sas-rabbitmq|container job namespace pod protocol service|rabbitmq_auth_attempts_total|
 |sas-rabbitmq|container content_type encoding job namespace pod registry service|telemetry_scrape_encoded_size_bytes_count|
 |sas-rabbitmq|container content_type encoding job namespace pod registry service|telemetry_scrape_encoded_size_bytes_sum|
-|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_heap_size_words|
-|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_memory_bytes|
-|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_message_queue_len|
-|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_min_bin_vheap_size_words|
-|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_min_heap_size_words|
-|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_reductions|
-|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_stack_size_words|
-|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_status|
-|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_total_heap_size_words|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_alloc_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_aux_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_bif_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_busy_wait_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_check_io_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_emulator_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_ets_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_gc_full_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_gc_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_nif_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_other_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_port_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_send_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_sleep_seconds_total|
-|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_timers_seconds_total|
 |sas-rabbitmq|alloc container instance_no job kind namespace pod service usage|erlang_vm_allocators|
-|sas-rabbitmq|container job namespace pod service usage|erlang_vm_memory_atom_bytes_total|
-|sas-rabbitmq|container job namespace pod service usage|erlang_vm_memory_processes_bytes_total|
-|sas-rabbitmq|container job namespace pod service usage|erlang_vm_memory_system_bytes_total|
-|sas-rabbitmq|container job kind namespace pod service|erlang_vm_memory_bytes_total|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_node_queue_size_bytes|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_node_state|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_port_input_bytes|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_port_memory_bytes|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_port_output_bytes|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_port_queue_size_bytes|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_recv_avg_bytes|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_recv_bytes|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_recv_cnt|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_recv_dvi_bytes|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_recv_max_bytes|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_send_avg_bytes|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_send_bytes|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_send_cnt|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_send_max_bytes|
+|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_send_pend_bytes|
 |sas-rabbitmq|container content_type job namespace pod registry service|telemetry_scrape_duration_seconds_count|
 |sas-rabbitmq|container content_type job namespace pod registry service|telemetry_scrape_duration_seconds_sum|
 |sas-rabbitmq|container content_type job namespace pod registry service|telemetry_scrape_size_bytes_count|
@@ -1618,30 +1609,45 @@
 |sas-rabbitmq|container job namespace pod service|rabbitmq_resident_memory_limit_bytes|
 |sas-rabbitmq|container job namespace pod service|rabbitmq_schema_db_disk_tx_total|
 |sas-rabbitmq|container job namespace pod service|rabbitmq_schema_db_ram_tx_total|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_node_queue_size_bytes|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_node_state|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_port_input_bytes|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_port_memory_bytes|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_port_output_bytes|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_port_queue_size_bytes|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_recv_avg_bytes|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_recv_bytes|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_recv_cnt|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_recv_dvi_bytes|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_recv_max_bytes|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_send_avg_bytes|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_send_bytes|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_send_cnt|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_send_max_bytes|
-|sas-rabbitmq|container job namespace peer pod service|erlang_vm_dist_send_pend_bytes|
+|sas-rabbitmq|container job namespace pod service usage|erlang_vm_memory_atom_bytes_total|
+|sas-rabbitmq|container job namespace pod service usage|erlang_vm_memory_processes_bytes_total|
+|sas-rabbitmq|container job namespace pod service usage|erlang_vm_memory_system_bytes_total|
+|sas-rabbitmq|container job kind namespace pod service|erlang_vm_memory_bytes_total|
+|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_heap_size_words|
+|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_memory_bytes|
+|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_message_queue_len|
+|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_min_bin_vheap_size_words|
+|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_min_heap_size_words|
+|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_reductions|
+|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_stack_size_words|
+|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_status|
+|sas-rabbitmq|container job namespace peer pod service type|erlang_vm_dist_proc_total_heap_size_words|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_alloc_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_aux_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_bif_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_busy_wait_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_check_io_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_emulator_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_ets_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_gc_full_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_gc_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_nif_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_other_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_port_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_send_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_sleep_seconds_total|
+|sas-rabbitmq|container id job namespace pod service type|erlang_vm_msacc_timers_seconds_total|
+
 </details>
 
 ## By Metric
 
 <details>
   <summary>Click to expand</summary
+
 | Metric | Dimensions | Source |
 | ---------- | ------ | ------ |
+|cas_nodes|cas_node cas_node_type cas_server connected container job namespace pod service uuid|sas-cas|
 |cas_grid_idle_seconds|cas_server container job namespace pod service|sas-cas|
 |cas_grid_sessions_created_total|cas_server container job namespace pod service|sas-cas|
 |cas_grid_sessions_current|cas_server container job namespace pod service|sas-cas|
@@ -1660,20 +1666,13 @@
 |cas_node_max_open_files|cas_node cas_node_type cas_server container job namespace pod service|sas-cas|
 |cas_node_one_minute_cpu_load_avg|cas_node cas_node_type cas_server container job namespace pod service|sas-cas|
 |cas_node_open_files|cas_node cas_node_type cas_server container job namespace pod service|sas-cas|
-|cas_nodes|cas_node cas_node_type cas_server connected container job namespace pod service uuid|sas-cas|
-|arke_request_elapsed|container job method namespace node pod quantile sas_service_base service status|sas-go|
-|go_gc_duration_seconds|container job namespace node pod quantile sas_service_base service|sas-go|
-|runtime_gc_pause_ns|container job namespace node pod quantile sas_service_base service|sas-go|
-|sas_db_connections_max|container job namespace node pod sas_service_base service state|sas-go|
-|sas_db_pool_connections|container job namespace node pod sas_service_base service state|sas-go|
-|sas_db_connections_max|container job namespace node pod sas_service_base schema service state|sas-go|
-|sas_db_pool_connections|container job namespace node pod sas_service_base schema service state|sas-go|
+|log_events_total|container job level namespace node pod sas_service_base service|sas-go|
+|sas_db_closed_total|container job namespace node pod reason sas_service_base service|sas-go|
 |sas_db_wait_seconds|container job namespace node pod sas_service_base schema service|sas-go|
 |sas_db_wait_total|container job namespace node pod sas_service_base schema service|sas-go|
-|arke_client_active_messages|ClientIdentitifer container job namespace node pod sas_service_base service|sas-go|
-|arke_client_consumed_total|ClientIdentitifer container job namespace node pod sas_service_base service|sas-go|
-|arke_client_produced_total|ClientIdentitifer container job namespace node pod sas_service_base service|sas-go|
-|arke_client_streams|ClientIdentitifer container job namespace node pod sas_service_base service|sas-go|
+|go_gc_duration_seconds|container job namespace node pod quantile sas_service_base service|sas-go|
+|runtime_gc_pause_ns|container job namespace node pod quantile sas_service_base service|sas-go|
+|arke_request_elapsed|container job method namespace node pod quantile sas_service_base service status|sas-go|
 |arke_client_active_messages|container job namespace node pod sas_service_base service|sas-go|
 |arke_client_consumed_total|container job namespace node pod sas_service_base service|sas-go|
 |arke_client_produced_total|container job namespace node pod sas_service_base service|sas-go|
@@ -1735,28 +1734,61 @@
 |sas_maps_report_polling_attempts_total|container job namespace node pod sas_service_base service|sas-go|
 |sas_maps_report_query_duration_seconds_count|container job namespace node pod sas_service_base service|sas-go|
 |sas_maps_report_query_duration_seconds_sum|container job namespace node pod sas_service_base service|sas-go|
+|sas_db_connections_max|container job namespace node pod sas_service_base schema service state|sas-go|
+|sas_db_pool_connections|container job namespace node pod sas_service_base schema service state|sas-go|
+|arke_client_active_messages|ClientIdentitifer container job namespace node pod sas_service_base service|sas-go|
+|arke_client_consumed_total|ClientIdentitifer container job namespace node pod sas_service_base service|sas-go|
+|arke_client_produced_total|ClientIdentitifer container job namespace node pod sas_service_base service|sas-go|
+|arke_client_streams|ClientIdentitifer container job namespace node pod sas_service_base service|sas-go|
 |arke_recvmsg_total|container job method namespace node pod sas_service_base service status|sas-go|
 |arke_request_elapsed_count|container job method namespace node pod sas_service_base service status|sas-go|
 |arke_request_elapsed_sum|container job method namespace node pod sas_service_base service status|sas-go|
 |arke_request_total|container job method namespace node pod sas_service_base service status|sas-go|
 |arke_sendmsg_total|container job method namespace node pod sas_service_base service status|sas-go|
 |sas_db_closed_total|container job namespace node pod reason sas_service_base schema service|sas-go|
-|log_events_total|container job level namespace node pod sas_service_base service|sas-go|
-|sas_db_closed_total|container job namespace node pod reason sas_service_base service|sas-go|
-|jvm_gc_pause_seconds_count|action cause container job namespace node pod sas_service_base|sas-java|
-|jvm_gc_pause_seconds_max|action cause container job namespace node pod sas_service_base|sas-java|
-|jvm_gc_pause_seconds_sum|action cause container job namespace node pod sas_service_base|sas-java|
-|log_events_total|container job level namespace node pod sas_service_base|sas-java|
-|spring_rabbitmq_listener_seconds_count|container job listener_id namespace node pod queue result sas_service_base|sas-java|
-|spring_rabbitmq_listener_seconds_max|container job listener_id namespace node pod queue result sas_service_base|sas-java|
-|spring_rabbitmq_listener_seconds_sum|container job listener_id namespace node pod queue result sas_service_base|sas-java|
+|sas_db_connections_max|container job namespace node pod sas_service_base service state|sas-go|
+|sas_db_pool_connections|container job namespace node pod sas_service_base service state|sas-go|
 |jvm_threads_states_threads|container job namespace node pod sas_service_base state|sas-java|
-|jvm_memory_committed_bytes|area container id job namespace node pod sas_service_base|sas-java|
-|jvm_memory_max_bytes|area container id job namespace node pod sas_service_base|sas-java|
-|jvm_memory_used_bytes|area container id job namespace node pod sas_service_base|sas-java|
+|http_client_requests_seconds_count|clientName container job method namespace node pod sas_service_base status uri|sas-java|
+|http_client_requests_seconds_max|clientName container job method namespace node pod sas_service_base status uri|sas-java|
+|http_client_requests_seconds_sum|clientName container job method namespace node pod sas_service_base status uri|sas-java|
+|jdbc_connections_active|container job name namespace node pod sas_service_base|sas-java|
+|jdbc_connections_idle|container job name namespace node pod sas_service_base|sas-java|
+|jdbc_connections_max|container job name namespace node pod sas_service_base|sas-java|
+|jdbc_connections_min|container job name namespace node pod sas_service_base|sas-java|
+|rabbitmq_acknowledged_published_total|container job name namespace node pod sas_service_base|sas-java|
+|rabbitmq_acknowledged_total|container job name namespace node pod sas_service_base|sas-java|
+|rabbitmq_channels|container job name namespace node pod sas_service_base|sas-java|
+|rabbitmq_connections|container job name namespace node pod sas_service_base|sas-java|
+|rabbitmq_consumed_total|container job name namespace node pod sas_service_base|sas-java|
+|rabbitmq_failed_to_publish_total|container job name namespace node pod sas_service_base|sas-java|
+|rabbitmq_not_acknowledged_published_total|container job name namespace node pod sas_service_base|sas-java|
+|rabbitmq_published_total|container job name namespace node pod sas_service_base|sas-java|
+|rabbitmq_rejected_total|container job name namespace node pod sas_service_base|sas-java|
+|rabbitmq_unrouted_published_total|container job name namespace node pod sas_service_base|sas-java|
+|tomcat_global_error_total|container job name namespace node pod sas_service_base|sas-java|
+|tomcat_global_received_bytes_total|container job name namespace node pod sas_service_base|sas-java|
+|tomcat_global_request_max_seconds|container job name namespace node pod sas_service_base|sas-java|
+|tomcat_global_request_seconds_count|container job name namespace node pod sas_service_base|sas-java|
+|tomcat_global_request_seconds_sum|container job name namespace node pod sas_service_base|sas-java|
+|tomcat_global_sent_bytes_total|container job name namespace node pod sas_service_base|sas-java|
+|tomcat_servlet_error_total|container job name namespace node pod sas_service_base|sas-java|
+|tomcat_servlet_request_max_seconds|container job name namespace node pod sas_service_base|sas-java|
+|tomcat_servlet_request_seconds_count|container job name namespace node pod sas_service_base|sas-java|
+|tomcat_servlet_request_seconds_sum|container job name namespace node pod sas_service_base|sas-java|
+|tomcat_threads_busy_threads|container job name namespace node pod sas_service_base|sas-java|
+|tomcat_threads_config_max_threads|container job name namespace node pod sas_service_base|sas-java|
+|tomcat_threads_current_threads|container job name namespace node pod sas_service_base|sas-java|
+|log_events_total|container job level namespace node pod sas_service_base|sas-java|
 |jvm_buffer_count_buffers|container id job namespace node pod sas_service_base|sas-java|
 |jvm_buffer_memory_used_bytes|container id job namespace node pod sas_service_base|sas-java|
 |jvm_buffer_total_capacity_bytes|container id job namespace node pod sas_service_base|sas-java|
+|spring_rabbitmq_listener_seconds_count|container job listener_id namespace node pod queue result sas_service_base|sas-java|
+|spring_rabbitmq_listener_seconds_max|container job listener_id namespace node pod queue result sas_service_base|sas-java|
+|spring_rabbitmq_listener_seconds_sum|container job listener_id namespace node pod queue result sas_service_base|sas-java|
+|http_server_requests_seconds_count|container job method namespace node outcome pod sas_service_base status uri|sas-java|
+|http_server_requests_seconds_max|container job method namespace node outcome pod sas_service_base status uri|sas-java|
+|http_server_requests_seconds_sum|container job method namespace node outcome pod sas_service_base status uri|sas-java|
 |jvm_classes_loaded_classes|container job namespace node pod sas_service_base|sas-java|
 |jvm_classes_unloaded_classes_total|container job namespace node pod sas_service_base|sas-java|
 |jvm_gc_live_data_size_bytes|container job namespace node pod sas_service_base|sas-java|
@@ -1792,68 +1824,22 @@
 |zipkin_reporter_spans_bytes_total|container job namespace node pod sas_service_base|sas-java|
 |zipkin_reporter_spans_dropped_total|container job namespace node pod sas_service_base|sas-java|
 |zipkin_reporter_spans_total|container job namespace node pod sas_service_base|sas-java|
-|http_server_requests_seconds_count|container job method namespace node outcome pod sas_service_base status uri|sas-java|
-|http_server_requests_seconds_max|container job method namespace node outcome pod sas_service_base status uri|sas-java|
-|http_server_requests_seconds_sum|container job method namespace node outcome pod sas_service_base status uri|sas-java|
-|jdbc_connections_active|container job name namespace node pod sas_service_base|sas-java|
-|jdbc_connections_idle|container job name namespace node pod sas_service_base|sas-java|
-|jdbc_connections_max|container job name namespace node pod sas_service_base|sas-java|
-|jdbc_connections_min|container job name namespace node pod sas_service_base|sas-java|
-|rabbitmq_acknowledged_published_total|container job name namespace node pod sas_service_base|sas-java|
-|rabbitmq_acknowledged_total|container job name namespace node pod sas_service_base|sas-java|
-|rabbitmq_channels|container job name namespace node pod sas_service_base|sas-java|
-|rabbitmq_connections|container job name namespace node pod sas_service_base|sas-java|
-|rabbitmq_consumed_total|container job name namespace node pod sas_service_base|sas-java|
-|rabbitmq_failed_to_publish_total|container job name namespace node pod sas_service_base|sas-java|
-|rabbitmq_not_acknowledged_published_total|container job name namespace node pod sas_service_base|sas-java|
-|rabbitmq_published_total|container job name namespace node pod sas_service_base|sas-java|
-|rabbitmq_rejected_total|container job name namespace node pod sas_service_base|sas-java|
-|rabbitmq_unrouted_published_total|container job name namespace node pod sas_service_base|sas-java|
-|tomcat_global_error_total|container job name namespace node pod sas_service_base|sas-java|
-|tomcat_global_received_bytes_total|container job name namespace node pod sas_service_base|sas-java|
-|tomcat_global_request_max_seconds|container job name namespace node pod sas_service_base|sas-java|
-|tomcat_global_request_seconds_count|container job name namespace node pod sas_service_base|sas-java|
-|tomcat_global_request_seconds_sum|container job name namespace node pod sas_service_base|sas-java|
-|tomcat_global_sent_bytes_total|container job name namespace node pod sas_service_base|sas-java|
-|tomcat_servlet_error_total|container job name namespace node pod sas_service_base|sas-java|
-|tomcat_servlet_request_max_seconds|container job name namespace node pod sas_service_base|sas-java|
-|tomcat_servlet_request_seconds_count|container job name namespace node pod sas_service_base|sas-java|
-|tomcat_servlet_request_seconds_sum|container job name namespace node pod sas_service_base|sas-java|
-|tomcat_threads_busy_threads|container job name namespace node pod sas_service_base|sas-java|
-|tomcat_threads_config_max_threads|container job name namespace node pod sas_service_base|sas-java|
-|tomcat_threads_current_threads|container job name namespace node pod sas_service_base|sas-java|
-|http_client_requests_seconds_count|clientName container job method namespace node pod sas_service_base status uri|sas-java|
-|http_client_requests_seconds_max|clientName container job method namespace node pod sas_service_base status uri|sas-java|
-|http_client_requests_seconds_sum|clientName container job method namespace node pod sas_service_base status uri|sas-java|
-|go_gc_duration_seconds|container exp_type job namespace pod quantile service|sas-postgres|
-|pg_locks_count|container datname exp_type job mode namespace pod server service|sas-postgres|
-|pg_stat_database_blk_read_time|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_blk_write_time|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_blks_hit|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_blks_read|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_conflicts|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_deadlocks|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_numbackends|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_stats_reset|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_temp_bytes|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_temp_files|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_tup_deleted|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_tup_fetched|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_tup_inserted|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_tup_returned|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_tup_updated|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_xact_commit|container datid exp_type job namespace pod server service|sas-postgres|
-|pg_stat_database_xact_rollback|container datid exp_type job namespace pod server service|sas-postgres|
+|jvm_gc_pause_seconds_count|action cause container job namespace node pod sas_service_base|sas-java|
+|jvm_gc_pause_seconds_max|action cause container job namespace node pod sas_service_base|sas-java|
+|jvm_gc_pause_seconds_sum|action cause container job namespace node pod sas_service_base|sas-java|
+|jvm_memory_committed_bytes|area container id job namespace node pod sas_service_base|sas-java|
+|jvm_memory_max_bytes|area container id job namespace node pod sas_service_base|sas-java|
+|jvm_memory_used_bytes|area container id job namespace node pod sas_service_base|sas-java|
+|ccp_nodemx_disk_activity_sectors_read|container exp_type job mount_point namespace pod server service|sas-postgres|
+|ccp_nodemx_disk_activity_sectors_written|container exp_type job mount_point namespace pod server service|sas-postgres|
+|pg_static|container exp_type job namespace pod server service short_version version|sas-postgres|
 |ccp_backrest_last_diff_backup_time_since_completion_seconds|container exp_type job namespace pod server service stanza|sas-postgres|
 |ccp_backrest_last_full_backup_time_since_completion_seconds|container exp_type job namespace pod server service stanza|sas-postgres|
 |ccp_backrest_last_incr_backup_time_since_completion_seconds|container exp_type job namespace pod server service stanza|sas-postgres|
-|ccp_nodemx_disk_activity_sectors_read|container exp_type job mount_point namespace pod server service|sas-postgres|
-|ccp_nodemx_disk_activity_sectors_written|container exp_type job mount_point namespace pod server service|sas-postgres|
-|ccp_nodemx_network_rx_bytes|container exp_type interface job namespace pod server service|sas-postgres|
-|ccp_nodemx_network_rx_packets|container exp_type interface job namespace pod server service|sas-postgres|
-|ccp_nodemx_network_tx_bytes|container exp_type interface job namespace pod server service|sas-postgres|
-|ccp_nodemx_network_tx_packets|container exp_type interface job namespace pod server service|sas-postgres|
-|ccp_locks_count|container dbname exp_type job mode namespace pod server service|sas-postgres|
+|ccp_nodemx_data_disk_available_bytes|container exp_type fs_type job mount_point namespace pod server service|sas-postgres|
+|ccp_nodemx_data_disk_free_file_nodes|container exp_type fs_type job mount_point namespace pod server service|sas-postgres|
+|ccp_nodemx_data_disk_total_bytes|container exp_type fs_type job mount_point namespace pod server service|sas-postgres|
+|ccp_nodemx_data_disk_total_file_nodes|container exp_type fs_type job mount_point namespace pod server service|sas-postgres|
 |ccp_archive_command_status_seconds_since_last_fail|container exp_type job namespace pod server service|sas-postgres|
 |ccp_connection_stats_active|container exp_type job namespace pod server service|sas-postgres|
 |ccp_connection_stats_idle|container exp_type job namespace pod server service|sas-postgres|
@@ -2154,13 +2140,31 @@
 |pg_stat_bgwriter_checkpoints_timed|container exp_type job namespace pod server service|sas-postgres|
 |pg_stat_bgwriter_maxwritten_clean|container exp_type job namespace pod server service|sas-postgres|
 |pg_stat_bgwriter_stats_reset|container exp_type job namespace pod server service|sas-postgres|
-|ccp_replication_lag_size_bytes|container exp_type job namespace pod replica replica_port server service|sas-postgres|
 |pg_stat_activity_count|container datname exp_type job namespace pod server service state|sas-postgres|
 |pg_stat_activity_max_tx_duration|container datname exp_type job namespace pod server service state|sas-postgres|
-|ccp_nodemx_data_disk_available_bytes|container exp_type fs_type job mount_point namespace pod server service|sas-postgres|
-|ccp_nodemx_data_disk_free_file_nodes|container exp_type fs_type job mount_point namespace pod server service|sas-postgres|
-|ccp_nodemx_data_disk_total_bytes|container exp_type fs_type job mount_point namespace pod server service|sas-postgres|
-|ccp_nodemx_data_disk_total_file_nodes|container exp_type fs_type job mount_point namespace pod server service|sas-postgres|
+|pg_locks_count|container datname exp_type job mode namespace pod server service|sas-postgres|
+|ccp_locks_count|container dbname exp_type job mode namespace pod server service|sas-postgres|
+|ccp_replication_lag_size_bytes|container exp_type job namespace pod replica replica_port server service|sas-postgres|
+|ccp_data_checksum_failure_time_since_last_failure_seconds|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_database_size_bytes|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_stat_database_blks_hit|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_stat_database_blks_read|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_stat_database_conflicts|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_stat_database_deadlocks|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_stat_database_temp_bytes|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_stat_database_temp_files|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_stat_database_tup_deleted|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_stat_database_tup_fetched|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_stat_database_tup_inserted|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_stat_database_tup_returned|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_stat_database_tup_updated|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_stat_database_xact_commit|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_stat_database_xact_rollback|container dbname exp_type job namespace pod server service|sas-postgres|
+|ccp_nodemx_network_rx_bytes|container exp_type interface job namespace pod server service|sas-postgres|
+|ccp_nodemx_network_rx_packets|container exp_type interface job namespace pod server service|sas-postgres|
+|ccp_nodemx_network_tx_bytes|container exp_type interface job namespace pod server service|sas-postgres|
+|ccp_nodemx_network_tx_packets|container exp_type interface job namespace pod server service|sas-postgres|
+|pg_exporter_user_queries_load_error|container exp_type filename hashsum job namespace pod service|sas-postgres|
 |go_gc_duration_seconds_count|container exp_type job namespace pod service|sas-postgres|
 |go_gc_duration_seconds_sum|container exp_type job namespace pod service|sas-postgres|
 |go_goroutines|container exp_type job namespace pod service|sas-postgres|
@@ -2200,24 +2204,6 @@
 |process_start_time_seconds|container exp_type job namespace pod service|sas-postgres|
 |process_virtual_memory_bytes|container exp_type job namespace pod service|sas-postgres|
 |process_virtual_memory_max_bytes|container exp_type job namespace pod service|sas-postgres|
-|ccp_data_checksum_failure_time_since_last_failure_seconds|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_database_size_bytes|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_stat_database_blks_hit|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_stat_database_blks_read|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_stat_database_conflicts|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_stat_database_deadlocks|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_stat_database_temp_bytes|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_stat_database_temp_files|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_stat_database_tup_deleted|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_stat_database_tup_fetched|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_stat_database_tup_inserted|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_stat_database_tup_returned|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_stat_database_tup_updated|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_stat_database_xact_commit|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_stat_database_xact_rollback|container dbname exp_type job namespace pod server service|sas-postgres|
-|ccp_backrest_last_info_backup_runtime_seconds|backup_type container exp_type job namespace pod server service stanza|sas-postgres|
-|ccp_backrest_last_info_repo_backup_size_bytes|backup_type container exp_type job namespace pod server service stanza|sas-postgres|
-|ccp_backrest_last_info_repo_total_size_bytes|backup_type container exp_type job namespace pod server service stanza|sas-postgres|
 |ccp_stat_user_tables_analyze_count|container dbname exp_type job namespace pod relname schemaname server service|sas-postgres|
 |ccp_stat_user_tables_autoanalyze_count|container dbname exp_type job namespace pod relname schemaname server service|sas-postgres|
 |ccp_stat_user_tables_autovacuum_count|container dbname exp_type job namespace pod relname schemaname server service|sas-postgres|
@@ -2233,7 +2219,6 @@
 |ccp_stat_user_tables_seq_tup_read|container dbname exp_type job namespace pod relname schemaname server service|sas-postgres|
 |ccp_stat_user_tables_vacuum_count|container dbname exp_type job namespace pod relname schemaname server service|sas-postgres|
 |ccp_table_size_size_bytes|container dbname exp_type job namespace pod relname schemaname server service|sas-postgres|
-|pg_exporter_user_queries_load_error|container exp_type filename hashsum job namespace pod service|sas-postgres|
 |pg_stat_database_blk_read_time|container datid datname exp_type job namespace pod server service|sas-postgres|
 |pg_stat_database_blk_write_time|container datid datname exp_type job namespace pod server service|sas-postgres|
 |pg_stat_database_blks_hit|container datid datname exp_type job namespace pod server service|sas-postgres|
@@ -2256,41 +2241,49 @@
 |pg_stat_database_tup_updated|container datid datname exp_type job namespace pod server service|sas-postgres|
 |pg_stat_database_xact_commit|container datid datname exp_type job namespace pod server service|sas-postgres|
 |pg_stat_database_xact_rollback|container datid datname exp_type job namespace pod server service|sas-postgres|
-|pg_static|container exp_type job namespace pod server service short_version version|sas-postgres|
+|ccp_backrest_last_info_backup_runtime_seconds|backup_type container exp_type job namespace pod server service stanza|sas-postgres|
+|ccp_backrest_last_info_repo_backup_size_bytes|backup_type container exp_type job namespace pod server service stanza|sas-postgres|
+|ccp_backrest_last_info_repo_total_size_bytes|backup_type container exp_type job namespace pod server service stanza|sas-postgres|
+|pg_stat_database_blk_read_time|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_blk_write_time|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_blks_hit|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_blks_read|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_conflicts|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_deadlocks|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_numbackends|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_stats_reset|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_temp_bytes|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_temp_files|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_tup_deleted|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_tup_fetched|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_tup_inserted|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_tup_returned|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_tup_updated|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_xact_commit|container datid exp_type job namespace pod server service|sas-postgres|
+|pg_stat_database_xact_rollback|container datid exp_type job namespace pod server service|sas-postgres|
+|go_gc_duration_seconds|container exp_type job namespace pod quantile service|sas-postgres|
 |rabbitmq_auth_attempts_failed_total|container job namespace pod protocol service|sas-rabbitmq|
 |rabbitmq_auth_attempts_succeeded_total|container job namespace pod protocol service|sas-rabbitmq|
 |rabbitmq_auth_attempts_total|container job namespace pod protocol service|sas-rabbitmq|
 |telemetry_scrape_encoded_size_bytes_count|container content_type encoding job namespace pod registry service|sas-rabbitmq|
 |telemetry_scrape_encoded_size_bytes_sum|container content_type encoding job namespace pod registry service|sas-rabbitmq|
-|erlang_vm_dist_proc_heap_size_words|container job namespace peer pod service type|sas-rabbitmq|
-|erlang_vm_dist_proc_memory_bytes|container job namespace peer pod service type|sas-rabbitmq|
-|erlang_vm_dist_proc_message_queue_len|container job namespace peer pod service type|sas-rabbitmq|
-|erlang_vm_dist_proc_min_bin_vheap_size_words|container job namespace peer pod service type|sas-rabbitmq|
-|erlang_vm_dist_proc_min_heap_size_words|container job namespace peer pod service type|sas-rabbitmq|
-|erlang_vm_dist_proc_reductions|container job namespace peer pod service type|sas-rabbitmq|
-|erlang_vm_dist_proc_stack_size_words|container job namespace peer pod service type|sas-rabbitmq|
-|erlang_vm_dist_proc_status|container job namespace peer pod service type|sas-rabbitmq|
-|erlang_vm_dist_proc_total_heap_size_words|container job namespace peer pod service type|sas-rabbitmq|
-|erlang_vm_msacc_alloc_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_aux_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_bif_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_busy_wait_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_check_io_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_emulator_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_ets_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_gc_full_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_gc_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_nif_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_other_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_port_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_send_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_sleep_seconds_total|container id job namespace pod service type|sas-rabbitmq|
-|erlang_vm_msacc_timers_seconds_total|container id job namespace pod service type|sas-rabbitmq|
 |erlang_vm_allocators|alloc container instance_no job kind namespace pod service usage|sas-rabbitmq|
-|erlang_vm_memory_atom_bytes_total|container job namespace pod service usage|sas-rabbitmq|
-|erlang_vm_memory_processes_bytes_total|container job namespace pod service usage|sas-rabbitmq|
-|erlang_vm_memory_system_bytes_total|container job namespace pod service usage|sas-rabbitmq|
-|erlang_vm_memory_bytes_total|container job kind namespace pod service|sas-rabbitmq|
+|erlang_vm_dist_node_queue_size_bytes|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_node_state|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_port_input_bytes|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_port_memory_bytes|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_port_output_bytes|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_port_queue_size_bytes|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_recv_avg_bytes|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_recv_bytes|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_recv_cnt|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_recv_dvi_bytes|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_recv_max_bytes|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_send_avg_bytes|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_send_bytes|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_send_cnt|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_send_max_bytes|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_dist_send_pend_bytes|container job namespace peer pod service|sas-rabbitmq|
 |telemetry_scrape_duration_seconds_count|container content_type job namespace pod registry service|sas-rabbitmq|
 |telemetry_scrape_duration_seconds_sum|container content_type job namespace pod registry service|sas-rabbitmq|
 |telemetry_scrape_size_bytes_count|container content_type job namespace pod registry service|sas-rabbitmq|
@@ -2436,20 +2429,33 @@
 |rabbitmq_resident_memory_limit_bytes|container job namespace pod service|sas-rabbitmq|
 |rabbitmq_schema_db_disk_tx_total|container job namespace pod service|sas-rabbitmq|
 |rabbitmq_schema_db_ram_tx_total|container job namespace pod service|sas-rabbitmq|
-|erlang_vm_dist_node_queue_size_bytes|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_node_state|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_port_input_bytes|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_port_memory_bytes|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_port_output_bytes|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_port_queue_size_bytes|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_recv_avg_bytes|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_recv_bytes|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_recv_cnt|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_recv_dvi_bytes|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_recv_max_bytes|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_send_avg_bytes|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_send_bytes|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_send_cnt|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_send_max_bytes|container job namespace peer pod service|sas-rabbitmq|
-|erlang_vm_dist_send_pend_bytes|container job namespace peer pod service|sas-rabbitmq|
+|erlang_vm_memory_atom_bytes_total|container job namespace pod service usage|sas-rabbitmq|
+|erlang_vm_memory_processes_bytes_total|container job namespace pod service usage|sas-rabbitmq|
+|erlang_vm_memory_system_bytes_total|container job namespace pod service usage|sas-rabbitmq|
+|erlang_vm_memory_bytes_total|container job kind namespace pod service|sas-rabbitmq|
+|erlang_vm_dist_proc_heap_size_words|container job namespace peer pod service type|sas-rabbitmq|
+|erlang_vm_dist_proc_memory_bytes|container job namespace peer pod service type|sas-rabbitmq|
+|erlang_vm_dist_proc_message_queue_len|container job namespace peer pod service type|sas-rabbitmq|
+|erlang_vm_dist_proc_min_bin_vheap_size_words|container job namespace peer pod service type|sas-rabbitmq|
+|erlang_vm_dist_proc_min_heap_size_words|container job namespace peer pod service type|sas-rabbitmq|
+|erlang_vm_dist_proc_reductions|container job namespace peer pod service type|sas-rabbitmq|
+|erlang_vm_dist_proc_stack_size_words|container job namespace peer pod service type|sas-rabbitmq|
+|erlang_vm_dist_proc_status|container job namespace peer pod service type|sas-rabbitmq|
+|erlang_vm_dist_proc_total_heap_size_words|container job namespace peer pod service type|sas-rabbitmq|
+|erlang_vm_msacc_alloc_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_aux_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_bif_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_busy_wait_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_check_io_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_emulator_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_ets_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_gc_full_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_gc_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_nif_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_other_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_port_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_send_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_sleep_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+|erlang_vm_msacc_timers_seconds_total|container id job namespace pod service type|sas-rabbitmq|
+
 </details>
