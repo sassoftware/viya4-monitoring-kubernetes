@@ -63,7 +63,7 @@ Run the following code from the command line to deploy the CloudWatch agent for 
 
 ```bash
 curl https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/service/cwagent-prometheus/prometheus-k8s.yaml | 
-sed "s/{{cluster_name}}/'${ClusterName}'/;s/{{region_name}}/'${RegionName}'/" | 
+sed "s/{{cluster_name}}/${ClusterName}/;s/{{region_name}}/${RegionName}/" | 
 kubectl apply -f -
 ```
 
