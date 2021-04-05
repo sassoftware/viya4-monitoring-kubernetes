@@ -133,19 +133,24 @@ To access the metrics:
 2. In the navigation bar on the left, choose `Metrics`.
 3. Select the `ContainerInsights/Prometheus` namespace.
 
-In the **Metrics** view, the SAS Viya metrics are organized into tiles. Each
-tile corresponds to a set of dimensions for the collected metric data. You can
-hover over a tile's dimensions to display the complete list of dimensions
-associated with the tile.
+The Cloudwatch **Metrics** view displays a set of tiles, with each tile corresponding to a common set of dimensions, You can hover over a tile's dimensions to display the complete list of dimensions associated with the tile. 
 
-Because a large number of SAS Viya metrics are collected for Cloudwatch, it can
-be difficult to find a specific metric or metrics from a specific source. Use
+The dimensions for a metric correspond to the metric's Prometheus labels, and are used to specify attributes about the source of the metric. Metrics use different dimensions, depending on the type of data being collected, For example, a metric collecting the memory of a CAS node might include dimensions such as the cluster name, the CAS node name, and the CAS node type. A metric collecting the memory usage of a SAS service might also use the cluster name, but include the SAS service base and SAS service name. 
+
+All of the metrics that use a common set of dimensions are grouped under a tile that is labeled with the list of dimensions. In order to find the a specific metric, you must find the tile with the corresponding set of dimensions.
+
+Because each metric has many dimensions and because many SAS Viya metrics are collected for Cloudwatch, it can
+be difficult to find a specific metric or metrics. You can use
 the reference tables in [CloudWatch SAS Viya Metrics](reference.md) to locate
-SAS Viya metrics and identify the tile with which they are associated.
+SAS Viya metrics and identify the tile with which they are associated. The tables provide these cross-reference listings: 
+
+- the metrics associated with each set of dimensions
+- the dimensions and metrics associated with each type of source (such as CAS, SAS services written in Go, or SAS services written in Java)
+- the dimensions associated with each each metric
 
 After you find the metric you are interested in, you can create a graph from
 the metric data. For example, these are the steps to create a graph of
-`go_memstats_alloc_bytes` (memory usage) of SAS Viya microservices that are
+`go_memstats_alloc_bytes` (memory usage) of SAS Viya services that are
 written in Go:
 
 1. Go to [CloudWatch SAS Viya Metrics](reference.md) and expand the
