@@ -1,9 +1,15 @@
 # CloudWatch SAS Viya Metrics
 
 ## By Dimensions
-lists the metrics associated with each set of dimensions
+Lists the metrics associated with each set of dimensions
 <details>
   <summary>Click to expand</summary>
+<b>ClusterName,cas_server,job,namespace,pod,state</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| cas_grid_state | sas-cas |
+
 <b>ClusterName,cas_node,cas_node_type,cas_server,job,namespace,pod,type</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
@@ -42,11 +48,24 @@ lists the metrics associated with each set of dimensions
 | cas_grid_start_time_seconds | sas-cas |
 | cas_grid_uptime_seconds_total | sas-cas |
 
-<b>ClusterName,cas_server,job,namespace,pod,state</b>
+<b>ClusterName,job,level,namespace,node,pod,sas_service_base,service</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ------ | ------ |
-| cas_grid_state | sas-cas |
+| log_events_total | sas-go |
+
+<b>ClusterName,job,namespace,node,pod,reason,sas_service_base,service</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| sas_db_closed_total | sas-go |
+
+<b>ClusterName,job,namespace,node,pod,sas_service_base,schema,service,state</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| sas_db_connections_max | sas-go |
+| sas_db_pool_connections | sas-go |
 
 <b>ClusterName,job,method,namespace,node,pod,quantile,sas_service_base,service,status</b>
 
@@ -140,41 +159,6 @@ lists the metrics associated with each set of dimensions
 | sas_maps_report_query_duration_seconds_count | sas-go |
 | sas_maps_report_query_duration_seconds_sum | sas-go |
 
-<b>ClusterName,job,namespace,node,pod,reason,sas_service_base,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| sas_db_closed_total | sas-go |
-
-<b>ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| arke_client_active_messages | sas-go |
-| arke_client_consumed_total | sas-go |
-| arke_client_produced_total | sas-go |
-| arke_client_streams | sas-go |
-
-<b>ClusterName,job,namespace,node,pod,quantile,sas_service_base,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| go_gc_duration_seconds | sas-go |
-| runtime_gc_pause_ns | sas-go |
-
-<b>ClusterName,job,level,namespace,node,pod,sas_service_base,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| log_events_total | sas-go |
-
-<b>ClusterName,job,namespace,node,pod,sas_service_base,schema,service,state</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| sas_db_connections_max | sas-go |
-| sas_db_pool_connections | sas-go |
-
 <b>ClusterName,job,method,namespace,node,pod,sas_service_base,service,status</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
@@ -185,21 +169,27 @@ lists the metrics associated with each set of dimensions
 | arke_request_total | sas-go |
 | arke_sendmsg_total | sas-go |
 
-<b>ClusterName,id,job,namespace,node,pod,sas_service_base</b>
+<b>ClusterName,job,namespace,node,pod,quantile,sas_service_base,service</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ------ | ------ |
-| jvm_buffer_count_buffers | sas-java |
-| jvm_buffer_memory_used_bytes | sas-java |
-| jvm_buffer_total_capacity_bytes | sas-java |
+| go_gc_duration_seconds | sas-go |
+| runtime_gc_pause_ns | sas-go |
 
-<b>ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base</b>
+<b>ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ------ | ------ |
-| spring_rabbitmq_listener_seconds_count | sas-java |
-| spring_rabbitmq_listener_seconds_max | sas-java |
-| spring_rabbitmq_listener_seconds_sum | sas-java |
+| arke_client_active_messages | sas-go |
+| arke_client_consumed_total | sas-go |
+| arke_client_produced_total | sas-go |
+| arke_client_streams | sas-go |
+
+<b>ClusterName,job,level,namespace,node,pod,sas_service_base</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| log_events_total | sas-java |
 
 <b>ClusterName,job,method,namespace,node,outcome,pod,sas_service_base,status,uri</b>
 
@@ -209,37 +199,13 @@ lists the metrics associated with each set of dimensions
 | http_server_requests_seconds_max | sas-java |
 | http_server_requests_seconds_sum | sas-java |
 
-<b>ClusterName,job,name,namespace,node,pod,sas_service_base</b>
+<b>ClusterName,id,job,namespace,node,pod,sas_service_base</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ------ | ------ |
-| jdbc_connections_active | sas-java |
-| jdbc_connections_idle | sas-java |
-| jdbc_connections_max | sas-java |
-| jdbc_connections_min | sas-java |
-| rabbitmq_acknowledged_published_total | sas-java |
-| rabbitmq_acknowledged_total | sas-java |
-| rabbitmq_channels | sas-java |
-| rabbitmq_connections | sas-java |
-| rabbitmq_consumed_total | sas-java |
-| rabbitmq_failed_to_publish_total | sas-java |
-| rabbitmq_not_acknowledged_published_total | sas-java |
-| rabbitmq_published_total | sas-java |
-| rabbitmq_rejected_total | sas-java |
-| rabbitmq_unrouted_published_total | sas-java |
-| tomcat_global_error_total | sas-java |
-| tomcat_global_received_bytes_total | sas-java |
-| tomcat_global_request_max_seconds | sas-java |
-| tomcat_global_request_seconds_count | sas-java |
-| tomcat_global_request_seconds_sum | sas-java |
-| tomcat_global_sent_bytes_total | sas-java |
-| tomcat_servlet_error_total | sas-java |
-| tomcat_servlet_request_max_seconds | sas-java |
-| tomcat_servlet_request_seconds_count | sas-java |
-| tomcat_servlet_request_seconds_sum | sas-java |
-| tomcat_threads_busy_threads | sas-java |
-| tomcat_threads_config_max_threads | sas-java |
-| tomcat_threads_current_threads | sas-java |
+| jvm_buffer_count_buffers | sas-java |
+| jvm_buffer_memory_used_bytes | sas-java |
+| jvm_buffer_total_capacity_bytes | sas-java |
 
 <b>ClusterName,job,namespace,node,pod,sas_service_base</b>
 
@@ -281,13 +247,13 @@ lists the metrics associated with each set of dimensions
 | zipkin_reporter_spans_dropped_total | sas-java |
 | zipkin_reporter_spans_total | sas-java |
 
-<b>ClusterName,area,id,job,namespace,node,pod,sas_service_base</b>
+<b>ClusterName,action,cause,job,namespace,node,pod,sas_service_base</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ------ | ------ |
-| jvm_memory_committed_bytes | sas-java |
-| jvm_memory_max_bytes | sas-java |
-| jvm_memory_used_bytes | sas-java |
+| jvm_gc_pause_seconds_count | sas-java |
+| jvm_gc_pause_seconds_max | sas-java |
+| jvm_gc_pause_seconds_sum | sas-java |
 
 <b>ClusterName,job,namespace,node,pod,sas_service_base,state</b>
 
@@ -303,59 +269,75 @@ lists the metrics associated with each set of dimensions
 | http_client_requests_seconds_max | sas-java |
 | http_client_requests_seconds_sum | sas-java |
 
-<b>ClusterName,job,level,namespace,node,pod,sas_service_base</b>
+<b>ClusterName,job,name,namespace,node,pod,sas_service_base</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ------ | ------ |
-| log_events_total | sas-java |
+| jdbc_connections_active | sas-java |
+| jdbc_connections_idle | sas-java |
+| jdbc_connections_max | sas-java |
+| jdbc_connections_min | sas-java |
+| rabbitmq_acknowledged_published_total | sas-java |
+| rabbitmq_acknowledged_total | sas-java |
+| rabbitmq_channels | sas-java |
+| rabbitmq_connections | sas-java |
+| rabbitmq_consumed_total | sas-java |
+| rabbitmq_failed_to_publish_total | sas-java |
+| rabbitmq_not_acknowledged_published_total | sas-java |
+| rabbitmq_published_total | sas-java |
+| rabbitmq_rejected_total | sas-java |
+| rabbitmq_unrouted_published_total | sas-java |
+| tomcat_global_error_total | sas-java |
+| tomcat_global_received_bytes_total | sas-java |
+| tomcat_global_request_max_seconds | sas-java |
+| tomcat_global_request_seconds_count | sas-java |
+| tomcat_global_request_seconds_sum | sas-java |
+| tomcat_global_sent_bytes_total | sas-java |
+| tomcat_servlet_error_total | sas-java |
+| tomcat_servlet_request_max_seconds | sas-java |
+| tomcat_servlet_request_seconds_count | sas-java |
+| tomcat_servlet_request_seconds_sum | sas-java |
+| tomcat_threads_busy_threads | sas-java |
+| tomcat_threads_config_max_threads | sas-java |
+| tomcat_threads_current_threads | sas-java |
 
-<b>ClusterName,action,cause,job,namespace,node,pod,sas_service_base</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| jvm_gc_pause_seconds_count | sas-java |
-| jvm_gc_pause_seconds_max | sas-java |
-| jvm_gc_pause_seconds_sum | sas-java |
-
-<b>ClusterName,datname,job,mode,namespace,pod,server,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| pg_locks_count | sas-postgres |
-
-<b>ClusterName,backup_type,job,namespace,pod,server,service,stanza</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| ccp_backrest_last_info_backup_runtime_seconds | sas-postgres |
-| ccp_backrest_last_info_repo_backup_size_bytes | sas-postgres |
-| ccp_backrest_last_info_repo_total_size_bytes | sas-postgres |
-
-<b>ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| ccp_stat_user_tables_analyze_count | sas-postgres |
-| ccp_stat_user_tables_autoanalyze_count | sas-postgres |
-| ccp_stat_user_tables_autovacuum_count | sas-postgres |
-| ccp_stat_user_tables_idx_scan | sas-postgres |
-| ccp_stat_user_tables_idx_tup_fetch | sas-postgres |
-| ccp_stat_user_tables_n_dead_tup | sas-postgres |
-| ccp_stat_user_tables_n_live_tup | sas-postgres |
-| ccp_stat_user_tables_n_tup_del | sas-postgres |
-| ccp_stat_user_tables_n_tup_hot_upd | sas-postgres |
-| ccp_stat_user_tables_n_tup_ins | sas-postgres |
-| ccp_stat_user_tables_n_tup_upd | sas-postgres |
-| ccp_stat_user_tables_seq_scan | sas-postgres |
-| ccp_stat_user_tables_seq_tup_read | sas-postgres |
-| ccp_stat_user_tables_vacuum_count | sas-postgres |
-| ccp_table_size_size_bytes | sas-postgres |
-
-<b>ClusterName,dbname,job,mode,namespace,pod,server,service</b>
+<b>ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ------ | ------ |
-| ccp_locks_count | sas-postgres |
+| spring_rabbitmq_listener_seconds_count | sas-java |
+| spring_rabbitmq_listener_seconds_max | sas-java |
+| spring_rabbitmq_listener_seconds_sum | sas-java |
+
+<b>ClusterName,area,id,job,namespace,node,pod,sas_service_base</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| jvm_memory_committed_bytes | sas-java |
+| jvm_memory_max_bytes | sas-java |
+| jvm_memory_used_bytes | sas-java |
+
+<b>ClusterName,datid,job,namespace,pod,server,service</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| pg_stat_database_blk_read_time | sas-postgres |
+| pg_stat_database_blk_write_time | sas-postgres |
+| pg_stat_database_blks_hit | sas-postgres |
+| pg_stat_database_blks_read | sas-postgres |
+| pg_stat_database_conflicts | sas-postgres |
+| pg_stat_database_deadlocks | sas-postgres |
+| pg_stat_database_numbackends | sas-postgres |
+| pg_stat_database_stats_reset | sas-postgres |
+| pg_stat_database_temp_bytes | sas-postgres |
+| pg_stat_database_temp_files | sas-postgres |
+| pg_stat_database_tup_deleted | sas-postgres |
+| pg_stat_database_tup_fetched | sas-postgres |
+| pg_stat_database_tup_inserted | sas-postgres |
+| pg_stat_database_tup_returned | sas-postgres |
+| pg_stat_database_tup_updated | sas-postgres |
+| pg_stat_database_xact_commit | sas-postgres |
+| pg_stat_database_xact_rollback | sas-postgres |
 
 <b>ClusterName,job,namespace,pod,server,service</b>
 
@@ -663,39 +645,14 @@ lists the metrics associated with each set of dimensions
 | pg_stat_bgwriter_maxwritten_clean | sas-postgres |
 | pg_stat_bgwriter_stats_reset | sas-postgres |
 
-<b>ClusterName,dbname,job,namespace,pod,server,service</b>
+<b>ClusterName,interface,job,namespace,pod,server,service</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ------ | ------ |
-| ccp_data_checksum_failure_time_since_last_failure_seconds | sas-postgres |
-| ccp_database_size_bytes | sas-postgres |
-| ccp_stat_database_blks_hit | sas-postgres |
-| ccp_stat_database_blks_read | sas-postgres |
-| ccp_stat_database_conflicts | sas-postgres |
-| ccp_stat_database_deadlocks | sas-postgres |
-| ccp_stat_database_temp_bytes | sas-postgres |
-| ccp_stat_database_temp_files | sas-postgres |
-| ccp_stat_database_tup_deleted | sas-postgres |
-| ccp_stat_database_tup_fetched | sas-postgres |
-| ccp_stat_database_tup_inserted | sas-postgres |
-| ccp_stat_database_tup_returned | sas-postgres |
-| ccp_stat_database_tup_updated | sas-postgres |
-| ccp_stat_database_xact_commit | sas-postgres |
-| ccp_stat_database_xact_rollback | sas-postgres |
-
-<b>ClusterName,job,namespace,pod,quantile,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| go_gc_duration_seconds | sas-postgres |
-
-<b>ClusterName,job,namespace,pod,server,service,stanza</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| ccp_backrest_last_diff_backup_time_since_completion_seconds | sas-postgres |
-| ccp_backrest_last_full_backup_time_since_completion_seconds | sas-postgres |
-| ccp_backrest_last_incr_backup_time_since_completion_seconds | sas-postgres |
+| ccp_nodemx_network_rx_bytes | sas-postgres |
+| ccp_nodemx_network_rx_packets | sas-postgres |
+| ccp_nodemx_network_tx_bytes | sas-postgres |
+| ccp_nodemx_network_tx_packets | sas-postgres |
 
 <b>ClusterName,datid,datname,job,namespace,pod,server,service</b>
 
@@ -724,42 +681,31 @@ lists the metrics associated with each set of dimensions
 | pg_stat_database_xact_commit | sas-postgres |
 | pg_stat_database_xact_rollback | sas-postgres |
 
+<b>ClusterName,dbname,job,namespace,pod,server,service</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| ccp_data_checksum_failure_time_since_last_failure_seconds | sas-postgres |
+| ccp_database_size_bytes | sas-postgres |
+| ccp_stat_database_blks_hit | sas-postgres |
+| ccp_stat_database_blks_read | sas-postgres |
+| ccp_stat_database_conflicts | sas-postgres |
+| ccp_stat_database_deadlocks | sas-postgres |
+| ccp_stat_database_temp_bytes | sas-postgres |
+| ccp_stat_database_temp_files | sas-postgres |
+| ccp_stat_database_tup_deleted | sas-postgres |
+| ccp_stat_database_tup_fetched | sas-postgres |
+| ccp_stat_database_tup_inserted | sas-postgres |
+| ccp_stat_database_tup_returned | sas-postgres |
+| ccp_stat_database_tup_updated | sas-postgres |
+| ccp_stat_database_xact_commit | sas-postgres |
+| ccp_stat_database_xact_rollback | sas-postgres |
+
 <b>ClusterName,job,namespace,pod,replica,replica_port,server,service</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ------ | ------ |
 | ccp_replication_lag_size_bytes | sas-postgres |
-
-<b>ClusterName,filename,hashsum,job,namespace,pod,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| pg_exporter_user_queries_load_error | sas-postgres |
-
-<b>ClusterName,fs_type,job,mount_point,namespace,pod,server,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| ccp_nodemx_data_disk_available_bytes | sas-postgres |
-| ccp_nodemx_data_disk_free_file_nodes | sas-postgres |
-| ccp_nodemx_data_disk_total_bytes | sas-postgres |
-| ccp_nodemx_data_disk_total_file_nodes | sas-postgres |
-
-<b>ClusterName,interface,job,namespace,pod,server,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| ccp_nodemx_network_rx_bytes | sas-postgres |
-| ccp_nodemx_network_rx_packets | sas-postgres |
-| ccp_nodemx_network_tx_bytes | sas-postgres |
-| ccp_nodemx_network_tx_packets | sas-postgres |
-
-<b>ClusterName,job,mount_point,namespace,pod,server,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| ccp_nodemx_disk_activity_sectors_read | sas-postgres |
-| ccp_nodemx_disk_activity_sectors_written | sas-postgres |
 
 <b>ClusterName,datname,job,namespace,pod,server,service,state</b>
 
@@ -768,27 +714,18 @@ lists the metrics associated with each set of dimensions
 | pg_stat_activity_count | sas-postgres |
 | pg_stat_activity_max_tx_duration | sas-postgres |
 
-<b>ClusterName,datid,job,namespace,pod,server,service</b>
+<b>ClusterName,dbname,job,mode,namespace,pod,server,service</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ------ | ------ |
-| pg_stat_database_blk_read_time | sas-postgres |
-| pg_stat_database_blk_write_time | sas-postgres |
-| pg_stat_database_blks_hit | sas-postgres |
-| pg_stat_database_blks_read | sas-postgres |
-| pg_stat_database_conflicts | sas-postgres |
-| pg_stat_database_deadlocks | sas-postgres |
-| pg_stat_database_numbackends | sas-postgres |
-| pg_stat_database_stats_reset | sas-postgres |
-| pg_stat_database_temp_bytes | sas-postgres |
-| pg_stat_database_temp_files | sas-postgres |
-| pg_stat_database_tup_deleted | sas-postgres |
-| pg_stat_database_tup_fetched | sas-postgres |
-| pg_stat_database_tup_inserted | sas-postgres |
-| pg_stat_database_tup_returned | sas-postgres |
-| pg_stat_database_tup_updated | sas-postgres |
-| pg_stat_database_xact_commit | sas-postgres |
-| pg_stat_database_xact_rollback | sas-postgres |
+| ccp_locks_count | sas-postgres |
+
+<b>ClusterName,job,mount_point,namespace,pod,server,service</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| ccp_nodemx_disk_activity_sectors_read | sas-postgres |
+| ccp_nodemx_disk_activity_sectors_written | sas-postgres |
 
 <b>ClusterName,job,namespace,pod,service</b>
 
@@ -834,11 +771,97 @@ lists the metrics associated with each set of dimensions
 | process_virtual_memory_bytes | sas-postgres |
 | process_virtual_memory_max_bytes | sas-postgres |
 
+<b>ClusterName,datname,job,mode,namespace,pod,server,service</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| pg_locks_count | sas-postgres |
+
+<b>ClusterName,fs_type,job,mount_point,namespace,pod,server,service</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| ccp_nodemx_data_disk_available_bytes | sas-postgres |
+| ccp_nodemx_data_disk_free_file_nodes | sas-postgres |
+| ccp_nodemx_data_disk_total_bytes | sas-postgres |
+| ccp_nodemx_data_disk_total_file_nodes | sas-postgres |
+
+<b>ClusterName,job,namespace,pod,server,service,stanza</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| ccp_backrest_last_diff_backup_time_since_completion_seconds | sas-postgres |
+| ccp_backrest_last_full_backup_time_since_completion_seconds | sas-postgres |
+| ccp_backrest_last_incr_backup_time_since_completion_seconds | sas-postgres |
+
+<b>ClusterName,job,namespace,pod,quantile,service</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| go_gc_duration_seconds | sas-postgres |
+
+<b>ClusterName,backup_type,job,namespace,pod,server,service,stanza</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| ccp_backrest_last_info_backup_runtime_seconds | sas-postgres |
+| ccp_backrest_last_info_repo_backup_size_bytes | sas-postgres |
+| ccp_backrest_last_info_repo_total_size_bytes | sas-postgres |
+
+<b>ClusterName,filename,hashsum,job,namespace,pod,service</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| pg_exporter_user_queries_load_error | sas-postgres |
+
 <b>ClusterName,job,namespace,pod,server,service,short_version,version</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ------ | ------ |
 | pg_static | sas-postgres |
+
+<b>ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| ccp_stat_user_tables_analyze_count | sas-postgres |
+| ccp_stat_user_tables_autoanalyze_count | sas-postgres |
+| ccp_stat_user_tables_autovacuum_count | sas-postgres |
+| ccp_stat_user_tables_idx_scan | sas-postgres |
+| ccp_stat_user_tables_idx_tup_fetch | sas-postgres |
+| ccp_stat_user_tables_n_dead_tup | sas-postgres |
+| ccp_stat_user_tables_n_live_tup | sas-postgres |
+| ccp_stat_user_tables_n_tup_del | sas-postgres |
+| ccp_stat_user_tables_n_tup_hot_upd | sas-postgres |
+| ccp_stat_user_tables_n_tup_ins | sas-postgres |
+| ccp_stat_user_tables_n_tup_upd | sas-postgres |
+| ccp_stat_user_tables_seq_scan | sas-postgres |
+| ccp_stat_user_tables_seq_tup_read | sas-postgres |
+| ccp_stat_user_tables_vacuum_count | sas-postgres |
+| ccp_table_size_size_bytes | sas-postgres |
+
+<b>ClusterName,job,namespace,pod,service,usage</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| erlang_vm_memory_atom_bytes_total | sas-rabbitmq |
+| erlang_vm_memory_processes_bytes_total | sas-rabbitmq |
+| erlang_vm_memory_system_bytes_total | sas-rabbitmq |
+
+<b>ClusterName,job,kind,namespace,pod,service</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| erlang_vm_memory_bytes_total | sas-rabbitmq |
+
+<b>ClusterName,content_type,job,namespace,pod,registry,service</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| telemetry_scrape_duration_seconds_count | sas-rabbitmq |
+| telemetry_scrape_duration_seconds_sum | sas-rabbitmq |
+| telemetry_scrape_size_bytes_count | sas-rabbitmq |
+| telemetry_scrape_size_bytes_sum | sas-rabbitmq |
 
 <b>ClusterName,job,namespace,peer,pod,service,type</b>
 
@@ -854,12 +877,47 @@ lists the metrics associated with each set of dimensions
 | erlang_vm_dist_proc_status | sas-rabbitmq |
 | erlang_vm_dist_proc_total_heap_size_words | sas-rabbitmq |
 
+<b>ClusterName,job,namespace,pod,protocol,service</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| rabbitmq_auth_attempts_failed_total | sas-rabbitmq |
+| rabbitmq_auth_attempts_succeeded_total | sas-rabbitmq |
+| rabbitmq_auth_attempts_total | sas-rabbitmq |
+
 <b>ClusterName,content_type,encoding,job,namespace,pod,registry,service</b>
 
 | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ------ | ------ |
 | telemetry_scrape_encoded_size_bytes_count | sas-rabbitmq |
 | telemetry_scrape_encoded_size_bytes_sum | sas-rabbitmq |
+
+<b>ClusterName,alloc,instance_no,job,kind,namespace,pod,service,usage</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| erlang_vm_allocators | sas-rabbitmq |
+
+<b>ClusterName,job,namespace,peer,pod,service</b>
+
+| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ------ | ------ |
+| erlang_vm_dist_node_queue_size_bytes | sas-rabbitmq |
+| erlang_vm_dist_node_state | sas-rabbitmq |
+| erlang_vm_dist_port_input_bytes | sas-rabbitmq |
+| erlang_vm_dist_port_memory_bytes | sas-rabbitmq |
+| erlang_vm_dist_port_output_bytes | sas-rabbitmq |
+| erlang_vm_dist_port_queue_size_bytes | sas-rabbitmq |
+| erlang_vm_dist_recv_avg_bytes | sas-rabbitmq |
+| erlang_vm_dist_recv_bytes | sas-rabbitmq |
+| erlang_vm_dist_recv_cnt | sas-rabbitmq |
+| erlang_vm_dist_recv_dvi_bytes | sas-rabbitmq |
+| erlang_vm_dist_recv_max_bytes | sas-rabbitmq |
+| erlang_vm_dist_send_avg_bytes | sas-rabbitmq |
+| erlang_vm_dist_send_bytes | sas-rabbitmq |
+| erlang_vm_dist_send_cnt | sas-rabbitmq |
+| erlang_vm_dist_send_max_bytes | sas-rabbitmq |
+| erlang_vm_dist_send_pend_bytes | sas-rabbitmq |
 
 <b>ClusterName,id,job,namespace,pod,service,type</b>
 
@@ -880,37 +938,6 @@ lists the metrics associated with each set of dimensions
 | erlang_vm_msacc_send_seconds_total | sas-rabbitmq |
 | erlang_vm_msacc_sleep_seconds_total | sas-rabbitmq |
 | erlang_vm_msacc_timers_seconds_total | sas-rabbitmq |
-
-<b>ClusterName,content_type,job,namespace,pod,registry,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| telemetry_scrape_duration_seconds_count | sas-rabbitmq |
-| telemetry_scrape_duration_seconds_sum | sas-rabbitmq |
-| telemetry_scrape_size_bytes_count | sas-rabbitmq |
-| telemetry_scrape_size_bytes_sum | sas-rabbitmq |
-
-<b>ClusterName,job,namespace,pod,service,usage</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| erlang_vm_memory_atom_bytes_total | sas-rabbitmq |
-| erlang_vm_memory_processes_bytes_total | sas-rabbitmq |
-| erlang_vm_memory_system_bytes_total | sas-rabbitmq |
-
-<b>ClusterName,job,kind,namespace,pod,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| erlang_vm_memory_bytes_total | sas-rabbitmq |
-
-<b>ClusterName,job,namespace,pod,protocol,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| rabbitmq_auth_attempts_failed_total | sas-rabbitmq |
-| rabbitmq_auth_attempts_succeeded_total | sas-rabbitmq |
-| rabbitmq_auth_attempts_total | sas-rabbitmq |
 
 <b>ClusterName,job,namespace,pod,service</b>
 
@@ -1058,39 +1085,18 @@ lists the metrics associated with each set of dimensions
 | rabbitmq_schema_db_disk_tx_total | sas-rabbitmq |
 | rabbitmq_schema_db_ram_tx_total | sas-rabbitmq |
 
-<b>ClusterName,alloc,instance_no,job,kind,namespace,pod,service,usage</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| erlang_vm_allocators | sas-rabbitmq |
-
-<b>ClusterName,job,namespace,peer,pod,service</b>
-
-| Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ------ | ------ |
-| erlang_vm_dist_node_queue_size_bytes | sas-rabbitmq |
-| erlang_vm_dist_node_state | sas-rabbitmq |
-| erlang_vm_dist_port_input_bytes | sas-rabbitmq |
-| erlang_vm_dist_port_memory_bytes | sas-rabbitmq |
-| erlang_vm_dist_port_output_bytes | sas-rabbitmq |
-| erlang_vm_dist_port_queue_size_bytes | sas-rabbitmq |
-| erlang_vm_dist_recv_avg_bytes | sas-rabbitmq |
-| erlang_vm_dist_recv_bytes | sas-rabbitmq |
-| erlang_vm_dist_recv_cnt | sas-rabbitmq |
-| erlang_vm_dist_recv_dvi_bytes | sas-rabbitmq |
-| erlang_vm_dist_recv_max_bytes | sas-rabbitmq |
-| erlang_vm_dist_send_avg_bytes | sas-rabbitmq |
-| erlang_vm_dist_send_bytes | sas-rabbitmq |
-| erlang_vm_dist_send_cnt | sas-rabbitmq |
-| erlang_vm_dist_send_max_bytes | sas-rabbitmq |
-| erlang_vm_dist_send_pend_bytes | sas-rabbitmq |
-
 </details>
 
 ## By Source
-lists the dimensions and metrics associated with each type of metric source (such as CAS, SAS services written in Go, or SAS services written in Java)
+Lists the dimensions and metrics associated with each type of metric source (such as CAS, SAS services written in Go, or SAS services written in Java)
 <details>
   <summary>Click to expand</summary>
+<b>sas-cas</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,cas_server,job,namespace,pod,state | cas_grid_state |
+
 <b>sas-cas</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
@@ -1129,11 +1135,24 @@ lists the dimensions and metrics associated with each type of metric source (suc
 | ClusterName,cas_server,job,namespace,pod | cas_grid_start_time_seconds |
 | ClusterName,cas_server,job,namespace,pod | cas_grid_uptime_seconds_total |
 
-<b>sas-cas</b>
+<b>sas-go</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
-| ClusterName,cas_server,job,namespace,pod,state | cas_grid_state |
+| ClusterName,job,level,namespace,node,pod,sas_service_base,service | log_events_total |
+
+<b>sas-go</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,job,namespace,node,pod,reason,sas_service_base,service | sas_db_closed_total |
+
+<b>sas-go</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,job,namespace,node,pod,sas_service_base,schema,service,state | sas_db_connections_max |
+| ClusterName,job,namespace,node,pod,sas_service_base,schema,service,state | sas_db_pool_connections |
 
 <b>sas-go</b>
 
@@ -1231,16 +1250,11 @@ lists the dimensions and metrics associated with each type of metric source (suc
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
-| ClusterName,job,namespace,node,pod,reason,sas_service_base,service | sas_db_closed_total |
-
-<b>sas-go</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | arke_client_active_messages |
-| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | arke_client_consumed_total |
-| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | arke_client_produced_total |
-| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | arke_client_streams |
+| ClusterName,job,method,namespace,node,pod,sas_service_base,service,status | arke_recvmsg_total |
+| ClusterName,job,method,namespace,node,pod,sas_service_base,service,status | arke_request_elapsed_count |
+| ClusterName,job,method,namespace,node,pod,sas_service_base,service,status | arke_request_elapsed_sum |
+| ClusterName,job,method,namespace,node,pod,sas_service_base,service,status | arke_request_total |
+| ClusterName,job,method,namespace,node,pod,sas_service_base,service,status | arke_sendmsg_total |
 
 <b>sas-go</b>
 
@@ -1253,40 +1267,16 @@ lists the dimensions and metrics associated with each type of metric source (suc
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
-| ClusterName,job,level,namespace,node,pod,sas_service_base,service | log_events_total |
-
-<b>sas-go</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,job,namespace,node,pod,sas_service_base,schema,service,state | sas_db_connections_max |
-| ClusterName,job,namespace,node,pod,sas_service_base,schema,service,state | sas_db_pool_connections |
-
-<b>sas-go</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,job,method,namespace,node,pod,sas_service_base,service,status | arke_recvmsg_total |
-| ClusterName,job,method,namespace,node,pod,sas_service_base,service,status | arke_request_elapsed_count |
-| ClusterName,job,method,namespace,node,pod,sas_service_base,service,status | arke_request_elapsed_sum |
-| ClusterName,job,method,namespace,node,pod,sas_service_base,service,status | arke_request_total |
-| ClusterName,job,method,namespace,node,pod,sas_service_base,service,status | arke_sendmsg_total |
+| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | arke_client_active_messages |
+| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | arke_client_consumed_total |
+| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | arke_client_produced_total |
+| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | arke_client_streams |
 
 <b>sas-java</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
-| ClusterName,id,job,namespace,node,pod,sas_service_base | jvm_buffer_count_buffers |
-| ClusterName,id,job,namespace,node,pod,sas_service_base | jvm_buffer_memory_used_bytes |
-| ClusterName,id,job,namespace,node,pod,sas_service_base | jvm_buffer_total_capacity_bytes |
-
-<b>sas-java</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base | spring_rabbitmq_listener_seconds_count |
-| ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base | spring_rabbitmq_listener_seconds_max |
-| ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base | spring_rabbitmq_listener_seconds_sum |
+| ClusterName,job,level,namespace,node,pod,sas_service_base | log_events_total |
 
 <b>sas-java</b>
 
@@ -1300,33 +1290,9 @@ lists the dimensions and metrics associated with each type of metric source (suc
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | jdbc_connections_active |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | jdbc_connections_idle |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | jdbc_connections_max |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | jdbc_connections_min |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_acknowledged_published_total |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_acknowledged_total |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_channels |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_connections |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_consumed_total |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_failed_to_publish_total |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_not_acknowledged_published_total |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_published_total |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_rejected_total |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_unrouted_published_total |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_global_error_total |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_global_received_bytes_total |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_global_request_max_seconds |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_global_request_seconds_count |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_global_request_seconds_sum |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_global_sent_bytes_total |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_servlet_error_total |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_servlet_request_max_seconds |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_servlet_request_seconds_count |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_servlet_request_seconds_sum |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_threads_busy_threads |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_threads_config_max_threads |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_threads_current_threads |
+| ClusterName,id,job,namespace,node,pod,sas_service_base | jvm_buffer_count_buffers |
+| ClusterName,id,job,namespace,node,pod,sas_service_base | jvm_buffer_memory_used_bytes |
+| ClusterName,id,job,namespace,node,pod,sas_service_base | jvm_buffer_total_capacity_bytes |
 
 <b>sas-java</b>
 
@@ -1372,9 +1338,9 @@ lists the dimensions and metrics associated with each type of metric source (suc
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
-| ClusterName,area,id,job,namespace,node,pod,sas_service_base | jvm_memory_committed_bytes |
-| ClusterName,area,id,job,namespace,node,pod,sas_service_base | jvm_memory_max_bytes |
-| ClusterName,area,id,job,namespace,node,pod,sas_service_base | jvm_memory_used_bytes |
+| ClusterName,action,cause,job,namespace,node,pod,sas_service_base | jvm_gc_pause_seconds_count |
+| ClusterName,action,cause,job,namespace,node,pod,sas_service_base | jvm_gc_pause_seconds_max |
+| ClusterName,action,cause,job,namespace,node,pod,sas_service_base | jvm_gc_pause_seconds_sum |
 
 <b>sas-java</b>
 
@@ -1394,55 +1360,71 @@ lists the dimensions and metrics associated with each type of metric source (suc
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
-| ClusterName,job,level,namespace,node,pod,sas_service_base | log_events_total |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | jdbc_connections_active |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | jdbc_connections_idle |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | jdbc_connections_max |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | jdbc_connections_min |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_acknowledged_published_total |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_acknowledged_total |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_channels |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_connections |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_consumed_total |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_failed_to_publish_total |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_not_acknowledged_published_total |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_published_total |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_rejected_total |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | rabbitmq_unrouted_published_total |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_global_error_total |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_global_received_bytes_total |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_global_request_max_seconds |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_global_request_seconds_count |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_global_request_seconds_sum |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_global_sent_bytes_total |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_servlet_error_total |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_servlet_request_max_seconds |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_servlet_request_seconds_count |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_servlet_request_seconds_sum |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_threads_busy_threads |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_threads_config_max_threads |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | tomcat_threads_current_threads |
 
 <b>sas-java</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
-| ClusterName,action,cause,job,namespace,node,pod,sas_service_base | jvm_gc_pause_seconds_count |
-| ClusterName,action,cause,job,namespace,node,pod,sas_service_base | jvm_gc_pause_seconds_max |
-| ClusterName,action,cause,job,namespace,node,pod,sas_service_base | jvm_gc_pause_seconds_sum |
+| ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base | spring_rabbitmq_listener_seconds_count |
+| ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base | spring_rabbitmq_listener_seconds_max |
+| ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base | spring_rabbitmq_listener_seconds_sum |
+
+<b>sas-java</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,area,id,job,namespace,node,pod,sas_service_base | jvm_memory_committed_bytes |
+| ClusterName,area,id,job,namespace,node,pod,sas_service_base | jvm_memory_max_bytes |
+| ClusterName,area,id,job,namespace,node,pod,sas_service_base | jvm_memory_used_bytes |
 
 <b>sas-postgres</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
-| ClusterName,datname,job,mode,namespace,pod,server,service | pg_locks_count |
-
-<b>sas-postgres</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,backup_type,job,namespace,pod,server,service,stanza | ccp_backrest_last_info_backup_runtime_seconds |
-| ClusterName,backup_type,job,namespace,pod,server,service,stanza | ccp_backrest_last_info_repo_backup_size_bytes |
-| ClusterName,backup_type,job,namespace,pod,server,service,stanza | ccp_backrest_last_info_repo_total_size_bytes |
-
-<b>sas-postgres</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_analyze_count |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_autoanalyze_count |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_autovacuum_count |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_idx_scan |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_idx_tup_fetch |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_n_dead_tup |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_n_live_tup |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_n_tup_del |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_n_tup_hot_upd |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_n_tup_ins |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_n_tup_upd |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_seq_scan |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_seq_tup_read |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_vacuum_count |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_table_size_size_bytes |
-
-<b>sas-postgres</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,dbname,job,mode,namespace,pod,server,service | ccp_locks_count |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_blk_read_time |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_blk_write_time |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_blks_hit |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_blks_read |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_conflicts |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_deadlocks |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_numbackends |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_stats_reset |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_temp_bytes |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_temp_files |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_tup_deleted |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_tup_fetched |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_tup_inserted |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_tup_returned |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_tup_updated |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_xact_commit |
+| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_xact_rollback |
 
 <b>sas-postgres</b>
 
@@ -1754,35 +1736,10 @@ lists the dimensions and metrics associated with each type of metric source (suc
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_data_checksum_failure_time_since_last_failure_seconds |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_database_size_bytes |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_blks_hit |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_blks_read |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_conflicts |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_deadlocks |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_temp_bytes |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_temp_files |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_tup_deleted |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_tup_fetched |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_tup_inserted |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_tup_returned |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_tup_updated |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_xact_commit |
-| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_xact_rollback |
-
-<b>sas-postgres</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,job,namespace,pod,quantile,service | go_gc_duration_seconds |
-
-<b>sas-postgres</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,job,namespace,pod,server,service,stanza | ccp_backrest_last_diff_backup_time_since_completion_seconds |
-| ClusterName,job,namespace,pod,server,service,stanza | ccp_backrest_last_full_backup_time_since_completion_seconds |
-| ClusterName,job,namespace,pod,server,service,stanza | ccp_backrest_last_incr_backup_time_since_completion_seconds |
+| ClusterName,interface,job,namespace,pod,server,service | ccp_nodemx_network_rx_bytes |
+| ClusterName,interface,job,namespace,pod,server,service | ccp_nodemx_network_rx_packets |
+| ClusterName,interface,job,namespace,pod,server,service | ccp_nodemx_network_tx_bytes |
+| ClusterName,interface,job,namespace,pod,server,service | ccp_nodemx_network_tx_packets |
 
 <b>sas-postgres</b>
 
@@ -1815,38 +1772,27 @@ lists the dimensions and metrics associated with each type of metric source (suc
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_data_checksum_failure_time_since_last_failure_seconds |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_database_size_bytes |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_blks_hit |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_blks_read |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_conflicts |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_deadlocks |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_temp_bytes |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_temp_files |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_tup_deleted |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_tup_fetched |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_tup_inserted |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_tup_returned |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_tup_updated |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_xact_commit |
+| ClusterName,dbname,job,namespace,pod,server,service | ccp_stat_database_xact_rollback |
+
+<b>sas-postgres</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
 | ClusterName,job,namespace,pod,replica,replica_port,server,service | ccp_replication_lag_size_bytes |
-
-<b>sas-postgres</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,filename,hashsum,job,namespace,pod,service | pg_exporter_user_queries_load_error |
-
-<b>sas-postgres</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | ccp_nodemx_data_disk_available_bytes |
-| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | ccp_nodemx_data_disk_free_file_nodes |
-| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | ccp_nodemx_data_disk_total_bytes |
-| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | ccp_nodemx_data_disk_total_file_nodes |
-
-<b>sas-postgres</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,interface,job,namespace,pod,server,service | ccp_nodemx_network_rx_bytes |
-| ClusterName,interface,job,namespace,pod,server,service | ccp_nodemx_network_rx_packets |
-| ClusterName,interface,job,namespace,pod,server,service | ccp_nodemx_network_tx_bytes |
-| ClusterName,interface,job,namespace,pod,server,service | ccp_nodemx_network_tx_packets |
-
-<b>sas-postgres</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,job,mount_point,namespace,pod,server,service | ccp_nodemx_disk_activity_sectors_read |
-| ClusterName,job,mount_point,namespace,pod,server,service | ccp_nodemx_disk_activity_sectors_written |
 
 <b>sas-postgres</b>
 
@@ -1859,23 +1805,14 @@ lists the dimensions and metrics associated with each type of metric source (suc
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_blk_read_time |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_blk_write_time |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_blks_hit |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_blks_read |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_conflicts |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_deadlocks |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_numbackends |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_stats_reset |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_temp_bytes |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_temp_files |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_tup_deleted |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_tup_fetched |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_tup_inserted |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_tup_returned |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_tup_updated |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_xact_commit |
-| ClusterName,datid,job,namespace,pod,server,service | pg_stat_database_xact_rollback |
+| ClusterName,dbname,job,mode,namespace,pod,server,service | ccp_locks_count |
+
+<b>sas-postgres</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,job,mount_point,namespace,pod,server,service | ccp_nodemx_disk_activity_sectors_read |
+| ClusterName,job,mount_point,namespace,pod,server,service | ccp_nodemx_disk_activity_sectors_written |
 
 <b>sas-postgres</b>
 
@@ -1925,7 +1862,93 @@ lists the dimensions and metrics associated with each type of metric source (suc
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
+| ClusterName,datname,job,mode,namespace,pod,server,service | pg_locks_count |
+
+<b>sas-postgres</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | ccp_nodemx_data_disk_available_bytes |
+| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | ccp_nodemx_data_disk_free_file_nodes |
+| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | ccp_nodemx_data_disk_total_bytes |
+| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | ccp_nodemx_data_disk_total_file_nodes |
+
+<b>sas-postgres</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,job,namespace,pod,server,service,stanza | ccp_backrest_last_diff_backup_time_since_completion_seconds |
+| ClusterName,job,namespace,pod,server,service,stanza | ccp_backrest_last_full_backup_time_since_completion_seconds |
+| ClusterName,job,namespace,pod,server,service,stanza | ccp_backrest_last_incr_backup_time_since_completion_seconds |
+
+<b>sas-postgres</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,job,namespace,pod,quantile,service | go_gc_duration_seconds |
+
+<b>sas-postgres</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,backup_type,job,namespace,pod,server,service,stanza | ccp_backrest_last_info_backup_runtime_seconds |
+| ClusterName,backup_type,job,namespace,pod,server,service,stanza | ccp_backrest_last_info_repo_backup_size_bytes |
+| ClusterName,backup_type,job,namespace,pod,server,service,stanza | ccp_backrest_last_info_repo_total_size_bytes |
+
+<b>sas-postgres</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,filename,hashsum,job,namespace,pod,service | pg_exporter_user_queries_load_error |
+
+<b>sas-postgres</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
 | ClusterName,job,namespace,pod,server,service,short_version,version | pg_static |
+
+<b>sas-postgres</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_analyze_count |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_autoanalyze_count |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_autovacuum_count |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_idx_scan |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_idx_tup_fetch |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_n_dead_tup |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_n_live_tup |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_n_tup_del |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_n_tup_hot_upd |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_n_tup_ins |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_n_tup_upd |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_seq_scan |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_seq_tup_read |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_stat_user_tables_vacuum_count |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | ccp_table_size_size_bytes |
+
+<b>sas-rabbitmq</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,job,namespace,pod,service,usage | erlang_vm_memory_atom_bytes_total |
+| ClusterName,job,namespace,pod,service,usage | erlang_vm_memory_processes_bytes_total |
+| ClusterName,job,namespace,pod,service,usage | erlang_vm_memory_system_bytes_total |
+
+<b>sas-rabbitmq</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,job,kind,namespace,pod,service | erlang_vm_memory_bytes_total |
+
+<b>sas-rabbitmq</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,content_type,job,namespace,pod,registry,service | telemetry_scrape_duration_seconds_count |
+| ClusterName,content_type,job,namespace,pod,registry,service | telemetry_scrape_duration_seconds_sum |
+| ClusterName,content_type,job,namespace,pod,registry,service | telemetry_scrape_size_bytes_count |
+| ClusterName,content_type,job,namespace,pod,registry,service | telemetry_scrape_size_bytes_sum |
 
 <b>sas-rabbitmq</b>
 
@@ -1945,8 +1968,43 @@ lists the dimensions and metrics associated with each type of metric source (suc
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ---------- | ------ |
+| ClusterName,job,namespace,pod,protocol,service | rabbitmq_auth_attempts_failed_total |
+| ClusterName,job,namespace,pod,protocol,service | rabbitmq_auth_attempts_succeeded_total |
+| ClusterName,job,namespace,pod,protocol,service | rabbitmq_auth_attempts_total |
+
+<b>sas-rabbitmq</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
 | ClusterName,content_type,encoding,job,namespace,pod,registry,service | telemetry_scrape_encoded_size_bytes_count |
 | ClusterName,content_type,encoding,job,namespace,pod,registry,service | telemetry_scrape_encoded_size_bytes_sum |
+
+<b>sas-rabbitmq</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,alloc,instance_no,job,kind,namespace,pod,service,usage | erlang_vm_allocators |
+
+<b>sas-rabbitmq</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| ---------- | ------ |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_node_queue_size_bytes |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_node_state |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_port_input_bytes |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_port_memory_bytes |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_port_output_bytes |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_port_queue_size_bytes |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_recv_avg_bytes |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_recv_bytes |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_recv_cnt |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_recv_dvi_bytes |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_recv_max_bytes |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_send_avg_bytes |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_send_bytes |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_send_cnt |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_send_max_bytes |
+| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_send_pend_bytes |
 
 <b>sas-rabbitmq</b>
 
@@ -1967,37 +2025,6 @@ lists the dimensions and metrics associated with each type of metric source (suc
 | ClusterName,id,job,namespace,pod,service,type | erlang_vm_msacc_send_seconds_total |
 | ClusterName,id,job,namespace,pod,service,type | erlang_vm_msacc_sleep_seconds_total |
 | ClusterName,id,job,namespace,pod,service,type | erlang_vm_msacc_timers_seconds_total |
-
-<b>sas-rabbitmq</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,content_type,job,namespace,pod,registry,service | telemetry_scrape_duration_seconds_count |
-| ClusterName,content_type,job,namespace,pod,registry,service | telemetry_scrape_duration_seconds_sum |
-| ClusterName,content_type,job,namespace,pod,registry,service | telemetry_scrape_size_bytes_count |
-| ClusterName,content_type,job,namespace,pod,registry,service | telemetry_scrape_size_bytes_sum |
-
-<b>sas-rabbitmq</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,job,namespace,pod,service,usage | erlang_vm_memory_atom_bytes_total |
-| ClusterName,job,namespace,pod,service,usage | erlang_vm_memory_processes_bytes_total |
-| ClusterName,job,namespace,pod,service,usage | erlang_vm_memory_system_bytes_total |
-
-<b>sas-rabbitmq</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,job,kind,namespace,pod,service | erlang_vm_memory_bytes_total |
-
-<b>sas-rabbitmq</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,job,namespace,pod,protocol,service | rabbitmq_auth_attempts_failed_total |
-| ClusterName,job,namespace,pod,protocol,service | rabbitmq_auth_attempts_succeeded_total |
-| ClusterName,job,namespace,pod,protocol,service | rabbitmq_auth_attempts_total |
 
 <b>sas-rabbitmq</b>
 
@@ -2145,39 +2172,18 @@ lists the dimensions and metrics associated with each type of metric source (suc
 | ClusterName,job,namespace,pod,service | rabbitmq_schema_db_disk_tx_total |
 | ClusterName,job,namespace,pod,service | rabbitmq_schema_db_ram_tx_total |
 
-<b>sas-rabbitmq</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,alloc,instance_no,job,kind,namespace,pod,service,usage | erlang_vm_allocators |
-
-<b>sas-rabbitmq</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Metric&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| ---------- | ------ |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_node_queue_size_bytes |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_node_state |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_port_input_bytes |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_port_memory_bytes |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_port_output_bytes |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_port_queue_size_bytes |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_recv_avg_bytes |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_recv_bytes |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_recv_cnt |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_recv_dvi_bytes |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_recv_max_bytes |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_send_avg_bytes |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_send_bytes |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_send_cnt |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_send_max_bytes |
-| ClusterName,job,namespace,peer,pod,service | erlang_vm_dist_send_pend_bytes |
-
 </details>
 
 ## By Metric
-lists the dimensions associated with each metric
+Lists the dimensions associated with each metric
 <details>
   <summary>Click to expand</summary>
+<b>cas_grid_state</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,cas_server,job,namespace,pod,state | sas-cas |
+
 <b>cas_node_cpu_time_seconds</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
@@ -2216,11 +2222,24 @@ lists the dimensions associated with each metric
 | ClusterName,cas_server,job,namespace,pod | sas-cas |
 | ClusterName,cas_server,job,namespace,pod | sas-cas |
 
-<b>cas_grid_state</b>
+<b>log_events_total</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ---------- | ------ |
-| ClusterName,cas_server,job,namespace,pod,state | sas-cas |
+| ClusterName,job,level,namespace,node,pod,sas_service_base,service | sas-go |
+
+<b>sas_db_closed_total</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,job,namespace,node,pod,reason,sas_service_base,service | sas-go |
+
+<b>sas_db_connections_max</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,job,namespace,node,pod,sas_service_base,schema,service,state | sas-go |
+| ClusterName,job,namespace,node,pod,sas_service_base,schema,service,state | sas-go |
 
 <b>arke_request_elapsed</b>
 
@@ -2314,41 +2333,6 @@ lists the dimensions associated with each metric
 | ClusterName,job,namespace,node,pod,sas_service_base,service | sas-go |
 | ClusterName,job,namespace,node,pod,sas_service_base,service | sas-go |
 
-<b>sas_db_closed_total</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,job,namespace,node,pod,reason,sas_service_base,service | sas-go |
-
-<b>arke_client_active_messages</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | sas-go |
-| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | sas-go |
-| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | sas-go |
-| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | sas-go |
-
-<b>go_gc_duration_seconds</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,job,namespace,node,pod,quantile,sas_service_base,service | sas-go |
-| ClusterName,job,namespace,node,pod,quantile,sas_service_base,service | sas-go |
-
-<b>log_events_total</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,job,level,namespace,node,pod,sas_service_base,service | sas-go |
-
-<b>sas_db_connections_max</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,job,namespace,node,pod,sas_service_base,schema,service,state | sas-go |
-| ClusterName,job,namespace,node,pod,sas_service_base,schema,service,state | sas-go |
-
 <b>arke_recvmsg_total</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
@@ -2359,21 +2343,27 @@ lists the dimensions associated with each metric
 | ClusterName,job,method,namespace,node,pod,sas_service_base,service,status | sas-go |
 | ClusterName,job,method,namespace,node,pod,sas_service_base,service,status | sas-go |
 
-<b>jvm_buffer_count_buffers</b>
+<b>go_gc_duration_seconds</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ---------- | ------ |
-| ClusterName,id,job,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,id,job,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,id,job,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,namespace,node,pod,quantile,sas_service_base,service | sas-go |
+| ClusterName,job,namespace,node,pod,quantile,sas_service_base,service | sas-go |
 
-<b>spring_rabbitmq_listener_seconds_count</b>
+<b>arke_client_active_messages</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ---------- | ------ |
-| ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base | sas-java |
-| ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base | sas-java |
-| ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base | sas-java |
+| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | sas-go |
+| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | sas-go |
+| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | sas-go |
+| ClientIdentitifer,ClusterName,job,namespace,node,pod,sas_service_base,service | sas-go |
+
+<b>log_events_total</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,job,level,namespace,node,pod,sas_service_base | sas-java |
 
 <b>http_server_requests_seconds_count</b>
 
@@ -2383,37 +2373,13 @@ lists the dimensions associated with each metric
 | ClusterName,job,method,namespace,node,outcome,pod,sas_service_base,status,uri | sas-java |
 | ClusterName,job,method,namespace,node,outcome,pod,sas_service_base,status,uri | sas-java |
 
-<b>jdbc_connections_active</b>
+<b>jvm_buffer_count_buffers</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ---------- | ------ |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,id,job,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,id,job,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,id,job,namespace,node,pod,sas_service_base | sas-java |
 
 <b>jvm_classes_loaded_classes</b>
 
@@ -2455,13 +2421,13 @@ lists the dimensions associated with each metric
 | ClusterName,job,namespace,node,pod,sas_service_base | sas-java |
 | ClusterName,job,namespace,node,pod,sas_service_base | sas-java |
 
-<b>jvm_memory_committed_bytes</b>
+<b>jvm_gc_pause_seconds_count</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ---------- | ------ |
-| ClusterName,area,id,job,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,area,id,job,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,area,id,job,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,action,cause,job,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,action,cause,job,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,action,cause,job,namespace,node,pod,sas_service_base | sas-java |
 
 <b>jvm_threads_states_threads</b>
 
@@ -2477,59 +2443,75 @@ lists the dimensions associated with each metric
 | ClusterName,job,method,namespace,node,pod,sas_service_base,status,uri | sas-java |
 | ClusterName,job,method,namespace,node,pod,sas_service_base,status,uri | sas-java |
 
-<b>log_events_total</b>
+<b>jdbc_connections_active</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ---------- | ------ |
-| ClusterName,job,level,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,job,name,namespace,node,pod,sas_service_base | sas-java |
 
-<b>jvm_gc_pause_seconds_count</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,action,cause,job,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,action,cause,job,namespace,node,pod,sas_service_base | sas-java |
-| ClusterName,action,cause,job,namespace,node,pod,sas_service_base | sas-java |
-
-<b>pg_locks_count</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,datname,job,mode,namespace,pod,server,service | sas-postgres |
-
-<b>ccp_backrest_last_info_backup_runtime_seconds</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,backup_type,job,namespace,pod,server,service,stanza | sas-postgres |
-| ClusterName,backup_type,job,namespace,pod,server,service,stanza | sas-postgres |
-| ClusterName,backup_type,job,namespace,pod,server,service,stanza | sas-postgres |
-
-<b>ccp_stat_user_tables_analyze_count</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
-
-<b>ccp_locks_count</b>
+<b>spring_rabbitmq_listener_seconds_count</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ---------- | ------ |
-| ClusterName,dbname,job,mode,namespace,pod,server,service | sas-postgres |
+| ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base | sas-java |
+| ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base | sas-java |
+| ClusterName,job,listener_id,namespace,node,pod,queue,result,sas_service_base | sas-java |
+
+<b>jvm_memory_committed_bytes</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,area,id,job,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,area,id,job,namespace,node,pod,sas_service_base | sas-java |
+| ClusterName,area,id,job,namespace,node,pod,sas_service_base | sas-java |
+
+<b>pg_stat_database_blk_read_time</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
 
 <b>ccp_archive_command_status_seconds_since_last_fail</b>
 
@@ -2837,6 +2819,42 @@ lists the dimensions associated with each metric
 | ClusterName,job,namespace,pod,server,service | sas-postgres |
 | ClusterName,job,namespace,pod,server,service | sas-postgres |
 
+<b>ccp_nodemx_network_rx_bytes</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,interface,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,interface,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,interface,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,interface,job,namespace,pod,server,service | sas-postgres |
+
+<b>pg_stat_database_blk_read_time</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
+
 <b>ccp_data_checksum_failure_time_since_last_failure_seconds</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
@@ -2857,83 +2875,11 @@ lists the dimensions associated with each metric
 | ClusterName,dbname,job,namespace,pod,server,service | sas-postgres |
 | ClusterName,dbname,job,namespace,pod,server,service | sas-postgres |
 
-<b>go_gc_duration_seconds</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,job,namespace,pod,quantile,service | sas-postgres |
-
-<b>ccp_backrest_last_diff_backup_time_since_completion_seconds</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,job,namespace,pod,server,service,stanza | sas-postgres |
-| ClusterName,job,namespace,pod,server,service,stanza | sas-postgres |
-| ClusterName,job,namespace,pod,server,service,stanza | sas-postgres |
-
-<b>pg_stat_database_blk_read_time</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,datname,job,namespace,pod,server,service | sas-postgres |
-
 <b>ccp_replication_lag_size_bytes</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ---------- | ------ |
 | ClusterName,job,namespace,pod,replica,replica_port,server,service | sas-postgres |
-
-<b>pg_exporter_user_queries_load_error</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,filename,hashsum,job,namespace,pod,service | sas-postgres |
-
-<b>ccp_nodemx_data_disk_available_bytes</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | sas-postgres |
-| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | sas-postgres |
-| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | sas-postgres |
-| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | sas-postgres |
-
-<b>ccp_nodemx_network_rx_bytes</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,interface,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,interface,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,interface,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,interface,job,namespace,pod,server,service | sas-postgres |
-
-<b>ccp_nodemx_disk_activity_sectors_read</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,job,mount_point,namespace,pod,server,service | sas-postgres |
-| ClusterName,job,mount_point,namespace,pod,server,service | sas-postgres |
 
 <b>pg_stat_activity_count</b>
 
@@ -2942,27 +2888,18 @@ lists the dimensions associated with each metric
 | ClusterName,datname,job,namespace,pod,server,service,state | sas-postgres |
 | ClusterName,datname,job,namespace,pod,server,service,state | sas-postgres |
 
-<b>pg_stat_database_blk_read_time</b>
+<b>ccp_locks_count</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ---------- | ------ |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
-| ClusterName,datid,job,namespace,pod,server,service | sas-postgres |
+| ClusterName,dbname,job,mode,namespace,pod,server,service | sas-postgres |
+
+<b>ccp_nodemx_disk_activity_sectors_read</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,job,mount_point,namespace,pod,server,service | sas-postgres |
+| ClusterName,job,mount_point,namespace,pod,server,service | sas-postgres |
 
 <b>go_gc_duration_seconds_count</b>
 
@@ -3008,11 +2945,97 @@ lists the dimensions associated with each metric
 | ClusterName,job,namespace,pod,service | sas-postgres |
 | ClusterName,job,namespace,pod,service | sas-postgres |
 
+<b>pg_locks_count</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,datname,job,mode,namespace,pod,server,service | sas-postgres |
+
+<b>ccp_nodemx_data_disk_available_bytes</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | sas-postgres |
+| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | sas-postgres |
+| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | sas-postgres |
+| ClusterName,fs_type,job,mount_point,namespace,pod,server,service | sas-postgres |
+
+<b>ccp_backrest_last_diff_backup_time_since_completion_seconds</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,job,namespace,pod,server,service,stanza | sas-postgres |
+| ClusterName,job,namespace,pod,server,service,stanza | sas-postgres |
+| ClusterName,job,namespace,pod,server,service,stanza | sas-postgres |
+
+<b>go_gc_duration_seconds</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,job,namespace,pod,quantile,service | sas-postgres |
+
+<b>ccp_backrest_last_info_backup_runtime_seconds</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,backup_type,job,namespace,pod,server,service,stanza | sas-postgres |
+| ClusterName,backup_type,job,namespace,pod,server,service,stanza | sas-postgres |
+| ClusterName,backup_type,job,namespace,pod,server,service,stanza | sas-postgres |
+
+<b>pg_exporter_user_queries_load_error</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,filename,hashsum,job,namespace,pod,service | sas-postgres |
+
 <b>pg_static</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ---------- | ------ |
 | ClusterName,job,namespace,pod,server,service,short_version,version | sas-postgres |
+
+<b>ccp_stat_user_tables_analyze_count</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+| ClusterName,dbname,job,namespace,pod,relname,schemaname,server,service | sas-postgres |
+
+<b>erlang_vm_memory_atom_bytes_total</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,job,namespace,pod,service,usage | sas-rabbitmq |
+| ClusterName,job,namespace,pod,service,usage | sas-rabbitmq |
+| ClusterName,job,namespace,pod,service,usage | sas-rabbitmq |
+
+<b>erlang_vm_memory_bytes_total</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,job,kind,namespace,pod,service | sas-rabbitmq |
+
+<b>telemetry_scrape_duration_seconds_count</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,content_type,job,namespace,pod,registry,service | sas-rabbitmq |
+| ClusterName,content_type,job,namespace,pod,registry,service | sas-rabbitmq |
+| ClusterName,content_type,job,namespace,pod,registry,service | sas-rabbitmq |
+| ClusterName,content_type,job,namespace,pod,registry,service | sas-rabbitmq |
 
 <b>erlang_vm_dist_proc_heap_size_words</b>
 
@@ -3028,12 +3051,47 @@ lists the dimensions associated with each metric
 | ClusterName,job,namespace,peer,pod,service,type | sas-rabbitmq |
 | ClusterName,job,namespace,peer,pod,service,type | sas-rabbitmq |
 
+<b>rabbitmq_auth_attempts_failed_total</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,job,namespace,pod,protocol,service | sas-rabbitmq |
+| ClusterName,job,namespace,pod,protocol,service | sas-rabbitmq |
+| ClusterName,job,namespace,pod,protocol,service | sas-rabbitmq |
+
 <b>telemetry_scrape_encoded_size_bytes_count</b>
 
 | Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
 | ---------- | ------ |
 | ClusterName,content_type,encoding,job,namespace,pod,registry,service | sas-rabbitmq |
 | ClusterName,content_type,encoding,job,namespace,pod,registry,service | sas-rabbitmq |
+
+<b>erlang_vm_allocators</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,alloc,instance_no,job,kind,namespace,pod,service,usage | sas-rabbitmq |
+
+<b>erlang_vm_dist_node_queue_size_bytes</b>
+
+| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
+| ---------- | ------ |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
+| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
 
 <b>erlang_vm_msacc_alloc_seconds_total</b>
 
@@ -3054,37 +3112,6 @@ lists the dimensions associated with each metric
 | ClusterName,id,job,namespace,pod,service,type | sas-rabbitmq |
 | ClusterName,id,job,namespace,pod,service,type | sas-rabbitmq |
 | ClusterName,id,job,namespace,pod,service,type | sas-rabbitmq |
-
-<b>telemetry_scrape_duration_seconds_count</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,content_type,job,namespace,pod,registry,service | sas-rabbitmq |
-| ClusterName,content_type,job,namespace,pod,registry,service | sas-rabbitmq |
-| ClusterName,content_type,job,namespace,pod,registry,service | sas-rabbitmq |
-| ClusterName,content_type,job,namespace,pod,registry,service | sas-rabbitmq |
-
-<b>erlang_vm_memory_atom_bytes_total</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,job,namespace,pod,service,usage | sas-rabbitmq |
-| ClusterName,job,namespace,pod,service,usage | sas-rabbitmq |
-| ClusterName,job,namespace,pod,service,usage | sas-rabbitmq |
-
-<b>erlang_vm_memory_bytes_total</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,job,kind,namespace,pod,service | sas-rabbitmq |
-
-<b>rabbitmq_auth_attempts_failed_total</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,job,namespace,pod,protocol,service | sas-rabbitmq |
-| ClusterName,job,namespace,pod,protocol,service | sas-rabbitmq |
-| ClusterName,job,namespace,pod,protocol,service | sas-rabbitmq |
 
 <b>erlang_mnesia_committed_transactions</b>
 
@@ -3231,32 +3258,5 @@ lists the dimensions associated with each metric
 | ClusterName,job,namespace,pod,service | sas-rabbitmq |
 | ClusterName,job,namespace,pod,service | sas-rabbitmq |
 | ClusterName,job,namespace,pod,service | sas-rabbitmq |
-
-<b>erlang_vm_allocators</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,alloc,instance_no,job,kind,namespace,pod,service,usage | sas-rabbitmq |
-
-<b>erlang_vm_dist_node_queue_size_bytes</b>
-
-| Dimensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Source |
-| ---------- | ------ |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
-| ClusterName,job,namespace,peer,pod,service | sas-rabbitmq |
 
 </details>
