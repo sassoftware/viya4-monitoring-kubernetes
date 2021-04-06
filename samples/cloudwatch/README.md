@@ -156,12 +156,12 @@ written in Go:
 1. Go to [CloudWatch SAS Viya Metrics](reference.md) and expand the
 **By Metric** table.
 2. Locate the `go_memstats_alloc_bytes` metric. The table indicates that it is
-associated with the `container,job,namespace,node,pod,sas_service_base,service`
+associated with the `'ClusterName,job,namespace,node,pod,sas_service_base,service`
 dimensions.
 3. From the AWS web console, navigate to CloudWatch.
 4. In the navigation bar on the left, choose `Metrics`.
 5. Select the `ContainerInsights/Prometheus` namespace.
-6. Select the tile with the `container,job,namespace,node,pod,sas_service_base,service`
+6. Select the tile with the `'ClusterName,job,namespace,node,pod,sas_service_base,service`
 dimension. A table appears that lists all of the metrics associated with that dimension.
 7. Locate the `go_memstats_alloc_bytes` metric.
 8. Click on the arrow next to the metric and select `Search for this only`.
