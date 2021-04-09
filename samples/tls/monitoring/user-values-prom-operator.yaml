@@ -37,8 +37,6 @@ alertmanager:
     externalUrl: https://alertmanager.monitoring.host.cluster.example.com
 
 grafana:
-  image:
-    tag: "7.0.3"
   # Disable default configuration of NodePort
   service:
     type: ClusterIP
