@@ -40,7 +40,7 @@ function get_ingress_ports {
 
      ingress_namespace="${NGINX_NS:-ingress-nginx}"
 
-     ingress_service="service/ingress-nginx-controller"
+     ingress_service="service/${NGINX_SVCNAME:-ingress-nginx-controller}"
 
      ingress_http_port=$(get_k8s_info "$ingress_namespace" "$ingress_service" "service_http_port")
      if [ -z "$ingress_http_port" ]; then
