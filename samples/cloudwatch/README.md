@@ -15,7 +15,9 @@ CloudWatch agents that you might want to use in your environment:
 
 - The CloudWatch agent with Prometheus monitoring scrapes metrics from
 Prometheus sources, such as SAS Viya. The metrics can then be converted and
-mapped for display in CloudWatch. Because SAS Viya monitoring uses
+mapped for display in CloudWatch. 
+
+Because SAS Viya monitoring uses
 Prometheus, this sample explains how to deploy and configure only the
 CloudWatch agent for use with Prometheus.
 
@@ -72,13 +74,15 @@ You must identify the Amazon EKS cluster on which SAS Viya is deployed and the
 region for the cluster. These values are needed to construct the correct
 endpoint for CloudWatch.
 
-Run the following code from the command line. Replace the
-values of `ClusterName` and `RegionName` with the values for your EKS cluster.
+
+Use values for your EKS cluster to set the `ClusterName` and `RegionName` environment variables.
 
 ```bash
 ClusterName=my-cluster
 RegionName=us-east-1
 ```
+
+After you set these environment variables, you can copy and paste the command in the next section to deploy the Cloudwatch agent.
 
 ### Deploy CloudWatch Agent for Prometheus
 
