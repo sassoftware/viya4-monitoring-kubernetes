@@ -17,19 +17,19 @@ CloudWatch agents that you might want to use in your environment:
 Prometheus sources, such as SAS Viya. The metrics can then be converted and
 mapped for display in CloudWatch. 
 
-Because SAS Viya monitoring uses
-Prometheus, this sample explains how to deploy and configure only the
-CloudWatch agent for use with Prometheus.
-
 - The default CloudWatch agent collects metrics from AWS nodes. Although
 these metrics are not specific to SAS Viya, you might want to use both agents
 so you can obtain a complete view of your environment's performance. For
 information about using the default agent, see the
 [CloudWatch documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html).
 If you do use the default agent, you must add tolerations to the agent's
-daemonset definition so that the agent can run on nodes that are tainted to
+DaemonSet definition so that the agent can run on nodes that are tainted to
 support SAS Viya workload node placement. See
-[CloudWatch Agent Daemonset and Workload Node Placement](#wnp_tolerations).
+[CloudWatch Agent DaemonSet and Workload Node Placement](#wnp_tolerations).
+
+Because SAS Viya monitoring uses
+Prometheus, this sample focuses on deploying and configuring the
+CloudWatch agent for use with Prometheus.
 
 ## Deployment
 
@@ -172,15 +172,15 @@ dimension. A table appears that lists all of the metrics associated with that di
 9. Select the checkbox for the SAS Viya services that you want to include in the
 graph.
 
-## CloudWatch Agent Daemonset and Workload Node Placement<a name=wnp_tolerations></a>
+## CloudWatch Agent DaemonSet and Workload Node Placement<a name=wnp_tolerations></a>
 
 The SAS Viya workload node placement configuration uses annotations and node taints
 to schedule pods on appropriate nodes. The default CloudWatch agent is deployed
-as a daemonset and runs on every node. If you use the default CloudWatch agent,
-you must add tolerations to the agent's daemonset definition to enable the agent
+as a DaemonSet and runs on every node. If you use the default CloudWatch agent,
+you must add tolerations to the agent's DaemonSet definition to enable the agent
 to run on nodes that are tainted for SAS Viya workload node placement.
 
-Here is a sample `tolerations` code snippet that you can add to the daemonset to
+Here is a sample `tolerations` code snippet that you can add to the DaemonSet to
 allow it to properly schedule a pod on every node in the cluster:
 
 ```yaml
@@ -189,6 +189,8 @@ tolerations:
   operator: Exists
   effect: NoSchedule
 ```
+
+See [Set Up the CloudWatch Agent to Collect Cluster Metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-setup-metrics.html) in the CloudWatch documentation for information about modifying the CloudWatch DaemonSet.
 
 ## Limitations
 
