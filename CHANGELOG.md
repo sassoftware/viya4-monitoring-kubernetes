@@ -1,5 +1,26 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.0.6 (19APR21)
+
+* **Overall**
+  * [FEATURE] Custom names for the NGINX controller service are now supported
+  via the `NGINX_SVCNAME` environment variable (or `user.env` setting).
+  * [CHANGE] Several updates to documentation have been made to improve clarity
+  and organize the content in a more useful way.
+
+* **Monitoring**
+  * [FEATURE] There is a [new sample](samples/gke-monitoring) that demonstrates
+  how to enable Google Cloud's Operation Suite to collect metrics a Prometheus
+  instance that is scraping metrics from SAS Viya components
+  * [CHANGE] The [Amazon CloudWatch sample](samples/cloudwatch) has been
+  updated to include many more metrics and mappings. Almost all metrics exposed
+  by SAS Viya and third party components are now mapped properly to sets of
+  dimensions. A new [reference](samples/cloudwatch/reference.md) documents
+  the metrics by dimention, by source, and by metric name.
+
+* **Logging**
+  * [FIX] Missing metadata on CAS server logs has been fixed.
+
 ## Version 1.0.5 (15MAR21)
 
 * **Overall**
@@ -37,7 +58,7 @@
 
 * **Logging**
   * [FEATURE] The browser-accessible URL for Kibana included in the output
-  of `logging/bin/deploy_logging_open.sh` now takes into account ingress 
+  of `logging/bin/deploy_logging_open.sh` now takes into account ingress
   configuration
   * [EXPERIMENTAL] A new _experimental_ script `logging/bin/getlogs.sh`
   allows exporting logs to CSV format [`Documentation`](logging/Export_Logs.md)
