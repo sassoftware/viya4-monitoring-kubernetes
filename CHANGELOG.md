@@ -22,10 +22,6 @@
   * [FIX] Missing Kubernetes metadata on log messages from some pods (inc. CAS
   server pod) has been fixed.  Prior to fix, the kube.namespace field was set
   to `missing_ns` and all other `kube.*` fields were not present.
-  * [FIX] Removed a hard-coded name for the nginx-controller service; added
-  support to override the default name for this resource via the
-  `NGINX_SVCNAME` environment variable.
-
 
 ## Version 1.0.5 (15MAR21)
 
