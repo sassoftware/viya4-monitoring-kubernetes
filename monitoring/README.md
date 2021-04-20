@@ -307,7 +307,7 @@ of this repository, then re-run the
 scripts to pick up the latest versions of the applications, dashboards, service
 monitors, and exporters.
 
-## Remove Monitoring Components
+## <a name="mremove"></a>Remove Monitoring Components
 
 To remove the monitoring components, run the following commands:
 
@@ -325,6 +325,11 @@ Removing cluster monitoring does not remove persistent volume claims
 by default. A re-install after removal should retain existing data.
 Manually delete the PVCs or the namespace to delete previously
 collected monitoring data.
+
+**Note:** If you attempt to remove the monitoring components by deleting the 
+namespace into which the components were deployed instead or running the removal 
+scripts, redeployment of monitoring fails. See [Troubleshooting](Troubleshootng.md) 
+for instructions to correct this issue.  
 
 ## Miscellaneous Notes and Troubleshooting
 
