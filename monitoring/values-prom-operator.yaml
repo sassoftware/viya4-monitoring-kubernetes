@@ -52,7 +52,7 @@ kubelet:
 # https://github.com/helm/charts/tree/master/stable/kube-state-metrics
 kube-state-metrics:
   image:
-    tag: v1.9.7
+    tag: v1.9.8
   resources:
     requests:
       cpu: "25m"
@@ -69,7 +69,7 @@ prometheus:
     nodePort: 31090
   prometheusSpec:
     image:
-      tag: v2.24.1
+      tag: v2.26.0
     logLevel: info
     logFormat: json
     podAntiAffinity: soft
@@ -162,7 +162,7 @@ nodeExporter:
 # https://github.com/grafana/helm-charts/tree/main/charts/grafana
 grafana:
   image:
-    tag: "7.4.1"
+    tag: "7.5.4"
   "grafana.ini":
     analytics:
       check_for_updates: false
