@@ -328,7 +328,7 @@ collected monitoring data.
 
 **Note:** If you attempt to remove the monitoring components by deleting the 
 namespace into which the components were deployed instead or running the removal 
-scripts, redeployment of monitoring fails. See [Troubleshooting](Troubleshootng.md) 
+scripts, redeployment of monitoring fails. See [Troubleshooting](Troubleshooting.md) 
 for instructions to correct this issue.  
 
 ## Miscellaneous Notes and Troubleshooting
