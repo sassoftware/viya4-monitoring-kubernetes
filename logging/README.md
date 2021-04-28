@@ -253,7 +253,7 @@ The script creates the namespace into which the components are deployed. By defa
 Updates in place are supported. To update, re-run the
 `deploy_logging_open.sh` script to install the latest versions of all components, indexes, and dashboards.
 
-## Remove Logging Components
+## <a name="lremove"></a>Remove Logging Components
 
 To remove all logging components, run the following command:
 
