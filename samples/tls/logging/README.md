@@ -54,7 +54,7 @@ The standard deployment script for the logging components use these TLS secrets 
 * `es-transport-tls-secret`
 * `kibana-tls-secret`
 
-See [NOTES_ON_USING_TLS](../../../logging/NOTES_ON_USING_TLS.md) for information about generating these secrets.
+See [Notes_on_using_TLS](../../../logging/Notes_on_using_TLS.md) for information about generating these secrets.
 
 By default, the deployment process uses [cert-manager](https://cert-manager.io/) (version v1.0 or later) to generate the certificates. If cert-manager is not available, you can manually generate the certificates. If the required certificates do not exist and cert-manager is not available, the deployment process fails. The cert-manager component is not required if all of the TLS secrets exist prior to deployment.
 
