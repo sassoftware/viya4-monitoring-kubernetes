@@ -1,37 +1,4 @@
 {
-  "__inputs": [],
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "7.1.4"
-    },
-    {
-      "type": "panel",
-      "id": "graph",
-      "name": "Graph",
-      "version": ""
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "stat",
-      "name": "Stat",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "table-old",
-      "name": "Table (old)",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -49,17 +16,15 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": null,
-  "iteration": 1599578863386,
+  "id": 29,
+  "iteration": 1620041175011,
   "links": [],
   "panels": [
     {
       "columns": [],
       "datasource": "$datasource",
       "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
+        "defaults": {},
         "overrides": []
       },
       "fontSize": "100%",
@@ -239,7 +204,6 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [
             {
               "id": 0,
@@ -249,7 +213,6 @@
               "value": "null"
             }
           ],
-          "nullValueMode": "connected",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -269,14 +232,14 @@
         "x": 8,
         "y": 3
       },
-      "id": 17,
+      "id": 19,
       "interval": null,
       "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
-        "justifyMode": "auto",
+        "justifyMode": "center",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -285,21 +248,23 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "text": {},
+        "textMode": "value"
       },
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
+          "exemplar": true,
           "expr": "sum(cas_grid_sessions_current{namespace=~\"$namespace\",cas_server=~\"$casServer\"})",
           "instant": false,
           "interval": "",
-          "legendFormat": "Sessions",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "",
+      "title": "Sessions",
       "type": "stat"
     },
     {
@@ -308,7 +273,6 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [
             {
               "id": 0,
@@ -318,7 +282,6 @@
               "value": "null"
             }
           ],
-          "nullValueMode": "connected",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -328,7 +291,7 @@
               }
             ]
           },
-          "unit": "clocks"
+          "unit": "m"
         },
         "overrides": []
       },
@@ -354,11 +317,13 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "value"
       },
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
+          "exemplar": true,
           "expr": "cas_grid_uptime_seconds_total{namespace=~\"$namespace\",cas_server=~\"$casServer\"}",
           "instant": true,
           "interval": "",
@@ -379,7 +344,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -408,8 +372,11 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.5.4",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -477,7 +444,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -506,8 +472,11 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.5.4",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -576,7 +545,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -604,8 +572,11 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.5.4",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -675,7 +646,6 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -702,8 +672,11 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.5.4",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -763,8 +736,8 @@
       }
     }
   ],
-  "refresh": false,
-  "schemaVersion": 26,
+  "refresh": "30s",
+  "schemaVersion": 27,
   "style": "dark",
   "tags": [
     "sas-viya",
@@ -774,10 +747,12 @@
     "list": [
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "Prometheus",
           "value": "Prometheus"
         },
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": null,
@@ -785,6 +760,7 @@
         "name": "datasource",
         "options": [],
         "query": "prometheus",
+        "queryValue": "",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -795,13 +771,18 @@
         "current": {},
         "datasource": "$datasource",
         "definition": "label_values(cas_build_info,namespace)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "Namespace",
         "multi": false,
         "name": "namespace",
         "options": [],
-        "query": "label_values(cas_build_info,namespace)",
+        "query": {
+          "query": "label_values(cas_build_info,namespace)",
+          "refId": "Prometheus-namespace-Variable-Query"
+        },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -814,16 +795,25 @@
       },
       {
         "allValue": ".*",
-        "current": {},
+        "current": {
+          "selected": true,
+          "text": "cas-shared-default",
+          "value": "cas-shared-default"
+        },
         "datasource": "$datasource",
         "definition": "label_values(cas_build_info{namespace=~\"$namespace\"},cas_server)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "CAS Server",
         "multi": false,
         "name": "casServer",
         "options": [],
-        "query": "label_values(cas_build_info{namespace=~\"$namespace\"},cas_server)",
+        "query": {
+          "query": "label_values(cas_build_info{namespace=~\"$namespace\"},cas_server)",
+          "refId": "Prometheus-casServer-Variable-Query"
+        },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
