@@ -17,7 +17,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 65,
-  "iteration": 1620047546678,
+  "iteration": 1620135119933,
   "links": [],
   "panels": [
     {
@@ -782,11 +782,7 @@
       },
       {
         "allValue": ".*",
-        "current": {
-          "selected": true,
-          "text": "rp",
-          "value": "rp"
-        },
+        "current": {},
         "datasource": "$datasource",
         "definition": "label_values(cas_build_info,namespace)",
         "description": null,
@@ -813,11 +809,7 @@
       },
       {
         "allValue": ".*",
-        "current": {
-          "selected": true,
-          "text": "cas-shared-default",
-          "value": "cas-shared-default"
-        },
+        "current": {},
         "datasource": "$datasource",
         "definition": "label_values(cas_build_info{namespace=~\"$namespace\"},cas_server)",
         "description": null,
@@ -864,5 +856,5 @@
   "timezone": "",
   "title": "SAS CAS Overview",
   "uid": "Ofw6e__Wk",
-  "version": 2
+  "version": 3
 }
