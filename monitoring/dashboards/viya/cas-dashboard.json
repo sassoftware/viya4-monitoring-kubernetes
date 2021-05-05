@@ -1,37 +1,4 @@
 {
-  "__inputs": [],
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "7.1.4"
-    },
-    {
-      "type": "panel",
-      "id": "graph",
-      "name": "Graph",
-      "version": ""
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "stat",
-      "name": "Stat",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "table-old",
-      "name": "Table (old)",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -49,8 +16,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": null,
-  "iteration": 1599578863386,
+  "id": 65,
+  "iteration": 1620135119933,
   "links": [],
   "panels": [
     {
@@ -218,7 +185,7 @@
       ],
       "targets": [
         {
-          "expr": "(cas_build_info{namespace=~\"$namespace\",cas_server=~\"$casServer\"} + on (cas_server,namespace) group_left(name,release,system,version) cas_os_info{namespace=~\"$namespace\",cas_server=~\"$casServer\"}) + on (cas_server, namespace) group_left(state) cas_grid_state{namespace=~\"$namespace\",cas_server=~\"$casServer\"}",
+          "expr": "(cas_build_info{namespace=~\"$namespace\",cas_server=~\"$casServer\",service=~\".+-client\"} + on (cas_server,namespace) group_left(name,release,system,version) cas_os_info{namespace=~\"$namespace\",cas_server=~\"$casServer\",service=~\".+-client\"}) + on (cas_server, namespace) group_left(state) cas_grid_state{namespace=~\"$namespace\",cas_server=~\"$casServer\",service=~\".+-client\"}",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -239,6 +206,9 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
           "custom": {},
           "mappings": [
             {
@@ -249,7 +219,6 @@
               "value": "null"
             }
           ],
-          "nullValueMode": "connected",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -269,14 +238,14 @@
         "x": 8,
         "y": 3
       },
-      "id": 17,
+      "id": 19,
       "interval": null,
       "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
-        "justifyMode": "auto",
+        "justifyMode": "center",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -285,21 +254,23 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "text": {},
+        "textMode": "value"
       },
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.4.1",
       "targets": [
         {
-          "expr": "sum(cas_grid_sessions_current{namespace=~\"$namespace\",cas_server=~\"$casServer\"})",
+          "exemplar": false,
+          "expr": "sum(cas_grid_sessions_current{namespace=~\"$namespace\",cas_server=~\"$casServer\",service=~\".+-client\"})",
           "instant": false,
           "interval": "",
-          "legendFormat": "Sessions",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "",
+      "title": "Current Sessions",
       "type": "stat"
     },
     {
@@ -308,6 +279,9 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
           "custom": {},
           "mappings": [
             {
@@ -318,7 +292,6 @@
               "value": "null"
             }
           ],
-          "nullValueMode": "connected",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -328,7 +301,7 @@
               }
             ]
           },
-          "unit": "clocks"
+          "unit": "m"
         },
         "overrides": []
       },
@@ -354,12 +327,14 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "value"
       },
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.4.1",
       "targets": [
         {
-          "expr": "cas_grid_uptime_seconds_total{namespace=~\"$namespace\",cas_server=~\"$casServer\"}",
+          "exemplar": false,
+          "expr": "cas_grid_uptime_seconds_total{namespace=~\"$namespace\",cas_server=~\"$casServer\",service=~\".+-client\"}",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -408,8 +383,11 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.4.1",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -419,7 +397,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(cas_node_cpu_time_seconds{namespace=~\"$namespace\",cas_server=~\"$casServer\",type=~\"user|system\"}[1m])) by (cas_node)",
+          "expr": "sum(rate(cas_node_cpu_time_seconds{namespace=~\"$namespace\",cas_server=~\"$casServer\",service=~\".+-client\",type=~\"user|system\"}[1m])) by (cas_node)",
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "{{cas_node}}",
@@ -506,8 +484,11 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.4.1",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -517,7 +498,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "(cas_node_mem_size_bytes{namespace=~\"$namespace\",cas_server=~\"$casServer\",type=\"physical\"}-cas_node_mem_free_bytes{namespace=~\"$namespace\",cas_server=~\"$casServer\",type=\"physical\"})",
+          "expr": "(cas_node_mem_size_bytes{namespace=~\"$namespace\",cas_server=~\"$casServer\",service=~\".+-client\",type=\"physical\"}-cas_node_mem_free_bytes{namespace=~\"$namespace\",cas_server=~\"$casServer\",service=~\".+-client\",type=\"physical\"})",
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "{{cas_node}}",
@@ -604,8 +585,11 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.4.1",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -615,7 +599,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (cas_node_type) (rate(cas_node_cpu_time_seconds{namespace=~\"$namespace\",cas_server=~\"$casServer\",type=~\"user|system\"}[1m]))",
+          "expr": "sum by (cas_node_type) (rate(cas_node_cpu_time_seconds{namespace=~\"$namespace\",cas_server=~\"$casServer\",service=~\".+-client\",type=~\"user|system\"}[1m]))",
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "{{cas_node_type}}s",
@@ -702,8 +686,11 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.4",
+      "pluginVersion": "7.4.1",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -713,7 +700,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "cas_node_open_files{namespace=~\"$namespace\",cas_server=~\"$casServer\"}",
+          "expr": "cas_node_open_files{namespace=~\"$namespace\",cas_server=~\"$casServer\",service=~\".+-client\"}",
           "interval": "",
           "legendFormat": "{{cas_node}}",
           "refId": "A"
@@ -763,8 +750,8 @@
       }
     }
   ],
-  "refresh": false,
-  "schemaVersion": 26,
+  "refresh": "30s",
+  "schemaVersion": 27,
   "style": "dark",
   "tags": [
     "sas-viya",
@@ -778,6 +765,8 @@
           "text": "Prometheus",
           "value": "Prometheus"
         },
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": null,
@@ -785,6 +774,7 @@
         "name": "datasource",
         "options": [],
         "query": "prometheus",
+        "queryValue": "",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -795,13 +785,18 @@
         "current": {},
         "datasource": "$datasource",
         "definition": "label_values(cas_build_info,namespace)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "Namespace",
         "multi": false,
         "name": "namespace",
         "options": [],
-        "query": "label_values(cas_build_info,namespace)",
+        "query": {
+          "query": "label_values(cas_build_info,namespace)",
+          "refId": "Prometheus-namespace-Variable-Query"
+        },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -817,13 +812,18 @@
         "current": {},
         "datasource": "$datasource",
         "definition": "label_values(cas_build_info{namespace=~\"$namespace\"},cas_server)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "CAS Server",
         "multi": false,
         "name": "casServer",
         "options": [],
-        "query": "label_values(cas_build_info{namespace=~\"$namespace\"},cas_server)",
+        "query": {
+          "query": "label_values(cas_build_info{namespace=~\"$namespace\"},cas_server)",
+          "refId": "Prometheus-casServer-Variable-Query"
+        },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -856,5 +856,5 @@
   "timezone": "",
   "title": "SAS CAS Overview",
   "uid": "Ofw6e__Wk",
-  "version": 1
+  "version": 3
 }
