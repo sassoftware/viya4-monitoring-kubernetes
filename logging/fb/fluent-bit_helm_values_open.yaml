@@ -1,5 +1,5 @@
 image:
-  tag: 1.6.10
+  tag: 1.6.10-debug
 podAnnotations: 
   fluentbit.io/parser: fluentbit
 podLabels:
@@ -29,6 +29,10 @@ env:
        secretKeyRef:
          name: internal-user-logcollector
          key: password
+envFrom:
+   - configMapRef:
+        name: fb-env-vars
+
 
 # Be very tolerant
 tolerations:
