@@ -47,10 +47,16 @@ set -e
 # Prometheus Pushgateway
 PUSHGATEWAY_ENABLED=${PUSHGATEWAY_ENABLED:-true}
 if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
+  PUSHGATEWAY_CHART_VERSION=${PUSHGATEWAY_CHART_VERSION:-1.9.0}
+  if helm3ReleaseExists prometheus-pushgateway $VIYA_NS; then
+    svcClusterIP=$(kubectl get svc -n $VIYA_NS prometheus-pushgateway -o 'jsonpath={.spec.clusterIP}')
+  fi
   log_info "Installing the Prometheus Pushgateway to the [$VIYA_NS] namespace"
   helm2ReleaseCheck pushgateway-$VIYA_NS
   helm $helmDebug upgrade --install prometheus-pushgateway \
   --namespace $VIYA_NS \
+  --version $PUSHGATEWAY_CHART_VERSION \
+  --set service.clusterIP=$svcClusterIP \
   -f monitoring/values-pushgateway.yaml \
   -f $wnpValuesFile \
   -f $PUSHGATEWAY_USER_YAML \
