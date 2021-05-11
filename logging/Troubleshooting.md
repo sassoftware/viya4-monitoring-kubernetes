@@ -72,3 +72,16 @@ If you have not yet deployed the logging components, run the standard deployment
 ```bash
 ./logging/bin/deploy_logging_open.sh
 ```
+
+## Issue: Manually deleting the logging namespace does not delete all components 
+
+### Description
+The logging components should be removed by using the `remove_logging_open.sh` script. See [Remove Logging Components](README.md#lremove) for more information. If you attempt to remove the logging components by only deleting the namespace into which the components are deployed, components in other locations are not removed and redeployment of logging fails.
+
+### Solution
+Run this command to delete all of the logging components that are in locations 
+other than the logging namespace.
+
+```bash
+kubectl delete psp v4m-es-psp
+```
