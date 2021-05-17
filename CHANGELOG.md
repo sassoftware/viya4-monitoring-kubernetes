@@ -23,6 +23,7 @@
   * [Instructions are now available](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/Troubleshooting.md#issue-manually-deleting-the-logging-namespace-does-not-delete-all-components)
   for manual cleanup if the logging namespace is deleted instead of running
   the remove_* scripts
+  * [FIX] The change_internal_password.sh script no longer fails if Helm is not installed (Helm was never required)
 
 ## Version 1.0.6 (19APR21)
 
