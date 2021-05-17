@@ -15,9 +15,14 @@
   * [FIX] Upgrade-in-place of the Prometheus Pushgateway fails
   * [FIX] CAS dashboard: Uptime widget format changed
   * [FIX] CAS dashboard: Dashboard errors with some CAS configurations
+  * [Instructions are now available](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/monitoring/Troubleshooting.md#issue-manually-deleting-the-monitoring-namespace-does-not-delete-all-components)
+  for manual cleanup if the monitoring namespace is deleted instead of running
+  the remove_* scripts
 
 * **Logging**
-  * No external changes in this release
+  * [Instructions are now available](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/Troubleshooting.md#issue-manually-deleting-the-logging-namespace-does-not-delete-all-components)
+  for manual cleanup if the logging namespace is deleted instead of running
+  the remove_* scripts
 
 ## Version 1.0.6 (19APR21)
 
