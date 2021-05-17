@@ -1,5 +1,25 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.0.7 (17MAY21)
+
+* **Overall**
+  * Research was completed that will enable OpenShift support in a future release
+
+* **Monitoring**
+  * [CHANGE] Severtal component versions have been updated
+    * [Grafana](https://github.com/grafana/grafana/blob/main/CHANGELOG.md#754-2021-04-14): 7.4.1 -> 7.5.4
+    * [Prometheus](https://github.com/prometheus/prometheus/blob/main/CHANGELOG.md#2260--2021-03-31): 2.24.1 -> 2.26.0
+    * [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator/blob/master/CHANGELOG.md#0470--2021-04-13): 0.45.0 -> 0.47.0
+    * [Prometheus Operator Helm Chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack): 13.7.2 -> 15.0.0
+    * [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics/blob/master/CHANGELOG.md): 1.9.7 -> 1.9.8
+  * [FIX] Upgrade-in-place of the Prometheus Pushgateway fails
+  * [FIX] CAS dashboard: Uptime widget format changed
+  * [FIX] CAS dashboard: Dashboard errors with some CAS configurations
+
+* **Logging**
+  * [FEATURE] Support [containerd](https://containerd.io/) runtime for
+  Fluent Bit log collection
+
 ## Version 1.0.6 (19APR21)
 
 * **Overall**
