@@ -17,8 +17,7 @@
   * [FIX] CAS dashboard: Dashboard errors with some CAS configurations
 
 * **Logging**
-  * [FEATURE] Support [containerd](https://containerd.io/) runtime for
-  Fluent Bit log collection
+  * No external changes in this release
 
 ## Version 1.0.6 (19APR21)
 
