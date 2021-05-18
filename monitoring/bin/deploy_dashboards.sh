@@ -15,6 +15,7 @@ KUBE_DASH="${KUBE_DASH:-true}"
 VIYA_DASH="${VIYA_DASH:-true}"
 PGMONITOR_DASH="${PGMONITOR_DASH:-$VIYA_DASH}"
 RABBITMQ_DASH="${RABBITMQ_DASH:-$VIYA_DASH}"
+NGINX_DASH="${NGINX_DASH:-true}"
 LOGGING_DASH="${LOGGING_DASH:-true}"
 ISTIO_DASH="${ISTIO_DASH:-${ISTIO_ENABLED:-false}}"
 USER_DASH="${USER_DASH:-true}"
@@ -122,6 +123,11 @@ fi
 if [ "$RABBITMQ_DASH" == "true" ]; then
   log_info "Deploying RabbitMQ dashboards..."
   deploy_dashboards "rabbitmq"
+fi
+
+if [ "$NGINX_DASH" == "true" ]; then
+  log_info "Deploying NGINX dashboards..."
+  deploy_dashboards "nginx"
 fi
 
 if [ "$USER_DASH" == "true" ]; then
