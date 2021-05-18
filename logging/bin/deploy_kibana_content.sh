@@ -54,7 +54,7 @@ log_info "Configuring Kibana"
 #### TEMP:  Remove if/when Helm chart supports defining nodePort
 KB_NODEPORT_ENABLE=${KB_NODEPORT_ENABLE:-true}
 
-if [ "$KB_NODEPORT_ENABLE" == "true"}; then
+if [ "$KB_NODEPORT_ENABLE" == "true" ]; then
    SVC=v4m-es-kibana-svc
    SVC_TYPE=$(kubectl get svc -n $LOG_NS $SVC -o jsonpath='{.spec.type}')
 

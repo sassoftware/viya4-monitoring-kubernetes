@@ -92,7 +92,7 @@ fi
 ES_ENDPOINT_ENABLE=${ES_ENDPOINT_ENABLE:-false}
 if [ "$ES_ENDPOINT_ENABLE" == "true" ]; then
    oc -n $LOG_NS create route passthrough v4m-es-api --service=v4m-es-client-service --port=http
-else
+fi
 
 
 ##################################
