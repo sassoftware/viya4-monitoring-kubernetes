@@ -15,6 +15,9 @@ json_paths["service_type"]='{.spec.type}'
 json_paths["service_nodeport"]='{.spec.ports[0].nodePort}'
 json_paths["service_http_port"]='{.spec.ports[?(@.name=="http")].port}'
 json_paths["service_https_port"]='{.spec.ports[?(@.name=="https")].port}'
+# k8s object: route (OpenShift)
+json_paths["host"]='{.spec.host}'
+json_paths["tls"]='{.spec.tls.termination}'
 
 function get_k8s_info {
   local namespace object info_item info rc
@@ -23,7 +26,7 @@ function get_k8s_info {
   object=$2
   info_item=$3
 
-  info=$(kubectl -n $namespace get $object  -o=jsonpath=${json_paths[$info_item]})
+  info=$(kubectl -n $namespace get $object  -o=jsonpath=${json_paths[$info_item]} 2>/dev/null)
   rc=$?
 
   if [ "$rc" == "0" ]; then
@@ -94,6 +97,31 @@ function get_ingress_url {
   echo "$url"
 }
 
+function get_route_url {
+
+  local host tls_enabled protocol url
+
+  namespace=$1
+  service=$2
+
+  # host=$(oc -n $LOG_NS get route v4m-es-kibana-svc -o=jsonpath='{.spec.host}')
+  host=$(get_k8s_info "$namespace" "route/$service" "host")
+  if [ -z "$host" ]; then
+     echo ""
+     return 1
+  fi
+  # tls_mode=$(oc -n $LOG_NS get route v4m-es-kibana-svc -o=jsonpath='{.spec.tls.termination}')
+  tls_mode=$(get_k8s_info "$namespace" "route/$service" "tls")
+  if [ -z "$tls_mode" ]; then
+     protocol="http"
+  else
+     protocol="https"
+  fi
+
+  url="$protocol://$host"
+  echo "$url"
+}
+
 function get_nodeport_url {
   local host path tls_enabled port porttxt  protocol
 
@@ -141,6 +169,19 @@ function get_service_url {
  path=$3                    # only used for NodePort?  Appended to path returned by ingress objects
  use_tls=$4                 # use http or https (ingress properties over-ride)
  ingress=${5:-${service}}   # (optional) name of ingress object (default: $service)
+
+ # is a route defined for this service?
+ if [ "$(kubectl -n $namespace get route/$service 2>/dev/null)" ]; then
+     url=$(get_route_url $namespace $service)
+
+     if [ -z "$url" ]; then
+        return 1
+     else
+        echo "$url"
+       return
+     fi
+
+ fi
 
  # determine nodePort or clusterPort (ingress)
  service_type=$(get_k8s_info "$namespace" "service/$service" "service_type")
