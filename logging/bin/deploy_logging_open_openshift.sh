@@ -120,20 +120,6 @@ fi
 logging/bin/show_app_url.sh $servicelist
 
 
-#host=$(oc -n $LOG_NS get route v4m-es-kibana-svc -o=jsonpath='{.spec.host}')
-#tls_mode=$(oc -n $LOG_NS get route v4m-es-kibana-svc -o=jsonpath='{.spec.tls.termination}')
-#if [ -z "$tls_mode" ]; then
- # NOT TLS enables
-# protocol="http"
-#else
-# protocol="https"
-#fi
-#url="$protocol://$host"
-
-#url=$(get_service_url $LOG_NS v4m-es-kibana-svc "/" $LOG_KB_TLS_ENABLE)
-#echo "KIBANA URL: $url"
-
-
 ##################################
 # Fluent Bit                     #
 ##################################
