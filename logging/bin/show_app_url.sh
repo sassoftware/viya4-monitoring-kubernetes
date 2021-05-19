@@ -23,7 +23,7 @@ add_notice "                                                                    
 
 
 #start looping through services
-servicelist=${1:-"ALL"}
+servicelist=${@:-"ALL"}
 if [ "$servicelist" == "ALL" ]; then
    servicelist="KIBANA ELASTICSEARCH GRAFANA"
 fi

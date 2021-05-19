@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname $BASH_SOURCE)/../.."
@@ -32,14 +32,7 @@ log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 # OpenShift-specific set-up/config
 
 log_info "STEP 0: OpenShift Setup"
-# link Elasticsearch serviceAccounts to 'privileged' scc
-oc adm policy add-scc-to-user privileged -z v4m-es-es -n $LOG_NS
-
-# create the 'v4mlogging' SCC
-oc create -f samples/openshift/logging/fb_v4mlogging_scc.yaml
-
-# link Fluent Bit serviceAccount to 'v4mlogging' scc
-oc adm policy add-scc-to-user v4mlogging -z v4m-fb    -n $LOG_NS
+logging/bin/deploy_openshift_prereqs.sh
 
 
 ##################################
@@ -80,20 +73,7 @@ logging/bin/deploy_esexporter.sh
 # Create OpenShift Routes        #
 ##################################
 log_info "STEP 4a: Create OpenShift Route(s)"
-
-# TO DO: MOVE TO INGRESS?
-
-if [ "$LOG_KB_TLS_ENABLE" != "true" ]; then
-   oc -n $LOG_NS expose service v4m-es-kibana-svc
-else
-   oc -n $LOG_NS create route passthrough v4m-es-kibana-svc --service=v4m-es-kibana-svc --port=kibana-svc
-fi
-
-ES_ENDPOINT_ENABLE=${ES_ENDPOINT_ENABLE:-false}
-if [ "$ES_ENDPOINT_ENABLE" == "true" ]; then
-   oc -n $LOG_NS create route passthrough v4m-es-api --service=v4m-es-client-service --port=http
-fi
-
+logging/bin/deploy_openshift_routes.sh
 
 ##################################
 # Kibana Content                 #

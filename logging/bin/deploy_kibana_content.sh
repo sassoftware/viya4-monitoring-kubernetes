@@ -62,9 +62,9 @@ if [ "$KB_NODEPORT_ENABLE" == "true" ]; then
      KIBANA_PORT=31033
      kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
      log_info "Set Kibana service NodePort to 31033"
-   else
-     log_debug "Kibana service NodePort NOT created because KB_NODEPORT_ENABLE set to [$KB_NODEPORT_ENABLE]."
    fi
+else
+  log_debug "Kibana service NodePort NOT created because KB_NODEPORT_ENABLE set to [$KB_NODEPORT_ENABLE]."
 fi
 
 
