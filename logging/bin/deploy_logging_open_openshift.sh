@@ -24,16 +24,17 @@ set -e
 
 log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 
+# Set flag for OpenShift cluster
+export OPENSHIFT_ENABLE=true
+
 
 ##################################
 # OpenShift Set-up               #
 ##################################
 
 # OpenShift-specific set-up/config
-
 log_info "STEP 0: OpenShift Setup"
 logging/bin/deploy_openshift_prereqs.sh
-
 
 ##################################
 # Event Router                   #

@@ -22,7 +22,7 @@ fi
 oc adm policy add-scc-to-user privileged -z v4m-es-es -n $LOG_NS
 
 # create the 'v4mlogging' SCC
-oc create -f samples/openshift/logging/fb_v4mlogging_scc.yaml
+oc create -f logging/openshift/fb_v4mlogging_scc.yaml
 
 # link Fluent Bit serviceAccount to 'v4mlogging' scc
 oc adm policy add-scc-to-user v4mlogging -z v4m-fb    -n $LOG_NS
