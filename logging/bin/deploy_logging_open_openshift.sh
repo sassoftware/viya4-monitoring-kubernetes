@@ -84,7 +84,7 @@ logging/bin/deploy_openshift_routes.sh
 
 log_info "STEP 4b: Configuring Kibana"
 
-export KB_NODEPORT_ENABLE=false
+export KB_KNOWN_NODEPORT_ENABLE=false
 logging/bin/deploy_kibana_content.sh
 
 
