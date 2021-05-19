@@ -29,7 +29,7 @@ if [ "$ES_ENDPOINT_ENABLE" == "true" ]; then
    oc -n $LOG_NS create route passthrough v4m-es-api --service=v4m-es-client-service --port=http
 fi
 
-log_info "OpenShift Prerequisites have been deployed."
+log_info "OpenShift Routes have been deployed."
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""
