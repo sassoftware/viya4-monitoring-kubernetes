@@ -52,19 +52,19 @@ set -e
 log_info "Configuring Kibana"
 
 #### TEMP:  Remove if/when Helm chart supports defining nodePort
-KB_NODEPORT_ENABLE=${KB_NODEPORT_ENABLE:-true}
+KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-true}
 
-if [ "$KB_NODEPORT_ENABLE" == "true" ]; then
+if [ "$KB_KNOWN_NODEPORT_ENABLE" == "true" ]; then
    SVC=v4m-es-kibana-svc
    SVC_TYPE=$(kubectl get svc -n $LOG_NS $SVC -o jsonpath='{.spec.type}')
 
    if [ "$SVC_TYPE" == "NodePort" ]; then
      KIBANA_PORT=31033
      kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
-     log_info "Set Kibana service NodePort to 31033"
+     log_info "Setting Kibana service NodePort to 31033"
    fi
 else
-  log_debug "Kibana service NodePort NOT created because KB_NODEPORT_ENABLE set to [$KB_NODEPORT_ENABLE]."
+  log_debug "Kibana service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
 fi
 
 
