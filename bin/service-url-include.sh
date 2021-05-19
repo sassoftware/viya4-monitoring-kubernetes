@@ -29,7 +29,7 @@ function get_k8s_info {
   info=$(kubectl -n $namespace get $object  -o=jsonpath=${json_paths[$info_item]} 2>/dev/null)
   rc=$?
 
-  if [ "$rc" == "0" ]; then
+  if [ ! -z  "$info" ]; then
      echo "$info"
   else
      echo ""
