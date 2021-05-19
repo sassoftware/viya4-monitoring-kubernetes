@@ -18,6 +18,14 @@ the OpenShift 'thanos-querier' service as its Prometheus data source which
 allows access to both cluster and user (SAS Viya) metrics. The same set of
 dashboards used in viya4-monitoring-kubernetes will be available in Grafana.
 
+## Prerequisites
+
+* Kubernetes version 1.19+
+* OpenShift 4.7+
+* [`kubectl`](https://kubernetes.io/docs/tasks/tools/) 1.19+
+* [`helm`](https://helm.sh/docs/intro/install/) 3.0+ (3.5+ recommended)
+* OpenShift `oc` command-line tool 3.0+
+
 ## Deployment
 
 OpenShift publishes documentation that describes how to enable monitoring of
@@ -220,6 +228,18 @@ Copy the token from the output of the second command and replace
 `$OPENSHIFT_SAMPLE_DIR/monitoring/grafana-common-values.yaml`.
 
 ### Deploy Grafana
+
+Check for the Grafana helm repo:
+
+```bash
+helm repo list
+```
+
+Add the `grafana` helm repository if it was not listed above:
+
+```bash
+helm repo add grafana https://grafana.github.io/helm-charts
+```
 
 Using helm 3.x, deploy Grafana:
 
