@@ -38,6 +38,9 @@ env:
        secretKeyRef:
          name: connection-info-azmonitor
          key: shared_key
+envFrom:
+   - configMapRef:
+        name: fb-env-vars
 
 # Be very tolerant
 tolerations:

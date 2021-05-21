@@ -29,6 +29,10 @@ env:
        secretKeyRef:
          name: internal-user-logcollector
          key: password
+envFrom:
+   - configMapRef:
+        name: fb-env-vars
+
 
 # Be very tolerant
 tolerations:

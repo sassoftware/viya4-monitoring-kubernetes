@@ -91,6 +91,31 @@ kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 kubectl -n $LOG_NS delete configmap fb-viya-parsers --ignore-not-found
 kubectl -n $LOG_NS create configmap fb-viya-parsers  --from-file=logging/fb/viya-parsers.conf
 
+# Check for Kubernetes container runtime log format info
+KUBERNETES_RUNTIME_LOGFMT=${KUBERNETES_RUNTIME_LOGFMT}
+if [ -z "$KUBERNETES_RUNTIME_LOGFMT" ]; then
+   somenode=$(kubectl get nodes | awk 'NR==2 { print $1 }')
+   runtime=$(kubectl get node $somenode -o jsonpath={.status.nodeInfo.containerRuntimeVersion} | awk -F: '{print $1}')
+   log_debug "Kubernetes container runtime [$runtime] found on node [$somenode]"
+   case $runtime in
+    docker)
+      KUBERNETES_RUNTIME_LOGFMT="docker"
+      ;;
+    containerd|cri-o)
+      KUBERNETES_RUNTIME_LOGFMT="criwithlog"
+      ;;
+    *)
+      log_warn "Unrecognized Kubernetes container runtime [$runtime]; using default parser"
+      KUBERNETES_RUNTIME_LOGFMT="docker"
+      ;;
+   esac
+fi
+
+
+# Create ConfigMap containing Kubernetes container runtime log format
+kubectl -n $LOG_NS delete configmap fb-env-vars --ignore-not-found
+kubectl -n $LOG_NS create configmap fb-env-vars --from-literal=KUBERNETES_RUNTIME_LOGFMT="$KUBERNETES_RUNTIME_LOGFMT"
+
 # Delete any existing Fluent Bit pods in the $LOG_NS namepace (otherwise Helm chart may assume an upgrade w/o reloading updated config
 kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=es"
 
