@@ -84,10 +84,10 @@ else
   sed -i "s/__BEARER_TOKEN__/$grafanaToken/g" $grafanaYAML
 fi
 
-if ! helm3ReleaseExists grafana-viya $MON_NS; then
+if ! helm3ReleaseExists v4m-grafana $MON_NS; then
   firstTimeGrafana=true
 fi
-helm upgrade --install --namespace $helmDebug $MON_NS grafana-viya \
+helm upgrade --install --namespace $helmDebug $MON_NS v4m-grafana \
   -f "$grafanaYAML" \
   -f "$userGrafanaYAML" grafana/grafana
 
@@ -110,14 +110,14 @@ for f in monitoring/rules/viya/rules-*.yaml; do
   kubectl apply -n $MON_NS -f $f
 done
 
-if ! kubectl get route -n $MON_NS grafana-viya 1>/dev/null 2>&1; then
-  oc expose service -n $MON_NS grafana-viya
+if ! kubectl get route -n $MON_NS v4m-grafana 1>/dev/null 2>&1; then
+  oc expose service -n $MON_NS v4m-grafana
 fi
-log_notice "Grafana URL: http://$(kubectl get route -n $MON_NS | grep grafana-viya | awk '{printf $2}')"
+log_notice "Grafana URL: http://$(kubectl get route -n $MON_NS | grep v4m-grafana | awk '{printf $2}')"
 
 if [ "$firstTimeGrafana" == "true" ]; then
   log_notice "Obtain the inital Grafana password by running:"
-  log_notice "kubectl get secret --namespace monitoring grafana-viya -o jsonpath="{.data.admin-password}" | base64 --decode ; echo"
+  log_notice "kubectl get secret --namespace monitoring v4m-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo"
 fi
 
 log_message ""

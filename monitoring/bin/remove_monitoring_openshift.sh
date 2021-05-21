@@ -5,20 +5,20 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
-source bin/openshift.sh
+source bin/openshift-include.sh
 
 MON_DELETE_PVCS_ON_REMOVE=${MON_DELETE_PVCS_ON_REMOVE:-false}
 MON_DELETE_NAMESPACE_ON_REMOVE=${MON_DELETE_NAMESPACE_ON_REMOVE:-false}
 
 log_info "Removing the Grafana route..."
-kubectl delete route --ignore-not-found -n $MON_NS grafana-viya
+kubectl delete route --ignore-not-found -n $MON_NS v4m-grafana
 
 log_info "Removing Grafana..."
-if helm3ReleaseExists grafana-viya $MON_NS; then
-  helm uninstall --namespace $MON_NS grafana-viya
+if helm3ReleaseExists v4m-grafana $MON_NS; then
+  helm uninstall --namespace $MON_NS v4m-grafana
 fi
 if [ $? != 0 ]; then
-  log_warn "Uninstall of [grafana-viya] was not successful. Check output above for details."
+  log_warn "Uninstall of [v4m-grafana] was not successful. Check output above for details."
 fi
 
 if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
