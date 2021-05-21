@@ -92,19 +92,9 @@ helm upgrade --install --namespace $helmDebug $MON_NS v4m-grafana \
   -f "$userGrafanaYAML" grafana/grafana
 
 log_info "Deploying SAS Viya Grafana dashboards..."
-DASH_NS=$MON_NS KUBE_DASH=${KUBE_DASH:-false} NGINX_DASH=${NGINX_DASH:-false} monitoring/bin/deploy_dashboards.sh
+DASH_NS=$MON_NS LOGGING_DASH=${LOGGING_DASH:-false} KUBE_DASH=${KUBE_DASH:-false} NGINX_DASH=${NGINX_DASH:-false} \
+  monitoring/bin/deploy_dashboards.sh
 
-log_info "Deploying cluster service monitors..."
-
-# Eventrouter ServiceMonitor
-kubectl apply -n $MON_NS -f monitoring/monitors/kube/podMonitor-eventrouter.yaml 2>/dev/null
- 
-# Elasticsearch ServiceMonitor
-kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-elasticsearch.yaml
- 
-# Fluent Bit ServiceMonitors
-kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-fluent-bit-v2.yaml
- 
 # Rules for SAS Jobs dashboards
 for f in monitoring/rules/viya/rules-*.yaml; do
   kubectl apply -n $MON_NS -f $f
