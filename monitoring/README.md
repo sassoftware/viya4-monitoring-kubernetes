@@ -28,14 +28,15 @@ These components are deployed:
 * Kubernetes cluster alert definitions
 
 If you are using a cloud provider, you must use ingress, rather than
-NodePorts. Specify the information needed to use ingress during the customization process.
+NodePorts. Specify the information needed to use ingress during the
+customization process.
 
 ## Perform Pre-Deployment Tasks
 
 Before deploying, you must perform these tasks:
 
-- [create a local copy of the repository](#mon_loc_copy)
-- [customize your deployment](#mon_custom)
+* [create a local copy of the repository](#mon_loc_copy)
+* [customize your deployment](#mon_custom)
 
 ### <a name="mon_loc_copy"></a>Create a Local Copy of the Repository
 
@@ -46,9 +47,12 @@ There are two methods to create a local copy of the repository:
 
 #### Download a Compressed Copy of the Repository
 
-1. On the main page of the repository, click on Releases (on the right side of the repository contents area) to display the [Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases)
+1. On the main page of the repository, click on Releases (on the right side of
+the repository contents area) to display the
+[Releases](https://github.com/sassoftware/viya4-monitoring-kubernetes/releases)
 page.
-2. Locate the release that you want to deploy. Typically, you should download the latest release, which is the first one listed.
+2. Locate the release that you want to deploy. Typically, you should download
+the latest release, which is the first one listed.
 3. Expand **Assets** for the release, which is located below the release notes.
 4. Select either **Source code (.zip)** or **Source code (.tar.gz)** to download
 the repository as a compressed file.
@@ -57,52 +61,88 @@ repository is created in a directory named `viya4-monitoring-kubernetes-<release
 
 #### Clone the Repository
 
-1. From the main page for the repository, select the **stable** branch, which is the most recent officially released version. The **master** branch is the branch under active development.
+1. From the main page for the repository, select the **stable** branch, which
+is the most recent officially released version. The **master** branch is the
+branch under active development.
 2. From the main page for the repository, click **Code**.
 3. Copy the HTTPS URL for the repository.
-4. From a directory where you want to create the local copy, enter the command `git clone --branch stable <https_url>`. You can replace `stable` with the tag associated with a specific release if you need a version other than the current stable version. For example, if you are developing a repeatable process and need to ensure the same release of the repo is used every time, specify the tag associated with that specific release rather than stable. Note that the tag and release names are typically the same, but you should check the Releases page to verify the tag name. 
+4. From a directory where you want to create the local copy, enter the command
+`git clone --branch stable <https_url>`. You can replace `stable` with the tag
+associated with a specific release if you need a version other than the current
+stable version. For example, if you are developing a repeatable process and
+need to ensure the same release of the repo is used every time, specify the tag
+associated with that specific release rather than stable. Note that the tag and
+release names are typically the same, but you should check the Releases page to
+verify the tag name.
 5. Change to the `viya4-monitoring-kubernetes` directory.
-6. Enter the command `git checkout <release_number>`. If you used the command `git clone --branch <my_branch> <https_url>` in Step 4 to specify the branch, release, or tag, you do not have to perform this step.
+6. Enter the command `git checkout <release_number>`. If you used the command
+`git clone --branch <my_branch> <https_url>` in Step 4 to specify the branch,
+release, or tag, you do not have to perform this step.
 
 ### <a name="mon_custom"></a>Customize the Deployment
 
-For most deployment scenarios, the process of customizing the monitoring deployments consists of: 
-- creating the location for your local customization files
-- using the `USER_DIR` environment variable to specify the location of the customization files
-- copying the customization files from one of the provided samples to your local directory
-- specifying customization variables and parameters in the customization files
+For most deployment scenarios, the process of customizing the monitoring
+deployments consists of:
 
-Other scenarios use different customization steps that are specific to each scenario.
+* creating the location for your local customization files
+* using the `USER_DIR` environment variable to specify the location of the
+customization files
+* copying the customization files from one of the provided samples to your
+local directory
+* specifying customization variables and parameters in the customization files
 
-[Samples](#msample) are provided for several common deployment scenarios. Each sample includes detailed information about the customization process and values for the scenario.
+Other scenarios use different customization steps that are specific to each
+scenario.
+
+[Samples](#msample) are provided for several common deployment scenarios. Each
+sample includes detailed information about the customization process and values
+for the scenario.
 
 #### Creating the Location for Customization Files
 
-The `USER_DIR` environment variable enables you to use a directory outside of the local repository to contain the customization files. By using a location outside of the repository, you can put the customization files in a location that is under version control, and you can preserve your customizations when you deploy new versions of the monitoring and logging applications. You could also create different sets of configuration files for different cluster types, and then use the `USER_DIR` variable to specify the configuration files to use based on the cluster type on which you were deploying.
+The `USER_DIR` environment variable enables you to use a directory outside of
+the local repository to contain the customization files. By using a location
+outside of the repository, you can put the customization files in a location
+that is under version control, and you can preserve your customizations when
+you deploy new versions of the monitoring and logging applications. You could
+also create different sets of configuration files for different cluster types,
+and then use the `USER_DIR` variable to specify the configuration files to use
+based on the cluster type on which you were deploying.
 
-For example, to create a root customization directory named *my-viya4mon-user-dir* (that can later be specified by the `USER_DIR` environment variable) and then create a directory for the monitoring customization files:
+For example, to create a root customization directory named
+*my-viya4mon-user-dir* (that can later be specified by the `USER_DIR`
+environment variable) and then create a directory for the monitoring
+customization files:
 
 ```bash
 mkdir ~/my-viya4mon-user-dir
 mkdir ~/my-viya4mon-user-dir/monitoring
 ```
 
-Note that these commands create a customization directory tree in the current user's home directory.
+Note that these commands create a customization directory tree in the current
+user's home directory.
 
 #### Using USER_DIR to Specify the Location of Customization Files
 
-Use the `USER_DIR` environment variable to specify the root location of your local customization files.
+Use the `USER_DIR` environment variable to specify the root location of your
+local customization files.
 
-This example sets the `USER_DIR` environment variable to the *my-viya4mon-user-dir* directory:
+This example sets the `USER_DIR` environment variable to the
+*my-viya4mon-user-dir* directory:
 
 ```bash
 export USER_DIR=~/my-viya4mon-user-dir
 ```
-The monitoring and logging deployment scripts use the customization files contained in the directories under the `USER_DIR` location.
+
+The monitoring and logging deployment scripts use the customization files
+contained in the directories under the `USER_DIR` location.
 
 #### <a name="mcustomization"></a>Specifying Customization Variables and Parameters
 
-After you create the location for your customization files, you can customize the components that you deploy for monitoring by specifying environment variables and Helm chart parameters in this set of customization files (in this example, contained in the *my-viya4mon-user-dir* root directory):
+After you create the location for your customization files, you can customize
+the components that you deploy for monitoring by specifying environment
+variables and Helm chart parameters in this set of customization files (in this
+example, contained in the *my-viya4mon-user-dir* root directory):
 
 ```text
 my-viya4mon-user-dir/user.env
@@ -112,32 +152,56 @@ my-viya4mon-user-dir/monitoring/user-values-prom-operator.yaml
 my-viya4mon-user-dir/monitoring/user-values-pushgateway.yaml
 ```
 
-You specify the environment variables in the `user.env` files and the Helm chart parameters in the `*.yaml` customization files. 
+You specify the environment variables in the `user.env` files and the Helm
+chart parameters in the `*.yaml` customization files.
 
-In order to minimize the potential for errors, you should not manually create the customization files, but use one of the sets of sample files as the starting point for your own customizations. 
+In order to minimize the potential for errors, you should not manually create
+the customization files, but use one of the sets of sample files as the
+starting point for your own customizations.
 
 #### <a name="msample"></a>Using Customization Samples
 
-The samples are provided to demonstrate how to customize the deployment of the monitoring components for specific situations. The samples provide instructions and example `*.yaml` files that you can modify to fit your environment. Although each example focuses on a specific scenario, you can combine multiple samples by merging the appropriate values in each deployment file.
+The samples are provided to demonstrate how to customize the deployment of the
+monitoring components for specific situations. The samples provide instructions
+and example `*.yaml` files that you can modify to fit your environment.
+Although each example focuses on a specific scenario, you can combine multiple
+samples by merging the appropriate values in each deployment file.
 
-If your situation matches one of the specialized samples, you can copy the customization files for the sample that most closely matches your environment from the repository to your customization file directory. This enables you to start your customization with a set of values that are valid for your situation. You can then make further modifications to the files.
+If your situation matches one of the specialized samples, you can copy the
+customization files for the sample that most closely matches your environment
+from the repository to your customization file directory. This enables you to
+start your customization with a set of values that are valid for your
+situation. You can then make further modifications to the files.
 
-If your situation does not match any of the specialized samples, copy the [generic-base sample](/samples/generic-base) as a base for your customization files, and then change the values or copy values from other samples to match your environment.
+If your situation does not match any of the specialized samples, copy the
+[generic-base sample](/samples/generic-base) as a base for your customization
+files, and then change the values or copy values from other samples to match
+your environment.
 
-If more than one sample applies to your environment, you can manually copy the values from the other sample files to the files in your customization directory.
+If more than one sample applies to your environment, you can manually copy the
+values from the other sample files to the files in your customization directory.
 
 See the [Samples page](/samples) for a list of provided samples.
 
 #### Specifying Environment Variables in user.env Files
 
-Environment variables control script behavior and high-level options such as TLS and workload node placement. Note that you can also specify environment variables on a command line, but specifying the variables in `user.env` is recommended, in order to maintain a consistent set of values for future deployments. The values in the top-level `user.env` file (`my-viya4mon-user-dir/user.env`) apply to both the monitoring and logging deployments. The values in `my-viya4mon-user-dir/monitoring/user.env` apply only to the monitoring deployment.
+Environment variables control script behavior and high-level options such as
+TLS and workload node placement. Note that you can also specify environment
+variables on a command line, but specifying the variables in `user.env` is
+recommended, in order to maintain a consistent set of values for future
+deployments. The values in the top-level `user.env` file
+(`my-viya4mon-user-dir/user.env`) apply to both the monitoring and logging
+deployments. The values in `my-viya4mon-user-dir/monitoring/user.env` apply
+only to the monitoring deployment.
 
 Any line whose first character is `#` is treated as a comment and ignored.
 
 #### Specifying the Default Grafana Password 
 
 Specify the `GRAFANA_ADMIN_PASSWORD` environment variable in
-`$USER_DIR/monitoring/user.env`to specify the default password for Grafana. If you do not specify a default password, one is randomly generated and displayed during deployment.
+`$USER_DIR/monitoring/user.env`to specify the default password for Grafana.
+If you do not specify a default password, one is randomly generated and
+displayed during deployment.
 
 #### Using Ingress for Cloud Providers
 
@@ -165,7 +229,13 @@ Node Exporter. Links to the charts and default values are included in the
 
 #### TLS Support
 
-The [TLS Monitoring sample](/samples/tls/monitoring) contains information about specifying the `TLS_ENABLE` environment variable to use TLS for in-cluster communications between the components and to use TLS for connections between the user and the monitoring components when using NodePorts. If you only use TLS (HTTPS) for ingress, you do not have to specify the environment variable `TLS_ENABLE=true`, but you must manually populate Kubernetes ingress secrets as specified in the [TLS Monitoring sample](/samples/tls/monitoring).
+The [TLS Monitoring sample](/samples/tls/monitoring) contains information about
+specifying the `TLS_ENABLE` environment variable to use TLS for in-cluster
+communications between the components and to use TLS for connections between
+the user and the monitoring components when using NodePorts. If you only use
+TLS (HTTPS) for ingress, you do not have to specify the environment variable
+`TLS_ENABLE=true`, but you must manually populate Kubernetes ingress secrets
+as specified in the [TLS Monitoring sample](/samples/tls/monitoring).
 
 #### Workload Node Placement
 
@@ -205,53 +275,89 @@ the following jobs in the Istio Prometheus instance:
 
 ### Add Custom Dashboards
 
-The monitoring deployment includes a set of dashboards, but you can also add your own. Many dashboards are available at [Grafana's site of community dashboards](https://grafana.com/grafana/dashboards). Download the `.json` file for a dashboard and save it using a filename that is
-a [valid kubernetes resource name](https://kubernetes.io/docs/concepts/overview/working-with-objects/names). There are three methods to add dashboards:
+The monitoring deployment includes a set of dashboards, but you can also add
+your own. Many dashboards are available at
+[Grafana's site of community dashboards](https://grafana.com/grafana/dashboards).
+Download the `.json` file for a dashboard and save it using a filename that is
+a [valid kubernetes resource name](https://kubernetes.io/docs/concepts/overview/working-with-objects/names).
+There are three methods to add dashboards:
 
-- manually import each dashboard into Grafana
-- add dashboards using a script
-- automatically deploy dashboards stored in the `$USER_DIR/monitoring/dashboards` directory
+* manually import each dashboard into Grafana
+* add dashboards using a script
+* automatically deploy dashboards stored in the
+`$USER_DIR/monitoring/dashboards` directory
 
 #### Manually Import Dashboards
 
-You can use Grafana's import function to import dashboards. 
+You can use Grafana's import function to import dashboards.
 
-The advantage of using the import function is that Grafana recognizes if the dashboard's data source is not valid for your environment and prompts you to select your environment's data source. 
+The advantage of using the import function is that Grafana recognizes if the
+dashboard's data source is not valid for your environment and prompts you to
+select your environment's data source.
 
-The disadvantage is that the process is not automated, so you must re-import the dashboards each time you redeploy the monitoring components. If you have many dashboards to import, the process could also be time-consuming. 
+The disadvantage is that the process is not automated, so you must re-import
+the dashboards each time you redeploy the monitoring components. If you have
+many dashboards to import, the process could also be time-consuming.
 
 #### Add Dashboards Using a Script
 
-You can use the `deploy_dashboards.sh [dashboard | dashboard_directory]` script to deploy a single dashboard or a directory of dashboards.
+You can use the `deploy_dashboards.sh [dashboard | dashboard_directory]` script
+to deploy a single dashboard or a directory of dashboards.
 
-Grafana cannot validate the data source of dashboards that are deployed using this script, so you must either manually change the data source or use Grafana to create a dashboard file with the data source resolved. See [Resolve Dashboard Data Sources](#resolve-dashboard-data-sources) for information.
+Grafana cannot validate the data source of dashboards that are deployed using
+this script, so you must either manually change the data source or use Grafana
+to create a dashboard file with the data source resolved. See
+[Resolve Dashboard Data Sources](#resolve-dashboard-data-sources) for
+information.
 
-The advantage of using the script is that the process can be automated, so you can automatically re-deploy all of your custom dashboards whenever you re-deploy the monitoring components.
+The advantage of using the script is that the process can be automated, so you
+can automatically re-deploy all of your custom dashboards whenever you
+re-deploy the monitoring components.
 
-Some detailed dashboards might be too large to deploy using the script, and must be imported manually. If the dashboard is too large, a message is displayed during deployment.
+Some detailed dashboards might be too large to deploy using the script, and
+must be imported manually. If the dashboard is too large, a message is
+displayed during deployment.
 
 #### Deploy Dashboards in the $USER_DIR/monitoring/dashboards Directory
 
-Dashboards that are stored in the `$USER_DIR/monitoring/dashboards` directory are automatically added when you deploy the monitoring components. The dashboards must be in `.json` format, and they cannot be in a subdirectory under `$USER_DIR/monitoring/dashboards`. If you remove the monitoring components using the `remove_monitoring_cluster.sh` script, the dashboards are removed as well.
+Dashboards that are stored in the `$USER_DIR/monitoring/dashboards` directory
+are automatically added when you deploy the monitoring components. The
+dashboards must be in `.json` format, and they cannot be in a subdirectory
+under `$USER_DIR/monitoring/dashboards`. If you remove the monitoring
+components using the `remove_monitoring_cluster.sh` script, the dashboards are
+removed as well.
 
-Grafana cannot validate the data source of dashboards that are deployed using this directory, so you must either manually change the data source or use Grafana to create a dashboard file with the data source resolved. See [Resolve Dashboard Data Sources](#resolve-dashboard-data-sources) for information.
+Grafana cannot validate the data source of dashboards that are deployed using
+this directory, so you must either manually change the data source or use
+Grafana to create a dashboard file with the data source resolved. See
+[Resolve Dashboard Data Sources](#resolve-dashboard-data-sources) for
+information.
 
 #### Resolve Dashboard Data Sources
 
-Grafana cannot validate the data source of dashboards that are deployed using either the `deploy_dashboards` script or the `$USER_DIR/monitoring/dashboards` directory, so the dashboards will display incomplete information. 
+Grafana cannot validate the data source of dashboards that are deployed using
+either the `deploy_dashboards` script or the `$USER_DIR/monitoring/dashboards`
+directory, so the dashboards will display incomplete information.
 
-To specify the data source, you can either manually change the data source in the dashboard's .json file or manually import the dashboard into Grafana (which prompts you to select a data source) and export the dashboard with the valid data source specified.
+To specify the data source, you can either manually change the data source in
+the dashboard's .json file or manually import the dashboard into Grafana (which
+prompts you to select a data source) and export the dashboard with the valid
+data source specified.
 
-To manually change the data source, edit the dashboard's `.json` file and change the data source to `Prometheus`. For example:
-- Find: `"datasource": "${DS_PROMETHEUS}"`
-- Replace with: `"datasource": "Prometheus"`
+To manually change the data source, edit the dashboard's `.json` file and
+change the data source to `Prometheus`. For example:
 
-Follow these steps to use Grafana's import and export functions to create a `.json` file for the dashboard with data sources resolved: 
+* Find: `"datasource": "${DS_PROMETHEUS}"`
+* Replace with: `"datasource": "Prometheus"`
+
+Follow these steps to use Grafana's import and export functions to create a
+`.json` file for the dashboard with data sources resolved:
 
 1. Import the dashboard into Grafana and resolve the data source.
 2. In Grafana, select Share, then select the Export tab.
 3. Ensure that the `Export for sharing externally` option is not selected.
-4. Select `Save to file` to save the `.json` file for the dashboard with the data source resolved.
+4. Select `Save to file` to save the `.json` file for the dashboard with
+the data source resolved.
 5. Use the script or directory to import the dashboard during future deployments.
 
 ## Deploy Cluster Monitoring Components
@@ -282,22 +388,29 @@ By default, the components are deployed into the namespace `monitoring`.
 
 ## Access Monitoring Applications
 
-If the deployment process completes without errors, a message 
-appears in the console window containing the URL address for Grafana. The URL for Grafana is different depending on whether you use nodeports or ingress to access Grafana. 
+If the deployment process completes without errors, a message appears in the
+console window containing the URL address for Grafana. The URL for Grafana is
+different depending on whether you use nodeports or ingress to access Grafana.
 
-NodePorts are used by default. If you deployed using NodePorts, Prometheus and AlertManager are available at these locations by default:
+NodePorts are used by default. If you deployed using NodePorts, Prometheus and
+AlertManager are available at these locations by default:
 
 * Prometheus - Port 31090 `http://master-node.yourcluster.example.com:31090`
 * AlertManager - Port 31091 `http://master-node.yourcluster.example.com:31091`
 
-The default Grafana admin user is `admin`. Unless you set the `GRAFANA_ADMIN_PASSWORD` environment variable (either in the `user.env` file or on the command line) to specify a default password during deployment, the default password is randomly generated and displayed during deployment. 
+The default Grafana admin user is `admin`. Unless you set the
+`GRAFANA_ADMIN_PASSWORD` environment variable (either in the `user.env` file or
+on the command line) to specify a default password during deployment, the
+default password is randomly generated and displayed during deployment.
 
 If you want to change the password, issue this command:
+
 ```bash
 kubectl exec -n <monitoring_namespace> <grafana_pod> -c grafana -- bin/grafana-cli admin reset-admin-password myNewPassword
 ```
 
-The randomly-generated password is displayed only during the initial deployment of the monitoring components.  It is not displayed if you redeploy the components.
+The randomly-generated password is displayed only during the initial deployment
+of the monitoring components.  It is not displayed if you redeploy the components.
 
 ## Update Monitoring Components
 
@@ -326,10 +439,10 @@ by default. A re-install after removal should retain existing data.
 Manually delete the PVCs or the namespace to delete previously
 collected monitoring data.
 
-**Note:** If you attempt to remove the monitoring components by deleting the 
-namespace into which the components were deployed instead or running the removal 
-scripts, redeployment of monitoring fails. See [Troubleshooting](Troubleshooting.md) 
-for instructions to correct this issue.  
+**Note:** If you attempt to remove the monitoring components by deleting the
+namespace into which the components were deployed instead or running the
+removal scripts, redeployment of monitoring fails. See
+[Troubleshooting](Troubleshooting.md) for instructions to correct this issue.
 
 ## Miscellaneous Notes and Troubleshooting
 
