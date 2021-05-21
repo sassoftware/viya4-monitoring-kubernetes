@@ -112,6 +112,16 @@ logging/bin/deploy_fluentbit_open.sh
 echo ""
 display_notices
 
+
+##################################
+# Service Monitors               #
+##################################
+
+log_info "STEP 6: Deploying Service Monitors"
+export DEPLOY_SERVICEMONITORS=${DEPLOY_SERVICEMONITORS:-true}
+logging/bin/deploy_servicemonitors_open.sh
+
+
 echo ""
 log_notice "The deployment of logging components has completed [$(date)]"
 echo ""
