@@ -12,6 +12,9 @@ You must have cluster-admin access to any cluster in which you deploy these
 components. You cannot deploy successfully if you have access only to a
 namespace or a subset of namespaces.
 
+**Note:** If you are deploying SAS Viya Monitoring on OpenShift, you must follow the 
+deployment process documented in [SAS Viya Monitoring on OpenShift](OpenShift.md).
+
 ### Components
 
 These components are deployed:
@@ -31,7 +34,7 @@ If you are using a cloud provider, you must use ingress, rather than
 NodePorts. Specify the information needed to use ingress during the
 customization process.
 
-## Perform Pre-Deployment Tasks
+## <a name="mon_pre_dep"></a>Perform Pre-Deployment Tasks
 
 Before deploying, you must perform these tasks:
 
@@ -368,6 +371,9 @@ To deploy the monitoring components for the cluster, issue this command:
 # Deploy cluster monitoring (can be done before or after deploying Viya)
 monitoring/bin/deploy_monitoring_cluster.sh
 ```
+
+**Note:** Do not use this script if you are deploying SAS Viya Monitoring on 
+OpenShift. Use the deployment script in [SAS Viya Monitoring on OpenShift](OpenShift.md).
 
 ## Deploy SAS Viya Monitoring Components
 
