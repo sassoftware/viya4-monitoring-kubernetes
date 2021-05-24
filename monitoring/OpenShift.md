@@ -2,9 +2,9 @@
 
 ## Overview
 
-The deployment process for [Red Hat OpenShift](https://www.openshift.com/) is
-handled differently than on vanilla Kubernetes. OpenShift includes nearly the
-same stack of monitoring components out of the box as this project:
+Deploying the monitoring components on [Red Hat OpenShift](https://www.openshift.com/) uses 
+a different process than deploying on generic Kubernetes. OpenShift already includes 
+these monitoring components that are used by SAS Viya Monitoring:
 
 * Prometheus Operator
 * Prometheus
@@ -15,65 +15,76 @@ same stack of monitoring components out of the box as this project:
 * ServiceMontitors for Kuberenetes components
 * Grafana dashboards for cluster monitoring
 
-There are some differences, however:
+These are the differences between the default OpenShift monitoring environment and 
+the SAS Viya Monitoring environment
 
-* Separate Prometheus instances are set up to monitor core
-Kuberenetes/OpenShift components and user workloads
-* [Thanos] is included to provide a single query interface for
+* OpenShift uses separate Prometheus instances to monitor core
+Kuberenetes and OpenShift components and to monitor user workloads
+* OpenShift includes [Thanos] to provide a single query interface for
 the multiple Prometheus instances used by OpenShift
-* The Grafana instance is read-only
-* There are fewer Prometheus recording rules defining custom
-convenience meterics
-* API access to the Prometheus instances are authenticated, requiring
-a service account and an access token for the new Grafana instance
+* The Grafana instance in OpenShift is read-only
+* SAS Viya Monitoring provides more Prometheus recording rules to define custom
+convenience metrics than are provided by OpenShift
+* In OpenShift, API access to the Prometheus instances is authenticated, so 
+a service account and an access token is required to use Grafana
 
-On OpenShift, the deployment of SAS Viya Monitoring will integrate with the
-monitoring components used by OpenShift. Since the included Grafana
-instance is read-only, a separate Grafana instance will be deployed to provide
-access to dashboards for SAS Viya components.
+The process of deploying SAS Viya Monitoring on OpenShift integrates the SAS Viya 
+Monitoring components with those used by OpenShift. Because the instance of Grafana 
+that is provided on Openshift is read-only, SAS Viya Monitoring deploys a separate 
+instance of Grafana in order to provide access to dashboards for SAS Viya components.
 
 ## Prerequisites
 
 * [Kubernetes](https://kubernetes.io/) version 1.19+
 * [OpenShift](https://www.openshift.com/) 4.7+
 * [`kubectl`](https://kubernetes.io/docs/tasks/tools/) 1.19+
-* [`helm`](https://helm.sh/docs/intro/install/) 3.0+ (3.5+ recommended)
+* [`Helm`](https://helm.sh/docs/intro/install/) 3.0+ (3.5+ recommended)
 * OpenShift [`oc`](https://docs.openshift.com/container-platform/3.6/cli_reference/get_started_cli.html)
 command-line tool 3.0+
 
 ## Deployment
 
-The normal `monitoring/bin/deploy_monitoring_cluster.sh` script is not
-appropriate for OpenShift and will likely fail if run. Instead, a separate,
-dedicated script tailored for OpenShift is provided.
+You must use this procedure to deploy SAS Viya Monitoring on OpenShift. Do not use 
+the standard monitoring deployment script (deploy_monitoring_cluster.sh). 
 
-The first step is to log in to the cluster using:
+1. Follow the instructions in the [monitoring README](README.md#mon_pre_dep) to 
+perform the standard predeployment tasks (create a local copy of the repository and 
+customize your deployment). See [Customization](#os_mon_cust) for information about 
+customization on OpenShift.
+
+2. Use this command to log on to the cluster:
 
 ```bash
 oc login [cluster-hostname] -u [userID]
 ```
 
-To deploy SAS Viya Monitoring for OpenShift, run:
+3. Use this command to deploy SAS Viya Monitoring for OpenShift:
 
 ```bash
 monitoring/bin/deploy_monitoring_openshift.sh
 ```
-
-Next, enable monitoring of each SAS Viya deployment normally by running:
+4. Use this command to enable monitoring of each SAS Viya deploymen:
 
 ```bash
 VIYA_NS=my-viya-namespace monitoring/bin/deploy_monitoring_viya.sh
 ```
 
-## Customization
+## <a name="mon_os_cust"></a>Customization
 
-The `deploy_monitoring_openshift.sh` script supports a `USER_DIR` directory
-similar to the one used by the generic `deploy_monitoring_cluster.sh` script,
-but since only Grafana is deployed, the only supported files are
-`$USER_DIR/user.env`, `$USER_DIR/monitoring/user-values-grafana.yaml`, and
-`$USER_DIR/monitoring/user.env`.
+Customization of SAS Viya Monitoring on OpenShift deployment follows the same 
+process as in a standard monitoring deployment, which uses the `USER_DIR` 
+environment variable to specify the location of your customization files. 
+See the 
+[monitoring README](README.md#mon_custom) for information about the 
+customization process.
 
-No customization is required, even for ingress, as the
-`deploy_monitoring_openshift.sh` script will define a
+However, because SAS Viya Monitoring on OpenShift only deploys Grafana, the 
+only customization files that are supported in the `USER_DIR` location are:
+- `$USER_DIR/user.env`
+- `$USER_DIR/monitoring/user-values-grafana.yaml`
+- `$USER_DIR/monitoring/user.env`
+
+No customizations are required, even if you are using ingress, because the
+`deploy_monitoring_openshift.sh` script defines a
 [route](https://docs.openshift.com/enterprise/3.0/architecture/core_concepts/routes.html)
 for Grafana.
