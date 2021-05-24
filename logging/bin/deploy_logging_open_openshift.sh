@@ -93,9 +93,9 @@ logging/bin/deploy_kibana_content.sh
 ##################################
 log_info "STEP 4c: Display Application URLs"
 if [ "$ES_ENDPOINT_ENABLE" == "true" ];then
-   servicelist="KIBANA"
-else
    servicelist="KIBANA ELASTICSEARCH"
+else
+   servicelist="KIBANA"
 fi
 
 logging/bin/show_app_url.sh $servicelist
@@ -108,10 +108,6 @@ logging/bin/show_app_url.sh $servicelist
 log_info "STEP 5: Deploying Fluent Bit"
 logging/bin/deploy_fluentbit_open.sh
 
-# Write any "notices" to console
-echo ""
-display_notices
-
 
 ##################################
 # Service Monitors               #
@@ -120,6 +116,14 @@ display_notices
 log_info "STEP 6: Deploying Service Monitors"
 export DEPLOY_SERVICEMONITORS=${DEPLOY_SERVICEMONITORS:-true}
 logging/bin/deploy_servicemonitors_open.sh
+
+
+##################################
+# Display Notices                #
+##################################
+# Write any "notices" to console
+echo ""
+display_notices
 
 
 echo ""
