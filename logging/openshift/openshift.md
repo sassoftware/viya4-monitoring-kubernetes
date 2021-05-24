@@ -50,3 +50,4 @@ When deploying onto an OpenShift cluster, by default, ServiceMonitors are also d
 | KB_KNOWN_NODEPORT_ENABLE | Make Kibana accessible via "known" NodePort (e.g. 31033)?| false |
 | DEPLOY_SERVICEMONITORS | Deploy ServiceMonitors for logging components? | true |
 | OPENSHIFT_ARTIFACTS_REMOVE | Remove OpenShift artifacts (e.g. custom SCCs)| true |
+| INFRA_LOG_RETENTION_PERIOD | Number of Days to retain OpenShift infrastructure log messages | 1 |
