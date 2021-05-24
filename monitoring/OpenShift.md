@@ -42,7 +42,7 @@ instance of Grafana in order to provide access to dashboards for SAS Viya compon
 * OpenShift [`oc`](https://docs.openshift.com/container-platform/3.6/cli_reference/get_started_cli.html)
 command-line tool 3.0+
 
-## Deployment
+## Deploy SAS Viya Monitoring on OpenShift
 
 You must use this procedure to deploy SAS Viya Monitoring on OpenShift. Do not use 
 the standard monitoring deployment script (deploy_monitoring_cluster.sh). 
@@ -63,7 +63,7 @@ oc login [cluster-hostname] -u [userID]
 ```bash
 monitoring/bin/deploy_monitoring_openshift.sh
 ```
-4. Use this command to enable monitoring of each SAS Viya deploymen:
+4. Use this command to enable monitoring of each SAS Viya deployment:
 
 ```bash
 VIYA_NS=my-viya-namespace monitoring/bin/deploy_monitoring_viya.sh
@@ -88,3 +88,17 @@ No customizations are required, even if you are using ingress, because the
 `deploy_monitoring_openshift.sh` script defines a
 [route](https://docs.openshift.com/enterprise/3.0/architecture/core_concepts/routes.html)
 for Grafana.
+
+## Remove SAS Viya Monitoring on OpenShift
+
+To remove the monitoring components, run these commands:
+
+```bash
+# Remove cluster monitoring
+monitoring/bin/remove_monitoring_openshift.sh
+
+# Optional: Remove SAS Viya monitoring
+# Run this section once per Viya namespace
+export VIYA_NS=<your_viya_namespace>
+monitoring/bin/remove_monitoring_viya.sh
+```
