@@ -5,5 +5,6 @@
     "number_of_replicas": 1,
     "opendistro.index_state_management.policy_id": "viya_logs_idxmgmt_policy",
     "index.default_pipeline":"viyaburstns"
-  }
+  },
+  "mappings": {"numeric_detection": false}
 }

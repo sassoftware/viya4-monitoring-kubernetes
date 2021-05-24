@@ -55,11 +55,11 @@ logging/bin/deploy_elasticsearch_open.sh
 
 
 ##################################
-# Open Distro Content            #
+# ODFE Content (OpenShift)       #
 ##################################
 
 log_info "STEP 2a: Loading Content into Elasticsearch"
-logging/bin/deploy_elasticsearch_content_open.sh
+logging/bin/deploy_elasticsearch_content_open_openshift.sh
 
 
 ##################################
