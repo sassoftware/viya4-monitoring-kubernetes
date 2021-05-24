@@ -1,10 +1,10 @@
 #! /bin/bash
 
-# Copyright © 20201, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-cd "$(dirname $BASH_SOURCE)/../.."
-#source logging/bin/common.sh
+cd "$(dirname $BASH_SOURCE)/.."
+echo "$(pwd)"
 source bin/common.sh
 source bin/service-url-include.sh
 

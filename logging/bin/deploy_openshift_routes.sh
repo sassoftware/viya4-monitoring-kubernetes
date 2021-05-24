@@ -26,7 +26,7 @@ fi
 
 ES_ENDPOINT_ENABLE=${ES_ENDPOINT_ENABLE:-false}
 if [ "$ES_ENDPOINT_ENABLE" == "true" ]; then
-   oc -n $LOG_NS create route passthrough v4m-es-api --service=v4m-es-client-service --port=http
+   oc -n $LOG_NS create route passthrough v4m-es-client-service --service=v4m-es-client-service --port=http
 fi
 
 log_info "OpenShift Routes have been deployed."
