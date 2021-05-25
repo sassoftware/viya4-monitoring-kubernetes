@@ -12,6 +12,8 @@ You must have cluster-admin access to any cluster in which you deploy these
 components. You cannot deploy successfully if you have access only to a
 namespace or a subset of namespaces.
 
+**Note:** If you are deploying SAS Viya Logging on OpenShift, you must follow the deployment process documented in [SAS Viya Logging on OpenShift](/openshift/openshift.md).
+
 ### Components
 
 These components are deployed:
@@ -25,7 +27,7 @@ Provides detailed Elasticsearch performance information for Prometheus
 If you are using a cloud provider, you must use ingress, rather than
 NodePorts. Specify the information needed to use ingress during the customization process.
 
-## Perform Pre-Deployment Tasks
+## <a name="l_pre_dep"></a>Perform Pre-Deployment Tasks
 
 Before deploying, you must perform these tasks:
 
@@ -247,6 +249,8 @@ which you cloned the repository and issue this command:
 ```
 
 The script creates the namespace into which the components are deployed. By default, the components are deployed into the namespace `logging`.
+
+**Note:** If you are deploying SAS Viya Logging on OpenShift, you must follow the deployment process documented in [SAS Viya Logging on OpenShift](/openshift/openshift.md).
 
 ## Update Logging Components
 
