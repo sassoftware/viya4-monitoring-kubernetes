@@ -33,6 +33,10 @@ Monitoring components with those used by OpenShift. Because the instance of Graf
 that is provided on Openshift is read-only, SAS Viya Monitoring deploys a separate 
 instance of Grafana in order to provide access to dashboards for SAS Viya components.
 
+**Note:** When deploying on other cloud providers, the ServiceMonitors for SAS Viya Logging 
+are deployed as part of SAS Viya Monitoring. On OpenShift, these ServiceMonitors 
+are deployed as part of SAS Viya Logging. 
+
 ## Prerequisites
 
 * [Kubernetes](https://kubernetes.io/) version 1.19+
