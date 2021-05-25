@@ -115,7 +115,7 @@ logging/bin/deploy_fluentbit_open.sh
 
 log_info "STEP 6: Deploying Service Monitors"
 export DEPLOY_SERVICEMONITORS=${DEPLOY_SERVICEMONITORS:-true}
-logging/bin/deploy_servicemonitors_open.sh
+logging/bin/deploy_servicemonitors_open_openshift.sh
 
 
 ##################################
