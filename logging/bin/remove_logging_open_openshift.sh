@@ -15,7 +15,7 @@ logging/bin/remove_openshift_artifacts.sh
 
 # remove ServiceMonitors
 export DEPLOY_SERVICEMONITORS=${DEPLOY_SERVICEMONITORS:-true}
-logging/bin/remove_servicemonitors_open.sh
+logging/bin/remove_servicemonitors_open_openshift.sh
 
 # remove logging components
 logging/bin/remove_logging_open.sh
