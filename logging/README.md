@@ -2,7 +2,8 @@
 
 ## Introduction
 
-This document outlines the steps needed to deploy a set of log collection and
+This document outlines the steps needed to deploy SAS Viya Logging, which is 
+a set of log collection and
 monitoring components for SAS Viya. These components provide a
 comprehensive solution for collecting, transforming and surfacing all of the
 log messages generated throughout SAS Viya. These components collect logs
@@ -250,7 +251,7 @@ which you cloned the repository and issue this command:
 
 The script creates the namespace into which the components are deployed. By default, the components are deployed into the namespace `logging`.
 
-**Note:** If you are deploying SAS Viya Logging on OpenShift, you must follow the deployment process documented in [SAS Viya Logging on OpenShift](/openshift/openshift.md).
+**Note:* If you are deploying SAS Viya Logging on OpenShift, you must follow the deployment process documented in [SAS Viya Logging on OpenShift](/openshift/openshift.md).**
 
 ## Update Logging Components
 
@@ -268,6 +269,13 @@ logging/bin/remove_logging_open.sh
 ```
 
 The script removes configmaps and secrets that were created by the deployment script. PersistentVolumeClaims and Kubernetes secrets that were created manually are not removed.  
+
+**Note: If you deployed SAS Viya Logging on OpenShift, you must use this script to remove the logging components:**
+```bash
+cd <viya4-monitoring-kubernetes repo directory>
+
+logging/bin/remove_logging_open_openshift.sh
+```
 
 ## Validate Your Deployment
 

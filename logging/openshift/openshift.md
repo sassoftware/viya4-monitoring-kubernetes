@@ -2,24 +2,25 @@
 
 ## Overview
 
-If you deploy SAS Viya on Red Hat OpenShift, you can use either the OpenShift logging components 
-or the SAS Viya logging components to view SAS Viya log messages. 
+If you deploy SAS Viya on Red Hat OpenShift, you can use either OpenShift 
+cluster logging or SAS Viya Logging (the components contained in this 
+repository) to view SAS Viya log messages. 
 
-If the optional OpenShift logging components have already been deployed, you can use 
+If the optional OpenShift cluster logging has already been deployed, you can use 
 them to view SAS Viya log messages. However, the messages from third-party components 
 of SAS Viya will be displayed differently than the messages from the SAS Viya components, 
 which might make message parsing and interpretation more difficult.
 
-If the Openshift logging components have not been installed, you can choose to deploy 
-the SAS Viya logging components. Deploying the SAS Viya logging components on 
+If Openshift cluster logging has not been installed, you can choose to deploy 
+SAS Viya Logging. Deploying SAS Viya Logging on 
 OpenShift uses a different process than deploying on generic Kubernetes, so you 
 must follow the procedure in this document. 
 
-Although you can deploy the SAS Viya logging components even if the the OpenShift 
-logging components are also deployed, this configuration is inefficient and 
-therefore not recommended. Using both sets of components results in two daemonsets   
+Although you can deploy SAS Viya Logging even if the OpenShift 
+cluster logging is also deployed, this configuration is inefficient and 
+therefore not recommended. Using both logging solutions results in two daemonsets   
 being used, each of which deploys separate log collection pods (Fluent Bit for 
-SAS Viya logging and Fluentd for Openshift logging) on every node in the cluster. 
+SAS Viya Logging and Fluentd for Openshift cluster logging) on every node in the cluster. 
 Every log message would also have to be stored in two separate storage systems.  
 
 ## Deploy SAS Viya Logging on OpenShift
@@ -48,6 +49,8 @@ are retained, modify the `INFRA_LOG_RETENTION_PERIOD` environment variable. The 
 value is `1` (1 day).
 
 No customizations are required, even if you are using ingress, because the `deploy_logging_openshift.sh` script defines a route for Kibana.
+
+OpenShift uses route objects, a feature unique to OpenShift, to access Kibana and (optionally) the Elasticsearch API endpoint. This makes it unnecessary to configure ingress objects or surface nodePorts.
 
 ## Remove SAS Viya Logging on OpenShift
 
