@@ -1,5 +1,7 @@
 image:
   tag: "7.5.4"
+readinessProbe: null
+livenessProbe: null
 sidecar:
   dashboards:
     enabled: true
@@ -34,7 +36,7 @@ datasources:
         tlsSkipVerify: true
       name: Prometheus
       secureJsonData:
-        # Replace BEARER_TOKEN below with a token for grafana-serviceaccount
+        # This BEARER_TOKEN will be replaced with a token for grafana-serviceaccount
         httpHeaderValue1: 'Bearer __BEARER_TOKEN__'
       type: prometheus
       url: 'https://thanos-querier.openshift-monitoring.svc.cluster.local:9091'
@@ -50,6 +52,9 @@ serviceAccount:
 testFramework:
   enabled: false
 "grafana.ini":
+  server:
+    http_addr: 0.0.0.0
+    http_port: 3000
   analytics:
     check_for_updates: false
   log:

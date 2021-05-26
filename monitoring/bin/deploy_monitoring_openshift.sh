@@ -84,31 +84,77 @@ else
   sed -i "s/__BEARER_TOKEN__/$grafanaToken/g" $grafanaYAML
 fi
 
+GRAFANA_PROXY_ENABLE=${GRAFANA_PROXY_ENABLE:-true}
+grafanaProxyYAML=$TMP_DIR/empty.yaml
+if [ "$GRAFANA_PROXY_ENABLE" == "true" ]; then
+  extraArgs="--set service.targetPort=3001"
+  grafanaProxyYAML="monitoring/openshift/grafana-proxy-values.yaml"
+fi
+
 if ! helm3ReleaseExists v4m-grafana $MON_NS; then
   firstTimeGrafana=true
 fi
 helm upgrade --install --namespace $helmDebug $MON_NS v4m-grafana \
+  $extraArgs \
   -f "$grafanaYAML" \
-  -f "$userGrafanaYAML" grafana/grafana
+  -f "$grafanaProxyYAML" \
+  -f "$userGrafanaYAML" \
+  grafana/grafana
+
+if [ "$GRAFANA_PROXY_ENABLE" == "true" ]; then
+  log_info "Enabling Grafana OpenShift proxy..."
+  log_debug "Creating grafana-proxy serviceaccount..."
+  kubectl annotate serviceaccount -n $MON_NS grafana-serviceaccount 'serviceaccounts.openshift.io/oauth-redirectreference.primary={"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"v4m-grafana"}}'
+  log_debug "Adding ClusterRoleBinding for grafana-serviceaccount..."
+  kubectl apply -f monitoring/openshift/grafana-serviceaccount-binding.yaml
+
+  kubectl apply -n $MON_NS -f monitoring/openshift/grafana-proxy-secret.yaml
+  
+  grafanaProxyPatchYAML=$TMP_DIR/grafana-proxy-patch.yaml
+  cp monitoring/openshift/grafana-proxy-patch.yaml $grafanaProxyPatchYAML
+  
+  log_debug "Deploying cert-manager issuers and certificates..."
+  deploy_issuers $MON_NS monitoring
+  kubectl apply -n $MON_NS -f monitoring/openshift/grafana-trusted-ca-bundle.yaml
+  
+  log_info "Patching Grafana service for auto-generated TLS certs"
+  # kubectl patch service -n $MON_NS v4m-grafana --patch "$(cat monitoring/openshift/grafana-service-patch.yaml)"
+  kubectl annotate service -n $MON_NS v4m-grafana 'service.beta.openshift.io/serving-cert-secret-name=grafana-tls'
+
+  log_info "Patching Grafana pod with authenticating TLS proxy..."
+  kubectl patch deployment -n $MON_NS v4m-grafana --patch "$(cat $grafanaProxyPatchYAML)"
+else
+  log_debug "Grafana proxy container disabled"
+fi
 
 log_info "Deploying SAS Viya Grafana dashboards..."
 DASH_NS=$MON_NS LOGGING_DASH=${LOGGING_DASH:-false} KUBE_DASH=${KUBE_DASH:-false} NGINX_DASH=${NGINX_DASH:-false} \
   monitoring/bin/deploy_dashboards.sh
 
-# Rules for SAS Jobs dashboards
+log_info "Adding SAS Viya recording rules..."
 for f in monitoring/rules/viya/rules-*.yaml; do
   kubectl apply -n $MON_NS -f $f
 done
 
 if ! kubectl get route -n $MON_NS v4m-grafana 1>/dev/null 2>&1; then
-  oc expose service -n $MON_NS v4m-grafana
+  log_info "Exposing Grafana service as a route..."
+  if [ "$GRAFANA_PROXY_ENABLE" == "true" ]; then  
+    oc create route reencrypt --service=v4m-grafana
+  else
+    oc create route edge --service=v4m-grafana
+  fi
 fi
-log_notice "Grafana URL: http://$(kubectl get route -n $MON_NS | grep v4m-grafana | awk '{printf $2}')"
 
-if [ "$firstTimeGrafana" == "true" ]; then
-  log_notice "Obtain the inital Grafana password by running:"
-  log_notice "kubectl get secret --namespace monitoring v4m-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo"
+scheme="http"
+if [ "$GRAFANA_PROXY_ENABLE" == "true" ]; then
+  scheme="https"
+else
+  if [ "$firstTimeGrafana" == "true" ]; then
+    log_notice "Obtain the inital Grafana password by running:"
+    log_notice "kubectl get secret --namespace monitoring v4m-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo"
+  fi
 fi
+log_notice "Grafana URL: $scheme://$(kubectl get route -n $MON_NS | grep v4m-grafana | awk '{printf $2}')"
 
 log_message ""
 log_notice "Successfully deployed SAS Viya monitoring for OpenShift"

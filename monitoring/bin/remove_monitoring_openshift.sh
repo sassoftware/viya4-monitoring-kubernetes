@@ -13,13 +13,19 @@ MON_DELETE_NAMESPACE_ON_REMOVE=${MON_DELETE_NAMESPACE_ON_REMOVE:-false}
 log_info "Removing the Grafana route..."
 kubectl delete route --ignore-not-found -n $MON_NS v4m-grafana
 
-log_info "Removing Grafana..."
 if helm3ReleaseExists v4m-grafana $MON_NS; then
+  log_info "Removing Grafana..."
   helm uninstall --namespace $MON_NS v4m-grafana
+  if [ $? != 0 ]; then
+    log_warn "Uninstall of [v4m-grafana] was not successful. Check output above for details."
+  fi
+else
+  log_debug "Helm release of [v4m-grafana] not found"
 fi
-if [ $? != 0 ]; then
-  log_warn "Uninstall of [v4m-grafana] was not successful. Check output above for details."
-fi
+
+log_info "Removing clusterrole and clusterrolebinding..."
+kubectl delete --ignore-not-found clusterrole v4m-grafana-clusterrole
+kubectl delete --ignore-not-found clusterrolebinding v4m-grafana-clusterrolebinding
 
 if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
   log_info "Deleting the [$MON_NS] namespace..."
@@ -33,6 +39,9 @@ if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
 fi
 
 log_info "Removing components from the [$MON_NS] namespace..."
+
+log_info "Removing CA bundle..."
+kubectl delete --ignore-not-found cm grafana-trusted-ca-bundle
 
 log_info "Removing dashboards..."
 monitoring/bin/remove_dashboards.sh
@@ -59,8 +68,8 @@ if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
 fi
 
 # Wait for resources to terminate
-log_info "Waiting 60 sec for resources to terminate..."
-sleep 60
+log_info "Waiting 10 sec for resources to terminate..."
+sleep 10
 
 log_info "Checking contents of the [$MON_NS] namespace:"
 crds=( all pvc cm servicemonitor podmonitor prometheus alertmanager prometheusrule thanosrulers )

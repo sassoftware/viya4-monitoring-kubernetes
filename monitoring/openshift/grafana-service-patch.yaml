@@ -1,0 +1,3 @@
+metadata:
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: grafana-tls

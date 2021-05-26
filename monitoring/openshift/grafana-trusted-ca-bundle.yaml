@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2021-05-08T01:44:45Z"
+  labels:
+    config.openshift.io/inject-trusted-cabundle: "true"
+  name: grafana-trusted-ca-bundle

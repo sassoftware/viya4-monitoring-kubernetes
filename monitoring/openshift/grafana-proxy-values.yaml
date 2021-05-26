@@ -1,0 +1,14 @@
+# Nothing yet
+"grafana.ini":
+  auth:
+    disable_login_form: true
+    disable_signout_menu: true
+  "auth.basic":
+    enabled: false
+  "auth.proxy":
+    auto_sign_up: true
+    enabled: true
+    header_name: X-Forwarded-User
+  security:
+    admin_user: WHAT_YOU_ARE_DOING_IS_VOIDING_SUPPORT_0000000000000000000000000000000000000000000000000000000000000000
+    cookie_secure: true
