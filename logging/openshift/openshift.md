@@ -7,7 +7,7 @@ cluster logging or SAS Viya Logging (the components contained in this
 repository) to view SAS Viya log messages. 
 
 If the optional OpenShift cluster logging has already been deployed, you can use 
-them to view SAS Viya log messages. However, the messages from third-party components 
+it to view SAS Viya log messages. However, the messages from third-party components 
 of SAS Viya will be displayed differently than the messages from the SAS Viya components, 
 which might make message parsing and interpretation more difficult.
 
@@ -50,7 +50,7 @@ value is `1` (1 day).
 
 No customizations are required, even if you are using ingress, because the `deploy_logging_openshift.sh` script defines a route for Kibana.
 
-OpenShift uses route objects, a feature unique to OpenShift, to access Kibana and (optionally) the Elasticsearch API endpoint. This makes it unnecessary to configure ingress objects or surface nodePorts.
+OpenShift uses [route](https://docs.openshift.com/enterprise/3.0/architecture/core_concepts/routes.html) objects, a feature unique to OpenShift, to access Kibana and (optionally) the Elasticsearch API endpoint. This makes it unnecessary to configure ingress objects or surface nodePorts.
 
 ## Remove SAS Viya Logging on OpenShift
 
