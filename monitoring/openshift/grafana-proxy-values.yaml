@@ -1,4 +1,5 @@
-# Nothing yet
+# Helm chart values for using the OpenShift authenticating TLS proxy
+
 "grafana.ini":
   auth:
     disable_login_form: true
@@ -12,3 +13,6 @@
   security:
     admin_user: WHAT_YOU_ARE_DOING_IS_VOIDING_SUPPORT_0000000000000000000000000000000000000000000000000000000000000000
     cookie_secure: true
+  users:
+    # auto_assign_org_role: Editor
+    auto_assign_org_role: Viewer

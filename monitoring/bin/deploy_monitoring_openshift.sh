@@ -76,6 +76,7 @@ if [ -f "$USER_DIR/monitoring/user-values-grafana.yaml" ]; then
   log_debug "User response file for Grafana found at [$userGrafanaYAML]"
 fi
 
+# Access token to OpenShift Prometheus instances
 grafanaYAML=$TMP_DIR/grafana-values.yaml
 cp monitoring/openshift/grafana-values.yaml $grafanaYAML
 if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
@@ -84,9 +85,9 @@ else
   sed -i "s/__BEARER_TOKEN__/$grafanaToken/g" $grafanaYAML
 fi
 
-GRAFANA_PROXY_ENABLE=${GRAFANA_PROXY_ENABLE:-true}
+OPENSHIFT_TLS_PROXY_ENABLE=${OPENSHIFT_TLS_PROXY_ENABLE:-true}
 grafanaProxyYAML=$TMP_DIR/empty.yaml
-if [ "$GRAFANA_PROXY_ENABLE" == "true" ]; then
+if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then
   extraArgs="--set service.targetPort=3001"
   grafanaProxyYAML="monitoring/openshift/grafana-proxy-values.yaml"
 fi
@@ -94,14 +95,17 @@ fi
 if ! helm3ReleaseExists v4m-grafana $MON_NS; then
   firstTimeGrafana=true
 fi
-helm upgrade --install --namespace $helmDebug $MON_NS v4m-grafana \
-  $extraArgs \
+
+helm upgrade --install $helmDebug \
+  -n "$MON_NS" \
   -f "$grafanaYAML" \
   -f "$grafanaProxyYAML" \
   -f "$userGrafanaYAML" \
+  $extraArgs \
+  v4m-grafana \
   grafana/grafana
 
-if [ "$GRAFANA_PROXY_ENABLE" == "true" ]; then
+if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then
   log_info "Enabling Grafana OpenShift proxy..."
   log_debug "Creating grafana-proxy serviceaccount..."
   kubectl annotate serviceaccount -n $MON_NS grafana-serviceaccount 'serviceaccounts.openshift.io/oauth-redirectreference.primary={"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"v4m-grafana"}}'
@@ -118,7 +122,6 @@ if [ "$GRAFANA_PROXY_ENABLE" == "true" ]; then
   kubectl apply -n $MON_NS -f monitoring/openshift/grafana-trusted-ca-bundle.yaml
   
   log_info "Patching Grafana service for auto-generated TLS certs"
-  # kubectl patch service -n $MON_NS v4m-grafana --patch "$(cat monitoring/openshift/grafana-service-patch.yaml)"
   kubectl annotate service -n $MON_NS v4m-grafana 'service.beta.openshift.io/serving-cert-secret-name=grafana-tls'
 
   log_info "Patching Grafana pod with authenticating TLS proxy..."
@@ -138,17 +141,15 @@ done
 
 if ! kubectl get route -n $MON_NS v4m-grafana 1>/dev/null 2>&1; then
   log_info "Exposing Grafana service as a route..."
-  if [ "$GRAFANA_PROXY_ENABLE" == "true" ]; then  
+  if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then  
     oc create route reencrypt --service=v4m-grafana
   else
     oc create route edge --service=v4m-grafana
   fi
 fi
 
-scheme="http"
-if [ "$GRAFANA_PROXY_ENABLE" == "true" ]; then
-  scheme="https"
-else
+scheme="https"
+if [ ! "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then
   if [ "$firstTimeGrafana" == "true" ]; then
     log_notice "Obtain the inital Grafana password by running:"
     log_notice "kubectl get secret --namespace monitoring v4m-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo"

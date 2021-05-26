@@ -19,8 +19,6 @@ persistence:
   accessModes:
     - ReadWriteOnce
   size: 5Gi
-# dashboards:
-#   default_home_dashboard_path: /tmp/dashboards/viya-welcome-dashboard.json
 datasources:
   datasources.yaml:
     apiVersion: 1
@@ -55,6 +53,8 @@ testFramework:
   server:
     http_addr: 0.0.0.0
     http_port: 3000
+  dashboards:
+    default_home_dashboard_path: /tmp/dashboards/viya-welcome-dashboard.json
   analytics:
     check_for_updates: false
   log:
