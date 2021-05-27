@@ -109,7 +109,16 @@ if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then
   log_info "Enabling Grafana OpenShift proxy..."
   log_debug "Creating grafana-proxy serviceaccount..."
   kubectl annotate serviceaccount -n $MON_NS grafana-serviceaccount 'serviceaccounts.openshift.io/oauth-redirectreference.primary={"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"v4m-grafana"}}'
+
   log_debug "Adding ClusterRoleBinding for grafana-serviceaccount..."
+  crbYAML=$TMP_DIR/grafana-serviceaccount-binding.yaml
+  cp monitoring/openshift/grafana-serviceaccount-binding.yaml $crbYAML
+  if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
+    sed -i '' "s/__MON_NS__/$MON_NS/g" $crbYAML
+  else
+    sed -i "s/__MON_NS__/$MON_NS/g" $crbYAML
+  fi
+
   kubectl apply -f monitoring/openshift/grafana-serviceaccount-binding.yaml
 
   kubectl apply -n $MON_NS -f monitoring/openshift/grafana-proxy-secret.yaml
