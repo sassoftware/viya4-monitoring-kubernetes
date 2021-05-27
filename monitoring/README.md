@@ -12,8 +12,7 @@ You must have cluster-admin access to any cluster in which you deploy these
 components. You cannot deploy successfully if you have access only to a
 namespace or a subset of namespaces.
 
-**Note:** If you are deploying SAS Viya Monitoring on OpenShift, you must follow the 
-deployment process documented in [SAS Viya Monitoring on OpenShift](OpenShift.md).
+**Note: If you are deploying SAS Viya Monitoring on OpenShift, you must follow the deployment process documented in [SAS Viya Monitoring on OpenShift](OpenShift.md).**
 
 ### Components
 
@@ -372,8 +371,7 @@ To deploy the monitoring components for the cluster, issue this command:
 monitoring/bin/deploy_monitoring_cluster.sh
 ```
 
-**Note:** Do not use this script if you are deploying SAS Viya Monitoring on 
-OpenShift. Use the deployment script in [SAS Viya Monitoring on OpenShift](OpenShift.md).
+**Note: Do not use this script if you are deploying SAS Viya Monitoring on OpenShift. Use the deployment script in [SAS Viya Monitoring on OpenShift](OpenShift.md) instead.**
 
 ## Deploy SAS Viya Monitoring Components
 
@@ -449,6 +447,18 @@ collected monitoring data.
 namespace into which the components were deployed instead or running the
 removal scripts, redeployment of monitoring fails. See
 [Troubleshooting](Troubleshooting.md) for instructions to correct this issue.
+
+**Note: If you deployed SAS Viya Monitoring on OpenShift, you must use these commands to remove the monitoring components:**
+
+```bash
+# Remove Openshift cluster monitoring
+monitoring/bin/remove_monitoring_openshift.sh
+
+# Optional: Remove SAS Viya monitoring
+# Run this section once per Viya namespace
+export VIYA_NS=<your_viya_namespace>
+monitoring/bin/remove_monitoring_viya.sh
+```
 
 ## Miscellaneous Notes and Troubleshooting
 
