@@ -71,8 +71,8 @@ fi
 
 log_info "Deploying Grafana..."
 userGrafanaYAML=$TMP_DIR/empty.yaml
-if [ -f "$USER_DIR/monitoring/user-values-grafana.yaml" ]; then
-  userGrafanaYAML="$USER_DIR/monitoring/user-values-grafana.yaml"
+if [ -f "$USER_DIR/monitoring/user-values-openshift-grafana.yaml" ]; then
+  userGrafanaYAML="$USER_DIR/monitoring/user-values-openshift-grafana.yaml"
   log_debug "User response file for Grafana found at [$userGrafanaYAML]"
 fi
 
