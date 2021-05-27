@@ -69,7 +69,7 @@ logging/bin/deploy_kibana_content.sh
 # Display Kibana URL             #
 ##################################
 log_info "STEP 4a: Display Application URLs"
-logging/bin/show_app_url.sh KIBANA ELASTICSEARCH
+bin/show_app_url.sh KIBANA ELASTICSEARCH
 
 
 ##################################
