@@ -173,7 +173,7 @@ INFRA_LOG_RETENTION_PERIOD="${INFRA_LOG_RETENTION_PERIOD:-1}"
 set_retention_period viya_infra_idxmgmt_policy INFRA_LOG_RETENTION_PERIOD
 
 # Link index management policy Index Template
-response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-infra-template "    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_infra.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-infra-template "    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_infra_openshift.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 # request returns: {"acknowledged":true}
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading infrastructure index template settings into Elasticsearch [$response]"
