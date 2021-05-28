@@ -7,8 +7,16 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 source bin/openshift-include.sh
 source bin/service-url-include.sh
-
 source bin/tls-include.sh
+
+if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
+  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+    log_error "This script should only be run on OpenShift clusters"
+    log_error "Run monitoring/bin/deploy_monitoring_cluster.sh instead"
+    exit 1
+  fi
+fi
+
 if verify_cert_manager $MON_NS prometheus alertmanager grafana; then
   log_debug "cert-manager check OK"
 else
@@ -96,11 +104,13 @@ if ! helm3ReleaseExists v4m-grafana $MON_NS; then
   firstTimeGrafana=true
 fi
 
+GRAFANA_CHART_VERSION=${GRAFANA_CHART_VERSION:-6.9.1}
 helm upgrade --install $helmDebug \
   -n "$MON_NS" \
   -f "$grafanaYAML" \
   -f "$grafanaProxyYAML" \
   -f "$userGrafanaYAML" \
+  --version "$GRAFANA_CHART_VERSION"
   $extraArgs \
   v4m-grafana \
   grafana/grafana

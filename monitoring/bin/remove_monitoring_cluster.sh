@@ -6,6 +6,14 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then  
+  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+    log_error "This script should not be run on OpenShift clusters"
+    log_error "Run monitoring/bin/remove_monitoring_openshift.sh instead"
+    exit 1
+  fi
+fi
+
 MON_DELETE_PVCS_ON_REMOVE=${MON_DELETE_PVCS_ON_REMOVE:-false}
 MON_DELETE_NAMESPACE_ON_REMOVE=${MON_DELETE_NAMESPACE_ON_REMOVE:-false}
 
