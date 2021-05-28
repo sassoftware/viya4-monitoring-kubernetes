@@ -6,8 +6,6 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 source bin/openshift-include.sh
-source bin/service-url-include.sh
-source bin/tls-include.sh
 
 if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
@@ -15,13 +13,6 @@ if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
     log_error "Run monitoring/bin/deploy_monitoring_cluster.sh instead"
     exit 1
   fi
-fi
-
-if verify_cert_manager $MON_NS prometheus alertmanager grafana; then
-  log_debug "cert-manager check OK"
-else
-  log_error "cert-manager is required but is not available"
-  exit 1
 fi
 
 checkDefaultStorageClass
@@ -110,7 +101,7 @@ helm upgrade --install $helmDebug \
   -f "$grafanaYAML" \
   -f "$grafanaProxyYAML" \
   -f "$userGrafanaYAML" \
-  --version "$GRAFANA_CHART_VERSION"
+  --version "$GRAFANA_CHART_VERSION" \
   $extraArgs \
   v4m-grafana \
   grafana/grafana
@@ -129,7 +120,7 @@ if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then
     sed -i "s/__MON_NS__/$MON_NS/g" $crbYAML
   fi
 
-  kubectl apply -f monitoring/openshift/grafana-serviceaccount-binding.yaml
+  kubectl apply -f $crbYAML
 
   kubectl apply -n $MON_NS -f monitoring/openshift/grafana-proxy-secret.yaml
   
@@ -137,7 +128,6 @@ if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then
   cp monitoring/openshift/grafana-proxy-patch.yaml $grafanaProxyPatchYAML
   
   log_debug "Deploying cert-manager issuers and certificates..."
-  deploy_issuers $MON_NS monitoring
   kubectl apply -n $MON_NS -f monitoring/openshift/grafana-trusted-ca-bundle.yaml
   
   log_info "Patching Grafana service for auto-generated TLS certs"

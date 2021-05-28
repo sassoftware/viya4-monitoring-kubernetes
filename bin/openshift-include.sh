@@ -7,14 +7,18 @@
 # Detect if it is an OpenShift cluster
 OPENSHIFT_CLUSTER=${OPENSHIFT_CLUSTER:-false}
 if kubectl get ns openshift 2>/dev/null 1>&2; then
+  log_debug "OpenShift detected"
   OPENSHIFT_CLUSTER=true 
+else
+  log_debug "OpenShift not detected. Skipping 'oc' checks."
 fi
 
-if [ "OPENSHIFT_CLUSTER" == "true" ]; then
-  log_debug "OpenShift detected"
-  if [ ! $(which oc) ]; then
-    echo "OpenShift 'oc' not found on the current PATH"
-    exit 1
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then  
+  if [ "${OPENSHIFT_OC_CHECK:-true}" == "true" ]; then
+    if [ ! $(which oc) ]; then
+      echo "OpenShift 'oc' not found on the current PATH"
+      exit 1
+    fi
   fi
 
   ocver=$(oc version --client 2>/dev/null)
@@ -27,6 +31,4 @@ if [ "OPENSHIFT_CLUSTER" == "true" ]; then
   fi
 
   export OPENSHIFT_CLUSTER OC_FULL_VERSION OC_MAJOR_VERSION OC_MINOR_VERSION OC_PATCH_VERSION
-else
-  log_debug "OpenShift not detected. Skipping 'oc' checks."
 fi

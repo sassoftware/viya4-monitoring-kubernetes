@@ -70,8 +70,10 @@ spec:
       - configMap:
           defaultMode: 420
           items:
-          - key: ca.crt
+          # - key: ca.crt
+          - key: ca-bundle.crt
             path: tls-ca-bundle.pem
-          name: kube-root-ca.crt
+          # name: kube-root-ca.crt
+          name: grafana-trusted-ca-bundle
           optional: true
         name: grafana-trusted-ca-bundle
