@@ -51,14 +51,6 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
        fi
     fi
 
-    # Detect if it is an OpenShift cluster
-    if kubectl get ns openshift 2>/dev/null 1>&2; then
-      log_debug "OpenShift detected"
-      export OPENSHIFT_CLUSTER=true
-    else
-      log_debug "OpenShift not detected"
-    fi
-
     export TMP_DIR=$(mktemp -d -t sas.mon.XXXXXXXX)
     if [ ! -d "$TMP_DIR" ]; then
       log_error "Could not create temporary directory [$TMP_DIR]"
