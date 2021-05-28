@@ -6,6 +6,18 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
+##################################
+# Confirm on OpenShift           #
+##################################
+
+if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
+  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+    log_error "This script should only be run on OpenShift clusters"
+    log_error "Run logging/bin/deploy_logging_open.sh instead"
+    exit 1
+  fi
+fi
+
 # set flag indicating wrapper/driver script being run
 export LOGGING_DRIVER=true
 
@@ -23,9 +35,6 @@ fi
 set -e
 
 log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
-
-# Set flag for OpenShift cluster
-export OPENSHIFT_ENABLE=true
 
 
 ##################################

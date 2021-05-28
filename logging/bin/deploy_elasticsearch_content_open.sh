@@ -11,12 +11,20 @@ this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
-
 ES_CONTENT_DEPLOY=${ES_CONTENT_DEPLOY:-${ELASTICSEARCH_ENABLE:-true}}
 
 if [ "$ES_CONTENT_DEPLOY" != "true" ]; then
   log_info "Environment variable [ES_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into Open Distro for Elasticsearch"
   exit 0
+fi
+
+# Confirm NOT on OpenShift
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+    log_error "This script should NOT be run on OpenShift clusters"
+    log_error "Run logging/bin/deploy_elasticsearch_content_open_openshift.sh instead"
+    exit 1
+  fi
 fi
 
 

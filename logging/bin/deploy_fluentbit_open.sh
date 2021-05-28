@@ -75,10 +75,10 @@ if [ ! -f "$FB_OPEN_USER_YAML" ]; then
 fi
 
 # Deploying on OpenShift?
-OPENSHIFT_ENABLE=${OPENSHIFT_ENABLE:-false}
+OPENSHIFT_CLUSTER=${OPENSHIFT_CLUSTER:-false}
 
 # Point to OpenShift response file or dummy as appropriate
-if [ "$OPENSHIFT_ENABLE" == "true" ]; then
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
   log_info "Deploying Fluent Bit on OpenShift cluster"
   openshiftValuesFile="logging/openshift/values-fluent-bit.yaml"
 else

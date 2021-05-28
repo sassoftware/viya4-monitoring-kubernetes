@@ -11,7 +11,6 @@ this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
-
 ES_CONTENT_DEPLOY=${ES_CONTENT_DEPLOY:-${ELASTICSEARCH_ENABLE:-true}}
 
 if [ "$ES_CONTENT_DEPLOY" != "true" ]; then
@@ -19,6 +18,14 @@ if [ "$ES_CONTENT_DEPLOY" != "true" ]; then
   exit 0
 fi
 
+# Confirm on OpenShift
+if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
+  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+    log_error "This script should only be run on OpenShift clusters"
+    log_error "Run logging/bin/deploy_elasticsearch_content_open.sh instead"
+    exit 1
+  fi
+fi
 
 # temp file used to capture command output
 tmpfile=$TMP_DIR/output.txt
