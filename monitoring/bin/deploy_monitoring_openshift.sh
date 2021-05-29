@@ -29,9 +29,8 @@ fi
 set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
 
-# The stable repo is used indirectly by prometheus-community/kube-prometheus-stack
+# Add the grafana helm chart repo
 helmRepoAdd grafana https://grafana.github.io/helm-charts
-
 log_info "Updating helm repositories..."
 helm repo update
 
