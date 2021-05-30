@@ -107,8 +107,8 @@ helm upgrade --install $helmDebug \
 
 if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then
   log_info "Enabling Grafana OpenShift proxy..."
-  log_debug "Creating grafana-proxy serviceaccount..."
-  kubectl annotate serviceaccount -n $MON_NS grafana-serviceaccount 'serviceaccounts.openshift.io/oauth-redirectreference.primary={"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"v4m-grafana"}}'
+  log_debug "Annotating grafana-serviceaccount to auto-generate TLS certs..."
+  kubectl annotate serviceaccount -n $MON_NS --overwrite grafana-serviceaccount 'serviceaccounts.openshift.io/oauth-redirectreference.primary={"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"v4m-grafana"}}'
 
   log_debug "Adding ClusterRoleBinding for grafana-serviceaccount..."
   crbYAML=$TMP_DIR/grafana-serviceaccount-binding.yaml
@@ -130,7 +130,7 @@ if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then
   kubectl apply -n $MON_NS -f monitoring/openshift/grafana-trusted-ca-bundle.yaml
   
   log_info "Patching Grafana service for auto-generated TLS certs"
-  kubectl annotate service -n $MON_NS v4m-grafana 'service.beta.openshift.io/serving-cert-secret-name=grafana-tls'
+  kubectl annotate service -n $MON_NS --overwrite v4m-grafana 'service.beta.openshift.io/serving-cert-secret-name=grafana-tls'
 
   log_info "Patching Grafana pod with authenticating TLS proxy..."
   kubectl patch deployment -n $MON_NS v4m-grafana --patch "$(cat $grafanaProxyPatchYAML)"
