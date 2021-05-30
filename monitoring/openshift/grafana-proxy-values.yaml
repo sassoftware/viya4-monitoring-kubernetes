@@ -13,6 +13,9 @@
   security:
     admin_user: WHAT_YOU_ARE_DOING_IS_VOIDING_SUPPORT_0000000000000000000000000000000000000000000000000000000000000000
     cookie_secure: true
+  server:
+    http_addr: 127.0.0.1
   users:
-    # auto_assign_org_role: Editor
-    auto_assign_org_role: Viewer
+    # auto_assign_org_role: one of Viewer/Editor/Admin
+    auto_assign_org_role: Editor
+    editors_can_admin: true

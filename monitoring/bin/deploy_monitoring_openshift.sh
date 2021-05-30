@@ -94,13 +94,13 @@ if ! helm3ReleaseExists v4m-grafana $MON_NS; then
   firstTimeGrafana=true
 fi
 
-GRAFANA_CHART_VERSION=${GRAFANA_CHART_VERSION:-6.9.1}
+OPENSHIFT_GRAFANA_CHART_VERSION=${OPENSHIFT_GRAFANA_CHART_VERSION:-6.9.1}
 helm upgrade --install $helmDebug \
   -n "$MON_NS" \
   -f "$grafanaYAML" \
   -f "$grafanaProxyYAML" \
   -f "$userGrafanaYAML" \
-  --version "$GRAFANA_CHART_VERSION" \
+  --version "$OPENSHIFT_GRAFANA_CHART_VERSION" \
   $extraArgs \
   v4m-grafana \
   grafana/grafana
