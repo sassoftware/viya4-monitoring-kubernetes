@@ -17,18 +17,18 @@ Monitoring:
 * Grafana dashboards for cluster monitoring
 
 These are the differences between the default OpenShift monitoring environment
-and
-the SAS Viya Monitoring environment
+and the SAS Viya Monitoring environment:
 
 * OpenShift uses separate Prometheus instances to monitor core
 Kuberenetes and OpenShift components and to monitor user workloads
-* OpenShift includes [Thanos] to provide a single query interface for
-the multiple Prometheus instances used by OpenShift
-* The Grafana instance in OpenShift is read-only
+* OpenShift includes [Thanos](https://github.com/thanos-io/thanos) to provide a
+single query interface for the multiple Prometheus instances used by OpenShift
 * SAS Viya Monitoring provides more Prometheus recording rules to define custom
 convenience metrics than are provided by OpenShift
-* In OpenShift, API access to the Prometheus instances is authenticated, so
-a service account and an access token is required to use Grafana
+* In OpenShift, API access to the [Thanos Querier](https://github.com/thanos-io/thanos/blob/main/docs/components/query.md)
+is authenticated
+* Users authenticate against OpenShift to access Grafana
+* The Grafana instance in OpenShift provides read-only access
 
 The process of deploying SAS Viya Monitoring on OpenShift integrates the SAS
 Viya Monitoring components with those used by OpenShift. Because the instance
@@ -36,9 +36,25 @@ of Grafana that is provided on Openshift is read-only, SAS Viya Monitoring
 deploys a separate instance of Grafana in order to provide access to dashboards
 for SAS Viya components.
 
+See the [Grafana helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana)
+for more information customizing the deployment. User settings for Grafana can
+be provided in `$USER_DIR/monitoring/user-values-openshift-grafana.yaml`.
+
 **Note:** When deploying on other cloud providers, the ServiceMonitors for SAS
 Viya Logging are deployed as part of SAS Viya Monitoring. On OpenShift, these
 ServiceMonitors are deployed as part of SAS Viya Logging.
+
+## Authentication
+
+By default, SAS Viya Monitoring on OpenShift will be deployed to use OpenShift
+authentication to log in to Grafana. Authentication is provied by the OpenShift
+oauth-proxy sidecar, which also enables in-cluster TLS (from the ingress
+controller to Grafana). To disable this behavior, set the
+`OPENSHIFT_TLS_PROXY_ENABLE` environment variable to `false`. This value can also
+be set in `$USER_DIR/monitoring/user.env`. Regardless of the value of
+`OPENSHIFT_TLS_PROXY_ENABLE`, edge TLS (HTTPS) will be enabled on the Grafana
+[route](https://docs.openshift.com/container-platform/4.7/rest_api/network_apis/route-route-openshift-io-v1.html)
+(OpenShift's version of ingress).
 
 ## Prerequisites
 
@@ -111,3 +127,12 @@ monitoring/bin/remove_monitoring_openshift.sh
 export VIYA_NS=<your_viya_namespace>
 monitoring/bin/remove_monitoring_viya.sh
 ```
+
+## Reference
+
+* [Understanding the monitoring stack](https://docs.openshift.com/container-platform/4.7/monitoring/understanding-the-monitoring-stack.html)
+* [Configuring built-in monitoring with Prometheus](https://docs.openshift.com/container-platform/4.7/operators/operator_sdk/osdk-monitoring-prometheus.html)
+* [Configuring the monitoring stack](https://docs.openshift.com/container-platform/4.7/monitoring/configuring-the-monitoring-stack.html)
+* [Enabling monitoring for user-defined projects](https://docs.openshift.com/container-platform/4.7/monitoring/enabling-monitoring-for-user-defined-projects.html)
+* [OpenShift oauth-proxy](https://github.com/openshift/oauth-proxy)
+* [Thanos](https://github.com/thanos-io/thanos)
