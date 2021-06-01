@@ -13,10 +13,16 @@ else
   log_debug "OpenShift not detected. Skipping 'oc' checks."
 fi
 
-if [ "$OPENSHIFT_CLUSTER" == "true" ]; then  
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+  log_warn "========================================================================="
+  log_warn "OpenShift support is under active development and is EXPERIMENTAL        "
+  log_warn "Variable names, defaults and usage may change until officially supported "
+  log_warn "========================================================================="
+  log_message ""
+  
   if [ "${OPENSHIFT_OC_CHECK:-true}" == "true" ]; then
     if [ ! $(which oc) ]; then
-      echo "OpenShift 'oc' not found on the current PATH"
+      echo "'oc' is required for OpenShift and not found on the current PATH"
       exit 1
     fi
   fi

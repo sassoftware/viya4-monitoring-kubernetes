@@ -5,7 +5,6 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
-source bin/openshift-include.sh
 
 if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then

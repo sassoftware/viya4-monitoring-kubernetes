@@ -1,5 +1,10 @@
 # SAS Viya Monitoring on OpenShift
 
+## NOTE: OpenShift Support is Experimental
+
+OpenShift support is currently being developed and is EXPERIMENTAL. Variable
+names, defaults and usage may change until officially supported
+
 ## Overview
 
 Deploying the monitoring components on [Red Hat OpenShift](https://www.openshift.com/)
