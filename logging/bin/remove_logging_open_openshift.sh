@@ -27,7 +27,11 @@ logging/bin/remove_openshift_artifacts.sh
 export DEPLOY_SERVICEMONITORS=${DEPLOY_SERVICEMONITORS:-true}
 logging/bin/remove_servicemonitors_open_openshift.sh
 
+#
 # remove logging components
+#
+# override-openshift check
+export CHECK_OPENSHIFT_CLUSTER=false
 logging/bin/remove_logging_open.sh
 
 

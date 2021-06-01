@@ -107,7 +107,7 @@ else
    servicelist="KIBANA"
 fi
 
-logging/bin/show_app_url.sh $servicelist
+bin/show_app_url.sh $servicelist
 
 
 ##################################
