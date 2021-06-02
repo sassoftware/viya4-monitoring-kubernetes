@@ -1,5 +1,10 @@
 # SAS Viya Log Monitoring on OpenShift
 
+## NOTE: OpenShift Support is Experimental
+
+Support for SAS Viya Logging on OpenShift continues to be developed, so it is currently considered to be EXPERIMENTAL. Variable names, defaults, and usage may change until 
+deployment on OpenShift is officially supported.
+
 ## Overview
 
 If you deploy SAS Viya on Red Hat OpenShift, you can use either OpenShift 
