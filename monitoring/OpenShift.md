@@ -2,8 +2,9 @@
 
 ## NOTE: OpenShift Support is Experimental
 
-OpenShift support is currently being developed and is EXPERIMENTAL. Variable
-names, defaults and usage may change until officially supported
+Support for SAS Viya Monitoring on OpenShift continues to be developed, 
+so it is currently considered to be EXPERIMENTAL. Variable names, defaults, 
+and usage may change until deployment on OpenShift is officially supported.
 
 ## Overview
 
@@ -42,8 +43,8 @@ deploys a separate instance of Grafana in order to provide access to dashboards
 for SAS Viya components.
 
 See the [Grafana helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana)
-for more information customizing the deployment. User settings for Grafana can
-be provided in `$USER_DIR/monitoring/user-values-openshift-grafana.yaml`.
+for more information about customizing the deployment. You can provide 
+user settings for Grafana in the file `$USER_DIR/monitoring/user-values-openshift-grafana.yaml`.
 
 **Note:** When deploying on other cloud providers, the ServiceMonitors for SAS
 Viya Logging are deployed as part of SAS Viya Monitoring. On OpenShift, these
@@ -51,13 +52,13 @@ ServiceMonitors are deployed as part of SAS Viya Logging.
 
 ## Authentication
 
-By default, SAS Viya Monitoring on OpenShift will be deployed to use OpenShift
-authentication to log in to Grafana. Authentication is provied by the OpenShift
+By default, SAS Viya Monitoring on OpenShift uses OpenShift
+authentication to log in to Grafana. Authentication is provided by the OpenShift
 oauth-proxy sidecar, which also enables in-cluster TLS (from the ingress
 controller to Grafana). To disable this behavior, set the
 `OPENSHIFT_TLS_PROXY_ENABLE` environment variable to `false`. This value can also
 be set in `$USER_DIR/monitoring/user.env`. Regardless of the value of
-`OPENSHIFT_TLS_PROXY_ENABLE`, edge TLS (HTTPS) will be enabled on the Grafana
+`OPENSHIFT_TLS_PROXY_ENABLE`, edge TLS (HTTPS) is enabled on the Grafana
 [route](https://docs.openshift.com/container-platform/4.7/rest_api/network_apis/route-route-openshift-io-v1.html)
 (OpenShift's version of ingress).
 
@@ -133,7 +134,7 @@ export VIYA_NS=<your_viya_namespace>
 monitoring/bin/remove_monitoring_viya.sh
 ```
 
-## Reference
+## References
 
 * [Understanding the monitoring stack](https://docs.openshift.com/container-platform/4.7/monitoring/understanding-the-monitoring-stack.html)
 * [Configuring built-in monitoring with Prometheus](https://docs.openshift.com/container-platform/4.7/operators/operator_sdk/osdk-monitoring-prometheus.html)
