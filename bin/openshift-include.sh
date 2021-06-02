@@ -4,13 +4,17 @@
 # This script is not intended to be run directly
 # Assumes bin/common.sh has been sourced
 
-# Detect if it is an OpenShift cluster
-OPENSHIFT_CLUSTER=${OPENSHIFT_CLUSTER:-false}
-if kubectl get ns openshift 2>/dev/null 1>&2; then
-  log_debug "OpenShift detected"
-  OPENSHIFT_CLUSTER=true 
+if [ "$OPENSHIFT_CLUSTER" == "" ]; then
+  # Detect OpenShift cluster
+  if kubectl get ns openshift 2>/dev/null 1>&2; then
+    log_debug "OpenShift detected"
+    OPENSHIFT_CLUSTER="true"
+  else
+    log_debug "OpenShift not detected"
+    OPENSHIFT_CLUSTER="false"
+  fi
 else
-  log_debug "OpenShift not detected. Skipping 'oc' checks."
+  log_debug "Skipping OpenShift detection. OPENSHIFT_CLUSTER=[$OPENSHIFT_CLUSTER]"
 fi
 
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
@@ -37,4 +41,6 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
   fi
 
   export OPENSHIFT_CLUSTER OC_FULL_VERSION OC_MAJOR_VERSION OC_MINOR_VERSION OC_PATCH_VERSION
+else
+  log_debug "OpenShift not detected. Skipping 'oc' checks."
 fi

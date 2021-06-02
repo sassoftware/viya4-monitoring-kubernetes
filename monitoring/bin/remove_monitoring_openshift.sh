@@ -53,12 +53,6 @@ kubectl delete --ignore-not-found cm grafana-trusted-ca-bundle
 log_info "Removing dashboards..."
 monitoring/bin/remove_dashboards.sh
 
-log_info "Removing service monitors..."
-kubectl delete --ignore-not-found podmonitor -n $MON_NS eventrouter
-kubectl delete --ignore-not-found servicemonitor -n $MON_NS elasticsearch
-kubectl delete --ignore-not-found servicemonitor -n $MON_NS fluent-bit
-kubectl delete --ignore-not-found servicemonitor -n $MON_NS fluent-bit-v2
-
 log_info "Removing Prometheus rules..."
 rules=( sas-launcher-job-rules )
 for rule in "${rules[@]}"
