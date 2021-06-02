@@ -1,0 +1,21 @@
+# Helm chart values for using the OpenShift authenticating TLS proxy
+
+"grafana.ini":
+  auth:
+    disable_login_form: true
+    disable_signout_menu: true
+  "auth.basic":
+    enabled: false
+  "auth.proxy":
+    auto_sign_up: true
+    enabled: true
+    header_name: X-Forwarded-User
+  security:
+    admin_user: WHAT_YOU_ARE_DOING_IS_VOIDING_SUPPORT_0000000000000000000000000000000000000000000000000000000000000000
+    cookie_secure: true
+  server:
+    http_addr: 127.0.0.1
+  users:
+    # auto_assign_org_role: one of Viewer/Editor/Admin
+    auto_assign_org_role: Editor
+    editors_can_admin: true

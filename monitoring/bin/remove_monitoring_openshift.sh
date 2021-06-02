@@ -1,15 +1,15 @@
 #! /bin/bash
 
-# Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 
-if [ "$OPENSHIFT_CLUSTER" == "true" ]; then  
+if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
-    log_error "This script should not be run on OpenShift clusters"
-    log_error "Run monitoring/bin/remove_monitoring_openshift.sh instead"
+    log_error "This script should only be run on OpenShift clusters"
+    log_error "Run monitoring/bin/remove_monitoring_cluster.sh instead"
     exit 1
   fi
 fi
@@ -17,20 +17,22 @@ fi
 MON_DELETE_PVCS_ON_REMOVE=${MON_DELETE_PVCS_ON_REMOVE:-false}
 MON_DELETE_NAMESPACE_ON_REMOVE=${MON_DELETE_NAMESPACE_ON_REMOVE:-false}
 
-# Check for existing incompatible helm releases up front
-helm2ReleaseCheck prometheus-$MON_NS
-helm2ReleaseCheck v4m-$MON_NS
+log_info "Removing the Grafana route..."
+kubectl delete route --ignore-not-found -n $MON_NS v4m-grafana
 
-log_info "Removing the Kube Prometheus Stack..."
-if helm3ReleaseExists prometheus-operator $MON_NS; then
-  promRelease=prometheus-operator
+if helm3ReleaseExists v4m-grafana $MON_NS; then
+  log_info "Removing Grafana..."
+  helm uninstall --namespace $MON_NS v4m-grafana
+  if [ $? != 0 ]; then
+    log_warn "Uninstall of [v4m-grafana] was not successful. Check output above for details."
+  fi
 else
-  promRelease=v4m-prometheus-operator
+  log_debug "Helm release of [v4m-grafana] not found"
 fi
-helm uninstall --namespace $MON_NS $promRelease
-if [ $? != 0 ]; then
-  log_warn "Uninstall of [$promRelease] was not successful. Check output above for details."
-fi
+
+log_info "Removing clusterrole and clusterrolebinding..."
+kubectl delete --ignore-not-found clusterrole v4m-grafana-clusterrole
+kubectl delete --ignore-not-found clusterrolebinding v4m-grafana-clusterrolebinding
 
 if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
   log_info "Deleting the [$MON_NS] namespace..."
@@ -45,6 +47,9 @@ fi
 
 log_info "Removing components from the [$MON_NS] namespace..."
 
+log_info "Removing CA bundle..."
+kubectl delete --ignore-not-found cm grafana-trusted-ca-bundle
+
 log_info "Removing dashboards..."
 monitoring/bin/remove_dashboards.sh
 
@@ -55,20 +60,17 @@ do
   kubectl delete --ignore-not-found -n $MON_NS prometheusrule $rule
 done
 
-log_info "Removing configmaps and secrets..."
-kubectl delete cm --ignore-not-found -n $MON_NS -l sas.com/monitoring-base=kube-viya-monitoring
-kubectl delete secret --ignore-not-found -n $MON_NS -l sas.com/monitoring-base=kube-viya-monitoring
+log_info "Removing Grafana service account..."
+kubectl delete --ignore-not-found serviceAccount -n $MON_NS grafana-serviceaccount
 
 if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
   log_info "Removing known monitoring PVCs..."
-  kubectl delete pvc --ignore-not-found -n $MON_NS -l app=alertmanager
   kubectl delete pvc --ignore-not-found -n $MON_NS -l app.kubernetes.io/name=grafana
-  kubectl delete pvc --ignore-not-found -n $MON_NS -l app=prometheus
 fi
 
 # Wait for resources to terminate
-log_info "Waiting 60 sec for resources to terminate..."
-sleep 60
+log_info "Waiting 10 sec for resources to terminate..."
+sleep 10
 
 log_info "Checking contents of the [$MON_NS] namespace:"
 crds=( all pvc cm servicemonitor podmonitor prometheus alertmanager prometheusrule thanosrulers )

@@ -2,6 +2,8 @@ image:
   repository: prom/pushgateway
   tag: v1.3.0
 
+securityContext: null
+
 # Bug in the helm chart - podLabels are put on the deployment, not the pod
 podLabels:
   sas.com/monitoring-base: kube-viya-monitoring

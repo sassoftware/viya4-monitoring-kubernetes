@@ -7,6 +7,14 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 source bin/service-url-include.sh
 
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+    log_error "This script should not be run on OpenShift clusters"
+    log_error "Run monitoring/bin/deploy_monitoring_openshift.sh instead"
+    exit 1
+  fi
+fi
+
 source bin/tls-include.sh
 if verify_cert_manager $MON_NS prometheus alertmanager grafana; then
   log_debug "cert-manager check OK"
@@ -39,10 +47,8 @@ fi
 set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
 
-# The stable repo is used indirectly by prometheus-community/kube-prometheus-stack
-helmRepoAdd stable https://charts.helm.sh/stable
+# Add the prometheus-community helm repo
 helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
-
 log_info "Updating helm repositories..."
 helm repo update
 

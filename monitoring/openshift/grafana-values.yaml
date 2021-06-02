@@ -1,0 +1,63 @@
+image:
+  tag: "7.5.4"
+readinessProbe: null
+livenessProbe: null
+sidecar:
+  dashboards:
+    enabled: true
+    label: grafana_dashboard
+  datasources:
+    enabled: true
+    label: grafana_datasource
+persistence:
+  type: pvc
+  enabled: true
+  # Provide custom storageClassName here if needed
+  # storageClassName: nfs-client
+  finalizers:
+    - kubernetes.io/pvc-protection
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    # OpenShift Thanos querier allows access to both cluster
+    # and user workload monitoring
+    - access: proxy
+      editable: false
+      isDefault: true
+      jsonData:
+        httpHeaderName1: 'Authorization'
+        timeInterval: 5s
+        tlsSkipVerify: true
+      name: Prometheus
+      secureJsonData:
+        # This BEARER_TOKEN will be replaced with a token for grafana-serviceaccount
+        httpHeaderValue1: 'Bearer __BEARER_TOKEN__'
+      type: prometheus
+      url: 'https://thanos-querier.openshift-monitoring.svc.cluster.local:9091'
+initChownData:
+  enabled: false
+# Set to null to disable securityContext for OpenShift
+securityContext: null
+serviceAccount:
+  # Service account created prior to helm install since the token is needed
+  # above in the datasource configuration
+  create: false
+  name: grafana-serviceaccount
+testFramework:
+  enabled: false
+"grafana.ini":
+  server:
+    http_addr: 0.0.0.0
+    http_port: 3000
+  dashboards:
+    default_home_dashboard_path: /tmp/dashboards/viya-welcome-dashboard.json
+  analytics:
+    check_for_updates: false
+  log:
+    mode: console
+  "log.console":
+      format: json
