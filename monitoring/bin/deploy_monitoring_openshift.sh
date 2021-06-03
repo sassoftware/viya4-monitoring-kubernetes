@@ -34,9 +34,9 @@ log_info "Updating helm repositories..."
 helm repo update
 
 if kubectl get cm -n openshift-monitoring cluster-monitoring-config 1>/dev/null 2>&1; then
-  log_warn "Configmap [openshift-monitoring/cluster-monitoring-config] exists"
-  log_warn "The configmap may need to be manually modified to enable"
-  log_warn "OpenShift user workload monitoring."
+  log_debug "Configmap [openshift-monitoring/cluster-monitoring-config] exists"
+  log_debug "The configmap may need to be manually modified to enable"
+  log_debug "OpenShift user workload monitoring."
 else
   log_info "Enabling OpenShift user workload monitoring..."
   kubectl apply -f monitoring/openshift/cluster-monitoring-config.yaml
