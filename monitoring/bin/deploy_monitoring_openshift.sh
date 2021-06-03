@@ -149,9 +149,9 @@ done
 if ! kubectl get route -n $MON_NS v4m-grafana 1>/dev/null 2>&1; then
   log_info "Exposing Grafana service as a route..."
   if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then  
-    oc create route reencrypt --service=v4m-grafana
+    oc create route reencrypt -n $MON_NS --service=v4m-grafana
   else
-    oc create route edge --service=v4m-grafana
+    oc create route edge -n $MON_NS --service=v4m-grafana
   fi
 fi
 
