@@ -5,6 +5,7 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
+source monitoring/bin/openshift-include.sh
 
 checkDefaultStorageClass
 
@@ -63,13 +64,20 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
   prometheus-community/prometheus-pushgateway
 fi
 
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+  # By default, do not validate monitors on OpenShift due to
+  # the older Prometheus Operator CRDs
+  VALIDATE_MONITORS=${VALIDATE_MONITORS:-false}
+else
+  VALIDATE_MONITORS=${VALIDATE_MONITORS:-true}
+fi
 if [ "$(kubectl get crd servicemonitors.monitoring.coreos.com -o name 2>/dev/null)" ]; then
   log_info "Adding monitors for resources in the [$VIYA_NS] namespace..."
   for f in monitoring/monitors/viya/serviceMonitor-*.yaml; do
-    kubectl apply -n $VIYA_NS -f $f
+    kubectl apply -n $VIYA_NS -f "$f" --validate=$VALIDATE_MONITORS
   done
   for f in monitoring/monitors/viya/podMonitor-*.yaml; do
-    kubectl apply -n $VIYA_NS -f $f
+    kubectl apply -n $VIYA_NS -f "$f" --validate=$VALIDATE_MONITORS
   done
   log_notice "Monitoring components successfully deployed into the [$VIYA_NS] namespace"
 
