@@ -74,8 +74,6 @@ if [ ! -f "$FB_OPEN_USER_YAML" ]; then
   FB_OPEN_USER_YAML=$TMP_DIR/empty.yaml
 fi
 
-# Deploying on OpenShift?
-OPENSHIFT_CLUSTER=${OPENSHIFT_CLUSTER:-false}
 
 # Point to OpenShift response file or dummy as appropriate
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
