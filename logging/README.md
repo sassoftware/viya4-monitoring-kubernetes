@@ -13,7 +13,7 @@ You must have cluster-admin access to any cluster in which you deploy these
 components. You cannot deploy successfully if you have access only to a
 namespace or a subset of namespaces.
 
-**Note:** If you are deploying SAS Viya Logging on OpenShift, you must follow the deployment process documented in [SAS Viya Logging on OpenShift](/openshift/openshift.md).
+**Note:** If you are deploying SAS Viya Logging on OpenShift, you must follow the deployment process documented in [SAS Viya Logging on OpenShift](/logging/OpenShift.md).
 
 ### Components
 
@@ -251,7 +251,7 @@ which you cloned the repository and issue this command:
 
 The script creates the namespace into which the components are deployed. By default, the components are deployed into the namespace `logging`.
 
-**Note:* If you are deploying SAS Viya Logging on OpenShift, you must follow the deployment process documented in [SAS Viya Logging on OpenShift](/openshift/openshift.md).**
+**Note:* If you are deploying SAS Viya Logging on OpenShift, you must follow the deployment process documented in [SAS Viya Logging on OpenShift](/logging/OpenShift.md).**
 
 ## Update Logging Components
 
