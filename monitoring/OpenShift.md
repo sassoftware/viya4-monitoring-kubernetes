@@ -56,9 +56,9 @@ By default, SAS Viya Monitoring on OpenShift uses OpenShift
 authentication to log in to Grafana. Authentication is provided by the OpenShift
 oauth-proxy sidecar, which also enables in-cluster TLS (from the ingress
 controller to Grafana). To disable this behavior, set the
-`OPENSHIFT_TLS_PROXY_ENABLE` environment variable to `false`. This value can also
+`OPENSHIFT_AUTH_ENABLE` environment variable to `false`. This value can also
 be set in `$USER_DIR/monitoring/user.env`. Regardless of the value of
-`OPENSHIFT_TLS_PROXY_ENABLE`, edge TLS (HTTPS) is enabled on the Grafana
+`OPENSHIFT_AUTH_ENABLE`, edge TLS (HTTPS) is enabled on the Grafana
 [route](https://docs.openshift.com/container-platform/4.7/rest_api/network_apis/route-route-openshift-io-v1.html)
 (OpenShift's version of ingress).
 

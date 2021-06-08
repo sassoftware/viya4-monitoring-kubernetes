@@ -63,6 +63,9 @@ done
 log_info "Removing Grafana service account..."
 kubectl delete --ignore-not-found serviceAccount -n $MON_NS grafana-serviceaccount
 
+log_debug "Removing Grafana service..."
+kubectl delete --ignore-not-found service -n $MON_NS v4m-grafana
+
 if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
   log_info "Removing known monitoring PVCs..."
   kubectl delete pvc --ignore-not-found -n $MON_NS -l app.kubernetes.io/name=grafana
