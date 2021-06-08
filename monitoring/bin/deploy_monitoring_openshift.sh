@@ -35,8 +35,7 @@ helm repo update
 
 if kubectl get cm -n openshift-monitoring cluster-monitoring-config 1>/dev/null 2>&1; then
   log_debug "Configmap [openshift-monitoring/cluster-monitoring-config] exists"
-  log_debug "The configmap may need to be manually modified to enable"
-  log_debug "OpenShift user workload monitoring."
+  log_debug "The configmap may need to be modified to enable user workload monitoring"
 else
   log_info "Enabling OpenShift user workload monitoring..."
   kubectl apply -f monitoring/openshift/cluster-monitoring-config.yaml
@@ -82,30 +81,37 @@ else
   sed -i "s/__BEARER_TOKEN__/$grafanaToken/g" $grafanaYAML
 fi
 
-OPENSHIFT_TLS_PROXY_ENABLE=${OPENSHIFT_TLS_PROXY_ENABLE:-true}
-grafanaProxyYAML=$TMP_DIR/empty.yaml
-if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then
-  extraArgs="--set service.targetPort=3001"
-  grafanaProxyYAML="monitoring/openshift/grafana-proxy-values.yaml"
-fi
-
 if ! helm3ReleaseExists v4m-grafana $MON_NS; then
   firstTimeGrafana=true
 fi
 
+OPENSHIFT_AUTH_ENABLE=${OPENSHIFT_AUTH_ENABLE:-true}
+if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
+  grafanaAuthYAML="monitoring/openshift/grafana-proxy-values.yaml"
+  extraArgs="--set service.targetPort=3001"
+else
+  grafanaAuthYAML="monitoring/openshift/grafana-tls-only-values.yaml"
+  log_debug "Creating the Grafana service to generate TLS certs..."
+  kubectl apply -n $MON_NS -f monitoring/openshift/v4m-grafana-svc.yaml
+  log_debug "Sleeping 5 sec..."
+  sleep 5
+fi
+
+log_info "Deploying Grafana..."
 OPENSHIFT_GRAFANA_CHART_VERSION=${OPENSHIFT_GRAFANA_CHART_VERSION:-6.9.1}
 helm upgrade --install $helmDebug \
   -n "$MON_NS" \
   -f "$grafanaYAML" \
-  -f "$grafanaProxyYAML" \
+  -f "$grafanaAuthYAML" \
   -f "$userGrafanaYAML" \
   --version "$OPENSHIFT_GRAFANA_CHART_VERSION" \
+  --atomic \
   $extraArgs \
   v4m-grafana \
   grafana/grafana
 
-if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then
-  log_info "Enabling Grafana OpenShift proxy..."
+if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
+  log_info "Using OpenShift authentication for Grafana"
   log_debug "Annotating grafana-serviceaccount to auto-generate TLS certs..."
   kubectl annotate serviceaccount -n $MON_NS --overwrite grafana-serviceaccount 'serviceaccounts.openshift.io/oauth-redirectreference.primary={"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"v4m-grafana"}}'
 
@@ -125,7 +131,7 @@ if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then
   grafanaProxyPatchYAML=$TMP_DIR/grafana-proxy-patch.yaml
   cp monitoring/openshift/grafana-proxy-patch.yaml $grafanaProxyPatchYAML
   
-  log_debug "Deploying cert-manager issuers and certificates..."
+  log_debug "Deploying CA bundle..."
   kubectl apply -n $MON_NS -f monitoring/openshift/grafana-trusted-ca-bundle.yaml
   
   log_info "Patching Grafana service for auto-generated TLS certs"
@@ -134,7 +140,7 @@ if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then
   log_info "Patching Grafana pod with authenticating TLS proxy..."
   kubectl patch deployment -n $MON_NS v4m-grafana --patch "$(cat $grafanaProxyPatchYAML)"
 else
-  log_debug "Grafana proxy container disabled"
+  log_info "Using native Grafana authentication"
 fi
 
 log_info "Deploying SAS Viya Grafana dashboards..."
@@ -148,15 +154,11 @@ done
 
 if ! kubectl get route -n $MON_NS v4m-grafana 1>/dev/null 2>&1; then
   log_info "Exposing Grafana service as a route..."
-  if [ "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then  
-    oc create route reencrypt -n $MON_NS --service=v4m-grafana
-  else
-    oc create route edge -n $MON_NS --service=v4m-grafana
-  fi
+  oc create route reencrypt -n $MON_NS --service=v4m-grafana
 fi
 
 scheme="https"
-if [ ! "$OPENSHIFT_TLS_PROXY_ENABLE" == "true" ]; then
+if [ ! "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   if [ "$firstTimeGrafana" == "true" ]; then
     log_notice "Obtain the inital Grafana password by running:"
     log_notice "kubectl get secret --namespace monitoring v4m-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo"

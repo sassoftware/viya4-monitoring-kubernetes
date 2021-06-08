@@ -1,0 +1,28 @@
+# Chart: https://github.com/grafana/helm-charts/tree/main/charts/grafana
+# Default Values: https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
+
+readinessProbe:
+  httpGet:
+    scheme: HTTPS
+    port: 3001
+livenessProbe:
+  httpGet:
+    scheme: HTTPS
+    port: 3001
+
+extraSecretMounts:
+- name: v4m-grafana-tls
+  mountPath: /cert
+  secretName: v4m-grafana-tls-secret
+  readOnly: true
+  subPath: ""
+
+service:
+  enabled: false
+
+"grafana.ini":
+  server:
+    protocol: https
+    http_port: 3001
+    cert_file: /cert/tls.crt
+    cert_key: /cert/tls.key
