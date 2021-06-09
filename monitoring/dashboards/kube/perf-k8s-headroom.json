@@ -572,7 +572,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(kube_node_status_allocatable_pods{}) - sum(kubelet_running_pod_count{job=\"kubelet\", metrics_path=\"/metrics\"})\r",
+          "expr": "sum(kube_node_status_allocatable_pods) - sum(kubelet_running_pods)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -857,7 +857,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "100 * (sum(kube_node_status_allocatable_pods{}) - sum(kubelet_running_pod_count{job=\"kubelet\", metrics_path=\"/metrics\"})) / sum(kube_node_status_allocatable_pods{})\r",
+          "expr": "100 * (sum(kube_node_status_allocatable_pods) - sum(kubelet_running_pods)) / sum(kube_node_status_allocatable_pods{})",
           "format": "time_series",
           "instant": false,
           "interval": "",
