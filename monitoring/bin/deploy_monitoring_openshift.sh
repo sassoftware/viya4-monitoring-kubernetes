@@ -97,6 +97,10 @@ else
   sleep 5
 fi
 
+if [ -n "$GRAFANA_ADMIN_PASSWORD" ]; then
+  grafanaPwd="--set adminPassword=$GRAFANA_ADMIN_PASSWORD"
+fi
+
 log_info "Deploying Grafana..."
 OPENSHIFT_GRAFANA_CHART_VERSION=${OPENSHIFT_GRAFANA_CHART_VERSION:-6.9.1}
 helm upgrade --install $helmDebug \
@@ -106,6 +110,7 @@ helm upgrade --install $helmDebug \
   -f "$userGrafanaYAML" \
   --version "$OPENSHIFT_GRAFANA_CHART_VERSION" \
   --atomic \
+  $grafanaPwd \
   $extraArgs \
   v4m-grafana \
   grafana/grafana
@@ -160,8 +165,10 @@ fi
 scheme="https"
 if [ ! "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   if [ "$firstTimeGrafana" == "true" ]; then
-    log_notice "Obtain the inital Grafana password by running:"
-    log_notice "kubectl get secret --namespace monitoring v4m-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo"
+    if [ -z "$GRAFANA_ADMIN_PASSWORD" ]; then
+      log_notice "Obtain the inital Grafana password by running:"
+      log_notice "kubectl get secret --namespace monitoring v4m-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo"
+    fi
   fi
 fi
 log_notice "Grafana URL: $scheme://$(kubectl get route -n $MON_NS | grep v4m-grafana | awk '{printf $2}')"
