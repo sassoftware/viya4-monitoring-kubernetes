@@ -54,11 +54,11 @@ ServiceMonitors are deployed as part of SAS Viya Logging.
 
 By default, SAS Viya Monitoring on OpenShift uses OpenShift
 authentication to log in to Grafana. Authentication is provided by the OpenShift
-oauth-proxy sidecar, which also enables in-cluster TLS (from the ingress
-controller to Grafana). To disable this behavior, set the
+oauth-proxy sidecar. To disable OpenShift authentication, set the
 `OPENSHIFT_AUTH_ENABLE` environment variable to `false`. This value can also
 be set in `$USER_DIR/monitoring/user.env`. Regardless of the value of
-`OPENSHIFT_AUTH_ENABLE`, edge TLS (HTTPS) is enabled on the Grafana
+`OPENSHIFT_AUTH_ENABLE`, in-cluster TLS (from the ingress controller
+to Grafana) and ingress TLS (browser to cluster) is enabled on the Grafana
 [route](https://docs.openshift.com/container-platform/4.7/rest_api/network_apis/route-route-openshift-io-v1.html)
 (OpenShift's version of ingress).
 
@@ -78,7 +78,7 @@ use the standard monitoring deployment script (deploy_monitoring_cluster.sh).
 
 1. Follow the instructions in the [monitoring README](README.md#mon_pre_dep) to
 perform the standard predeployment tasks (create a local copy of the repository and
-customize your deployment). See [Customization](#os_mon_cust) for information about
+customize your deployment). See [Customization](#mon_os_cust) for information about
 customization on OpenShift.
 
 2. Use this command to log on to the cluster:
