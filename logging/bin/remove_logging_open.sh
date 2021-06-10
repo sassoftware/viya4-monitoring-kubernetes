@@ -6,6 +6,16 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
+# Confirm NOT on OpenShift
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+    log_error "This script should NOT be run on OpenShift clusters"
+    log_error "Run logging/bin/remove_logging_open_openshift.sh instead"
+    exit 1
+  fi
+fi
+
+
 LOG_DELETE_CONFIGMAPS_ON_REMOVE=${LOG_DELETE_CONFIGMAPS_ON_REMOVE:-true}
 LOG_DELETE_SECRETS_ON_REMOVE=${LOG_DELETE_SECRETS_ON_REMOVE:-true}
 LOG_DELETE_PVCS_ON_REMOVE=${LOG_DELETE_PVCS_ON_REMOVE:-false}

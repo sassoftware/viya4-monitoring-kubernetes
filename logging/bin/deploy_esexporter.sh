@@ -67,6 +67,16 @@ else
 fi
 
 
+# Point to OpenShift response file or dummy as appropriate
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+  log_info "Deploying Elasticsearch metric exporter onto OpenShift cluster"
+  openshiftValuesFile="logging/openshift/values-elasticsearch-exporter-openshift.yaml"
+else
+  log_debug "Elasticsearch metric exporter is NOT being deployed on OpenShift cluster"
+  openshiftValuesFile="$TMP_DIR/empty.yaml"
+fi
+
+
 log_info "Deploying Elasticsearch metric exporter"
 
 # Elasticsearch metric exporter
@@ -76,6 +86,7 @@ helm $helmDebug upgrade --install es-exporter \
  --namespace $LOG_NS \
  -f logging/esexporter/values-es-exporter_open.yaml \
  -f $wnpValuesFile \
+ -f $openshiftValuesFile \
  -f $ES_OPEN_EXPORTER_USER_YAML \
  prometheus-community/prometheus-elasticsearch-exporter \
  --set fullnameOverride=v4m-es-exporter

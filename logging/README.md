@@ -2,7 +2,8 @@
 
 ## Introduction
 
-This document outlines the steps needed to deploy a set of log collection and
+This document outlines the steps needed to deploy SAS Viya Logging, which is 
+a set of log collection and
 monitoring components for SAS Viya. These components provide a
 comprehensive solution for collecting, transforming and surfacing all of the
 log messages generated throughout SAS Viya. These components collect logs
@@ -11,6 +12,8 @@ from all pods in a Kubernetes cluster, not only the pods used for SAS Viya.
 You must have cluster-admin access to any cluster in which you deploy these
 components. You cannot deploy successfully if you have access only to a
 namespace or a subset of namespaces.
+
+**Note:** If you are deploying SAS Viya Logging on OpenShift, you must follow the deployment process documented in [SAS Viya Logging on OpenShift](/logging/OpenShift.md).
 
 ### Components
 
@@ -25,7 +28,7 @@ Provides detailed Elasticsearch performance information for Prometheus
 If you are using a cloud provider, you must use ingress, rather than
 NodePorts. Specify the information needed to use ingress during the customization process.
 
-## Perform Pre-Deployment Tasks
+## <a name="l_pre_dep"></a>Perform Pre-Deployment Tasks
 
 Before deploying, you must perform these tasks:
 
@@ -248,6 +251,8 @@ which you cloned the repository and issue this command:
 
 The script creates the namespace into which the components are deployed. By default, the components are deployed into the namespace `logging`.
 
+**Note:* If you are deploying SAS Viya Logging on OpenShift, you must follow the deployment process documented in [SAS Viya Logging on OpenShift](/logging/OpenShift.md).**
+
 ## Update Logging Components
 
 Updates in place are supported. To update, re-run the
@@ -264,6 +269,13 @@ logging/bin/remove_logging_open.sh
 ```
 
 The script removes configmaps and secrets that were created by the deployment script. PersistentVolumeClaims and Kubernetes secrets that were created manually are not removed.  
+
+**Note: If you deployed SAS Viya Logging on OpenShift, you must use this script to remove the logging components:**
+```bash
+cd <viya4-monitoring-kubernetes repo directory>
+
+logging/bin/remove_logging_open_openshift.sh
+```
 
 ## Validate Your Deployment
 

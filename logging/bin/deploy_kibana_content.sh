@@ -52,21 +52,19 @@ set -e
 log_info "Configuring Kibana"
 
 #### TEMP:  Remove if/when Helm chart supports defining nodePort
-SVC=v4m-es-kibana-svc
-SVC_TYPE=$(kubectl get svc -n $LOG_NS $SVC -o jsonpath='{.spec.type}')
-if [ "$SVC_TYPE" == "NodePort" ]; then
-  KIBANA_PORT=31033
-  kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
-  log_info "Set Kibana service NodePort to 31033"
-fi
+KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-true}
 
+if [ "$KB_KNOWN_NODEPORT_ENABLE" == "true" ]; then
+   SVC=v4m-es-kibana-svc
+   SVC_TYPE=$(kubectl get svc -n $LOG_NS $SVC -o jsonpath='{.spec.type}')
 
-# construct URL to access Kibana
-# Use existing NODE_NAME or find one
-NODE_NAME=${NODE_NAME:-$(kubectl get node --selector='node-role.kubernetes.io/master' | awk 'NR==2 { print $1 }')}
-if [ "$NODE_NAME" == "" ]; then
-  # Get first node
-  NODE_NAME=$(kubectl get nodes | awk 'NR==2 { print $1 }')
+   if [ "$SVC_TYPE" == "NodePort" ]; then
+     KIBANA_PORT=31033
+     kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
+     log_info "Setting Kibana service NodePort to 31033"
+   fi
+else
+  log_debug "Kibana service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
 fi
 
 
@@ -166,50 +164,6 @@ kill  -9 $pfPID
 rm -f $tmpfile
 
 sleep 7s
-
-
-set +e
-# call function to get HTTP/HTTPS ports from ingress controller
-get_ingress_ports
-
-# get URLs for Kibana and Elasticsearch REST api endpoint
-kb_url=$(get_service_url $LOG_NS v4m-es-kibana-svc "/" "$LOG_KB_TLS_ENABLE" "v4m-es-kibana")
-es_url=$(get_service_url $LOG_NS v4m-es-client-service "/" "true")
-set -e
-
-# Print URL to access Kibana
-add_notice ""
-add_notice "================================================================================"
-add_notice "==                    Accessing the monitoring applications                   =="
-add_notice "==                                                                            =="
-add_notice "== ***KIBANA***                                                               =="
-if [ ! -z "$kb_url" ]; then
-   add_notice "==  You can access Kibana via the following URL:                              =="
-   add_notice "==   $kb_url  =="
-   add_notice "==                                                                            =="
-else
-   add_notice "== It was not possible to determine the URL needed to access Kibana. Note     =="
-   add_notice "== that this is not necessarily a sign of a problem; it may only reflect an   =="
-   add_notice "== ingress or network access configuration that this script does not handle.  =="
-   add_notice "==                                                                            =="
-fi
-if [ ! -z "$es_url" ]; then
-   add_notice "== ***Elasticsearch REST Endpoint***                                          =="
-   add_notice "==  You can access Elasticsearch REST endpoint via the following URL:         =="
-   add_notice "==   $es_url   =="
-   add_notice "==                                                                            =="
-fi
-add_notice "== Note: These URLs may be incorrect if your ingress and/or other network     =="
-add_notice "==       configuration includes options this script does not handle.          =="
-add_notice "================================================================================"
-add_notice ""
-
-LOGGING_DRIVER=${LOGGING_DRIVER:-false}
-if [ "$LOGGING_DRIVER" != "true" ]; then
-   echo ""
-   display_notices
-   echo ""
-fi
 
 log_info "Configuring Kibana has been completed"
 

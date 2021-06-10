@@ -1,0 +1,31 @@
+{
+    "policy": {
+        "policy_id": "viya-infra-idxmgmt-policy",
+        "description": "An index management policy for infrastructure log messages.",
+        "error_notification": null,
+        "default_state": "hot",
+        "states": [
+            {
+                "name": "hot",
+                "actions": [],
+                "transitions": [
+                    {
+                        "state_name": "doomed",
+                        "conditions": {
+                            "min_index_age": "xxxRETENTION_PERIODxxx"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "doomed",
+                "actions": [
+                    {
+                        "delete": {}
+                    }
+                ],
+                "transitions": []
+            }
+        ]
+    }
+}

@@ -74,6 +74,17 @@ if [ ! -f "$FB_OPEN_USER_YAML" ]; then
   FB_OPEN_USER_YAML=$TMP_DIR/empty.yaml
 fi
 
+
+# Point to OpenShift response file or dummy as appropriate
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+  log_info "Deploying Fluent Bit on OpenShift cluster"
+  openshiftValuesFile="logging/openshift/values-fluent-bit.yaml"
+else
+  log_debug "Fluent Bit is NOT being deployed on OpenShift cluster"
+  openshiftValuesFile="$TMP_DIR/empty.yaml"
+fi
+
+
 if [ -f "$USER_DIR/logging/fluent-bit_config.configmap_open.yaml" ]; then
    # use copy in USER_DIR
    FB_CONFIGMAP="$USER_DIR/logging/fluent-bit_config.configmap_open.yaml"
@@ -120,7 +131,11 @@ kubectl -n $LOG_NS create configmap fb-env-vars --from-literal=KUBERNETES_RUNTIM
 kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=es"
 
 # Deploy Fluent Bit via Helm chart
-helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb --values logging/fb/fluent-bit_helm_values_open.yaml --values $FB_OPEN_USER_YAML  --set fullnameOverride=v4m-fb fluent/fluent-bit
+helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
+  --values logging/fb/fluent-bit_helm_values_open.yaml  \
+  --values $openshiftValuesFile \
+  --values $FB_OPEN_USER_YAML   \
+  --set fullnameOverride=v4m-fb fluent/fluent-bit
 
 log_info "Fluent Bit deployment completed"
 
