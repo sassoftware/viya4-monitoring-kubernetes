@@ -5,7 +5,7 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
-source monitoring/bin/openshift-include.sh
+source bin/openshift-include.sh
 
 checkDefaultStorageClass
 
