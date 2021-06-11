@@ -4,6 +4,8 @@
 
 * **Monitoring**
   * [EXPERIMENTAL] OpenShift automation
+    * Documentation
+      `monitoring/OpenShift.md`
     * Deployment to OpenShift clusters is now supported via
       `monitoring/bin/deploy_monitoring_openshift.sh`
     * OpenShift authentication for Grafana is enabled by default, but can be
@@ -16,6 +18,16 @@
   `deploy_dashboards.sh`.
 
 * **Logging**
+  * [EXPERIMENTAL] OpenShift automation
+    * Documentation
+      `logging/OpenShift.md`
+    * Deployment to OpenShift clusters is now supported via
+      `logging/bin/deploy_logging_open_openshift.sh`
+  * [FEATURE] Container runtimes other than Docker are now supported.
+    The container runtime is now determined during script execution and
+    will be used to determine the format of container logs.  However,
+    the `KUBERNETES_RUNTIME_LOGFMT` environment varible can be used to
+    explicitly identify the format of container logs (e.g. docker or cri-o).
 
 ## Version 1.0.7 (17MAY21)
 
