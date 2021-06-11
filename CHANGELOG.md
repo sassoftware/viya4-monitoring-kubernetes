@@ -4,8 +4,7 @@
 
 * **Monitoring**
   * [EXPERIMENTAL] OpenShift automation
-    * Documentation
-      `monitoring/OpenShift.md`
+    * [Deploying Monitoring on OpenShift documentation](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/monitoring/OpenShift.md)
     * Deployment to OpenShift clusters is now supported via
       `monitoring/bin/deploy_monitoring_openshift.sh`
     * OpenShift authentication for Grafana is enabled by default, but can be
@@ -19,8 +18,7 @@
 
 * **Logging**
   * [EXPERIMENTAL] OpenShift automation
-    * Documentation
-      `logging/OpenShift.md`
+    * [Deploying Log Monitoring on OpenShift documentation](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/OpenShift.md)
     * Deployment to OpenShift clusters is now supported via
       `logging/bin/deploy_logging_open_openshift.sh`
   * [FEATURE] Container runtimes other than Docker are now supported.
