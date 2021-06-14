@@ -65,11 +65,11 @@ to Grafana) and ingress TLS (browser to cluster) is enabled on the Grafana
 ## Prerequisites
 
 * [Kubernetes](https://kubernetes.io/) version 1.19+
-* [OpenShift](https://www.openshift.com/) 4.7+
+* [OpenShift](https://www.openshift.com/) 4.6
 * [`kubectl`](https://kubernetes.io/docs/tasks/tools/) 1.19+
 * [`Helm`](https://helm.sh/docs/intro/install/) 3.0+ (3.5+ recommended)
 * OpenShift [`oc`](https://docs.openshift.com/container-platform/3.6/cli_reference/get_started_cli.html)
-command-line tool 3.0+
+command-line tool 4.0+
 
 ## Deploy SAS Viya Monitoring on OpenShift
 

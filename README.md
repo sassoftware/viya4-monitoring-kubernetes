@@ -43,7 +43,7 @@ for more information about using the monitoring components.
 
 ## Logging - Aggregation, Searching, & Filtering
 
-The logging solution includes these components:
+The logging solution includes these components and your right to use each such component is governed by its applicable open source license:
 
 - [Fluent Bit](https://fluentbit.io/)
   - Custom Fluent Bit parsers
