@@ -22,7 +22,7 @@
       `logging/bin/deploy_logging_open_openshift.sh`
     * OpenShift support is still under development. Usage and features may
       change until the feature set is finalized.
-   * Documentation is available in [Deploying Log Monitoring on OpenShift](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/OpenShift.md)
+    * Documentation is available in [Deploying Log Monitoring on OpenShift](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/OpenShift.md)
   * [FEATURE] Container runtimes other than Docker are now supported.
     The container runtime is now determined during script execution and
     will be used to determine the format of container logs.  However,
