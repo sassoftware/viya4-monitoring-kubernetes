@@ -4,7 +4,6 @@
 
 * **Monitoring**
   * [EXPERIMENTAL] OpenShift automation
-    * [Deploying Monitoring on OpenShift documentation](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/monitoring/OpenShift.md)
     * Deployment to OpenShift clusters is now supported via
       `monitoring/bin/deploy_monitoring_openshift.sh`
     * OpenShift authentication for Grafana is enabled by default, but can be
@@ -12,15 +11,18 @@
     * TLS is always enabled for both ingress and in-cluster communication
     * OpenShift support is still under development. Usage and features may
       change until the feature set is finalized.
+    * Documentation is available in [Deploying Monitoring on OpenShift](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/monitoring/OpenShift.md)
   * [FEATURE] The new `NGINX_DASH` environemnt variable now controls whether
   the NGINX dashboard gets deployed when using `deploy_monitoring_*.sh` or
   `deploy_dashboards.sh`.
 
 * **Logging**
   * [EXPERIMENTAL] OpenShift automation
-    * [Deploying Log Monitoring on OpenShift documentation](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/OpenShift.md)
     * Deployment to OpenShift clusters is now supported via
       `logging/bin/deploy_logging_open_openshift.sh`
+    * OpenShift support is still under development. Usage and features may
+      change until the feature set is finalized.
+   * Documentation is available in [Deploying Log Monitoring on OpenShift](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/OpenShift.md)
   * [FEATURE] Container runtimes other than Docker are now supported.
     The container runtime is now determined during script execution and
     will be used to determine the format of container logs.  However,
