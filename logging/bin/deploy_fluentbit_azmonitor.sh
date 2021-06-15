@@ -123,7 +123,7 @@ kubectl -n $LOG_NS create configmap fb-env-vars --from-literal=KUBERNETES_RUNTIM
 
 
 # Delete any existing Fluent Bit pods in the $LOG_NS namepace (otherwise Helm chart may assume an upgrade w/o reloading updated config
-kubectl -n $LOG_NS delete pods -l "app=fluent-bit, fbout=azuremonitor"
+kubectl -n $LOG_NS delete pods -l "app.kubernetes.io/name=fluent-bit, fbout=azuremonitor"
 
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install v4m-fbaz         --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_azmonitor.yaml --values $FB_AZMONITOR_USER_YAML  --set fullnameOverride=v4m-fbaz fluent/fluent-bit
