@@ -53,7 +53,7 @@ To change the number of days that log messages from OpenShift infrastructure com
 are retained, modify the `INFRA_LOG_RETENTION_PERIOD` environment variable. The default 
 value is `1` (1 day).
 
-No customizations are required, even if you are using ingress, because the `deploy_logging_openshift.sh` script defines a route for Kibana.
+No customizations are required, even if you are using ingress, because the `deploy_logging_open_openshift.sh` script defines a route for Kibana.
 
 OpenShift uses [route](https://docs.openshift.com/enterprise/3.0/architecture/core_concepts/routes.html) objects, a feature unique to OpenShift, to access Kibana and (optionally) the Elasticsearch API endpoint. This makes it unnecessary to configure ingress objects or surface nodePorts.
 

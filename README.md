@@ -8,7 +8,7 @@ no hard dependencies between the two.
 
 ## Monitoring - Metrics and Alerts
 
-The monitoring solution includes these components:
+The monitoring solution includes these components and your right to use each such component is governed by its applicable open source license:
 
 - [Prometheus Operator](https://github.com/coreos/prometheus-operator)
   - [Prometheus](https://prometheus.io/docs/introduction/overview/)
