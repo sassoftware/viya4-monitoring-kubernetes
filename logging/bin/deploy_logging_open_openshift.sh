@@ -73,20 +73,27 @@ logging/bin/deploy_esexporter.sh
 
 
 ##################################
-# Create OpenShift Routes        #
+# Create OpenShift Route(s)      #
+# and display app URL(s)         #
 ##################################
-log_info "STEP 4a: Create OpenShift Route(s)"
+log_info "STEP 4a: Create OpenShift Route(s) & Application URL(s)"
 
 OPENSHIFT_ROUTES_ENABLE=${OPENSHIFT_ROUTES_ENABLE:-true}
 
 if [ "$OPENSHIFT_ROUTES_ENABLE" == "true" ]; then
 
+   servicelist="KIBANA"
    logging/bin/create_openshift_route.sh KIBANA
 
    ES_ENDPOINT_ENABLE=${ES_ENDPOINT_ENABLE:-false}
    if [ "$ES_ENDPOINT_ENABLE" == "true" ]; then
       logging/bin/create_openshift_route.sh ELASTICSEARCH
+
+      servicelist="KIBANA ELASTICSEARCH"
    fi
+
+   bin/show_app_url.sh $servicelist
+
 else
    log_info "Environment variable [OPENSHIFT_ROUTES_ENABLE] is not set to 'true'; exiting WITHOUT deploying OpenShift Routes"
 fi
@@ -97,21 +104,7 @@ fi
 ##################################
 log_info "STEP 4b: Configuring Kibana"
 
-export KB_KNOWN_NODEPORT_ENABLE=false
-logging/bin/deploy_kibana_content.sh
-
-
-##################################
-# Display Kibana URL             #
-##################################
-log_info "STEP 4c: Display Application URLs"
-if [ "$ES_ENDPOINT_ENABLE" == "true" ];then
-   servicelist="KIBANA ELASTICSEARCH"
-else
-   servicelist="KIBANA"
-fi
-
-bin/show_app_url.sh $servicelist
+KB_KNOWN_NODEPORT_ENABLE=false logging/bin/deploy_kibana_content.sh
 
 
 ##################################
