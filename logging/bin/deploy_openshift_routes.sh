@@ -18,20 +18,11 @@ if [ "$OPENSHIFT_ROUTES_ENABLE" != "true" ]; then
   exit
 fi
 
-if [ "$LOG_KB_TLS_ENABLE" != "true" ]; then
-   # oc -n $LOG_NS expose service v4m-es-kibana-svc
-   tls_mode=edge
-else
-   # NOTE: use of passthrough is a temp fix; will need to work with reencrypt eventually
-   tls_mode=passthrough
-fi
-oc -n $LOG_NS create route $tls_mode v4m-es-kibana-svc  --service v4m-es-kibana-svc     --port=kibana-svc
-
+logging/bin/create_openshift_route.sh KIBANA
 
 ES_ENDPOINT_ENABLE=${ES_ENDPOINT_ENABLE:-false}
 if [ "$ES_ENDPOINT_ENABLE" == "true" ]; then
-   # NOTE: use of passthrough is a temp fix; will need to work with reencrypt eventually
-   oc -n $LOG_NS create route passthrough v4m-es-client-service --service=v4m-es-client-service --port=http
+   logging/bin/create_openshift_route.sh ELASTICSEARCH
 fi
 
 log_info "OpenShift Routes have been deployed."
