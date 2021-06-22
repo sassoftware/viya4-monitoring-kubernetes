@@ -76,7 +76,20 @@ logging/bin/deploy_esexporter.sh
 # Create OpenShift Routes        #
 ##################################
 log_info "STEP 4a: Create OpenShift Route(s)"
-logging/bin/deploy_openshift_routes.sh
+
+OPENSHIFT_ROUTES_ENABLE=${OPENSHIFT_ROUTES_ENABLE:-true}
+
+if [ "$OPENSHIFT_ROUTES_ENABLE" == "true" ]; then
+
+   logging/bin/create_openshift_route.sh KIBANA
+
+   ES_ENDPOINT_ENABLE=${ES_ENDPOINT_ENABLE:-false}
+   if [ "$ES_ENDPOINT_ENABLE" == "true" ]; then
+      logging/bin/create_openshift_route.sh ELASTICSEARCH
+   fi
+else
+   log_info "Environment variable [OPENSHIFT_ROUTES_ENABLE] is not set to 'true'; exiting WITHOUT deploying OpenShift Routes"
+fi
 
 
 ##################################
