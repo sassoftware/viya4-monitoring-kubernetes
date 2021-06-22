@@ -82,16 +82,18 @@ fi
 
 if [ "$tls_enable" != "true" ]; then
    tls_mode="edge"
-   cert_options=""
+   cert_options="--insecure-policy=Redirect"
 else
-   oc -n $namespace get secret $tls_secret  -o template='{{index .data "ca.crt"}}' | base64 -d > $TMP_DIR/tls_ca.crt
+   oc -n $namespace get secret $tls_secret  -o template='{{index .data "tls.crt"}}' | base64 -d > $TMP_DIR/tls.crt
+   oc -n $namespace get secret $tls_secret  -o template='{{index .data "tls.key"}}' | base64 -d > $TMP_DIR/tls.key
+   oc -n $namespace get secret $tls_secret  -o template='{{index .data "ca.crt"}}'  | base64 -d > $TMP_DIR/ca.crt
 
-   if [ ! -f "$TMP_DIR/tls_ca.crt" ]; then
+   if [ ! -f "$TMP_DIR/tls.crt" ] || [ ! -f "$TMP_DIR/tls.key" ] || [ ! -f "$TMP_DIR/ca.crt" ]; then
       log_error "Required TLS information for [$route_name] not found in expected location [secret/$tls_secret]; unable to create route."
       exit 1
    fi
    tls_mode="reencrypt"
-   cert_options="--dest-ca-cert=$TMP_DIR/tls_ca.crt"
+   cert_options="--cert=$TMP_DIR/tls.crt --key=$TMP_DIR/tls.key --dest-ca-cert=$TMP_DIR/ca.crt --insecure-policy=Redirect"
 fi
 
 oc -n $LOG_NS create route $tls_mode $route_name  --service $service_name  --port=$port  $cert_options
