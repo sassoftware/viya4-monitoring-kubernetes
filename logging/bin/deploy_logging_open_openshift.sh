@@ -43,6 +43,8 @@ log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 log_info "STEP 0: OpenShift Setup"
 logging/bin/deploy_openshift_prereqs.sh
 
+# On OpenShift force "full" TLS
+export LOG_KB_TLS_ENABLE=true
 
 ##################################
 # Event Router                   #
