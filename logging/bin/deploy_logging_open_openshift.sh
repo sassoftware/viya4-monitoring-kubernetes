@@ -95,7 +95,7 @@ if [ "$OPENSHIFT_ROUTES_ENABLE" == "true" ]; then
    bin/show_app_url.sh $servicelist
 
 else
-   log_info "Environment variable [OPENSHIFT_ROUTES_ENABLE] is not set to 'true'; exiting WITHOUT deploying OpenShift Routes"
+   log_info "Environment variable [OPENSHIFT_ROUTES_ENABLE] is not set to 'true'; continuing WITHOUT deploying OpenShift Routes"
 fi
 
 
