@@ -33,7 +33,7 @@ case "$app" in
       namespace="$LOG_NS"
       service_name="v4m-es-kibana-svc"
       port="kibana-svc"
-      tls_enable="$LOG_KB_TLS_ENABLE"
+      tls_enable="true"
       tls_secret="kibana-tls-secret"
       ingress_tls_secret="kibana-ingress-tls-secret"
       route_name="$service_name"
@@ -48,6 +48,11 @@ case "$app" in
       route_name="$service_name"
       ;;
    *)
+      # NOTE: ** Experimental feature **
+      # NOTE: Use of this script to create routes other than the ones above is not supported.
+      log_warn "** Experimental feature **"
+      log_warn "Use of this script to create adhoc routes is NOT supported."
+      log_warn "The resulting route may not be usable or properly secured."
       namespace="$app"
       service_name="$2"
       port="${3:-http}"
@@ -83,19 +88,13 @@ if oc -n $namespace get route $route_name 2>/dev/null 1>&2; then
    exit 1
 fi
 
-if oc -n $namespace get secret $ingress_tls_secret 2>/dev/null 1>&2; then
-   annotations="cert-utils-operator.redhat-cop.io/certs-from-secret=$ingress_tls_secret"
-else
-   log_debug "The ingress TLS certificate [$ingress_tls_secret] does NOT exist; using default OpenShift certs."
-fi
-
 if [ "$tls_enable" != "true" ]; then
    tls_mode="edge"
 else
 
    if oc -n $namespace get secret $tls_secret 2>/dev/null 1>&2; then
       tls_mode="reencrypt"
-      annotations="$annotations cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret"
+      annotations="cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret $annotations"
    else
       log_error "The specified secret [$tls_secret] does NOT exists in the namespace [$namespace]."
       exit 1
@@ -111,10 +110,14 @@ if [ "$rc" != "0" ]; then
    exit 1
 fi
 
-if [ -n "$annotations" ]; then
-   # add annotations to identify secret containing TLS certs
-   oc -n $LOG_NS annotate  route $route_name $annotations
+if [ "$tls_enable" == "true" ]; then
+   # identify secret containing destination CA
+   oc -n $LOG_NS annotate  route $route_name cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret
 fi
+
+# identify secret containing TLS certs
+oc -n $LOG_NS annotate  route $route_name cert-utils-operator.redhat-cop.io/certs-from-secret=$ingress_tls_secret
+
 
 log_info "OpenShift Route [$route_name] has been created."
 
