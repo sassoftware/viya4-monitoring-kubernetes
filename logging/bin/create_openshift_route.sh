@@ -10,7 +10,6 @@ this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
-
 ##################################
 # Confirm on OpenShift           #
 ##################################
@@ -61,7 +60,6 @@ if [ "$tls_enable" != "true" ]; then
 else
    if oc -n $namespace get secret $tls_secret 2>/dev/null 1>&2; then
       tls_mode="reencrypt"
-      annotations="cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret $annotations"
    else
       log_error "The specified secret [$tls_secret] does NOT exists in the namespace [$namespace]."
       exit 1
