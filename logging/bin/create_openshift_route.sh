@@ -22,13 +22,8 @@ if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
   fi
 fi
 
-
 app=${1}
 case "$app" in
-   "")
-      log_error "You must identify the application for which you want to create a route."
-      exit 1
-      ;;
    "KIBANA"|"kibana"|"kb"|"KB")
       namespace="$LOG_NS"
       service_name="v4m-es-kibana-svc"
@@ -47,37 +42,10 @@ case "$app" in
       ingress_tls_secret="elasticsearch-ingress-tls-secret"
       route_name="$service_name"
       ;;
-   *)
-      # NOTE: ** Experimental feature **
-      # NOTE: Use of this script to create routes other than the ones above is not supported.
-      log_warn "** Experimental feature **"
-      log_warn "Use of this script to create adhoc routes is NOT supported."
-      log_warn "The resulting route may not be usable or properly secured."
-      namespace="$app"
-      service_name="$2"
-      port="${3:-http}"
-      tls_enable="${4:-$TLS_ENABLE}"
-      tls_secret="$5"
-      ingress_tls_secret="$6"
-      route_name="${7:-$service_name}"
-
-      if [ -z "$service_name" ]; then
-         log_error "You must provide the name of the service for which you want route created."
-         exit 1
-      fi
-
-      if [ -z "$namespace" ]; then
-         log_error "You must provide the namespace in which you want the route created."
-         exit 1
-      fi
-
-      if [ "$tls_enable" == "true" ]; then
-
-         if [ -z "$tls_secret" ]; then
-            log_error "You must provide the name of the secret containing the CA information for the TLS certs used by the service for which you want route created."
-            exit 1
-         fi
-      fi
+  ""|*)
+      log_error "Application name is invalid or missing."
+      log_error "The APPLICATION NAME is required; valid values are: ELASTICSEARCH or KIBANA"
+      exit 1
       ;;
 esac
 
@@ -91,7 +59,6 @@ fi
 if [ "$tls_enable" != "true" ]; then
    tls_mode="edge"
 else
-
    if oc -n $namespace get secret $tls_secret 2>/dev/null 1>&2; then
       tls_mode="reencrypt"
       annotations="cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret $annotations"
@@ -99,7 +66,6 @@ else
       log_error "The specified secret [$tls_secret] does NOT exists in the namespace [$namespace]."
       exit 1
    fi
-
 fi
 
 oc -n $LOG_NS create route $tls_mode $route_name  --service $service_name  --port=$port  --insecure-policy=Redirect
