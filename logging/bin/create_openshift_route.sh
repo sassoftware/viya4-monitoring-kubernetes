@@ -35,6 +35,7 @@ case "$app" in
       port="kibana-svc"
       tls_enable="$LOG_KB_TLS_ENABLE"
       tls_secret="kibana-tls-secret"
+      ingress_tls_secret="kibana-ingress-tls-secret"
       route_name="$service_name"
       ;;
    "ELASTICSEARCH"|"elasticsearch"|"ES"|"es")
@@ -43,6 +44,7 @@ case "$app" in
       port="http"
       tls_enable="true"
       tls_secret="es-rest-tls-secret"
+      ingress_tls_secret="elasticsearch-ingress-tls-secret"
       route_name="$service_name"
       ;;
    *)
@@ -51,7 +53,8 @@ case "$app" in
       port="${3:-http}"
       tls_enable="${4:-$TLS_ENABLE}"
       tls_secret="$5"
-      route_name="${6:-$service_name}"
+      ingress_tls_secret="$6"
+      route_name="${7:-$service_name}"
 
       if [ -z "$service_name" ]; then
          log_error "You must provide the name of the service for which you want route created."
@@ -80,28 +83,37 @@ if oc -n $namespace get route $route_name 2>/dev/null 1>&2; then
    exit 1
 fi
 
-if [ "$tls_enable" != "true" ]; then
-   tls_mode="edge"
-   cert_options="--insecure-policy=Redirect"
+if oc -n $namespace get secret $ingress_tls_secret 2>/dev/null 1>&2; then
+   annotations="cert-utils-operator.redhat-cop.io/certs-from-secret=$ingress_tls_secret"
 else
-   oc -n $namespace get secret $tls_secret  -o template='{{index .data "tls.crt"}}' | base64 -d > $TMP_DIR/tls.crt
-   oc -n $namespace get secret $tls_secret  -o template='{{index .data "tls.key"}}' | base64 -d > $TMP_DIR/tls.key
-   oc -n $namespace get secret $tls_secret  -o template='{{index .data "ca.crt"}}'  | base64 -d > $TMP_DIR/ca.crt
-
-   if [ ! -f "$TMP_DIR/tls.crt" ] || [ ! -f "$TMP_DIR/tls.key" ] || [ ! -f "$TMP_DIR/ca.crt" ]; then
-      log_error "Required TLS information for [$route_name] not found in expected location [secret/$tls_secret]; unable to create route."
-      exit 1
-   fi
-   tls_mode="reencrypt"
-   cert_options="--cert=$TMP_DIR/tls.crt --key=$TMP_DIR/tls.key --dest-ca-cert=$TMP_DIR/ca.crt --insecure-policy=Redirect"
+   log_debug "The ingress TLS certificate [$ingress_tls_secret] does NOT exist; using default OpenShift certs."
 fi
 
-oc -n $LOG_NS create route $tls_mode $route_name  --service $service_name  --port=$port  $cert_options
+if [ "$tls_enable" != "true" ]; then
+   tls_mode="edge"
+else
+
+   if oc -n $namespace get secret $tls_secret 2>/dev/null 1>&2; then
+      tls_mode="reencrypt"
+      annotations="$annotations cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret"
+   else
+      log_error "The specified secret [$tls_secret] does NOT exists in the namespace [$namespace]."
+      exit 1
+   fi
+
+fi
+
+oc -n $LOG_NS create route $tls_mode $route_name  --service $service_name  --port=$port  --insecure-policy=Redirect
 rc=$?
 
 if [ "$rc" != "0" ]; then
    log_error "There was a problem creating the route for [$route_name]. [$rc]"
    exit 1
+fi
+
+if [ -n "$annotations" ]; then
+   # add annotations to identify secret containing TLS certs
+   oc -n $LOG_NS annotate  route $route_name $annotations
 fi
 
 log_info "OpenShift Route [$route_name] has been created."
