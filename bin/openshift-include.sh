@@ -52,19 +52,19 @@ function ocVersionCheck {
       log_debug "OpenShift version check OK"
     elif [ "$OSHIFT_MAJOR_VERSION" -lt 4 ]; then
       log_error "Unsupported OpenShift version: $OSHIFT_FULL_VERSION"
-      log_error "Supported versions include: 4.6.x"
+      log_error "Version 4.6+ is required"
       exit 1
     elif [ "$OSHIFT_MAJOR_VERSION" -eq 4 ] && [ "$OSHIFT_MINOR_VERSION" -lt 6 ]; then
       log_error "Unsupported OpenShift version: $OSHIFT_FULL_VERSION"
-      log_error "Supported versions include: 4.6.x"
+      log_error "Version 4.6+ is required"
       exit 1
     elif [ "$OSHIFT_MAJOR_VERSION" -eq 4 ] && [ "$OSHIFT_MINOR_VERSION" -gt 6 ]; then
       # 4.7+ (not 5+) should still work, so just issue a warning
       log_warn "OpenShift version is higher than expected: $OSHIFT_FULL_VERSION"
-      log_error "Supported versions include: 4.6.x"
+      log_error "Version 4.6+ is required"
     else
       log_error "Unsupported OpenShift version: $OSHIFT_FULL_VERSION"
-      log_error "Supported versions include: 4.6.x"
+      log_error "Version 4.6+ is required"
       exit 1
     fi
   fi
