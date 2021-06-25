@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.11-oslog2a
+       Set  fb_configMap_version 0.2.11-oslog2c
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -683,7 +683,8 @@ data:
        Parser          misc8
        Parser          collectapiT
        Parser          collectapi
-       #Parser          haproxy_default
+       Parser          haproxy_default
+       Parser          openvswitch
        Parser          level_only2
        Parser          level_only
        Parser          truncatedjson
