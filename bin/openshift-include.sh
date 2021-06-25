@@ -4,6 +4,73 @@
 # This script is not intended to be run directly
 # Assumes bin/common.sh has been sourced
 
+function ocVersionCheck {
+  origIFS=$IFS
+  IFS=$'\n'
+
+  allArr=($(oc version 2>/dev/null))
+  IFS=$origIFS
+
+  for (( i=0; i<${#allArr[@]}; i++ )); do
+    # Split the line into an array
+    verArr=(${allArr[$i]})
+    if [ ${#verArr[@]} -eq 3 ]; then
+      verType="${verArr[0]}"
+      ver="${verArr[2]}"
+      if [ "$verType" == "Client" ]; then
+          ver="${verArr[2]}"
+          if [[ $ver =~ v(([0-9]+)\.([0-9]+)\.([0-9]+)) ]]; then
+            OC_FULL_VERSION=${BASH_REMATCH[1]}
+            OC_MAJOR_VERSION=${BASH_REMATCH[2]}
+            OC_MINOR_VERSION=${BASH_REMATCH[3]}
+            OC_PATCH_VERSION=${BASH_REMATCH[4]}
+          else
+            echo "Unable to parse client version: [$ver]"
+          fi
+      elif [ "$verType" == "Server" ]; then
+          ver="${verArr[2]}"
+          if [[ $ver =~ (([0-9]+)\.([0-9]+)\.([0-9]+)) ]]; then
+            OSHIFT_FULL_VERSION=${BASH_REMATCH[1]}
+            OSHIFT_MAJOR_VERSION=${BASH_REMATCH[2]}
+            OSHIFT_MINOR_VERSION=${BASH_REMATCH[3]}
+            OSHIFT_PATCH_VERSION=${BASH_REMATCH[4]}
+          else
+            echo "Unable to parse server version: [$ver]"
+          fi
+      fi
+    fi
+  done
+  log_info "OpenShift client version: $OC_FULL_VERSION"
+  log_info "OpenShift server version: $OSHIFT_FULL_VERSION"
+  # Version enforcement
+  if [ "$OPENSHIFT_VERSION_CHECK" == "true" ]; then
+    if [ "$OC_MAJOR_VERSION" -lt 4 ]; then
+      log_error "Unsupported 'oc' version: $OC_FULL_VERSION. Version 4+ is required."
+      exit 1
+    fi
+    if [ "$OSHIFT_MAJOR_VERSION" -eq 4 ] && [ "$OSHIFT_MINOR_VERSION" -eq 6 ]; then
+      log_debug "OpenShift version check OK"
+    elif [ "$OSHIFT_MAJOR_VERSION" -lt 4 ]; then
+      log_error "Unsupported OpenShift version: $OSHIFT_FULL_VERSION"
+      log_error "Version 4.6+ is required"
+      exit 1
+    elif [ "$OSHIFT_MAJOR_VERSION" -eq 4 ] && [ "$OSHIFT_MINOR_VERSION" -lt 6 ]; then
+      log_error "Unsupported OpenShift version: $OSHIFT_FULL_VERSION"
+      log_error "Version 4.6+ is required"
+      exit 1
+    elif [ "$OSHIFT_MAJOR_VERSION" -eq 4 ] && [ "$OSHIFT_MINOR_VERSION" -gt 6 ]; then
+      # 4.7+ (not 5+) should still work, so just issue a warning
+      log_warn "OpenShift version is higher than expected: $OSHIFT_FULL_VERSION"
+      log_error "Version 4.6+ is required"
+    else
+      log_error "Unsupported OpenShift version: $OSHIFT_FULL_VERSION"
+      log_error "Version 4.6+ is required"
+      exit 1
+    fi
+  fi
+}
+
+OPENSHIFT_VERSION_CHECK=${OPENSHIFT_VERSION_CHECK:-true}
 if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
   if [ "$OPENSHIFT_CLUSTER" == "" ]; then
     # Detect OpenShift cluster
@@ -30,18 +97,11 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
         echo "'oc' is required for OpenShift and not found on the current PATH"
         exit 1
       fi
-    fi
+      ocVersionCheck
 
-    ocver=$(oc version --client 2>/dev/null)
-    log_debug "oc: $ocver"
-    if [[ $verstr =~ v(([0-9]+)\.([0-9]+)\.([0-9]+)) ]]; then
-      OC_FULL_VERSION=${BASH_REMATCH[1]}
-      OC_MAJOR_VERSION=${BASH_REMATCH[2]}
-      OC_MINOR_VERSION=${BASH_REMATCH[3]}
-      OC_PATCH_VERSION=${BASH_REMATCH[4]}
+      export OC_MAJOR_VERSION OC_MINOR_VERSION OC_PATCH_VERSION
+      export OSHIFT_MAJOR_VERSION OSHIFT_MINOR_VERSION OSHIFT_PATCH_VERSION 
     fi
-
-    export OPENSHIFT_CLUSTER OC_FULL_VERSION OC_MAJOR_VERSION OC_MINOR_VERSION OC_PATCH_VERSION
   else
     log_debug "OpenShift not detected. Skipping 'oc' checks."
   fi

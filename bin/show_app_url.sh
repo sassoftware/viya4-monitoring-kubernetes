@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname $BASH_SOURCE)/.."
-echo "$(pwd)"
 source bin/common.sh
 source bin/service-url-include.sh
 
