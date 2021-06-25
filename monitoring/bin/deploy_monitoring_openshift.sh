@@ -105,7 +105,7 @@ fi
 MON_NODE_PLACEMENT_ENABLE=${MON_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
 if [ "$MON_NODE_PLACEMENT_ENABLE" == "true" ]; then
   log_info "Enabling monitoring components for workload node placement"
-  wnpValuesFile="monitoring/node-placement/values-prom-operator-wnp.yaml"
+  wnpValuesFile="monitoring/node-placement/values-grafana-wnp.yaml"
 else
   log_debug "Workload node placement support is disabled"
   wnpValuesFile="$TMP_DIR/empty.yaml"
