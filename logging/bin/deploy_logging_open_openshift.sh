@@ -87,8 +87,8 @@ if [ "$OPENSHIFT_ROUTES_ENABLE" == "true" ]; then
    servicelist="KIBANA"
    logging/bin/create_openshift_route.sh KIBANA
 
-   ES_ENDPOINT_ENABLE=${ES_ENDPOINT_ENABLE:-false}
-   if [ "$ES_ENDPOINT_ENABLE" == "true" ]; then
+   OPENSHIFT_ES_ROUTE_ENABLE=${OPENSHIFT_ES_ROUTE_ENABLE:-false}
+   if [ "$OPENSHIFT_ES_ROUTE_ENABLE" == "true" ]; then
       logging/bin/create_openshift_route.sh ELASTICSEARCH
 
       servicelist="KIBANA ELASTICSEARCH"
