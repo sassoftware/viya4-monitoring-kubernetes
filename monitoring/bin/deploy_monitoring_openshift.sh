@@ -101,10 +101,21 @@ if [ -n "$GRAFANA_ADMIN_PASSWORD" ]; then
   grafanaPwd="--set adminPassword=$GRAFANA_ADMIN_PASSWORD"
 fi
 
+# Optional workload node placement support
+MON_NODE_PLACEMENT_ENABLE=${MON_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
+if [ "$MON_NODE_PLACEMENT_ENABLE" == "true" ]; then
+  log_info "Enabling monitoring components for workload node placement"
+  wnpValuesFile="monitoring/node-placement/values-grafana-wnp.yaml"
+else
+  log_debug "Workload node placement support is disabled"
+  wnpValuesFile="$TMP_DIR/empty.yaml"
+fi
+
 log_info "Deploying Grafana..."
 OPENSHIFT_GRAFANA_CHART_VERSION=${OPENSHIFT_GRAFANA_CHART_VERSION:-6.9.1}
 helm upgrade --install $helmDebug \
   -n "$MON_NS" \
+  -f "$wnpValuesFile" \
   -f "$grafanaYAML" \
   -f "$grafanaAuthYAML" \
   -f "$userGrafanaYAML" \
