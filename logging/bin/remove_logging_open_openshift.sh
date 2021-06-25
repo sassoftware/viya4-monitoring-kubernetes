@@ -22,6 +22,7 @@ fi
 
 # remove OpenShift-specific content not removed by primary removal script
 logging/bin/remove_openshift_artifacts.sh
+logging/bin/remove_openshift_routes.sh
 
 # remove ServiceMonitors
 export DEPLOY_SERVICEMONITORS=${DEPLOY_SERVICEMONITORS:-true}

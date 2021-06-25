@@ -6,6 +6,15 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
+# Confirm NOT on OpenShift
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+    log_error "This script should NOT be run on OpenShift clusters"
+    log_error "Run 'logging/bin/create_openshift_route.sh ELASTICSEARCH' instead"
+    exit 1
+  fi
+fi
+
 set -e
 
 # set env var with desired port

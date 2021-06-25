@@ -22,7 +22,7 @@ fi
 oc delete scc v4mlogging --ignore-not-found
 
 
-log_info "OpenShift Prerequisites have been deployed."
+log_info "OpenShift Prerequisites have been removed."
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""
