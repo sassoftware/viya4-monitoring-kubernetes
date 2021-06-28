@@ -19,7 +19,7 @@ function ocVersionCheck {
       ver="${verArr[2]}"
       if [ "$verType" == "Client" ]; then
           ver="${verArr[2]}"
-          if [[ $ver =~ v(([0-9]+)\.([0-9]+)\.([0-9]+)) ]]; then
+          if [[ $ver =~ v?(([0-9]+)\.([0-9]+)\.([0-9]+)) ]]; then
             OC_FULL_VERSION=${BASH_REMATCH[1]}
             OC_MAJOR_VERSION=${BASH_REMATCH[2]}
             OC_MINOR_VERSION=${BASH_REMATCH[3]}
