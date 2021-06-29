@@ -183,9 +183,16 @@ done
 if ! kubectl get route -n $MON_NS v4m-grafana 1>/dev/null 2>&1; then
   log_info "Exposing Grafana service as a route..."
   if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
-    oc create route reencrypt -n $MON_NS --service=v4m-grafana --path /grafana
+    oc create route reencrypt \
+      -n $MON_NS \
+      --service v4m-grafana \
+      --hostname "v4m-grafana-$MON_NS.$OPENSHIFT_ROUTE_HOST" \
+      --path $OPENSHIFT_ROUTE_PATH_GRAFANA
   else
-    oc create route reencrypt -n $MON_NS --service=v4m-grafana
+    oc create route reencrypt \
+      -n $MON_NS \
+      --service v4m-grafana \
+      --hostname "v4m-grafana-$MON_NS.$OPENSHIFT_ROUTE_HOST"
   fi
 fi
 
@@ -198,7 +205,7 @@ if [ ! "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
     fi
   fi
 fi
-log_notice "Grafana URL: $scheme://$(kubectl get route -n $MON_NS v4m-grafana -o jsonpath='{.spec.host}{.spec.path}'"
+log_notice "Grafana URL: $scheme://$(kubectl get route -n $MON_NS v4m-grafana -o jsonpath='{.spec.host}{.spec.path}')"
 
 log_message ""
 log_notice "Successfully deployed SAS Viya monitoring for OpenShift"

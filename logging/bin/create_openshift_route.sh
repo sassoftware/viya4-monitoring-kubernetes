@@ -88,11 +88,11 @@ fi
 
 if [ "$tls_enable" == "true" ]; then
    # identify secret containing destination CA
-   oc -n $LOG_NS annotate  route $route_name cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret
+   oc -n $LOG_NS annotate route $route_name cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret
 fi
 
 # identify secret containing TLS certs
-oc -n $LOG_NS annotate  route $route_name cert-utils-operator.redhat-cop.io/certs-from-secret=$ingress_tls_secret
+oc -n $LOG_NS annotate route $route_name cert-utils-operator.redhat-cop.io/certs-from-secret=$ingress_tls_secret
 
 log_info "OpenShift Route [$route_name] has been created."
 

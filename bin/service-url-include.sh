@@ -104,13 +104,11 @@ function get_route_url {
   namespace=$1
   service=$2
 
-  # host=$(oc -n $LOG_NS get route v4m-es-kibana-svc -o=jsonpath='{.spec.host}')
-  host=$(get_k8s_info "$namespace" "route/$service" "host")
+  host=$(kubectl get route -n $MON_NS v4m-grafana -o jsonpath='{.spec.host}{.spec.path}')
   if [ -z "$host" ]; then
      echo ""
      return 1
   fi
-  # tls_mode=$(oc -n $LOG_NS get route v4m-es-kibana-svc -o=jsonpath='{.spec.tls.termination}')
   tls_mode=$(get_k8s_info "$namespace" "route/$service" "tls")
   if [ -z "$tls_mode" ]; then
      protocol="http"
