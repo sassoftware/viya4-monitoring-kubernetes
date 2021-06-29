@@ -129,7 +129,7 @@ helm upgrade --install $helmDebug \
   -f "$grafanaAuthYAML" \
   -f "$userGrafanaYAML" \
   --set 'grafana\.ini'.server.domain=$OPENSHIFT_ROUTE_HOST \
-  --set 'grafana\.ini'.server.root_url=https://$OPENSHIFT_ROUTE_HOST$OPENSHIFT_ROUTE_PATH_GRAFANA \
+  --set 'grafana\.ini'.server.root_url=https://v4m-grafana-$MON_NS.$OPENSHIFT_ROUTE_HOST$OPENSHIFT_ROUTE_PATH_GRAFANA \
   --set 'grafana\.ini'.server.serve_from_sub_path=$grafanaSubPath \
   --version "$OPENSHIFT_GRAFANA_CHART_VERSION" \
   --atomic \

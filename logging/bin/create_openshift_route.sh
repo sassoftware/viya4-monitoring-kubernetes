@@ -79,7 +79,7 @@ fi
 oc -n $LOG_NS create route $tls_mode $route_name --service $service_name --port=$port --insecure-policy=Redirect --path $route_path
 rc=$?
 
-oc -n $LOG_NS annotate route $route_name "haproxy.router.openshift.io/rewrite-target=$route_path"
+oc -n $LOG_NS annotate route $route_name "haproxy.router.openshift.io/rewrite-target=/"
 
 if [ "$rc" != "0" ]; then
    log_error "There was a problem creating the route for [$route_name]. [$rc]"
