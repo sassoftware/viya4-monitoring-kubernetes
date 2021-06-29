@@ -99,6 +99,16 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
       fi
       ocVersionCheck
 
+      # Get base OpenShift route hostname
+      OPENSHIFT_ROUTE_HOST=${OPENSHIFT_ROUTE_HOST:-$(oc get route -n openshift-console console -o 'jsonpath={.spec.host}' | cut -c 27-)}
+      if [ "$OPENSHIFT_ROUTE_HOST" != "" ]; then
+        log_debug "OpenShift route host is [$OPENSHIFT_ROUTE_HOST]"
+      else
+        log_error "Unable to determine OpenShift route host. Set OPENSHIFT_ROUTE_HOST if necessary."
+        exit 1
+      fi
+
+      export OPENSHIFT_ROUTE_HOST
       export OC_MAJOR_VERSION OC_MINOR_VERSION OC_PATCH_VERSION
       export OSHIFT_MAJOR_VERSION OSHIFT_MINOR_VERSION OSHIFT_PATCH_VERSION 
     fi

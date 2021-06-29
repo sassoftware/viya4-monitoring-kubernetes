@@ -1,0 +1,25 @@
+# Chart: https://github.com/opendistro-for-elasticsearch/opendistro-build/tree/master/helm
+# Default values: https://github.com/opendistro-for-elasticsearch/opendistro-build/blob/master/helm/opendistro-es/values.yaml
+
+kibana:
+  extraEnvs:
+  # Needed for path-based ingress
+  - name: SERVER_BASEPATH
+    value: /kibana
+  # Username & password need to be set here since helm *replaces* array values
+  - name: ELASTICSEARCH_USERNAME
+    valueFrom:
+       secretKeyRef:
+          name: internal-user-kibanaserver
+          key: username
+  - name: ELASTICSEARCH_PASSWORD
+    valueFrom:
+       secretKeyRef:
+          name: internal-user-kibanaserver
+          key: password
+
+
+  service:
+    type: ClusterIP
+    nodePort: null
+

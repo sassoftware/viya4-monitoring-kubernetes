@@ -31,6 +31,11 @@ case "$app" in
       tls_secret="kibana-tls-secret"
       ingress_tls_secret="kibana-ingress-tls-secret"
       route_name="$service_name"
+      if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
+        route_path="/kibana"
+      else
+        route_path="/"
+      fi
       ;;
    "ELASTICSEARCH"|"elasticsearch"|"ES"|"es")
       namespace="$LOG_NS"
@@ -40,6 +45,11 @@ case "$app" in
       tls_secret="es-rest-tls-secret"
       ingress_tls_secret="elasticsearch-ingress-tls-secret"
       route_name="$service_name"
+      if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
+        route_path="/elasticsearch"
+      else
+        route_path="/"
+      fi
       ;;
   ""|*)
       log_error "Application name is invalid or missing."
@@ -66,8 +76,10 @@ else
    fi
 fi
 
-oc -n $LOG_NS create route $tls_mode $route_name  --service $service_name  --port=$port  --insecure-policy=Redirect
+oc -n $LOG_NS create route $tls_mode $route_name --service $service_name --port=$port --insecure-policy=Redirect --path $route_path
 rc=$?
+
+oc -n $LOG_NS annotate route $route_name "haproxy.router.openshift.io/rewrite-target=$route_path"
 
 if [ "$rc" != "0" ]; then
    log_error "There was a problem creating the route for [$route_name]. [$rc]"
@@ -81,7 +93,6 @@ fi
 
 # identify secret containing TLS certs
 oc -n $LOG_NS annotate  route $route_name cert-utils-operator.redhat-cop.io/certs-from-secret=$ingress_tls_secret
-
 
 log_info "OpenShift Route [$route_name] has been created."
 
