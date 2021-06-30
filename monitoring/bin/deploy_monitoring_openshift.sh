@@ -188,7 +188,7 @@ for f in monitoring/rules/viya/rules-*.yaml; do
 done
 
 if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
-  routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m.$OPENSHIFT_ROUTE_DOMAIN}
+  routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-$MON_NS.$OPENSHIFT_ROUTE_DOMAIN}
 else
   routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-grafana-$MON_NS.$OPENSHIFT_ROUTE_DOMAIN}
 fi

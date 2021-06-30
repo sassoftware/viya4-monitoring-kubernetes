@@ -32,7 +32,7 @@ case "$app" in
       ingress_tls_secret="kibana-ingress-tls-secret"
       route_name="$service_name"
       if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
-        route_host=${OPENSHIFT_ROUTE_HOST_KIBANA:-v4m.$OPENSHIFT_ROUTE_DOMAIN}
+        route_host=${OPENSHIFT_ROUTE_HOST_KIBANA:-v4m-$namespace.$OPENSHIFT_ROUTE_DOMAIN}
         route_path="/kibana"
       else
         route_host=${OPENSHIFT_ROUTE_HOST_KIBANA:-$service_name-$namespace.$OPENSHIFT_ROUTE_DOMAIN}
@@ -48,7 +48,7 @@ case "$app" in
       ingress_tls_secret="elasticsearch-ingress-tls-secret"
       route_name="$service_name"
       if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
-        route_host=${OPENSHIFT_ROUTE_HOST_KIBANA:-v4m.$OPENSHIFT_ROUTE_DOMAIN}
+        route_host=${OPENSHIFT_ROUTE_HOST_KIBANA:-v4m-$namespace.$OPENSHIFT_ROUTE_DOMAIN}
         route_path="/elasticsearch"
       else
         route_host=${OPENSHIFT_ROUTE_HOST_KIBANA:-$service_name-$namespace.$OPENSHIFT_ROUTE_DOMAIN}
