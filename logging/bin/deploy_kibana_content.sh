@@ -123,13 +123,9 @@ else
 fi
 
 # Confirm Kibana is ready
-log_debug "BRYAN - Kibana pod ready - about to wait for response"
 for pause in 30 30 30 30 30 30
 do
-   log_debug "BRYAN - getting response from curl..."
-   log_debug "BRYAN - curl -s -o /dev/null -w  \"%{http_code}\" -XGET  \"$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/status\"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure"
    response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
-   log_debug "BRYAN - curl complete: [$response]"
    # returns 503 (and outputs "Kibana server is not ready yet") when Kibana isn't ready yet
    # TO DO: check for 503 specifically?
 
