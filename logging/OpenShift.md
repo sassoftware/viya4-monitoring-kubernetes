@@ -46,22 +46,64 @@ oc login [cluster-hostname] -u [userID]
 ```
 
 ## <a name="l_os_cust"></a>Customization 
+#### General Customization
 
 Customization of SAS Viya Logging on OpenShift deployment follows the same process as in a standard logging deployment, which uses the USER_DIR environment variable to specify the location of your customization files. See the [logging README](../logging/README.md#log_custom) for information about the customization process.
 
-To change the number of days that log messages from OpenShift infrastructure components 
-are retained, modify the `INFRA_LOG_RETENTION_PERIOD` environment variable. The default 
-value is `1` (1 day).
+### OpenShift-Specific Customization
 
+#### OpenShift Infrastructure Message Retention
+You can change the number of days that log messages from OpenShift infrastructure namespaces (any namespace that starts with "openshift") 
+are retained so that the messages do not fill up the storage space. To change the retention period, modify the `INFRA_LOG_RETENTION_PERIOD` environment variable. The default value is `1` (1 day).
+
+#### Access Using Route Objects
+OpenShift uses [route](https://docs.openshift.com/enterprise/3.0/architecture/core_concepts/routes.html) objects, a feature unique to OpenShift, to access Kibana and (optionally) the Elasticsearch API endpoint. This makes it unnecessary to configure ingress objects or surface nodePorts.
 No customizations are required, even if you are using ingress, because the `deploy_logging_open_openshift.sh` script defines a route for Kibana.
 
-OpenShift uses [route](https://docs.openshift.com/enterprise/3.0/architecture/core_concepts/routes.html) objects, a feature unique to OpenShift, to access Kibana and (optionally) the Elasticsearch API endpoint. This makes it unnecessary to configure ingress objects or surface nodePorts.
+#### TLS
+OpenShift route objects are always TLS-enabled. Traffic is encrypted between the user 
+and OpenShift and again within the OpenShift cluster. The TLS certificates used on 
+OpenShift come from the same Kubernetes secrets as a standard logging deployment:
+***In-Cluster TLS:***
+- `es-transport-tls-secret`
+- `es-rest-tls-secret`
+- `es-admin-tls-secret`
+***Ingress TLS:***
+- `kibana-ingress-tls-secret`
+- `elasticsearch-ingress-tls-secret`
+
+By default, the deployment process uses cert-manager to obtain and manage the digital security certificates. If the Ingress secrets are not populated, default certificates 
+are provided by OpenShift.
+
+You can also use your own TLS certificates to populate the Kuberbetes secrets. 
+See [Notes_on_using_TLS](Notes_on_using_TLS.md) for information about the in-cluster 
+secrets and [Sample - TLS Enablement for Logging](../samples/tls/logging/README.md) for 
+information about the Ingress secrets.
+
+#### Enable Access to the Elasticsearch API Endpoint
+You can make the Elasticsearch API accessible so that users can query Elasticsearch 
+by using the `getlogs.sh` script or curl commands. To make the API endpoint 
+accessible, set the `OPENSHIFT_ES_ROUTE_ENABLE` environment variable to true before 
+you deploy the logging components. 
+
+If you need to make the API endpoint accessible after deployment is complete, run 
+the `create_openshift_route.sh` script and pass the `ELASTICSEARCH` argument:
+```bash
+./logging/bin/remove_logging_open_openshift.sh
+```  
+
+To remove access to the API endpoint, use the oc command to delete the route:
+```bash
+oc -n $LOG_NS delete route v4m-es-client-service
+```  
+***Note:*** Do not use the `es_nodeport_enable.sh` and `es_nodeport_enable.sh` scripts 
+in an OpenShift environment.  
 
 ## Remove SAS Viya Logging on OpenShift
 
 To remove the monitoring components, run this command:
 ```bash
-./logging/bin/remove_logging_open_openshift.sh
+./logging/bin/create_openshift_route.sh ELASTICSEARCH
 ```
 By default, the removal script does not remove all of the associated Kubernetes objects. The Kubernetes configuration maps (configMaps), secrets and persistent value claims (PVC) 
 created in the logging namespace during the deployment process are not removed so that you can 
