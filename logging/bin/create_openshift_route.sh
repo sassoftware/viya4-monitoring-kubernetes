@@ -80,7 +80,7 @@ else
    fi
 fi
 
-oc -n $LOG_NS create route $tls_mode $route_name \
+oc -n $namespace create route $tls_mode $route_name \
     --service $service_name \
     --port=$port \
     --insecure-policy=Redirect \
@@ -89,7 +89,7 @@ oc -n $LOG_NS create route $tls_mode $route_name \
 rc=$?
 
 if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
-    oc -n $LOG_NS annotate route $route_name "haproxy.router.openshift.io/rewrite-target=/"
+    oc -n $namespace annotate route $route_name "haproxy.router.openshift.io/rewrite-target=/"
 fi
 
 if [ "$rc" != "0" ]; then
@@ -99,11 +99,16 @@ fi
 
 if [ "$tls_enable" == "true" ]; then
    # identify secret containing destination CA
-   oc -n $LOG_NS annotate route $route_name cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret
+   oc -n $namespace annotate route $route_name cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret
 fi
 
-# identify secret containing TLS certs
-oc -n $LOG_NS annotate route $route_name cert-utils-operator.redhat-cop.io/certs-from-secret=$ingress_tls_secret
+
+if oc -n $namespace get secret $ingress_tls_secret 2>/dev/null 1>&2; then
+   # Add annotation to identify secret containing TLS certs
+   oc -n $namespace annotate route $route_name cert-utils-operator.redhat-cop.io/certs-from-secret=$ingress_tls_secret
+else
+   log_debug "The ingress secret [$ingress_tls_secret] does NOT exists, omitting annotation [certs-from-secret]."
+fi
 
 log_info "OpenShift Route [$route_name] has been created."
 
