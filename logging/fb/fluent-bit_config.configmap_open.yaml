@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.11-oslog2g2
+       Set  fb_configMap_version 0.2.11-oslog2L
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -404,9 +404,7 @@ data:
        Alias           flag_etcd_msgs
        Name            modify
        Match           kube.*
-       #Condition       Key_value_equals  temp_namespace kube-system
-       Condition       Key_value_matches  temp_namespace kube-system|openshift-etcd
-       #Condition       Key_value_equals  temp_component etcd
+       Condition       Key_value_matches                    temp_namespace kube-system|openshift-etcd
        Condition       Matching_keys_have_matching_values   appname|temp_component (?i:etcd)
        Copy            message   etcd_message
        Rename          message   unparsed_message
@@ -689,7 +687,7 @@ data:
        Parser          haproxy_default
        Parser          openvswitch
        Parser          keepalived
-       Parser          level_only2
+       Parser          sas_log
        Parser          level_only
        Parser          truncatedjson
        Parser          gopanic
