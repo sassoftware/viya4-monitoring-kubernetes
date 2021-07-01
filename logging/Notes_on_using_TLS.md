@@ -73,7 +73,7 @@ export USER_DIR=~/my-cluster-files/ops/user-dir
 
 ***Note:*** You must specify the subject information exactly as it was returned from the certificate (without any spaces after the commas). 
 
-7. If you plan on using ingress,populate these Kubernetes secrets with 
+7. If you plan on using ingress, populate these Kubernetes secrets with 
 TLS certificates before you run the deployment script:
 
 * `kibana-ingress-tls-secret`
