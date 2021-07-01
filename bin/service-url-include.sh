@@ -143,7 +143,7 @@ function get_nodeport_url {
      host=$(kubectl get nodes | awk 'NR==2 { print $1 }')  # use first node
   fi
 
-  port=$(get_k8s_info "$namespace" "service/$service" "json_service_nodeport")
+  port=$(get_k8s_info "$namespace" "service/$service" "$json_service_nodeport")
 
   if [ "$tls_enabled" == "true" ]; then
      protocol=https
@@ -169,20 +169,19 @@ function get_service_url {
  ingress=${5:-${service}}   # (optional) name of ingress/route object (default: $service)
 
  # is a route defined for this service?
- if [ "$(kubectl -n $namespace get route/$service 2>/dev/null)" ]; then
+ if [ "$OPENSHIFT_CLUSTER" == "true" ] && [ "$(kubectl -n $namespace get route/$service 2>/dev/null)" ]; then
      url=$(get_route_url $namespace $service)
 
      if [ -z "$url" ]; then
         return 1
      else
         echo "$url"
-       return
+        return
      fi
-
  fi
 
  # determine nodePort or clusterPort (ingress)
- service_type=$(get_k8s_info "$namespace" "service/$service" "json_service_type")
+ service_type=$(get_k8s_info "$namespace" "service/$service" "$json_service_type")
 
  if [ "$service_type" == "ClusterIP" ]; then
      get_ingress_ports
