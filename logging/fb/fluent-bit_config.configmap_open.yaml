@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.11-oslog2L
+       Set  fb_configMap_version 0.2.11-oslog2p
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -664,7 +664,7 @@ data:
     [FILTER]
        Alias           flag_misc99
        Name            modify
-       Match           kube.*
+       Match           XXXkube.*
        Condition       Key_does_not_exist log
        Condition       Key_does_not_exist message
        Copy            flagged4parsing  DB__orig_parser
@@ -676,7 +676,8 @@ data:
        Match           kube.*
        Key_name        misc2_message
        Parser          misc-stderr2
-       Parser          misc2
+       Parser          misc2brackets
+       Parser          misc2colon
        Parser          misc3
        Parser          misc5
        Parser          misc6
@@ -687,8 +688,10 @@ data:
        Parser          haproxy_default
        Parser          openvswitch
        Parser          keepalived
+       Parser          prom_op
        Parser          sas_log
        Parser          level_only
+       Parser          timestamp_only
        Parser          truncatedjson
        Parser          gopanic
        Reserve_Data    On
