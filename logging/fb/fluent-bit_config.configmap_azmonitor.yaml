@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.10
+       Set  fb_configMap_version 0.2.11-osparse
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -404,8 +404,8 @@ data:
        Alias           flag_etcd_msgs
        Name            modify
        Match           kube.*
-       Condition       Key_value_equals  temp_namespace kube-system
-       Condition       Key_value_equals  temp_component etcd
+       Condition       Key_value_matches                    temp_namespace kube-system|openshift-etcd
+       Condition       Matching_keys_have_matching_values   appname|temp_component (?i:etcd)
        Copy            message   etcd_message
        Rename          message   unparsed_message
        Add             flagged4parsing etcd
@@ -415,6 +415,8 @@ data:
        Match           kube.*
        Key_name        etcd_message
        Parser          etcd
+       Parser          etcd2
+       Parser          misc-stderr2
        Reserve_Data    On
     [FILTER]
        #
@@ -663,7 +665,7 @@ data:
     [FILTER]
        Alias           flag_misc99
        Name            modify
-       Match           kube.*
+       Match           XXXkube.*
        Condition       Key_does_not_exist log
        Condition       Key_does_not_exist message
        Copy            flagged4parsing  DB__orig_parser
@@ -675,7 +677,8 @@ data:
        Match           kube.*
        Key_name        misc2_message
        Parser          misc-stderr2
-       Parser          misc2
+       Parser          misc2brackets
+       Parser          misc2colon
        Parser          misc3
        Parser          misc5
        Parser          misc6
@@ -683,7 +686,14 @@ data:
        Parser          misc8
        Parser          collectapiT
        Parser          collectapi
-       Parser          level_only
+       Parser          haproxy_default
+       Parser          openvswitch
+       Parser          keepalived
+       Parser          prom_op
+       Parser          sas_log
+       Parser          level_only_brackets
+       Parser          level_only_colon
+       Parser          timestamp_only
        Parser          truncatedjson
        Parser          gopanic
        Reserve_Data    On
@@ -729,11 +739,11 @@ data:
        Nest_under      properties
        Remove_prefix   PROPS__
     [FILTER]
-       # "Standardize" Level: DEBUG (includes 'HINT', 'FINE')
+       # "Standardize" Level: DEBUG (includes 'HINT', 'FINE','DBG')
        Alias          fix_level_debug
        Name           modify
        Match          *
-       Condition      Key_value_matches level (?i:DEBUG)|(?:\AD\z)|(?i:hint)|(?i:fine)
+       Condition      Key_value_matches level (?i:DEBUG)|(?:\AD\z)|(?i:hint)|(?i:fine)|(?i:DBG)
        Set            level DEBUG
        Set            __temp_level_fixed   Y
     [FILTER]
@@ -764,12 +774,12 @@ data:
        Set            level INFO
        Set            __temp_level_fixed   Y
     [FILTER]
-       # "Standardize" Level: PANIC (includes 'PANIC','EMERG*')
+       # "Standardize" Level: PANIC (includes 'PANIC','EMER*')
        Alias          fix_level_panic
        Name           modify
        Match          *
        Condition      Key_value_does_not_equal __temp_level_fixed Y
-       Condition      Key_value_matches level (?i:panic)|(?i:emerg\w*)
+       Condition      Key_value_matches level (?i:panic)|(?i:emer\w*)
        Set            level PANIC
        Set            __temp_level_fixed   Y
     [FILTER]
