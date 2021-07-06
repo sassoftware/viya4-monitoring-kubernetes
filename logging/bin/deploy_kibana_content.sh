@@ -48,7 +48,6 @@ if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
 
 set -e
 
-
 log_info "Configuring Kibana"
 
 #### TEMP:  Remove if/when Helm chart supports defining nodePort
@@ -123,6 +122,7 @@ else
 fi
 
 # Confirm Kibana is ready
+set +e
 for pause in 30 30 30 30 30 30
 do
    response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
@@ -138,6 +138,7 @@ do
       break
    fi
 done
+set -e
 
 if [ "$kibanaready" != "TRUE" ]; then
    log_error "The Kibana REST endpoint has NOT become accessible in the expected time; exiting."

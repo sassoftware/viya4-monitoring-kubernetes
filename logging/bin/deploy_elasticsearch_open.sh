@@ -207,10 +207,20 @@ else
   wnpValuesFile="$TMP_DIR/empty.yaml"
 fi
 
+ES_PATH_INGRESS_YAML=$TMP_DIR/empty.yaml
+if [ "$OPENSHIFT_CLUSTER:$OPENSHIFT_PATH_ROUTES" == "true:true" ]; then
+    ES_PATH_INGRESS_YAML=logging/openshift/values-elasticsearch-path-route-openshift.yaml
+fi
 
 # Deploy Elasticsearch via Helm chart
-helm $helmDebug upgrade --install odfe --namespace $LOG_NS  --values logging/es/odfe/es_helm_values_open.yaml  --values "$KB_OPEN_TLS_YAML" --values "$wnpValuesFile" --values "$ES_OPEN_USER_YAML" --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
-
+helm $helmDebug upgrade --install odfe \
+    --namespace $LOG_NS \
+    --values logging/es/odfe/es_helm_values_open.yaml \
+    --values "$KB_OPEN_TLS_YAML" \
+    --values "$wnpValuesFile" \
+    --values "$ES_OPEN_USER_YAML" \
+    --values "$ES_PATH_INGRESS_YAML" \
+    --set fullnameOverride=v4m-es $TMP_DIR/$odfe_tgz_file
 
 # Use multi-purpose Elasticsearch nodes?
 ES_MULTIROLE_NODES=${ES_MULTIROLE_NODES:-false}

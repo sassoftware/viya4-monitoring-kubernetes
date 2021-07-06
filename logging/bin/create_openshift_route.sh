@@ -31,6 +31,13 @@ case "$app" in
       tls_secret="kibana-tls-secret"
       ingress_tls_secret="kibana-ingress-tls-secret"
       route_name="$service_name"
+      if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
+        route_host=${OPENSHIFT_ROUTE_HOST_KIBANA:-v4m-$namespace.$OPENSHIFT_ROUTE_DOMAIN}
+        route_path="/kibana"
+      else
+        route_host=${OPENSHIFT_ROUTE_HOST_KIBANA:-$service_name-$namespace.$OPENSHIFT_ROUTE_DOMAIN}
+        route_path="/"
+      fi
       ;;
    "ELASTICSEARCH"|"elasticsearch"|"ES"|"es")
       namespace="$LOG_NS"
@@ -40,6 +47,13 @@ case "$app" in
       tls_secret="es-rest-tls-secret"
       ingress_tls_secret="elasticsearch-ingress-tls-secret"
       route_name="$service_name"
+      if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
+        route_host=${OPENSHIFT_ROUTE_HOST_ELASTICSEARCH:-v4m-$namespace.$OPENSHIFT_ROUTE_DOMAIN}
+        route_path="/elasticsearch"
+      else
+        route_host=${OPENSHIFT_ROUTE_HOST_ELASTICSEARCH:-$service_name-$namespace.$OPENSHIFT_ROUTE_DOMAIN}
+        route_path="/"
+      fi
       ;;
   ""|*)
       log_error "Application name is invalid or missing."
@@ -66,8 +80,17 @@ else
    fi
 fi
 
-oc -n $LOG_NS create route $tls_mode $route_name  --service $service_name  --port=$port  --insecure-policy=Redirect
+oc -n $namespace create route $tls_mode $route_name \
+    --service $service_name \
+    --port=$port \
+    --insecure-policy=Redirect \
+    --hostname $route_host \
+    --path $route_path
 rc=$?
+
+if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
+    oc -n $namespace annotate route $route_name "haproxy.router.openshift.io/rewrite-target=/"
+fi
 
 if [ "$rc" != "0" ]; then
    log_error "There was a problem creating the route for [$route_name]. [$rc]"
@@ -76,12 +99,16 @@ fi
 
 if [ "$tls_enable" == "true" ]; then
    # identify secret containing destination CA
-   oc -n $LOG_NS annotate  route $route_name cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret
+   oc -n $namespace annotate route $route_name cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret
 fi
 
-# identify secret containing TLS certs
-oc -n $LOG_NS annotate  route $route_name cert-utils-operator.redhat-cop.io/certs-from-secret=$ingress_tls_secret
 
+if oc -n $namespace get secret $ingress_tls_secret 2>/dev/null 1>&2; then
+   # Add annotation to identify secret containing TLS certs
+   oc -n $namespace annotate route $route_name cert-utils-operator.redhat-cop.io/certs-from-secret=$ingress_tls_secret
+else
+   log_debug "The ingress secret [$ingress_tls_secret] does NOT exists, omitting annotation [certs-from-secret]."
+fi
 
 log_info "OpenShift Route [$route_name] has been created."
 

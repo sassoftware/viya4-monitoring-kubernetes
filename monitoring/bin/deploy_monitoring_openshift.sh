@@ -111,6 +111,15 @@ else
   wnpValuesFile="$TMP_DIR/empty.yaml"
 fi
 
+if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
+  OPENSHIFT_ROUTE_PATH_GRAFANA=${OPENSHIFT_ROUTE_PATH_GRAFANA:-/grafana}
+fi
+if [ "$OPENSHIFT_ROUTE_PATH_GRAFANA" != "" ] && [ "$OPENSHIFT_ROUTE_PATH_GRAFANA" != "/" ]; then
+  grafanaSubPath="true"
+else
+  grafanaSubPath="false"
+fi
+
 log_info "Deploying Grafana..."
 OPENSHIFT_GRAFANA_CHART_VERSION=${OPENSHIFT_GRAFANA_CHART_VERSION:-6.9.1}
 helm upgrade --install $helmDebug \
@@ -119,6 +128,9 @@ helm upgrade --install $helmDebug \
   -f "$grafanaYAML" \
   -f "$grafanaAuthYAML" \
   -f "$userGrafanaYAML" \
+  --set 'grafana\.ini'.server.domain=$OPENSHIFT_ROUTE_DOMAIN \
+  --set 'grafana\.ini'.server.root_url=https://v4m-grafana-$MON_NS.$OPENSHIFT_ROUTE_DOMAIN$OPENSHIFT_ROUTE_PATH_GRAFANA \
+  --set 'grafana\.ini'.server.serve_from_sub_path=$grafanaSubPath \
   --version "$OPENSHIFT_GRAFANA_CHART_VERSION" \
   --atomic \
   $grafanaPwd \
@@ -145,8 +157,15 @@ if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   kubectl apply -n $MON_NS -f monitoring/openshift/grafana-proxy-secret.yaml
   
   grafanaProxyPatchYAML=$TMP_DIR/grafana-proxy-patch.yaml
-  cp monitoring/openshift/grafana-proxy-patch.yaml $grafanaProxyPatchYAML
-  
+
+  if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
+    log_debug "Using path-based version of the OpenShift Grafana proxy patch"
+    cp monitoring/openshift/grafana-proxy-patch-path.yaml $grafanaProxyPatchYAML
+  else
+    log_debug "Using host-based version of the OpenShift Grafana proxy patch"
+    cp monitoring/openshift/grafana-proxy-patch-host.yaml $grafanaProxyPatchYAML
+  fi
+    
   log_debug "Deploying CA bundle..."
   kubectl apply -n $MON_NS -f monitoring/openshift/grafana-trusted-ca-bundle.yaml
   
@@ -168,9 +187,25 @@ for f in monitoring/rules/viya/rules-*.yaml; do
   kubectl apply -n $MON_NS -f $f
 done
 
+if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
+  routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-$MON_NS.$OPENSHIFT_ROUTE_DOMAIN}
+else
+  routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-grafana-$MON_NS.$OPENSHIFT_ROUTE_DOMAIN}
+fi
 if ! kubectl get route -n $MON_NS v4m-grafana 1>/dev/null 2>&1; then
   log_info "Exposing Grafana service as a route..."
-  oc create route reencrypt -n $MON_NS --service=v4m-grafana
+  if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
+    oc create route reencrypt \
+      -n $MON_NS \
+      --service v4m-grafana \
+      --hostname "$routeHost" \
+      --path $OPENSHIFT_ROUTE_PATH_GRAFANA
+  else
+    oc create route reencrypt \
+      -n $MON_NS \
+      --service v4m-grafana \
+      --hostname "$routeHost"
+  fi
 fi
 
 scheme="https"
@@ -182,7 +217,8 @@ if [ ! "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
     fi
   fi
 fi
-log_notice "Grafana URL: $scheme://$(kubectl get route -n $MON_NS | grep v4m-grafana | awk '{printf $2}')"
+bin/show_app_url.sh GRAFANA
+# log_notice "Grafana URL: $scheme://$(kubectl get route -n $MON_NS v4m-grafana -o jsonpath='{.spec.host}{.spec.path}')"
 
 log_message ""
 log_notice "Successfully deployed SAS Viya monitoring for OpenShift"
