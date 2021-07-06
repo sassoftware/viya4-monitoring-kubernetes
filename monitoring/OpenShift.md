@@ -120,6 +120,20 @@ No customizations are required, even if you are using ingress, because the
 [route](https://docs.openshift.com/enterprise/3.0/architecture/core_concepts/routes.html)
 for Grafana.
 
+### Customizing Routes
+
+Routes may be configured to be host-based (default) or path-based. When
+using host-based routes, access to Grafana will be by hostname only - for
+example: `https://v4m-grafana-monitoring.apps.my-openshift-cluster.com`. Path-
+based routes will result in a url ending in `/grafana` - for example:
+`https://v4m-monitoring.apps.my-openshift-cluster.com/grafana`.
+
+Use `OPENSHIFT_PATH_ROUTES=true` in `$USER_DIR/user.env` to use path-based
+routes.
+
+The hostname can be configured using `OPENSHIFT_ROUTE_HOST_GRAFANA` in
+`$USER_DIR/user.env`.
+
 ## Remove SAS Viya Monitoring on OpenShift
 
 To remove the monitoring components, run these commands:
