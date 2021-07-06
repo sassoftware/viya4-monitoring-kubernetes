@@ -28,7 +28,7 @@ If you want to change either of these retention periods, follow these steps:
 
   If you are deploying on OpenShift, the policy `viya_infra_idxmgmt_policy.json` is 
   added to manage log messages from OpenShift infrastructure namespaces (which 
-  is any namespace that starts with "openshift"). By default, these messages are 
+  are any namespaces that start with "openshift"). By default, these messages are 
   retained for one day. To change the retention period for OpenShift infrastructure 
   messages, modify the `INFRA_LOG_RETENTION_PERIOD` environment variable.
 
