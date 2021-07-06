@@ -222,8 +222,3 @@ bin/show_app_url.sh GRAFANA
 
 log_message ""
 log_notice "Successfully deployed SAS Viya monitoring for OpenShift"
-
-function url {
-  scheme=$(figure out tls present???)
-  echo "$scheme://$(kubectl get route -n $namespace $service -o jsonpath='{.spec.host}{.spec.path}')"
-}
