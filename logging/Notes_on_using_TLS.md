@@ -71,4 +71,22 @@ export USER_DIR=~/my-cluster-files/ops/user-dir
 
    - For the value of the key `opendistro_security.nodes_dn`, specify the subject information that you obtained from the `es-transport-tls` certificate.
 
-*Note:* You must specify the subject information exactly as it was returned from the certificate (without any spaces after the commas). 
+***Note:*** You must specify the subject information exactly as it was returned from the certificate (without any spaces after the commas). 
+
+7. If you plan on using ingress, populate these Kubernetes secrets with 
+TLS certificates before you run the deployment script:
+
+* `kibana-ingress-tls-secret`
+* `elasticsearch-ingress-tls-secret`
+
+8. After you have obtained the certificates for the secrets, use this command to generate the secrets:
+
+```bash
+kubectl create secret tls $SECRET_NAME -n $NAMESPACE --key $CERT_KEY --cert $CERT_FILE
+```
+
+Use `kibana-ingress-tls-secret` and `elasticsearch-ingress-tls-secret` as values for `$SECRET_NAME`. Use the name of the namespace into which the logging components 
+were deployed (such as `logging`) for the value of `$NAMESPACE`.
+
+9. If you are using an ingress controller other than NGINX, modify the annotation 
+`nginx.ingress.kubernetes.io/backend-protocol: HTTPS` as needed in the `user-values-elasticsearch-open.yaml` file. Refer to the documentation for your ingress controller. 

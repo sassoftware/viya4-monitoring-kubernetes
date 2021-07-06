@@ -48,7 +48,7 @@ The process of generating the certificates for these secrets is out of scope for
 
 ### Secrets for In-Cluster TLS
 
-The standard deployment script for the logging components use these TLS secrets for the TLS certificates that handle interactions between components:
+The standard deployment script for the logging components use these Kubernetes secrets for the TLS certificates that handle interactions between components:
 
 * `es-rest-tls-secret`
 * `es-transport-tls-secret`

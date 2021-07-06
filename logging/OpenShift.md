@@ -46,16 +46,70 @@ oc login [cluster-hostname] -u [userID]
 ```
 
 ## <a name="l_os_cust"></a>Customization 
+#### General Customization
 
 Customization of SAS Viya Logging on OpenShift deployment follows the same process as in a standard logging deployment, which uses the USER_DIR environment variable to specify the location of your customization files. See the [logging README](../logging/README.md#log_custom) for information about the customization process.
 
-To change the number of days that log messages from OpenShift infrastructure components 
-are retained, modify the `INFRA_LOG_RETENTION_PERIOD` environment variable. The default 
-value is `1` (1 day).
+### OpenShift-Specific Customization and Information
 
+#### OpenShift Infrastructure Message Retention
+An additional index management policy, named `viya_infra_idxmgmt_policy`, is added 
+in an OpenShift environment. The policy manages log messages from OpenShift 
+infrastructure namespaces (which is ny namespace that starts with "openshift"). 
+Because the OpenShift infrastructure namespaces can generate a large number of 
+log messages, you can use the policy to change the number of days that these 
+log messages are retained. To change the retention period, modify the `INFRA_LOG_RETENTION_PERIOD` environment variable. The default value is `1` (1 day).
+
+***Note:*** See [Log Retention](Log_Retention.md) for information 
+about the index policies and log message retention for SAS Viya, Kubernetes, 
+and logging components.
+
+#### Access Using Route Objects
+OpenShift uses [route](https://docs.openshift.com/enterprise/3.0/architecture/core_concepts/routes.html) objects, a feature unique to OpenShift, to access Kibana and (optionally) the Elasticsearch API endpoint. This makes it unnecessary to configure ingress objects or surface nodePorts.
 No customizations are required, even if you are using ingress, because the `deploy_logging_open_openshift.sh` script defines a route for Kibana.
 
-OpenShift uses [route](https://docs.openshift.com/enterprise/3.0/architecture/core_concepts/routes.html) objects, a feature unique to OpenShift, to access Kibana and (optionally) the Elasticsearch API endpoint. This makes it unnecessary to configure ingress objects or surface nodePorts.
+#### TLS
+OpenShift route objects that are created as part of SAS Viya Logging 
+deployment are TLS-enabled. The routes are configured 
+with re-encrypt termination, which means that traffic is encrypted between the user 
+and OpenShift and again within the OpenShift cluster. The TLS certificates used on 
+OpenShift come from the same Kubernetes secrets as a standard logging deployment:
+
+***In-Cluster TLS:***
+- `es-transport-tls-secret`
+- `es-rest-tls-secret`
+- `es-admin-tls-secret`
+
+***Ingress TLS:***
+- `kibana-ingress-tls-secret`
+- `elasticsearch-ingress-tls-secret`
+
+By default, the deployment process uses cert-manager to obtain and manage the 
+certificates used for in-cluster TLS. If the Ingress secrets are not populated, default certificates 
+are provided by OpenShift.
+
+You can also use your own TLS certificates to populate the Kuberbetes secrets. 
+See [Notes_on_using_TLS](Notes_on_using_TLS.md) for information about replacing 
+the in-cluster secrets and [Sample - TLS Enablement for Logging](../samples/tls/logging/README.md) for information about replacing the Ingress secrets.
+
+#### Enable Access to the Elasticsearch API Endpoint
+You can make the Elasticsearch API accessible so that users can query Elasticsearch 
+by using the `getlogs.sh` script or curl commands. To make the API endpoint 
+accessible, set the `OPENSHIFT_ES_ROUTE_ENABLE` environment variable to `true` before 
+you deploy the logging components. 
+
+If you need to make the API endpoint accessible after deployment is complete, run 
+the `create_openshift_route.sh` script and pass the `ELASTICSEARCH` argument:
+```bash
+./logging/bin/create_openshift_route.sh ELASTICSEARCH
+```  
+
+To remove access to the API endpoint, use the oc command to delete the route:
+```bash
+oc -n $LOG_NS delete route v4m-es-client-service
+```  
+***Note:*** Do not use the `es_nodeport_enable.sh` and `es_nodeport_enable.sh` scripts 
+in an OpenShift environment.  
 
 ## Remove SAS Viya Logging on OpenShift
 
