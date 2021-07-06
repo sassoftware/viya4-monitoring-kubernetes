@@ -26,5 +26,11 @@ If you want to change either of these retention periods, follow these steps:
   - SAS Viya and Kubernetes pods: `/logging/es/odfe/es_viya_logs_idxmgmt_policy.json`
   - Logging components: `/logging/es/odfe/es_viya_logs_idxmgmt_policy.json`
 
+  If you are deploying on OpenShift, the policy `viya_infra_idxmgmt_policy.json` is 
+  added to manage log messages from OpenShift infrastructure namespaces (which 
+  is any namespace that starts with "openshift"). By default, these messages are 
+  retained for one day. To change the retention period for OpenShift infrastructure 
+  messages, modify the `INFRA_LOG_RETENTION_PERIOD` environment variable.
+
 You can modify these policies or create your own. For information about index management, see [Index State Management](https://opendistro.github.io/for-elasticsearch-docs/docs/ism/) in the Open Distro for Elasticsearch documentation.
 

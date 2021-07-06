@@ -69,14 +69,17 @@ OpenShift uses [route](https://docs.openshift.com/enterprise/3.0/architecture/co
 No customizations are required, even if you are using ingress, because the `deploy_logging_open_openshift.sh` script defines a route for Kibana.
 
 #### TLS
-OpenShift route objects are TLS-enabled. The routes are configured 
+OpenShift route objects that are created as part of SAS Viya Logging 
+deployment are TLS-enabled. The routes are configured 
 with re-encrypt termination, which means that traffic is encrypted between the user 
 and OpenShift and again within the OpenShift cluster. The TLS certificates used on 
 OpenShift come from the same Kubernetes secrets as a standard logging deployment:
+
 ***In-Cluster TLS:***
 - `es-transport-tls-secret`
 - `es-rest-tls-secret`
 - `es-admin-tls-secret`
+
 ***Ingress TLS:***
 - `kibana-ingress-tls-secret`
 - `elasticsearch-ingress-tls-secret`
