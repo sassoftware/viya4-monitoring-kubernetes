@@ -27,7 +27,7 @@ prometheusOperator:
       memory: "50Mi"
     limits:
       cpu: "250m"
-      memory: "150Mi"
+      memory: "1Gi"
   tlsProxy:
     resources:
       requests:
