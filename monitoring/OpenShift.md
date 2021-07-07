@@ -128,11 +128,12 @@ example: `https://v4m-grafana-monitoring.apps.my-openshift-cluster.com`. Path-
 based routes will result in a url ending in `/grafana` - for example:
 `https://v4m-monitoring.apps.my-openshift-cluster.com/grafana`.
 
-Use `OPENSHIFT_PATH_ROUTES=true` in `$USER_DIR/user.env` to use path-based
-routes.
+Specify `OPENSHIFT_PATH_ROUTES=true` in the `$USER_DIR/user.env` file
+(applies to both monitoring and logging) or the `$USER_DIR/logging/user.env`
+file (for only logging components) to use path-based routes.
 
-The hostname can be configured using `OPENSHIFT_ROUTE_HOST_GRAFANA` in
-`$USER_DIR/user.env`.
+The Grafana hostname can be configured using `OPENSHIFT_ROUTE_HOST_GRAFANA` in
+`$USER_DIR/user.env` or `$USER_DIR/monitoring/user.env`.
 
 ## Remove SAS Viya Monitoring on OpenShift
 
