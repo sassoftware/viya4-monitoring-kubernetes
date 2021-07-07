@@ -111,6 +111,25 @@ oc -n $LOG_NS delete route v4m-es-client-service
 ***Note:*** Do not use the `es_nodeport_enable.sh` and `es_nodeport_enable.sh` scripts 
 in an OpenShift environment.  
 
+#### Customizing Routes
+
+Routes may be configured to be host-based (default) or path-based. When
+using host-based routes, the name of the application is part of the hostname
+in the URL (for example:
+`https://v4m-kibana-monitoring.apps.my-openshift-cluster.com`).
+When using path-based routes, the application name only appears as part of the
+path at the end of the URL (for example:
+`https://v4m-logging.apps.my-openshift-cluster.com/kibana`).
+
+Specify `OPENSHIFT_PATH_ROUTES=true` in the `$USER_DIR/user.env` file
+(applies to both logging and monitoring) or the `$USER_DIR/logging/user.env`
+file (for only logging components) to use path-based routes.
+
+The hostnames for Kibana and Elasticsearch can be configured using
+`OPENSHIFT_ROUTE_HOST_KIBANA` and/or `OPENSHIFT_ROUTE_HOST_ELASTICSEARCH`
+(if the Elasticsearch route is enabled) in `$USER_DIR/user.env` or
+`$USER_DIR/logging/user.env`.
+
 ## Remove SAS Viya Logging on OpenShift
 
 To remove the monitoring components, run this command:
