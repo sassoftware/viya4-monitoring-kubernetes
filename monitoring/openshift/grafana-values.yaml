@@ -9,6 +9,8 @@ sidecar:
   datasources:
     enabled: true
     label: grafana_datasource
+deploymentStrategy:
+  type: Recreate
 persistence:
   type: pvc
   enabled: true
