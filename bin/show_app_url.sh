@@ -13,7 +13,7 @@ log_debug "Script [$this_script] has started [$(date)]"
 
 # Fixed-width version of add_notice
 function add_notice_wide {
-  width=$(tput cols)
+  width=$(tput cols 2>/dev/null)
   if [ "$width" == "" ]; then
     width=80
   fi
