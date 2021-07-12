@@ -63,10 +63,8 @@ case "$app" in
 esac
 
 if oc -n $namespace get route $route_name 2>/dev/null 1>&2; then
-   log_error "The requested route [$route_name] already exists in the namespace [$namespace]."
-   log_error "The details of existing route are shown below:"
-   oc -n $namespace get route $route_name
-   exit 1
+   log_info "The requested route [$route_name] already exists in the namespace [$namespace]."
+   exit 0
 fi
 
 if [ "$tls_enable" != "true" ]; then

@@ -21,8 +21,12 @@ fi
 # link Elasticsearch serviceAccounts to 'privileged' scc
 oc adm policy add-scc-to-user privileged -z v4m-es-es -n $LOG_NS
 
-# create the 'v4mlogging' SCC
-oc create -f logging/openshift/fb_v4mlogging_scc.yaml
+# create the 'v4mlogging' SCC, if it does not already exist
+if oc get scc v4mlogging 2>/dev/null 1>&2; then
+   log_info "Using existing scc [v4mlogging]"
+else
+   oc create -f logging/openshift/fb_v4mlogging_scc.yaml
+fi
 
 # link Fluent Bit serviceAccount to 'v4mlogging' scc
 oc adm policy add-scc-to-user v4mlogging -z v4m-fb    -n $LOG_NS
