@@ -23,7 +23,7 @@ oc adm policy add-scc-to-user privileged -z v4m-es-es -n $LOG_NS
 
 # create the 'v4mlogging' SCC, if it does not already exist
 if oc get scc v4mlogging 2>/dev/null 1>&2; then
-   log_info "Using existing scc [v4mlogging]"
+   log_info "Skipping scc creation; using existing scc [v4mlogging]"
 else
    oc create -f logging/openshift/fb_v4mlogging_scc.yaml
 fi
