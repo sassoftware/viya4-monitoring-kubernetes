@@ -1,5 +1,5 @@
 image:
-  tag: 1.6.10
+  tag: 1.7.9
 podAnnotations: 
   fluentbit.io/parser: fluentbit
 podLabels:
@@ -19,11 +19,15 @@ extraVolumeMounts:
 - mountPath: /fluent-bit/etc/viya-parsers.conf
   name: parsers-config
   subPath: viya-parsers.conf
+- mountPath: /var/log/fb_buffer
+  name: fb-buffer
 extraVolumes:
 - configMap:
     defaultMode: 420
     name: fbaz-viya-parsers
   name: parsers-config
+- name: fb-buffer
+  emptyDir: {}
 fullConfigMap: false
 existingConfigMap: fbaz-fluent-bit-config
 

@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.11-osparse
+       Set  fb_configMap_version 0.2.11fb170
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -875,6 +875,7 @@ data:
        Ignore_Older     1d
        DB               /var/log/sas_viya_flb.db
        DB.locking       On
+       storage.type     filesystem
     [INPUT]
        # NOTE: ** METALOGGING **
        Name             tail
@@ -888,6 +889,7 @@ data:
        Ignore_Older     1d
        DB               /var/log/sas_viya_flb.db
        DB.locking       On
+       storage.type     filesystem
     [OUTPUT]
        Name  es
        Alias eslogs
@@ -898,6 +900,7 @@ data:
        Logstash_Format On
        Retry_Limit 5
        Type  _doc
+       Workers 1
        Time_Key @timestamp
        Generate_ID  On
        Replace_Dots On
@@ -924,6 +927,7 @@ data:
        Retry_Limit 5
        Type  _doc
        Time_Key @timestamp
+       Workers 1
        Replace_Dots On
        Logstash_Prefix viya_ops
        HTTP_User ${ES_LOGCOLLECTOR_USER}
@@ -940,6 +944,11 @@ data:
        HTTP_Server  On
        HTTP_Listen  0.0.0.0
        HTTP_Port    2020
+       storage.path /var/log/fb_buffer/
+       storage.checksum off
+       storage.sync normal
+       storage.backlog.mem_limit 5M
+       storage.metrics On
   parsers.conf: ""
 kind: ConfigMap
 metadata:
