@@ -134,8 +134,8 @@ file (for only logging components) to use path-based routes.
 
 The Grafana hostname can be configured using `OPENSHIFT_ROUTE_HOST_GRAFANA` in
 `$USER_DIR/user.env` or `$USER_DIR/monitoring/user.env`. Note that OpenShift
-does not allow the use of the same across namespaces, so do not use the same
-hostname across logging and monitoring.
+does not allow the use of the same route hostname across namespaces, so do not
+use the same custom hostname across logging and monitoring.
 
 ## Remove SAS Viya Monitoring on OpenShift
 
