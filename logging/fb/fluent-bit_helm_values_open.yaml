@@ -10,15 +10,11 @@ extraVolumeMounts:
 - mountPath: /fluent-bit/etc/viya-parsers.conf
   name: parsers-config
   subPath: viya-parsers.conf
-- mountPath: /var/log/fb_buffer
-  name: fb-buffer
 extraVolumes:
 - configMap:
     defaultMode: 420
     name: fb-viya-parsers
   name: parsers-config
-- name: fb-buffer
-  emptyDir: {}
 fullConfigMap: false
 existingConfigMap: fb-fluent-bit-config
 
