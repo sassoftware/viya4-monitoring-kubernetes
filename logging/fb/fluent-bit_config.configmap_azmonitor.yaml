@@ -906,7 +906,7 @@ data:
        HTTP_Server  On
        HTTP_Listen  0.0.0.0
        HTTP_Port    2020
-       storage.path /var/log/fb_buffer/
+       storage.path /tmp/fb_buffer/
        storage.checksum off
        storage.sync normal
        storage.backlog.mem_limit 5M
