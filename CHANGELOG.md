@@ -22,7 +22,7 @@
 
 * **Logging**
   * [CHANGE] Fluent Bit has been updated to version [1.7.9](https://fluentbit.io/announcements/v1.7.9/)
-  * [FEATURE] Fluent Bit disk buffering is now enabled by default
+  * [FEATURE] Fluent Bit disk buffering is now enabled
   * [FIX] Fluent Bit pods were not restarted properly during an
     upgrade-in-place
   * [FIX] OpenShift: Upgrade-in-place now functions properly
