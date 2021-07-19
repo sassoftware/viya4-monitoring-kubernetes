@@ -1,5 +1,34 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.0.9 (19JUL21)
+
+* **Overall**
+  * [FEATURE] OpenShift version checking has been added
+    * Version 4.6.x is supported
+    * Version 4.5 or lower generates an error
+    * Version 4.7 or higher generates a warning
+  * [FEATURE] Integration with the SAS Viya workload node placement strategy
+    can be enabled with `NODE_PLACEMENT_ENABLE=true`
+  * [FEATURE] OpenShift: Path-based ingress can be enabled
+    with `OPENSHIFT_PATH_ROUTES=true`
+
+* **Monitoring**
+  * [FIX] OpenShift: Some of the Perf dashboards displayed empty charts
+  * [CHANGE] Prometheus version changed from 2.26.0 to 2.26.1
+  * [FEATURE] OpenShift: A custom route hostname can be set with
+    `OPENSHIFT_ROUTE_HOST_GRAFANA`
+  * [FIX] The memory limit of the Prometheus Operator has been increased
+    to 1 GiB
+
+* **Logging**
+  * [CHANGE] Fluent Bit has been updated to version [1.7.9](https://fluentbit.io/announcements/v1.7.9/)
+  * [FEATURE] Fluent Bit disk buffering is now enabled
+  * [FIX] Fluent Bit pods were not restarted properly during an
+    upgrade-in-place
+  * [FIX] OpenShift: Upgrade-in-place now functions properly
+  * [FEATURE] OpenShift: A custom route hostname can be set with
+    `OPENSHIFT_ROUTE_HOST_KIBANA` and `OPENSHIFT_ROUTE_HOST_ELASTICSEARCH`
+
 ## Version 1.0.8 (14JUN21)
 
 * **Monitoring**
