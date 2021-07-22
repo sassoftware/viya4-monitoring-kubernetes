@@ -28,6 +28,8 @@ export SVC=v4m-es-client-service
 if [ "$ES_PORT" != "0" ]; then
    log_info "Making Elasticsearch instance [$SVC] in [$LOG_NS] namespace available on port [$ES_PORT]"
    echo
+else
+   log_debug "No specific port was provided, will make Elasticsearch instance available on a random port"
 fi
 
 # set env var to a node in cluster
