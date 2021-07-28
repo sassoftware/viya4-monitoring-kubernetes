@@ -194,6 +194,8 @@ grafana:
       requests:
         cpu: "50m"
         memory: "100Mi"
+  deploymentStrategy:
+    type: Recreate
   persistence:
     type: pvc
     enabled: true
