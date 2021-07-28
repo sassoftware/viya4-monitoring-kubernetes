@@ -116,6 +116,16 @@ helm2ReleaseCheck odfe-$LOG_NS
 if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
    log_debug "A Helm release [odfe] exists; upgrading the release."
    existingODFE="true"
+
+   # Check to see if Nodeport for Elasticsearch API has been enabled
+   # If so, Will be re-enabled at end of script
+   ES_PORT=$(kubectl -n $LOG_NS get service v4m-es-client-service -o=jsonpath='{.spec.ports[?(@.name=="http")].nodePort}' 2>/dev/null)
+   if [ -n "$ES_PORT" ]; then
+      log_debug "NodePort for Elasticsearch detected [$ES_PORT]"
+      logging/bin/es_nodeport_disable_open.sh
+      ES_NODEPORT_ENABLE=true
+      export ES_PORT
+   fi
 else
    log_debug "A Helm release [odfe] do NOT exist; deploying a new release."
    existingODFE="false"
@@ -315,6 +325,14 @@ if [ "$existingODFE" == "false" ]; then
   sed 's/^/   | /' $TMP_DIR/run_securityadmin.log
 else
   log_info "Existing Open Distro release found. Skipping Elasticsearh security initialization."
+fi
+
+
+# (Re-)Enable Nodeport for Elasticsearch API?
+ES_NODEPORT_ENABLE=${ES_NODEPORT_ENABLE:-false}
+if [ "$ES_NODEPORT_ENABLE" == "true" ]; then
+   log_debug "(Re)Enabling NodePort for Elasticsearch"
+   SHOW_ES_URL=false logging/bin/es_nodeport_enable_open.sh
 fi
 
 set -e
