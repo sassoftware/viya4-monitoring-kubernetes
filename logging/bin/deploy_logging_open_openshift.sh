@@ -123,6 +123,11 @@ log_info "STEP 6: Deploying Service Monitors"
 export DEPLOY_SERVICEMONITORS=${DEPLOY_SERVICEMONITORS:-true}
 logging/bin/deploy_servicemonitors_open_openshift.sh
 
+##################################
+# Version Info                   #
+##################################
+log_info "STEP 7: Updating version info"
+deployV4MInfo "$LOG_NS"
 
 ##################################
 # Display Notices                #
