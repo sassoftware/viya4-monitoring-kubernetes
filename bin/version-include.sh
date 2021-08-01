@@ -7,11 +7,13 @@ function deployV4MInfo() {
     log_error "No namespace specified for deploying version info"
     return 1
   fi
-  echo "installUser: $USER" > $TMP_DIR/envValues.yaml
+  # TODO: Add user.env content to yaml
+  envValuesYAML=$TMP_DIR/empty.yaml
+
   log_info "Updating version info..."
   helm upgrade --install \
     -n "$NS" \
-    --values $TMP_DIR/envValues.yaml \
+    --values $envValuesYAML \
     v4m ./v4m-chart
 }
 
@@ -22,7 +24,7 @@ function removeV4MInfo() {
     return 1
   fi
   log_info "Removing version info..."
-  helm uninstall -n "$V4M_NS" v4m
+  helm uninstall -n "$NS" v4m
 }
 
 if [ -z "$V4M_VERSION_INCLUDE" ]; then
