@@ -29,10 +29,6 @@ function deployV4MInfo() {
     cat "$USER_DIR/logging/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
   fi
   
-  echo ">>BRYAN<<"
-  cat "$v4mValuesYAML"
-  echo "<<BRYAN>>"
-
   log_info "Updating version info..."
   helm upgrade --install \
     -n "$NS" \
