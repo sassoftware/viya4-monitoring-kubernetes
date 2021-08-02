@@ -7,13 +7,36 @@ function deployV4MInfo() {
     log_error "No namespace specified for deploying version info"
     return 1
   fi
-  # TODO: Add user.env content to yaml
-  envValuesYAML=$TMP_DIR/empty.yaml
+  v4mValuesYAML=$TMP_DIR/v4mValues.yaml
+  rm -f "$v4mValuesYAML"
+  touch "$v4mValuesYAML"
+
+  if [ -d "$USER_DIR" ]; then
+    echo '"user_dir":' >> "$v4mValuesYAML"
+    echo '  files: |' >> "$v4mValuesYAML"
+    ls -R "$USER_DIR" | sed 's/^/      /' >> "$v4mValuesYAML"
+  fi  
+  if [ -f "$USER_DIR/user.env" ]; then
+    echo '  "user.env": |' >> "$v4mValuesYAML"
+    cat "$USER_DIR/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
+  fi
+  if [ -f "$USER_DIR/monitoring/user.env" ]; then
+    echo '  "monitoring_user.env": |' >> "$v4mValuesYAML"
+    cat "$USER_DIR/monitoring/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
+  fi
+  if [ -f "$USER_DIR/logging/user.env" ]; then
+    echo '  "logging_user.env": |' >> "$v4mValuesYAML"
+    cat "$USER_DIR/logging/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
+  fi
+  
+  echo ">>BRYAN<<"
+  cat "$v4mValuesYAML"
+  echo "<<BRYAN>>"
 
   log_info "Updating version info..."
   helm upgrade --install \
     -n "$NS" \
-    --values $envValuesYAML \
+    --values $v4mValuesYAML \
     v4m ./v4m-chart
 }
 
