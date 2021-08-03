@@ -1,38 +1,48 @@
 # Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+function populateValuesYAML() {
+  v4mValuesYAML=$1
+  rm -f "$v4mValuesYAML"
+  touch "$v4mValuesYAML"
+
+  # List contents of USER_DIR
+  if [ -d "$USER_DIR" ]; then
+    echo '"user_dir":' >> "$v4mValuesYAML"
+    echo '  files: |' >> "$v4mValuesYAML"
+    ls -R "$USER_DIR" | sed 's/^/      /' >> "$v4mValuesYAML"
+  fi  
+  # Top-level user.env contents
+  if [ -f "$USER_DIR/user.env" ]; then
+    echo '  "user.env": |' >> "$v4mValuesYAML"
+    cat "$USER_DIR/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
+  fi
+  # Monitoring user.env contents
+  if [ -f "$USER_DIR/monitoring/user.env" ]; then
+    echo '  "monitoring_user.env": |' >> "$v4mValuesYAML"
+    cat "$USER_DIR/monitoring/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
+  fi
+  # Logging user.env contents
+  if [ -f "$USER_DIR/logging/user.env" ]; then
+    echo '  "logging_user.env": |' >> "$v4mValuesYAML"
+    cat "$USER_DIR/logging/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
+  fi
+}
+
 function deployV4MInfo() {
   NS=$1
   if [ -z "$NS" ]; then
     log_error "No namespace specified for deploying version info"
     return 1
   fi
-  v4mValuesYAML=$TMP_DIR/v4mValues.yaml
-  rm -f "$v4mValuesYAML"
-  touch "$v4mValuesYAML"
 
-  if [ -d "$USER_DIR" ]; then
-    echo '"user_dir":' >> "$v4mValuesYAML"
-    echo '  files: |' >> "$v4mValuesYAML"
-    ls -R "$USER_DIR" | sed 's/^/      /' >> "$v4mValuesYAML"
-  fi  
-  if [ -f "$USER_DIR/user.env" ]; then
-    echo '  "user.env": |' >> "$v4mValuesYAML"
-    cat "$USER_DIR/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
-  fi
-  if [ -f "$USER_DIR/monitoring/user.env" ]; then
-    echo '  "monitoring_user.env": |' >> "$v4mValuesYAML"
-    cat "$USER_DIR/monitoring/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
-  fi
-  if [ -f "$USER_DIR/logging/user.env" ]; then
-    echo '  "logging_user.env": |' >> "$v4mValuesYAML"
-    cat "$USER_DIR/logging/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
-  fi
-  
+  valuesYAML=$TMP_DIR/v4mValues.yaml
+  populateValuesYAML "$valuesYAML"
+
   log_info "Updating version info..."
   helm upgrade --install \
     -n "$NS" \
-    --values $v4mValuesYAML \
+    --values $valuesYAML \
     v4m ./v4m-chart
 }
 
