@@ -49,14 +49,3 @@ Selector labels
 app.kubernetes.io/name: {{ include "v4m.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "v4m.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "v4m.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
