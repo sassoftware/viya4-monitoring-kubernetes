@@ -6,11 +6,22 @@ function populateValuesYAML() {
   rm -f "$v4mValuesYAML"
   touch "$v4mValuesYAML"
 
+  # Attempt to obtain current git commit hash
+  gitCommit=$(git rev-parse --short HEAD 2>/dev/null)
+  if [ -n "$gitCommit" ]; then
+    echo "gitCommit: $gitCommit" >> "$v4mValuesYAML"
+  fi
+
   # List contents of USER_DIR
   if [ -d "$USER_DIR" ]; then
     echo '"user_dir":' >> "$v4mValuesYAML"
     echo '  files: |' >> "$v4mValuesYAML"
-    ls -R "$USER_DIR" | sed 's/^/      /' >> "$v4mValuesYAML"
+    l=($(find "$USER_DIR" -type f))
+    for (( i=0; i<${#l[@]}; i++ )); do
+      fullPath=${l[i]}
+      path=${fullPath#"$USER_DIR/"}
+      echo "      $path" >> "$v4mValuesYAML"
+    done
   fi  
   # Top-level user.env contents
   if [ -f "$USER_DIR/user.env" ]; then
