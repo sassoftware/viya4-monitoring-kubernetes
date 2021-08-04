@@ -4,3 +4,4 @@ description: Viya 4 Monitoring for Kubernetes (https://github.com/sassoftware/vi
 type: application
 version: 1.0.10-SNAPSHOT
 appVersion: "1.0.10-SNAPSHOT"
+# foo

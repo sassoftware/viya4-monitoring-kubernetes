@@ -10,6 +10,11 @@ function populateValuesYAML() {
   gitCommit=$(git rev-parse --short HEAD 2>/dev/null)
   if [ -n "$gitCommit" ]; then
     echo "gitCommit: $gitCommit" >> "$v4mValuesYAML"
+    gitStatus=$(git status -s | sed 's/^ M/M/' | sed 's/^/  /')
+    if [ -n "$gitStatus" ]; then
+      echo "gitStatus: |" >> "$v4mValuesYAML"
+      echo "$gitStatus" >> "$v4mValuesYAML"
+    fi
   fi
 
   # List contents of USER_DIR
@@ -73,7 +78,7 @@ if [ -z "$V4M_VERSION_INCLUDE" ]; then
   IFS=$'\n' v4mHelmVersionLines=($(helm list -n "$V4M_NS" --filter '^v4m$' -o yaml))
   IFS=$origIFS
   if [ -z "$v4mHelmVersionLines" ]; then
-  log_debug "No v4m release found in [$V4M_NS]"
+    log_debug "No v4m release found in [$V4M_NS]"
   else
     for (( i=0; i<${#v4mHelmVersionLines[@]}; i++ )); do 
       line=${v4mHelmVersionLines[$i]}

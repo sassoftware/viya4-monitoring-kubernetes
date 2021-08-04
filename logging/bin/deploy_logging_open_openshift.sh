@@ -127,7 +127,10 @@ logging/bin/deploy_servicemonitors_open_openshift.sh
 # Version Info                   #
 ##################################
 log_info "STEP 7: Updating version info"
-deployV4MInfo "$LOG_NS"
+if ! deployV4MInfo "$LOG_NS"; then
+  log_warn "Unable to update SAS Viya Monitoring version info"
+fi
+
 
 ##################################
 # Display Notices                #
