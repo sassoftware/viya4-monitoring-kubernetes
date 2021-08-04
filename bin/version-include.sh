@@ -15,6 +15,7 @@ function populateValuesYAML() {
   # List contents of USER_DIR
   if [ -d "$USER_DIR" ]; then
     echo '"user_dir":' >> "$v4mValuesYAML"
+    echo "  path: $(dirname $USER_DIR)" >> "$v4mValuesYAML"
     echo '  files: |' >> "$v4mValuesYAML"
     l=($(find "$USER_DIR" -type f))
     for (( i=0; i<${#l[@]}; i++ )); do
@@ -76,12 +77,12 @@ if [ -z "$V4M_VERSION_INCLUDE" ]; then
   else
     for (( i=0; i<${#v4mHelmVersionLines[@]}; i++ )); do 
       line=${v4mHelmVersionLines[$i]}
-      vre='app_version: (([0-9]+).([[0-9]+)(.[0-9]+)?(-.+)?)'
+      vre='app_version: (([0-9]+).([[0-9]+).([0-9]+)\.?(-.+)?)'
       sre='status: (.+)'
       if [[ $line =~ $vre ]]; then
         V4M_CURRENT_VERSION_FULL=${BASH_REMATCH[1]}
         V4M_CURRENT_VERSION_MAJOR=${BASH_REMATCH[2]}
-        V4M_CURRENT_VERSION_MINOR=${BASH_REMATCH[3]}
+        V4M_CURRENT_VERSION_MINOR=${BASH_REMATCH[3]}        
         V4M_CURRENT_VERSION_PATCH=${BASH_REMATCH[4]}
       elif [[ "$line" =~ $sre ]]; then
         V4M_CURRENT_STATUS=${BASH_REMATCH[1]}

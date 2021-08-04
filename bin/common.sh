@@ -9,7 +9,6 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     source bin/colors-include.sh
     source bin/log-include.sh
     source bin/openshift-include.sh
-    source bin/version-include.sh
 
     export USER_DIR=${USER_DIR:-$(pwd)}
     if [ -f "$USER_DIR/user.env" ]; then
