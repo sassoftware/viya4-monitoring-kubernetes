@@ -18,31 +18,34 @@ function populateValuesYAML() {
   fi
 
   # List contents of USER_DIR
-  if [ -d "$USER_DIR" ]; then
-    echo '"user_dir":' >> "$v4mValuesYAML"
-    echo "  path: $(dirname $USER_DIR)" >> "$v4mValuesYAML"
-    echo '  files: |' >> "$v4mValuesYAML"
-    l=($(find "$USER_DIR" -type f))
-    for (( i=0; i<${#l[@]}; i++ )); do
-      fullPath=${l[i]}
-      path=${fullPath#"$USER_DIR/"}
-      echo "      $path" >> "$v4mValuesYAML"
-    done
-  fi  
-  # Top-level user.env contents
-  if [ -f "$USER_DIR/user.env" ]; then
-    echo '  "user.env": |' >> "$v4mValuesYAML"
-    cat "$USER_DIR/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
-  fi
-  # Monitoring user.env contents
-  if [ -f "$USER_DIR/monitoring/user.env" ]; then
-    echo '  "monitoring_user.env": |' >> "$v4mValuesYAML"
-    cat "$USER_DIR/monitoring/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
-  fi
-  # Logging user.env contents
-  if [ -f "$USER_DIR/logging/user.env" ]; then
-    echo '  "logging_user.env": |' >> "$v4mValuesYAML"
-    cat "$USER_DIR/logging/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
+  if ! [[ "$USER_DIR" -ef "$(pwd)" ]]; then
+    if [ -d "$USER_DIR" ]; then
+      echo '"user_dir":' >> "$v4mValuesYAML"
+      echo "  path: $(dirname $USER_DIR)" >> "$v4mValuesYAML"
+      echo '  files: |' >> "$v4mValuesYAML"
+      l=($(find "$USER_DIR" -type f))
+      for (( i=0; i<${#l[@]}; i++ )); do
+        fullPath=${l[i]}
+        path=${fullPath#"$USER_DIR/"}
+        echo "      $path" >> "$v4mValuesYAML"
+      done
+    fi
+    
+    # Top-level user.env contents
+    if [ -f "$USER_DIR/user.env" ]; then
+      echo '  "user.env": |' >> "$v4mValuesYAML"
+      cat "$USER_DIR/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
+    fi
+    # Monitoring user.env contents
+    if [ -f "$USER_DIR/monitoring/user.env" ]; then
+      echo '  "monitoring_user.env": |' >> "$v4mValuesYAML"
+      cat "$USER_DIR/monitoring/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
+    fi
+    # Logging user.env contents
+    if [ -f "$USER_DIR/logging/user.env" ]; then
+      echo '  "logging_user.env": |' >> "$v4mValuesYAML"
+      cat "$USER_DIR/logging/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
+    fi
   fi
 }
 
