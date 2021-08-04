@@ -1,0 +1,1 @@
+Viya Monitoring for Kubernetes {{ .Chart.AppVersion }} is installed

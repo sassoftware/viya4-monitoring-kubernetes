@@ -88,6 +88,15 @@ bin/show_app_url.sh KIBANA ELASTICSEARCH
 log_info "STEP 5: Deploying Fluent Bit"
 logging/bin/deploy_fluentbit_open.sh
 
+
+##################################
+# Version Info                   #
+##################################
+log_info "STEP 6: Updating version info"
+if ! deployV4MInfo "$LOG_NS"; then
+  log_warn "Unable to update SAS Viya Monitoring version info"
+fi
+
 # Write any "notices" to console
 echo ""
 display_notices
@@ -95,3 +104,4 @@ display_notices
 echo ""
 log_notice "The deployment of logging components has completed [$(date)]"
 echo ""
+
