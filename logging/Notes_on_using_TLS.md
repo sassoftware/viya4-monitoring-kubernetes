@@ -2,7 +2,21 @@
 
 ## Overview
 
-TLS is required for communication between the Elasticsearch nodes and for accessing Elasticsearch from other components. It is also a best practice to use TLS (by using HTTPS) when accessing Kibana from a browser.
+TLS enablement for SAS Viya logging is divided into two parts:
+
+- **TLS for in-cluster communications**, which is between logging components within
+the cluster (between the Elasticsearch nodes and between Elasticsearch and other logging components). TLS must be enabled on these connections.
+
+- **TLS for communications into the cluster**, which is between a user's 
+browser and Kibana. TLS is optional on these connections, although enabling
+TLS is a best practice.
+
+The information in this document explains only how to configure TLS 
+for in-cluster communications, either automatically (using cert-manager) 
+or manually.
+
+For information about configuring TLS for communications into the cluster, see 
+the [TLS logging sample](../samples/tls/loggingREADME.md).
 
 TLS requires the use of digital security certificates. These certificates allow the Elasticsearch nodes to verify their identity when establishing communication connections. For SAS Viya Monitoring, these certificates are persisted as Kubernetes secrets. Kubernetes mounts these secrets onto the various Elasticsearch and Kibana pods where they appear as files on disk. The name and location of these files is fixed by the Open Distro for Elasticsearch Helm chart and cannot be changed. 
 
