@@ -7,16 +7,15 @@ TLS enablement for SAS Viya logging is divided into two parts:
 - **TLS for in-cluster communications**, which is between logging components within
 the cluster (between the Elasticsearch nodes and between Elasticsearch and other logging components). TLS must be enabled on these connections.
 
-The information in this document explains only how to configure TLS 
+The information in this document explains how to configure TLS 
 for in-cluster communications, either automatically (using 
 cert-manager to generate certificates) or by manually generating certificates.
 
-- **TLS for communications into the cluster**, which is between a user's 
-browser and Kibana. TLS is optional on these connections, although enabling
-TLS is a best practice.
+- **TLS for communications into the cluster**, which is between Ingress or a 
+user's browser (if NodePorts are used) and Kibana. TLS is optional on these connections, although enabling TLS is a best practice.
 
 For information about configuring TLS for communications into the cluster, see 
-the [TLS logging sample](../samples/tls/loggingREADME.md).
+the [TLS logging sample](../samples/tls/logging/README.md).
 
 TLS requires the use of digital security certificates. These certificates allow the Elasticsearch nodes to verify their identity when establishing communication connections. For SAS Viya Monitoring, these certificates are persisted as Kubernetes secrets. Kubernetes mounts these secrets onto the various Elasticsearch and Kibana pods where they appear as files on disk. The name and location of these files is fixed by the Open Distro for Elasticsearch Helm chart and cannot be changed. 
 
@@ -47,6 +46,8 @@ By default, the value of `namespace` that is used during the deployment process 
    - `es-transport-tls-secret`: used to establish communications between Elasticsearch nodes
    - `es-rest-tls-secret`: used to establish communications between Elasticsearch and incoming REST call traffic
    - `es-admin-tls-secret`: used to establish communications for internal administration actions that are performed locally on the Elasticsearch nodes
+   - `kibana-tls-secret`: used for TLS connections between Ingress or a 
+   user's browser (if NodePorts are used) and Kibana.   
 
 Use the appropriate values for `tls_cert_name`, `key_name`, and `CA_key_name` for each secret that that is being generated.
 
