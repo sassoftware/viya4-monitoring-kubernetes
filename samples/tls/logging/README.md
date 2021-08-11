@@ -74,8 +74,9 @@ Use `elasticsearch-ingress-tls-secret` and `kibana-ingress-tls-secret` as values
 were deployed (such as `logging`) for the value of `$NAMESPACE`.
 
 3. In your local copy of the file 
-`$USER_DIR\samples\tls\logging\user-values-elasticsearch-open.yaml`, replace the 
-values `kibana.logging.host.cluster.example.com` and `elasticsearch.logging.host.cluster.example.com` with valid locations for your environment.
+`$USER_DIR\samples\tls\logging\user-values-elasticsearch-open.yaml`, update the 
+values `kibana.logging.host.cluster.example.com` and `elasticsearch.logging.host.cluster.example.com` to reflect the namespace into which you have deployed the 
+log monitoring components and the correct ingress host information.
 
 4. If you are using an ingress controller other than NGINX, modify the annotation 
 `nginx.ingress.kubernetes.io/backend-protocol: HTTPS` as needed in the `user-values-elasticsearch-open.yaml` file. Refer to the documentation for your ingress controller. 
