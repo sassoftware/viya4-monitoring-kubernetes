@@ -10,6 +10,7 @@
   * [FIX] Grafana update fails with PVC multi-attach error
 
 * **Logging**
+  * [FEATURE] SAS Update Checker Report added to Kibana
   * [FIX] Enabled NodePort for Elasticsearch causes update-in-place to fail
   * [FIX] Eventrouter references deprecated version of K8s authorization API
 
