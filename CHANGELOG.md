@@ -1,5 +1,19 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.0.10 (16AUG21)
+
+* **Overall**
+  * [FEATURE] The version of `viya4-monitoring-kubernetes` deployed is now
+  saved in-cluster for support purposes
+
+* **Monitoring**
+  * [FIX] Grafana update fails with PVC multi-attach error
+
+* **Logging**
+  * [FEATURE] SAS Update Checker Report added to Kibana
+  * [FIX] Enabled NodePort for Elasticsearch causes update-in-place to fail
+  * [FIX] Eventrouter references deprecated version of K8s authorization API
+
 ## Version 1.0.9 (19JUL21)
 
 * **Overall**
