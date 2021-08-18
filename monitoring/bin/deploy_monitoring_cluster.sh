@@ -52,15 +52,11 @@ helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-cha
 log_info "Updating helm repositories..."
 helm repo update
 
-# Create a temporary yaml file for optional components/settings
-genValuesFile=$TMP_DIR/values-prom-operator-tmp.yaml
-rm -f $genValuesFile
-touch $genValuesFile
-
+istioValuesFile=$TMP_DIR/empty.yaml
 # Istio - Federate data from Istio's Prometheus instance
 if [ "$ISTIO_ENABLED" == "true" ]; then
   log_info "Including Istio metric federation"
-  cat monitoring/values-prom-operator-istio.yaml >> $genValuesFile
+  istioValuesFile=$TMP_DIR/values-prom-operator-tmp.yaml
 else
   log_debug "ISTIO_ENABLED flag not set"
   log_debug "Skipping deployment of federated scrape of Istio Prometheus instance"
@@ -106,12 +102,13 @@ else
 fi
 
 # Optional TLS Support
+tlsValuesFile=$TMP_DIR/empty.yaml
 if [ "$TLS_ENABLE" == "true" ]; then
   apps=( prometheus alertmanager grafana )
   create_tls_certs $MON_NS monitoring ${apps[@]}
 
-  log_debug "Appending monitoring/tls/values-prom-operator-tls.yaml to $genValuesFile"
-  cat monitoring/tls/values-prom-operator-tls.yaml >> $genValuesFile
+  tlsValuesFile=monitoring/tls/values-prom-operator-tls.yaml
+  log_debug "Including TLS response file $tlsValuesFile"
 
   log_info "Provisioning TLS-enabled Prometheus datasource for Grafana..."
   kubectl delete cm -n $MON_NS --ignore-not-found grafana-datasource-prom-https
@@ -124,6 +121,13 @@ if [ "$TLS_ENABLE" == "true" ]; then
   sleep 1
   kubectl create cm -n $MON_NS node-exporter-tls-web-config --from-file monitoring/tls/node-exporter-web.yaml
   kubectl label cm -n $MON_NS node-exporter-tls-web-config sas.com/monitoring-base=kube-viya-monitoring
+fi
+
+nodePortValuesFile=$TMP_DIR/empty.yaml
+PROM_NODEPORT_ENABLE=${PROM_NODEPORT_ENABLE:-false}
+if [ "$PROM_NODEPORT_ENABLE" == "true" ]; then
+  log_debug "Enabling NodePort access for Prometheus and Alertmanager..."
+  nodePortValuesFile=monitoring/values-prom-nodeport.yaml
 fi
 
 if helm3ReleaseExists prometheus-operator $MON_NS; then
@@ -150,7 +154,9 @@ KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-15.0.0}
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
   -f monitoring/values-prom-operator.yaml \
-  -f $genValuesFile \
+  -f $istioValuesFile \
+  -f $tlsValuesFile \
+  -f $nodePortValuesFile \
   -f $wnpValuesFile \
   -f $PROM_OPER_USER_YAML \
   --atomic \
@@ -163,8 +169,6 @@ helm $helmDebug upgrade --install $promRelease \
   --set grafana.adminPassword="$grafanaPwd" \
   --version $KUBE_PROM_STACK_CHART_VERSION \
   prometheus-community/kube-prometheus-stack
-
-rm -f $genValuesFile
 
 sleep 2
 

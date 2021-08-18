@@ -65,8 +65,8 @@ prometheus:
   serviceAccount:
     name: sas-ops-acct
   service:
-    type: NodePort
-    nodePort: 31090
+    type: ClusterIP
+    nodePort: {}  
   prometheusSpec:
     image:
       tag: v2.26.1
@@ -102,8 +102,8 @@ prometheus:
 # =======================
 alertmanager:
   service:
-    type: NodePort
-    nodePort: 31091
+    type: ClusterIP
+    nodePort: {}  
   alertmanagerSpec:
     image:
       tag: v0.21.0
