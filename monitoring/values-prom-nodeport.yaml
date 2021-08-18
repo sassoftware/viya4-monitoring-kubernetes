@@ -1,0 +1,9 @@
+prometheus:
+  service:
+    type: NodePort
+    nodePort: 31090
+
+alertmanager:
+  service:
+    type: NodePort
+    nodePort: 31091
