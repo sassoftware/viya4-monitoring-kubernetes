@@ -21,7 +21,7 @@ function populateValuesYAML() {
   if ! [[ "$USER_DIR" -ef "$(pwd)" ]]; then
     if [ -d "$USER_DIR" ]; then
       echo '"user_dir":' >> "$v4mValuesYAML"
-      echo "  path: $(dirname $USER_DIR)" >> "$v4mValuesYAML"
+      echo "  path: $USER_DIR" >> "$v4mValuesYAML"
       echo '  files: |' >> "$v4mValuesYAML"
       l=($(find "$USER_DIR" -type f))
       for (( i=0; i<${#l[@]}; i++ )); do

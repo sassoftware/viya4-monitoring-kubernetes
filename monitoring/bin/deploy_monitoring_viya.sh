@@ -48,7 +48,7 @@ set -e
 # Prometheus Pushgateway
 PUSHGATEWAY_ENABLED=${PUSHGATEWAY_ENABLED:-true}
 if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
-  PUSHGATEWAY_CHART_VERSION=${PUSHGATEWAY_CHART_VERSION:-1.9.0}
+  PUSHGATEWAY_CHART_VERSION=${PUSHGATEWAY_CHART_VERSION:-1.10.1}
   if helm3ReleaseExists prometheus-pushgateway $VIYA_NS; then
     svcClusterIP=$(kubectl get svc -n $VIYA_NS prometheus-pushgateway -o 'jsonpath={.spec.clusterIP}')
   fi
