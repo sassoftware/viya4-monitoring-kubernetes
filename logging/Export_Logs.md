@@ -57,7 +57,7 @@ specifies the maximum number of messages that are returned. The default value is
 
 For example, if you specify `--maxrows 100` and the script generates three queries, each query returns a maximum of 100 messages. If the first query returns 90 messages, those 90 messages are returned. If the second query returns 100 messages, those 100 messages are also returned, because the first query did not reach the `maxrows` limit and the number of messages returned by the second query also does not exceed the limit for the query. However, because the first and second queries return a total of 190 messages, this total value exceeds the `maxrows` limit, so the third query does not run.
 
-`-q|--query_file` *`query-filename`*
+`-q|--query-file` *`query-filename`*
 specifies a file that contains values for all of the query and time period options. If this option is specified, all other query and time period options are ignored.
 
 `--show-query`
