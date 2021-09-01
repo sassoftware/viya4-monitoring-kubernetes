@@ -84,7 +84,7 @@ data:
     [FILTER]
        #
        # Make kubernetes label adjustments here
-       # NOTE: ES will convert "." in label names "_" but
+       # NOTE: ES will convert "." in label names to "_" but
        #       you need to specify names w/ the "." here.
        #
        Alias          set_appname
@@ -108,9 +108,7 @@ data:
        Condition      Key_does_not_exist labels_app
        Copy           labels_k8s-app  appname
     [FILTER]
-       #
        # Use k8s labels sas.com/tenant for TENANT
-       #
        Alias          set_tenant
        Name           modify
        Match          *
