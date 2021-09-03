@@ -605,7 +605,7 @@ do # submit queries
    qresults_file="$TMP_DIR/query_results.$i.txt"
 
    log_debug "Query [$(($i+1))] of [$query_count] $(date)"
-   response=$(curl -m $maxtime -s  -o $qresults_file -w "%{http_code}"  -XPOST "https://$host:$port/_opendistro/_sql?format=$format" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $username:$password -k)
+   response=$(curl -m $maxtime -s  -o $qresults_file -w "%{http_code}"  -XPOST "$protocol://$host:$port/_opendistro/_sql?format=$format" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $username:$password -k)
    rc=$?
    log_debug "curl command response: [$response] rc:[$rc]"
 
