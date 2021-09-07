@@ -136,6 +136,7 @@ function add_rolemapping {
     log_debug "Existing rolemappings for [$targetrole] obtained. [$response]"
     log_debug "$(cat $TMP_DIR/rolemapping.json)"
 
+
     if [ "$(grep $berole  $TMP_DIR/rolemapping.json)" ]; then
        log_debug "A rolemapping between [$targetrole] and  back-end role [$berole] already appears to exist; leaving as-is."
        return 0
@@ -196,7 +197,7 @@ function remove_rolemapping {
    # Returns: 0 - The rolemappings removed
    #          1 - The rolemappings were/could not be removed
 
- local targetrole
+ local targetrole regex json beroles newroles response
  targetrole=$1
 
 
@@ -217,8 +218,19 @@ function remove_rolemapping {
        if [ "$(grep '"backend_roles":\[\]' $TMP_DIR/rolemapping.json)" ]; then
           log_debug "No backend roles to patch for [$targetrole]; moving on"
        else
+
+          # ODFE 1.7  {"kibana_user":{"reserved":false,"hidden":false,"backend_roles":["kibanauser","d27885_kibana_users","acme_d27885_kibana_user"],"hosts":[],"users":[],"and_backend_roles":[],"description":"Maps kibanauser to kibana_user"}}
+          # ODFE 1.13 {"kibana_user":{"hosts":[],"users":[],"reserved":false,"hidden":false,"backend_roles":["kibanauser","d27886_kibana_users","d35396_kibana_users","d35396_acme_kibana_users","d35396A_kibana_users","d35396A_acme_kibana_users"],"and_backend_roles":[]}}
+
           # Extract and reconstruct backend_roles array from rolemapping json
-          newroles=$(grep -oE '"backend_roles":\[(.*)\],"h' $TMP_DIR/rolemapping.json | grep -oE '\[.*\]' | sed "s/\"$BACKENDROLE\"//g;s/\"$BACKENDROROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/" )
+          #newroles=$(grep -oE  '"backend_roles":\[((("[_0-9a-zA-Z\-]+",?)?)+)\]'  $TMP_DIR/rolemapping.json | grep -oE '\[.*\]' | sed "s/\"$BACKENDROLE\"//g;s/\"$BACKENDROROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/" )
+          regex='"backend_roles":\[((("[_0-9a-zA-Z\-]+",?)?)+)\]'
+          json=$(cat  $TMP_DIR/rolemapping.json)
+          if [[ $json =~ $regex ]]; then
+             be_roles="[${BASH_REMATCH[1]}]"
+             echo "BE_ROLES: $be_roles"
+             newroles=$(echo $be_roles | sed "s/\"$BACKENDROLE\"//g;s/\"$BACKENDROROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/")
+          fi
           log_debug "Updated Back-end Roles ($targetrole): $newroles"
 
           # Copy RBAC template
