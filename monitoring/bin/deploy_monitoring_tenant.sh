@@ -84,10 +84,10 @@ fi
 
 # Deploy additional scrape configs for Prometheus
 log_info "Creating scrape config secret"
-kubectl delete secret --ignore-not-found -n $VIYA_NS prometheus-scrape-$VIYA_TENANT
+kubectl delete secret --ignore-not-found -n $VIYA_NS prometheus-federate-$VIYA_TENANT
 kubectl create secret generic \
   -n $VIYA_NS \
-  prometheus-scrape-$VIYA_TENANT \
+  prometheus-federate-$VIYA_TENANT \
   --from-file cluster-federate-job=$tenantDir/mt-federate-secret.yaml
 
 # Deploy Prometheus
