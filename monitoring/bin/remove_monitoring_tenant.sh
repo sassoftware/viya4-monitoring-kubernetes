@@ -33,9 +33,11 @@ for f in $tenantDir/*; do
   if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
     sed -i '' "s/__TENANT__/$VIYA_TENANT/g" $f
     sed -i '' "s/__TENANT_NS__/$VIYA_NS/g" $f
+    sed -i '' "s/__MON_NS__/$MON_NS/g" $f
   else
     sed -i "s/__TENANT__/$VIYA_TENANT/g" $f
     sed -i "s/__TENANT_NS__/$VIYA_NS/g" $f
+    sed -i "s/__MON_NS__/$MON_NS/g" $f
   fi
 done
 
@@ -46,5 +48,6 @@ log_info "Removing Prometheus"
 kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/mt-prometheus.yaml
 kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-cas-tenant.yaml
 kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-pushgateway-tenant.yaml
+kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/mt-federate-secret.yaml
 
 log_notice "Uninstalled monitoring for [$VIYA_NS/$VIYA_TENANT]"

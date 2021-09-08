@@ -1,9 +1,4 @@
-# This is a sample Prometheus resource that deploys a
-# namespace-only instance of Prometheus
-
-# Note: ClusterRoles and ClusterRoleBindings are still required
-# at the moment. Limiting these to namespace permissions is 
-# still being investigated.
+# This is a Prometheus resource that deploys a tenant-specific instance
 
 apiVersion: v1
 kind: ServiceAccount
@@ -32,64 +27,7 @@ subjects:
 roleRef:
   kind: Role
   name: prometheus-role-__TENANT__
-  #apiGroup: rbac.authorization.k8s.io
   apiGroup: ""
-# ---
-# apiVersion: rbac.authorization.k8s.io/v1
-# kind: ClusterRole
-# metadata:
-#   name: prometheus-__TENANT__
-#   labels:
-#     sas.com/tenant: __TENANT__
-# rules:
-# - apiGroups:
-#   - ""
-#   resources:
-#   - nodes/metrics
-#   verbs:
-#   - get
-#   - list
-#   - watch
-# - apiGroups:
-#   - ""
-#   resources:
-#   - nodes
-#   - nodes/proxy
-#   - services
-#   - endpoints
-#   - pods
-#   verbs:
-#   - get
-#   - list
-#   - watch
-# - apiGroups:
-#   - extensions
-#   - networking.k8s.io
-#   resources:
-#   - ingresses
-#   verbs:
-#   - get
-#   - list
-#   - watch
-# - nonResourceURLs:
-#   - /metrics
-#   verbs:
-#   - get
-# ---
-# apiVersion: rbac.authorization.k8s.io/v1
-# kind: ClusterRoleBinding
-# metadata:
-#   name: prometheus-__TENANT__
-#   labels:
-#     sas.com/tenant: __TENANT__
-# roleRef:
-#   apiGroup: rbac.authorization.k8s.io
-#   kind: ClusterRole
-#   name: prometheus-__TENANT__
-# subjects:
-# - kind: ServiceAccount
-#   name: prometheus-__TENANT__
-#   namespace: __VIYA_NS__
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
@@ -99,6 +37,9 @@ metadata:
     sas.com/tenant: __TENANT__
   name: prometheus-__TENANT__
 spec:
+  additionalScrapeConfigs:
+    name: prometheus-scrape-__TENANT__
+    key: cluster-federate-job
   image: quay.io/prometheus/prometheus:v2.26.1
   # alerting:
   #   alertmanagers:
@@ -108,7 +49,6 @@ spec:
   #     pathPrefix: /
   #     port: web
   enableAdminAPI: false
-  # externalUrl: http://prometheus.viya-one.host.cluster.example.com
   listenLocal: false
   logFormat: json
   logLevel: info
@@ -123,23 +63,12 @@ spec:
     runAsNonRoot: true
     runAsUser: 1000
   serviceAccountName: prometheus-__TENANT__
-  # serviceMonitorNamespaceSelector:
-  #   matchNames:
-  #   - __TENANT_NS__
   serviceMonitorSelector:
     matchLabels:
-      sas.com/tenant: __TENANT__
-  
-  # podMonitorNamespaceSelector:
-  #   matchNames:
-  #   - __TENANT_NS__
+      sas.com/tenant: __TENANT__ 
   podMonitorSelector:
     matchLabels:
       sas.com/tenant: __TENANT__
-
-  # ruleNamespaceSelector:
-  #   matchNames:
-  #   - __TENANT_NS__
   ruleSelector:
     matchLabels:
       sas.com/tenant: __TENANT__

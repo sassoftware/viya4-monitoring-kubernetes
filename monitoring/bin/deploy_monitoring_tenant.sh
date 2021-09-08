@@ -43,9 +43,11 @@ for f in $tenantDir/*; do
   if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
     sed -i '' "s/__TENANT__/$VIYA_TENANT/g" $f
     sed -i '' "s/__TENANT_NS__/$VIYA_NS/g" $f
+    sed -i '' "s/__MON_NS__/$MON_NS/g" $f
   else
     sed -i "s/__TENANT__/$VIYA_TENANT/g" $f
     sed -i "s/__TENANT_NS__/$VIYA_NS/g" $f
+    sed -i "s/__MON_NS__/$MON_NS/g" $f
   fi
 done
 
@@ -80,12 +82,21 @@ else
   wnpGrafanaValuesFile="$TMP_DIR/empty.yaml"
 fi
 
+# Deploy additional scrape configs for Prometheus
+log_info "Creating scrape config secret"
+kubectl delete secret --ignore-not-found -n $VIYA_NS prometheus-scrape-$VIYA_TENANT
+kubectl create secret generic \
+  -n $VIYA_NS \
+  prometheus-scrape-$VIYA_TENANT \
+  --from-file cluster-federate-job=$tenantDir/mt-federate-secret.yaml
+
 # Deploy Prometheus
+log_info "Deploying Prometheus"
 kubectl apply -n $VIYA_NS -f $tenantDir/mt-prometheus.yaml
 
 # Deploy Grafana
 log_info "Deploying Grafana..."
-MULTITENANT_GRAFANA_CHART_VERSION=${MULTITENANT_GRAFANA_CHART_VERSION:-6.9.1}
+GRAFANA_CHART_VERSION_TENANT=${GRAFANA_CHART_VERSION_TENANT:-6.9.1}
 helm upgrade --install $helmDebug \
   -n "$VIYA_NS" \
   -f "$wnpGrafanaValuesFile" \
@@ -93,7 +104,7 @@ helm upgrade --install $helmDebug \
   -f "$grafanaTLSYAML" \
   -f "$userGrafanaYAML" \
   --set "extraLabels.sas\\.com/tenant=$VIYA_TENANT" \
-  --version "$MULTITENANT_GRAFANA_CHART_VERSION" \
+  --version "$GRAFANA_CHART_VERSION_TENANT" \
   --atomic \
   --timeout "5m" \
   $grafanaPwd \
@@ -116,7 +127,7 @@ function deploy_tenant_dashboards {
        log_debug "Deploying dashboard from file [$f]"
        name=$(basename $f .json)
       
-       kubectl create cm -n $DASH_NS $name $dryRun --from-file $f -o yaml | kubectl apply -f -
+       kubectl create cm -n $DASH_NS $name --dry-run=client --from-file $f -o yaml | kubectl apply -f -
        kubectl label cm -n $DASH_NS $name --overwrite grafana_tenant_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring
      fi
    done
