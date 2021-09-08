@@ -54,6 +54,7 @@ function delete_role {
       fi
    else
       #role does not exist, nothing to do
+      log_debug "Role [$role] does not exist; not able to delete it."
       return 1
    fi
 }
@@ -116,7 +117,7 @@ function role_exists {
 function add_rolemapping {
  # adds $berole to the  rolemappings for $targetrole
 
- local targetrole berole
+ local targetrole berole json verb response
  targetrole=$1
  berole=$2
 
@@ -170,12 +171,15 @@ function delete_rolemappings {
    # Returns: 0 - Rolemappings deleted
    #          1 - Rolemappings were/could not be deleted
 
-   local role
+   local role response
    role=$1
 
    if role_exists $role; then
       response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "$sec_api_url/rolesmapping/$role"   --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-      if [[ $response != 2* ]]; then
+      if [[ $response == 404 ]]; then
+         log_info "Rolemappings for [$role] do not exist; nothing to delete. [$response]"
+         return 0
+      elif [[ $response != 2* ]]; then
          log_error "There was an issue deleting the rolemappings for [$role] [$response]"
          return 1
       else
@@ -184,6 +188,7 @@ function delete_rolemappings {
       fi
    else
       #role does not exist, nothing to do
+      log_debug "Role [$role] does not exist; no rolemappings to delete."
       return 1
    fi
 }
@@ -208,6 +213,7 @@ function remove_rolemapping {
 
     if [[ $response == 404 ]]; then
        log_debug "Rolemappings for [$targetrole] do not exist; nothing to do. [$response]"
+       return 0
     elif [[ $response != 2* ]]; then
        log_error "There was an issue getting the existing rolemappings for [$targetrole]. [$response]"
        return 1
@@ -215,41 +221,50 @@ function remove_rolemapping {
        log_debug "Existing rolemappings for [$targetrole] obtained. [$response]"
        log_debug "$(cat $TMP_DIR/rolemapping.json)"
 
-       if [ "$(grep '"backend_roles":\[\]' $TMP_DIR/rolemapping.json)" ]; then
-          log_debug "No backend roles to patch for [$targetrole]; moving on"
-       else
+       regex='"backend_roles":\[((("[_0-9a-zA-Z\-]+",?)?)+)\]'
+       json=$(cat  $TMP_DIR/rolemapping.json)
 
-          # ODFE 1.7  {"kibana_user":{"reserved":false,"hidden":false,"backend_roles":["kibanauser","d27885_kibana_users","acme_d27885_kibana_user"],"hosts":[],"users":[],"and_backend_roles":[],"description":"Maps kibanauser to kibana_user"}}
-          # ODFE 1.13 {"kibana_user":{"hosts":[],"users":[],"reserved":false,"hidden":false,"backend_roles":["kibanauser","d27886_kibana_users","d35396_kibana_users","d35396_acme_kibana_users","d35396A_kibana_users","d35396A_acme_kibana_users"],"and_backend_roles":[]}}
+       if [[ $json =~ $regex ]]; then
 
-          # Extract and reconstruct backend_roles array from rolemapping json
-          #newroles=$(grep -oE  '"backend_roles":\[((("[_0-9a-zA-Z\-]+",?)?)+)\]'  $TMP_DIR/rolemapping.json | grep -oE '\[.*\]' | sed "s/\"$BACKENDROLE\"//g;s/\"$BACKENDROROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/" )
-          regex='"backend_roles":\[((("[_0-9a-zA-Z\-]+",?)?)+)\]'
-          json=$(cat  $TMP_DIR/rolemapping.json)
-          if [[ $json =~ $regex ]]; then
-             be_roles="[${BASH_REMATCH[1]}]"
-             echo "BE_ROLES: $be_roles"
-             newroles=$(echo $be_roles | sed "s/\"$BACKENDROLE\"//g;s/\"$BACKENDROROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/")
-          fi
-          log_debug "Updated Back-end Roles ($targetrole): $newroles"
+          be_roles="[${BASH_REMATCH[1]}]"
 
-          # Copy RBAC template
-          cp logging/es/odfe/rbac/backend_rolemapping_delete.json $TMP_DIR/${targetrole}_backend_rolemapping_delete.json
-
-          #update json template file w/revised list of backend roles
-          sed -i'.bak' "s/xxBACKENDROLESxx/$newroles/g"     $TMP_DIR/${targetrole}_backend_rolemapping_delete.json # BACKENDROLES
-
-          # Replace the rolemappings for the $targetrole with the revised list of backend roles
-          response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/rolesmapping/$targetrole"  -H 'Content-Type: application/json' -d @$TMP_DIR/${targetrole}_backend_rolemapping_delete.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-          if [[ $response != 2* ]]; then
-             log_error "There was an issue updating the rolesmapping for [$targetrole] to remove link with backend-roles [$BACKENDROLE, $BACKENDROROLE]. [$response]"
-             return 1
+          if [ -z "$be_roles" ]; then
+             log_debug "No backend roles to patch for [$targetrole]; moving on"
+             return 0
           else
-             log_info "Security rolemapping deleted between [$targetrole] and backend-roles [$BACKENDROLE, $BACKENDROROLE]. [$response]"
+
+             # ODFE 1.7  {"kibana_user":{"reserved":false,"hidden":false,"backend_roles":["kibanauser","d27885_kibana_users","acme_d27885_kibana_user"],"hosts":[],"users":[],"and_backend_roles":[],"description":"Maps kibanauser to kibana_user"}}
+             # ODFE 1.13 {"kibana_user":{"hosts":[],"users":[],"reserved":false,"hidden":false,"backend_roles":["kibanauser","d27886_kibana_users","d35396_kibana_users","d35396_acme_kibana_users","d35396A_kibana_users","d35396A_acme_kibana_users"],"and_backend_roles":[]}}
+
+             # Extract and reconstruct backend_roles array from rolemapping json
+             newroles=$(echo $be_roles | sed "s/\"$BACKENDROLE\"//g;s/\"$BACKENDROROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/")
+             if [ "$be_roles" == "$newroles" ]; then
+                log_debug "The backend roles [$BACKENDROLE and $BACKENDROROLE] are not mapped to [$targetrole]; moving on"
+                return 0
+             else
+
+                log_debug "Updated Back-end Roles ($targetrole): $newroles"
+
+                # Copy RBAC template
+                cp logging/es/odfe/rbac/backend_rolemapping_delete.json $TMP_DIR/${targetrole}_backend_rolemapping_delete.json
+
+                #update json template file w/revised list of backend roles
+                sed -i'.bak' "s/xxBACKENDROLESxx/$newroles/g"     $TMP_DIR/${targetrole}_backend_rolemapping_delete.json # BACKENDROLES
+
+                # Replace the rolemappings for the $targetrole with the revised list of backend roles
+                response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/rolesmapping/$targetrole"  -H 'Content-Type: application/json' -d @$TMP_DIR/${targetrole}_backend_rolemapping_delete.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+                if [[ $response != 2* ]]; then
+                   log_error "There was an issue updating the rolesmapping for [$targetrole] to remove link with backend-roles [$BACKENDROLE, $BACKENDROROLE]. [$response]"
+                   return 1
+                else
+                   log_info "Security rolemapping deleted between [$targetrole] and backend-roles [$BACKENDROLE, $BACKENDROROLE]. [$response]"
+                   return 0
+                fi
+             fi
           fi
        fi
     fi
  else
-   log_debug "The role [$targetrole] does not exist; doing nothing. [$response]"
- fi # role exists
+    log_debug "The role [$targetrole] does not exist; doing nothing. [$response]"
+ fi
 }

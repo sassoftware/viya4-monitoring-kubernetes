@@ -43,9 +43,26 @@ function get_sec_api_url {
          exit 18
       fi
       sec_api_url="https://localhost:$TEMP_PORT/_opendistro/_security/api"
+
+      trap stop_portforwarding EXIT
    fi
    log_debug "Security API Endpoint: [$sec_api_url]"
 
 }
 
-export -f get_sec_api_url
+function stop_portforwarding {
+   # terminate port-forwarding process if PID was cached
+
+   if [ -n "$pfPID" ]; then
+      log_debug "Killing port-forwarding process [$pfPID]"
+      kill  -9 $pfPID
+   else
+      log_debug "No portforwarding processID found; nothing to terminate."
+   fi
+}
+
+#initialize "global" vars
+pfPID=""
+sec_api_url=""
+
+export -f get_sec_api_url stop_portforwarding

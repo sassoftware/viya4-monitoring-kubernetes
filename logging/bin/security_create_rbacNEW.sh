@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021, 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 #
@@ -61,14 +61,14 @@ elif [[ "$READONLY" =~ -H|--HELP|-h|--help ]]; then
 elif [ "$READONLY" != "false" ]; then
  log_error "Unrecognized additional option(s) [$READONLY] provided."
  show_usage
- exit 2
+ exit 1
 fi
 
 if [ -z "$NAMESPACE" ]; then
   log_error "Required argument NAMESPACE no specified"
   echo  ""
   show_usage
-  exit 4
+  exit 1
 elif [[ "$NAMESPACE" =~ -H|--HELP|-h|--help ]]; then
  show_usage
  exit
@@ -79,8 +79,10 @@ if [[ "$TENANT" =~ -H|--HELP|-h|--help ]]; then
    exit
 elif [ -n "$TENANT" ]; then
    NST="${NAMESPACE}_${TENANT}"
+   INDEX_NST="${NAMESPACE}-__${TENANT}__"
 else
    NST="$NAMESPACE"
+   INDEX_NST="${NAMESPACE}"
 fi
 
 if [ -n "$TENANT" ]; then
@@ -106,8 +108,12 @@ log_debug "NST: $NST TENANT: $TENANT NAMESPACE: $NAMESPACE ROLENAME: $ROLENAME R
 cp logging/es/odfe/rbac $TMP_DIR -r
 
 # Replace PLACEHOLDERS
-sed -i'.bak' "s/xxIDXPREFIXxx/$INDEX_PREFIX/g"  $TMP_DIR/rbac/*.json                  # IDXPREFIX
-sed -i'.bak' "s/xxNAMESPACExx/$NST/g"     $TMP_DIR/rbac/*.json                  # NAMESPACE
+sed -i'.bak' "s/xxIDXPREFIXxx/$INDEX_PREFIX/g"  $TMP_DIR/rbac/*.json     # IDXPREFIX
+sed -i'.bak' "s/xxNAMESPACExx/$NAMESPACE/g"     $TMP_DIR/rbac/*.json     # NAMESPACE
+sed -i'.bak' "s/xxTENANTxx/$TENANT/g"           $TMP_DIR/rbac/*.json     # TENANT
+sed -i'.bak' "s/xxIDXNSTxx/$INDEX_NST/g"        $TMP_DIR/rbac/*.json     # NAMESPACE|NAMESPACE-__TENANT__    (used in index names)
+sed -i'.bak' "s/xxNSTxx/$NST/g"                 $TMP_DIR/rbac/*.json     # NAMESPACE|NAMESPACE_TENANT        (used in RBAC names)
+
 
 
 # get admin credentials
@@ -118,8 +124,7 @@ export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=js
 #temp file to hold responses
 tmpfile=$TMP_DIR/output.txt
 
-
-sec_api_url=""
+# Get Security API URL
 get_sec_api_url
 
 if [ -z "$sec_api_url" ]; then
@@ -152,15 +157,9 @@ if [ "$READONLY" == "true" ]; then
    add_rolemapping kibana_read_only $RO_BE_ROLENAME
 fi
 
-# terminate port-forwarding and remove tmpfile
-if [ -n "$pfPID" ]; then
-   log_info "You may see a message below about a process being killed; it is expected and can be ignored."
-   kill  -9 $pfPID
-fi
+#remove tmpfile
 rm -f $tmpfile
 
-#pause to allow port-forward kill message to appear
-sleep 7s
 
 log_notice "Access controls created [$(date)]"
 echo ""

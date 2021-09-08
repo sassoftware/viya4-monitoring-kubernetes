@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021, 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 #
@@ -68,7 +68,7 @@ export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=js
 #temp file to hold responses
 tmpfile=$TMP_DIR/output.txt
 
-sec_api_url=""
+# Get Security API URL
 get_sec_api_url
 
 if [ -z "$sec_api_url" ]; then
@@ -90,21 +90,15 @@ remove_rolemapping kibana_read_only
 remove_rolemapping cluster_ro_perms
 
 
-# terminate port-forwarding and remove tmpfile
-if [ -n "$pfPID" ]; then
-   log_info "You may see a message below about a process being killed; it is expected and can be ignored."
-   kill  -9 $pfPID
-fi
+#remove tmpfile
 rm -f $tmpfile
 
-#pause to allow port-forward kill message to appear
-sleep 7s
 
 log_notice "Access controls deleted [$(date)]"
 echo ""
 if [ -n "$TENANT" ]; then
-   log_notice "   You should delete any users whose only purpose was to access log messages from the [$TENANT] tenant within the [$NAMESPACE] namespace  "
+   log_notice "You should delete any users whose only purpose was to access log messages from the [$TENANT] tenant within the [$NAMESPACE] namespace  "
 else
-   log_notice "   You should delete any users whose only purpose was to access log messages from the [$NAMESPACE] namespace  "
+   log_notice "You should delete any users whose only purpose was to access log messages from the [$NAMESPACE] namespace  "
 fi
 
