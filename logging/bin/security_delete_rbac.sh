@@ -43,7 +43,11 @@ if [ -z "$NAMESPACE" ]; then
 
   exit 4
 else
-  log_notice "Deleting access controls for namespace [$NAMESPACE] [$(date)]"
+  if [ -n "$TENANT" ]; then
+     log_notice "Deleting access controls for the [$TENANT] tenant within the namespace [$NAMESPACE] [$(date)]"
+  else
+     log_notice "Deleting access controls for namespace [$NAMESPACE] [$(date)]"
+  fi
 fi
 
 if [ -n "$TENANT" ]; then
