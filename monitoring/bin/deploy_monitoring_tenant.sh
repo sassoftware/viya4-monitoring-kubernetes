@@ -19,6 +19,15 @@ if [ "$VIYA_TENANT" == "" ]; then
   exit 1
 fi
 
+if [ "$V4M_FEATURE_MULTITENANT_ENABLE" != "true" ]; then
+  log_debug "Multi-tenant feature flag is enabled"
+else
+  log_error "Multi-tenant support is under active development and is not yet fully    "
+  log_error "functional. Set V4M_FEATURE_MULTITENANT_ENABLE=true to continue anyway.  "
+  log_message ""
+  exit 1
+fi
+
 checkDefaultStorageClass
 
 HELM_DEBUG="${HELM_DEBUG:-false}"
@@ -38,8 +47,8 @@ mkdir -p $tenantDir
 cp monitoring/multitenant/*.yaml $tenantDir/
 
 # Replace placeholders
+log_debug "Replacing __TENANT__ for files in [$tenantDir]"
 for f in $tenantDir/*; do
-  log_debug "Replacing __TENANT__ in [$f]"
   if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
     sed -i '' "s/__TENANT__/$VIYA_TENANT/g" $f
     sed -i '' "s/__TENANT_NS__/$VIYA_NS/g" $f
@@ -67,11 +76,6 @@ if [ -f "$USER_DIR/monitoring/user-values-multitenant-grafana.yaml" ]; then
   log_debug "User response file for Grafana found at [$userGrafanaYAML]"
 fi
 
-grafanaPwd="--set adminPassword=admin"
-if [ -n "$GRAFANA_ADMIN_PASSWORD" ]; then
-  grafanaPwd="--set adminPassword=$GRAFANA_ADMIN_PASSWORD"
-fi
-
 # Optional workload node placement support
 MON_NODE_PLACEMENT_ENABLE=${MON_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
 if [ "$MON_NODE_PLACEMENT_ENABLE" == "true" ]; then
@@ -94,8 +98,20 @@ kubectl create secret generic \
 log_info "Deploying Prometheus"
 kubectl apply -n $VIYA_NS -f $tenantDir/mt-prometheus.yaml
 
+# Grafana password
+if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS; then
+  log_info "Upgrading Grafana via Helm...($(date) - timeout 10m)"
+else
+  grafanaPwd="$GRAFANA_ADMIN_PASSWORD"
+  if [ "$grafanaPwd" == "" ]; then
+    log_debug "Generating random Grafana admin password..."
+    showPass="true"
+    grafanaPwd="$(randomPassword)"
+  fi
+  log_info "Deploying Grafana via Helm...($(date) - timeout 10m)"
+fi
+
 # Deploy Grafana
-log_info "Deploying Grafana..."
 GRAFANA_CHART_VERSION_TENANT=${GRAFANA_CHART_VERSION_TENANT:-6.9.1}
 helm upgrade --install $helmDebug \
   -n "$VIYA_NS" \
@@ -104,10 +120,10 @@ helm upgrade --install $helmDebug \
   -f "$grafanaTLSYAML" \
   -f "$userGrafanaYAML" \
   --set "extraLabels.sas\\.com/tenant=$VIYA_TENANT" \
+  --set grafana.adminPassword="$grafanaPwd" \
   --version "$GRAFANA_CHART_VERSION_TENANT" \
   --atomic \
-  --timeout "5m" \
-  $grafanaPwd \
+  --timeout "10m" \
   $extraArgs \
   grafana-$VIYA_TENANT \
   grafana/grafana
@@ -138,5 +154,17 @@ function deploy_tenant_dashboards {
 DASH_NS=$VIYA_NS
 DASH_BASE=$tenantDir/dashboards
 deploy_tenant_dashboards monitoring/multitenant/dashboards
+
+if [ "$showPass" == "true" ]; then
+  # Find the grafana pod
+  grafanaPod="$(kubectl get po -n $VIYA_NS -l app.kubernetes.io/name=grafana --template='{{range .items}}{{.metadata.name}}{{end}}')"
+
+  log_notice "====================================================================="
+  log_notice "Generated Grafana admin password is: $grafanaPwd"
+  log_notice "Change the password at any time by running (replace password):       "
+  log_notice "kubectl exec -n $VIYA_NS $grafanaPod -c grafana -- bin/grafana-cli admin reset-admin-password myNewPassword"
+  log_notice "====================================================================="
+  log_message ""
+fi
 
 log_notice "Tenant monitoring is now enabled for [$VIYA_NS/$VIYA_TENANT]"

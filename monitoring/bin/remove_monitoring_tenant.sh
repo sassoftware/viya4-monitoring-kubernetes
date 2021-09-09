@@ -28,8 +28,8 @@ mkdir -p $tenantDir
 cp monitoring/multitenant/*.yaml $tenantDir/
 
 # Replace placeholders
-for f in $tenantDir/*; do
-  log_debug "Replacing __TENANT__ in [$f]"
+log_debug "Replacing __TENANT__ for files in [$tenantDir]"
+for f in $tenantDir/*; do 
   if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
     sed -i '' "s/__TENANT__/$VIYA_TENANT/g" $f
     sed -i '' "s/__TENANT_NS__/$VIYA_NS/g" $f
@@ -41,13 +41,17 @@ for f in $tenantDir/*; do
   fi
 done
 
-log_info "Removing Grafana..."
-helm uninstall -n $VIYA_NS grafana-$VIYA_TENANT
+if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS; then
+  log_info "Removing Grafana..."
+  helm uninstall -n $VIYA_NS grafana-$VIYA_TENANT
+else
+  log_debug "Grafana helm release [grafana-$VIYA_TENANT] not found. Skipping uninstall."
+fi
 
 log_info "Removing Prometheus"
 kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/mt-prometheus.yaml
 kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-cas-tenant.yaml
 kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-pushgateway-tenant.yaml
-kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/mt-federate-secret.yaml
+kubectl delete -n $VIYA_NS --ignore-not-found secret prometheus-federate-$VIYA_TENANT
 
 log_notice "Uninstalled monitoring for [$VIYA_NS/$VIYA_TENANT]"
