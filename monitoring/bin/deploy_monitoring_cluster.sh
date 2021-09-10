@@ -124,7 +124,7 @@ if [ "$TLS_ENABLE" == "true" ]; then
 fi
 
 nodePortValuesFile=$TMP_DIR/empty.yaml
-PROM_NODEPORT_ENABLE=${PROM_NODEPORT_ENABLE:-false}
+PROM_NODEPORT_ENABLE=${PROM_NODEPORT_ENABLE:-true}
 if [ "$PROM_NODEPORT_ENABLE" == "true" ]; then
   log_debug "Enabling NodePort access for Prometheus and Alertmanager..."
   nodePortValuesFile=monitoring/values-prom-nodeport.yaml
