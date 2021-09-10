@@ -1,3 +1,4 @@
+
 {
   "annotations": {
     "list": [
@@ -15,8 +16,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 44,
-  "iteration": 1600096791939,
+  "id": 46,
+  "iteration": 1631197715513,
   "links": [],
   "panels": [
     {
@@ -38,11 +39,9 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "decimals": 2,
           "mappings": [],
           "noValue": "0",
-          "nullValueMode": "connected",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -76,11 +75,13 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.1.5",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
+          "exemplar": true,
           "expr": "sum (rate(container_cpu_usage_seconds_total{pod=~\"$pod\"}[1m]) * on(pod) group_left(phase) kube_pod_status_phase{pod=~\"$pod\", phase=\"Running\"})",
           "hide": true,
           "instant": false,
@@ -89,6 +90,7 @@
           "refId": "A"
         },
         {
+          "exemplar": true,
           "expr": "sum(:sas_launcher_pod_cpu_core_usage:{pod=~\"$pod\"}) or vector(0)",
           "instant": false,
           "interval": "",
@@ -98,7 +100,6 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "",
       "transparent": true,
       "type": "stat"
     },
@@ -107,7 +108,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "decimals": 2,
           "mappings": [
             {
@@ -120,7 +120,6 @@
           ],
           "min": 0,
           "noValue": "0",
-          "nullValueMode": "connected",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -154,9 +153,10 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.1.5",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
           "expr": "sum(:sas_launcher_pod_mem_usage_bytes:{pod=~\"$pod\"}) or vector(0)",
@@ -168,7 +168,6 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "",
       "transparent": true,
       "type": "stat"
     },
@@ -178,7 +177,6 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -238,9 +236,10 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.1.5",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
           "expr": "sum(kube_pod_status_phase{pod=~\"$pod\", phase=~\"Pending\"}) or vector(0)",
@@ -252,7 +251,6 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "",
       "transparent": true,
       "type": "stat"
     },
@@ -262,7 +260,6 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -322,9 +319,10 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.1.5",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
           "expr": "sum(kube_pod_status_phase{pod=~\"$pod\", phase=~\"Running\"}) or vector(0)",
@@ -336,7 +334,6 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "",
       "transparent": true,
       "type": "stat"
     },
@@ -346,7 +343,6 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "decimals": 2,
           "mappings": [
             {
@@ -358,7 +354,6 @@
             }
           ],
           "min": 0,
-          "nullValueMode": "connected",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -392,9 +387,10 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.1.5",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
           "expr": "sum(rate(:sas_launcher_pod_net_transmit_bytes_total:{pod=~\"$pod\"}[1m])) + sum(rate(:sas_launcher_pod_net_receive_bytes_total:{pod=~\"$pod\"}[1m])) or vector(0)",
@@ -406,7 +402,6 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "",
       "transparent": true,
       "type": "stat"
     },
@@ -415,7 +410,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "decimals": 2,
           "mappings": [
             {
@@ -427,7 +421,6 @@
             }
           ],
           "min": 0,
-          "nullValueMode": "connected",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -461,9 +454,10 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.1.5",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
           "expr": "sum(rate(:sas_launcher_pod_fs_read_bytes_total:{pod=~\"$pod\"}[1m])) + sum(rate(:sas_launcher_pod_fs_write_bytes_total:{pod=~\"$pod\"}[1m])) or vector(0)",
@@ -475,7 +469,6 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "",
       "transparent": true,
       "type": "stat"
     },
@@ -499,11 +492,9 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "min": 0,
           "noValue": "No active jobs",
-          "nullValueMode": "connected",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -537,9 +528,10 @@
           "fields": "",
           "values": false
         },
-        "showUnfilled": true
+        "showUnfilled": true,
+        "text": {}
       },
-      "pluginVersion": "7.1.5",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
           "expr": "sort_desc(topk($top,count(:sas_launcher_pod_status:{pod=~\"$pod\",phase=~\"Pending|Running\"}) by (label_launcher_sas_com_username)))",
@@ -565,7 +557,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -596,8 +587,11 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.5",
+      "pluginVersion": "7.5.4",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -674,7 +668,6 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -703,8 +696,11 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.5",
+      "pluginVersion": "7.5.4",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -780,7 +776,6 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -811,8 +806,11 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.5",
+      "pluginVersion": "7.5.4",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -904,7 +902,6 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -935,8 +932,11 @@
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.5",
+      "pluginVersion": "7.5.4",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1432,11 +1432,9 @@
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 26,
+  "schemaVersion": 27,
   "style": "dark",
-  "tags": [
-    "sas-viya"
-  ],
+  "tags": [],
   "templating": {
     "list": [
       {
@@ -1445,6 +1443,8 @@
           "text": "Prometheus",
           "value": "Prometheus"
         },
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "Datasource",
@@ -1469,14 +1469,19 @@
           ]
         },
         "datasource": "$datasource",
-        "definition": "label_values(kube_service_info{service=\"sas-launcher\"},namespace)",
+        "definition": "label_values(:sas_launcher_pod_info:,namespace)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Namespace",
         "multi": true,
         "name": "namespace",
         "options": [],
-        "query": "label_values(kube_service_info{service=\"sas-launcher\"},namespace)",
+        "query": {
+          "query": "label_values(:sas_launcher_pod_info:,namespace)",
+          "refId": "StandardVariableQuery"
+        },
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -1499,6 +1504,8 @@
             "$__all"
           ]
         },
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Job Type",
@@ -1543,14 +1550,19 @@
           ]
         },
         "datasource": "$datasource",
-        "definition": "label_values({namespace=~\"$namespace\"},label_launcher_sas_com_username)",
+        "definition": "label_values(:sas_launcher_pod_info:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\"},label_launcher_sas_com_username)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "User",
         "multi": true,
         "name": "user",
         "options": [],
-        "query": "label_values({namespace=~\"$namespace\"},label_launcher_sas_com_username)",
+        "query": {
+          "query": "label_values(:sas_launcher_pod_info:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\"},label_launcher_sas_com_username)",
+          "refId": "StandardVariableQuery"
+        },
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -1562,7 +1574,7 @@
         "useTags": false
       },
       {
-        "allValue": "",
+        "allValue": null,
         "current": {
           "selected": true,
           "text": [
@@ -1572,15 +1584,71 @@
             "$__all"
           ]
         },
-        "datasource": "$datasource",
-        "definition": "label_values(kube_pod_labels{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",label_job_name=~\"sas-launcher-.+-.+-.+-.+-.+\"},pod)",
+        "datasource": null,
+        "definition": "label_values(:sas_launcher_pod_info:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\"},job_name)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Job",
         "multi": true,
-        "name": "pod",
+        "name": "jobName",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "$__all"
+          },
+          {
+            "selected": false,
+            "text": "brell@世界.com",
+            "value": "brell@世界.com"
+          },
+          {
+            "selected": false,
+            "text": "testLongDataStep",
+            "value": "testLongDataStep"
+          }
+        ],
+        "query": {
+          "query": "label_values(:sas_launcher_pod_info:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\"},job_name)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 0,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "text": [
+            "default"
+          ],
+          "value": [
+            "default"
+          ]
+        },
+        "datasource": null,
+        "definition": "label_values(:sas_launcher_pod_info:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\"}, queue_name)",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": "Queue",
+        "multi": true,
+        "name": "queue",
         "options": [],
-        "query": "label_values(kube_pod_labels{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",label_job_name=~\"sas-launcher-.+-.+-.+-.+-.+\"},pod)",
+        "query": {
+          "query": "label_values(:sas_launcher_pod_info:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\"}, queue_name)",
+          "refId": "StandardVariableQuery"
+        },
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -1598,6 +1666,8 @@
           "text": "5",
           "value": "5"
         },
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "Top",
@@ -1605,12 +1675,12 @@
         "name": "top",
         "options": [
           {
-            "selected": false,
+            "selected": true,
             "text": "5",
             "value": "5"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "10",
             "value": "10"
           },
@@ -1629,6 +1699,41 @@
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
+      },
+      {
+        "allValue": "",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "$datasource",
+        "definition": "label_values(:sas_launcher_pod_info:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"},pod)",
+        "description": null,
+        "error": null,
+        "hide": 2,
+        "includeAll": true,
+        "label": "Pod",
+        "multi": true,
+        "name": "pod",
+        "options": [],
+        "query": {
+          "query": "label_values(:sas_launcher_pod_info:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"},pod)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
       }
     ]
   },
@@ -1652,5 +1757,5 @@
   "timezone": "",
   "title": "SAS Launched Jobs - User Activity",
   "uid": "yMknIpvGk",
-  "version": 3
+  "version": 5
 }
