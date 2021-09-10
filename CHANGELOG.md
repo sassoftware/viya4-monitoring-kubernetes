@@ -1,5 +1,21 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.0.11 (13SEP21)
+
+* **Monitoring**
+  * [FEATURE] SAS Job dashboards now support a 'queue' filter for SAS Workload 
+  Orchestrator	
+  * [FEATURE] SAS Job dashboards 'Job' filter now displays user-provided 
+  job names if available
+  * [DEPRECATION] In the next release, NodePorts will be disabled by default 
+  for Prometheus and AlertManager for security reasons. Set the environment 
+  variable `PROM_NODEPORT_ENABLE=true` to maintain current behavior as it will
+   default to 'false' in the next release
+
+* **Logging**
+  * Internal improvements, refactoring and preparations for application multi-
+  tenancy in SAS Viya
+
 ## Version 1.0.10 (16AUG21)
 
 * **Overall**
