@@ -87,7 +87,7 @@ else
 fi
 
 # Deploy additional scrape configs for Prometheus
-log_info "Creating scrape config secret"
+log_info "Creating federation scrape config secret"
 kubectl delete secret --ignore-not-found -n $VIYA_NS prometheus-federate-$VIYA_TENANT
 kubectl create secret generic \
   -n $VIYA_NS \
@@ -97,6 +97,11 @@ kubectl create secret generic \
 # Deploy Prometheus
 log_info "Deploying Prometheus"
 kubectl apply -n $VIYA_NS -f $tenantDir/mt-prometheus.yaml
+
+# Deploy Prometheus Grafana datasource
+kubectl delete secret -n $VIYA_NS --ignore-not-found grafana-datasource-$VIYA_TENANT
+kubectl create secret generic -n $VIYA_NS grafana-datasource-$VIYA_TENANT --from-file $tenantDir/grafana-datasource-v4m.yaml
+kubectl label secret -n $VIYA_NS grafana-datasource-$VIYA_TENANT grafana_datasource-$VIYA_TENANT=1
 
 # Grafana password
 if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS; then
@@ -120,7 +125,7 @@ helm upgrade --install $helmDebug \
   -f "$grafanaTLSYAML" \
   -f "$userGrafanaYAML" \
   --set "extraLabels.sas\\.com/tenant=$VIYA_TENANT" \
-  --set grafana.adminPassword="$grafanaPwd" \
+  --set adminPassword="$grafanaPwd" \
   --version "$GRAFANA_CHART_VERSION_TENANT" \
   --atomic \
   --timeout "10m" \
@@ -141,10 +146,10 @@ function deploy_tenant_dashboards {
      # f will include the wildcard character (*)
      if [ -f "$f" ]; then
        log_debug "Deploying dashboard from file [$f]"
-       name=$(basename $f .json)
+       name=$(basename $f .json)-$VIYA_TENANT
       
        kubectl create cm -n $DASH_NS $name --dry-run=client --from-file $f -o yaml | kubectl apply -f -
-       kubectl label cm -n $DASH_NS $name --overwrite grafana_tenant_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring
+       kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard-$VIYA_TENANT=1 sas.com/monitoring-base=kube-viya-monitoring
      fi
    done
    log_message "--------------------------------"

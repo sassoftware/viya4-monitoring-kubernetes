@@ -5,10 +5,10 @@ livenessProbe: null
 sidecar:
   dashboards:
     enabled: true
-    label: grafana_tenant_dashboard
+    label: grafana_dashboard-__TENANT__
   datasources:
     enabled: true
-    label: grafana_tenant_datasource
+    label: grafana_datasource-__TENANT__
 deploymentStrategy:
   type: Recreate
 persistence:
@@ -38,7 +38,7 @@ testFramework:
     http_addr: 0.0.0.0
     http_port: 3000
   dashboards:
-    default_home_dashboard_path: /tmp/dashboards/viya-welcome-dashboard.json
+    default_home_dashboard_path: /tmp/dashboards/cas-dashboard.json
   analytics:
     check_for_updates: false
   log:

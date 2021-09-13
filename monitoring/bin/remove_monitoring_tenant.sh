@@ -48,6 +48,12 @@ else
   log_debug "Grafana helm release [grafana-$VIYA_TENANT] not found. Skipping uninstall."
 fi
 
+log_info "Removing Grafana dashboards..."
+kubectl delete cm -n $VIYA_NS --ignore-not-found -l grafana_dashboard-$VIYA_TENANT
+
+log_info "Removing Grafana datasource..."
+kubectl delete secret -n $VIYA_NS --ignore-not-found -l grafana_datasource-$VIYA_TENANT
+
 log_info "Removing Prometheus"
 kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/mt-prometheus.yaml
 kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-cas-tenant.yaml
