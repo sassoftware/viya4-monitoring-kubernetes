@@ -99,9 +99,9 @@ log_info "Deploying Prometheus"
 kubectl apply -n $VIYA_NS -f $tenantDir/mt-prometheus.yaml
 
 # Deploy Prometheus Grafana datasource
-kubectl delete secret -n $VIYA_NS --ignore-not-found grafana-datasource-v4m
-kubectl create secret generic -n $VIYA_NS grafana-datasource-v4m --from-file $tenantDir/grafana-datasource-v4m.yaml
-kubectl label secret -n $VIYA_NS grafana-datasource-v4m grafana_tenant_datasource=1
+kubectl delete secret -n $VIYA_NS --ignore-not-found grafana-datasource-$VIYA_TENANT
+kubectl create secret generic -n $VIYA_NS grafana-datasource-$VIYA_TENANT --from-file $tenantDir/grafana-datasource-v4m.yaml
+kubectl label secret -n $VIYA_NS grafana-datasource-$VIYA_TENANT grafana_datasource-$VIYA_TENANT=1
 
 # Grafana password
 if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS; then
@@ -146,10 +146,10 @@ function deploy_tenant_dashboards {
      # f will include the wildcard character (*)
      if [ -f "$f" ]; then
        log_debug "Deploying dashboard from file [$f]"
-       name=$(basename $f .json)
+       name=$(basename $f .json)-$VIYA_TENANT
       
        kubectl create cm -n $DASH_NS $name --dry-run=client --from-file $f -o yaml | kubectl apply -f -
-       kubectl label cm -n $DASH_NS $name --overwrite grafana_tenant_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring
+       kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard-$VIYA_TENANT=1 sas.com/monitoring-base=kube-viya-monitoring
      fi
    done
    log_message "--------------------------------"
