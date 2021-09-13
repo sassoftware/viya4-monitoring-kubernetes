@@ -19,7 +19,7 @@ if [ "$VIYA_TENANT" == "" ]; then
   exit 1
 fi
 
-if [ "$V4M_FEATURE_MULTITENANT_ENABLE" != "true" ]; then
+if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
   log_debug "Multi-tenant feature flag is enabled"
 else
   log_error "Multi-tenant support is under active development and is not yet fully    "
