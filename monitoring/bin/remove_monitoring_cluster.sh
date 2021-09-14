@@ -34,7 +34,7 @@ fi
 
 if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
   log_info "Deleting the [$MON_NS] namespace..."
-  if kubectl delete namespace $MON_NS; then
+  if kubectl delete namespace $MON_NS --timeout $KUBE_NAMESPACE_DELETE_TIMEOUT; then
     log_info "[$MON_NS] namespace and monitoring components successfully removed"
     exit 0
   else
