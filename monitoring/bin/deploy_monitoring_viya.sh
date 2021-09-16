@@ -48,7 +48,7 @@ set -e
 # Prometheus Pushgateway
 PUSHGATEWAY_ENABLED=${PUSHGATEWAY_ENABLED:-true}
 if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
-  PUSHGATEWAY_CHART_VERSION=${PUSHGATEWAY_CHART_VERSION:-1.9.0}
+  PUSHGATEWAY_CHART_VERSION=${PUSHGATEWAY_CHART_VERSION:-1.10.1}
   if helm3ReleaseExists prometheus-pushgateway $VIYA_NS; then
     svcClusterIP=$(kubectl get svc -n $VIYA_NS prometheus-pushgateway -o 'jsonpath={.spec.clusterIP}')
   fi
@@ -84,6 +84,7 @@ if [ "$(kubectl get crd servicemonitors.monitoring.coreos.com -o name 2>/dev/nul
   # Temporary - Remove obsolete ServiceMonitors
   kubectl delete --ignore-not-found ServiceMonitor -n $VIYA_NS sas-java-services
   kubectl delete --ignore-not-found ServiceMonitor -n $VIYA_NS sas-go-services
+  kubectl delete --ignore-not-found ServiceMonitor -n $VIYA_NS sas-deployment-operator
 else
   log_warn "Prometheus Operator not found. Skipping deployment of ServiceMonitors."
 fi

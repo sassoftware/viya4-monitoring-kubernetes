@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.11-osparse
+       Set  fb_configMap_version 0.2.12
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -84,6 +84,8 @@ data:
     [FILTER]
        #
        # Make kubernetes label adjustments here
+       # NOTE: ES will convert "." in label names to "_" but
+       #       you need to specify names w/ the "." here.
        #
        Alias          set_appname
        Name           modify
@@ -105,6 +107,12 @@ data:
        Match          *
        Condition      Key_does_not_exist labels_app
        Copy           labels_k8s-app  appname
+    [FILTER]
+       # Use k8s labels sas.com/tenant for TENANT
+       Alias          set_tenant
+       Name           modify
+       Match          *
+       Copy           labels_sas.com/tenant  tenant
     [FILTER]
        Name           nest
        Match          *
@@ -856,6 +864,7 @@ data:
        Whitelist_key  @timestamp
        Whitelist_key  debug
        Whitelist_key  level
+       Whitelist_key  tenant
        Whitelist_key  kube
        Whitelist_key  logsource
        Whitelist_key  message
@@ -875,6 +884,7 @@ data:
        Ignore_Older     1d
        DB               /var/log/sas_viya_flb.db
        DB.locking       On
+       storage.type     filesystem
     [INPUT]
        # NOTE: ** METALOGGING **
        Name             tail
@@ -888,6 +898,7 @@ data:
        Ignore_Older     1d
        DB               /var/log/sas_viya_flb.db
        DB.locking       On
+       storage.type     filesystem
     [OUTPUT]
        Name  azure
        Alias azurelogs
@@ -904,6 +915,11 @@ data:
        HTTP_Server  On
        HTTP_Listen  0.0.0.0
        HTTP_Port    2020
+       storage.path /tmp/fb_buffer/
+       storage.checksum off
+       storage.sync normal
+       storage.backlog.mem_limit 5M
+       storage.metrics On
   parsers.conf: ""
 kind: ConfigMap
 metadata:

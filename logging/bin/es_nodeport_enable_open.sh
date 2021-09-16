@@ -28,6 +28,8 @@ export SVC=v4m-es-client-service
 if [ "$ES_PORT" != "0" ]; then
    log_info "Making Elasticsearch instance [$SVC] in [$LOG_NS] namespace available on port [$ES_PORT]"
    echo
+else
+   log_debug "No specific port was provided, will make Elasticsearch instance available on a random port"
 fi
 
 # set env var to a node in cluster
@@ -38,9 +40,11 @@ kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":
 
 # Determine which port was ultimately used
 ACTUAL_ES_PORT=$(kubectl -n $LOG_NS get service v4m-es-client-service -o=jsonpath='{.spec.ports[?(@.name=="http")].nodePort}')
+log_debug "ES NodePort enabled on [$ACTUAL_ES_PORT]"
 
-# Print URL to access Kibana
-echo
-log_notice "=========================================================================================================="
-log_notice "== Access Elasticsearch using this URL: https://$NODE_NAME:$ACTUAL_ES_PORT/ =="
-log_notice "=========================================================================================================="
+# Print URL to access Elasticsearch
+SHOW_ES_URL="${SHOW_ES_URL:-true}"
+if [ "$SHOW_ES_URL" == "true" ]; then
+   bin/show_app_url.sh ELASTICSEARCH
+fi
+

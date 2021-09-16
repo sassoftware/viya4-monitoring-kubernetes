@@ -10,7 +10,8 @@ spec:
       app: prometheus-pushgateway
   endpoints:
   - port: http
-  - relabelings:
+    interval: 15s
+    relabelings:
     - sourceLabels: [__meta_kubernetes_pod_annotation_sas_com_tls_enabled_ports]
       action: replace
       regex: all|.*http.*

@@ -10,7 +10,16 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     source bin/log-include.sh
     source bin/openshift-include.sh
 
+    if [ ! $(which sha256sum) ]; then
+      log_error "Missing required utility: sha256sum"
+      exit 1
+    fi
+
     export USER_DIR=${USER_DIR:-$(pwd)}
+    if [ -d "$USER_DIR" ]; then
+      # Resolve full path
+      export USER_DIR=$(cd "$(dirname "$USER_DIR")"; pwd)/$(basename "$USER_DIR")
+    fi
     if [ -f "$USER_DIR/user.env" ]; then
         userEnv=$(grep -v '^[[:blank:]]*$' $USER_DIR/user.env | grep -v '^#' | xargs)
         if [ "$userEnv" != "" ]; then

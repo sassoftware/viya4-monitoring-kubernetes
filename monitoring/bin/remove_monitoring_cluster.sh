@@ -34,7 +34,7 @@ fi
 
 if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
   log_info "Deleting the [$MON_NS] namespace..."
-  if kubectl delete namespace $MON_NS; then
+  if kubectl delete namespace $MON_NS --timeout $KUBE_NAMESPACE_DELETE_TIMEOUT; then
     log_info "[$MON_NS] namespace and monitoring components successfully removed"
     exit 0
   else
@@ -65,6 +65,8 @@ if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
   kubectl delete pvc --ignore-not-found -n $MON_NS -l app.kubernetes.io/name=grafana
   kubectl delete pvc --ignore-not-found -n $MON_NS -l app=prometheus
 fi
+
+removeV4MInfo "$MON_NS"
 
 # Wait for resources to terminate
 log_info "Waiting 60 sec for resources to terminate..."

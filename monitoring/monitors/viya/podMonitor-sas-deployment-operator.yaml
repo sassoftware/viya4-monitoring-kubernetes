@@ -1,0 +1,38 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: sas-deployment-operator
+  labels:
+    sas.com/monitoring-base: kube-viya-monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sas-deployment-operator
+  podMetricsEndpoints:
+  - relabelings:
+    - sourceLabels: [__meta_kubernetes_pod_label_sas_com_deployment]
+      targetLabel: sas_deployment
+    - sourceLabels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+      action: keep
+      regex: 'true'
+    - sourceLabels: [__meta_kubernetes_pod_annotationpresent_prometheus_io_scheme,__meta_kubernetes_pod_annotation_prometheus_io_scheme]
+      action: replace
+      regex: true;(.+)
+      targetLabel: __scheme__
+      replacement: $1
+    - sourceLabels: [__meta_kubernetes_pod_annotationpresent_prometheus_io_port,__meta_kubernetes_pod_annotation_prometheus_io_port]
+      action: replace
+      regex: true;(.+)
+      targetLabel: __port
+      replacement: $1
+    - sourceLabels: [__meta_kubernetes_pod_ip, __port]
+      regex: (.+);(.+)
+      targetLabel: __address__
+      replacement: $1:$2
+    - sourceLabels: [__meta_kubernetes_pod_annotationpresent_prometheus_io_path,__meta_kubernetes_pod_annotation_prometheus_io_path]
+      action: replace
+      regex: true;(.+)
+      targetLabel: __metrics_path__
+      replacement: $1
+    tlsConfig:
+      insecureSkipVerify: true

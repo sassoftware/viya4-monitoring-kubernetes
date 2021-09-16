@@ -44,6 +44,7 @@ If you specify `TLS_ENABLE=true`, the `kibana-tls-secret` Kubernetes secret
 must be present. By default, the `deploy_logging_open.sh` deployment script automatically obtains the certificates from cert-manager and creates 
 the `kibana-tls-secret` secret.
 
+
 See [Notes_on_using_TLS](../../../logging/Notes_on_using_TLS.md) for 
 information about creating this secret manually. 
 
@@ -57,6 +58,7 @@ you must manually create two Kubernetes secrets.
 ```bash
 kubectl create secret tls $SECRET_NAME -n $NAMESPACE --key <cert-key> --cert <cert-file>
 ```
+By default, the value of `namespace` that is used during the deployment process is `logging`. Run the command for for each of these values of `secret-name`:
 
 Use `elasticsearch-ingress-tls-secret` and `kibana-ingress-tls-secret` as values for `$SECRET_NAME`. Use the name of the namespace into which the logging components 
 were deployed (such as `logging`) for the value of `$NAMESPACE`.
@@ -68,5 +70,6 @@ log monitoring components and the correct ingress host information.
 
 3. If you are using an ingress controller other than NGINX, modify the annotation 
 `nginx.ingress.kubernetes.io/backend-protocol: HTTPS` as needed in the `user-values-elasticsearch-open.yaml` file. Refer to the documentation for your ingress controller. 
+
 
 

@@ -123,6 +123,14 @@ log_info "STEP 6: Deploying Service Monitors"
 export DEPLOY_SERVICEMONITORS=${DEPLOY_SERVICEMONITORS:-true}
 logging/bin/deploy_servicemonitors_open_openshift.sh
 
+##################################
+# Version Info                   #
+##################################
+log_info "STEP 7: Updating version info"
+if ! deployV4MInfo "$LOG_NS"; then
+  log_warn "Unable to update SAS Viya Monitoring version info"
+fi
+
 
 ##################################
 # Display Notices                #

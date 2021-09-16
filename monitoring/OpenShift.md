@@ -2,8 +2,8 @@
 
 ## NOTE: OpenShift Support is Experimental
 
-Support for SAS Viya Monitoring on OpenShift continues to be developed, 
-so it is currently considered to be EXPERIMENTAL. Variable names, defaults, 
+Support for SAS Viya Monitoring on OpenShift continues to be developed,
+so it is currently considered to be EXPERIMENTAL. Variable names, defaults,
 and usage may change until deployment on OpenShift is officially supported.
 
 ## Overview
@@ -43,7 +43,7 @@ deploys a separate instance of Grafana in order to provide access to dashboards
 for SAS Viya components.
 
 See the [Grafana helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana)
-for more information about customizing the deployment. You can provide 
+for more information about customizing the deployment. You can provide
 user settings for Grafana in the file `$USER_DIR/monitoring/user-values-openshift-grafana.yaml`.
 
 **Note:** When deploying on other cloud providers, the ServiceMonitors for SAS
@@ -65,7 +65,7 @@ to Grafana) and ingress TLS (browser to cluster) is enabled on the Grafana
 ## Prerequisites
 
 * [Kubernetes](https://kubernetes.io/) version 1.19+
-* [OpenShift](https://www.openshift.com/) 4.6
+* [OpenShift](https://www.openshift.com/) 4.7
 * [`kubectl`](https://kubernetes.io/docs/tasks/tools/) 1.19+
 * [`Helm`](https://helm.sh/docs/intro/install/) 3.0+ (3.5+ recommended)
 * OpenShift [`oc`](https://docs.openshift.com/container-platform/3.6/cli_reference/get_started_cli.html)
@@ -133,7 +133,9 @@ Specify `OPENSHIFT_PATH_ROUTES=true` in the `$USER_DIR/user.env` file
 file (for only logging components) to use path-based routes.
 
 The Grafana hostname can be configured using `OPENSHIFT_ROUTE_HOST_GRAFANA` in
-`$USER_DIR/user.env` or `$USER_DIR/monitoring/user.env`.
+`$USER_DIR/user.env` or `$USER_DIR/monitoring/user.env`. Note that OpenShift
+does not allow the use of the same route hostname across namespaces, so do not
+use the same custom hostname across logging and monitoring.
 
 ## Remove SAS Viya Monitoring on OpenShift
 

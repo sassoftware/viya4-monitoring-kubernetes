@@ -1,22 +1,32 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: sas-deployment-operator
+  name: sas-cas-server-__TENANT__
   labels:
     sas.com/monitoring-base: kube-viya-monitoring
+    sas.com/tenant: __TENANT__
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: sas-deployment-operator
+      app.kubernetes.io/name: sas-cas-server
+      sas.com/tenant: __TENANT__
   endpoints:
-  - port: metrics
-    path: /metrics
+  - port: http
+    path: /internal/metrics
     relabelings:
+    - sourceLabels: [__meta_kubernetes_pod_label_casoperator_sas_com_node_type]
+      regex: "controller"
+      action: keep
+    - sourceLabels: [__meta_kubernetes_service_name]
+      regex: ".+-client"
+      action: keep
     - sourceLabels: [__meta_kubernetes_pod_label_sas_com_deployment]
       targetLabel: sas_deployment
+    - sourceLabels: [__meta_kubernetes_pod_label_sas_com_tenant]
+      targetLabel: sas_tenant
     - sourceLabels: [__meta_kubernetes_pod_annotation_sas_com_tls_enabled_ports]
       action: replace
-      regex: all|.*metrics.*
+      regex: all|.*http.*
       targetLabel: __scheme__
       replacement: https
     - sourceLabels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
