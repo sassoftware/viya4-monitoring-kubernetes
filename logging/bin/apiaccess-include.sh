@@ -44,7 +44,7 @@ function get_sec_api_url {
       fi
       sec_api_url="https://localhost:$TEMP_PORT/_opendistro/_security/api"
 
-      trap stop_portforwarding EXIT
+      trap_add stop_portforwarding EXIT
    fi
    log_debug "Security API Endpoint: [$sec_api_url]"
 
