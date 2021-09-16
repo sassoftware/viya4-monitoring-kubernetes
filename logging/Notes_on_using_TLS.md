@@ -29,7 +29,7 @@ The `deploy_logging_open.sh` deployment script automatically obtains the certifi
 
 To enable TLS without using cert-manager, you must perform manual steps to obtain the digital certificates and create the corresponding Kubernetes secrets.
 
-1. Use the method of your choice to create the files that are required to generate the Kubernetes secrets. Create these files:
+1. Use the method of your choice to create the files that are required to generate the Kubernetes secrets. The certificate that you use for the `es-admin-tls-secret` secret cannot be re-used for any of the other TLS certificates. Create these files: 
 
    - TLS certificate (the "cert"): used to generate the tls.crt; must be an X.509 PEM certificate
    - TLS key (the "key"): used to generate the tls.key; must be an X.509 PEM key
