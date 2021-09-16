@@ -7,6 +7,26 @@
 # Current directory must be the root directory of the repo
 
 source bin/service-url-include.sh
+trap_add() {
+ # based on https://stackoverflow.com/questions/3338030/multiple-bash-traps-for-the-same-signal
+ # but prepends new cmd rather than append it
+
+    local cmd_to_add signal
+
+    cmd_to_add=$1; shift
+    for signal in "$@"; do
+        trap -- "$(
+            # print the new trap command
+            printf '%s\n' "${cmd_to_add}"
+            # helper fn to get existing trap command from output
+            # of trap -p
+            extract_trap_cmd() { printf '%s\n' "$3"; }
+            # print existing trap command with newline
+            eval "extract_trap_cmd $(trap -p "${signal}")"
+        )" "${signal}" 
+    done
+}
+export -f  trap_add
 
 
 function stop_portforwarding {
@@ -18,6 +38,7 @@ function stop_portforwarding {
    if [ -n "$pfpid" ]; then
       log_debug "Killing port-forwarding process [$pfpid]"
       kill  -9 $pfpid
+      wait $pfpid 2>/dev/null
    else
       log_debug "No portforwarding processID found; nothing to terminate."
    fi
@@ -27,6 +48,7 @@ function stop_es_portforwarding {
    if [ -n "$espfpid" ]; then
       log_debug "ES PF PID for stopping: $espfpid"
       stop_portforwarding $espfpid
+      unset espfpid
    fi
 }
 
@@ -34,6 +56,7 @@ function stop_kb_portforwarding {
    if [ -n "$kbpfpid" ]; then
       log_debug "KB PF PID for stopping: $kbpfpid"
       stop_portforwarding $kbpfpid
+      unset kbpfpid
    fi
  }
 
@@ -75,7 +98,7 @@ function get_api_url {
       fi
       api_url="https://localhost:$TEMP_PORT/"
 
-      #trap stop_portforwarding EXIT
+      #trap_add stop_portforwarding EXIT
    fi
    log_debug "API Endpoint for [$servicename]: $api_url"
 }
@@ -95,7 +118,7 @@ function get_es_api_url {
    if [ "$rc" == "0" ]; then
       es_api_url=$api_url
       espfpid=$pfPID
-      #trap stop_es_portforwarding EXIT
+      trap_add stop_es_portforwarding EXIT
       return 0
    else
       return 1
@@ -116,7 +139,7 @@ function get_kb_api_url {
    if [ "$rc" == "0" ]; then
       kb_api_url=$api_url
       kbpfpid=$pfPID
-      #trap stop_kb_portforwarding EXIT
+      trap_add stop_kb_portforwarding EXIT
       return 0
    else
       return 1

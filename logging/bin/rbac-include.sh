@@ -268,3 +268,30 @@ function remove_rolemapping {
     log_debug "The role [$targetrole] does not exist; doing nothing. [$response]"
  fi
 }
+
+
+#
+# TENANT Functions
+#
+
+function kibana_tenant_exits {
+   # Check if $tenant exists
+   #
+   # Returns: 0 - Tenant exists
+   #          1 - Tenant does not exist
+
+   local tenant
+   tenant=$1
+
+   response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "${sec_api_url}/tenants/$tenant" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+
+   if [[ $response == 2* ]]; then
+      log_debug "Confirmed Kibana tenant [$tenant] exists.[$response]"
+      return 0
+   else
+      log_debug "Kibana tenant [$tenant] does not exist. [$response]"
+      return 1
+   fi
+}
+
+
