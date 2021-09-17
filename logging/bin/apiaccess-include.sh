@@ -7,27 +7,6 @@
 # Current directory must be the root directory of the repo
 
 source bin/service-url-include.sh
-trap_add() {
- # based on https://stackoverflow.com/questions/3338030/multiple-bash-traps-for-the-same-signal
- # but prepends new cmd rather than append it
-
-    local cmd_to_add signal
-
-    cmd_to_add=$1; shift
-    for signal in "$@"; do
-        trap -- "$(
-            # print the new trap command
-            printf '%s\n' "${cmd_to_add}"
-            # helper fn to get existing trap command from output
-            # of trap -p
-            extract_trap_cmd() { printf '%s\n' "$3"; }
-            # print existing trap command with newline
-            eval "extract_trap_cmd $(trap -p "${signal}")"
-        )" "${signal}" 
-    done
-}
-export -f  trap_add
-
 
 function stop_portforwarding {
    # terminate port-forwarding process if PID was cached
