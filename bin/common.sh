@@ -4,6 +4,26 @@
 # This file is not marked as executable as it is intended to be sourced
 # Current directory must be the root directory of the repo
 
+trap_add() {
+ # based on https://stackoverflow.com/questions/3338030/multiple-bash-traps-for-the-same-signal
+ # but: prepends new cmd rather than append it, changed var names and eliminated messages
+
+   local cmd_to_add signal
+
+   cmd_to_add=$1; shift
+   for signal in "$@"; do
+      trap -- "$(
+         # print the new trap command
+         printf '%s\n' "${cmd_to_add}"
+         # helper fn to get existing trap command from output
+         # of trap -p
+         extract_trap_cmd() { printf '%s\n' "$3"; }
+         # print existing trap command with newline
+         eval "extract_trap_cmd $(trap -p "${signal}")"
+      )" "${signal}"
+   done
+}
+
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
     # Includes
     source bin/colors-include.sh
@@ -79,7 +99,7 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
         log_info "TMP_DIR [$TMP_DIR] was not removed"
       fi
     }
-    trap cleanup EXIT
+    trap_add cleanup EXIT
 
     export SAS_COMMON_SOURCED=true
 fi
@@ -110,4 +130,5 @@ function randomPassword {
 
 export -f checkDefaultStorageClass
 export -f randomPassword
+export -f  trap_add
 
