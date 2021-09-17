@@ -58,7 +58,7 @@ removeV4MInfo "$LOG_NS"
 
 if [ "$LOG_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
   log_info "Deleting the [$LOG_NS] namespace..."
-  if kubectl delete namespace $LOG_NS; then
+  if kubectl delete namespace $LOG_NS --timeout $KUBE_NAMESPACE_DELETE_TIMEOUT; then
     log_info "[$LOG_NS] namespace and logging components successfully removed"
     exit 0
   else

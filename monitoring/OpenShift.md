@@ -65,7 +65,7 @@ to Grafana) and ingress TLS (browser to cluster) is enabled on the Grafana
 ## Prerequisites
 
 * [Kubernetes](https://kubernetes.io/) version 1.19+
-* [OpenShift](https://www.openshift.com/) 4.6
+* [OpenShift](https://www.openshift.com/) 4.7
 * [`kubectl`](https://kubernetes.io/docs/tasks/tools/) 1.19+
 * [`Helm`](https://helm.sh/docs/intro/install/) 3.0+ (3.5+ recommended)
 * OpenShift [`oc`](https://docs.openshift.com/container-platform/3.6/cli_reference/get_started_cli.html)

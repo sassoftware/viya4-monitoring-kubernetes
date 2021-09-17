@@ -98,7 +98,6 @@ function get_api_url {
       fi
       api_url="https://localhost:$TEMP_PORT/"
 
-      #trap_add stop_portforwarding EXIT
    fi
    log_debug "API Endpoint for [$servicename]: $api_url"
 }
