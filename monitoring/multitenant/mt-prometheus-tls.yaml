@@ -1,1 +1,111 @@
-# Coming soon
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: prometheus
+    self-monitor: "true"
+    sas.com/tenant: __TENANT__
+  name: prometheus-__TENANT__
+spec:
+  type: ClusterIP
+  ports:
+  - name: web
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:
+    app: prometheus
+    prometheus: prometheus-__TENANT__
+  sessionAffinity: None
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: prometheus
+    sas.com/tenant: __TENANT__
+  name: prometheus-__TENANT__
+spec:
+  endpoints:
+  - path: /metrics
+    port: web
+  selector:
+    matchLabels:
+      app: prometheus
+      self-monitor: "true"
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  labels:
+    app: prometheus
+    sas.com/tenant: __TENANT__
+  name: prometheus-__TENANT__
+spec:
+  listenLocal: true
+  containers:
+  # Add square/ghosttunnel TLS proxy
+  - name: tls-proxy
+    args:
+    - server
+    - --listen=:443
+    - --target=127.0.0.1:9090
+    - --key=/cert/tls.key
+    - --cert=/cert/tls.crt
+    - --disable-authentication
+    image: squareup/ghostunnel:v1.5.2
+    imagePullPolicy: IfNotPresent
+    ports:
+    - name: https
+      containerPort: 443 
+      protocol: TCP
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: true
+      privileged: true
+      readOnlyRootFilesystem: true
+      runAsUser: 0
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /cert
+      name: tls-proxy-secret
+      readOnly: true
+  additionalScrapeConfigs:
+    name: prometheus-federate-__TENANT__
+    key: cluster-federate-job
+  image: quay.io/prometheus/prometheus:v2.26.1
+  # alerting:
+  #   alertmanagers:
+  #   - apiVersion: v2
+  #     name: prometheus-operator-alertmanager
+  #     namespace: __MON_NS__
+  #     pathPrefix: /
+  #     port: web
+  enableAdminAPI: false
+  logFormat: json
+  logLevel: info
+  paused: false
+  portName: web
+  replicas: 1
+  retention: 3d
+  retentionSize: 5GiB
+  routePrefix: /
+  securityContext:
+    runAsNonRoot: false
+  volumes:
+    - name: tls-proxy-secret
+      secret:
+        defaultMode: 420
+        secretName: prometheus-tls-secret-__TENANT__
+  serviceAccountName: prometheus-__TENANT__
+  serviceMonitorSelector:
+    matchLabels:
+      sas.com/tenant: __TENANT__ 
+  podMonitorSelector:
+    matchLabels:
+      sas.com/tenant: __TENANT__
+  ruleSelector:
+    matchLabels:
+      sas.com/tenant: __TENANT__
+  version: v2.26.1

@@ -1,33 +1,38 @@
-# This is a Prometheus resource that deploys a tenant-specific instance
-
 apiVersion: v1
-kind: ServiceAccount
+kind: Service
 metadata:
-  name: prometheus-__TENANT__
   labels:
+    app: prometheus
+    self-monitor: "true"
     sas.com/tenant: __TENANT__
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: prometheus-role-__TENANT__
-rules:
-- apiGroups: [""] # "" indicates the core API group
-  resources: ["pods","services","endpoints","ingresses"]
-  verbs: ["get", "watch", "list"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: prometheus-rolebinding-__TENANT__
-subjects:
-- kind: ServiceAccount
   name: prometheus-__TENANT__
-  apiGroup: ""
-roleRef:
-  kind: Role
-  name: prometheus-role-__TENANT__
-  apiGroup: ""
+spec:
+  type: ClusterIP
+  ports:
+  - name: web
+    port: 9090
+    protocol: TCP
+    targetPort: 9090
+  selector:
+    app: prometheus
+    prometheus: prometheus-__TENANT__
+  sessionAffinity: None
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: prometheus
+    sas.com/tenant: __TENANT__
+  name: prometheus-__TENANT__
+spec:
+  endpoints:
+  - path: /metrics
+    port: web
+  selector:
+    matchLabels:
+      app: prometheus
+      self-monitor: "true"
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
@@ -72,42 +77,4 @@ spec:
   ruleSelector:
     matchLabels:
       sas.com/tenant: __TENANT__
-
   version: v2.26.1
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: prometheus
-    self-monitor: "true"
-    sas.com/tenant: __TENANT__
-  name: prometheus-__TENANT__
-spec:
-  type: ClusterIP
-  ports:
-  - name: web
-    port: 9090
-    protocol: TCP
-    targetPort: 9090
-  selector:
-    app: prometheus
-    prometheus: prometheus-__TENANT__
-  sessionAffinity: None
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    app: prometheus
-    sas.com/tenant: __TENANT__
-  name: prometheus-__TENANT__
-spec:
-  endpoints:
-  - path: /metrics
-    port: web
-  selector:
-    matchLabels:
-      app: prometheus
-      self-monitor: "true"
-

@@ -1,0 +1,30 @@
+# This is a Prometheus resource that deploys a tenant-specific instance
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus-__TENANT__
+  labels:
+    sas.com/tenant: __TENANT__
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prometheus-role-__TENANT__
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods","services","endpoints","ingresses"]
+  verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prometheus-rolebinding-__TENANT__
+subjects:
+- kind: ServiceAccount
+  name: prometheus-__TENANT__
+  apiGroup: ""
+roleRef:
+  kind: Role
+  name: prometheus-role-__TENANT__
+  apiGroup: ""
