@@ -97,7 +97,7 @@ spec:
     - name: tls-proxy-secret
       secret:
         defaultMode: 420
-        secretName: prometheus-tls-secret-__TENANT__
+        secretName: prometheus-__TENANT__-tls-secret
   serviceAccountName: prometheus-__TENANT__
   serviceMonitorSelector:
     matchLabels:

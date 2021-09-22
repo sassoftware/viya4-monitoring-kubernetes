@@ -46,13 +46,6 @@ spec:
     name: prometheus-federate-__TENANT__
     key: cluster-federate-job
   image: quay.io/prometheus/prometheus:v2.26.1
-  # alerting:
-  #   alertmanagers:
-  #   - apiVersion: v2
-  #     name: prometheus-operator-alertmanager
-  #     namespace: __MON_NS__
-  #     pathPrefix: /
-  #     port: web
   enableAdminAPI: false
   listenLocal: false
   logFormat: json

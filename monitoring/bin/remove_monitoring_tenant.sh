@@ -25,11 +25,11 @@ fi
 # Copy template files to temp
 tenantDir=$TMP_DIR/$VIYA_TENANT
 mkdir -p $tenantDir
-cp monitoring/multitenant/*.yaml $tenantDir/
+cp -R monitoring/multitenant/* $tenantDir/
 
 # Replace placeholders
 log_debug "Replacing __TENANT__ for files in [$tenantDir]"
-for f in $tenantDir/*; do 
+for f in $(find $tenantDir -name '*.yaml'); do
   if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
     sed -i '' "s/__TENANT__/$VIYA_TENANT/g" $f
     sed -i '' "s/__TENANT_NS__/$VIYA_NS/g" $f
@@ -59,5 +59,8 @@ kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/mt-prometheus.yaml
 kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-cas-tenant.yaml
 kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-pushgateway-tenant.yaml
 kubectl delete -n $VIYA_NS --ignore-not-found secret prometheus-federate-$VIYA_TENANT
+
+# Remove non-user-provided certificates
+kubectl delete -n $VIYA_NS --ignore-not-found certificate -l 'sas.com/monitoring-base=kube-viya-monitoring' 2>/dev/null
 
 log_notice "Uninstalled monitoring for [$VIYA_NS/$VIYA_TENANT]"

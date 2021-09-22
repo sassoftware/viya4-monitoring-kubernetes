@@ -38,7 +38,7 @@ extraContainerVolumes:
 - name: tls-proxy-secret
   secret:
     defaultMode: 420
-    secretName: grafana-tls-secret-__TENANT__
+    secretName: grafana-__TENANT__-tls-secret
 service:
   port: 443
   targetPort: 443
