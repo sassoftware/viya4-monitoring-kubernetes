@@ -239,6 +239,17 @@ TLS (HTTPS) for ingress, you do not have to specify the environment variable
 `TLS_ENABLE=true`, but you must manually populate Kubernetes ingress secrets
 as specified in the [TLS Monitoring sample](/samples/tls/monitoring).
 
+The standard deployment script for the monitoring components use these TLS secrets for the TLS certificates that handle interactions between components:
+
+* `prometheus-tls-secret`
+* `alertmanager-tls-secret`
+* `grafana-tls-secret`
+
+If any of the required certificates do not exist, the deployment process attempts to use [cert-manager](https://cert-manager.io/) (version v1.0 or later) to generate the missing
+certificates. If the required certificates do not exist and cert-manager is
+not available, the deployment process fails. cert-manager is not required
+if TLS is disabled or if all of the TLS secrets exist prior to deployment.
+
 #### Workload Node Placement
 
 SAS Viya is deployed using a workload node placement strategy, which uses the
@@ -415,6 +426,19 @@ kubectl exec -n <monitoring_namespace> <grafana_pod> -c grafana -- bin/grafana-c
 
 The randomly-generated password is displayed only during the initial deployment
 of the monitoring components.  It is not displayed if you redeploy the components.
+
+## Deploy Monitoring for Tenants
+
+If you are the provider administrator in a multi-tenant environment, you can 
+provide monitoring capabilities for the tenant administrators in your 
+environment. The tenant administrator can view CAS and SAS job metric 
+information for only their tenant. The provider administrator can view 
+information for all tenants.
+
+You must deploy both the cluster monitoring components and the SAS Viya 
+monitoring components before deploying monitoring components for a tenant.
+
+For instructions, see [Deploying Monitoring for Tenants](Tenant_Monitoring.md)
 
 ## Update Monitoring Components
 
