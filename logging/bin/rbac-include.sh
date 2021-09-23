@@ -274,13 +274,56 @@ function remove_rolemapping {
 # TENANT Functions
 #
 
-function kibana_tenant_exits {
+function create_kibana_tenant {
+   # Creates a Kibana tenant
+   #
+   # Returns: 0 - Kibana tenant created
+   #          1 - Kibana tenant NOT created
+
+   local tenant description response
+
+   tenant=$1
+   description=$2
+
+   response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/tenants/$tenant"  -H 'Content-Type: application/json' -d '{"description":"'"$description"'"}'  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+
+   if [[ $response == 2* ]]; then
+      log_info "Kibana tenant space [$tenant] created [$response]"
+      return  0
+   else
+      log_error "There was an issue creating the Kibana tenant space [$tenant] [$response]"
+      return 1
+   fi
+}
+
+function delete_kibana_tenant {
+   # Deletes a Kibana tenant
+   #
+   # Returns: 0 - Kibana tenant deleted
+   #          1 - Kibana tenant NOT deleted
+
+   local tenant response
+
+   tenant=$1
+
+   response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "$sec_api_url/tenants/$tenant"   --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+
+   if [[ $response == 2* ]]; then
+      log_info "Kibana tenant space [$tenant] deleted [$response]"
+      return  0
+   else
+      log_error "There was an issue deleting the Kibana tenant space [$tenant] [$response]"
+      return 1
+   fi
+}
+
+function kibana_tenant_exists {
    # Check if $tenant exists
    #
    # Returns: 0 - Tenant exists
    #          1 - Tenant does not exist
 
-   local tenant
+   local tenant response
    tenant=$1
 
    response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "${sec_api_url}/tenants/$tenant" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
@@ -293,5 +336,6 @@ function kibana_tenant_exits {
       return 1
    fi
 }
+
 
 

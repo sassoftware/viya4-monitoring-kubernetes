@@ -97,7 +97,7 @@ get_credentials_from_secret admin
 rc=$?
 if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
 
-if kibana_tenant_exits $tenant; then
+if kibana_tenant_exists $tenant; then
    log_debug "Specified tenant exists"
 else
    log_error "Specified tenant does not exist"
