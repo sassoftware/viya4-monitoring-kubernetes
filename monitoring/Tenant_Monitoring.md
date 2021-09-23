@@ -9,13 +9,26 @@ information for only their tenant. The provider administrator can view
 information for all tenants.
 
 Monitoring components are deployed individually for each tenant, so you 
-can choose which tenants can have monitoring capability. The deployment 
-process deploys tenant-specific instances of Prometheus and Grafana that 
-process and display information only from the tenant. 
+can choose which tenants can have monitoring capability. The process of 
+deploying monitoring components for a tenant deploys instances of 
+both Prometheus and Grafana that are specific to the tenant. These 
+instances require fewer resources than the instances for cluster 
+monitoring, because the tenant-specific Prometheus instance collects 
+information only for the tenant and the tenant-specific Grafana 
+instance contains its own user definitions and includes only 
+three dashboards. 
 
 ### Secrets for In-Cluster TLS
 
-The deployment script for the tenant monitoring components use these 
+The [TLS Monitoring sample](/samples/tls/monitoring) contains information about
+specifying the `TLS_ENABLE` environment variable to use TLS for in-cluster
+communications between the components and to use TLS for connections between
+the user and the monitoring components when using NodePorts. If you only use
+TLS (HTTPS) for ingress, you do not have to specify the environment variable
+`TLS_ENABLE=true`, but you must manually populate Kubernetes ingress secrets
+as specified in the [TLS Monitoring sample](/samples/tls/monitoring).
+
+The deployment script for the tenant monitoring components uses these 
 TLS secrets for the TLS certificates that handle interactions 
 between components:
 
