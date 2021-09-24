@@ -17,16 +17,18 @@ if [ "$VIYA_NS" == "" ]; then
 fi
 
 if [ "$VIYA_TENANT" == "" ]; then
-  log_error "VIYA_TENANT must be set to the name of an existing Viya tenant"
+  log_error "VIYA_TENANT must be set to the name of a current or planned Viya tenant"
   exit 1
 fi
 
-if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
-  log_debug "Multi-tenant feature flag is enabled"
+# Validate tenant name
+if [[ $VIYA_TENANT =~ ^[a-z]([a-z0-9]){0,15}$ ]]; then
+  if [[ $VIYA_TENANT =~ ^sas ]]; then
+    log_error "Tenant names cannot start with 'sas'"
+    exit 1
+  fi
 else
-  log_error "Multi-tenant support is under active development and is not yet fully    "
-  log_error "functional. Set V4M_FEATURE_MULTITENANT_ENABLE=true to continue anyway.  "
-  log_message ""
+  log_error "[$VIYA_TENANT] is not a valid tenant name"
   exit 1
 fi
 
@@ -97,7 +99,7 @@ else
 fi
 
 # Deploy additional scrape configs for Prometheus
-log_info "Creating federation scrape config secret"
+log_info "Configuring secret for Prometheus federation"
 kubectl delete secret --ignore-not-found -n $VIYA_NS prometheus-federate-$VIYA_TENANT
 kubectl create secret generic \
   -n $VIYA_NS \
@@ -124,12 +126,11 @@ if [ "$TLS_ENABLE" == "true" ]; then
 else
   grafanaDatasource=$tenantDir/grafana-datasource-tenant.yaml
 fi
-
 kubectl delete secret -n $VIYA_NS --ignore-not-found grafana-datasource-$VIYA_TENANT
 kubectl create secret generic -n $VIYA_NS grafana-datasource-$VIYA_TENANT --from-file $grafanaDatasource
 kubectl label secret -n $VIYA_NS grafana-datasource-$VIYA_TENANT grafana_datasource-$VIYA_TENANT=1
 
-# Grafana password
+# Grafana
 if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS; then
   log_info "Upgrading Grafana via Helm...($(date) - timeout 10m)"
 else
@@ -142,7 +143,7 @@ else
   log_info "Deploying Grafana via Helm...($(date) - timeout 10m)"
 fi
 
-# Deploy Grafana
+# Deploy Grafana using Helm
 GRAFANA_CHART_VERSION_TENANT=${GRAFANA_CHART_VERSION_TENANT:-6.9.1}
 helm upgrade --install $helmDebug \
   -n "$VIYA_NS" \
@@ -154,7 +155,7 @@ helm upgrade --install $helmDebug \
   --set adminPassword="$grafanaPwd" \
   --version "$GRAFANA_CHART_VERSION_TENANT" \
   --atomic \
-  --timeout "5m" \
+  --timeout "10m" \
   $extraArgs \
   grafana-$VIYA_TENANT \
   grafana/grafana
