@@ -41,16 +41,16 @@ function delete_role {
    # Returns: 0 - Role deleted
    #          1 - Role was/could not be deleted
 
-   local role
+   local role response
    role=$1
 
    if role_exists $role; then
       response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "$sec_api_url/roles/$role"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
       if [[ $response != 2* ]]; then
-         log_error "There was an issue deleting the security role [$ROLENAME] [$response]"
+         log_error "There was an issue deleting the security role [$role] [$response]"
          return 1
       else
-         log_info "Security role [$ROLENAME] deleted. [$response]"
+         log_info "Security role [$role] deleted. [$response]"
       fi
    else
       #role does not exist, nothing to do
@@ -95,7 +95,7 @@ function role_exists {
    # Returns: 0 - Role exists
    #          1 - Role does not exist
 
-   local role
+   local role response
 
    role=$1
 

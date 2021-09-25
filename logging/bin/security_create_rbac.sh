@@ -9,7 +9,8 @@
 #
 #                                    /-- [ROLE: kibana_user]       (allows access to Kibana)
 # [BACKEND_ROLE: {NST}_kibana_user]<-
-#                                    \-- [ROLE: search_index_{NST}] (allows access to log messages from {NST})
+#                                    \--- [ROLE: search_index_{NST}] (allows access to log messages from {NST})
+#                                     \-- [ROLE: tenant_{NST}]       (allows access to Kibana tenant space for {NST})
 #
 #
 #
@@ -46,6 +47,7 @@ function show_usage {
 NAMESPACE=${1}
 TENANT=${2}
 READONLY=${3:-false}
+create_ktenant_roles=${CREATE_KTENANT_ROLE:-true}
 
 if [ "$TENANT" == "--add_read_only" ]; then
    READONLY="--add_read_only"
@@ -133,9 +135,21 @@ if [ -z "$sec_api_url" ]; then
 fi
 
 
-#index user
+#index user (controls access to indexes)
 ensure_role_exists $ROLENAME $TMP_DIR/rbac/index_role.json
 add_rolemapping $ROLENAME $BE_ROLENAME
+
+#tenant role (controls access to Kibanas tenant spaces)
+if [ "$create_ktenant_roles" == "true" ]; then
+
+   if [ -n "$TENANT" ]; then
+      ensure_role_exists tenant_${NST} $TMP_DIR/rbac/kibana_tenant_tenant_role.json
+   else
+      ensure_role_exists tenant_${NST} $TMP_DIR/rbac/kibana_tenant_namespace_role.json
+   fi
+   add_rolemapping  tenant_${NST} $BE_ROLENAME
+
+fi
 
 #kibana_user
 add_rolemapping kibana_user $BE_ROLENAME null
@@ -145,6 +159,8 @@ if [ "$READONLY" == "true" ]; then
 
    #index user
    add_rolemapping $ROLENAME $RO_BE_ROLENAME
+
+   #TO DO: Add tenant role OR drop READ_ONLY roles
 
    #kibana_user
    add_rolemapping kibana_user $RO_BE_ROLENAME

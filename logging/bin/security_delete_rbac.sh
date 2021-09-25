@@ -8,7 +8,9 @@
 #
 #                                    /-- [ROLE: kibana_user]           |only link to backend role is deleted; kibana_user role NOT deleted
 # [BACKEND_ROLE: {NST}_kibana_user]<-                                  |{NST}_kibana_user backend-role IS deleted
-#                                    \-- [ROLE: search_index_{NST}]    |search_index_{NST} role IS deleted
+#                                    \--- [ROLE: search_index_{NST}]   |search_index_{NST} role IS deleted
+#                                     \-- [ROLE: tenant_{NST}]         |tenant_{NST} role IS deleted
+
 #
 #
 # READONLY ROLE
@@ -83,6 +85,10 @@ fi
 # handle $ROLENAME
 delete_rolemappings $ROLENAME
 delete_role $ROLENAME
+
+# handle tenant_$NST
+delete_rolemappings tenant_${NST}
+delete_role tenant_${NST}
 
 # handle KIBANA_USER
 remove_rolemapping kibana_user
