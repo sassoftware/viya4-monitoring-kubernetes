@@ -22,6 +22,9 @@ if [ "$VIYA_TENANT" == "" ]; then
   exit 1
 fi
 
+# Validate tenant name
+validateTenantID $VIYA_TENANT
+
 # Copy template files to temp
 tenantDir=$TMP_DIR/$VIYA_TENANT
 mkdir -p $tenantDir

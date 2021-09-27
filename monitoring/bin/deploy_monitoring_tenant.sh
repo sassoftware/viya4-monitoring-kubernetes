@@ -22,15 +22,7 @@ if [ "$VIYA_TENANT" == "" ]; then
 fi
 
 # Validate tenant name
-if [[ $VIYA_TENANT =~ ^[a-z]([a-z0-9]){0,15}$ ]]; then
-  if [[ $VIYA_TENANT =~ ^sas ]]; then
-    log_error "Tenant names cannot start with 'sas'"
-    exit 1
-  fi
-else
-  log_error "[$VIYA_TENANT] is not a valid tenant name"
-  exit 1
-fi
+validateTenantID $VIYA_TENANT
 
 checkDefaultStorageClass
 

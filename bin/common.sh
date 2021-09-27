@@ -124,11 +124,24 @@ function checkDefaultStorageClass {
     fi
 }
 
+function validateTenantID {
+  tenantID=$1
+  if [[ $tenantID =~ ^[a-z]([a-z0-9]){0,15}$ ]]; then
+    if [[ $tenantID =~ ^sas ]]; then
+      log_error "Tenant names cannot start with 'sas'"
+      exit 1
+    fi
+  else
+    log_error "[$tenantID] is not a valid tenant name"
+    exit 1
+  fi
+}
+
 function randomPassword {
   date +%s | sha256sum | base64 | head -c 32 ; echo
 }
 
 export -f checkDefaultStorageClass
+export -f validateTenantID
 export -f randomPassword
 export -f  trap_add
-
