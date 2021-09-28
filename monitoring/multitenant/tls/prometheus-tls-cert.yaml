@@ -3,7 +3,7 @@ kind: Certificate
 metadata:
   name: prometheus-__TENANT__-tls-cert
   labels:
-    sas.com/tenant: __TENANT__
+    v4m.sas.com/tenant: __TENANT__
     sas.com/monitoring-base: kube-viya-monitoring
 spec:
   commonName: prometheus-__TENANT__

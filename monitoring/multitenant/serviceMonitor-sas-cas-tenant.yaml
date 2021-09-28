@@ -4,7 +4,7 @@ metadata:
   name: sas-cas-server-__TENANT__
   labels:
     sas.com/monitoring-base: kube-viya-monitoring
-    sas.com/tenant: __TENANT__
+    v4m.sas.com/tenant: __TENANT__
 spec:
   selector:
     matchLabels:

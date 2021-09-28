@@ -64,6 +64,6 @@ kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-p
 kubectl delete -n $VIYA_NS --ignore-not-found secret prometheus-federate-$VIYA_TENANT
 
 # Remove non-user-provided certificates
-kubectl delete -n $VIYA_NS --ignore-not-found certificate -l 'sas.com/monitoring-base=kube-viya-monitoring' 2>/dev/null
+kubectl delete -n $VIYA_NS --ignore-not-found certificate -l "v4m.sas.com/tenant=$VIYA_TENANT" 2>/dev/null
 
 log_notice "Uninstalled monitoring for [$VIYA_NS/$VIYA_TENANT]"

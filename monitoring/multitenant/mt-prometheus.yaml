@@ -4,7 +4,7 @@ metadata:
   labels:
     app: prometheus
     self-monitor: "true"
-    sas.com/tenant: __TENANT__
+    v4m.sas.com/tenant: __TENANT__
   name: prometheus-__TENANT__
 spec:
   type: ClusterIP
@@ -23,7 +23,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: prometheus
-    sas.com/tenant: __TENANT__
+    v4m.sas.com/tenant: __TENANT__
   name: prometheus-__TENANT__
 spec:
   endpoints:
@@ -39,7 +39,7 @@ kind: Prometheus
 metadata:
   labels:
     app: prometheus
-    sas.com/tenant: __TENANT__
+    v4m.sas.com/tenant: __TENANT__
   name: prometheus-__TENANT__
 spec:
   additionalScrapeConfigs:
@@ -63,11 +63,11 @@ spec:
   serviceAccountName: prometheus-__TENANT__
   serviceMonitorSelector:
     matchLabels:
-      sas.com/tenant: __TENANT__ 
+      v4m.sas.com/tenant: __TENANT__ 
   podMonitorSelector:
     matchLabels:
-      sas.com/tenant: __TENANT__
+      v4m.sas.com/tenant: __TENANT__
   ruleSelector:
     matchLabels:
-      sas.com/tenant: __TENANT__
+      v4m.sas.com/tenant: __TENANT__
   version: v2.26.1

@@ -126,14 +126,27 @@ function checkDefaultStorageClass {
 
 function validateTenantID {
   tenantID=$1
-  if [[ $tenantID =~ ^[a-z]([a-z0-9]){0,15}$ ]]; then
-    if [[ $tenantID =~ ^sas ]]; then
-      log_error "Tenant names cannot start with 'sas'"
+  reservedNames=(default provider shared sharedservices spre uaa viya)
+
+  CHECK_TENANT_NAME=${CHECK_TENANT_NAME:-true}
+  if [ "$CHECK_TENANT_NAME" == "true" ]; then
+    if [[ $tenantID =~ ^[a-z]([a-z0-9]){0,15}$ ]]; then
+      if [[ $tenantID =~ ^sas ]]; then
+        log_error "Tenant names cannot start with 'sas'"
+        exit 1
+      fi
+      for n in ${reservedNames[@]}; do
+        if [ "$tenantID" == "$n" ]; then
+          log_error "The tenant name [$tenantID] is a reserved name"
+          exit 1
+        fi
+      done
+    else
+      log_error "[$tenantID] is not a valid tenant name"
       exit 1
     fi
   else
-    log_error "[$tenantID] is not a valid tenant name"
-    exit 1
+    log_debug "Tenant name validation is disabled"
   fi
 }
 
