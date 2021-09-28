@@ -61,6 +61,13 @@ function verify_cert_manager {
 function deploy_issuers {
   namespace=$1
   context=$2
+
+  contextDir=${TLS_CONTEXT_DIR:-$context/tls}
+
+  if [ "TLS_DEPLOY_SELFSIGNED_ISSUERS" == "false" ]; then
+    return 0
+  fi
+
   # Create issuers if needed
   # Issuers honor USER_DIR for overrides/customizations
   if [ -z "$(kubectl get issuer -n $namespace selfsigning-issuer -o name 2>/dev/null)" ]; then
@@ -106,8 +113,10 @@ function deploy_app_cert {
   context=$2
   app=$3
   
+  contextDir=${TLS_CONTEXT_DIR:-$context/tls}
+
   # Create the certificate using cert-manager
-  certyaml=$context/tls/$app-tls-cert.yaml
+  certyaml=$TLS_CONTEXT_DIR/$app-tls-cert.yaml
   if [ -f "$USER_DIR/$context/tls/$app-tls-cert.yaml" ]; then
     certyaml="$USER_DIR/$context/tls/$app-tls-cert.yaml"
   fi

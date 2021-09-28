@@ -6,6 +6,8 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 source bin/openshift-include.sh
+source bin/tls-include.sh
+export TLS_DEPLOY_SELFSIGNED_ISSUERS="false"
 
 set -e
 
@@ -15,18 +17,12 @@ if [ "$VIYA_NS" == "" ]; then
 fi
 
 if [ "$VIYA_TENANT" == "" ]; then
-  log_error "VIYA_TENANT must be set to the name of an existing Viya tenant"
+  log_error "VIYA_TENANT must be set to the name of a current or planned Viya tenant"
   exit 1
 fi
 
-if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
-  log_debug "Multi-tenant feature flag is enabled"
-else
-  log_error "Multi-tenant support is under active development and is not yet fully    "
-  log_error "functional. Set V4M_FEATURE_MULTITENANT_ENABLE=true to continue anyway.  "
-  log_message ""
-  exit 1
-fi
+# Validate tenant name
+validateTenantID $VIYA_TENANT
 
 checkDefaultStorageClass
 
@@ -44,11 +40,11 @@ helm repo update
 # Copy template files to temp
 tenantDir=$TMP_DIR/$VIYA_TENANT
 mkdir -p $tenantDir
-cp monitoring/multitenant/*.yaml $tenantDir/
+cp -R monitoring/multitenant/* $tenantDir/
 
 # Replace placeholders
 log_debug "Replacing __TENANT__ for files in [$tenantDir]"
-for f in $tenantDir/*; do
+for f in $(find $tenantDir -name '*.yaml'); do
   if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
     sed -i '' "s/__TENANT__/$VIYA_TENANT/g" $f
     sed -i '' "s/__TENANT_NS__/$VIYA_NS/g" $f
@@ -60,19 +56,27 @@ for f in $tenantDir/*; do
   fi
 done
 
+# TLS - Rename certificate files in $TMP_DIR
+if [ "$MON_TLS_ENABLE" == "true" ] || [ "$TLS_ENABLE" == "true" ]; then
+  log_debug "TLS support is enabled"
+  export TLS_CONTEXT_DIR=$tenantDir/tls
+  mv $tenantDir/tls/grafana-tls-cert.yaml $tenantDir/tls/grafana-$VIYA_TENANT-tls-cert.yaml
+  mv $tenantDir/tls/prometheus-tls-cert.yaml $tenantDir/tls/prometheus-$VIYA_TENANT-tls-cert.yaml
+fi
+
 # Grafana options
 grafanaYAML=$tenantDir/mt-grafana-values.yaml
 
-# TLS
+# Grafana TLS
 grafanaTLSYAML=$TMP_DIR/empty.yaml
 if [ "$MON_TLS_ENABLE" == "true" ] || [ "$TLS_ENABLE" == "true" ]; then
-  grafanaTLSYAML=$tenantDir/mt-grafana-tls-values.yaml
+  grafanaTLSYAML=$tenantDir/tls/mt-grafana-tls-values.yaml
 fi
 
 # USER_DIR customizations
 userGrafanaYAML=$TMP_DIR/empty.yaml
-if [ -f "$USER_DIR/monitoring/user-values-multitenant-grafana.yaml" ]; then
-  userGrafanaYAML="$USER_DIR/monitoring/user-values-multitenant-grafana.yaml"
+if [ -f "$USER_DIR/monitoring/user-values-grafana-$VIYA_TENANT.yaml" ]; then
+  userGrafanaYAML="$USER_DIR/monitoring/user-values-grafana-$VIYA_TENANT.yaml"
   log_debug "User response file for Grafana found at [$userGrafanaYAML]"
 fi
 
@@ -87,23 +91,38 @@ else
 fi
 
 # Deploy additional scrape configs for Prometheus
-log_info "Creating federation scrape config secret"
+log_info "Configuring secret for Prometheus federation"
 kubectl delete secret --ignore-not-found -n $VIYA_NS prometheus-federate-$VIYA_TENANT
 kubectl create secret generic \
   -n $VIYA_NS \
   prometheus-federate-$VIYA_TENANT \
   --from-file cluster-federate-job=$tenantDir/mt-federate-secret.yaml
 
+if [ "$TLS_ENABLE" == "true" ]; then
+  apps=( prometheus-$VIYA_TENANT grafana-$VIYA_TENANT )
+  create_tls_certs $VIYA_NS monitoring ${apps[@]}
+fi
+
 # Deploy Prometheus
 log_info "Deploying Prometheus"
-kubectl apply -n $VIYA_NS -f $tenantDir/mt-prometheus.yaml
+kubectl apply -n $VIYA_NS -f $tenantDir/mt-prometheus-common.yaml
+if [ "$TLS_ENABLE" == "true" ]; then
+  kubectl apply -n $VIYA_NS -f $tenantDir/tls/mt-prometheus-tls.yaml
+else
+  kubectl apply -n $VIYA_NS -f $tenantDir/mt-prometheus.yaml
+fi
 
 # Deploy Prometheus Grafana datasource
+if [ "$TLS_ENABLE" == "true" ]; then
+  grafanaDatasource=$tenantDir/tls/grafana-datasource-tenant-tls.yaml
+else
+  grafanaDatasource=$tenantDir/grafana-datasource-tenant.yaml
+fi
 kubectl delete secret -n $VIYA_NS --ignore-not-found grafana-datasource-$VIYA_TENANT
-kubectl create secret generic -n $VIYA_NS grafana-datasource-$VIYA_TENANT --from-file $tenantDir/grafana-datasource-v4m.yaml
+kubectl create secret generic -n $VIYA_NS grafana-datasource-$VIYA_TENANT --from-file $grafanaDatasource
 kubectl label secret -n $VIYA_NS grafana-datasource-$VIYA_TENANT grafana_datasource-$VIYA_TENANT=1
 
-# Grafana password
+# Grafana
 if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS; then
   log_info "Upgrading Grafana via Helm...($(date) - timeout 10m)"
 else
@@ -116,7 +135,7 @@ else
   log_info "Deploying Grafana via Helm...($(date) - timeout 10m)"
 fi
 
-# Deploy Grafana
+# Deploy Grafana using Helm
 GRAFANA_CHART_VERSION_TENANT=${GRAFANA_CHART_VERSION_TENANT:-6.9.1}
 helm upgrade --install $helmDebug \
   -n "$VIYA_NS" \

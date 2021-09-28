@@ -10,9 +10,9 @@ spec:
   type: ClusterIP
   ports:
   - name: web
-    port: 9090
+    port: 443
     protocol: TCP
-    targetPort: 9090
+    targetPort: 443
   selector:
     app: prometheus
     prometheus: prometheus-__TENANT__
@@ -42,12 +42,47 @@ metadata:
     v4m.sas.com/tenant: __TENANT__
   name: prometheus-__TENANT__
 spec:
+  listenLocal: true
+  containers:
+  # Add square/ghosttunnel TLS proxy
+  - name: tls-proxy
+    args:
+    - server
+    - --listen=:443
+    - --target=127.0.0.1:9090
+    - --key=/cert/tls.key
+    - --cert=/cert/tls.crt
+    - --disable-authentication
+    image: squareup/ghostunnel:v1.5.2
+    imagePullPolicy: IfNotPresent
+    ports:
+    - name: https
+      containerPort: 443 
+      protocol: TCP
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: true
+      privileged: true
+      readOnlyRootFilesystem: true
+      runAsUser: 0
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /cert
+      name: tls-proxy-secret
+      readOnly: true
   additionalScrapeConfigs:
     name: prometheus-federate-__TENANT__
     key: cluster-federate-job
   image: quay.io/prometheus/prometheus:v2.26.1
+  # alerting:
+  #   alertmanagers:
+  #   - apiVersion: v2
+  #     name: prometheus-operator-alertmanager
+  #     namespace: __MON_NS__
+  #     pathPrefix: /
+  #     port: web
   enableAdminAPI: false
-  listenLocal: false
   logFormat: json
   logLevel: info
   paused: false
@@ -57,9 +92,12 @@ spec:
   retentionSize: 5GiB
   routePrefix: /
   securityContext:
-    fsGroup: 2000
-    runAsNonRoot: true
-    runAsUser: 1000
+    runAsNonRoot: false
+  volumes:
+    - name: tls-proxy-secret
+      secret:
+        defaultMode: 420
+        secretName: prometheus-__TENANT__-tls-secret
   serviceAccountName: prometheus-__TENANT__
   serviceMonitorSelector:
     matchLabels:
