@@ -32,8 +32,8 @@ The deployment script for the tenant monitoring components uses these
 TLS secrets for the TLS certificates that handle interactions 
 between components:
 
-* `prometheus-tenant-tls-secret`
-* `grafana-tenant-tls-secret`
+* `prometheus-<tenant-name>-tls-secret`
+* `grafana-<tenant-name>-tls-secret`
 
 If any of the required certificates do not exist, the deployment process attempts to use [cert-manager](https://cert-manager.io/) (version v1.0 or later) to generate the missing
 certificates. If the required certificates do not exist and cert-manager is
