@@ -31,3 +31,19 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     export SAS_LOGGING_COMMON_SOURCED=true
 fi
 echo ""
+
+# REMOVE
+# Temporary until function is merged into bin/common.sh
+function validateTenantID {
+  tenantID=$1
+  if [[ $tenantID =~ ^[a-z]([a-z0-9]){0,15}$ ]]; then
+    if [[ $tenantID =~ ^sas ]]; then
+      log_error "Tenant names cannot start with 'sas'"
+      exit 1
+    fi
+  else
+    log_error "[$tenantID] is not a valid tenant name"
+    exit 1
+  fi
+}
+export -f validateTenantID
