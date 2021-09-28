@@ -55,8 +55,18 @@ function import_content {
    return $rc
 }
 
+if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
+  log_debug "Multi-tenant feature flag is enabled"
+else
+  log_error "Multi-tenant support is under active development and is not yet fully    "
+  log_error "functional. Set V4M_FEATURE_MULTITENANT_ENABLE=true to continue anyway.  "
+  log_message ""
+  exit 1
+fi
 
-
+#
+# Process input parms and args
+#
 
 if [ "$#" != "2" ]; then
    log_error "Invalid set of arguments"
@@ -71,6 +81,8 @@ if [ "$#" != "2" ]; then
    exit 1
 fi
 
+#Flag to suppress file/directory not found error
+ignore_not_found="${IGNORE_NOT_FOUND:-false}"
 
 get_kb_api_url
 if [ -z "$kb_api_url" ]; then
@@ -98,9 +110,9 @@ rc=$?
 if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
 
 if kibana_tenant_exists $tenant; then
-   log_debug "Specified tenant exists"
+   log_debug "Specified tenant [$tenant] exists"
 else
-   log_error "Specified tenant does not exist"
+   log_error "Specified tenant [$tenant] does not exist"
    exit 1
 fi
 
@@ -123,8 +135,11 @@ elif [ -d "$1" ]; then
     log_info "Importing Kibana content in [$1] to Kibana tenant space [$tenant]..."
     import_content $1
     import_problems=$?
+elif [ "$ignore_not_found" == "true" ]; then
+   log_debug "The specified file/directory to import [$1] does not exist or cannot be accessed but --ignore-not-found flag has been set."
+   exit 0
 else
-   log_error "The specified input directory [$1] does not exist or cannot be accessed."
+   log_error "The specified file/directory to import [$1] does not exist or cannot be accessed."
    exit 1
 fi
 
