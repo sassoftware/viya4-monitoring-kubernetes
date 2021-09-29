@@ -14,15 +14,6 @@
 #
 #
 #
-# READONLY ROLE
-#
-#                                         /- [ROLE: cluster_ro_perms]   (limits access to cluster to read-only)
-#                                        /-- [ROLE: kibana_read_only]   (limits Kibana access to read-only)
-#                                       /--- [ROLE: v4m_kibana_user]    (allows access to Kibana)
-# [BACKEND_ROLE: {NST}_kibana_ro_user]<-
-#                                       \--- [ROLE: search_index_{NST}] (allows access to log messages from {NST})
-#                                        \-- [ROLE: tenant_{NST}]       (allows access to Kibana tenant space for {NST})
-#
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
@@ -47,7 +38,6 @@ function show_usage {
 
 namespace=${1}
 tenant=${2}
-readonly=${3:-false}
 
 if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    create_ktenant_roles=${CREATE_KTENANT_ROLE:-true}
@@ -55,22 +45,6 @@ else
    create_ktenant_roles=${CREATE_KTENANT_ROLE:-false}
 fi
 
-if [ "$tenant" == "--add_read_only" ]; then
-   readonly="--add_read_only"
-   tenant=""
-fi
-
-if [ "$readonly" == "--add_read_only" ]; then
- readonly="true"
- readonly_flag="_ro"
-elif [[ "$readonly" =~ -H|--HELP|-h|--help ]]; then
- show_usage
- exit
-elif [ "$readonly" != "false" ]; then
- log_error "Unrecognized additional option(s) [$readonly] provided."
- show_usage
- exit 1
-fi
 
 if [ -z "$namespace" ]; then
   log_error "Required argument NAMESPACE no specified"
@@ -103,13 +77,8 @@ fi
 INDEX_PREFIX=viya_logs
 ROLENAME=search_index_$NST
 BE_ROLENAME=${NST}_kibana_users
-if [ "$readonly" == "true" ]; then
-   RO_BE_ROLENAME=${NST}_kibana_ro_users
-else
-   RO_BE_ROLENAME="null"
-fi
 
-log_debug "NST: $NST TENANT: $tenant NAMESPACE: $namespace ROLENAME: $ROLENAME RO_BE_ROLENAME: $RO_BE_ROLENAME "
+log_debug "NST: $NST TENANT: $tenant NAMESPACE: $namespace ROLENAME: $ROLENAME"
 
 
 # Copy RBAC templates
@@ -162,25 +131,6 @@ fi
 ensure_role_exists v4m_kibana_user $TMP_DIR/rbac/v4m_kibana_user_role.json
 add_rolemapping v4m_kibana_user $BE_ROLENAME null
 
-# Create restricted READ_ONLY Kibana role as well
-if [ "$readonly" == "true" ]; then
-
-   #index user
-   add_rolemapping $ROLENAME $RO_BE_ROLENAME
-
-   #TO DO: Add tenant role OR drop READ_ONLY roles
-
-   #kibana_user
-   #add_rolemapping kibana_user $RO_BE_ROLENAME
-   add_rolemapping v4m_kibana_user $RO_BE_ROLENAME
-
-   #cluster_ro_perms
-   ensure_role_exists cluster_ro_perms $TMP_DIR/rbac/cluster_ro_perms_role.json
-   add_rolemapping cluster_ro_perms $RO_BE_ROLENAME
-
-   #kibana_read_only
-   add_rolemapping kibana_read_only $RO_BE_ROLENAME
-fi
 
 #remove tmpfile
 rm -f $tmpfile
@@ -195,16 +145,6 @@ if [ -n "$tenant" ]; then
    add_notice "   from the [$tenant] tenant within the [$namespace] namespace          "
 else
    add_notice "   from the [$namespace] namespace.                               "
-fi
-if [ "$readonly" == "true" ]; then
-   add_notice "                                                                                 "
-   add_notice "   Assign users the back-end role of  [${RO_BE_ROLENAME}] to                     "
-   add_notice "   grant them READ-ONLY access to Kibana and limit their access to log messages  "
-   if [ -n "$tenant" ]; then
-      add_notice "   from the [$tenant] tenant within the [$namespace] namespace       "
-   else
-      add_notice "   from the [$namespace] namespace.                            "
-   fi
 fi
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}

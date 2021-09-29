@@ -52,11 +52,6 @@ POS_PARMS=""
 
 while (( "$#" )); do
   case "$1" in
-    -ro|--readonly)
-      # READ_ONLY functionality not currently supported
-      READONLY_FLAG="_ro"
-      shift
-      ;;
     -ns|--namespace)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         namespace=$2
@@ -232,7 +227,7 @@ case "$action" in
 
 
       # Create user
-      response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/internalusers/$username"  -H 'Content-Type: application/json' -d @$TMP_DIR/rbac/user${READONLY_FLAG}.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+      response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/internalusers/$username"  -H 'Content-Type: application/json' -d @$TMP_DIR/rbac/user.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 
       if [[ $response != 2* ]]; then
          log_error "There was an issue creating the user [$username]. [$response]"

@@ -13,15 +13,6 @@
 
 #
 #
-# READONLY ROLE
-#
-#                                         /- [ROLE: cluster_ro_perms]  |only link to backend role is deleted; cluster_ro_perms role NOT deleted
-#                                        /-- [ROLE: kibana_read_only]  |only link to backend role is deleted; kibana_read_only role NOT deleted
-#                                       /--- [ROLE: v4m_kibana_user]   |only link to backend role is deleted; v4m_kibana_user role NOT deleted
-# [BACKEND_ROLE: {NST}_kibana_ro_users]<                               |{NST}_kibana_ro_user backend-role IS deleted
-#                                       \--- [ROLE: search_index_{NST}]|search_index_{NST} role IS deleted
-#                                        \-- [ROLE: tenant_{NST}]      |tenant_{NST} role IS deleted
-#
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
@@ -63,7 +54,6 @@ fi
 
 ROLENAME=search_index_$NST
 BACKENDROLE=${NST}_kibana_users
-BACKENDROROLE=${NST}_kibana_ro_users
 
 log_debug "NAMESPACE: $NAMESPACE TENANT: $TENANT ROLENAME: $ROLENAME BACKENDROLE: $BACKENDROLE"
 
@@ -94,12 +84,6 @@ delete_role tenant_${NST}
 # handle KIBANA_USER
 #remove_rolemapping kibana_user
 remove_rolemapping v4m_kibana_user
-
-# handle KIBANA_READ_ONLY
-remove_rolemapping kibana_read_only
-
-# handle CLUSTER_RO_PERMS
-remove_rolemapping cluster_ro_perms
 
 
 #remove tmpfile
