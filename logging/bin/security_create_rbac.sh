@@ -7,7 +7,7 @@
 # Creates the following RBAC structures (NST=NAMESPACE|NAMESPACE_TENANT):
 #
 #
-#                                    /-- [ROLE: kibana_user]       (allows access to Kibana)
+#                                    /--- [ROLE: v4m_kibana_user]    (allows access to Kibana)
 # [BACKEND_ROLE: {NST}_kibana_user]<-
 #                                    \--- [ROLE: search_index_{NST}] (allows access to log messages from {NST})
 #                                     \-- [ROLE: tenant_{NST}]       (allows access to Kibana tenant space for {NST})
@@ -16,11 +16,12 @@
 #
 # READONLY ROLE
 #
-#                                         /- [ROLE: cluster_ro_perms]  (limits access to cluster to read-only)
-#                                        /-- [ROLE: kibana_read_only]  (limits Kibana access to read-only)
-#                                       /--- [ROLE: kibana_user]       (allows access to Kibana)
+#                                         /- [ROLE: cluster_ro_perms]   (limits access to cluster to read-only)
+#                                        /-- [ROLE: kibana_read_only]   (limits Kibana access to read-only)
+#                                       /--- [ROLE: v4m_kibana_user]    (allows access to Kibana)
 # [BACKEND_ROLE: {NST}_kibana_ro_user]<-
 #                                       \--- [ROLE: search_index_{NST}] (allows access to log messages from {NST})
+#                                        \-- [ROLE: tenant_{NST}]       (allows access to Kibana tenant space for {NST})
 #
 
 cd "$(dirname $BASH_SOURCE)/../.."
@@ -157,7 +158,9 @@ if [ "$create_ktenant_roles" == "true" ]; then
 fi
 
 #kibana_user
-add_rolemapping kibana_user $BE_ROLENAME null
+#add_rolemapping kibana_user $BE_ROLENAME null
+ensure_role_exists v4m_kibana_user $TMP_DIR/rbac/v4m_kibana_user_role.json
+add_rolemapping v4m_kibana_user $BE_ROLENAME null
 
 # Create restricted READ_ONLY Kibana role as well
 if [ "$readonly" == "true" ]; then
@@ -168,7 +171,8 @@ if [ "$readonly" == "true" ]; then
    #TO DO: Add tenant role OR drop READ_ONLY roles
 
    #kibana_user
-   add_rolemapping kibana_user $RO_BE_ROLENAME
+   #add_rolemapping kibana_user $RO_BE_ROLENAME
+   add_rolemapping v4m_kibana_user $RO_BE_ROLENAME
 
    #cluster_ro_perms
    ensure_role_exists cluster_ro_perms $TMP_DIR/rbac/cluster_ro_perms_role.json

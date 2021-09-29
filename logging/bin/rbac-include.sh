@@ -141,6 +141,10 @@ function add_rolemapping {
     if [ "$(grep $berole  $TMP_DIR/rolemapping.json)" ]; then
        log_debug "A rolemapping between [$targetrole] and  back-end role [$berole] already appears to exist; leaving as-is."
        return 0
+    elif [ "$(grep '\"backend_roles\":\[\],' $TMP_DIR/rolemapping.json)" ]; then
+       log_debug "The role [$targetrole] has no existing rolemappings"
+       json='[{"op": "add","path": "/backend_roles","value":["'"$berole"'"]}]'
+       verb=PATCH
     else
        json='[{"op": "add","path": "/backend_roles/-","value":"'"$berole"'"}]'
        verb=PATCH

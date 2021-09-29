@@ -6,8 +6,8 @@
 #
 # Deletes the following RBAC structures (NST=NAMESPACE|NAMESPACE_TENANT):
 #
-#                                    /-- [ROLE: kibana_user]           |only link to backend role is deleted; kibana_user role NOT deleted
-# [BACKEND_ROLE: {NST}_kibana_user]<-                                  |{NST}_kibana_user backend-role IS deleted
+#                                    /--- [ROLE: v4m_kibana_user]      |only link to backend role is deleted; v4m_kibana_user role NOT deleted
+# [BACKEND_ROLE: {NST}_kibana_users]<                                  |{NST}_kibana_user backend-role IS deleted
 #                                    \--- [ROLE: search_index_{NST}]   |search_index_{NST} role IS deleted
 #                                     \-- [ROLE: tenant_{NST}]         |tenant_{NST} role IS deleted
 
@@ -17,9 +17,10 @@
 #
 #                                         /- [ROLE: cluster_ro_perms]  |only link to backend role is deleted; cluster_ro_perms role NOT deleted
 #                                        /-- [ROLE: kibana_read_only]  |only link to backend role is deleted; kibana_read_only role NOT deleted
-#                                       /--- [ROLE: kibana_user]       |only link to backend role is deleted; kibana_user role NOT deleted
-# [BACKEND_ROLE: {NST}_kibana_ro_user]<-                               |{NST}_kibana_ro_user backend-role IS deleted
+#                                       /--- [ROLE: v4m_kibana_user]   |only link to backend role is deleted; v4m_kibana_user role NOT deleted
+# [BACKEND_ROLE: {NST}_kibana_ro_users]<                               |{NST}_kibana_ro_user backend-role IS deleted
 #                                       \--- [ROLE: search_index_{NST}]|search_index_{NST} role IS deleted
+#                                        \-- [ROLE: tenant_{NST}]      |tenant_{NST} role IS deleted
 #
 
 cd "$(dirname $BASH_SOURCE)/../.."
@@ -91,7 +92,8 @@ delete_rolemappings tenant_${NST}
 delete_role tenant_${NST}
 
 # handle KIBANA_USER
-remove_rolemapping kibana_user
+#remove_rolemapping kibana_user
+remove_rolemapping v4m_kibana_user
 
 # handle KIBANA_READ_ONLY
 remove_rolemapping kibana_read_only
