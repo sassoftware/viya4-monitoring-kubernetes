@@ -2,8 +2,8 @@
 ## Default values: https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-elasticsearch-exporter/values.yaml
 
 # image:
-#   repository: justwatch/elasticsearch_exporter
-#   tag: 1.1.0
+#  repository: quay.io/prometheuscommunity/elasticsearch-exporter
+#  tag: v1.2.1
 
 # es:
 ##  The env vars ES_USER and ES_PASSWORD are set, by default,
