@@ -39,6 +39,11 @@ function show_usage {
 namespace=${1}
 tenant=${2}
 
+# Convert namespace and tenant to all lower-case
+namespace=$(echo "$namespace"| tr '[:upper:]' '[:lower:]')
+tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
+
+
 if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    create_ktenant_roles=${CREATE_KTENANT_ROLE:-true}
 else

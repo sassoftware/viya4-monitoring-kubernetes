@@ -44,6 +44,11 @@ else
   fi
 fi
 
+
+# Convert namespace and tenant to all lower-case
+namespace=$(echo "$namespace"| tr '[:upper:]' '[:lower:]')
+tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
+
 if [ -n "$TENANT" ]; then
    NST="${NAMESPACE}_${TENANT}"
 else

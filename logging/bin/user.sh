@@ -131,6 +131,11 @@ fi
 
 log_debug "POS_PARMS: $POS_PARMS"
 
+# Convert namespace and tenant to all lower-case
+namespace=$(echo "$namespace"| tr '[:upper:]' '[:lower:]')
+tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
+
+
 if [ -n "$tenant" ]; then
    nst="${namespace}_${tenant}"
 else
