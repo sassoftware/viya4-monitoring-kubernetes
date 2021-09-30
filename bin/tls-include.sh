@@ -116,7 +116,7 @@ function deploy_app_cert {
   contextDir=${TLS_CONTEXT_DIR:-$context/tls}
 
   # Create the certificate using cert-manager
-  certyaml=$TLS_CONTEXT_DIR/$app-tls-cert.yaml
+  certyaml=$contextDir/$app-tls-cert.yaml
   if [ -f "$USER_DIR/$context/tls/$app-tls-cert.yaml" ]; then
     certyaml="$USER_DIR/$context/tls/$app-tls-cert.yaml"
   fi
