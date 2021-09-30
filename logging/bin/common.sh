@@ -47,3 +47,16 @@ function validateTenantID {
   fi
 }
 export -f validateTenantID
+
+function validateNamespace {
+  local namespace
+  namespace="$1"
+  if [[ "$namespace" =~ ^[a-z0-9]([\-a-z0-9]*[a-z0-9])?$ ]]; then
+    log_info "Namespace [$namespace] passes validation"
+  else
+    log_error "[$namespace] is not a valid namespace name"
+    exit 1
+  fi
+}
+export -f validateNamespace
+
