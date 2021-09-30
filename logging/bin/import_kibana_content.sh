@@ -24,7 +24,7 @@ function import_file {
    if [ -f "$file" ]; then
       # ODFE 1.7.0: successful request returns: {"success":true,"successCount":20}
       # ODFE 1.13.2: successful request returns: {"successCount":1,"success":true,"successResults":[...content details...]}
-      response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "${kb_api_url}api/saved_objects/_import?overwrite=true" -H "security_tenant: $tenant"  -H "kbn-xsrf: true"   --form file=@$file --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+      response=$(curl -s -o /tmp/curl_import.txt -w "%{http_code}" -XPOST "${kb_api_url}api/saved_objects/_import?overwrite=false" -H "security_tenant: $tenant"  -H "kbn-xsrf: true"   --form file=@$file --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 
       if [[ $response == 2* ]]; then
          log_info "Deployed content from file [$f] - Success!"
@@ -71,12 +71,12 @@ fi
 if [ "$#" != "2" ]; then
    log_error "Invalid set of arguments"
    log_message  ""
-   log_message  "Usage: $this_script [CONTENT_LOCATION] [TENANT]"
+   log_message  "Usage: $this_script [CONTENT_LOCATION] [TENANT_SPACE]"
    log_message  ""
    log_message  "Loads content from the specified location into the specified Kibana tenant space."
    log_message  ""
    log_message  "     CONTENT_LOCATION  - (Required) The location, either a single file or a directory, containing content to be imported into Kibana. Note: content must be in form of .ndjson files."
-   log_message  "     TENANT            - (Required) The Kibana tenant space to which the content should be imported.  Note: the tenant space must already exist."
+   log_message  "     TENANT_SPACE      - (Required) The Kibana tenant space to which the content should be imported.  Note: the tenant space must already exist."
    log_message  ""
    exit 1
 fi
@@ -98,11 +98,14 @@ if [ -z "$sec_api_url" ]; then
 fi
 
 if [ -z "$2" ]; then
-   log_error "The required parameter [TENANT] was NOT specified; please specify a tenant"
+   log_error "The required parameter [TENANT_SPACE] was NOT specified; please specify a Kibana tenant space."
    exit 1
 else
    tenant=$2
 fi
+
+# Convert tenant to all lower-case
+tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
 
 # get credentials
 get_credentials_from_secret admin
@@ -110,9 +113,11 @@ rc=$?
 if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
 
 if kibana_tenant_exists $tenant; then
-   log_debug "Specified tenant [$tenant] exists"
+   log_debug "Confirmed Kibana tenant space [$tenant] exists"
+elif [ "$tenant" == "global" ];then
+   log_debug "Kibana tenant space [global] specified."
 else
-   log_error "Specified tenant [$tenant] does not exist"
+   log_error "Specified Kibana tenant space [$tenant] does not exist. Target Kibana tenant space must exist."
    exit 1
 fi
 
@@ -145,7 +150,7 @@ fi
 
 
 if [ "$import_problems" == "0" ]; then
- log_info "Imported content into tenant space [$tenant]."
+ log_info "Imported content into Kibana tenant space [$tenant]."
 else
  log_warn "There were one or more issues deploying the requested content to Kibana.  Review the messages above."
 fi
