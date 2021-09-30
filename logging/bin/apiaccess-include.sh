@@ -45,12 +45,14 @@ function get_api_url {
    servicename=$1
    portpath=$2
    usetls=${3:-false}
+   ingress=$4
 
-   api_url=$(get_service_url "$LOG_NS" "$servicename" "/" "$usetls")
+   api_url=$(get_service_url "$LOG_NS" "$servicename" "/" "$usetls" $ingress)
 
    if [ -z "$api_url" ] || [ "$LOG_ALWAYS_PORT_FORWARD" == "true" ]; then
       # set up temporary port forwarding to allow curl access
       log_debug "Will use Kubernetes port-forwarding to access"
+      log_debug "LOG_ALWAYS_PORT_FORWARD: $LOG_ALWAYS_PORT_FORWARD api_url: $api_url"
 
       serviceport=$(kubectl -n $LOG_NS get service $servicename -o=jsonpath=$portpath)
 
@@ -111,7 +113,7 @@ function get_kb_api_url {
    fi
 
    pfPID=""
-   get_api_url "v4m-es-kibana-svc" '{.spec.ports[?(@.name=="kibana-svc")].port}' false
+   get_api_url "v4m-es-kibana-svc" '{.spec.ports[?(@.name=="kibana-svc")].port}' false v4m-es-kibana
    rc=$?
 
    if [ "$rc" == "0" ]; then
