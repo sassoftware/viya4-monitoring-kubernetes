@@ -22,8 +22,7 @@ These components are deployed:
 * [Fluent Bit](https://fluentbit.io/) - Log collection with limited transformation
 * [Elasticsearch](https://www.elastic.co/) - Unstructured document storage and query engine
 * [Kibana](https://www.elastic.co/kibana) - User interface for query and visualization
-* [Prometheus Exporter for Elasticsearch](https://github.com/justwatchcom/elasticsearch_exporter) -
-Provides detailed Elasticsearch performance information for Prometheus
+* [Prometheus Exporter for Elasticsearch](https://github.com/prometheus-community/elasticsearch_exporter) - Provides detailed Elasticsearch performance information for Prometheus
 
 If you are using a cloud provider, you must use ingress, rather than
 NodePorts. Specify the information needed to use ingress during the customization process.
