@@ -5,6 +5,9 @@
 # Current directory must be the root directory of the repo
 
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
+    # Save standard out to a new descriptor
+    exec 3>&1
+    
     # Includes
     source bin/colors-include.sh
     source bin/log-include.sh

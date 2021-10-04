@@ -34,67 +34,67 @@ lightbluebg="\033[46m"
 
 # Foregrounds
 function black {
-  echo -e "${black}${1}${end}"
+  echo -e "${black}${1}${end}" >&3
 }
 
 function blackb {
-  echo -e "${blackb}${1}${end}"
+  echo -e "${blackb}${1}${end}" >&3
 }
 
 function white {
-  echo -e "${white}${1}${end}"
+  echo -e "${white}${1}${end}" >&3
 }
 
 function whiteb {
-  echo -e "${whiteb}${1}${end}"
+  echo -e "${whiteb}${1}${end}" >&3
 }
 
 function red {
-  echo -e "${red}${1}${end}"
+  echo -e "${red}${1}${end}" >&3
 }
 
 function redb {
-  echo -e "${redb}${1}${end}"
+  echo -e "${redb}${1}${end}" >&3
 }
 
 function green {
-  echo -e "${green}${1}${end}"
+  echo -e "${green}${1}${end}" >&3
 }
 
 function greenb {
-  echo -e "${greenb}${1}${end}"
+  echo -e "${greenb}${1}${end}" >&3
 }
 
 function yellow {
-  echo -e "${yellow}${1}${end}"
+  echo -e "${yellow}${1}${end}" >&3
 }
 
 function yellowb {
-  echo -e "${yellowb}${1}${end}"
+  echo -e "${yellowb}${1}${end}" >&3
 }
 
 function blue {
-  echo -e "${blue}${1}${end}"
+  echo -e "${blue}${1}${end}" >&3
 }
 
 function blueb {
-  echo -e "${blueb}${1}${end}"
+  echo -e "${blueb}${1}${end}" >&3
 }
 
 function purple {
-  echo -e "${purple}${1}${end}"
+  echo -e "${purple}${1}${end}" >&3
 }
 
 function purpleb {
-  echo -e "${purpleb}${1}${end}"
+  echo -e "${purpleb}${1}${end}" >&3
 }
 
 function lightblue {
-  echo -e "${lightblue}${1}${end}"
+  echo -e "${lightblue}${1}${end}" >&3
 }
 
 function lightblueb {
-  echo -e "${lightblueb}${1}${end}"
+  echo -e "${lightblueb}${1}${end}" >&3
 }
 
 # Export all the things

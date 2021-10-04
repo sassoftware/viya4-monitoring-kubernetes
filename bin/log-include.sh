@@ -6,6 +6,11 @@
 colorEnable=${LOG_COLOR_ENABLE:-true}
 levelEnable=${LOG_LEVEL_ENABLE:-true}
 logDebug=${LOG_DEBUG_ENABLE:-false}
+logVerbose=${LOG_VERBOSE_ENABLE:-true}
+
+if [ "$logVerbose" != "true" ]; then
+  exec >/dev/null
+fi
 
 function add_notice {
   echo "$*"  >> $TMP_DIR/notices.txt
@@ -23,12 +28,12 @@ function log_notice {
   if [ "$colorEnable" = "true" ]; then
     whiteb "${bluebg}$*"
   else
-    echo $*
+    echo $* >&3
   fi
 }
 
 function log_message {
-    echo $*
+    echo $*  >&3
 }
 
 function log_debug {
@@ -39,9 +44,9 @@ function log_debug {
         level=""
     fi
     if [ "$colorEnable" = "true" ]; then
-        echo -e "${whiteb}${level}${white}$*${end}"
+        echo -e "${whiteb}${level}${white}$*${end}" >&3
     else
-        echo $*
+        echo $* >&3
     fi
   fi
 }
@@ -53,9 +58,15 @@ function log_info {
     level=""
   fi
   if [ "$colorEnable" = "true" ]; then
-    echo -e "${greenb}${level}${whiteb}$*${end}"
+    echo -e "${greenb}${level}${whiteb}$*${end}" >&3
   else
-    echo $*
+    echo $* >&3
+  fi
+}
+
+function log_verbose {
+  if [ "$logVerbose" == "true" ]; then
+		log_info $*
   fi
 }
 
@@ -66,9 +77,9 @@ function log_warn {
     level=""
   fi
   if [ "$colorEnable" = "true" ]; then
-    echo -e "${black}${yellowbg}${level}$*${end}"
+    echo -e "${black}${yellowbg}${level}$*${end}" >&3
   else
-    echo $*
+    echo $* >&3
   fi
 }
 
@@ -79,11 +90,11 @@ function log_error {
     level=""
   fi
   if [ "$colorEnable" = "true" ]; then
-    echo -e "${whiteb}${redbg}${level}$*${end}"
+    echo -e "${whiteb}${redbg}${level}$*${end}" >&3
   else
-    echo $*
+    echo $* >&3
   fi
 }
 
-export -f log_notice log_message log_debug log_info log_warn log_error add_notice display_notices
+export -f log_notice log_message log_debug log_info log_warn log_error add_notice display_notices log_verbose
 export colorEnable levelEnable logDebug
