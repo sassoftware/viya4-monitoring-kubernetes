@@ -1,4 +1,3 @@
-
 {
   "annotations": {
     "list": [
@@ -16,8 +15,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 46,
-  "iteration": 1631197715513,
+  "id": 92,
+  "iteration": 1633352525141,
   "links": [],
   "panels": [
     {
@@ -601,17 +600,19 @@
       "steppedLine": false,
       "targets": [
         {
+          "exemplar": true,
           "expr": "topk($top,:sas_launcher_pod_cpu_core_usage:{pod=~\"$pod\"})",
           "hide": true,
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{label_launcher_sas_com_username}}({{label_launcher_sas_com_requested_by_client}}) - {{pod}}",
           "refId": "A"
         },
         {
+          "exemplar": true,
           "expr": "topk($top,sum(:sas_launcher_pod_cpu_core_usage:{pod=~\"$pod\"}) by (label_launcher_sas_com_username))",
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{label_launcher_sas_com_username}}",
           "refId": "B"
         }
@@ -710,17 +711,19 @@
       "steppedLine": false,
       "targets": [
         {
+          "exemplar": true,
           "expr": "topk($top,:sas_launcher_pod_mem_usage_bytes:{pod=~\"$pod\"})",
           "hide": true,
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{label_launcher_sas_com_username}}({{label_launcher_sas_com_requested_by_client}}) - {{pod}}",
           "refId": "A"
         },
         {
+          "exemplar": true,
           "expr": "topk($top,sum(:sas_launcher_pod_mem_usage_bytes:{pod=~\"$pod\"}) by (label_launcher_sas_com_username))",
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{label_launcher_sas_com_username}}",
           "refId": "B"
         }
@@ -834,18 +837,20 @@
           "refId": "B"
         },
         {
+          "exemplar": true,
           "expr": "topk($top,sum(rate(:sas_launcher_pod_fs_read_bytes_total:{pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username))",
           "hide": false,
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{label_launcher_sas_com_username}} - Reads",
           "refId": "C"
         },
         {
+          "exemplar": true,
           "expr": "-topk($top,sum(rate(:sas_launcher_pod_fs_write_bytes_total:{pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username))",
           "hide": false,
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{label_launcher_sas_com_username}} - Writes",
           "refId": "D"
         }
@@ -960,16 +965,18 @@
           "refId": "B"
         },
         {
+          "exemplar": true,
           "expr": "topk($top,sum(rate(:sas_launcher_pod_net_receive_bytes_total:{pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username))",
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{label_launcher_sas_com_username}} - Receive",
           "refId": "C"
         },
         {
+          "exemplar": true,
           "expr": "-topk($top,sum(rate(:sas_launcher_pod_net_transmit_bytes_total:{pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username))",
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{label_launcher_sas_com_username}} - Transmit",
           "refId": "D"
         }
@@ -1033,7 +1040,8 @@
           "fieldConfig": {
             "defaults": {
               "custom": {
-                "align": null
+                "align": null,
+                "filterable": false
               },
               "decimals": 2,
               "mappings": [],
@@ -1339,7 +1347,7 @@
               }
             ]
           },
-          "pluginVersion": "7.1.4",
+          "pluginVersion": "7.5.4",
           "targets": [
             {
               "expr": ":sas_launcher_pod_cpu_core_usage:{phase=~\"Pending|Running\",pod=~\"$pod\"}",
@@ -1757,5 +1765,5 @@
   "timezone": "",
   "title": "SAS Launched Jobs - User Activity",
   "uid": "yMknIpvGk",
-  "version": 5
+  "version": 6
 }
