@@ -1,56 +1,46 @@
 {
-  "description": "Direct the incoming document to the proper index based on the value of the NAMESPACE and (if present) TENANT field(s).",
-  "processors": [
-    {
-      "lowercase": {
-        "field": "kube.namespace",
-        "on_failure": [
-          {
-            "set": {
-              "field": "kube.namespace",
-              "value": "missing_ns"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "set": {
-        "field": "index_fragment",
-        "value": "{{kube.namespace}}"
-      }
-    },
-    {
-      "script": {
-        "lang": "painless",
-        "source": """
-            if (ctx.kube.container =='cas'|| ctx.kube.container =='sas-programming-environment') 
+    "description": "UPDATED: Direct the incoming document to the proper index based on the value of the NAMESPACE and (if 
+present) TENANT field(s).",
+    "processors": [
+      {
+        "set": {
+          "field": "index_fragment",
+          "value": "{{kube.namespace}}"
+        }
+      },
+      {
+        "script": {
+          "lang": "painless",
+          "source": """
+            List primaryContainerNames = ["cas", "sas"];
+            List internalTenantNames = ["default", "provider", "shared", "sharedservices", "spre", "uaa", "viya"];
+            if (primaryContainerNames.contains(ctx.kube.container) && !internalTenantNames.contains(ctx.tenant)) 
 {ctx.index_fragment=ctx.kube.namespace+"-__"+ctx.tenant+"__"}
           """
-      }
-    },
-    {
-      "date_index_name": {
-        "field": "@timestamp",
-        "date_rounding": "d",
-        "date_formats": [
-          "ISO8601"
-        ],
-        "index_name_prefix": "viya_logs-{{index_fragment}}-",
-        "on_failure": [
-          {
-            "set": {
-              "field": "pipeline_error",
-              "value": "{{ _ingest.on_failure_message}}"
+        }
+      },
+      {
+        "date_index_name": {
+          "field": "@timestamp",
+          "date_rounding": "d",
+          "date_formats": [
+            "ISO8601"
+          ],
+          "index_name_prefix": "viya_logs-{{index_fragment}}-",
+          "on_failure": [
+            {
+              "set": {
+                "field": "pipeline_error",
+                "value": "{{ _ingest.on_failure_message}}"
+              }
             }
-          }
-        ]
+          ]
+        }
+      },
+      {
+        "remove": {
+          "field": "index_fragment"
+        }
       }
-    },
-    {
-      "remove": {
-        "field": "index_fragment"
-      }
-    }
-  ]
-}
+    ]
+  }
