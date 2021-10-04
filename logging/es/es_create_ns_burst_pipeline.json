@@ -10,6 +10,7 @@ present) TENANT field(s).",
       },
       {
         "script": {
+          "if": "ctx.tenant != null && !ctx.tenant.startsWith('sas')",
           "lang": "painless",
           "source": """
             List primaryContainerNames = ["cas", "sas"];
