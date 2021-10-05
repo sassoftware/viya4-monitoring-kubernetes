@@ -15,32 +15,39 @@
       }
     },
     {
-      "lowercase": {
-        "if": "ctx.tenant != null",
-        "field": "tenant",
-        "on_failure": [
-          {
-            "set": {
-              "field": "pipeline_error",
-              "value": "{{ _ingest.on_failure_message}}"
-            }
-          }
-        ]
+      "set": {
+        "if": "'ctx.kube.labels.sas_com/tenant' != null",
+        "field": "__tenant",
+        "value": "{{kube.labels.sas_com/tenant}}"
       }
     },
+      {
+        "lowercase": {
+          "if": "ctx.__tenant != null",
+          "field": "__tenant",
+          "on_failure": [
+            {
+              "set": {
+                "field": "pipeline_error",
+                "value": "{{ _ingest.on_failure_message}}"
+              }
+            }
+          ]
+        }
+      },
     {
       "set": {
-        "field": "index_fragment",
+        "field": "__index_fragment",
         "value": "{{kube.namespace}}"
       }
     },
     {
       "script": {
-        "if": "ctx.tenant != null && !ctx.tenant.startsWith('sas')",
+        "if": "ctx.__tenant != null && !ctx.__tenant.startsWith('sas')",
         "lang": "painless",
         "source": " List primaryContainerNames = [\"cas\", \"sas-programming-environment\"];
                     List internalTenantNames = [\"default\", \"provider\", \"shared\", \"sharedservices\", \"spre\", \"uaa\", \"viya\"];
-                    if (primaryContainerNames.contains(ctx.kube.container) && !internalTenantNames.contains(ctx.tenant)) {ctx.index_fragment=ctx.kube.namespace+\"-__\"+ctx.tenant+\"__\"}
+                    if (primaryContainerNames.contains(ctx.kube.container) && !internalTenantNames.contains(ctx.__tenant)) {ctx.__index_fragment=ctx.kube.namespace+\"-__\"+ctx.__tenant+\"__\"}
                   "
       }
     },
@@ -51,7 +58,7 @@
         "date_formats": [
           "ISO8601"
         ],
-        "index_name_prefix": "viya_logs-{{index_fragment}}-",
+        "index_name_prefix": "viya_logs-{{__index_fragment}}-",
         "on_failure": [
           {
             "set": {
@@ -64,7 +71,7 @@
     },
     {
       "remove": {
-        "field": "index_fragment"
+        "field": ["__index_fragment","__tenant"]
       }
     }
   ]
