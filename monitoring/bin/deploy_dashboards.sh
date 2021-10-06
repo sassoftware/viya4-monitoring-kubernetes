@@ -23,18 +23,6 @@ TEST_DASH="${TEST_DASH:-false}"
 
 DASH_BASE="${DASH_BASE:-monitoring/dashboards}"
 
-# The kubectl --dry-run command changed as of v1.18
-if [[ $KUBE_CLIENT_VER =~ v1.1[4-7] ]]; then
-  dryRun="--dry-run"
-elif [[ $KUBE_CLIENT_VER =~ v1.1[8-9] ]]; then
-  dryRun="--dry-run=client"
-elif [[ $KUBE_CLIENT_VER =~ v1.[2-9] ]]; then
-  dryRun="--dry-run=client"
-else 
-  log_error "Unsupported kubectl version: [$KUBE_CLIENT_VER]"
-  exit 1
-fi
-
 function deploy_dashboards {
    type=$1
    if [ -z "$2" ]; then
