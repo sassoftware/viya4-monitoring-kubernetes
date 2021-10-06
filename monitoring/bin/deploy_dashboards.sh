@@ -56,7 +56,7 @@ if [ "$1" != "" ]; then
       f=$1
       log_info "Deploying Grafana dashboard [$f]..."
       name=$(basename $f .json)
-      kubectl create cm -n $DASH_NS $name $dryRun --from-file $f -o yaml | kubectl apply -f -
+      kubectl create cm -n $DASH_NS $name --dry-run=client --from-file $f -o yaml | kubectl apply -f -
       kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring sas.com/dashboardType=manual
       exit $?
     else
