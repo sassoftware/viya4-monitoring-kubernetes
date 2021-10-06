@@ -40,11 +40,30 @@ certificates. If the required certificates do not exist and cert-manager is
 not available, the deployment process fails. cert-manager is not required
 if TLS is disabled or if all of the TLS secrets exist prior to deployment.
  
-## Deploy Monitoring Components for a Tenant
+## Customize and Deploy Monitoring Components for a Tenant
 
 Before deploying monitoring for a tenant, you must deploy both the cluster 
 monitoring components and the SAS Viya monitoring components. See the 
 [monitoring README](README.md) for information.
+
+You can customize each tenant's deployment by specifying values 
+in a `*.yaml` file for each tenant. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
+[monitoring README](README.md#mon_custom) for information about the customization process.
+
+After you create the location for your customization files, you can customize
+each tenant's monitoring deployment by specifying Helm chart parameters in 
+a tenant's customization file:
+
+`$USER_DIR/monitoring/user-values-grafana-$VIYA_TENANT.yaml`
+
+Each tenant has a separate customization file.
+
+The tenant deployment process uses the [public Grafana Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana). Overrides for these 
+values are specified in `monitoring/multitenant/mt-grafana-values.yaml` and 
+`monitoring/multitenant/tls/mt-grafana-tls-values.yaml` (if TLS is enabled).
+
+See [Helm Chart values](https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml) for a complete list of values that you can specify in 
+your Helm chart customization file. 
 
 To deploy the monitoring components for a tenant, issue this command: 
 
