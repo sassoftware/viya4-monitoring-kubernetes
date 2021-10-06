@@ -10,18 +10,21 @@ source logging/bin/apiaccess-include.sh
 source logging/bin/secrets-include.sh
 source logging/bin/rbac-include.sh
 
+this_script=`basename "$0"`
+
+
 function show_usage {
   log_message  "Usage: $this_script --namespace NAMESPACE [--tenant TENANT] [OPTIONS]"
   log_message  ""
-  log_message  "'Onboards' a Viya deployment (namespace) and, optionally, a tenant within that deployment.  This process allows admins responsible for a Viya deployment (or a single tenant within a given deployment) to work with log messages collected from the deployment (or tenant within the deployment)."
+  log_message  "'Onboards' a Viya deployment (namespace) or a specific tenant within that deployment.  This process allows admins responsible for a Viya deployment (or a single tenant within a given deployment) to work with log messages collected from the deployment (or tenant within the deployment)."
   log_message  "The onboarding process creates the security access controls and, optionally, an initial user granted access.  In addition, a Kibana tenant space is created and populated with an initial set of Kibana content (e.g. visualizations, dashboards, etc.)."
   log_message  ""
   log_message  "    Arguments:"
-  log_message  "     -ns, --namespace   NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace to which this user should be granted access"
-  log_message  "     -t,  --tenant      TENANT    - (Optional) The tenant within the specific Viya deployment/Kubernetes Namespace to which this user should be granted access."
+  log_message  "     -ns, --namespace   NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace to 'on-board' or the namespace in which the tenant to 'on-board' resides."
+  log_message  "     -t,  --tenant      TENANT    - (Optional) The tenant within the specified Viya deployment/Kubernetes Namespace to 'on-board'."
   log_message  ""
   log_message  "    Options:"
-  log_message  "        -u, --user [USER]           - Create an initial user with access to this Kibana tenant space. User name is optional, by default its name will match the Kibana tenant space name."
+  log_message  "        -u, --user [USER]           - Create an initial user with access to this Kibana tenant space. User name is optional, by default its name will combine the Kibana tenant space name with '_admin'."
   log_message  "        -p, --password PASSWORD     - Password for the initial user."
   log_message  ""
 }
@@ -142,9 +145,7 @@ else
    index_nst="${namespace}"
 fi
 
-
-#TO DO: Should tenant name be ${nst}_tenant?  This prevents name collisions
-#       with the "private" tenant for users with names that match $nst.
+#FUTURE: Allow user to specify Kibana tenant space name?
 ktenant=$nst
 
 if [ -n "$tenant" ]; then
@@ -212,7 +213,8 @@ fi
 if [ "$createuser" == "true" ]; then
 
    if [ -z "$inituser" ]; then
-      inituser=$ktenant
+      inituser="${ktenant}_admin"
+
    else
       log_debug "Initial user name [$inituser] provided."
    fi

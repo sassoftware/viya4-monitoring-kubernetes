@@ -10,6 +10,9 @@ source logging/bin/apiaccess-include.sh
 source logging/bin/secrets-include.sh
 source logging/bin/rbac-include.sh
 
+this_script=`basename "$0"`
+
+
 function show_usage {
   log_message  "Usage: $this_script --namespace NAMESPACE [--tenant TENANT] [OPTIONS]"
   log_message  ""
