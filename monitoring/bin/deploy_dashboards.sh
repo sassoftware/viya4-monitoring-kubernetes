@@ -23,18 +23,6 @@ TEST_DASH="${TEST_DASH:-false}"
 
 DASH_BASE="${DASH_BASE:-monitoring/dashboards}"
 
-# The kubectl --dry-run command changed as of v1.18
-if [[ $KUBE_CLIENT_VER =~ v1.1[4-7] ]]; then
-  dryRun="--dry-run"
-elif [[ $KUBE_CLIENT_VER =~ v1.1[8-9] ]]; then
-  dryRun="--dry-run=client"
-elif [[ $KUBE_CLIENT_VER =~ v1.[2-9] ]]; then
-  dryRun="--dry-run=client"
-else 
-  log_error "Unsupported kubectl version: [$KUBE_CLIENT_VER]"
-  exit 1
-fi
-
 function deploy_dashboards {
    type=$1
    if [ -z "$2" ]; then
@@ -50,8 +38,8 @@ function deploy_dashboards {
      if [ -f "$f" ]; then
        log_debug "Deploying dashboard from file [$f]"
        name=$(basename $f .json)
-      
-       kubectl create cm -n $DASH_NS $name $dryRun --from-file $f -o yaml | kubectl apply -f -
+       
+       kubectl create cm -n $DASH_NS $name --dry-run=client --from-file $f -o yaml | kubectl apply -f -
        kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring sas.com/dashboardType=$type
      fi
    done
@@ -68,7 +56,7 @@ if [ "$1" != "" ]; then
       f=$1
       log_info "Deploying Grafana dashboard [$f]..."
       name=$(basename $f .json)
-      kubectl create cm -n $DASH_NS $name $dryRun --from-file $f -o yaml | kubectl apply -f -
+      kubectl create cm -n $DASH_NS $name --dry-run=client --from-file $f -o yaml | kubectl apply -f -
       kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring sas.com/dashboardType=manual
       exit $?
     else

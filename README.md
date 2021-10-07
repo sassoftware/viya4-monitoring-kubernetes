@@ -65,7 +65,7 @@ for more information about using the logging components.
 
 - A Kubernetes cluster that meets the prerequisites for SAS Viya
 - [Helm](https://helm.sh) version 3.x
-- `kubectl` with cluster-admin access
+- `kubectl` version 1.18+ with cluster-admin access
 - [Git](https://git-scm.com/) version 1.8 or later
 - [Bash](https://www.gnu.org/software/bash/)
 
@@ -84,7 +84,8 @@ including Fluent Bit, Elasticsearch, and Kibana.
 
 ## Customization
 
-For most deployment scenarios, the process of customizing the monitoring and logging deployments consists of: 
+For most deployment scenarios, the process of customizing the monitoring and logging deployments consists of:
+
 - creating the location for your local customization files
 - using the `USER_DIR` environment variable to specify the location of the customization files
 - copying the customization files from one of the provided samples to your local directory
@@ -92,7 +93,7 @@ For most deployment scenarios, the process of customizing the monitoring and log
 
 Other scenarios use different customization steps that are specific to each scenario.
 
-Samples are provided for several common deployment scenarios. Each sample includes detailed information about the customization process and values for the scenario. 
+Samples are provided for several common deployment scenarios. Each sample includes detailed information about the customization process and values for the scenario.
 
 See the [monitoring README](monitoring/README.md) and [logging README](logging/README.md) for detailed information about the customization process and about determining valid customization values. See the README file for each [sample](samples/README.md) for detailed information about customization for each deployment scenario.
 
