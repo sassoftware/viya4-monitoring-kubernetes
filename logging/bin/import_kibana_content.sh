@@ -18,16 +18,21 @@ function import_file {
    # Returns: 0 - Content loaded successfully
    #          1 - Content was not loaded successfully
 
-   local file filename
+   local file filename response
    file=$1
 
    if [ -f "$file" ]; then
       # ODFE 1.7.0: successful request returns: {"success":true,"successCount":20}
       # ODFE 1.13.2: successful request returns: {"successCount":1,"success":true,"successResults":[...content details...]}
-      response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "${kb_api_url}api/saved_objects/_import?overwrite=false" -H "security_tenant: $tenant"  -H "kbn-xsrf: true"   --form file=@$file --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
-
+      response=$(curl -s -o $TMP_DIR/curl.response -w "%{http_code}" -XPOST "${kb_api_url}api/saved_objects/_import?overwrite=false" -H "securitytenant: $tenant"  -H "kbn-xsrf: true"   --form file=@$file --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
       if [[ $response == 2* ]]; then
-         log_info "Deployed content from file [$f] - Success!"
+         if grep -q '"success":true' $TMP_DIR/curl.response ; then
+            log_info "Deployed content from file [$f] - Success! [$response]"
+         else
+            log_warn "Unable to deploy content from file [$f]. [$response]"
+            log_warn "  Response received was: $(cat $TMP_DIR/curl.response)"
+            #log_message "" # null line since response file may not contain LF
+         fi
          return 0
       else
          log_warn "Error encountered while deploying content from file [$f]. [$response]"
