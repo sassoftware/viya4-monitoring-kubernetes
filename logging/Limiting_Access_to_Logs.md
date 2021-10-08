@@ -123,7 +123,9 @@ When you run the `onboard.sh` script to add Kibana tenant space, two new roles a
 | Back-end Role | Role | Purpose |
 | --- | --- | --- |
 |     | v4m_kibana_user | allows access to Kibana |
-| production_acme_kibana_users | search_index_production_acme | Allows access to log messages from the `production` namespace and `acme` tenant ||
+<tr/tr>
+| production_acme_kibana_users | search_index_production_acme | Allows access to log messages from the `production` namespace and `acme` tenant |
+<tr/tr>
 |     | tenant_production_acme | Allows access to Kibana tenant space for `production_acme` |
 
 After these access controls have been defined, you can assign the back-end role of `production_acme_kibana_users` to a user. The back-end role 
