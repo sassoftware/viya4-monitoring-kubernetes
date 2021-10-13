@@ -4,22 +4,23 @@
 
 By default, the log monitoring capability in SAS Viya Monitoring for 
 Kubernetes enables an administrator to view log information about 
-everything in your deployment. However, there might be instances where 
+everything in your Kubernetes cluster. However, there might be instances where 
 you want to restrict the information that certain administrators can access:
 
-- If you have log monitoring deployed in multiple namespaces (such as for Dev, Test, and Prod), you can enable a cluster administrator to access log 
-information only for a specified namespace.
-- If you have a multi-tenant deployment, you can enable each tenant 
+- If you have multiple SAS Viya deployments in your cluster (for example, 
+to support Dev, Test, and Prod instances), you can enable a cluster administrator to access log information only for a specified namespace.
+- If you have a multi-tenant SAS Viya deployment, you can enable each tenant 
 administrator to access log information only for their SAS Viya tenant.
 
 This access is controlled by a combination of Kibana tenant spaces and 
 Open Distro for Elasticsearch roles, back-end roles, and role mappings. 
 Scripts are provided to create everything that is needed for each 
-environment.
+scenario.
 
-## Implement Access Limitations for a Tenant or Namespace
+## Implement Access Controls for a Tenant or Namespace
 
-Use the `/logging/bin/onboard.sh` script to implement logging access limitations for a namespace or SAS Viya tenant. The script performs these actions: 
+Use the `/logging/bin/onboard.sh` script to implement logging access 
+controls for a namespace or SAS Viya tenant. The script performs these actions: 
 
 - Creates a Kibana tenant space
 - Loads Kibana content such as visualizations and dashboards into the Kibana 
@@ -63,10 +64,11 @@ This is the syntax for the script:
 ```
 /logging/bin/offboard.sh --namespace <namespace>  [--tenant <tenant>]
 ```
-The `namespace` parameter is required. It specifies the Kubernetes namespace that identifies the Kibana tenant space to be removed.
+The `namespace` parameter is required. It specifies the Kubernetes namespace for which the corresponding Kibana tenant space and access controls will 
+be removed.
 
-The `tenant` parameter specifies the SAS Viya tenant that identifies the 
-Kibana tenant space to be removed.
+The `tenant` parameter specifies the SAS Viya tenant for which the corresponding Kibana tenant space and access controls will 
+be removed.
 
 As with the `onboard.sh` script, the Kibana tenant space name is a 
 combination of the namespace name and the SAS Viya tenant name (if used). For example, if you ran the script and specified only `--namespace mynamespace`, the script would remove the Kibana tenant space named `mynamespace`. If you ran the script and specified `--namespace mynamespace --tenant mytenant1`, the script would remove the Kibana tenant space named `mynamespace_mytenant1`. 
@@ -104,21 +106,20 @@ This is the syntax for the script to remove a user:
 
 The Open Distro for Elasticsearch security plug-in uses roles to 
 control access to the logging information from 
-a cluster, and index, or a Kibana tenant space. A role contains 
+a cluster, an index, or a Kibana tenant space. A role contains 
 permissions for actions (such as cluster 
 access and index access) that correspond to sources and type of log 
 information. You can then assign users to roles in order to grant them 
 the permissions that are defined in the role. 
 
-A back-end role enables 
-you to point to multiple roles. You can then create a single role to 
-access the back-end role, so that a user can essentially be assigned 
-to multiple roles at once.
+A back-end role enables you to point to multiple roles. The security 
+plug-in links roles and back-end roles through role mappings. 
+Role mappings can also be used to define links between users 
+and roles and between users and back-end roles.
+By assigning a single back-end role to a user, the user can 
+essentially be assigned to multiple roles at once.
 
-The security plug-in links roles and back-end roles through role mappings.  Role mappings can also be used to define links between users and roles 
-and between users and back-end roles.
-
-When you run the `onboard.sh` script to add Kibana tenant space, two new roles are created and role mappings are defined to link the new roles (and one pre-existing role) to a new back-end role.  The following diagram depicts the roles, back-end roles and role mappings that are created when the script is run to add the SAS Viya tenant `acme` from the `production` Viya namespace:
+When you run the `onboard.sh` script to add Kibana tenant space, two new roles are created and role mappings are defined to link the new roles (and one pre-existing role) to a new back-end role.  The following table depicts the roles, back-end roles and role mappings that are created when the script is run to onboard the SAS Viya tenant `acme` from the `production` Viya namespace:
 
 | Back-end Role | Role | Purpose |
 | --- | --- | --- |

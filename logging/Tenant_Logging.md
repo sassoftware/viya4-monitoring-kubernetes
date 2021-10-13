@@ -1,10 +1,12 @@
 # Implementing Access Limitations for Logging for Tenants
 
-If you are the provider administrator in a multi-tenant environment, you 
+If you are the provider administrator in a SAS Viya multi-tenant 
+environment, you 
 can implement access controls so that the administrators of each 
-tenant can view only the log messages associated with the tenant and 
+SAS Viya tenant can view only the log messages associated with the 
+tenant and 
 access only the Kibana resources for the tenant. Scripts are provided 
-to manage the access controls for tenants.
+to manage the access controls for SAS Viya tenants.
 
 Use the `/logging/bin/onboard.sh` script to implement logging access limitations 
 for a SAS Viya tenant.
