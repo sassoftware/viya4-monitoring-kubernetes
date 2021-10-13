@@ -61,10 +61,15 @@ elif [[ "$namespace" =~ -H|--HELP|-h|--help ]]; then
  exit
 fi
 
+validateNamespace "$namespace"
+
 if [[ "$tenant" =~ -H|--HELP|-h|--help ]]; then
    show_usage
    exit
 elif [ -n "$tenant" ]; then
+
+   validateTenantID $tenant
+
    NST="${namespace}_${tenant}"
    INDEX_NST="${namespace}-__${tenant}__"
 else

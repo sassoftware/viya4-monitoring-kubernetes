@@ -21,46 +21,46 @@ this_script=`basename "$0"`
 source logging/bin/rbac-include.sh
 source logging/bin/apiaccess-include.sh
 
-NAMESPACE=${1}
-TENANT=${2}
+namespace=${1}
+tenant=${2}
 
-if [ -z "$NAMESPACE" ]; then
+if [ -z "$namespace" ]; then
   log_error "Required argument NAMESPACE not specified"
-  log_info  ""
-  log_info  "Usage: $this_script NAMESPACE"
-  log_info  ""
-  log_info  "Deletes access control artifacts (e.g. roles, role-mappings, etc.) previously created to limit access to the specified namespace."
-  log_info  ""
-  log_info  "        NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace for which access controls should be deleted"
-  log_info  "        TENANT    - (Optional) The tenant with the Viya deployment/Kubernetes Namespace for which access controls should be created"
-  log_info  ""
+  log_message  ""
+  log_message  "Usage: $this_script NAMESPACE"
+  log_message  ""
+  log_message  "Deletes access control artifacts (e.g. roles, role-mappings, etc.) previously created to limit access to the specified namespace."
+  log_message  ""
+  log_message  "        NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace for which access controls should be deleted"
+  log_message  "        TENANT    - (Optional) The tenant with the Viya deployment/Kubernetes Namespace for which access controls should be created"
+  log_message  ""
 
-  exit 4
-else
-  if [ -n "$TENANT" ]; then
-     log_notice "Deleting access controls for the [$TENANT] tenant within the namespace [$NAMESPACE] [$(date)]"
-  else
-     log_notice "Deleting access controls for namespace [$NAMESPACE] [$(date)]"
-  fi
+  exit 1
 fi
-
 
 # Convert namespace and tenant to all lower-case
 namespace=$(echo "$namespace"| tr '[:upper:]' '[:lower:]')
 tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
 
-if [ -n "$TENANT" ]; then
-   NST="${NAMESPACE}_${TENANT}"
-else
-   NST="$NAMESPACE"
-fi
+validateNamespace "$namespace"
 
+if [ -n "$tenant" ]; then
+   validateTenantID $tenant
+
+   NST="${namespace}_${tenant}"
+
+   log_notice "Deleting access controls for the [$tenant] tenant within the namespace [$namespace] [$(date)]"
+
+else
+   NST="$namespace"
+   log_notice "Deleting access controls for namespace [$namespace] [$(date)]"
+fi
 
 
 ROLENAME=search_index_$NST
 BACKENDROLE=${NST}_kibana_users
 
-log_debug "NAMESPACE: $NAMESPACE TENANT: $TENANT ROLENAME: $ROLENAME BACKENDROLE: $BACKENDROLE"
+log_debug "NAMESPACE: $namespace TENANT: $tenant ROLENAME: $ROLENAME BACKENDROLE: $BACKENDROLE"
 
 
 # get admin credentials
@@ -90,9 +90,9 @@ remove_rolemapping v4m_kibana_user
 
 log_notice "Access controls deleted [$(date)]"
 echo ""
-if [ -n "$TENANT" ]; then
-   log_notice "You should delete any users whose only purpose was to access log messages from the [$TENANT] tenant within the [$NAMESPACE] namespace  "
+if [ -n "$tenant" ]; then
+   log_notice "You should delete any users whose only purpose was to access log messages from the [$tenant] tenant within the [$namespace] namespace  "
 else
-   log_notice "You should delete any users whose only purpose was to access log messages from the [$NAMESPACE] namespace  "
+   log_notice "You should delete any users whose only purpose was to access log messages from the [$namespace] namespace  "
 fi
 
