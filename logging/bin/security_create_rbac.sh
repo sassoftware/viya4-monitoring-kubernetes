@@ -129,10 +129,12 @@ if [ "$create_ktenant_roles" == "true" ]; then
 fi
 
 #kibana_user
-#add_rolemapping kibana_user $BE_ROLENAME null
-ensure_role_exists v4m_kibana_user $TMP_DIR/rbac/v4m_kibana_user_role.json
-add_rolemapping v4m_kibana_user $BE_ROLENAME null
-
+if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
+   ensure_role_exists v4m_kibana_user $TMP_DIR/rbac/v4m_kibana_user_role.json
+   add_rolemapping v4m_kibana_user $BE_ROLENAME null
+else
+   add_rolemapping kibana_user $BE_ROLENAME null
+fi
 
 log_notice "Access controls created [$(date)]"
 echo ""
