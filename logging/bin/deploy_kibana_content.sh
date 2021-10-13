@@ -126,7 +126,15 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    ./logging/bin/import_kibana_content.sh logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson admin_tenant
 else
    # Importing content into Global tenant for continuity, to be removed in future
-   ./logging/bin/import_kibana_content.sh logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson global
+   response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "${kb_api_url}api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+
+   if [[ $response != 2* ]]; then
+      log_error "There was an issue loading content into Kibana [$response]"
+      exit 1
+   else
+      log_info "Content loaded into Kibana [$response]"
+   fi
+
 fi
 
 log_info "Configuring Kibana has been completed"
