@@ -25,10 +25,10 @@ function create_role {
    response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/roles/$role"  -H 'Content-Type: application/json' -d @${role_template}  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 
    if [[ $response == 2* ]]; then
-      log_info "Security role [$role] created [$response]"
+      log_info "Security role [$role] created. [$response]"
       return  0
    else
-      log_error "There was an issue creating the security role [$role] [$response]"
+      log_error "There was an issue creating the security role [$role]. [$response]"
       log_debug "template contents: /n $(cat $role_template)"
       return 1
    fi
@@ -47,7 +47,7 @@ function delete_role {
    if role_exists $role; then
       response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "$sec_api_url/roles/$role"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
       if [[ $response != 2* ]]; then
-         log_error "There was an issue deleting the security role [$role] [$response]"
+         log_error "There was an issue deleting the security role [$role]. [$response]"
          return 1
       else
          log_info "Security role [$role] deleted. [$response]"
@@ -184,7 +184,7 @@ function delete_rolemappings {
          log_info "Rolemappings for [$role] do not exist; nothing to delete. [$response]"
          return 0
       elif [[ $response != 2* ]]; then
-         log_error "There was an issue deleting the rolemappings for [$role] [$response]"
+         log_error "There was an issue deleting the rolemappings for [$role]. [$response]"
          return 1
       else
          log_info "Security rolemappings for [$role] deleted. [$response]"
@@ -292,10 +292,10 @@ function create_kibana_tenant {
    response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/tenants/$tenant"  -H 'Content-Type: application/json' -d '{"description":"'"$description"'"}'  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 
    if [[ $response == 2* ]]; then
-      log_info "Kibana tenant space [$tenant] created [$response]"
+      log_info "Kibana tenant space [$tenant] created. [$response]"
       return  0
    else
-      log_error "There was an issue creating the Kibana tenant space [$tenant] [$response]"
+      log_error "There was an issue creating the Kibana tenant space [$tenant]. [$response]"
       return 1
    fi
 }
@@ -313,10 +313,10 @@ function delete_kibana_tenant {
    response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "$sec_api_url/tenants/$tenant"   --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 
    if [[ $response == 2* ]]; then
-      log_info "Kibana tenant space [$tenant] deleted [$response]"
+      log_info "Kibana tenant space [$tenant] deleted. [$response]"
       return  0
    else
-      log_error "There was an issue deleting the Kibana tenant space [$tenant] [$response]"
+      log_error "There was an issue deleting the Kibana tenant space [$tenant]. [$response]"
       return 1
    fi
 }
@@ -333,7 +333,7 @@ function kibana_tenant_exists {
    response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "${sec_api_url}/tenants/$tenant" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 
    if [[ $response == 2* ]]; then
-      log_debug "Confirmed Kibana tenant [$tenant] exists.[$response]"
+      log_debug "Confirmed Kibana tenant [$tenant] exists. [$response]"
       return 0
    else
       log_debug "Kibana tenant [$tenant] does not exist. [$response]"

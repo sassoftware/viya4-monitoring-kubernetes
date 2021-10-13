@@ -25,6 +25,7 @@ function import_file {
       # ODFE 1.7.0: successful request returns: {"success":true,"successCount":20}
       # ODFE 1.13.2: successful request returns: {"successCount":1,"success":true,"successResults":[...content details...]}
       response=$(curl -s -o $TMP_DIR/curl.response -w "%{http_code}" -XPOST "${kb_api_url}api/saved_objects/_import?overwrite=true" -H "securitytenant: $tenant"  -H "kbn-xsrf: true"   --form file=@$file --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+
       if [[ $response == 2* ]]; then
          if grep -q '"success":true' $TMP_DIR/curl.response ; then
             log_info "Deployed content from file [$f] - Success! [$response]"
@@ -93,6 +94,8 @@ get_kb_api_url
 if [ -z "$kb_api_url" ]; then
    log_error "Unable to determine Kibana URL"
    exit 1
+else
+   log_debug "Kibana URL: $kb_api_url"
 fi
 
 

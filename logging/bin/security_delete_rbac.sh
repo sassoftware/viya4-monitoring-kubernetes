@@ -67,9 +67,6 @@ log_debug "NAMESPACE: $NAMESPACE TENANT: $TENANT ROLENAME: $ROLENAME BACKENDROLE
 export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
 export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
 
-#temp file to hold responses
-tmpfile=$TMP_DIR/output.txt
-
 # Get Security API URL
 get_sec_api_url
 
@@ -89,10 +86,6 @@ delete_role tenant_${NST}
 # handle KIBANA_USER
 #remove_rolemapping kibana_user
 remove_rolemapping v4m_kibana_user
-
-
-#remove tmpfile
-rm -f $tmpfile
 
 
 log_notice "Access controls deleted [$(date)]"

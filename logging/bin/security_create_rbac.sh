@@ -103,9 +103,6 @@ export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=json
 export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
 
 
-#temp file to hold responses
-tmpfile=$TMP_DIR/output.txt
-
 # Get Security API URL
 get_sec_api_url
 
@@ -135,10 +132,6 @@ fi
 #add_rolemapping kibana_user $BE_ROLENAME null
 ensure_role_exists v4m_kibana_user $TMP_DIR/rbac/v4m_kibana_user_role.json
 add_rolemapping v4m_kibana_user $BE_ROLENAME null
-
-
-#remove tmpfile
-rm -f $tmpfile
 
 
 log_notice "Access controls created [$(date)]"

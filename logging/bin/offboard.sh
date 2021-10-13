@@ -41,8 +41,6 @@ fi
 # set flag indicating wrapper/driver script being run
 export LOGGING_DRIVER=true
 
-tmpfile=$TMP_DIR/output.txt
-
 
 #
 #Handle arguments and parameters

@@ -156,8 +156,6 @@ log_debug "NAMESPACE: $namespace TENANT: $tenant NST: $nst USERNAME: $username"
 export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
 export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
 
-#temp file to hold responses
-tmpfile=$TMP_DIR/output.txt
 
 # Get Security API URL
 get_sec_api_url
@@ -279,9 +277,6 @@ case "$action" in
    ;;
 esac
 
-
-#remove tmpfile
-rm -f $tmpfile
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}
 if [ "$LOGGING_DRIVER" != "true" ]; then

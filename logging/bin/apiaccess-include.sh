@@ -6,24 +6,37 @@
 # This file is not marked as executable as it is intended to be sourced
 # Current directory must be the root directory of the repo
 
+# Global variables used/set by functions in this file
+#    es_api_url  - URL to access ES API/serivce
+#    kb_api_url  - URL to access KB API/serivce
+#    espfpid     - process id of ES portforwarding
+#    kbpfpid     - process id of KB portforwarding
+#    sec_api_url - URL to access ODFE Security API/serivce
+#    pfPID       - process id used for portforwardign
+
 source bin/service-url-include.sh
 
 function stop_portforwarding {
    # terminate port-forwarding process if PID was cached
 
-   local pfpid
-   pfpid=${1:-$pfPID}
+   local pid
+   pid=${1:-$pfPID}
 
-   if [ -n "$pfpid" ]; then
-      log_debug "Killing port-forwarding process [$pfpid]"
-      kill  -9 $pfpid
-      wait $pfpid 2>/dev/null
+   if [ -n "$pid" ]; then
+      log_debug "Killing port-forwarding process [$pid]."
+      kill  -9 $pid
+      wait $pid 2>/dev/null  # suppresses message reporting process has been killed
    else
       log_debug "No portforwarding processID found; nothing to terminate."
    fi
 }
 
 function stop_es_portforwarding {
+   #
+   # terminate ES port-forwarding process
+   #
+   # Global vars:      espfpid - process id of ES portforwarding
+
    if [ -n "$espfpid" ]; then
       log_debug "ES PF PID for stopping: $espfpid"
       stop_portforwarding $espfpid
@@ -32,6 +45,11 @@ function stop_es_portforwarding {
 }
 
 function stop_kb_portforwarding {
+   #
+   # terminate KB port-forwarding process
+   #
+   # Global vars:      kbpfpid - process id of KB portforwarding
+
    if [ -n "$kbpfpid" ]; then
       log_debug "KB PF PID for stopping: $kbpfpid"
       stop_portforwarding $kbpfpid
@@ -40,7 +58,12 @@ function stop_kb_portforwarding {
  }
 
 function get_api_url {
-
+   #
+   # determine URL to access specified API/service
+   #
+   # Global vars:      api_url - URL to access requested API/serivce
+   #                   pfPID   - process id used for portforwarding
+   #
    local servicename portpath usetls serviceport
    servicename=$1
    portpath=$2
@@ -55,6 +78,7 @@ function get_api_url {
       log_debug "LOG_ALWAYS_PORT_FORWARD: $LOG_ALWAYS_PORT_FORWARD api_url: $api_url"
 
       serviceport=$(kubectl -n $LOG_NS get service $servicename -o=jsonpath=$portpath)
+      log_debug "serviceport: $serviceport"
 
       # command is sent to run in background
       kubectl -n $LOG_NS port-forward --address localhost svc/$servicename :$serviceport > $tmpfile  &
@@ -77,7 +101,14 @@ function get_api_url {
          log_error "Unable to obtain or identify the temporary port used for port-forwarding; exiting script.";
          return 1
       fi
-      api_url="https://localhost:$TEMP_PORT/"
+
+      if [ "$usetls" == "true" ]; then
+         protocol="https"
+      else
+         protocol="http"
+      fi
+
+      api_url="$protocol://localhost:$TEMP_PORT/"
 
    fi
    log_debug "API Endpoint for [$servicename]: $api_url"
@@ -85,6 +116,11 @@ function get_api_url {
 
 
 function get_es_api_url {
+   #
+   # obtain ES API/service URL (establish port-forwarding, if necessary)
+   #
+   # Global vars:      es_api_url - URL to access ES API/serivce
+   #                   espfpid    - process id of ES portforwarding
 
    if [ -n "$es_api_url" ]; then
       log_debug "Elasticsearch API Endpoint already set [$es_api_url]"
@@ -106,6 +142,11 @@ function get_es_api_url {
 }
 
 function get_kb_api_url {
+   #
+   # obtain KB API/service URL (establish port-forwarding, if necessary)
+   #
+   # Global vars:      kb_api_url - URL to access KB API/serivce
+   #                   kbpfpid    - process id of KB portforwarding
 
    if [ -n "$kb_api_url" ]; then
       log_debug "Kibana API Endpoint already set [$kb_api_url]"
@@ -113,7 +154,7 @@ function get_kb_api_url {
    fi
 
    pfPID=""
-   get_api_url "v4m-es-kibana-svc" '{.spec.ports[?(@.name=="kibana-svc")].port}' false v4m-es-kibana
+   get_api_url "v4m-es-kibana-svc" '{.spec.ports[?(@.name=="kibana-svc")].port}' $LOG_KB_TLS_ENABLE v4m-es-kibana
    rc=$?
 
    if [ "$rc" == "0" ]; then
@@ -127,6 +168,11 @@ function get_kb_api_url {
 }
 
 function get_sec_api_url {
+   #
+   # obtain ODFE Security API/service URL (calls get_es_api_url function, if necessary)
+   #
+   # Global vars:      sec_api_url - URL to access ODFE Security API/serivce
+
  if [ -n "$sec_api_url" ]; then
     log_debug "Security API Endpoint already set [$sec_api_url]"
     return 0
@@ -148,10 +194,11 @@ function get_sec_api_url {
 
 export -f get_sec_api_url stop_portforwarding get_es_api_url get_kb_api_url stop_es_portforwarding stop_kb_portforwarding
 
+
 #initialize "global" vars
 export es_api_url kb_api_url espfpid kbpfpid sec_api_url pfPID
 
 #create a temp file to hold curl response
 if [ -z "$tmpfile" ]; then
-   tmpfile=$TMP_DIR/output.txt
+   tmpfile=$TMP_DIR/curl_response.txt
 fi

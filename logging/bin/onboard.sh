@@ -43,8 +43,6 @@ fi
 # set flag indicating wrapper/driver script being run
 export LOGGING_DRIVER=true
 
-tmpfile=$TMP_DIR/output.txt
-
 #default values for flags
 createuser=false
 
@@ -182,6 +180,9 @@ else
    log_error "A Kibana tenant space [$ktenant] already exists."
    exit 1
 fi
+
+# get KIBANA API URL
+get_kb_api_url
 
 # Import appropriate content into Kibana tenant space
 ./logging/bin/import_kibana_content.sh logging/kibana/common $ktenant
