@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.12
+       Set  fb_configMap_version 0.2.13-mtburst2.1
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -107,12 +107,6 @@ data:
        Match          *
        Condition      Key_does_not_exist labels_app
        Copy           labels_k8s-app  appname
-    [FILTER]
-       # Use k8s labels sas.com/tenant for TENANT
-       Alias          set_tenant
-       Name           modify
-       Match          *
-       Copy           labels_sas.com/tenant  tenant
     [FILTER]
        Name           nest
        Match          *
@@ -864,7 +858,6 @@ data:
        Whitelist_key  @timestamp
        Whitelist_key  debug
        Whitelist_key  level
-       Whitelist_key  tenant
        Whitelist_key  kube
        Whitelist_key  logsource
        Whitelist_key  message

@@ -1,46 +1,78 @@
 {
-	"description": "Direct the incoming document to the proper index based on the value of the NAMESPACE and (if present) TENANT field(s).",
-	"processors": [
-		{
-		  "lowercase": {
-			"field": "kube.namespace",
-			"on_failure": [{
-				"set": {
-					"field": "kube.namespace",
-					"value": "missing_ns"
-				}
-			}]
-		}
-		},
-		{
-		  "date_index_name": {
-		  "if": "ctx.tenant != null",
-			"field": "@timestamp",
-			"date_rounding": "d",
-			"date_formats": ["ISO8601"],
-			"index_name_prefix": "viya_logs-{{kube.namespace}}-__{{tenant}}__-",
-			"on_failure": [{
-				    "set": {
-					        "field": "pipeline_error",
-					        "value": "{{ _ingest.on_failure_message}}"
-				}
-			}]
-		}
-		},
-		{
-		  "date_index_name": {
-		  "if": "ctx.tenant == null",
-			"field": "@timestamp",
-			"date_rounding": "d",
-			"date_formats": ["ISO8601"],
-			"index_name_prefix": "viya_logs-{{kube.namespace}}-",
-			"on_failure": [{
-      		 "set": {
-					        "field": "pipeline_error",
-					        "value": "{{ _ingest.on_failure_message}}"
-			    }
-			}]
-				}
-	}
-	]
+  "description": "Direct the incoming document to the proper index based on the value of the NAMESPACE and (if present and appropriate) TENANT field(s).",
+  "processors": [
+    {
+      "lowercase": {
+        "field": "kube.namespace",
+        "on_failure": [
+          {
+            "set": {
+              "field": "kube.namespace",
+              "value": "missing_ns"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "set": {
+        "if": "'ctx.kube.labels.sas_com/tenant' != null",
+        "field": "__tenant",
+        "value": "{{kube.labels.sas_com/tenant}}"
+      }
+    },
+      {
+        "lowercase": {
+          "if": "ctx.__tenant != null",
+          "field": "__tenant",
+          "on_failure": [
+            {
+              "set": {
+                "field": "pipeline_error",
+                "value": "{{ _ingest.on_failure_message}}"
+              }
+            }
+          ]
+        }
+      },
+    {
+      "set": {
+        "field": "__index_fragment",
+        "value": "{{kube.namespace}}"
+      }
+    },
+    {
+      "script": {
+        "if": "ctx.__tenant != null && !ctx.__tenant.startsWith('sas')",
+        "lang": "painless",
+        "source": " List primaryContainerNames = [\"cas\", \"sas-programming-environment\"];
+                    List internalTenantNames = [\"default\", \"provider\", \"shared\", \"sharedservices\", \"spre\", \"uaa\", \"viya\"];
+                    if (primaryContainerNames.contains(ctx.kube.container) && !internalTenantNames.contains(ctx.__tenant)) {ctx.__index_fragment=ctx.kube.namespace+\"-__\"+ctx.__tenant+\"__\"}
+                  "
+      }
+    },
+    {
+      "date_index_name": {
+        "field": "@timestamp",
+        "date_rounding": "d",
+        "date_formats": [
+          "ISO8601"
+        ],
+        "index_name_prefix": "viya_logs-{{__index_fragment}}-",
+        "on_failure": [
+          {
+            "set": {
+              "field": "pipeline_error",
+              "value": "{{ _ingest.on_failure_message}}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "remove": {
+        "field": ["__index_fragment","__tenant"]
+      }
+    }
+  ]
 }
