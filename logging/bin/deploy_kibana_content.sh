@@ -121,11 +121,13 @@ if [ "$kibanaready" != "TRUE" ]; then
    exit 1
 fi
 
-# Import Kibana Searches, Visualizations and Dashboard Objects using curl
-./logging/bin/import_kibana_content.sh logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson admin_tenant
-
-# Importing content into Global tenant for continuity, to be removed in future
-./logging/bin/import_kibana_content.sh logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson global
+if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
+   # Import Kibana Searches, Visualizations and Dashboard Objects using curl
+   ./logging/bin/import_kibana_content.sh logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson admin_tenant
+else
+   # Importing content into Global tenant for continuity, to be removed in future
+   ./logging/bin/import_kibana_content.sh logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson global
+fi
 
 log_info "Configuring Kibana has been completed"
 
