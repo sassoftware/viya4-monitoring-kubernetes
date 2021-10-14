@@ -129,8 +129,6 @@ tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
 if [ "$namespace" == "global" ]; then
    log_error "Invalid namespace value specified; you can NOT onboard the [global] namespace."
    exit 1
-else
-   validateNamespace $namespace
 fi
 
 validateNamespace "$namespace"
