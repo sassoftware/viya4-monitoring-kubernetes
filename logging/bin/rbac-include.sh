@@ -241,7 +241,7 @@ function remove_rolemapping {
              # ODFE 1.13 {"kibana_user":{"hosts":[],"users":[],"reserved":false,"hidden":false,"backend_roles":["kibanauser","d27886_kibana_users","d35396_kibana_users","d35396_acme_kibana_users","d35396A_kibana_users","d35396A_acme_kibana_users"],"and_backend_roles":[]}}
 
              # Extract and reconstruct backend_roles array from rolemapping json
-             newroles=$(echo $be_roles | sed "s/\"$BACKENDROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/")
+             newroles=$(echo $be_roles | sed "s/\"$BACKENDROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/g;s/\[,/\[/g")
              if [ "$be_roles" == "$newroles" ]; then
                 log_debug "The backend role [$BACKENDROLE] is not mapped to [$targetrole]; moving on."
                 return 0
