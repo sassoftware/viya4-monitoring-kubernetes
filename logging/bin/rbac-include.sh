@@ -25,10 +25,10 @@ function create_role {
    response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/roles/$role"  -H 'Content-Type: application/json' -d @${role_template}  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 
    if [[ $response == 2* ]]; then
-      log_info "Security role [$role] created [$response]"
+      log_info "Security role [$role] created. [$response]"
       return  0
    else
-      log_error "There was an issue creating the security role [$role] [$response]"
+      log_error "There was an issue creating the security role [$role]. [$response]"
       log_debug "template contents: /n $(cat $role_template)"
       return 1
    fi
@@ -41,16 +41,16 @@ function delete_role {
    # Returns: 0 - Role deleted
    #          1 - Role was/could not be deleted
 
-   local role
+   local role response
    role=$1
 
    if role_exists $role; then
       response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "$sec_api_url/roles/$role"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
       if [[ $response != 2* ]]; then
-         log_error "There was an issue deleting the security role [$ROLENAME] [$response]"
+         log_error "There was an issue deleting the security role [$role]. [$response]"
          return 1
       else
-         log_info "Security role [$ROLENAME] deleted. [$response]"
+         log_info "Security role [$role] deleted. [$response]"
       fi
    else
       #role does not exist, nothing to do
@@ -95,7 +95,7 @@ function role_exists {
    # Returns: 0 - Role exists
    #          1 - Role does not exist
 
-   local role
+   local role response
 
    role=$1
 
@@ -141,6 +141,10 @@ function add_rolemapping {
     if [ "$(grep $berole  $TMP_DIR/rolemapping.json)" ]; then
        log_debug "A rolemapping between [$targetrole] and  back-end role [$berole] already appears to exist; leaving as-is."
        return 0
+    elif [ "$(grep '\"backend_roles\":\[\],' $TMP_DIR/rolemapping.json)" ]; then
+       log_debug "The role [$targetrole] has no existing rolemappings"
+       json='[{"op": "add","path": "/backend_roles","value":["'"$berole"'"]}]'
+       verb=PATCH
     else
        json='[{"op": "add","path": "/backend_roles/-","value":"'"$berole"'"}]'
        verb=PATCH
@@ -180,7 +184,7 @@ function delete_rolemappings {
          log_info "Rolemappings for [$role] do not exist; nothing to delete. [$response]"
          return 0
       elif [[ $response != 2* ]]; then
-         log_error "There was an issue deleting the rolemappings for [$role] [$response]"
+         log_error "There was an issue deleting the rolemappings for [$role]. [$response]"
          return 1
       else
          log_info "Security rolemappings for [$role] deleted. [$response]"
@@ -195,8 +199,8 @@ function delete_rolemappings {
 
 
 function remove_rolemapping {
-   # removes $BACKENDROLE and $BACKENDROROLE from the
-   # rolemappings for $targetrole (if $targetrole exists)
+   # removes $BACKENDROLE from the rolemappings
+   # for $targetrole (if $targetrole exists)
 
    #
    # Returns: 0 - The rolemappings removed
@@ -237,13 +241,13 @@ function remove_rolemapping {
              # ODFE 1.13 {"kibana_user":{"hosts":[],"users":[],"reserved":false,"hidden":false,"backend_roles":["kibanauser","d27886_kibana_users","d35396_kibana_users","d35396_acme_kibana_users","d35396A_kibana_users","d35396A_acme_kibana_users"],"and_backend_roles":[]}}
 
              # Extract and reconstruct backend_roles array from rolemapping json
-             newroles=$(echo $be_roles | sed "s/\"$BACKENDROLE\"//g;s/\"$BACKENDROROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/")
+             newroles=$(echo $be_roles | sed "s/\"$BACKENDROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/")
              if [ "$be_roles" == "$newroles" ]; then
-                log_debug "The backend roles [$BACKENDROLE and $BACKENDROROLE] are not mapped to [$targetrole]; moving on"
+                log_debug "The backend role [$BACKENDROLE] is not mapped to [$targetrole]; moving on."
                 return 0
              else
 
-                log_debug "Updated Back-end Roles ($targetrole): $newroles"
+                log_debug "Updated Back-end Role ($targetrole): $newroles"
 
                 # Copy RBAC template
                 cp logging/es/odfe/rbac/backend_rolemapping_delete.json $TMP_DIR/${targetrole}_backend_rolemapping_delete.json
@@ -254,10 +258,10 @@ function remove_rolemapping {
                 # Replace the rolemappings for the $targetrole with the revised list of backend roles
                 response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/rolesmapping/$targetrole"  -H 'Content-Type: application/json' -d @$TMP_DIR/${targetrole}_backend_rolemapping_delete.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
                 if [[ $response != 2* ]]; then
-                   log_error "There was an issue updating the rolesmapping for [$targetrole] to remove link with backend-roles [$BACKENDROLE, $BACKENDROROLE]. [$response]"
+                   log_error "There was an issue updating the rolesmapping for [$targetrole] to remove link with backend-role [$BACKENDROLE]. [$response]"
                    return 1
                 else
-                   log_info "Security rolemapping deleted between [$targetrole] and backend-roles [$BACKENDROLE, $BACKENDROROLE]. [$response]"
+                   log_info "Security rolemapping deleted between [$targetrole] and backend-role [$BACKENDROLE]. [$response]"
                    return 0
                 fi
              fi
@@ -267,4 +271,72 @@ function remove_rolemapping {
  else
     log_debug "The role [$targetrole] does not exist; doing nothing. [$response]"
  fi
+}
+
+
+#
+# TENANT Functions
+#
+
+function create_kibana_tenant {
+   # Creates a Kibana tenant
+   #
+   # Returns: 0 - Kibana tenant created
+   #          1 - Kibana tenant NOT created
+
+   local tenant description response
+
+   tenant=$1
+   description=$2
+
+   response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/tenants/$tenant"  -H 'Content-Type: application/json' -d '{"description":"'"$description"'"}'  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+
+   if [[ $response == 2* ]]; then
+      log_info "Kibana tenant space [$tenant] created. [$response]"
+      return  0
+   else
+      log_error "There was an issue creating the Kibana tenant space [$tenant]. [$response]"
+      return 1
+   fi
+}
+
+function delete_kibana_tenant {
+   # Deletes a Kibana tenant
+   #
+   # Returns: 0 - Kibana tenant deleted
+   #          1 - Kibana tenant NOT deleted
+
+   local tenant response
+
+   tenant=$1
+
+   response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "$sec_api_url/tenants/$tenant"   --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+
+   if [[ $response == 2* ]]; then
+      log_info "Kibana tenant space [$tenant] deleted. [$response]"
+      return  0
+   else
+      log_error "There was an issue deleting the Kibana tenant space [$tenant]. [$response]"
+      return 1
+   fi
+}
+
+function kibana_tenant_exists {
+   # Check if $tenant exists
+   #
+   # Returns: 0 - Tenant exists
+   #          1 - Tenant does not exist
+
+   local tenant response
+   tenant=$1
+
+   response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "${sec_api_url}/tenants/$tenant" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+
+   if [[ $response == 2* ]]; then
+      log_debug "Confirmed Kibana tenant [$tenant] exists. [$response]"
+      return 0
+   else
+      log_debug "Kibana tenant [$tenant] does not exist. [$response]"
+      return 1
+   fi
 }

@@ -1,0 +1,34 @@
+{
+  "description": "Provide the permissions for a Viya 4 Monitoring for Kubernetes Kibana user",
+  "index_permissions": [
+    {
+      "index_patterns": [
+        ".kibana",
+        ".kibana_*"
+      ],
+      "fls": [],
+      "masked_fields": [],
+      "allowed_actions": [
+        "read",
+        "delete",
+        "manage",
+        "index"
+      ]
+    },
+    {
+      "index_patterns": [
+        ".tasks",
+        "*:.tasks"
+      ],
+      "fls": [],
+      "masked_fields": [],
+      "allowed_actions": [
+        "indices_all"
+      ]
+    }
+  ],
+  "tenant_permissions": [],
+  "cluster_permissions": [
+    "cluster_composite_ops"
+  ]
+}

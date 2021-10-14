@@ -17,11 +17,13 @@ function add_notice {
 }
 
 function display_notices {
-  IFS=''
-  cat $TMP_DIR/notices.txt | while read line || [[ -n "$line" ]];
-  do
-    log_notice "$line"
-  done
+  if [ -f "$TMP_DIR/notices.txt" ]; then
+     IFS=''
+     cat $TMP_DIR/notices.txt | while read line || [[ -n "$line" ]];
+     do
+       log_notice "$line"
+     done
+ fi
 }
 
 function log_notice {

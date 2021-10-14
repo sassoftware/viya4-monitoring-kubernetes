@@ -7,6 +7,7 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 source bin/service-url-include.sh
+source logging/bin/apiaccess-include.sh
 
 this_script=`basename "$0"`
 
@@ -93,39 +94,13 @@ if [ "$podready" != "TRUE" ]; then
    exit 1
 fi
 
-# set up temporary port forwarding to allow curl access
-K_PORT=$(kubectl -n $LOG_NS get service v4m-es-kibana-svc -o=jsonpath='{.spec.ports[?(@.name=="kibana-svc")].port}')
-
-# command is sent to run in background
-kubectl -n $LOG_NS port-forward  --address localhost svc/v4m-es-kibana-svc :$K_PORT > $tmpfile &
-
-# get PID to allow us to kill process later
-pfPID=$!
-log_debug "pfPID: $pfPID"
-
-# pause to allow port-forwarding messages to appear
-sleep 5s
-
-# determine which port port-forwarding is using
-pfRegex='Forwarding from .+:([0-9]+)'
-myline=$(head -n1  $tmpfile)
-
-if [[ $myline =~ $pfRegex ]]; then
-   TEMP_PORT="${BASH_REMATCH[1]}";
-   log_debug "TEMP_PORT=${TEMP_PORT}"
-else
-   set +e
-   log_error "Unable to obtain or identify the temporary port used for port-forwarding; exiting script.";
-   kill -9 $pfPID
-   rm -f $tmpfile
-   exit 1
-fi
+get_kb_api_url
 
 # Confirm Kibana is ready
 set +e
 for pause in 30 30 30 30 30 30
 do
-   response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
+   response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "${kb_api_url}api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
    # returns 503 (and outputs "Kibana server is not ready yet") when Kibana isn't ready yet
    # TO DO: check for 503 specifically?
 
@@ -143,28 +118,24 @@ set -e
 if [ "$kibanaready" != "TRUE" ]; then
    log_error "The Kibana REST endpoint has NOT become accessible in the expected time; exiting."
    log_error "Review the Kibana pod's events and log to identify the issue and resolve it before trying again."
-   kill -9 $pfPID
    exit 1
 fi
 
-# Import Kibana Searches, Visualizations and Dashboard Objects using curl
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$KB_CURL_PROTOCOL://localhost:$TEMP_PORT/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
-# successful request returns: {"success":true,"successCount":20}
-
-if [[ $response != 2* ]]; then
-   log_error "There was an issue loading content into Kibana [$response]"
-   kill -9 $pfPID
-   exit 1
+if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
+   # Import Kibana Searches, Visualizations and Dashboard Objects using curl
+   ./logging/bin/import_kibana_content.sh logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson admin_tenant
 else
-   log_info "Content loaded into Kibana [$response]"
+   # Importing content into Global tenant for continuity, to be removed in future
+   response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "${kb_api_url}api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+
+   if [[ $response != 2* ]]; then
+      log_error "There was an issue loading content into Kibana [$response]"
+      exit 1
+   else
+      log_info "Content loaded into Kibana [$response]"
+   fi
+
 fi
-
-# terminate port-forwarding and delete tmpfile
-log_info "You may see a message below about a process being killed; it is expected and can be ignored."
-kill  -9 $pfPID
-rm -f $tmpfile
-
-sleep 7s
 
 log_info "Configuring Kibana has been completed"
 

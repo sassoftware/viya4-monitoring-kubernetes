@@ -6,18 +6,12 @@
 #
 # Deletes the following RBAC structures (NST=NAMESPACE|NAMESPACE_TENANT):
 #
-#                                    /-- [ROLE: kibana_user]           |only link to backend role is deleted; kibana_user role NOT deleted
-# [BACKEND_ROLE: {NST}_kibana_user]<-                                  |{NST}_kibana_user backend-role IS deleted
-#                                    \-- [ROLE: search_index_{NST}]    |search_index_{NST} role IS deleted
+#                                    /--- [ROLE: v4m_kibana_user]      |only link to backend role is deleted; v4m_kibana_user role NOT deleted
+# [BACKEND_ROLE: {NST}_kibana_users]<                                  |{NST}_kibana_user backend-role IS deleted
+#                                    \--- [ROLE: search_index_{NST}]   |search_index_{NST} role IS deleted
+#                                     \-- [ROLE: tenant_{NST}]         |tenant_{NST} role IS deleted
+
 #
-#
-# READONLY ROLE
-#
-#                                         /- [ROLE: cluster_ro_perms]  |only link to backend role is deleted; cluster_ro_perms role NOT deleted
-#                                        /-- [ROLE: kibana_read_only]  |only link to backend role is deleted; kibana_read_only role NOT deleted
-#                                       /--- [ROLE: kibana_user]       |only link to backend role is deleted; kibana_user role NOT deleted
-# [BACKEND_ROLE: {NST}_kibana_ro_user]<-                               |{NST}_kibana_ro_user backend-role IS deleted
-#                                       \--- [ROLE: search_index_{NST}]|search_index_{NST} role IS deleted
 #
 
 cd "$(dirname $BASH_SOURCE)/../.."
@@ -27,50 +21,51 @@ this_script=`basename "$0"`
 source logging/bin/rbac-include.sh
 source logging/bin/apiaccess-include.sh
 
-NAMESPACE=${1}
-TENANT=${2}
+namespace=${1}
+tenant=${2}
 
-if [ -z "$NAMESPACE" ]; then
+if [ -z "$namespace" ]; then
   log_error "Required argument NAMESPACE not specified"
-  log_info  ""
-  log_info  "Usage: $this_script NAMESPACE"
-  log_info  ""
-  log_info  "Deletes access control artifacts (e.g. roles, role-mappings, etc.) previously created to limit access to the specified namespace."
-  log_info  ""
-  log_info  "        NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace for which access controls should be deleted"
-  log_info  "        TENANT    - (Optional) The tenant with the Viya deployment/Kubernetes Namespace for which access controls should be created"
-  log_info  ""
+  log_message  ""
+  log_message  "Usage: $this_script NAMESPACE"
+  log_message  ""
+  log_message  "Deletes access control artifacts (e.g. roles, role-mappings, etc.) previously created to limit access to the specified namespace."
+  log_message  ""
+  log_message  "        NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace for which access controls should be deleted"
+  log_message  "        TENANT    - (Optional) The tenant with the Viya deployment/Kubernetes Namespace for which access controls should be created"
+  log_message  ""
 
-  exit 4
-else
-  if [ -n "$TENANT" ]; then
-     log_notice "Deleting access controls for the [$TENANT] tenant within the namespace [$NAMESPACE] [$(date)]"
-  else
-     log_notice "Deleting access controls for namespace [$NAMESPACE] [$(date)]"
-  fi
+  exit 1
 fi
 
-if [ -n "$TENANT" ]; then
-   NST="${NAMESPACE}_${TENANT}"
-else
-   NST="$NAMESPACE"
-fi
+# Convert namespace and tenant to all lower-case
+namespace=$(echo "$namespace"| tr '[:upper:]' '[:lower:]')
+tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
 
+validateNamespace "$namespace"
+
+if [ -n "$tenant" ]; then
+   validateTenantID $tenant
+
+   NST="${namespace}_${tenant}"
+
+   log_notice "Deleting access controls for the [$tenant] tenant within the namespace [$namespace] [$(date)]"
+
+else
+   NST="$namespace"
+   log_notice "Deleting access controls for namespace [$namespace] [$(date)]"
+fi
 
 
 ROLENAME=search_index_$NST
 BACKENDROLE=${NST}_kibana_users
-BACKENDROROLE=${NST}_kibana_ro_users
 
-log_debug "NAMESPACE: $NAMESPACE TENANT: $TENANT ROLENAME: $ROLENAME BACKENDROLE: $BACKENDROLE"
+log_debug "NAMESPACE: $namespace TENANT: $tenant ROLENAME: $ROLENAME BACKENDROLE: $BACKENDROLE"
 
 
 # get admin credentials
 export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
 export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
-
-#temp file to hold responses
-tmpfile=$TMP_DIR/output.txt
 
 # Get Security API URL
 get_sec_api_url
@@ -84,25 +79,20 @@ fi
 delete_rolemappings $ROLENAME
 delete_role $ROLENAME
 
+# handle tenant_$NST
+delete_rolemappings tenant_${NST}
+delete_role tenant_${NST}
+
 # handle KIBANA_USER
-remove_rolemapping kibana_user
-
-# handle KIBANA_READ_ONLY
-remove_rolemapping kibana_read_only
-
-# handle CLUSTER_RO_PERMS
-remove_rolemapping cluster_ro_perms
-
-
-#remove tmpfile
-rm -f $tmpfile
+remove_rolemapping kibana_user     # Needed for RBACs created prior to MT support (should be no-op for post MT RBACs)
+remove_rolemapping v4m_kibana_user
 
 
 log_notice "Access controls deleted [$(date)]"
 echo ""
-if [ -n "$TENANT" ]; then
-   log_notice "You should delete any users whose only purpose was to access log messages from the [$TENANT] tenant within the [$NAMESPACE] namespace  "
+if [ -n "$tenant" ]; then
+   log_notice "You should delete any users whose only purpose was to access log messages from the [$tenant] tenant within the [$namespace] namespace  "
 else
-   log_notice "You should delete any users whose only purpose was to access log messages from the [$NAMESPACE] namespace  "
+   log_notice "You should delete any users whose only purpose was to access log messages from the [$namespace] namespace  "
 fi
 

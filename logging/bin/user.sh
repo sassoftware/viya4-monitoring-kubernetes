@@ -23,8 +23,8 @@ function show_usage {
        log_info  ""
        log_info  "     -ns, --namespace   NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace to which this user should be granted access"
        log_info  "     -t,  --tenant      TENANT    - (Optional) The tenant within the specific Viya deployment/Kubernetes Namespace to which this user should be granted access."
-       log_info  "     -u,  --user        USERNAME  - (Optional) The username to be created (defaults to match NAMESPACE)"
-       log_info  "     -p,  --password    PASSWORD  - (Optional) The password for the newly created account (defaults to match USERNAME)"
+       log_info  "     -u,  --user        USERNAME  - (Optional) The username to be created (default: [NAMESPACE]|[NAMESPACE_TENANT]_admin)"
+       log_info  "     -p,  --password    PASSWORD  - (Optional) The password for the newly created account (default: [USERNAME])"
        echo ""
        ;;
     "DELETE")
@@ -52,14 +52,9 @@ POS_PARMS=""
 
 while (( "$#" )); do
   case "$1" in
-    -ro|--readonly)
-      # READ_ONLY functionality not currently supported
-      READONLY_FLAG="_ro"
-      shift
-      ;;
     -ns|--namespace)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        NAMESPACE=$2
+        namespace=$2
         shift 2
       else
         log_error "Error: A value for parameter [Namespace] has not been provided." >&2
@@ -69,7 +64,7 @@ while (( "$#" )); do
       ;;
     -t|--tenant)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        TENANT=$2
+        tenant=$2
         shift 2
       else
         log_error "Error: A value for parameter [Tenant] has not been provided." >&2
@@ -77,19 +72,19 @@ while (( "$#" )); do
       exit 2
       fi
       ;;
-    -u|--username)
+    -u|--user|--username)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        USERNAME=$2
+        username=$2
         shift 2
       else
-        log_error "Error: A value for parameter [Username] has not been provided." >&2
+        log_error "Error: A value for parameter [User] has not been provided." >&2
         show_usage
       exit 2
       fi
       ;;
     -p|--password)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-        PASSWORD=$2
+        password=$2
         shift 2
       else
         log_error "Error: A value for parameter [Password] has not been provided." >&2
@@ -98,7 +93,7 @@ while (( "$#" )); do
       fi
       ;;
     -h|--help)
-      SHOW_USAGE=1
+      show_usage=1
       shift
       ;;
     -*|--*=) # unsupported flags
@@ -121,7 +116,7 @@ shift
 
 log_debug "Action: $action"
 
-if [ "$SHOW_USAGE" == "1" ]; then
+if [ "$show_usage" == "1" ]; then
    show_usage $action
    exit
 fi
@@ -136,28 +131,31 @@ fi
 
 log_debug "POS_PARMS: $POS_PARMS"
 
-if [ -n "$TENANT" ]; then
-   NST="${NAMESPACE}_${TENANT}"
+# Convert namespace and tenant to all lower-case
+namespace=$(echo "$namespace"| tr '[:upper:]' '[:lower:]')
+tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
+
+
+if [ -n "$tenant" ]; then
+   nst="${namespace}_${tenant}"
 else
-   NST="$NAMESPACE"
+   nst="$namespace"
 fi
 
-if [ -z "$USERNAME"  ] && [ -z "$NAMESPACE" ]; then
+if [ -z "$username"  ] && [ -z "$namespace" ]; then
   log_error "Required parameter(s) NAMESPACE and/or USERNAME not specified"
   show_usage $action
   exit 4
-elif [ -z "$USERNAME" ]; then
-  USERNAME="$NST"
+elif [ -z "$username" ]; then
+  username="${nst}_admin"
 fi
 
-log_debug "NAMESPACE: $NAMESPACE TENANT: $TENANT NST: $NST USERNAME: $USERNAME"
+log_debug "NAMESPACE: $namespace TENANT: $tenant NST: $nst USERNAME: $username"
 
 # get admin credentials
 export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
 export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
 
-#temp file to hold responses
-tmpfile=$TMP_DIR/output.txt
 
 # Get Security API URL
 get_sec_api_url
@@ -170,61 +168,61 @@ fi
 
 
 # Check if user exists
-response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "$sec_api_url/internalusers/$USERNAME"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "$sec_api_url/internalusers/$username"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 if [[ $response == 404 ]]; then
-   USER_EXISTS=false
+   user_exists=false
 else
-   USER_EXISTS=true
+   user_exists=true
 fi
-log_debug "USER_EXISTS: $USER_EXISTS"
+log_debug "USER_EXISTS: $user_exists"
 
 case "$action" in
    CREATE)
-      if [ -z "$NAMESPACE" ]; then
+      if [ -z "$namespace" ]; then
          log_error "Required argument NAMESPACE no specified"
          echo ""
          show_usage CREATE
          exit 1
       fi
-      if [ -n "$TENANT" ]; then
-         NST="${NAMESPACE}_${TENANT}"
-         log_info "Attempting to create user [$USERNAME] and grant them access to the tenant [$TENANT] within the namespace [$NAMESPACE] [$(date)]"
+      if [ -n "$tenant" ]; then
+         nst="${namespace}_${tenant}"
+         log_info "Attempting to create user [$username] and grant them access to the tenant [$tenant] within the namespace [$namespace] [$(date)]"
       else
-         NST="$NAMESPACE"
-         log_info "Attempting to create user [$USERNAME] and grant them access to namespace [$NAMESPACE] [$(date)]"
+         nst="$namespace"
+         log_info "Attempting to create user [$username] and grant them access to namespace [$namespace] [$(date)]"
       fi
 
       # Check if user exists
-      if [[ "$USER_EXISTS" == "true" ]]; then
-         log_error "A user with this name [$USERNAME] already exists. [$response]"
+      if [[ "$user_exists" == "true" ]]; then
+         log_error "A user with this name [$username] already exists. [$response]"
           exit 1
       fi
 
-      INDEX_PREFIX=viya_logs
-      ROLENAME=search_index_$NST
+      index_prefix=viya_logs
+      rolename=search_index_$nst
 
       #Check if role exists
-      if ! role_exists $ROLENAME; then
-         log_error "The expected access control role [$ROLENAME] does NOT exist; the role must be created before users can be linked to that role."
+      if ! role_exists $rolename; then
+         log_error "The expected access control role [$rolename] does NOT exist; the role must be created before users can be linked to that role."
          exit 1
       fi
 
-      PASSWORD=${PASSWORD:-$USERNAME}
-      if [ -z "$TENANT" ]; then
-         TCONSTRAINT="-none-"
+      password=${password:-$username}
+      if [ -z "$tenant" ]; then
+         tconstraint="-none-"
       else
-         TCONSTRAINT=$TENANT
+         tconstraint=$tenant
       fi
 
       cp logging/es/odfe/rbac $TMP_DIR -r
 
       # Replace PLACEHOLDERS
-      sed -i'.bak' "s/xxIDXPREFIXxx/$INDEX_PREFIX/g"  $TMP_DIR/rbac/*.json                  # IDXPREFIX
-      sed -i'.bak' "s/xxNSTxx/$NST/g"                 $TMP_DIR/rbac/*.json                  # NAMESPACE|NAMESPACE_TENANT
-      sed -i'.bak' "s/xxNAMESPACExx/$NAMESPACE/g"     $TMP_DIR/rbac/*.json                  # NAMESPACE
-      sed -i'.bak' "s/xxTENANTxx/$TENANT/g"           $TMP_DIR/rbac/*.json                  # TENANT
-      sed -i'.bak' "s/xxTCONSTRAINTxx/$TCONSTRAINT/g" $TMP_DIR/rbac/*.json                  # TENANT|'-none-'
-      sed -i'.bak' "s/xxPASSWORDxx/$PASSWORD/g"       $TMP_DIR/rbac/*.json                  # PASSWORD
+      sed -i'.bak' "s/xxIDXPREFIXxx/$index_prefix/g"  $TMP_DIR/rbac/*.json                  # IDXPREFIX
+      sed -i'.bak' "s/xxNSTxx/$nst/g"                 $TMP_DIR/rbac/*.json                  # NAMESPACE|NAMESPACE_TENANT
+      sed -i'.bak' "s/xxNAMESPACExx/$namespace/g"     $TMP_DIR/rbac/*.json                  # NAMESPACE
+      sed -i'.bak' "s/xxTENANTxx/$tenant/g"           $TMP_DIR/rbac/*.json                  # TENANT
+      sed -i'.bak' "s/xxTCONSTRAINTxx/$tconstraint/g" $TMP_DIR/rbac/*.json                  # TENANT|'-none-'
+      sed -i'.bak' "s/xxPASSWORDxx/$password/g"       $TMP_DIR/rbac/*.json                  # PASSWORD
       sed -i'.bak' "s/xxCREATEDBYxx/$this_script/g"   $TMP_DIR/rbac/*.json                  # CREATEDBY
       sed -i'.bak' "s/xxDATETIMExx/$(date)/g"         $TMP_DIR/rbac/*.json                  # DATE
 
@@ -232,42 +230,45 @@ case "$action" in
 
 
       # Create user
-      response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/internalusers/$USERNAME"  -H 'Content-Type: application/json' -d @$TMP_DIR/rbac/user${READONLY_FLAG}.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+      response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/internalusers/$username"  -H 'Content-Type: application/json' -d @$TMP_DIR/rbac/user.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 
       if [[ $response != 2* ]]; then
-         log_error "There was an issue creating the user [$USERNAME]. [$response]"
+         log_error "There was an issue creating the user [$username]. [$response]"
          exit 1
       else
-      log_info "User [$USERNAME] created. [$response]"
+      log_info "User [$username] created. [$response]"
       fi
-      log_notice "User [$USERNAME] added to internal user database [$(date)]"
+      log_notice "User [$username] added to internal user database [$(date)]"
+      add_notice "                                                          "
+      add_notice "   User [$username] added to internal user database.      "
+      add_notice "                                                          "
       ;;
    DELETE)
-      if [ -z "$USERNAME" ]; then
+      if [ -z "$username" ]; then
          log_error "Required argument USERNAME not specified"
          echo ""
          show_usage DELETE
          exit 1
       fi
 
-      log_info "Attempting to remove user [$USERNAME] from the internal user database [$(date)]"
+      log_info "Attempting to remove user [$username] from the internal user database [$(date)]"
 
       # Check if user exists
-      if [[ "$USER_EXISTS" != "true" ]]; then
-         log_error "There was an issue deleting the user [$USERNAME]; the user does NOT exists. [$response]"
+      if [[ "$user_exists" != "true" ]]; then
+         log_error "There was an issue deleting the user [$username]; the user does NOT exists. [$response]"
          exit 1
       else
-         log_debug "User [$USERNAME] exists. [$response]"
+         log_debug "User [$username] exists. [$response]"
       fi
 
       # Delete user
-      response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "$sec_api_url/internalusers/$USERNAME"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+      response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "$sec_api_url/internalusers/$username"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
       if [[ $response != 2* ]]; then
-         log_error "There was an issue deleting the user [$USERNAME]. [$response]"
+         log_error "There was an issue deleting the user [$username]. [$response]"
          exit 1
       else
-         log_info "User [$USERNAME] deleted. [$response]"
-         log_notice "User [$USERNAME] removed from internal user database [$(date)]"
+         log_info "User [$username] deleted. [$response]"
+         log_notice "User [$username] removed from internal user database [$(date)]"
       fi
       ;;
    *)
@@ -277,6 +278,9 @@ case "$action" in
 esac
 
 
-#remove tmpfile
-rm -f $tmpfile
-
+LOGGING_DRIVER=${LOGGING_DRIVER:-false}
+if [ "$LOGGING_DRIVER" != "true" ]; then
+   echo ""
+   display_notices
+   echo ""
+fi

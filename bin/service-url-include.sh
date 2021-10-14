@@ -93,7 +93,7 @@ function get_ingress_url {
      porttxt=":$port"
   fi
 
-  url="$protocol://${host}${porttxt}${path}"
+  url="$protocol://${host}${porttxt}${path}/"
   echo "$url"
 }
 

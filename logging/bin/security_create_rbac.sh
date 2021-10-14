@@ -7,19 +7,12 @@
 # Creates the following RBAC structures (NST=NAMESPACE|NAMESPACE_TENANT):
 #
 #
-#                                    /-- [ROLE: kibana_user]       (allows access to Kibana)
+#                                    /--- [ROLE: v4m_kibana_user]    (allows access to Kibana)
 # [BACKEND_ROLE: {NST}_kibana_user]<-
-#                                    \-- [ROLE: search_index_{NST}] (allows access to log messages from {NST})
+#                                    \--- [ROLE: search_index_{NST}] (allows access to log messages from {NST})
+#                                     \-- [ROLE: tenant_{NST}]       (allows access to Kibana tenant space for {NST})
 #
 #
-#
-# READONLY ROLE
-#
-#                                         /- [ROLE: cluster_ro_perms]  (limits access to cluster to read-only)
-#                                        /-- [ROLE: kibana_read_only]  (limits Kibana access to read-only)
-#                                       /--- [ROLE: kibana_user]       (allows access to Kibana)
-# [BACKEND_ROLE: {NST}_kibana_ro_user]<-
-#                                       \--- [ROLE: search_index_{NST}] (allows access to log messages from {NST})
 #
 
 cd "$(dirname $BASH_SOURCE)/../.."
@@ -43,65 +36,59 @@ function show_usage {
 
 #TO DO: Move to named args
 
-NAMESPACE=${1}
-TENANT=${2}
-READONLY=${3:-false}
+namespace=${1}
+tenant=${2}
 
-if [ "$TENANT" == "--add_read_only" ]; then
-   READONLY="--add_read_only"
-   TENANT=""
+# Convert namespace and tenant to all lower-case
+namespace=$(echo "$namespace"| tr '[:upper:]' '[:lower:]')
+tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
+
+
+if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
+   create_ktenant_roles=${CREATE_KTENANT_ROLE:-true}
+else
+   create_ktenant_roles=${CREATE_KTENANT_ROLE:-false}
 fi
 
-if [ "$READONLY" == "--add_read_only" ]; then
- READONLY="true"
- READONLY_FLAG="_ro"
-elif [[ "$READONLY" =~ -H|--HELP|-h|--help ]]; then
- show_usage
- exit
-elif [ "$READONLY" != "false" ]; then
- log_error "Unrecognized additional option(s) [$READONLY] provided."
- show_usage
- exit 1
-fi
 
-if [ -z "$NAMESPACE" ]; then
+if [ -z "$namespace" ]; then
   log_error "Required argument NAMESPACE no specified"
   echo  ""
   show_usage
   exit 1
-elif [[ "$NAMESPACE" =~ -H|--HELP|-h|--help ]]; then
+elif [[ "$namespace" =~ -H|--HELP|-h|--help ]]; then
  show_usage
  exit
 fi
 
-if [[ "$TENANT" =~ -H|--HELP|-h|--help ]]; then
+validateNamespace "$namespace"
+
+if [[ "$tenant" =~ -H|--HELP|-h|--help ]]; then
    show_usage
    exit
-elif [ -n "$TENANT" ]; then
-   NST="${NAMESPACE}_${TENANT}"
-   INDEX_NST="${NAMESPACE}-__${TENANT}__"
+elif [ -n "$tenant" ]; then
+
+   validateTenantID $tenant
+
+   NST="${namespace}_${tenant}"
+   INDEX_NST="${namespace}-__${tenant}__"
 else
-   NST="$NAMESPACE"
-   INDEX_NST="${NAMESPACE}"
+   NST="$namespace"
+   INDEX_NST="${namespace}"
 fi
 
-if [ -n "$TENANT" ]; then
-  log_notice "Creating access controls for tenant [$TENANT] within namespace [$NAMESPACE] [$(date)]"
+if [ -n "$tenant" ]; then
+  log_notice "Creating access controls for tenant [$tenant] within namespace [$namespace] [$(date)]"
 else
-  log_notice "Creating access controls for namespace [$NAMESPACE] [$(date)]"
+  log_notice "Creating access controls for namespace [$namespace] [$(date)]"
 fi
 
 
 INDEX_PREFIX=viya_logs
 ROLENAME=search_index_$NST
 BE_ROLENAME=${NST}_kibana_users
-if [ "$READONLY" == "true" ]; then
-   RO_BE_ROLENAME=${NST}_kibana_ro_users
-else
-   RO_BE_ROLENAME="null"
-fi
 
-log_debug "NST: $NST TENANT: $TENANT NAMESPACE: $NAMESPACE ROLENAME: $ROLENAME RO_BE_ROLENAME: $RO_BE_ROLENAME "
+log_debug "NST: $NST TENANT: $tenant NAMESPACE: $namespace ROLENAME: $ROLENAME"
 
 
 # Copy RBAC templates
@@ -109,8 +96,8 @@ cp logging/es/odfe/rbac $TMP_DIR -r
 
 # Replace PLACEHOLDERS
 sed -i'.bak' "s/xxIDXPREFIXxx/$INDEX_PREFIX/g"  $TMP_DIR/rbac/*.json     # IDXPREFIX
-sed -i'.bak' "s/xxNAMESPACExx/$NAMESPACE/g"     $TMP_DIR/rbac/*.json     # NAMESPACE
-sed -i'.bak' "s/xxTENANTxx/$TENANT/g"           $TMP_DIR/rbac/*.json     # TENANT
+sed -i'.bak' "s/xxNAMESPACExx/$namespace/g"     $TMP_DIR/rbac/*.json     # NAMESPACE
+sed -i'.bak' "s/xxTENANTxx/$tenant/g"           $TMP_DIR/rbac/*.json     # TENANT
 sed -i'.bak' "s/xxIDXNSTxx/$INDEX_NST/g"        $TMP_DIR/rbac/*.json     # NAMESPACE|NAMESPACE-__TENANT__    (used in index names)
 sed -i'.bak' "s/xxNSTxx/$NST/g"                 $TMP_DIR/rbac/*.json     # NAMESPACE|NAMESPACE_TENANT        (used in RBAC names)
 
@@ -121,9 +108,6 @@ export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=json
 export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
 
 
-#temp file to hold responses
-tmpfile=$TMP_DIR/output.txt
-
 # Get Security API URL
 get_sec_api_url
 
@@ -133,53 +117,48 @@ if [ -z "$sec_api_url" ]; then
 fi
 
 
-#index user
+#index user (controls access to indexes)
 ensure_role_exists $ROLENAME $TMP_DIR/rbac/index_role.json
 add_rolemapping $ROLENAME $BE_ROLENAME
 
-#kibana_user
-add_rolemapping kibana_user $BE_ROLENAME null
+#tenant role (controls access to Kibanas tenant spaces)
+if [ "$create_ktenant_roles" == "true" ]; then
 
-# Create restricted READ_ONLY Kibana role as well
-if [ "$READONLY" == "true" ]; then
+   if [ -n "$tenant" ]; then
+      ensure_role_exists tenant_${NST} $TMP_DIR/rbac/kibana_tenant_tenant_role.json
+   else
+      ensure_role_exists tenant_${NST} $TMP_DIR/rbac/kibana_tenant_namespace_role.json
+   fi
+   add_rolemapping  tenant_${NST} $BE_ROLENAME
 
-   #index user
-   add_rolemapping $ROLENAME $RO_BE_ROLENAME
-
-   #kibana_user
-   add_rolemapping kibana_user $RO_BE_ROLENAME
-
-   #cluster_ro_perms
-   ensure_role_exists cluster_ro_perms $TMP_DIR/rbac/cluster_ro_perms_role.json
-   add_rolemapping cluster_ro_perms $RO_BE_ROLENAME
-
-   #kibana_read_only
-   add_rolemapping kibana_read_only $RO_BE_ROLENAME
 fi
 
-#remove tmpfile
-rm -f $tmpfile
-
+#kibana_user
+if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
+   ensure_role_exists v4m_kibana_user $TMP_DIR/rbac/v4m_kibana_user_role.json
+   add_rolemapping v4m_kibana_user $BE_ROLENAME null
+else
+   add_rolemapping kibana_user $BE_ROLENAME null
+fi
 
 log_notice "Access controls created [$(date)]"
 echo ""
 
-log_notice    "================================================================================="
-log_notice    "   Assign users the back-end role of  [${BE_ROLENAME}] to                        "
-log_notice    "   grant them access to Kibana and limit their access to log messages            "
-if [ -n "$TENANT" ]; then
-   log_notice "   from the [$TENANT] tenant within the [$NAMESPACE] namespace          "
+add_notice    "   Assign users the back-end role of  [${BE_ROLENAME}] to                        "
+add_notice    "   grant them access to Kibana and limit their access to log messages            "
+if [ -n "$tenant" ]; then
+   add_notice "   from the [$tenant] tenant within the [$namespace] namespace          "
 else
-   log_notice "   from the [$NAMESPACE] namespace.                               "
+   add_notice "   from the [$namespace] namespace.                               "
 fi
-if [ "$READONLY" == "true" ]; then
-   log_notice "                                                                                 "
-   log_notice "   Assign users the back-end role of  [${RO_BE_ROLENAME}] to                     "
-   log_notice "   grant them READ-ONLY access to Kibana and limit their access to log messages  "
-   if [ -n "$TENANT" ]; then
-      log_notice "   from the [$TENANT] tenant within the [$NAMESPACE] namespace       "
-   else
-      log_notice "   from the [$NAMESPACE] namespace.                            "
-   fi
+
+LOGGING_DRIVER=${LOGGING_DRIVER:-false}
+if [ "$LOGGING_DRIVER" != "true" ]; then
+   echo ""
+   log_notice    "================================================================================="
+   display_notices
+   log_notice    "================================================================================="
+   echo ""
 fi
-log_notice    "================================================================================="
+
+
