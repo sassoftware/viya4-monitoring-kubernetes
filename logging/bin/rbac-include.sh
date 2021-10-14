@@ -199,8 +199,8 @@ function delete_rolemappings {
 
 
 function remove_rolemapping {
-   # removes $BACKENDROLE and $BACKENDROROLE from the
-   # rolemappings for $targetrole (if $targetrole exists)
+   # removes $BACKENDROLE from the rolemappings
+   # for $targetrole (if $targetrole exists)
 
    #
    # Returns: 0 - The rolemappings removed
@@ -241,13 +241,13 @@ function remove_rolemapping {
              # ODFE 1.13 {"kibana_user":{"hosts":[],"users":[],"reserved":false,"hidden":false,"backend_roles":["kibanauser","d27886_kibana_users","d35396_kibana_users","d35396_acme_kibana_users","d35396A_kibana_users","d35396A_acme_kibana_users"],"and_backend_roles":[]}}
 
              # Extract and reconstruct backend_roles array from rolemapping json
-             newroles=$(echo $be_roles | sed "s/\"$BACKENDROLE\"//g;s/\"$BACKENDROROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/")
+             newroles=$(echo $be_roles | sed "s/\"$BACKENDROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/")
              if [ "$be_roles" == "$newroles" ]; then
-                log_debug "The backend roles [$BACKENDROLE and $BACKENDROROLE] are not mapped to [$targetrole]; moving on"
+                log_debug "The backend role [$BACKENDROLE] is not mapped to [$targetrole]; moving on."
                 return 0
              else
 
-                log_debug "Updated Back-end Roles ($targetrole): $newroles"
+                log_debug "Updated Back-end Role ($targetrole): $newroles"
 
                 # Copy RBAC template
                 cp logging/es/odfe/rbac/backend_rolemapping_delete.json $TMP_DIR/${targetrole}_backend_rolemapping_delete.json
@@ -258,10 +258,10 @@ function remove_rolemapping {
                 # Replace the rolemappings for the $targetrole with the revised list of backend roles
                 response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/rolesmapping/$targetrole"  -H 'Content-Type: application/json' -d @$TMP_DIR/${targetrole}_backend_rolemapping_delete.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
                 if [[ $response != 2* ]]; then
-                   log_error "There was an issue updating the rolesmapping for [$targetrole] to remove link with backend-roles [$BACKENDROLE, $BACKENDROROLE]. [$response]"
+                   log_error "There was an issue updating the rolesmapping for [$targetrole] to remove link with backend-role [$BACKENDROLE]. [$response]"
                    return 1
                 else
-                   log_info "Security rolemapping deleted between [$targetrole] and backend-roles [$BACKENDROLE, $BACKENDROROLE]. [$response]"
+                   log_info "Security rolemapping deleted between [$targetrole] and backend-role [$BACKENDROLE]. [$response]"
                    return 0
                 fi
              fi
@@ -340,6 +340,3 @@ function kibana_tenant_exists {
       return 1
    fi
 }
-
-
-
