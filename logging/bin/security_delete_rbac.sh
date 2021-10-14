@@ -84,7 +84,7 @@ delete_rolemappings tenant_${NST}
 delete_role tenant_${NST}
 
 # handle KIBANA_USER
-#remove_rolemapping kibana_user
+remove_rolemapping kibana_user     # Needed for RBACs created prior to MT support (should be no-op for post MT RBACs)
 remove_rolemapping v4m_kibana_user
 
 
