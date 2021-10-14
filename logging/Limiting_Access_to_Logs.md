@@ -8,9 +8,12 @@ everything in your Kubernetes cluster. However, there might be instances where
 you want to restrict the information that certain administrators can access:
 
 - If you have multiple SAS Viya deployments in your cluster (for example, 
-to support Dev, Test, and Prod instances), you can enable a cluster administrator to access log information only for a specified namespace.
-- If you have a multi-tenant SAS Viya deployment, you can enable each tenant 
-administrator to access log information only for their SAS Viya tenant.
+to support Dev, Test, and Prod instances), you can limit an 
+administrator's access so that they can access the log information 
+only for a specified namespace.
+- If you have a multi-tenant SAS Viya deployment, you can limit 
+each tenant administrator's access so that they can access the 
+log information only for their SAS Viya tenant.
 
 This access is controlled by a combination of Kibana tenant spaces and 
 Open Distro for Elasticsearch roles, back-end roles, and role mappings. 
