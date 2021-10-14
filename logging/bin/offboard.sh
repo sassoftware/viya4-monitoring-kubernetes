@@ -106,6 +106,8 @@ if [ "$namespace" == "global" ]; then
    exit 1
 fi
 
+validateNamespace $namespace
+
 if [ -n "$tenant" ]; then
    validateTenantID $tenant
 
