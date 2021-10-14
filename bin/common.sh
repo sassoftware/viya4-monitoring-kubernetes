@@ -153,11 +153,25 @@ function validateTenantID {
   fi
 }
 
+
+function validateNamespace {
+  local namespace
+  namespace="$1"
+  if [[ "$namespace" =~ ^[a-z0-9]([\-a-z0-9]*[a-z0-9])?$ ]]; then
+    log_debug "Namespace [$namespace] passes validation"
+  else
+    log_error "[$namespace] is not a valid namespace name"
+    exit 1
+  fi
+}
+
+
 function randomPassword {
   date +%s | sha256sum | base64 | head -c 32 ; echo
 }
 
 export -f checkDefaultStorageClass
 export -f validateTenantID
+export -f validateNamespace
 export -f randomPassword
 export -f  trap_add
