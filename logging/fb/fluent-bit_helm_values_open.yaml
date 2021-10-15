@@ -1,5 +1,5 @@
 image:
-  tag: 1.7.9
+  tag: 1.8.7
 podAnnotations: 
   fluentbit.io/parser: fluentbit
 podLabels:
