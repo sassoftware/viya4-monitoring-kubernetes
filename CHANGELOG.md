@@ -13,9 +13,8 @@
 
 * **Monitoring**
   * [FIX] Metrics will be properly collected from the SAS Deployment Operator
-  * [FEATURE] Support for application multi-tenancy in SAS Viya
-    * Scripts for onboarding/offboarding tenants
-    * Documentation is available in [Tenant Monitoring](monitoring/Tenant_Monitoring.md)
+  * [CHANGE] Internal improvements, refactoring and preparations for future support
+    of application multi-tenancy in SAS Viya
   * [FIX] The two SAS Jobs dashboards have been updated and slightly optimzed
 
 * **Logging**
