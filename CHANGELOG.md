@@ -30,12 +30,12 @@
 ## Version 1.0.11 (13SEP21)
 
 * **Monitoring**
-  * [FEATURE] SAS Job dashboards now support a 'queue' filter for SAS Workload 
+  * [FEATURE] SAS Job dashboards now support a 'queue' filter for SAS Workload
   Orchestrator
-  * [FEATURE] SAS Job dashboards 'Job' filter now displays user-provided 
+  * [FEATURE] SAS Job dashboards 'Job' filter now displays user-provided
   job names if available
-  * [DEPRECATION] In the next release, NodePorts will be disabled by default 
-  for Prometheus and AlertManager for security reasons. Set the environment 
+  * [DEPRECATION] In the next release, NodePorts will be disabled by default
+  for Prometheus and AlertManager for security reasons. Set the environment
   variable `PROM_NODEPORT_ENABLE=true` to maintain current behavior as it will
    default to 'false' in the next release
 
@@ -247,7 +247,7 @@
   * The application filter on the SAS Java Services dashboard is now sorted
   * The Perf/Node Utilization dashboard now uses node names instead of IP
   addresses to identify nodes
-  
+
 * **Logging**
   * Moved Helm chart from deprecated `stable/elasticsearch-exporter` to
   `prometheus-community/elasticsearch-exporter`
