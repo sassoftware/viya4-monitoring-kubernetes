@@ -1,14 +1,36 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.0.12 (18OCT21)
+
+* **Overall**
+  * [CHANGE] The minimum supported version of OpenShift is now 4.7. OpenShift
+    support itself is still experimental.
+  * [FIX] There is now a check for the presence of the `sha256sum` utility
+    in the `PATH`
+  * [FIX] There is now a timeout (default 10 min) when deleting namespaces
+    using `LOG_DELETE_NAMESPACE_ON_REMOVE` or `MON_DELETE_NAMESPACE_ON_REMOVE`.
+    The timeout can be set via `KUBE_NAMESPACE_DELETE_TIMEOUT`.
+
+* **Monitoring**
+  * [FIX] Metrics will be properly collected from the SAS Deployment Operator
+  * [CHANGE] Internal improvements, refactoring and preparations for future support
+    of application multi-tenancy in SAS Viya
+  * [FIX] The two SAS Jobs dashboards have been updated and slightly optimzed
+
+* **Logging**
+  * [CHANGE] Fluent Bit has been upgraded to version 1.8.7
+  * [CHANGE] Internal improvements, refactoring and preparations for future support
+    of application multi-tenancy in SAS Viya
+
 ## Version 1.0.11 (13SEP21)
 
 * **Monitoring**
-  * [FEATURE] SAS Job dashboards now support a 'queue' filter for SAS Workload 
-  Orchestrator	
-  * [FEATURE] SAS Job dashboards 'Job' filter now displays user-provided 
+  * [FEATURE] SAS Job dashboards now support a 'queue' filter for SAS Workload
+  Orchestrator
+  * [FEATURE] SAS Job dashboards 'Job' filter now displays user-provided
   job names if available
-  * [DEPRECATION] In the next release, NodePorts will be disabled by default 
-  for Prometheus and AlertManager for security reasons. Set the environment 
+  * [DEPRECATION] In the next release, NodePorts will be disabled by default
+  for Prometheus and AlertManager for security reasons. Set the environment
   variable `PROM_NODEPORT_ENABLE=true` to maintain current behavior as it will
    default to 'false' in the next release
 
@@ -220,7 +242,7 @@
   * The application filter on the SAS Java Services dashboard is now sorted
   * The Perf/Node Utilization dashboard now uses node names instead of IP
   addresses to identify nodes
-  
+
 * **Logging**
   * Moved Helm chart from deprecated `stable/elasticsearch-exporter` to
   `prometheus-community/elasticsearch-exporter`
