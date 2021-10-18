@@ -15,7 +15,7 @@
   * [FIX] Metrics will be properly collected from the SAS Deployment Operator
   * [CHANGE] Internal improvements, refactoring and preparations for future support
     of application multi-tenancy in SAS Viya
-  * [FIX] The two SAS Jobs dashboards have been updated and slightly optimzed
+  * [FIX] The two SAS Jobs dashboards have been updated and slightly optimized
 
 * **Logging**
   * [CHANGE] Fluent Bit has been upgraded to version 1.8.7
