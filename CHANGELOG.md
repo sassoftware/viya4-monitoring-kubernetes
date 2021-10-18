@@ -8,7 +8,7 @@
   * [FIX] There is now a check for the presence of the `sha256sum` utility
     in the `PATH`
   * [FIX] There is now a timeout (default 10 min) when deleting namespaces
-    using `LOG_DELETE_NAMESPACE_ON_REMOVE` or `LOG_DELETE_NAMESPACE_ON_REMOVE`.
+    using `LOG_DELETE_NAMESPACE_ON_REMOVE` or `MON_DELETE_NAMESPACE_ON_REMOVE`.
     The timeout can be set via `KUBE_NAMESPACE_DELETE_TIMEOUT`.
 
 * **Monitoring**
@@ -19,13 +19,9 @@
   * [FIX] The two SAS Jobs dashboards have been updated and slightly optimzed
 
 * **Logging**
-  * [FEATURE] Support for application multi-tenancy in SAS Viya
-    * Scripts for onboarding/offboarding tenants
-    * Enhancements to security scripts
-    * Enabling Kibana tenant spaces (Kibana tenants);
-    * Scripts for importing content into Kibana tenant spaces.
-    * Documentation is available in [Tenant Logging](logging/Tenant_Logging.md)
-  * [CHANGE] Move to Open Distro for Elasticsearch version 1.13.2
+  * [CHANGE] Fluent Bit has been upgraded to version 1.8.7
+  * [CHANGE] Internal improvements, refactoring and preparations for future support
+    of application multi-tenancy in SAS Viya
 
 ## Version 1.0.11 (13SEP21)
 
