@@ -6,6 +6,8 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
+log_info "On branch: geturlbug"  # REMOVE
+
 # Confirm NOT on OpenShift
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
