@@ -94,6 +94,8 @@ function get_ingress_url {
   fi
 
   url="$protocol://${host}${porttxt}${path}"
+
+  url="${url%/}"   # strip any trailing "/"
   echo "$url"
 }
 
