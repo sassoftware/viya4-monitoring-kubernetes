@@ -93,7 +93,7 @@ function get_ingress_url {
      porttxt=":$port"
   fi
 
-  url="$protocol://${host}${porttxt}${path}/"
+  url="$protocol://${host}${porttxt}${path}"
   echo "$url"
 }
 
@@ -124,12 +124,11 @@ function get_route_url {
 }
 
 function get_nodeport_url {
-  local host path tls_enabled port porttxt protocol
+  local host tls_enabled port porttxt protocol
 
   namespace=$1
   service=$2
-  path=$3
-  tls_enabled=$4
+  tls_enabled=$3
 
   if [ ! "$(kubectl -n $namespace get service/$service 2>/dev/null)" ]; then
     # ingress object does not exist
@@ -155,18 +154,17 @@ function get_nodeport_url {
      porttxt=":$port"
   fi
 
-  url="$protocol://${host}${porttxt}${path}"
+  url="$protocol://${host}${porttxt}"
   echo "$url"
 }
 
 function get_service_url {
- local namespace service path use_tls ingress service_type url
+ local namespace service use_tls ingress service_type url
 
  namespace=$1
  service=$2                 # name of service
- path=$3                    # (optional - NodePort only) Appended to path returned by ingress objects
- use_tls=$4                 # (optional - NodePort only) use http or https (ingress properties over-ride)
- ingress=${5:-${service}}   # (optional) name of ingress/route object (default: $service)
+ use_tls=$3                 # (optional - NodePort only) use http or https (ingress properties over-ride)
+ ingress=${4:-${service}}   # (optional) name of ingress/route object (default: $service)
 
  # is a route defined for this service?
  if [ "$OPENSHIFT_CLUSTER" == "true" ] && [ "$(kubectl -n $namespace get route/$service 2>/dev/null)" ]; then
@@ -194,7 +192,7 @@ function get_service_url {
         echo "$url"
      fi
  elif [ "$service_type" == "NodePort" ]; then
-     url=$(get_nodeport_url $namespace $service $path $use_tls)
+     url=$(get_nodeport_url $namespace $service $use_tls)
 
      if [ -z "$url" ]; then
         return 1

@@ -100,7 +100,7 @@ get_kb_api_url
 set +e
 for pause in 30 30 30 30 30 30
 do
-   response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "${kb_api_url}api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
+   response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "${kb_api_url}/api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
    # returns 503 (and outputs "Kibana server is not ready yet") when Kibana isn't ready yet
    # TO DO: check for 503 specifically?
 
@@ -126,7 +126,7 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    ./logging/bin/import_kibana_content.sh logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson admin_tenant
 else
    # Importing content into Global tenant for continuity, to be removed in future
-   response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "${kb_api_url}api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+   response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 
    if [[ $response != 2* ]]; then
       log_error "There was an issue loading content into Kibana [$response]"

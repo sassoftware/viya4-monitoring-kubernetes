@@ -160,7 +160,7 @@ fi
 
 # Delete ES index containing tenant content
 kibana_index_name=".kibana_*_$(echo "$ktenant"|tr -d _)"
-response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "${es_api_url}$kibana_index_name"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "${es_api_url}/$kibana_index_name"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 if [[ $response == 2* ]]; then
    log_info "Deleted index [$kibana_index_name]. [$response]"
 else

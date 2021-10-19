@@ -217,9 +217,9 @@ set +e
 get_ingress_ports
 
 # get URLs for Grafana, Prometheus and AlertManager
-gf_url=$(get_service_url $MON_NS v4m-grafana  "/" "false")
-# pr_url=$(get_url $MON_NS v4m-prometheus  "/" "false")
-# am_url=$(get_url $MON_NS v4m-alertmanager  "/" "false")
+gf_url=$(get_service_url $MON_NS v4m-grafana  "false")
+# pr_url=$(get_url $MON_NS v4m-prometheus  "false")
+# am_url=$(get_url $MON_NS v4m-alertmanager  "false")
 set -e
 
 if ! deployV4MInfo "$MON_NS"; then
