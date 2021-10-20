@@ -122,6 +122,8 @@ function get_route_url {
   fi
 
   url="$protocol://$host$path"
+  url="${url%/}"   # strip any trailing "/"
+
   echo "$url"
 }
 
