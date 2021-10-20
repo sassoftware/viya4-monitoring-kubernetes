@@ -8,7 +8,7 @@
 
 ## Version 1.0.12 (18OCT21) 
 ---
-### UPDATE: **Due to a serious bug, do not use Version 1.0.12; use a more recent version.**
+#### UPDATE: **Due to a serious bug, do not use Version 1.0.12; use a more recent version.**
 ---
 * **Overall**
   * [CHANGE] The minimum supported version of OpenShift is now 4.7. OpenShift
