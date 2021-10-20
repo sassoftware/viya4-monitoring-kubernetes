@@ -1,6 +1,13 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Version 1.0.12 (18OCT21)
+## Version 1.0.13 (20OCT21)
+
+* **Logging**
+  * [FIX] Addressed a serious issue (introduced in Version 1.0.12) that prevented the 
+    successful deployment of the logging components when configured using ingress.
+
+## Version 1.0.12 (18OCT21) 
+* **UPDATE** **Due to a serious bug, do not use Version 1.0.12; use a more recent version.**
 
 * **Overall**
   * [CHANGE] The minimum supported version of OpenShift is now 4.7. OpenShift
