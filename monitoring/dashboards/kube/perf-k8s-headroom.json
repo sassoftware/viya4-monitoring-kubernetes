@@ -374,7 +374,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(kube_node_status_capacity{resource=\"cpu\"}) - sum(kube_pod_container_resource_requests_cpu_cores)\r",
+          "expr": "sum(kube_node_status_capacity{resource=\"cpu\"}) - sum(kube_pod_container_resource_requests{resource=\"cpu\"})\r",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -467,7 +467,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "(sum(kube_node_status_capacity{resource=\"memory\"}) - sum(kube_pod_container_resource_requests_memory_bytes)\r)",
+          "expr": "(sum(kube_node_status_capacity{resource=\"memory\"}) - sum(kube_pod_container_resource_requests{resource=\"memory\"})\r)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -653,7 +653,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "100 * (sum(kube_node_status_capacity{resource=\"cpu\"}) - sum(kube_pod_container_resource_requests_cpu_cores)) / sum(kube_node_status_capacity{resource=\"cpu\"})",
+          "expr": "100 * (sum(kube_node_status_capacity{resource=\"cpu\"}) - sum(kube_pod_container_resource_requests{resource=\"cpu\"})) / sum(kube_node_status_capacity{resource=\"cpu\"})",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -746,7 +746,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "100*(sum(kube_node_status_capacity{resource=\"memory\"}) - sum(kube_pod_container_resource_requests_memory_bytes)\r)/sum(kube_node_status_capacity{resource=\"memory\"})",
+          "expr": "100*(sum(kube_node_status_capacity{resource=\"memory\"}) - sum(kube_pod_container_resource_requests{resource=\"memory\"})\r)/sum(kube_node_status_capacity{resource=\"memory\"})",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -1015,7 +1015,7 @@
       ],
       "targets": [
         {
-          "expr": "sum(kube_pod_container_resource_requests_cpu_cores) by (namespace)",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\"}) by (namespace)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -1035,7 +1035,7 @@
           "refId": "E"
         },
         {
-          "expr": "sum(kube_pod_container_resource_requests_memory_bytes) by (namespace)",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\"}) by (namespace)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -1238,7 +1238,7 @@
         },
         {
           "exemplar": true,
-          "expr": "sum(kube_pod_container_resource_requests_cpu_cores)\r by (node)",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\"})\r by (node)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -1257,7 +1257,7 @@
           "refId": "D"
         },
         {
-          "expr": "sum(kube_pod_container_resource_requests_memory_bytes) by (node)",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\"}) by (node)",
           "format": "table",
           "instant": true,
           "interval": "",

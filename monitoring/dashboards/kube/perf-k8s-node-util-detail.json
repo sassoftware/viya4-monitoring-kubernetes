@@ -308,7 +308,7 @@
       "pluginVersion": "7.5.4",
       "targets": [
         {
-          "expr": "100* (\n  instance:node_cpu_utilisation:rate1m{job=\"node-exporter\", instance=~\"$instance\"}\n  * instance:node_num_cpu:sum{job=\"node-exporter\", instance=~\"$instance\"}\n/ ignoring (instance) group_left\n  sum without (instance) (instance:node_num_cpu:sum{job=\"node-exporter\", instance=~\"$instance\"})\n)\n",
+          "expr": "100* (\n  instance:node_cpu_utilisation:rate5m{job=\"node-exporter\", nodename=\"$Node\"}\n  / instance:node_num_cpu:sum{job=\"node-exporter\", nodename=\"$Node\"})\n",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
