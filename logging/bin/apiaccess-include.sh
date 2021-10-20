@@ -70,7 +70,7 @@ function get_api_url {
    usetls=${3:-false}
    ingress=$4
 
-   api_url=$(get_service_url "$LOG_NS" "$servicename" "/" "$usetls" $ingress)
+   api_url=$(get_service_url "$LOG_NS" "$servicename" "$usetls" $ingress)
 
    if [ -z "$api_url" ] || [ "$LOG_ALWAYS_PORT_FORWARD" == "true" ]; then
       # set up temporary port forwarding to allow curl access
@@ -108,7 +108,7 @@ function get_api_url {
          protocol="http"
       fi
 
-      api_url="$protocol://localhost:$TEMP_PORT/"
+      api_url="$protocol://localhost:$TEMP_PORT"
 
    fi
    log_debug "API Endpoint for [$servicename]: $api_url"
@@ -182,7 +182,7 @@ function get_sec_api_url {
  rc=$?
 
  if [ "$rc" == "0" ]; then
-    sec_api_url="${es_api_url}_opendistro/_security/api"
+    sec_api_url="${es_api_url}/_opendistro/_security/api"
     log_debug "Security API Endpoint: [$sec_api_url]"
     return 0
  else
