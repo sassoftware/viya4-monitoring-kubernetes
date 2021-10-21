@@ -9,7 +9,6 @@
 # Default Values
 # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
 
-
 commonLabels:
   sas.com/monitoring-base: kube-viya-monitoring
 
@@ -18,16 +17,20 @@ commonLabels:
 # ===================
 # https://github.com/coreos/prometheus-operator
 prometheusOperator:
+  image:
+    tag: v0.51.2
   logFormat: json
   logLevel: info
   createCustomResource: false
+  prometheusConfigReloaderImage:
+    tag: v0.51.2
   resources:
     requests:
       cpu: "100m"
       memory: "50Mi"
     limits:
-      cpu: "250m"
-      memory: "1Gi"
+      cpu: "500m"
+      memory: "2Gi"
   tlsProxy:
     resources:
       requests:
@@ -57,11 +60,11 @@ kubeStateMetrics:
 # https://github.com/helm/charts/tree/master/stable/kube-state-metrics
 kube-state-metrics:
   image:
-    tag: v1.9.8
+    tag: v2.2.1
   resources:
     requests:
       cpu: "25m"
-      memory: "30Mi"
+      memory: "50Mi"
 
 # ==========
 # Prometheus
@@ -74,7 +77,7 @@ prometheus:
     nodePort: null  
   prometheusSpec:
     image:
-      tag: v2.26.1
+      tag: v2.30.3
     logLevel: info
     logFormat: json
     podAntiAffinity: soft
@@ -111,7 +114,7 @@ alertmanager:
     nodePort: null  
   alertmanagerSpec:
     image:
-      tag: v0.21.0
+      tag: v0.23.0
     logFormat: json
     podAntiAffinity: soft
     retention: 240h
@@ -135,17 +138,17 @@ alertmanager:
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
 prometheus-node-exporter:
   image:
-    tag: v1.0.1
+    tag: v1.2.2
   service:
     # Override the default port of 9100 to avoid potential conflicts
     port: 9110
     targetPort: 9110
   resources:
     requests:
-      cpu: "30m"
+      cpu: "50m"
       memory: "50Mi"
     limits:
-      cpu: "100m"
+      cpu: "250m"
       memory: "100Mi"
   # Be very tolerant
   tolerations:
@@ -167,7 +170,7 @@ nodeExporter:
 # https://github.com/grafana/helm-charts/tree/main/charts/grafana
 grafana:
   image:
-    tag: "7.5.4"
+    tag: "8.2.1"
   "grafana.ini":
     analytics:
       check_for_updates: false
