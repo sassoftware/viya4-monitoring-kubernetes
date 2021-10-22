@@ -1,2 +1,1 @@
-hello_tenant.ndjson
-tenant.md
+* hello_tenant.ndjson
