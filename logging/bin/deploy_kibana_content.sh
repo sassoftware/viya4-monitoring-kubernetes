@@ -123,9 +123,14 @@ fi
 
 if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    # Import Kibana Searches, Visualizations and Dashboard Objects using curl
-   ./logging/bin/import_kibana_content.sh logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson admin_tenant
+   ./logging/bin/import_kibana_content.sh logging/kibana/common          admin_tenant
+   ./logging/bin/import_kibana_content.sh logging/kibana/cluster_admins  admin_tenant
+   ./logging/bin/import_kibana_content.sh logging/kibana/namespace       admin_tenant
+   ./logging/bin/import_kibana_content.sh logging/kibana/tenant          admin_tenant
+
 else
    # Importing content into Global tenant for continuity, to be removed in future
+   log_debug "Deploying content into Global tenant (multi-tenancy NOT enabled)"
    response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_import?overwrite=true"  -H "kbn-xsrf: true"   --form file=@logging/kibana/kibana_saved_objects_7.6.1_210809.ndjson --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 
    if [[ $response != 2* ]]; then
