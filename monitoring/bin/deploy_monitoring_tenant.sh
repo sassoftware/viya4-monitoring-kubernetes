@@ -152,6 +152,33 @@ helm upgrade --install $helmDebug \
   grafana-$VIYA_TENANT \
   grafana/grafana
 
+# Deploy Grafana route (OpenShift only)
+if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
+  if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
+    routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-$VIYA_NS.$OPENSHIFT_ROUTE_DOMAIN}
+  else
+    routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-grafana-$VIYA_TENANT-$VIYA_NS.$OPENSHIFT_ROUTE_DOMAIN}
+  fi
+
+  if ! kubectl get route -n $VIYA_NS v4m-grafana-$VIYA_TENANT 1>/dev/null 2>&1; then
+    log_info "Exposing Grafana service as a route..."
+    if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
+      log_debug "Creating path-based OpenShift route for v4m-grafana-$VIYA_TENANT"
+      oc create route reencrypt \
+        -n $VIYA_NS \
+        --service v4m-grafana-$VIYA_TENANT \
+        --hostname "$routeHost" \
+        --path $OPENSHIFT_ROUTE_PATH_GRAFANA
+    else
+      log_debug "Creating host-based OpenShift route for v4m-grafana-$VIYA_TENANT"
+      oc create route reencrypt \
+        -n $VIYA_NS \
+        --service v4m-grafana-$VIYA_TENANT \
+        --hostname "$routeHost"
+    fi
+  fi
+fi
+
 # Deploy ServiceMonitors
 kubectl apply -n $VIYA_NS -f $tenantDir/serviceMonitor-sas-cas-tenant.yaml
 kubectl apply -n $VIYA_NS -f $tenantDir/serviceMonitor-sas-pushgateway-tenant.yaml
