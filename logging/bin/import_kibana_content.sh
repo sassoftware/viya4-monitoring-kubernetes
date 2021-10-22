@@ -24,7 +24,7 @@ function import_file {
    if [ -f "$file" ]; then
       # ODFE 1.7.0: successful request returns: {"success":true,"successCount":20}
       # ODFE 1.13.2: successful request returns: {"successCount":1,"success":true,"successResults":[...content details...]}
-      response=$(curl -s -o $TMP_DIR/curl.response -w "%{http_code}" -XPOST "${kb_api_url}api/saved_objects/_import?overwrite=true" -H "securitytenant: $tenant"  -H "kbn-xsrf: true"   --form file=@$file --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+      response=$(curl -s -o $TMP_DIR/curl.response -w "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_import?overwrite=true" -H "securitytenant: $tenant"  -H "kbn-xsrf: true"   --form file=@$file --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 
       if [[ $response == 2* ]]; then
          if grep -q '"success":true' $TMP_DIR/curl.response ; then

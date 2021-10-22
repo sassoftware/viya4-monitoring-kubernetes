@@ -6,8 +6,9 @@ component. This configuration could save CPU and memory resources and could be u
 
 ## Using This Sample
 
-You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
-[logging README](../../logging/README.md#log_custom) for information about the customization process. 
+You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. 
+See the [logging README](../../logging/README.md#log_custom) for 
+information about the customization process. 
 
 The customization files in this sample provide a starting point for the customization files for a deployment that supports logging that minimizes resource usage. 
 

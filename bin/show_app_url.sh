@@ -83,8 +83,8 @@ do
    esac
 
    # get URLs for requested services
-   log_debug "Function call: get_service_url $namespace $servicename / $tls_flag $ingressname"
-   service_url=$(get_service_url "$namespace" "$servicename" "/" "$tls_flag" "$ingressname")
+   log_debug "Function call: get_service_url $namespace $servicename $tls_flag $ingressname"
+   service_url=$(get_service_url "$namespace" "$servicename"  "$tls_flag" "$ingressname")
 
    # Print URLs
    add_notice_wide "*** $service ***"
