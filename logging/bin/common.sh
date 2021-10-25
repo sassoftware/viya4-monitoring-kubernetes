@@ -29,6 +29,9 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     source bin/version-include.sh
 
     export SAS_LOGGING_COMMON_SOURCED=true
+
+    export V4M_FEATURE_MULTITENANT_ENABLE=${V4M_FEATURE_MULTITENANT_ENABLE:-true}
+
 fi
 echo ""
 
