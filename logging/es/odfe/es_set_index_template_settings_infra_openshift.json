@@ -3,7 +3,7 @@
   "order": 5,
   "settings": {
     "number_of_shards": 1,
-    "number_of_replicas": 1,
-    "opendistro.index_state_management.policy_id": "viya_infra_idxmgmt_policy"
-  }
+    "number_of_replicas": 1
+  },
+  "mappings": {"numeric_detection": false}
 }
