@@ -209,6 +209,15 @@ for f in monitoring/rules/viya/rules-*.yaml; do
   kubectl apply -n $MON_NS -f $f
 done
 
+kubectl get prometheusrule -n $MON_NS v4m-kubernetes-apps 2>/dev/null
+if [ $? == 0 ]; then
+  log_info "Patching KubeHpaMaxedOut rule..."
+  # Fixes the issue of false positives when max replicas == 1
+  kubectl patch prometheusrule --type='json' -n $MON_NS v4m-kubernetes-apps --patch "$(cat monitoring/kube-hpa-alert-patch.json)"
+else
+  log_debug "PrometheusRule $MON_NS/v4m-kubernetes-apps does not exist"
+fi
+
 echo ""
 monitoring/bin/deploy_dashboards.sh
 
