@@ -24,7 +24,7 @@ function csvlist {
    local rawvalue values outvalue
    rawvalue=$@
    IFS=', ' read -a arr <<<"$rawvalue"
-   printf -v values ',\\"%s\\"' "${arr[@]}"
+   printf -v values ",'%s'" "${arr[@]}"
    outvalue="(${values:1})"
    echo "$outvalue"
 }
@@ -33,7 +33,7 @@ default_maxrows=500
 
 # NOTE: the 'trim(foo.bar.keyword) as bar' syntax is needed to ensure nested fields appear
 #       as properly named columns rather than as nested fields "(e.g. foo={'bar'='baz'})"
-default_output_vars="@timestamp, level, logsource,kube.namespace, kube.pod, kube.container, message"
+#default_output_vars="@timestamp, level, logsource,kube.namespace, kube.pod, kube.container, message"
 default_output_vars="@timestamp, level, logsource,trim(kube.namespace.keyword) as namespace, trim(kube.pod.keyword) as pod, trim(kube.container.keyword) as container, message"
 
 valid_levels="PANIC,FATAL,ERROR,WARNING,INFO,DEBUG,NONE"
@@ -560,21 +560,21 @@ else
       #WHERE clauses
       echo  -n " where 1 = 1 " >> $query_file  # dummy always true
 
-      if [ ! -z "$namespace" ];  then echo -n ' and kube.namespace =\"'"$namespace"'\"' >> $query_file; fi;
+      if [ ! -z "$namespace" ];  then echo -n " and kube.namespace ='$namespace'" >> $query_file; fi;
 
-      if [ ! -z "$logsource" ];          then echo -n ' and logsource          in '"$(csvlist $logsource)"         >> $query_file; fi;
-      if [ ! -z "$logsource_exclude" ];  then echo -n ' and logsource      NOT in '"$(csvlist $logsource_exclude)" >> $query_file; fi;
-      if [ ! -z "$pod" ];                then echo -n ' and kube.pod           in '"$(csvlist $pod)"               >> $query_file; fi;
-      if [ ! -z "$pod_exclude" ];        then echo -n ' and kube.pod       NOT in '"$(csvlist $pod_exclude)"       >> $query_file; fi;
-      if [ ! -z "$container" ];          then echo -n ' and kube.container     in '"$(csvlist $container)"         >> $query_file; fi;
-      if [ ! -z "$container_exclude" ];  then echo -n ' and kube.container NOT in '"$(csvlist $container_exclude)" >> $query_file; fi;
-      if [ ! -z "$msglevel" ];           then echo -n ' and level              in '"$(csvlist $msglevel)"          >> $query_file; fi;
-      if [ ! -z "$level_exclude" ];      then echo -n ' and level          NOT in '"$(csvlist $level_exclude)"     >> $query_file; fi;
+      if [ ! -z "$logsource" ];          then echo -n " and logsource          in $(csvlist $logsource)"         >> $query_file; fi;
+      if [ ! -z "$logsource_exclude" ];  then echo -n " and logsource      NOT in $(csvlist $logsource_exclude)" >> $query_file; fi;
+      if [ ! -z "$pod" ];                then echo -n " and kube.pod           in $(csvlist $pod)"               >> $query_file; fi;
+      if [ ! -z "$pod_exclude" ];        then echo -n " and kube.pod       NOT in $(csvlist $pod_exclude)"       >> $query_file; fi;
+      if [ ! -z "$container" ];          then echo -n " and kube.container     in $(csvlist $container)"         >> $query_file; fi;
+      if [ ! -z "$container_exclude" ];  then echo -n " and kube.container NOT in $(csvlist $container_exclude)" >> $query_file; fi;
+      if [ ! -z "$msglevel" ];           then echo -n " and level              in $(csvlist $msglevel)"          >> $query_file; fi;
+      if [ ! -z "$level_exclude" ];      then echo -n " and level          NOT in $(csvlist $level_exclude)"     >> $query_file; fi;
 
-      if [ ! -z "$search_string" ];  then echo -n ' and multi_match(\"'"$search_string"'\")'>> $query_file; fi;
+      if [ ! -z "$search_string" ];  then echo -n " and multi_match('$search_string')">> $query_file; fi;
 
-      if [ ! -z "$start_date" ]; then echo -n ' and @timestamp >=\"'"$start_date"'\"' >> $query_file; fi;
-      if [ ! -z "$end_date" ];   then echo -n ' and @timestamp < \"'"$end_date"'\"'    >> $query_file; fi;
+      if [ ! -z "$start_date" ]; then echo -n " and @timestamp >= '$start_date'" >> $query_file; fi;
+      if [ ! -z "$end_date" ];   then echo -n " and @timestamp <  '$end_date'"   >> $query_file; fi;
 
       echo "order by @timestamp DESC" >> $query_file;
 
