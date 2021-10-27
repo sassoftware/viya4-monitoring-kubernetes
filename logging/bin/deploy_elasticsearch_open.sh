@@ -174,7 +174,7 @@ create_secret_from_file securityconfig/roles_mapping.yml   security-roles-mappin
 # Open Distro for Elasticsearch
 log_info "Deploying Open Distro for Elasticsearch"
 
-odfe_tgz_file=opendistro-es-1.8.0.tgz
+odfe_tgz_file=opendistro-es-1.13.2.tgz
 
 baseDir=$(pwd)
 if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
@@ -184,14 +184,12 @@ if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
    log_info "Cloning Open Distro for Elasticsearch repo"
    git clone https://github.com/opendistro-for-elasticsearch/opendistro-build
 
-   # checkout specific commit
    cd opendistro-build
-   git checkout 2c139044ee31a490b58ac6a306a5a5ef5ef21383
 
    # build package
    log_info "Packaging Helm Chart for Elasticsearch"
 
-   # cd opendistro-build/helm/opendistro-es/
+   # cd to the appropriate sub-directory
    cd helm/opendistro-es/
    helm package .
 
