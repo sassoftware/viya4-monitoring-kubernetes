@@ -124,11 +124,7 @@ add_rolemapping $ROLENAME $BE_ROLENAME
 #tenant role (controls access to Kibanas tenant spaces)
 if [ "$create_ktenant_roles" == "true" ]; then
 
-   if [ -n "$tenant" ]; then
-      ensure_role_exists tenant_${NST} $TMP_DIR/rbac/kibana_tenant_tenant_role.json
-   else
-      ensure_role_exists tenant_${NST} $TMP_DIR/rbac/kibana_tenant_namespace_role.json
-   fi
+   ensure_role_exists tenant_${NST} $TMP_DIR/rbac/kibana_tenant_limited_role.json
    add_rolemapping  tenant_${NST} $BE_ROLENAME
 
 fi

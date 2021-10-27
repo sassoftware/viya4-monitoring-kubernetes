@@ -62,6 +62,7 @@ elasticsearch:
     internalUsersSecret: security-internal-users
     rolesSecret: security-roles
     rolesMappingSecret: security-roles-mapping
+    tenantsSecret: security-tenants
 
   extraEnvs:
   - name: ES_ADMIN_PASSWD

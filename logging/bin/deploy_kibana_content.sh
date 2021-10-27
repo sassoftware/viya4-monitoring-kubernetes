@@ -123,10 +123,10 @@ fi
 
 if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    # Import Kibana Searches, Visualizations and Dashboard Objects using curl
-   ./logging/bin/import_kibana_content.sh logging/kibana/common          admin_tenant
-   ./logging/bin/import_kibana_content.sh logging/kibana/cluster_admins  admin_tenant
-   ./logging/bin/import_kibana_content.sh logging/kibana/namespace       admin_tenant
-   ./logging/bin/import_kibana_content.sh logging/kibana/tenant          admin_tenant
+   ./logging/bin/import_kibana_content.sh logging/kibana/common          cluster_admins
+   ./logging/bin/import_kibana_content.sh logging/kibana/cluster_admins  cluster_admins
+   ./logging/bin/import_kibana_content.sh logging/kibana/namespace       cluster_admins
+   ./logging/bin/import_kibana_content.sh logging/kibana/tenant          cluster_admins
 
 else
    # Importing content into Global tenant for continuity, to be removed in future

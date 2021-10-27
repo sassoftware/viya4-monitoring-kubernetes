@@ -169,6 +169,7 @@ create_secret_from_file securityconfig/config.yml          security-config      
 create_secret_from_file securityconfig/internal_users.yml  security-internal-users  managed-by=v4m-es-script
 create_secret_from_file securityconfig/roles.yml           security-roles           managed-by=v4m-es-script
 create_secret_from_file securityconfig/roles_mapping.yml   security-roles-mapping   managed-by=v4m-es-script
+create_secret_from_file securityconfig/tenants.yml         security-tenants         managed-by=v4m-es-script
 
 
 # Open Distro for Elasticsearch
