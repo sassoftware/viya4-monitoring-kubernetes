@@ -1,4 +1,10 @@
 _meta:
-  type: "actiongroups"
+  type: actiongroups
   config_version: 2
 
+v4m_reporting: 
+  reserved: false
+  hidden: false
+  static: false
+  allowed_actions: 
+  - cluster:admin/opendistro/reports/* 
