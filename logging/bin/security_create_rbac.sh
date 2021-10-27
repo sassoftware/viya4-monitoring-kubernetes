@@ -124,15 +124,6 @@ add_rolemapping $ROLENAME $BE_ROLENAME
 #tenant role (controls access to Kibanas tenant spaces)
 if [ "$create_ktenant_roles" == "true" ]; then
 
-   # We prototyped granting namespace admins access to tenant Kibana tenant spaces.
-   # however, we decided to NOT do that until a clearer requirement for that access
-   # could be found.
-   #
-   # A "provider_FOO" user tied to a specific namespace and tenant should be created
-   # to allow deployment (namespace) admins access to the tenant's Kibana tenant
-   # space as needed.  This would ensure their backend access is appropriately
-   # limited when viewing tenant-specific Kibana content.
-
    ensure_role_exists tenant_${NST} $TMP_DIR/rbac/kibana_tenant_limited_role.json
    add_rolemapping  tenant_${NST} $BE_ROLENAME
 
