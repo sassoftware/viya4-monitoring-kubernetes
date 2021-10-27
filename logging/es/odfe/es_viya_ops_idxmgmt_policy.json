@@ -1,31 +1,35 @@
 {
-    "policy": {
-        "policy_id": "viya-ops-idxmgmt-policy",
-        "description": "An index management policy for log messages from logging components.",
-        "error_notification": null,
-        "default_state": "hot",
-        "states": [
-            {
-                "name": "hot",
-                "actions": [],
-                "transitions": [
-                    {
-                        "state_name": "doomed",
-                        "conditions": {
-                            "min_index_age": "xxxRETENTION_PERIODxxx"
-                        }
+    "policy_id": "viya_ops_idxmgmt_policy",
+    "description": "An index management policy for log messages from logging components.",
+    "error_notification": null,
+    "default_state": "hot",
+    "states": [
+        {
+            "name": "hot",
+            "actions": [],
+            "transitions": [
+                {
+                    "state_name": "doomed",
+                    "conditions": {
+                        "min_index_age": "xxxRETENTION_PERIODxxx"                       
                     }
-                ]
-            },
-            {
-                "name": "doomed",
-                "actions": [
-                    {
-                        "delete": {}
-                    }
-                ],
-                "transitions": []
-            }
-        ]
+                }
+            ]
+        },
+        {
+            "name": "doomed",
+            "actions": [
+                {
+                    "delete": {}
+                }
+            ],
+            "transitions": []
+        }
+    ],
+    "ism_template": {
+        "index_patterns": [
+            "viya_ops-*"
+        ],
+        "priority": 100
     }
 }

@@ -26,6 +26,12 @@
                 ],
                 "transitions": []
             }
-        ]
+        ],
+        "ism_template": {
+                "index_patterns": [
+                        "viya_logs-openshift-*"
+                 ],
+                 "priority": 100
+        }
     }
 }
