@@ -62,6 +62,7 @@ elasticsearch:
     internalUsersSecret: security-internal-users
     rolesSecret: security-roles
     rolesMappingSecret: security-roles-mapping
+    tenantsSecret: security-tenants
 
   extraEnvs:
   - name: ES_ADMIN_PASSWD
@@ -229,7 +230,9 @@ kibana:
     elasticsearch.username: ${ELASTICSEARCH_USERNAME}
     elasticsearch.password: ${ELASTICSEARCH_PASSWORD}
 
-    opendistro_security.multitenancy.enabled: false
+    opendistro_security.multitenancy.enabled: true
+    opendistro_security.multitenancy.tenants.enable_private: false
+    opendistro_security.multitenancy.tenants.enable_global: false
     # opendistro_security.multitenancy.tenants.preferred: ["Global","Private"]
     elasticsearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
 
