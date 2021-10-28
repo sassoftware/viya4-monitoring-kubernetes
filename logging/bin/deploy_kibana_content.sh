@@ -8,6 +8,7 @@ source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 source bin/service-url-include.sh
 source logging/bin/apiaccess-include.sh
+source logging/bin/rbac-include.sh
 
 this_script=`basename "$0"`
 
@@ -122,7 +123,7 @@ if [ "$kibanaready" != "TRUE" ]; then
 fi
 
 if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
-
+   set -x   #REMOVE
    # Need to create cluster_admins Kibana tenant space?
    # Should only be true during UIP scenario b/c our updated
    # securityconfig processing is bypassed (to prevent
@@ -144,7 +145,7 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    else
       log_debug "The Kibana tenant space [cluster_admins] exists."
    fi
-
+   set +x   #REMOVE
    # Import Kibana Searches, Visualizations and Dashboard Objects using curl
    ./logging/bin/import_kibana_content.sh logging/kibana/common          cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/cluster_admins  cluster_admins
