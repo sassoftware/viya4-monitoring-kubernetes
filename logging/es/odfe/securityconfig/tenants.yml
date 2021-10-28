@@ -3,8 +3,6 @@ _meta:
   type: "tenants"
   config_version: 2
 
-
 cluster_admins:
   reserved: false
   description: "Kibana tenant space for Cluster Administrators"
-
