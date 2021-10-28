@@ -123,14 +123,16 @@ if [ "$kibanaready" != "TRUE" ]; then
 fi
 
 if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
-   set -x   #REMOVE
+
+   set +e  # disable exit on error
+
    # Need to create cluster_admins Kibana tenant space?
    # Should only be true during UIP scenario b/c our updated
    # securityconfig processing is bypassed (to prevent
    # clobbering post-deployment changes made via Kibana).
 
    # get Security API URL
-   get_sec_api_url
+   get_sec_api_url 
 
    # Create cluster_admins Kibana tenant space (if it doesn't exist)
    if ! kibana_tenant_exists "cluster_admins"; then
@@ -145,12 +147,14 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    else
       log_debug "The Kibana tenant space [cluster_admins] exists."
    fi
-   set +x   #REMOVE
+
    # Import Kibana Searches, Visualizations and Dashboard Objects using curl
    ./logging/bin/import_kibana_content.sh logging/kibana/common          cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/cluster_admins  cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/namespace       cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/tenant          cluster_admins
+
+   set -e
 
 else
    # Importing content into Global tenant for continuity, to be removed in future
