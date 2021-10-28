@@ -97,6 +97,8 @@ INFO The Kibana pod is ready...continuing
 INFO The Kibana REST endpoint does not appear to be quite ready [000]; sleeping for [30] more seconds before checking again.
 INFO The Kibana REST endpoint does not appear to be quite ready [000]; sleeping for [30] more seconds before checking again.
 INFO The Kibana REST endpoint does not appear to be quite ready [000]; sleeping for [30] more seconds before checking again.
+The Kibana REST endpoint has NOT become accessible in the expected time; exiting.
+Review the Kibana pod's events and log to identify the issue and resolve it before trying again.
 ```
 This happens when Kibana cannot be accessed from the machine on which the deployment process is running via the same
 URL your end-users will be using.  This might the case if your environment has been configured to only allow access via
