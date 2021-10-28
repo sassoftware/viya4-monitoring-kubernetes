@@ -122,6 +122,29 @@ if [ "$kibanaready" != "TRUE" ]; then
 fi
 
 if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
+
+   # Need to create cluster_admins Kibana tenant space?
+   # Should only be true during UIP scenario b/c our updated
+   # securityconfig processing is bypassed (to prevent
+   # clobbering post-deployment changes made via Kibana).
+
+   # get Security API URL
+   get_sec_api_url
+
+   # Create cluster_admins Kibana tenant space (if it doesn't exist)
+   if ! kibana_tenant_exists "cluster_admins"; then
+      create_kibana_tenant "cluster_admins" "Kibana tenant space for Cluster Administrators"
+      rc=$?
+      if [ "$rc" == "0" ]; then
+         log_info "Created the Kibana tenant space [cluster_admins]."
+      else
+         log_error "Problems were encountered while attempting to create tenant space [cluster_admins]."
+         exit 1
+      fi
+   else
+      log_debug "The Kibana tenant space [cluster_admins] exists."
+   fi
+
    # Import Kibana Searches, Visualizations and Dashboard Objects using curl
    ./logging/bin/import_kibana_content.sh logging/kibana/common          cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/cluster_admins  cluster_admins
