@@ -76,7 +76,7 @@ If you have not yet deployed the logging components, run the standard deployment
 ## Issue: Manually deleting the logging namespace does not delete all components 
 
 ### Description
-The logging components should be removed by using the `remove_logging_open.sh` script. See [Remove Logging Components](README.md#lremove) for more information. If you attempt to remove the logging components by only deleting the namespace into which the components are deployed, components in other locations are not removed and redeployment of logging fails.
+The logging components should be removed by using the `remove_logging_open.sh` script.  If you attempt to remove the logging components by only deleting the namespace into which the components are deployed, components in other locations are not removed and redeployment of logging fails.
 
 ### Solution
 Run this command to delete all of the logging components that are in locations 
@@ -85,3 +85,27 @@ other than the logging namespace.
 ```bash
 kubectl delete psp v4m-es-psp
 ```
+
+## Issue: Deployment does not complete if Elastisearch/Kibana is not reachable from the deployment machine
+
+### Description
+The deployment scripts fails during the "Configuring Kibana" step of the process with messages like the following:
+```
+INFO STEP 4: Configuring Kibana
+INFO Configuring Kibana
+INFO The Kibana pod is ready...continuing
+INFO The Kibana REST endpoint does not appear to be quite ready [000]; sleeping for [30] more seconds before checking again.
+INFO The Kibana REST endpoint does not appear to be quite ready [000]; sleeping for [30] more seconds before checking again.
+INFO The Kibana REST endpoint does not appear to be quite ready [000]; sleeping for [30] more seconds before checking again.
+```
+This happens when Kibana cannot be accessed from the machine on which the deployment process is running via the same
+URL your end-users will be using.  This might the case if your environment has been configured to only allow access via
+a private network inaccessable to the deployment machine.  In these situations, setting the LOG_ALWAYS_PORT_FORWARD 
+property to "true" will force the deployment scripts to use Kubernetes port-forwarding when accessing the Kibana and/or 
+Elasticsearch APIs rather than the end-user URLs.
+
+### Solution
+Set the LOG_ALWAYS_PORT_FORWARD environment variable to "true" before (re-)running the deployment script.  
+This should be done by modifying (or adding) the appropriate line in the $USER_DIR/logging/user.env file.  
+See the [main README](../README.md#customization) for information about the customization process and 
+how to set up a USER_DIR.
