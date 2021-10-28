@@ -76,7 +76,7 @@ If you have not yet deployed the logging components, run the standard deployment
 ## Issue: Manually deleting the logging namespace does not delete all components 
 
 ### Description
-The logging components should be removed by using the `remove_logging_open.sh` script.  If you attempt to remove the logging components by only deleting the namespace into which the components are deployed, components in other locations are not removed and redeployment of logging fails.
+The logging components should be removed by using the `remove_logging_open.sh` script. See [Remove Logging Components](README.md#lremove) for more information. If you attempt to remove the logging components by only deleting the namespace into which the components are deployed, components in other locations are not removed and redeployment of logging fails.
 
 ### Solution
 Run this command to delete all of the logging components that are in locations 
