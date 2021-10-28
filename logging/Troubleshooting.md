@@ -105,7 +105,6 @@ property to "true" will force the deployment scripts to use Kubernetes port-forw
 Elasticsearch APIs rather than the end-user URLs.
 
 ### Solution
-Set the LOG_ALWAYS_PORT_FORWARD environment variable to "true" before (re-)running the deployment script.  
-This should be done by modifying (or adding) the appropriate line in the $USER_DIR/logging/user.env file.  
-See the [main README](../README.md#customization) for information about the customization process and 
-how to set up a USER_DIR.
+Set the LOG_ALWAYS_PORT_FORWARD environment variable to "true" before (re-)running the deployment script.  This should be done 
+by modifying (or adding) the appropriate line in the $USER_DIR/logging/user.env file.  See the [main README](../README.md#customization) 
+for information about the customization process and how to set up a USER_DIR.
