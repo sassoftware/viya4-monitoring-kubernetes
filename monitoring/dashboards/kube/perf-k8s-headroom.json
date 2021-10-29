@@ -20,8 +20,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 138,
-  "iteration": 1597075678678,
+  "id": 50,
+  "iteration": 1632868344505,
   "links": [],
   "panels": [
     {
@@ -37,9 +37,7 @@
       "decimals": 0,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
+        "defaults": {},
         "overrides": []
       },
       "format": "none",
@@ -96,7 +94,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(kube_node_status_allocatable_cpu_cores)",
+          "expr": "sum(kube_node_status_capacity{resource=\"cpu\"})",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -132,9 +130,7 @@
       "decimals": null,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
+        "defaults": {},
         "overrides": []
       },
       "format": "bytes",
@@ -191,7 +187,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "(sum(kube_node_status_allocatable_memory_bytes)\r)",
+          "expr": "(sum(kube_node_status_capacity{resource=\"memory\"})\r)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -227,9 +223,7 @@
       "decimals": null,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
+        "defaults": {},
         "overrides": []
       },
       "format": "none",
@@ -286,7 +280,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(kube_node_status_allocatable_pods{})",
+          "expr": "sum(kube_node_status_capacity{resource=\"pods\"})",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -323,9 +317,7 @@
       "decimals": 3,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
+        "defaults": {},
         "overrides": []
       },
       "format": "none",
@@ -382,7 +374,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(kube_node_status_allocatable_cpu_cores) - sum(kube_pod_container_resource_requests_cpu_cores)\r",
+          "expr": "sum(kube_node_status_capacity{resource=\"cpu\"}) - sum(kube_pod_container_resource_requests{resource=\"cpu\"})\r",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -418,9 +410,7 @@
       "decimals": null,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
+        "defaults": {},
         "overrides": []
       },
       "format": "bytes",
@@ -477,7 +467,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "(sum(kube_node_status_allocatable_memory_bytes) - sum(kube_pod_container_resource_requests_memory_bytes)\r)",
+          "expr": "(sum(kube_node_status_capacity{resource=\"memory\"}) - sum(kube_pod_container_resource_requests{resource=\"memory\"})\r)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -513,9 +503,7 @@
       "decimals": null,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
+        "defaults": {},
         "overrides": []
       },
       "format": "none",
@@ -572,7 +560,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(kube_node_status_allocatable_pods) - sum(kubelet_running_pods)",
+          "expr": "sum(kube_node_status_capacity{resource=\"pods\"}) - sum(kubelet_running_pods)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -608,9 +596,7 @@
       "decimals": null,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
+        "defaults": {},
         "overrides": []
       },
       "format": "percent",
@@ -667,7 +653,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "100 * (sum(kube_node_status_allocatable_cpu_cores) - sum(kube_pod_container_resource_requests_cpu_cores)) / sum(kube_node_status_allocatable_cpu_cores)",
+          "expr": "100 * (sum(kube_node_status_capacity{resource=\"cpu\"}) - sum(kube_pod_container_resource_requests{resource=\"cpu\"})) / sum(kube_node_status_capacity{resource=\"cpu\"})",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -703,9 +689,7 @@
       "decimals": null,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
+        "defaults": {},
         "overrides": []
       },
       "format": "percent",
@@ -762,7 +746,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "100*(sum(kube_node_status_allocatable_memory_bytes) - sum(kube_pod_container_resource_requests_memory_bytes)\r)/sum(kube_node_status_allocatable_memory_bytes)",
+          "expr": "100*(sum(kube_node_status_capacity{resource=\"memory\"}) - sum(kube_pod_container_resource_requests{resource=\"memory\"})\r)/sum(kube_node_status_capacity{resource=\"memory\"})",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -798,9 +782,7 @@
       "decimals": null,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
+        "defaults": {},
         "overrides": []
       },
       "format": "percent",
@@ -857,7 +839,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "100 * (sum(kube_node_status_allocatable_pods) - sum(kubelet_running_pods)) / sum(kube_node_status_allocatable_pods{})",
+          "expr": "100 * (sum(kube_node_status_capacity{resource=\"pods\"}) - sum(kubelet_running_pods)) / sum(kube_node_status_capacity{resource=\"pods\"})",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -885,14 +867,12 @@
       "datasource": null,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
+        "defaults": {},
         "overrides": []
       },
       "fontSize": "100%",
       "gridPos": {
-        "h": 13,
+        "h": 8,
         "w": 15,
         "x": 0,
         "y": 6
@@ -1035,7 +1015,7 @@
       ],
       "targets": [
         {
-          "expr": "sum(kube_pod_container_resource_requests_cpu_cores) by (namespace)",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\"}) by (namespace)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -1045,7 +1025,7 @@
           "refId": "C"
         },
         {
-          "expr": "sum(kube_node_status_allocatable_cpu_cores)",
+          "expr": "sum(kube_node_status_capacity{resource=\"cpu\"})",
           "format": "table",
           "hide": true,
           "instant": true,
@@ -1055,7 +1035,7 @@
           "refId": "E"
         },
         {
-          "expr": "sum(kube_pod_container_resource_requests_memory_bytes) by (namespace)",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\"}) by (namespace)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -1065,7 +1045,7 @@
           "refId": "D"
         },
         {
-          "expr": "sum(kube_node_status_allocatable_memory_bytes)",
+          "expr": "sum(kube_node_status_capacity{resource=\"memory\"})",
           "format": "table",
           "hide": true,
           "instant": true,
@@ -1106,24 +1086,22 @@
       "datasource": null,
       "description": "",
       "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
+        "defaults": {},
         "overrides": []
       },
       "fontSize": "100%",
       "gridPos": {
-        "h": 19,
+        "h": 16,
         "w": 15,
         "x": 0,
-        "y": 19
+        "y": 14
       },
       "id": 13,
       "pageSize": null,
       "showHeader": true,
       "sort": {
         "col": 1,
-        "desc": false
+        "desc": true
       },
       "styles": [
         {
@@ -1135,7 +1113,7 @@
           "type": "hidden"
         },
         {
-          "alias": "Pods Count",
+          "alias": "Pods",
           "align": "auto",
           "colorMode": null,
           "colors": [
@@ -1239,16 +1217,17 @@
       ],
       "targets": [
         {
-          "expr": "sum(kubelet_running_pod_count{job=\"kubelet\", metrics_path=\"/metrics\"}) by (node)",
+          "exemplar": true,
+          "expr": "count by (node) (kube_pod_info)",
           "format": "table",
           "instant": true,
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "Pod Count",
+          "legendFormat": "Pods",
           "refId": "A"
         },
         {
-          "expr": "sum(kube_node_status_allocatable_pods{}) by (node)",
+          "expr": "sum(kube_node_status_capacity{resource=\"pods\"}) by (node)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -1258,7 +1237,8 @@
           "refId": "B"
         },
         {
-          "expr": "sum(kube_pod_container_resource_requests_cpu_cores{})\r by (node)",
+          "exemplar": true,
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\"})\r by (node)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -1268,7 +1248,7 @@
           "refId": "C"
         },
         {
-          "expr": "sum(kube_node_status_allocatable_cpu_cores{}) by (node)",
+          "expr": "sum(kube_node_status_capacity{resource=\"cpu\"}) by (node)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -1277,7 +1257,7 @@
           "refId": "D"
         },
         {
-          "expr": "sum(kube_pod_container_resource_requests_memory_bytes{}) by (node)",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\"}) by (node)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -1286,7 +1266,7 @@
           "refId": "E"
         },
         {
-          "expr": "sum(kube_node_status_allocatable_memory_bytes{}) by (node)",
+          "expr": "sum(kube_node_status_capacity{resource=\"memory\"}) by (node)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -1302,8 +1282,8 @@
       "type": "table-old"
     }
   ],
-  "refresh": false,
-  "schemaVersion": 26,
+  "refresh": "1m",
+  "schemaVersion": 27,
   "style": "dark",
   "tags": [
     "kubernetes-cluster",
@@ -1317,6 +1297,8 @@
           "text": "Prometheus",
           "value": "Prometheus"
         },
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": null,
@@ -1332,7 +1314,7 @@
     ]
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {
@@ -1362,5 +1344,5 @@
   "timezone": "",
   "title": "Perf / Kubernetes Headroom",
   "uid": "DTe_wTSMz",
-  "version": 1
+  "version": 5
 }

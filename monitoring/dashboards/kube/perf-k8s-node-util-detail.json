@@ -1,31 +1,4 @@
 {
-  "__inputs": [],
-  "__requires": [
-    {
-      "type": "panel",
-      "id": "gauge",
-      "name": "Gauge",
-      "version": ""
-    },
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "7.1.3"
-    },
-    {
-      "type": "panel",
-      "id": "graph",
-      "name": "Graph",
-      "version": ""
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -42,8 +15,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": null,
-  "iteration": 1597076454386,
+  "id": 49,
+  "iteration": 1631718621608,
   "links": [],
   "panels": [
     {
@@ -55,7 +28,6 @@
       "description": "These percentages sum up to 100% max. So, it is a graph of CPU utilization per core as a % contribution to total cpu. I'd prefer to multiply each by # cpu on the node so its a graph of % util of each cpu (i.e. one cpu line could max at 100% and sum of all would max to N*%100 for N cpu total)  ",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -85,8 +57,11 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.3",
+      "pluginVersion": "7.5.4",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -156,7 +131,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -186,8 +160,11 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.3",
+      "pluginVersion": "7.5.4",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -273,7 +250,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [
             {
               "id": 0,
@@ -285,7 +261,6 @@
           ],
           "max": 100,
           "min": 0,
-          "nullValueMode": "connected",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -327,12 +302,13 @@
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "text": {}
       },
-      "pluginVersion": "7.1.3",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
-          "expr": "100* (\n  instance:node_cpu_utilisation:rate1m{job=\"node-exporter\", instance=~\"$instance\"}\n  * instance:node_num_cpu:sum{job=\"node-exporter\", instance=~\"$instance\"}\n/ ignoring (instance) group_left\n  sum without (instance) (instance:node_num_cpu:sum{job=\"node-exporter\", instance=~\"$instance\"})\n)\n",
+          "expr": "100* (\n  instance:node_cpu_utilisation:rate5m{job=\"node-exporter\", nodename=\"$Node\"}\n  / instance:node_num_cpu:sum{job=\"node-exporter\", nodename=\"$Node\"})\n",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -351,7 +327,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -381,8 +356,11 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.3",
+      "pluginVersion": "7.5.4",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -467,7 +445,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [
             {
               "id": 0,
@@ -479,7 +456,6 @@
           ],
           "max": 100,
           "min": 0,
-          "nullValueMode": "connected",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -521,9 +497,10 @@
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "text": {}
       },
-      "pluginVersion": "7.1.3",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
           "expr": "100 -\n(\n  node_memory_MemAvailable_bytes{job=\"node-exporter\", instance=\"$instance\"}\n/\n  node_memory_MemTotal_bytes{job=\"node-exporter\", instance=\"$instance\"}\n* 100\n)\n",
@@ -545,7 +522,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -553,7 +529,7 @@
       "fill": 1,
       "fillGradient": 5,
       "gridPos": {
-        "h": 7,
+        "h": 10,
         "w": 12,
         "x": 0,
         "y": 14
@@ -561,22 +537,27 @@
       "hiddenSeries": false,
       "id": 6,
       "legend": {
-        "alignAsTable": false,
-        "avg": false,
+        "alignAsTable": true,
+        "avg": true,
         "current": false,
-        "max": false,
-        "min": false,
+        "max": true,
+        "min": true,
         "rightSide": false,
         "show": true,
+        "sort": "max",
+        "sortDesc": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.3",
+      "pluginVersion": "7.5.4",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -669,7 +650,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -677,7 +657,7 @@
       "fill": 1,
       "fillGradient": 1,
       "gridPos": {
-        "h": 7,
+        "h": 10,
         "w": 12,
         "x": 12,
         "y": 14
@@ -699,8 +679,11 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.3",
+      "pluginVersion": "7.5.4",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -720,8 +703,10 @@
       "steppedLine": false,
       "targets": [
         {
+          "exemplar": true,
           "expr": "sum(\n  max by (device) (\n    node_filesystem_size_bytes{job=\"node-exporter\", instance=\"$instance\", fstype!=\"\"}\n  -\n    node_filesystem_avail_bytes{job=\"node-exporter\", instance=\"$instance\", fstype!=\"\"}\n  )\n)\n",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 2,
           "legendFormat": "used",
           "refId": "A"
@@ -783,7 +768,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -794,7 +778,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 21
+        "y": 24
       },
       "hiddenSeries": false,
       "id": 8,
@@ -813,8 +797,11 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.3",
+      "pluginVersion": "7.5.4",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -882,7 +869,6 @@
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "links": []
         },
         "overrides": []
@@ -893,7 +879,7 @@
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 21
+        "y": 24
       },
       "hiddenSeries": false,
       "id": 9,
@@ -912,8 +898,11 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
-      "pluginVersion": "7.1.3",
+      "pluginVersion": "7.5.4",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -974,8 +963,8 @@
       }
     }
   ],
-  "refresh": "",
-  "schemaVersion": 26,
+  "refresh": false,
+  "schemaVersion": 27,
   "style": "dark",
   "tags": [
     "kubernetes-cluster"
@@ -988,6 +977,8 @@
           "text": "Prometheus",
           "value": "Prometheus"
         },
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": null,
@@ -1002,16 +993,25 @@
       },
       {
         "allValue": ".*",
-        "current": {},
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": "$datasource",
         "definition": "label_values(kube_node_labels,label_workload_sas_com_class)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Node Class",
         "multi": false,
         "name": "NodeClass",
         "options": [],
-        "query": "label_values(kube_node_labels,label_workload_sas_com_class)",
+        "query": {
+          "query": "label_values(kube_node_labels,label_workload_sas_com_class)",
+          "refId": "Prometheus-NodeClass-Variable-Query"
+        },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -1024,16 +1024,25 @@
       },
       {
         "allValue": null,
-        "current": {},
+        "current": {
+          "selected": false,
+          "text": "jpmccas11.unx.sas.com",
+          "value": "jpmccas11.unx.sas.com"
+        },
         "datasource": "$datasource",
         "definition": "label_values(kube_node_labels{label_workload_sas_com_class=~\"$NodeClass\"},node)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "",
         "multi": false,
         "name": "Node",
         "options": [],
-        "query": "label_values(kube_node_labels{label_workload_sas_com_class=~\"$NodeClass\"},node)",
+        "query": {
+          "query": "label_values(kube_node_labels{label_workload_sas_com_class=~\"$NodeClass\"},node)",
+          "refId": "Prometheus-Node-Variable-Query"
+        },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -1046,16 +1055,25 @@
       },
       {
         "allValue": null,
-        "current": {},
+        "current": {
+          "selected": false,
+          "text": "10.124.87.17:9110",
+          "value": "10.124.87.17:9110"
+        },
         "datasource": "$datasource",
         "definition": "label_values(node_uname_info{nodename=~\"(?i:($Node))\"}, instance)",
+        "description": null,
+        "error": null,
         "hide": 2,
         "includeAll": false,
         "label": null,
         "multi": false,
         "name": "instance",
         "options": [],
-        "query": "label_values(node_uname_info{nodename=~\"(?i:($Node))\"}, instance)",
+        "query": {
+          "query": "label_values(node_uname_info{nodename=~\"(?i:($Node))\"}, instance)",
+          "refId": "Prometheus-instance-Variable-Query"
+        },
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -1100,5 +1118,8 @@
   "timezone": "",
   "title": "Perf / Node Utilization Detail",
   "uid": "2538aTSMz",
-  "version": 1
+  "variables": {
+    "list": []
+  },
+  "version": 7
 }
