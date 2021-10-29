@@ -166,8 +166,6 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
       fi
    fi
 
-   set -e
-
 else
    # Importing content into Global tenant for continuity, to be removed in future
    log_debug "Deploying content into Global tenant (multi-tenancy NOT enabled)"
