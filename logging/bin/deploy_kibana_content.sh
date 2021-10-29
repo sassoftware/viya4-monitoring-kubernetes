@@ -138,9 +138,7 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    if ! kibana_tenant_exists "cluster_admins"; then
       create_kibana_tenant "cluster_admins" "Kibana tenant space for Cluster Administrators"
       rc=$?
-      if [ "$rc" == "0" ]; then
-         log_info "Created the Kibana tenant space [cluster_admins]."
-      else
+      if [ "$rc" != "0" ]; then
          log_error "Problems were encountered while attempting to create tenant space [cluster_admins]."
          exit 1
       fi
@@ -153,6 +151,20 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    ./logging/bin/import_kibana_content.sh logging/kibana/cluster_admins  cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/namespace       cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/tenant          cluster_admins
+
+
+   # delete "demo" Kibana tenant space created (but not used) prior to version 1.1.0
+   if kibana_tenant_exists "admin_tenant"; then
+
+      delete_kibana_tenant "admin_tenant"
+
+      rc=$?
+      if [ "$rc" == "0" ]; then
+         log_debug "The Kibana tenant space [admin_tenant] was deleted."
+      else
+         log_debug "Problems were encountered while attempting to delete tenant space [admin_tenant]."
+      fi
+   fi
 
    set -e
 
