@@ -91,7 +91,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum (container_memory_working_set_bytes{node=~\"^$Node$\",pod=~\"^$Deployment.*$\"}) / sum (machine_memory_bytes{node=~\"^$Node$\"}) * 100",
+          "expr": "sum (container_memory_working_set_bytes{node=~\"^$Node$\",pod=~\"^$Deployment.*$\"}) / sum (kube_node_status_capacity{resource=\"memory\",node=~\"^$Node$\"}) * 100",
           "interval": "10s",
           "intervalFactor": 1,
           "legendFormat": "",
@@ -184,7 +184,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum (rate (container_cpu_usage_seconds_total{node=~\"^$Node$\",pod=~\"^$Deployment.*$\"}[1m])) / sum (machine_cpu_cores{node=~\"^$Node$\"}) * 100",
+          "expr": "sum (rate (container_cpu_usage_seconds_total{node=~\"^$Node$\",pod=~\"^$Deployment.*$\"}[1m])) / sum (kube_node_status_capacity{resource=\"cpu\",node=~\"^$Node$\"}) * 100",
           "interval": "10s",
           "intervalFactor": 1,
           "legendFormat": "",
@@ -458,7 +458,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum (machine_memory_bytes{node=~\"^$Node$\"})",
+          "expr": "sum (kube_node_status_capacity{resource=\"memory\",node=~\"^$Node$\"})",
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "",
@@ -642,7 +642,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum (machine_cpu_cores{node=~\"^$Node$\"})",
+          "expr": "sum (kube_node_status_capacity{resource=\"cpu\",node=~\"^$Node$\"})",
           "intervalFactor": 2,
           "refId": "A",
           "step": 40
