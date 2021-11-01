@@ -86,10 +86,10 @@ other than the logging namespace.
 kubectl delete psp v4m-es-psp
 ```
 
-## Issue: Deployment does not complete if Elastisearch/Kibana is not reachable from the deployment machine
+## Issue: Deployment does not complete if Kibana is not reachable from the deployment machine
 
 ### Description
-The deployment scripts fails during the "Configuring Kibana" step of the process with messages like the following:
+The deployment fails during the "Configuring Kibana" step of the process with messages like the following:
 ```
 INFO STEP 4: Configuring Kibana
 INFO Configuring Kibana
