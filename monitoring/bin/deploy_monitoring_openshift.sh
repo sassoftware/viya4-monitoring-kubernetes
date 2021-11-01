@@ -65,7 +65,7 @@ if [ "$grafanaToken" == "" ]; then
   exit 1
 fi
 
-log_info "Deploying Grafana..."
+log_info "Deploying monitoring components for OpenShift..."
 userGrafanaYAML=$TMP_DIR/empty.yaml
 if [ -f "$USER_DIR/monitoring/user-values-openshift-grafana.yaml" ]; then
   userGrafanaYAML="$USER_DIR/monitoring/user-values-openshift-grafana.yaml"

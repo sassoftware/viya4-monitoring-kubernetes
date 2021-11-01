@@ -99,7 +99,7 @@ kubectl create secret generic \
   --from-file cluster-federate-job=$tenantDir/mt-federate-secret.yaml
 
 if [ "$TLS_ENABLE" == "true" ]; then
-  apps=( prometheus-$VIYA_TENANT grafana-$VIYA_TENANT )
+  apps=( v4m-prometheus-$VIYA_TENANT v4m-grafana-$VIYA_TENANT )
   create_tls_certs $VIYA_NS monitoring ${apps[@]}
 fi
 
@@ -123,7 +123,7 @@ kubectl create secret generic -n $VIYA_NS grafana-datasource-$VIYA_TENANT --from
 kubectl label secret -n $VIYA_NS grafana-datasource-$VIYA_TENANT grafana_datasource-$VIYA_TENANT=1
 
 # Grafana
-if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS; then
+if helm3ReleaseExists v4m-grafana-$VIYA_TENANT $VIYA_NS; then
   log_info "Upgrading Grafana via Helm...($(date) - timeout 10m)"
 else
   grafanaPwd="$GRAFANA_ADMIN_PASSWORD"
@@ -149,35 +149,8 @@ helm upgrade --install $helmDebug \
   --atomic \
   --timeout "10m" \
   $extraArgs \
-  grafana-$VIYA_TENANT \
+  v4m-grafana-$VIYA_TENANT \
   grafana/grafana
-
-# Deploy Grafana route (OpenShift only)
-if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
-  if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
-    routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-$VIYA_NS.$OPENSHIFT_ROUTE_DOMAIN}
-  else
-    routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-grafana-$VIYA_TENANT-$VIYA_NS.$OPENSHIFT_ROUTE_DOMAIN}
-  fi
-
-  if ! kubectl get route -n $VIYA_NS v4m-grafana-$VIYA_TENANT 1>/dev/null 2>&1; then
-    log_info "Exposing Grafana service as a route..."
-    if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
-      log_debug "Creating path-based OpenShift route for v4m-grafana-$VIYA_TENANT"
-      oc create route reencrypt \
-        -n $VIYA_NS \
-        --service v4m-grafana-$VIYA_TENANT \
-        --hostname "$routeHost" \
-        --path $OPENSHIFT_ROUTE_PATH_GRAFANA
-    else
-      log_debug "Creating host-based OpenShift route for v4m-grafana-$VIYA_TENANT"
-      oc create route reencrypt \
-        -n $VIYA_NS \
-        --service v4m-grafana-$VIYA_TENANT \
-        --hostname "$routeHost"
-    fi
-  fi
-fi
 
 # Deploy ServiceMonitors
 kubectl apply -n $VIYA_NS -f $tenantDir/serviceMonitor-sas-cas-tenant.yaml

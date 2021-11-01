@@ -1,5 +1,5 @@
 image:
-  tag: "7.5.4"
+  tag: "8.2.1"
 readinessProbe: null
 livenessProbe: null
 sidecar:

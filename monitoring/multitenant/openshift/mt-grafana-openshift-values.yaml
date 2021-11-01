@@ -5,10 +5,10 @@ livenessProbe: null
 sidecar:
   dashboards:
     enabled: true
-    label: grafana_dashboard
+    label: grafana_dashboard-__TENANT__
   datasources:
     enabled: true
-    label: grafana_datasource
+    label: grafana_datasource-__TENANT__
 deploymentStrategy:
   type: Recreate
 persistence:
@@ -21,34 +21,18 @@ persistence:
   accessModes:
     - ReadWriteOnce
   size: 5Gi
-datasources:
-  datasources.yaml:
-    apiVersion: 1
-    datasources:
-    # OpenShift Thanos querier allows access to both cluster
-    # and user workload monitoring
-    - access: proxy
-      editable: false
-      isDefault: true
-      jsonData:
-        httpHeaderName1: 'Authorization'
-        timeInterval: 5s
-        tlsSkipVerify: true
-      name: Prometheus
-      secureJsonData:
-        # This BEARER_TOKEN will be replaced with a token for grafana-serviceaccount
-        httpHeaderValue1: 'Bearer __BEARER_TOKEN__'
-      type: prometheus
-      url: 'https://thanos-querier.openshift-monitoring.svc.cluster.local:9091'
 initChownData:
   enabled: false
 # Set to null to disable securityContext for OpenShift
 securityContext: null
+service:
+  enabled: false
 serviceAccount:
   # Service account created prior to helm install since the token is needed
   # above in the datasource configuration
-  create: false
-  name: grafana-serviceaccount
+  name: grafana-serviceaccount-__TENANT__
+serviceMonitor:
+  enabled: true
 testFramework:
   enabled: false
 "grafana.ini":
@@ -56,7 +40,7 @@ testFramework:
     http_addr: 0.0.0.0
     http_port: 3000
   dashboards:
-    default_home_dashboard_path: /tmp/dashboards/viya-welcome-dashboard.json
+    default_home_dashboard_path: /tmp/dashboards/cas-dashboard.json
   analytics:
     check_for_updates: false
   log:
