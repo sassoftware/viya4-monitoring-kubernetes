@@ -176,8 +176,6 @@ function add_ism_template {
          log_debug "Index policy [$policy_name] deleted [$response]."
       fi
 
-
-
       #load revised policy
       response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/$policy_name"  -H 'Content-Type: application/json' -d "@$TMP_DIR/ism_policy_patch.json" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
       if [[ $response != 2* ]]; then
@@ -192,7 +190,6 @@ function add_ism_template {
       return
    fi
 }
-
 
 
 LOG_RETENTION_PERIOD="${LOG_RETENTION_PERIOD:-3}"
@@ -210,7 +207,7 @@ else
    log_info "Ingest pipeline definition loaded into Elasticsearch [$response]"
 fi
 
-# Link index management policy and Ingest Pipeline to Index Template
+# Configure index template settings and link Ingest Pipeline to Index Template
 response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-logs-template "    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_logs.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 # request returns: {"acknowledged":true}
 if [[ $response != 2* ]]; then
