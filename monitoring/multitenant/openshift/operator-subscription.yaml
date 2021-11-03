@@ -1,0 +1,10 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: v4m-prometheus-operator
+  namespace: __TENANT_NS__
+spec:
+  channel: beta
+  name: prometheus
+  source: community-operators 
+  sourceNamespace: openshift-marketplace

@@ -66,7 +66,7 @@ spec:
       - name: secret-grafana-proxy
         secret:
           defaultMode: 420
-          secretName: grafana-proxy-__TENANT__
+          secretName: grafana-proxy
       - name: grafana-trusted-ca-bundle
         configMap:
           defaultMode: 420
@@ -75,5 +75,5 @@ spec:
           - key: ca-bundle.crt
             path: tls-ca-bundle.pem
           # name: kube-root-ca.crt
-          name: grafana-trusted-ca-bundle-__TENANT__
+          name: trusted-ca-bundle-__TENANT__
           optional: true

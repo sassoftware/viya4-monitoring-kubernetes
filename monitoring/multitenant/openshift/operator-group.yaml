@@ -1,0 +1,8 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: __TENANT__
+  namespace: __TENANT_NS__
+spec:
+  targetNamespaces:
+  - __TENANT_NS__

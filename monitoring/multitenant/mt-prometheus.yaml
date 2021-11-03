@@ -43,7 +43,7 @@ metadata:
   name: v4m-prometheus-__TENANT__
 spec:
   additionalScrapeConfigs:
-    name: v4m-prometheus-federate-__TENANT__
+    name: prometheus-federate-__TENANT__
     key: cluster-federate-job
   image: quay.io/prometheus/prometheus:v2.30.3
   enableAdminAPI: false

@@ -25,12 +25,12 @@ initChownData:
   enabled: false
 # Set to null to disable securityContext for OpenShift
 securityContext: null
-service:
-  enabled: false
+# service:
+#   enabled: false
 serviceAccount:
   # Service account created prior to helm install since the token is needed
   # above in the datasource configuration
-  name: grafana-serviceaccount-__TENANT__
+  create: false
 serviceMonitor:
   enabled: true
 testFramework:

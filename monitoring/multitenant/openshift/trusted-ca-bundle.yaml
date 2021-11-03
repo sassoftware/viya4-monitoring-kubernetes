@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   labels:
     config.openshift.io/inject-trusted-cabundle: "true"
-  name: grafana-trusted-ca-bundle-__TENANT__
+  name: trusted-ca-bundle-__TENANT__

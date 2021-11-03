@@ -7,4 +7,4 @@
       jsonData:
         tlsSkipVerify: true
       editable: true
-      url: https://prometheus-__TENANT__
+      url: https://prometheus-__TENANT__:9191

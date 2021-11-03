@@ -57,6 +57,10 @@ fi
 set -e
 log_notice "Deploying OpenShift tenant monitoring to the [$VIYA_NS] namespace..."
 
+log_info "Deploying Prometheus Operator to the $VIYA_TENANT namespace..."
+oc apply -f $tenantDir/openshift/operator-group.yaml
+oc apply -f $tenantDir/openshift/operator-subscription.yaml
+
 log_info "Enabling Grafana to access OpenShift Prometheus instances..."
 if [ -z "$(kubectl get serviceAccount -n $VIYA_NS grafana-serviceaccount-$VIYA_TENANT -o name 2>/dev/null)" ]; then
   log_info "Creating [$VIYA_TENANT] tenant Grafana serviceAccount..."
@@ -78,10 +82,19 @@ helm repo update
 
 log_info "Deploying [$VIYA_TENANT] tenant monitoring components for OpenShift..."
 
+# Deploy additional scrape configs for Prometheus
+log_info "Configuring secret for Prometheus federation"
+kubectl delete secret --ignore-not-found -n $VIYA_NS prometheus-federate-$VIYA_TENANT
+kubectl create secret generic \
+  -n $VIYA_NS \
+  prometheus-federate-$VIYA_TENANT \
+  --from-file cluster-federate-job=$tenantDir/openshift/mt-federate-secret-openshift.yaml
+
 # Deploy Prometheus
 log_info "Deploying Prometheus..."
-kubectl apply -n $VIYA_NS -f $tenantDir/mt-prometheus-common.yaml
-kubectl apply -n $VIYA_NS -f $tenantDir/tls/mt-prometheus-tls.yaml
+kubectl apply -n $VIYA_NS -f $tenantDir/openshift/mt-prometheus-openshift.yaml
+# kubectl apply -n $VIYA_NS -f $tenantDir/mt-prometheus-common.yaml
+# kubectl apply -n $VIYA_NS -f $tenantDir/tls/mt-prometheus-tls.yaml
 
 # Deploy Prometheus Grafana datasource
 grafanaDatasource=$tenantDir/tls/grafana-datasource-tenant-tls.yaml
@@ -110,12 +123,15 @@ fi
 
 OPENSHIFT_AUTH_ENABLE=${OPENSHIFT_AUTH_ENABLE:-true}
 if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
+  log_debug "Enabling OpenShift Authentication for Grafana"
   grafanaAuthYAML="monitoring/openshift/grafana-proxy-values.yaml"
   extraArgs="--set service.targetPort=3001"
 else
   grafanaAuthYAML="$tenantDir/openshift/mt-grafana-tls-only-values.yaml"
   log_debug "Creating the Grafana service to generate TLS certs..."
   kubectl apply -n $VIYA_NS -f $tenantDir/openshift/v4m-grafana-tenant-svc.yaml
+  log_debug "Creating the Prometheus service to generate TLS certs..."
+  kubectl apply -n $VIYA_NS -f $tenantDir/openshift/v4m-prometheus-tenant-svc.yaml
   log_debug "Sleeping 5 sec..."
   sleep 5
 fi
@@ -133,14 +149,6 @@ else
   log_debug "Workload node placement support is disabled"
   wnpValuesFile="$TMP_DIR/empty.yaml"
 fi
-
-# Deploy additional scrape configs for Prometheus
-log_info "Configuring secret for Prometheus federation"
-kubectl delete secret --ignore-not-found -n $VIYA_NS prometheus-federate-$VIYA_TENANT
-kubectl create secret generic \
-  -n $VIYA_NS \
-  prometheus-federate-$VIYA_TENANT \
-  --from-file cluster-federate-job=$tenantDir/mt-federate-secret.yaml
 
 if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
   OPENSHIFT_ROUTE_PATH_GRAFANA=${OPENSHIFT_ROUTE_PATH_GRAFANA:-/grafana}
@@ -185,26 +193,27 @@ if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
 
   kubectl apply -f $crbYAML
 
+  kubectl apply -n $VIYA_NS -f monitoring/openshift/prometheus-proxy-secret.yaml
   kubectl apply -n $VIYA_NS -f monitoring/openshift/grafana-proxy-secret.yaml
   
   grafanaProxyPatchYAML=$TMP_DIR/grafana-proxy-patch.yaml
 
   if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
     log_debug "Using path-based version of the OpenShift Grafana proxy patch"
-    cp monitoring/openshift/grafana-proxy-patch-path.yaml $grafanaProxyPatchYAML
+    cp $tenantDir/openshift/grafana-proxy-patch-tenant-path.yaml $grafanaProxyPatchYAML
   else
     log_debug "Using host-based version of the OpenShift Grafana proxy patch"
-    cp monitoring/openshift/grafana-proxy-patch-host.yaml $grafanaProxyPatchYAML
+    cp $tenantDir/openshift/grafana-proxy-patch-tenant-host.yaml $grafanaProxyPatchYAML
   fi
     
   log_debug "Deploying CA bundle..."
-  kubectl apply -n $VIYA_NS -f $tenantDir/openshift/grafana-trusted-ca-bundle.yaml
+  kubectl apply -n $VIYA_NS -f $tenantDir/openshift/trusted-ca-bundle.yaml
   
   log_info "Patching Grafana service for auto-generated TLS certs"
-  kubectl annotate service -n $VIYA_NS --overwrite v4m-grafana "service.beta.openshift.io/serving-cert-secret-name=grafana-tls-$VIYA_TENANT"
+  kubectl annotate service -n $VIYA_NS --overwrite v4m-grafana-$VIYA_TENANT "service.beta.openshift.io/serving-cert-secret-name=grafana-tls-$VIYA_TENANT"
 
   log_info "Patching Grafana pod with authenticating TLS proxy..."
-  kubectl patch deployment -n $VIYA_NS v4m-grafana --patch "$(cat $grafanaProxyPatchYAML)"
+  kubectl patch deployment -n $VIYA_NS v4m-grafana-$VIYA_TENANT --patch "$(cat $grafanaProxyPatchYAML)"
 else
   log_info "Using native Grafana authentication"
 fi
