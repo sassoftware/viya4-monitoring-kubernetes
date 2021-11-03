@@ -132,7 +132,7 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    # clobbering post-deployment changes made via Kibana).
 
    # get Security API URL
-   get_sec_api_url 
+   get_sec_api_url
 
    # Create cluster_admins Kibana tenant space (if it doesn't exist)
    if ! kibana_tenant_exists "cluster_admins"; then
@@ -146,8 +146,8 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
       log_debug "The Kibana tenant space [cluster_admins] exists."
    fi
 
-   #Migrating from ODFE 1.7.0 to ODFE 1.13.2
-   if [ "$ODFE_UPGRADE_IN_PROGRESS" == "true" ]; then
+   #Migrating from ODFE 1.7.0 to ODFE 1.13.2 (file should only exist during migration)
+   if [ -f "$KB_GLOBAL_EXPORT_FILE" ]; then
 
       # delete "demo" Kibana tenant space created (but not used) prior to version 1.1.0
       if kibana_tenant_exists "admin_tenant"; then
@@ -162,29 +162,23 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
          fi
       fi
 
-      #Confirm cached content file exists?
-      if [ -f "$KB_GLOBAL_EXPORT_FILE" ]; then
-         log_info "Will attempt to migrate Kibana content from previous deployment."
+      log_info "Will attempt to migrate Kibana content from previous deployment."
 
-         kb_migrate_response="$TMP_DIR/kb_migrate_response.json"
+      kb_migrate_response="$TMP_DIR/kb_migrate_response.json"
 
-         #import previously exported content from global tenant
-         response=$(curl -s -o $kb_migrate_response  -w  "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_import?overwrite=false" -H "kbn-xsrf: true"  -H 'securitytenant: cluster_admins'  --form file="@$KB_GLOBAL_EXPORT_FILE"  -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
+      #import previously exported content from global tenant
+      response=$(curl -s -o $kb_migrate_response  -w  "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_import?overwrite=false" -H "kbn-xsrf: true"  -H 'securitytenant: cluster_admins'  --form file="@$KB_GLOBAL_EXPORT_FILE"  -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
 
-         if [[ $response != 2* ]]; then
-            log_warn "There was an issue importing the cached existing Kibana content into the Kibana tenant space [cluster_admins]. [$response]"
-            log_debug "Failed response details: $(tail -n1 $kb_migrate_response)"
-            #TODO: Exit here?  Display messages as shown?  Add BIG MESSAGE about potential loss of content?
-         else
-            log_info "Existing Kibana imported to [cluster_admins] Kibana tenant space. [$response]"
-            log_debug "Import details: $(tail -n1 $kb_migrate_response)"
-         fi
-
-         # TODO: Confirm file exists?
-         # TODO: Confirm success?  But what do we do if not successful?
+      if [[ $response != 2* ]]; then
+         log_warn "There was an issue importing the cached existing Kibana content into the Kibana tenant space [cluster_admins]. [$response]"
+         log_debug "Failed response details: $(tail -n1 $kb_migrate_response)"
+         #TODO: Exit here?  Display messages as shown?  Add BIG MESSAGE about potential loss of content?
       else
-         log_info "No cached existing Kibana content found to be loaded [$KB_GLOBAL_EXPORT_FILE]."
+         log_info "Existing Kibana imported to [cluster_admins] Kibana tenant space. [$response]"
+         log_debug "Import details: $(tail -n1 $kb_migrate_response)"
       fi
+
+      # TODO: Confirm success?  But what do we do if not successful?
    else
       log_debug "Migration from ODFE 1.7.0 to ODFE 1.13.2 *NOT* detected"
    fi
@@ -195,8 +189,7 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    ./logging/bin/import_kibana_content.sh logging/kibana/namespace       cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/tenant          cluster_admins
 
-
-   # delete "demo" Kibana tenant space created (but not used) prior to version 1.1.0
+   # delete "demo" Kibana tenant space created (but not used) prior to v4m version 1.1.0
    if kibana_tenant_exists "admin_tenant"; then
 
       delete_kibana_tenant "admin_tenant"
@@ -208,7 +201,6 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
          log_debug "Problems were encountered while attempting to delete tenant space [admin_tenant]."
       fi
    fi
-
 else
    # Importing content into Global tenant for continuity, to be removed in future
    log_debug "Deploying content into Global tenant (multi-tenancy NOT enabled)"

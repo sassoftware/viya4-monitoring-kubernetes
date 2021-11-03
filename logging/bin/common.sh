@@ -33,9 +33,7 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     export V4M_FEATURE_MULTITENANT_ENABLE=${V4M_FEATURE_MULTITENANT_ENABLE:-true}
 
     #Environment vars related to upgrading ODFE 1.7.0 to ODFE 1.13.2
-    #ODFE_UPGRADE_IN_PROGRESS will be set to 'true' by deploy_elasticsearch_open.sh if needed
-    ODFE_UPGRADE_IN_PROGRESS=${ODFE_UPGRADE_IN_PROGRESS:-false}
-    KB_GLOBAL_EXPORT_FILE=${KB_GLOBAL_EXPORT_FILE:-"$TMP_DIR/kibana_global_content.ndjson"}
+    export KB_GLOBAL_EXPORT_FILE=${KB_GLOBAL_EXPORT_FILE:-"$TMP_DIR/kibana_global_content.ndjson"}
 fi
 echo ""
 

@@ -124,9 +124,6 @@ if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
       # Prior to 1.1.0 we used ODFE 1.7.0
       log_info "Migrating from Open Distro for Elasticsearch 1.7.0"
 
-      #set existing flag to indicate upgrade in progress
-      ODFE_UPGRADE_IN_PROGRESS="true"
-
       #export exisiting content from global tenant
       #KB_GLOBAL_EXPORT_FILE="$TMP_DIR/kibana_global_content.ndjson"
 
