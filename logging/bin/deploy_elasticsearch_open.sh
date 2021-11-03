@@ -7,6 +7,7 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 source bin/tls-include.sh
+source logging/bin/apiaccess-include.sh
 
 this_script=`basename "$0"`
 
@@ -116,6 +117,37 @@ helm2ReleaseCheck odfe-$LOG_NS
 if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
    log_debug "A Helm release [odfe] exists; upgrading the release."
    existingODFE="true"
+
+   #Migrate Kibana content if upgrading from ODFE 1.7.0 to 1.13.2
+   if [ "$(helm -n logging list -o yaml --filter odfe |grep app_version)" == "- app_version: 1.8.0" ]; then
+
+      # Prior to 1.1.0 we used ODFE 1.7.0
+      log_info "Migrating from Open Distro for Elasticsearch 1.7.0"
+
+      #set existing flag to indicate upgrade in progress
+      ODFE_UPGRADE_IN_PROGRESS="true"
+
+      #export exisiting content from global tenant
+      #KB_GLOBAL_EXPORT_FILE="$TMP_DIR/kibana_global_content.ndjson"
+
+      log_debug "Exporting exisiting content from global tenant to temporary file [$KB_GLOBAL_EXPORT_FILE]."
+
+      get_kb_api_url
+
+      content2export='{"type": ["url","visualization", "dashboard", "search", "index-pattern"],"excludeExportDetails": false}'
+
+      response=$(curl -s -o $KB_GLOBAL_EXPORT_FILE  -w  "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_export" -d "$content2export"  -H "kbn-xsrf: true" -H 'Content-Type: application/json' -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
+
+      if [[ $response != 2* ]]; then
+         log_warn "There was an issue exporting the existing content from Kibana [$response]"
+         log_debug "Failed response details: $(tail -n1 $KB_GLOBAL_EXPORT_FILE)"
+         #TODO: Exit here?  Display messages as shown?  Add BIG MESSAGE about potential loss of content?
+      else
+         log_info "Existing Kibana content cached for migration. [$response]"
+         log_debug "Export details: $(tail -n1 $KB_GLOBAL_EXPORT_FILE)"
+      fi
+   fi
+
 
    # Check to see if Nodeport for Elasticsearch API has been enabled
    # If so, Will be re-enabled at end of script

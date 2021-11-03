@@ -8,6 +8,7 @@ source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 source bin/service-url-include.sh
 source logging/bin/apiaccess-include.sh
+source logging/bin/rbac-include.sh
 
 this_script=`basename "$0"`
 
@@ -122,6 +123,73 @@ if [ "$kibanaready" != "TRUE" ]; then
 fi
 
 if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
+
+   set +e  # disable exit on error
+
+   # Need to create cluster_admins Kibana tenant space?
+   # Should only be true during UIP scenario b/c our updated
+   # securityconfig processing is bypassed (to prevent
+   # clobbering post-deployment changes made via Kibana).
+
+   # get Security API URL
+   get_sec_api_url
+
+   # Create cluster_admins Kibana tenant space (if it doesn't exist)
+   if ! kibana_tenant_exists "cluster_admins"; then
+      create_kibana_tenant "cluster_admins" "Kibana tenant space for Cluster Administrators"
+      rc=$?
+      if [ "$rc" != "0" ]; then
+         log_error "Problems were encountered while attempting to create tenant space [cluster_admins]."
+         exit 1
+      fi
+   else
+      log_debug "The Kibana tenant space [cluster_admins] exists."
+   fi
+
+
+   #Migrating from ODFE 1.7.0 to ODFE 1.13.2
+   if [ "$ODFE_UPGRADE_IN_PROGRESS" == "true" ]; then
+
+      # delete "demo" Kibana tenant space created (but not used) prior to version 1.1.0
+      if kibana_tenant_exists "admin_tenant"; then
+
+         delete_kibana_tenant "admin_tenant"
+
+         rc=$?
+         if [ "$rc" == "0" ]; then
+            log_debug "The Kibana tenant space [admin_tenant] was deleted."
+         else
+            log_debug "Problems were encountered while attempting to delete tenant space [admin_tenant]."
+         fi
+      fi
+
+      #Confirm cached content file exists?
+      if [ -f "$KB_GLOBAL_EXPORT_FILE" ]; then
+         log_info "Will attempt to migrate Kibana content from previous deployment."
+
+         kb_migrate_response="$TMP_DIR/kb_migrate_response.json"
+
+         #import previously exported content from global tenant
+         response=$(curl -s -o $kb_migrate_response  -w  "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_import?overwrite=false" -H "kbn-xsrf: true"  -H 'securitytenant: cluster_admins'  --form file="@$KB_GLOBAL_EXPORT_FILE"  -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
+
+         if [[ $response != 2* ]]; then
+            log_warn "There was an issue importing the cached existing Kibana content into the Kibana tenant space [cluster_admins]. [$response]"
+            log_debug "Failed response details: $(tail -n1 $kb_migrate_response)"
+            #TODO: Exit here?  Display messages as shown?  Add BIG MESSAGE about potential loss of content?
+         else
+            log_info "Existing Kibana imported to [cluster_admins] Kibana tenant space. [$response]"
+            log_debug "Import details: $(tail -n1 $kb_migrate_response)"
+         fi
+
+         # TODO: Confirm file exists?
+         # TODO: Confirm success?  But what do we do if not successful?
+      else
+         log_info "No cached existing Kibana content found to be loaded [$KB_GLOBAL_EXPORT_FILE]."
+      fi
+   else
+      log_debug "Migration from ODFE 1.7.0 to ODFE 1.13.2 *NOT* detected"
+   fi
+
    # Import Kibana Searches, Visualizations and Dashboard Objects using curl
    ./logging/bin/import_kibana_content.sh logging/kibana/common          cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/cluster_admins  cluster_admins
