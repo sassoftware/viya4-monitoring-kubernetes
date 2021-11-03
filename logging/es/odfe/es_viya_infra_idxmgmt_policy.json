@@ -1,6 +1,6 @@
 {
     "policy": {
-        "policy_id": "viya-infra-idxmgmt-policy",
+        "policy_id": "viya_infra_idxmgmt_policy",
         "description": "An index management policy for infrastructure log messages.",
         "error_notification": null,
         "default_state": "hot",

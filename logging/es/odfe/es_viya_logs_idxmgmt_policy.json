@@ -1,6 +1,6 @@
 {
     "policy": {
-        "policy_id": "viya-logs-idxmgmt-policy",
+        "policy_id": "viya_logs_idxmgmt_policy",
         "description": "An index management policy for log messages from SAS Viya deployments.",
         "error_notification": null,
         "default_state": "hot",
