@@ -91,7 +91,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum (container_memory_working_set_bytes{node=~\"^$Node$\",pod=~\"^$Deployment.*$\"}) / sum (machine_memory_bytes{node=~\"^$Node$\"}) * 100",
+          "expr": "sum (container_memory_working_set_bytes{node=~\"^$Node$\",pod=~\"^$Deployment.*$\"}) / sum (kube_node_status_capacity{resource=\"memory\",node=~\"^$Node$\"}) * 100",
           "interval": "10s",
           "intervalFactor": 1,
           "legendFormat": "",
@@ -184,7 +184,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum (rate (container_cpu_usage_seconds_total{node=~\"^$Node$\",pod=~\"^$Deployment.*$\"}[1m])) / sum (machine_cpu_cores{node=~\"^$Node$\"}) * 100",
+          "expr": "sum (rate (container_cpu_usage_seconds_total{node=~\"^$Node$\",pod=~\"^$Deployment.*$\"}[1m])) / sum (kube_node_status_capacity{resource=\"cpu\",node=~\"^$Node$\"}) * 100",
           "interval": "10s",
           "intervalFactor": 1,
           "legendFormat": "",
@@ -458,7 +458,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum (machine_memory_bytes{node=~\"^$Node$\"})",
+          "expr": "sum (kube_node_status_capacity{resource=\"memory\",node=~\"^$Node$\"})",
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "",
@@ -642,7 +642,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum (machine_cpu_cores{node=~\"^$Node$\"})",
+          "expr": "sum (kube_node_status_capacity{resource=\"cpu\",node=~\"^$Node$\"})",
           "intervalFactor": 2,
           "refId": "A",
           "step": 40
@@ -900,7 +900,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum (rate (container_cpu_usage_seconds_total{image!=\"\",name=~\"^k8s_.*\",pod=~\"^$Deployment.*$\"}[1m])) by (pod)",
+          "expr": "sum (rate (container_cpu_usage_seconds_total{image!=\"\",pod=~\"^$Deployment.*$\"}[1m])) by (pod)",
           "interval": "10s",
           "intervalFactor": 1,
           "legendFormat": "{{ pod }}",
@@ -1247,7 +1247,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum (container_memory_working_set_bytes{image!=\"\",name=~\"^k8s_.*\",pod=~\"^$Deployment.*$\"}) by (pod)",
+          "expr": "sum (container_memory_working_set_bytes{image!=\"\",pod=~\"^$Deployment.*$\"}) by (pod)",
           "interval": "10s",
           "intervalFactor": 1,
           "legendFormat": "{{ pod }}",
@@ -1463,7 +1463,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum (rate (container_network_receive_bytes_total{image!=\"\",name=~\"^k8s_.*\",pod=~\"^$Deployment.*$\"}[1m])) by (pod)",
+          "expr": "sum (rate (container_network_receive_bytes_total{image!=\"\",pod=~\"^$Deployment.*$\"}[1m])) by (pod)",
           "interval": "10s",
           "intervalFactor": 1,
           "legendFormat": "-> {{ pod }}",
@@ -1472,7 +1472,7 @@
           "step": 10
         },
         {
-          "expr": "- sum (rate (container_network_transmit_bytes_total{image!=\"\",name=~\"^k8s_.*\",pod=~\"^$Deployment.*$\"}[1m])) by (pod)",
+          "expr": "- sum (rate (container_network_transmit_bytes_total{image!=\"\",pod=~\"^$Deployment.*$\"}[1m])) by (pod)",
           "interval": "10s",
           "intervalFactor": 1,
           "legendFormat": "<- {{ pod }}",
@@ -1735,5 +1735,5 @@
   "timezone": "browser",
   "title": "Kubernetes Deployment metrics",
   "uid": "iNUKDXrWk",
-  "version": 1
+  "version": 2
 }

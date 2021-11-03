@@ -132,7 +132,7 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    # clobbering post-deployment changes made via Kibana).
 
    # get Security API URL
-   get_sec_api_url
+   get_sec_api_url 
 
    # Create cluster_admins Kibana tenant space (if it doesn't exist)
    if ! kibana_tenant_exists "cluster_admins"; then
@@ -145,7 +145,6 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    else
       log_debug "The Kibana tenant space [cluster_admins] exists."
    fi
-
 
    #Migrating from ODFE 1.7.0 to ODFE 1.13.2
    if [ "$ODFE_UPGRADE_IN_PROGRESS" == "true" ]; then
@@ -195,6 +194,20 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    ./logging/bin/import_kibana_content.sh logging/kibana/cluster_admins  cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/namespace       cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/tenant          cluster_admins
+
+
+   # delete "demo" Kibana tenant space created (but not used) prior to version 1.1.0
+   if kibana_tenant_exists "admin_tenant"; then
+
+      delete_kibana_tenant "admin_tenant"
+
+      rc=$?
+      if [ "$rc" == "0" ]; then
+         log_debug "The Kibana tenant space [admin_tenant] was deleted."
+      else
+         log_debug "Problems were encountered while attempting to delete tenant space [admin_tenant]."
+      fi
+   fi
 
 else
    # Importing content into Global tenant for continuity, to be removed in future
