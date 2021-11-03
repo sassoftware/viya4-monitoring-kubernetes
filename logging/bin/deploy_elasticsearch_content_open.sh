@@ -143,8 +143,61 @@ function set_retention_period {
    fi
 }
 
+#Patch ODFE 1.7.0 ISM policies to ODFE 1.13.2 format
+function add_ism_template {
+   local policy_name pattern
+
+   #Arguments
+   policy_name=$1                                   # Name of policy
+   pattern=$2                                       # Index pattern to associate with policy
+
+   response=$(curl -s -o $TMP_DIR/ism_policy_patch.json -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/$policy_name" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+   if [[ $response != 2* ]]; then
+      log_debug "No ISM policy [$policy_name] found to patch; moving on.[$response]"
+      return
+   fi
+
+   if [ -n "$(cat $TMP_DIR/ism_policy_patch.json |grep '"ism_template":null')" ]; then
+      log_debug "No ISM Template on policy [$policy_name]; adding one."
+
+      #remove crud returned but not needed
+      sed -i'.bak'  "s/\"_id\":\"${policy_name}\",//;s/\"_version\":[0-9]*,//;s/\"_seq_no\":[0-9]*,//;s/\"_primary_term\":[0-9]*,//" $TMP_DIR/ism_policy_patch.json
+
+      #add ISM_Template to existing ISM policy
+      sed -i'.bak'  "s/\"ism_template\":null/\"ism_template\": {\"index_patterns\": \[\"${pattern}\"\]}/g" $TMP_DIR/ism_policy_patch.json
+
+      #delete exisiting policy
+      response=$(curl -s -o /dev/null   -w "%{http_code}" -XDELETE "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/$policy_name" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+      if [[ $response != 2* ]]; then
+         log_error "Error encountered deleting index management policy [$policy_name] before patching to add ISM template stanza [$response]."
+         log_error "Review the index managment policy [$policy_name] within Kibana to ensure it is properly configured and linked to appropriate indexes [$pattern]."
+         return
+      else
+         log_debug "Index policy [$policy_name] deleted [$response]."
+      fi
+
+
+
+      #load revised policy
+      response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/$policy_name"  -H 'Content-Type: application/json' -d "@$TMP_DIR/ism_policy_patch.json" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+      if [[ $response != 2* ]]; then
+         log_error "Unable to update index management policy [$policy_name] to add a ISM_TEMPLATE stanza [$response]"
+         log_error "Review/create the index managment policy [$policy_name] within Kibana to ensure it is properly configured and linked to appropriate indexes [$pattern]."
+         return
+      else
+         log_info "Index management policy [$policy_name] loaded into Elasticsearch [$response]"
+      fi
+   else
+      log_debug "The policy definition for [$policy_name] already includes an ISM Template stanza; no need to patch."
+      return
+   fi
+}
+
+
+
 LOG_RETENTION_PERIOD="${LOG_RETENTION_PERIOD:-3}"
 set_retention_period viya_logs_idxmgmt_policy LOG_RETENTION_PERIOD
+add_ism_template "viya_logs_idxmgmt_policy" "viya_logs-*"
 
 # Create Ingest Pipeline to "burst" incoming log messages to separate indexes based on namespace
 response=$(curl  -s -o /dev/null -w "%{http_code}"  -XPUT "https://localhost:$TEMP_PORT/_ingest/pipeline/viyaburstns" -H 'Content-Type: application/json' -d @logging/es/es_create_ns_burst_pipeline.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
@@ -173,6 +226,7 @@ fi
 
 OPS_LOG_RETENTION_PERIOD="${OPS_LOG_RETENTION_PERIOD:-1}"
 set_retention_period viya_ops_idxmgmt_policy OPS_LOG_RETENTION_PERIOD
+add_ism_template "viya_ops_idxmgmt_policy"  "viya_ops-*"
 
 # Load template
 response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-ops-template " -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_ops.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
