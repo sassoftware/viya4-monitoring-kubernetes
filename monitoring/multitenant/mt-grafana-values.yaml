@@ -1,5 +1,7 @@
 image:
   tag: "8.2.1"
+extraLabels:
+  v4m.sas.com/tenant: __TENANT__
 readinessProbe: null
 livenessProbe: null
 sidecar:

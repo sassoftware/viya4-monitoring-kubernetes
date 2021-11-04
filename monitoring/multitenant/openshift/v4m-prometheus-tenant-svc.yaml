@@ -8,7 +8,6 @@ metadata:
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/version: 2.30.3
     v4m.sas.com/tenant: __TENANT__
-    foo: bar
 spec:
   ports:
   - name: service

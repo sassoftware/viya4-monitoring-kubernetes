@@ -24,6 +24,8 @@ if [ "$VIYA_TENANT" == "" ]; then
   exit 1
 fi
 
+log_notice "Deploying OpenShift tenant monitoring for [$VIYA_TENANT] to the [$VIYA_NS] namespace..."
+
 # Copy template files to temp
 tenantDir=$TMP_DIR/$VIYA_TENANT
 mkdir -p $tenantDir
@@ -44,6 +46,7 @@ for f in $(find $tenantDir -name '*.yaml'); do
 done
 
 checkDefaultStorageClass
+set -e
 
 export HELM_DEBUG="${HELM_DEBUG:-false}"
 if [ "$HELM_DEBUG" == "true" ]; then
@@ -53,9 +56,6 @@ fi
 if [ -z "$(kubectl get ns $VIYA_NS -o name 2>/dev/null)" ]; then
   kubectl create ns $VIYA_NS
 fi
-
-set -e
-log_notice "Deploying OpenShift tenant monitoring to the [$VIYA_NS] namespace..."
 
 log_info "Deploying Prometheus Operator to the $VIYA_TENANT namespace..."
 oc apply -f $tenantDir/openshift/operator-group.yaml

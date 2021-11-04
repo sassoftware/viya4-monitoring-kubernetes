@@ -11,6 +11,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: prometheus-role-__TENANT__
+  labels:
+    v4m.sas.com/tenant: __TENANT__
 rules:
 - apiGroups: [""] # "" indicates the core API group
   resources: ["pods","services","endpoints","ingresses"]
@@ -20,6 +22,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: prometheus-rolebinding-__TENANT__
+  labels:
+    v4m.sas.com/tenant: __TENANT__
 subjects:
 - kind: ServiceAccount
   name: v4m-prometheus-__TENANT__
