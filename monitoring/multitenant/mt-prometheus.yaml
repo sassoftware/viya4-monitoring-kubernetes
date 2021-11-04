@@ -29,9 +29,12 @@ spec:
   endpoints:
   - path: /metrics
     port: web
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
   selector:
     matchLabels:
-      app: prometheus
+      app.kubernetes.io/instance: v4m-prometheus-__TENANT__
       self-monitor: "true"
 ---
 apiVersion: monitoring.coreos.com/v1

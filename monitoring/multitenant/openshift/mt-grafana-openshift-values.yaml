@@ -31,13 +31,14 @@ serviceAccount:
   # Service account created prior to helm install since the token is needed
   # above in the datasource configuration
   create: false
+  name: grafana-serviceaccount-__TENANT__
 serviceMonitor:
-  enabled: true
+  enabled: false
 testFramework:
   enabled: false
 "grafana.ini":
   server:
-    http_addr: 0.0.0.0
+    http_addr: 127.0.0.1
     http_port: 3000
   dashboards:
     default_home_dashboard_path: /tmp/dashboards/cas-dashboard.json

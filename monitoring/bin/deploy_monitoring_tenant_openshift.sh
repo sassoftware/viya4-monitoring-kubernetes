@@ -66,14 +66,6 @@ if [ -z "$(kubectl get serviceAccount -n $VIYA_NS grafana-serviceaccount-$VIYA_T
   log_info "Creating [$VIYA_TENANT] tenant Grafana serviceAccount..."
   kubectl create serviceaccount -n $VIYA_NS grafana-serviceaccount-$VIYA_TENANT
 fi
-# log_debug "Adding cluster role..."
-# oc adm policy add-cluster-role-to-user cluster-monitoring-view -z grafana-serviceaccount-$VIYA_TENANT -n $VIYA_NS
-# log_debug "Obtaining token..."
-# grafanaToken=$(oc serviceaccounts get-token grafana-serviceaccount-$VIYA_TENANT -n $VIYA_NS)
-# if [ "$grafanaToken" == "" ]; then
-#   log_error "Unable to obtain authentication token for [grafana-serviceaccount-$VIYA_TENANT]"
-#   exit 1
-# fi
 
 # Add the grafana helm chart repo
 helmRepoAdd grafana https://grafana.github.io/helm-charts
@@ -93,8 +85,11 @@ kubectl create secret generic \
 # Deploy Prometheus
 log_info "Deploying Prometheus..."
 kubectl apply -n $VIYA_NS -f $tenantDir/openshift/mt-prometheus-openshift.yaml
-# kubectl apply -n $VIYA_NS -f $tenantDir/mt-prometheus-common.yaml
-# kubectl apply -n $VIYA_NS -f $tenantDir/tls/mt-prometheus-tls.yaml
+
+log_debug "Adding cluster role to Grafana service account..."
+oc adm policy add-cluster-role-to-user cluster-monitoring-view -z prometheus-k8s -n $VIYA_NS
+oc adm policy add-cluster-role-to-user cluster-monitoring-view -z grafana-serviceaccount-$VIYA_TENANT -n $VIYA_NS
+log_debug "Obtaining Grafana serviceaccount token..."
 
 # Deploy Prometheus Grafana datasource
 grafanaDatasource=$tenantDir/tls/grafana-datasource-tenant-tls.yaml
@@ -109,14 +104,6 @@ if [ -f "$USER_DIR/monitoring/user-values-openshift-grafana-$VIYA_TENANT.yaml" ]
   log_debug "User response file for Grafana found at [$userGrafanaYAML]"
 fi
 
-grafanaYAML=$TMP_DIR/grafana-$VIYA_TENANT-values.yaml
-cp $tenantDir/openshift/mt-grafana-openshift-values.yaml $grafanaYAML
-if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-  sed -i '' "s/__BEARER_TOKEN__/$grafanaToken/g" $grafanaYAML
-else
-  sed -i "s/__BEARER_TOKEN__/$grafanaToken/g" $grafanaYAML
-fi
-
 if ! helm3ReleaseExists v4m-grafana-$VIYA_TENANT $VIYA_NS; then
   firstTimeGrafana=true
 fi
@@ -125,7 +112,7 @@ OPENSHIFT_AUTH_ENABLE=${OPENSHIFT_AUTH_ENABLE:-true}
 if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   log_debug "Enabling OpenShift Authentication for monitoring"
   log_debug "Creating the Prometheus service to generate TLS certs..."
-  kubectl apply -n $VIYA_NS -f $tenantDir/openshift/v4m-prometheus-tenant-svc-oauth.yaml
+  kubectl apply -n $VIYA_NS -f $tenantDir/openshift/v4m-prometheus-tenant-svc.yaml
   log_debug "Creating the Grafana service to generate TLS certs..."
   kubectl apply -n $VIYA_NS -f $tenantDir/openshift/v4m-grafana-tenant-svc-oauth.yaml
   grafanaAuthYAML="monitoring/openshift/grafana-proxy-values.yaml"
@@ -163,6 +150,7 @@ else
 fi
 
 log_info "Deploying Grafana..."
+grafanaYAML=$tenantDir/openshift/mt-grafana-openshift-values.yaml
 OPENSHIFT_GRAFANA_CHART_VERSION=${OPENSHIFT_GRAFANA_CHART_VERSION:-6.17.2}
 helm upgrade --install $helmDebug \
   -n "$VIYA_NS" \
@@ -182,25 +170,17 @@ helm upgrade --install $helmDebug \
 
 if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   log_info "Using OpenShift authentication for [$VIYA_TENANT] tenant instance of Grafana"
-  log_debug "Annotating grafana-serviceaccount-$VIYA_TENANT to auto-generate TLS certs..."
+  log_debug "Annotating grafana-serviceaccount-$VIYA_TENANT"
   kubectl annotate serviceaccount -n $VIYA_NS --overwrite grafana-serviceaccount-$VIYA_TENANT 'serviceaccounts.openshift.io/oauth-redirectreference.primary={"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"v4m-grafana-'$VIYA_TENANT'"}}'
 
   log_debug "Adding ClusterRoleBinding for grafana-serviceaccount..."
-  crbYAML=$TMP_DIR/grafana-serviceaccount-binding.yaml
-  cp monitoring/openshift/grafana-serviceaccount-binding.yaml $crbYAML
-  if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-    sed -i '' "s/__TENANT_NS__/$VIYA_NS/g" $crbYAML
-  else
-    sed -i "s/__TENANT_NS__/$VIYA_NS/g" $crbYAML
-  fi
+  kubectl apply -f $tenantDir/openshift/prometheus-serviceaccount-binding.yaml
 
-  kubectl apply -f $crbYAML
-
-  kubectl apply -n $VIYA_NS -f monitoring/openshift/prometheus-proxy-secret.yaml
+  log_debug "Configuring Grafana proxy"
+  # kubectl apply -n $VIYA_NS -f monitoring/openshift/prometheus-proxy-secret.yaml
   kubectl apply -n $VIYA_NS -f monitoring/openshift/grafana-proxy-secret.yaml
   
   grafanaProxyPatchYAML=$TMP_DIR/grafana-proxy-patch.yaml
-
   if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
     log_debug "Using path-based version of the OpenShift Grafana proxy patch"
     cp $tenantDir/openshift/grafana-proxy-patch-tenant-path.yaml $grafanaProxyPatchYAML

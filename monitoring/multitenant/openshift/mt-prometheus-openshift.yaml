@@ -20,76 +20,46 @@ metadata:
   labels:
     app: prometheus
     v4m.sas.com/tenant: __TENANT__
+    self-monitor: "true"
   name: v4m-prometheus-__TENANT__
 spec:
   listenLocal: true
   containers:
-  - args:
-    - -provider=openshift
-    - -https-address=:9191
-    - -http-address=
-    - -email-domain=*
-    - -upstream=http://localhost:9090
-    - -tls-cert=/etc/tls/private/tls.crt
-    - -tls-key=/etc/tls/private/tls.key
-    - -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token
-    - -cookie-secret-file=/etc/proxy/secrets/session_secret
-    - -openshift-service-account=prometheus-k8s
-    - -openshift-ca=/etc/pki/tls/cert.pem
-    - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    - -skip-auth-regex=^/metrics
-    
-    env:
-    - name: HTTP_PROXY
-    - name: HTTPS_PROXY
-    - name: NO_PROXY
-    image: openshift/oauth-proxy:latest
+  # Add square/ghosttunnel TLS proxy
+  - name: tls-proxy
+    args:
+    - server
+    - --listen=:9191
+    - --target=127.0.0.1:9090
+    - --key=/cert/tls.key
+    - --cert=/cert/tls.crt
+    - --disable-authentication
+    image: squareup/ghostunnel:v1.5.2
     imagePullPolicy: IfNotPresent
-    name: openshift-oauth-proxy
     ports:
-    - containerPort: 9191
-      name: https
+    - name: https
+      containerPort: 9191 
       protocol: TCP
-    readinessProbe:
-      failureThreshold: 3
-      httpGet:
-        path: /oauth/healthz
-        port: https
-        scheme: HTTPS
-      periodSeconds: 10
-      successThreshold: 1
-      timeoutSeconds: 1
-    resources:
-      requests:
-        cpu: 1m
-        memory: 20Mi
+    resources: {}
+    securityContext:
+      readOnlyRootFilesystem: true
     terminationMessagePath: /dev/termination-log
     terminationMessagePolicy: File
     volumeMounts:
-    - mountPath: /etc/tls/private
+    - mountPath: /cert
       name: secret-prometheus-tls
-    - mountPath: /etc/proxy/secrets
-      name: secret-prometheus-proxy
-    - mountPath: /etc/pki/ca-trust/extracted/pem/
-      name: prometheus-trusted-ca-bundle
       readOnly: true
   volumes:
   - name: secret-prometheus-tls
     secret:
       defaultMode: 420
       secretName: v4m-prometheus-__TENANT__-tls-secret
-  - name: secret-prometheus-proxy
-    secret:
-      defaultMode: 420
-      secretName: prometheus-proxy
   - name: prometheus-trusted-ca-bundle
     configMap:
       defaultMode: 420
       items:
-      # - key: ca.crt
       - key: ca-bundle.crt
         path: tls-ca-bundle.pem
-      # name: kube-root-ca.crt
       name: trusted-ca-bundle-__TENANT__
       optional: true
   additionalScrapeConfigs:
