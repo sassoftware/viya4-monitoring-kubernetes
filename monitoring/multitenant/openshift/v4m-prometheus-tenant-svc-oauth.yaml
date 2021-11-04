@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: v4m-prometheus-__TENANT__
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: v4m-prometheus-__TENANT__-tls-secret
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/version: 2.30.3
+    v4m.sas.com/tenant: __TENANT__
+    foo: bar
+spec:
+  ports:
+  - name: service
+    port: 9191
+    protocol: TCP
+    targetPort: 9191
+  selector:
+    app.kubernetes.io/name: prometheus
+  sessionAffinity: None
+  type: ClusterIP

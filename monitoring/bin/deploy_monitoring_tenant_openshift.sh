@@ -123,9 +123,12 @@ fi
 
 OPENSHIFT_AUTH_ENABLE=${OPENSHIFT_AUTH_ENABLE:-true}
 if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
-  log_debug "Enabling OpenShift Authentication for Grafana"
+  log_debug "Enabling OpenShift Authentication for monitoring"
+  log_debug "Creating the Prometheus service to generate TLS certs..."
+  kubectl apply -n $VIYA_NS -f $tenantDir/openshift/v4m-prometheus-tenant-svc-oauth.yaml
+  log_debug "Creating the Grafana service to generate TLS certs..."
+  kubectl apply -n $VIYA_NS -f $tenantDir/openshift/v4m-grafana-tenant-svc-oauth.yaml
   grafanaAuthYAML="monitoring/openshift/grafana-proxy-values.yaml"
-  extraArgs="--set service.targetPort=3001"
 else
   grafanaAuthYAML="$tenantDir/openshift/mt-grafana-tls-only-values.yaml"
   log_debug "Creating the Grafana service to generate TLS certs..."
@@ -251,10 +254,11 @@ for f in monitoring/rules/viya/rules-*.yaml; do
 done
 
 if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
-  routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-$VIYA_NS.$OPENSHIFT_ROUTE_DOMAIN}
+  routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-$VIYA_TENANT-$VIYA_NS.$OPENSHIFT_ROUTE_DOMAIN}
 else
-  routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-grafana-$VIYA_NS.$OPENSHIFT_ROUTE_DOMAIN}
+  routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-grafana-$VIYA_TENANT-$VIYA_NS.$OPENSHIFT_ROUTE_DOMAIN}
 fi
+
 if ! kubectl get route -n $VIYA_NS v4m-grafana-$VIYA_TENANT 1>/dev/null 2>&1; then
   log_info "Exposing Grafana service as a route..."
   if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
@@ -280,7 +284,8 @@ if [ ! "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
     fi
   fi
 fi
-bin/show_app_url.sh GRAFANA
+
+log_notice "Grafana URL is https://$(kubectl get route -n $VIYA_NS v4m-grafana-$VIYA_TENANT -o jsonpath='{ .spec.host }/{ .spec.path }')"
 
 log_message ""
 log_notice "Successfully deployed SAS Viya tenant monitoring for [$VIYA_TENANT] on OpenShift"
