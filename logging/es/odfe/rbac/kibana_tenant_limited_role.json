@@ -8,14 +8,6 @@
       "allowed_actions": [
         "kibana_all_write"
       ]
-    },
-    {
-      "tenant_patterns": [
-        "global_tenant"
-      ],
-      "allowed_actions": [
-        "kibana_all_read"
-      ]
     }
   ],
   "cluster_permissions": []
