@@ -12,10 +12,15 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 source bin/openshift-include.sh
 
-if [ "$OPENSHIFT_CLUSTER" == "true" ]; then  
+if [ "$OPENSHIFT_TENANT_MONITORING_ENABLE" != "true" ]; then
+  log_error "OpenShift tenant monitoring is currently under development and is not supported"
+  exit 1
+fi
+
+if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
-    log_error "This script should not be run on OpenShift clusters"
-    log_error "Run monitoring/bin/remove_monitoring_openshift.sh instead"
+    log_error "This script should only be run on OpenShift clusters"
+    log_error "Run monitoring/bin/deploy_monitoring_cluster.sh instead"
     exit 1
   fi
 fi
@@ -52,31 +57,22 @@ for f in $(find $tenantDir -name '*.yaml'); do
   fi
 done
 
-if helm3ReleaseExists v4m-grafana-$VIYA_TENANT $VIYA_NS; then
-  log_info "Removing Grafana..."
-  helm uninstall -n $VIYA_NS v4m-grafana-$VIYA_TENANT
+if helm3ReleaseExists v4m-grafana-$VIYA_NS-$VIYA_TENANT $VIYA_NS; then
+  log_info "Uninstalling Grafana helm chart..."
+  helm uninstall -n $VIYA_NS v4m-grafana-$VIYA_NS-$VIYA_TENANT
 else
-  log_debug "Grafana helm release [grafana-$VIYA_TENANT] not found. Skipping uninstall."
+  log_debug "Grafana helm release [v4m-grafana-$VIYA_NS-$VIYA_TENANT] not found. Skipping uninstall."
 fi
+log_info "Removing other resources..."
 
-log_info "Removing Grafana dashboards..."
-kubectl delete cm -n $VIYA_NS --ignore-not-found -l grafana_dashboard-$VIYA_TENANT
+log_debug "Removing Grafana datasource..."
+kubectl delete secret -n $VIYA_NS --ignore-not-found -l grafana_datasource-$VIYA_TENANT >/dev/null
 
-log_info "Removing Grafana datasource..."
-kubectl delete secret -n $VIYA_NS --ignore-not-found -l grafana_datasource-$VIYA_TENANT
+log_debug "Removing namespace resources..."
+types=( route prometheus prometheusrule servicemonitor podmonitor service configmap serviceaccount )
+for type in "${types[@]}"; do
+  log_debug "  Removing [$type] resources..."
+  kubectl delete --ignore-not-found $type -n $VIYA_NS -l "v4m.sas.com/tenant=$VIYA_TENANT" >/dev/null
+done
 
-log_info "Removing Prometheus"
-kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/mt-prometheus.yaml
-kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-cas-tenant.yaml
-kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-pushgateway-tenant.yaml
-kubectl delete -n $VIYA_NS --ignore-not-found secret prometheus-federate-$VIYA_TENANT
-
-# Remove non-user-provided certificates
-kubectl delete -n $VIYA_NS --ignore-not-found certificate -l "v4m.sas.com/tenant=$VIYA_TENANT" 2>/dev/null
-
-if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
-  log_info "Deleting route for $VIYA_NS/v4m-grafana-$VIYA_TENANT..."
-  kubectl delete route -n $VIYA_NS v4m-grafana-$VIYA_TENANT
-fi
-
-log_notice "Uninstalled monitoring for [$VIYA_NS/$VIYA_TENANT]"
+log_notice "Successfully removed OpenShift tenant monitoring for [$VIYA_NS/$VIYA_TENANT]"

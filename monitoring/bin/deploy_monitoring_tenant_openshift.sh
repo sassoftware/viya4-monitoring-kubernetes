@@ -6,6 +6,11 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 
+if [ "$OPENSHIFT_TENANT_MONITORING_ENABLE" != "true" ]; then
+  log_error "OpenShift tenant monitoring is currently under development and is not supported"
+  exit 1
+fi
+
 if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
     log_error "This script should only be run on OpenShift clusters"
