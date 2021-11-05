@@ -11,7 +11,7 @@ spec:
       app: prometheus-pushgateway
   endpoints:
   - port: http
-  - relabelings:
+    relabelings:
     - sourceLabels: [__name__]
       regex: "sas_.+"
       action: keep

@@ -1,23 +1,3 @@
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: prometheus
-    self-monitor: "true"
-    v4m.sas.com/tenant: __TENANT__
-  name: v4m-prometheus-__TENANT__
-spec:
-  type: ClusterIP
-  ports:
-  - name: web
-    port: 443
-    protocol: TCP
-    targetPort: 443
-  selector:
-    app: prometheus
-    prometheus: v4m-prometheus-__TENANT__
-  sessionAffinity: None
----
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -32,6 +12,7 @@ spec:
   selector:
     matchLabels:
       app: prometheus
+      v4m.sas.com/tenant: __TENANT__
       self-monitor: "true"
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -40,6 +21,7 @@ metadata:
   labels:
     app: prometheus
     v4m.sas.com/tenant: __TENANT__
+    self-monitor: "true"
   name: v4m-prometheus-__TENANT__
 spec:
   listenLocal: true
@@ -48,7 +30,7 @@ spec:
   - name: tls-proxy
     args:
     - server
-    - --listen=:443
+    - --listen=:9191
     - --target=127.0.0.1:9090
     - --key=/cert/tls.key
     - --cert=/cert/tls.crt
@@ -57,31 +39,34 @@ spec:
     imagePullPolicy: IfNotPresent
     ports:
     - name: https
-      containerPort: 443 
+      containerPort: 9191 
       protocol: TCP
     resources: {}
     securityContext:
-      #allowPrivilegeEscalation: true
-      # privileged: true
       readOnlyRootFilesystem: true
-      # runAsUser: 0
     terminationMessagePath: /dev/termination-log
     terminationMessagePolicy: File
     volumeMounts:
     - mountPath: /cert
-      name: tls-proxy-secret
+      name: secret-prometheus-tls
       readOnly: true
+  volumes:
+  - name: secret-prometheus-tls
+    secret:
+      defaultMode: 420
+      secretName: v4m-prometheus-__TENANT__-tls-secret
+  - name: prometheus-trusted-ca-bundle
+    configMap:
+      defaultMode: 420
+      items:
+      - key: ca-bundle.crt
+        path: tls-ca-bundle.pem
+      name: trusted-ca-bundle-__TENANT__
+      optional: true
   additionalScrapeConfigs:
     name: prometheus-federate-__TENANT__
     key: cluster-federate-job
   image: quay.io/prometheus/prometheus:v2.30.3
-  # alerting:
-  #   alertmanagers:
-  #   - apiVersion: v2
-  #     name: prometheus-operator-alertmanager
-  #     namespace: __MON_NS__
-  #     pathPrefix: /
-  #     port: web
   enableAdminAPI: false
   logFormat: json
   logLevel: info
@@ -93,12 +78,7 @@ spec:
   routePrefix: /
   securityContext:
     runAsNonRoot: false
-  volumes:
-    - name: tls-proxy-secret
-      secret:
-        defaultMode: 420
-        secretName: v4m-prometheus-__TENANT__-tls-secret
-  serviceAccountName: v4m-prometheus-__TENANT__
+  serviceAccountName: prometheus-k8s
   serviceMonitorSelector:
     matchLabels:
       v4m.sas.com/tenant: __TENANT__ 

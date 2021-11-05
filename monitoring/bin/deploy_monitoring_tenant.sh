@@ -11,6 +11,14 @@ export TLS_DEPLOY_SELFSIGNED_ISSUERS="false"
 
 set -e
 
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+    log_error "This script should not be run on OpenShift clusters"
+    log_error "Run monitoring/bin/deploy_monitoring_openshift.sh instead"
+    exit 1
+  fi
+fi
+
 if [ "$VIYA_NS" == "" ]; then
   log_error "VIYA_NS must be set to the namespace of an existing Viya deployment"
   exit 1
@@ -99,7 +107,7 @@ kubectl create secret generic \
   --from-file cluster-federate-job=$tenantDir/mt-federate-secret.yaml
 
 if [ "$TLS_ENABLE" == "true" ]; then
-  apps=( prometheus-$VIYA_TENANT grafana-$VIYA_TENANT )
+  apps=( v4m-prometheus-$VIYA_TENANT v4m-grafana-$VIYA_TENANT )
   create_tls_certs $VIYA_NS monitoring ${apps[@]}
 fi
 
@@ -123,7 +131,7 @@ kubectl create secret generic -n $VIYA_NS grafana-datasource-$VIYA_TENANT --from
 kubectl label secret -n $VIYA_NS grafana-datasource-$VIYA_TENANT grafana_datasource-$VIYA_TENANT=1
 
 # Grafana
-if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS; then
+if helm3ReleaseExists v4m-grafana-$VIYA_TENANT $VIYA_NS; then
   log_info "Upgrading Grafana via Helm...($(date) - timeout 10m)"
 else
   grafanaPwd="$GRAFANA_ADMIN_PASSWORD"
@@ -149,7 +157,7 @@ helm upgrade --install $helmDebug \
   --atomic \
   --timeout "10m" \
   $extraArgs \
-  grafana-$VIYA_TENANT \
+  v4m-grafana-$VIYA_TENANT \
   grafana/grafana
 
 # Deploy ServiceMonitors

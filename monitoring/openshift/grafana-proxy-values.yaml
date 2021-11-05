@@ -17,5 +17,5 @@
     http_addr: 127.0.0.1
   users:
     # auto_assign_org_role: one of Viewer/Editor/Admin
-    auto_assign_org_role: Editor
+    auto_assign_org_role: Admin
     editors_can_admin: true

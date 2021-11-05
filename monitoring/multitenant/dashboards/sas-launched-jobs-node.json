@@ -1,4 +1,3 @@
-
 {
   "annotations": {
     "list": [
@@ -16,8 +15,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 45,
-  "iteration": 1631197755952,
+  "id": 91,
+  "iteration": 1633352694396,
   "links": [],
   "panels": [
     {
@@ -85,7 +84,7 @@
           "hide": true,
           "instant": false,
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "",
           "refId": "A"
         },
@@ -94,7 +93,7 @@
           "expr": "sum(:sas_launcher_pod_cpu_core_usage:{pod=~\"$pod\"}) or vector(0)",
           "instant": false,
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "Total CPU Usage",
           "refId": "B"
         }
@@ -159,10 +158,11 @@
       "pluginVersion": "7.5.4",
       "targets": [
         {
+          "exemplar": true,
           "expr": "sum(:sas_launcher_pod_mem_working_set_bytes:{pod=~\"$pod\"}) or vector(0)",
           "instant": false,
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "Total Memory Usage",
           "refId": "A"
         }
@@ -245,9 +245,11 @@
       "pluginVersion": "7.5.4",
       "targets": [
         {
+          "exemplar": true,
           "expr": "sum(kube_pod_status_phase{pod=~\"$pod\", phase=~\"Pending\"}) or vector(0)",
           "instant": false,
           "interval": "",
+          "intervalFactor": 1,
           "legendFormat": "Pending",
           "refId": "A"
         }
@@ -398,10 +400,11 @@
       "pluginVersion": "7.5.4",
       "targets": [
         {
+          "exemplar": true,
           "expr": "sum(rate(:sas_launcher_pod_net_transmit_bytes_total:{pod=~\"$pod\"}[1m])) + sum(rate(:sas_launcher_pod_net_receive_bytes_total:{pod=~\"$pod\"}[1m])) or vector(0)",
           "instant": false,
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "Network I/O",
           "refId": "A"
         }
@@ -466,10 +469,11 @@
       "pluginVersion": "7.5.4",
       "targets": [
         {
+          "exemplar": true,
           "expr": "sum(rate(:sas_launcher_pod_fs_read_bytes_total:{pod=~\"$pod\"}[1m])) + sum(rate(:sas_launcher_pod_fs_write_bytes_total:{pod=~\"$pod\"}[1m])) or vector(0)",
           "instant": false,
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "File I/O",
           "refId": "A"
         }
@@ -608,9 +612,10 @@
       "steppedLine": false,
       "targets": [
         {
+          "exemplar": true,
           "expr": "sum(:sas_launcher_pod_cpu_core_usage:{pod=~\"$pod\"}) by (node)",
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{node}}",
           "refId": "B"
         }
@@ -709,9 +714,10 @@
       "steppedLine": false,
       "targets": [
         {
+          "exemplar": true,
           "expr": "sum(:sas_launcher_pod_mem_working_set_bytes:{pod=~\"$pod\"}) by (node)",
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{node}}",
           "refId": "B"
         }
@@ -825,18 +831,20 @@
           "refId": "B"
         },
         {
+          "exemplar": true,
           "expr": "sum(rate(:sas_launcher_pod_fs_read_bytes_total:{pod=~\"$pod\"}[1m])) by (node)",
           "hide": false,
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{node}} - Reads",
           "refId": "C"
         },
         {
+          "exemplar": true,
           "expr": "-sum(rate(:sas_launcher_pod_fs_write_bytes_total:{pod=~\"$pod\"}[1m])) by (node)",
           "hide": false,
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{node}} - Writes",
           "refId": "D"
         }
@@ -951,16 +959,18 @@
           "refId": "B"
         },
         {
+          "exemplar": true,
           "expr": "sum(rate(:sas_launcher_pod_net_receive_bytes_total:{pod=~\"$pod\"}[1m])) by (node)",
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{node}} - Receive",
           "refId": "C"
         },
         {
+          "exemplar": true,
           "expr": "-sum(rate(:sas_launcher_pod_net_transmit_bytes_total:{pod=~\"$pod\"}[1m])) by (node)",
           "interval": "",
-          "intervalFactor": 4,
+          "intervalFactor": 1,
           "legendFormat": "{{node}} - Transmit",
           "refId": "D"
         }
@@ -1725,5 +1735,5 @@
   "timezone": "",
   "title": "SAS Launched Jobs - Node Activity",
   "uid": "aBDyaKNGk",
-  "version": 4
+  "version": 6
 }

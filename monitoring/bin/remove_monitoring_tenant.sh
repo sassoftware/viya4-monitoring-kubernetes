@@ -12,6 +12,14 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 source bin/openshift-include.sh
 
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then  
+  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+    log_error "This script should not be run on OpenShift clusters"
+    log_error "Run monitoring/bin/remove_monitoring_openshift.sh instead"
+    exit 1
+  fi
+fi
+
 if [ "$VIYA_NS" == "" ]; then
   log_error "VIYA_NS must be set to the namespace of an existing Viya deployment"
   exit 1
@@ -44,9 +52,9 @@ for f in $(find $tenantDir -name '*.yaml'); do
   fi
 done
 
-if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS; then
+if helm3ReleaseExists v4m-grafana-$VIYA_TENANT $VIYA_NS; then
   log_info "Removing Grafana..."
-  helm uninstall -n $VIYA_NS grafana-$VIYA_TENANT
+  helm uninstall -n $VIYA_NS v4m-grafana-$VIYA_TENANT
 else
   log_debug "Grafana helm release [grafana-$VIYA_TENANT] not found. Skipping uninstall."
 fi
@@ -65,5 +73,10 @@ kubectl delete -n $VIYA_NS --ignore-not-found secret prometheus-federate-$VIYA_T
 
 # Remove non-user-provided certificates
 kubectl delete -n $VIYA_NS --ignore-not-found certificate -l "v4m.sas.com/tenant=$VIYA_TENANT" 2>/dev/null
+
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+  log_info "Deleting route for $VIYA_NS/v4m-grafana-$VIYA_TENANT..."
+  kubectl delete route -n $VIYA_NS v4m-grafana-$VIYA_TENANT
+fi
 
 log_notice "Uninstalled monitoring for [$VIYA_NS/$VIYA_TENANT]"

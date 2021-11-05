@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    config.openshift.io/inject-trusted-cabundle: "true"
+    v4m.sas.com/tenant: __TENANT__
+  name: trusted-ca-bundle-__TENANT__
