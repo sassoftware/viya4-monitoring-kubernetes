@@ -109,22 +109,11 @@ if ! helm3ReleaseExists v4m-grafana-$VIYA_TENANT $VIYA_NS; then
 fi
 
 OPENSHIFT_AUTH_ENABLE=${OPENSHIFT_AUTH_ENABLE:-true}
-if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
-  log_debug "Enabling OpenShift Authentication for monitoring"
-  log_debug "Creating the Prometheus service to generate TLS certs..."
-  kubectl apply -n $VIYA_NS -f $tenantDir/openshift/v4m-prometheus-tenant-svc.yaml
-  log_debug "Creating the Grafana service to generate TLS certs..."
-  kubectl apply -n $VIYA_NS -f $tenantDir/openshift/v4m-grafana-tenant-svc-oauth.yaml
-  grafanaAuthYAML="monitoring/openshift/grafana-proxy-values.yaml"
-else
-  grafanaAuthYAML="$tenantDir/openshift/mt-grafana-tls-only-values.yaml"
-  log_debug "Creating the Grafana service to generate TLS certs..."
-  kubectl apply -n $VIYA_NS -f $tenantDir/openshift/v4m-grafana-tenant-svc.yaml
-  log_debug "Creating the Prometheus service to generate TLS certs..."
-  kubectl apply -n $VIYA_NS -f $tenantDir/openshift/v4m-prometheus-tenant-svc.yaml
-  log_debug "Sleeping 5 sec..."
-  sleep 5
-fi
+log_debug "Creating the Prometheus service to generate TLS certs..."
+kubectl apply -n $VIYA_NS -f $tenantDir/openshift/v4m-prometheus-tenant-svc.yaml
+log_debug "Creating the Grafana service to generate TLS certs..."
+kubectl apply -n $VIYA_NS -f $tenantDir/openshift/v4m-grafana-tenant-svc.yaml
+grafanaAuthYAML="monitoring/openshift/grafana-proxy-values.yaml"
 
 if [ -n "$GRAFANA_ADMIN_PASSWORD" ]; then
   grafanaPwd="--set adminPassword=$GRAFANA_ADMIN_PASSWORD"
@@ -173,13 +162,9 @@ if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   log_debug "Annotating grafana-serviceaccount-$VIYA_TENANT"
   kubectl annotate serviceaccount -n $VIYA_NS --overwrite grafana-serviceaccount-$VIYA_TENANT 'serviceaccounts.openshift.io/oauth-redirectreference.primary={"kind":"OAuthRedirectReference","apiVersion":"v1","reference":{"kind":"Route","name":"v4m-grafana-'$VIYA_TENANT'"}}'
 
-  log_debug "Adding ClusterRoleBinding for grafana-serviceaccount..."
-  kubectl apply -f $tenantDir/openshift/prometheus-serviceaccount-binding.yaml
-
   log_debug "Configuring Grafana proxy"
-  # kubectl apply -n $VIYA_NS -f monitoring/openshift/prometheus-proxy-secret.yaml
   kubectl apply -n $VIYA_NS -f monitoring/openshift/grafana-proxy-secret.yaml
-  
+
   grafanaProxyPatchYAML=$TMP_DIR/grafana-proxy-patch.yaml
   if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
     log_debug "Using path-based version of the OpenShift Grafana proxy patch"
@@ -188,10 +173,10 @@ if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
     log_debug "Using host-based version of the OpenShift Grafana proxy patch"
     cp $tenantDir/openshift/grafana-proxy-patch-tenant-host.yaml $grafanaProxyPatchYAML
   fi
-    
+
   log_debug "Deploying CA bundle..."
   kubectl apply -n $VIYA_NS -f $tenantDir/openshift/trusted-ca-bundle.yaml
-  
+
   log_info "Patching Grafana service for auto-generated TLS certs"
   kubectl annotate service -n $VIYA_NS --overwrite v4m-grafana-$VIYA_TENANT "service.beta.openshift.io/serving-cert-secret-name=grafana-tls-$VIYA_TENANT"
 
@@ -201,26 +186,23 @@ else
   log_info "Using native Grafana authentication"
 fi
 
-# Deploy ServiceMonitors
+log_debug "Creating tenant ServiceMonitors..."
 kubectl apply -n $VIYA_NS -f $tenantDir/serviceMonitor-sas-cas-tenant.yaml
 kubectl apply -n $VIYA_NS -f $tenantDir/serviceMonitor-sas-pushgateway-tenant.yaml
 
 function deploy_tenant_dashboards {
    dir=$1
-   
-   log_message "--------------------------------"
    for f in $dir/*.json; do
      # Need to check existence because if there are no matching files,
      # f will include the wildcard character (*)
      if [ -f "$f" ]; then
        log_debug "Deploying dashboard from file [$f]"
        name=$(basename $f .json)-$VIYA_TENANT
-      
+
        kubectl create cm -n $DASH_NS $name --dry-run=client --from-file $f -o yaml | kubectl apply -f -
        kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard-$VIYA_TENANT=1 sas.com/monitoring-base=kube-viya-monitoring
      fi
    done
-   log_message "--------------------------------"
 }
 
 # Deploy dashboards
@@ -228,7 +210,7 @@ DASH_NS=$VIYA_NS
 DASH_BASE=$tenantDir/dashboards
 deploy_tenant_dashboards monitoring/multitenant/dashboards
 
-log_info "Adding SAS Viya recording rules..."
+log_debug "Adding SAS Viya recording rules..."
 for f in monitoring/rules/viya/rules-*.yaml; do
   kubectl apply -n $VIYA_NS -f $f
 done
@@ -240,7 +222,7 @@ else
 fi
 
 if ! kubectl get route -n $VIYA_NS v4m-grafana-$VIYA_TENANT 1>/dev/null 2>&1; then
-  log_info "Exposing Grafana service as a route..."
+  log_debug "Exposing Grafana service as a route..."
   if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
     oc create route reencrypt \
       -n $VIYA_NS \

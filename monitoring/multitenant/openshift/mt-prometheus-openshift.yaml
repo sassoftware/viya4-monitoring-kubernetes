@@ -12,6 +12,7 @@ spec:
   selector:
     matchLabels:
       app: prometheus
+      v4m.sas.com/tenant: __TENANT__
       self-monitor: "true"
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -66,13 +67,6 @@ spec:
     name: prometheus-federate-__TENANT__
     key: cluster-federate-job
   image: quay.io/prometheus/prometheus:v2.30.3
-  # alerting:
-  #   alertmanagers:
-  #   - apiVersion: v2
-  #     name: prometheus-operator-alertmanager
-  #     namespace: __MON_NS__
-  #     pathPrefix: /
-  #     port: web
   enableAdminAPI: false
   logFormat: json
   logLevel: info

@@ -4,6 +4,8 @@ extraLabels:
   v4m.sas.com/tenant: __TENANT__
 readinessProbe: null
 livenessProbe: null
+rbac:
+  pspEnabled: false
 sidecar:
   dashboards:
     enabled: true
