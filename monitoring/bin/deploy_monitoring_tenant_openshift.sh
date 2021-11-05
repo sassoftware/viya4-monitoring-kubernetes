@@ -154,7 +154,7 @@ helm upgrade --install $helmDebug \
   --atomic \
   $grafanaPwd \
   $extraArgs \
-  v4m-grafana-$VIYA_TENANT \
+  v4m-grafana-$VIYA_NS-$VIYA_TENANT \
   grafana/grafana
 
 if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
@@ -181,7 +181,7 @@ if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   kubectl annotate service -n $VIYA_NS --overwrite v4m-grafana-$VIYA_TENANT "service.beta.openshift.io/serving-cert-secret-name=grafana-tls-$VIYA_TENANT"
 
   log_info "Patching Grafana pod with authenticating TLS proxy..."
-  kubectl patch deployment -n $VIYA_NS v4m-grafana-$VIYA_TENANT --patch "$(cat $grafanaProxyPatchYAML)"
+  kubectl patch deployment -n $VIYA_NS v4m-grafana-$VIYA_NS-$VIYA_TENANT --patch "$(cat $grafanaProxyPatchYAML)"
 else
   log_info "Using native Grafana authentication"
 fi
