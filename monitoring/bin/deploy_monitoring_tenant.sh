@@ -11,6 +11,14 @@ export TLS_DEPLOY_SELFSIGNED_ISSUERS="false"
 
 set -e
 
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+    log_error "This script should not be run on OpenShift clusters"
+    log_error "Run monitoring/bin/deploy_monitoring_openshift.sh instead"
+    exit 1
+  fi
+fi
+
 if [ "$VIYA_NS" == "" ]; then
   log_error "VIYA_NS must be set to the namespace of an existing Viya deployment"
   exit 1
