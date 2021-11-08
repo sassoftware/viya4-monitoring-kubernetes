@@ -131,7 +131,7 @@ if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
 
       get_kb_api_url
 
-      content2export='{"type": ["url","visualization", "dashboard", "search", "index-pattern"],"excludeExportDetails": false}'
+      content2export='{"type": ["config", "url","visualization", "dashboard", "search", "index-pattern"],"excludeExportDetails": false}'
 
       response=$(curl -s -o $KB_GLOBAL_EXPORT_FILE  -w  "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_export" -d "$content2export"  -H "kbn-xsrf: true" -H 'Content-Type: application/json' -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
 
