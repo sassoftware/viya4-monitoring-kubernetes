@@ -167,6 +167,13 @@ else
    log_warn "There was an issue deleting the index [$kibana_index_name] holding content related to Kibana tenant space [$ktenant]. You may need to manually delete this index. [$response]"
 fi
 
+response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "${es_api_url}/${kibana_index_name}_*"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+if [[ $response == 2* ]]; then
+   log_info "Deleted index [${kibana_index_name}_*]. [$response]"
+else
+   log_warn "There was an issue deleting the index [${kibana_index_name}_*] holding content related to Kibana tenant space [$ktenant]. You may need to manually delete this index. [$response]"
+fi
+
 
 # Delete access controls
 ./logging/bin/security_delete_rbac.sh $namespace $tenant
