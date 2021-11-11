@@ -219,7 +219,6 @@ if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
    # build package
    log_info "Packaging Helm Chart for Elasticsearch"
 
-   # cd to the appropriate sub-directory
    cd helm/opendistro-es/
    helm package .
 
