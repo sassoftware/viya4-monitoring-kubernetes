@@ -322,7 +322,7 @@ __Add filter__ to filter the messages that are displayed.
 You can choose to enable users to access Elasticsearch so that they can issue queries using API calls or scripts. Run this command to enable nodeport connections to Elasticsearch:
 
 ```bash
-./logging/bin/es_nodeport_enable.sh
+./logging/bin/es_nodeport_enable_open.sh
 ``` 
 
 When the script completes, a message such as this appears in the console window:
@@ -340,7 +340,7 @@ User connections to Elasticsearch always use TLS.
 To disable nodeport connections to Elasticsearch, run this command:
 
 ```bash
-./logging/bin/es_nodeport_disable.sh
+./logging/bin/es_nodeport_disable_open.sh
 ```  
 
 You can use these scripts to temporarily enable user access to Elasticsearch.

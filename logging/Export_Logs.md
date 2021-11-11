@@ -17,8 +17,8 @@ A query is cancelled if it does not complete within three minutes. If the script
 
 For options than accept multiple values, the values must be in quotes and must be separated by commas. 
 
-If you are using nodeports, an administrator must run the `logging/bin/es_nodeport_enable.sh` 
-script to enable HTTPS access to Elasticsearch and to obtain the host and port values to use when specifying the connection options. After this script is run, HTTPS access to Elasticsearch remains enabled until either the `logging/bin/es_nodeport_disable.sh` script is run or the logging components are redeployed.
+If you are using nodeports, an administrator must run the `logging/bin/es_nodeport_enable_open.sh` 
+script to enable HTTPS access to Elasticsearch and to obtain the host and port values to use when specifying the connection options. After this script is run, HTTPS access to Elasticsearch remains enabled until either the `logging/bin/es_nodeport_disable_open.sh` script is run or the logging components are redeployed.
 
 ## Query Options
 
