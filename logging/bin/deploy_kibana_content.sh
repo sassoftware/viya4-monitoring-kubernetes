@@ -149,7 +149,7 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    #Migrating from ODFE 1.7.0 to ODFE 1.13.2 (file should only exist during migration)
    if [ -f "$KB_GLOBAL_EXPORT_FILE" ]; then
 
-      # delete "demo" Kibana tenant space created (but not used) prior to version 1.1.0
+      # delete "demo" Kibana tenant space created (but not used) prior to V4m version 1.1.0
       if kibana_tenant_exists "admin_tenant"; then
 
          delete_kibana_tenant "admin_tenant"
@@ -189,18 +189,6 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    ./logging/bin/import_kibana_content.sh logging/kibana/namespace       cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/tenant          cluster_admins
 
-   # delete "demo" Kibana tenant space created (but not used) prior to v4m version 1.1.0
-   if kibana_tenant_exists "admin_tenant"; then
-
-      delete_kibana_tenant "admin_tenant"
-
-      rc=$?
-      if [ "$rc" == "0" ]; then
-         log_debug "The Kibana tenant space [admin_tenant] was deleted."
-      else
-         log_debug "Problems were encountered while attempting to delete tenant space [admin_tenant]."
-      fi
-   fi
 else
    # Importing content into Global tenant for continuity, to be removed in future
    log_debug "Deploying content into Global tenant (multi-tenancy NOT enabled)"
