@@ -48,7 +48,7 @@ do
      KIBANA)
         namespace=${LOG_NS:-"logging"}
         servicename="v4m-es-kibana-svc"
-        ingressname="v4m-es-kibana"
+        ingressname="v4m-es-kibana-ing"
         tls_flag="$LOG_KB_TLS_ENABLE"
         ;;
      ELASTICSEARCH)

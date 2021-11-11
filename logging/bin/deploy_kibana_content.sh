@@ -95,10 +95,10 @@ if [ "$podready" != "TRUE" ]; then
    exit 1
 fi
 
+set +e
 get_kb_api_url
 
 # Confirm Kibana is ready
-set +e
 for pause in 30 30 30 30 30 30
 do
    response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "${kb_api_url}/api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
