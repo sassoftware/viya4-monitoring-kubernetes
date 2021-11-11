@@ -231,7 +231,7 @@ kibana:
     elasticsearch.password: ${ELASTICSEARCH_PASSWORD}
 
     opendistro_security.multitenancy.enabled: true
-    # opendistro_security.multitenancy.tenants.preferred: ["Global","Private"]
+    opendistro_security.multitenancy.tenants.preferred: ["cluster_admins"]
     opendistro_security.multitenancy.tenants.enable_private: false
     opendistro_security.multitenancy.tenants.enable_global: false
     elasticsearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
