@@ -14,7 +14,7 @@ log_debug "Script [$this_script] has started [$(date)]"
 ES_CONTENT_DEPLOY=${ES_CONTENT_DEPLOY:-${ELASTICSEARCH_ENABLE:-true}}
 
 if [ "$ES_CONTENT_DEPLOY" != "true" ]; then
-  log_info "Environment variable [ES_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into Open Distro for Elasticsearch"
+  log_verbose "Environment variable [ES_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into Open Distro for Elasticsearch"
   exit 0
 fi
 
@@ -27,6 +27,7 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
   fi
 fi
 
+log_info "Loading Content into Elasticsearch"
 
 # temp file used to capture command output
 tmpfile=$TMP_DIR/output.txt
@@ -45,7 +46,7 @@ fi
 # get credentials
 get_credentials_from_secret admin
 rc=$?
-if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
+if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 
 # set up temporary port forwarding to allow curl access
@@ -85,10 +86,10 @@ do
    # TO DO: check for 503 specifically?
 
    if [[ $response != 2* ]]; then
-      log_info "The Elasticsearch REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
+      log_verbose "The Elasticsearch REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
       sleep ${pause}s
    else
-      log_info "The Elasticsearch REST endpoint appears to be ready...continuing"
+      log_debug "The Elasticsearch REST endpoint appears to be ready...continuing"
       esready="TRUE"
       break
    fi
@@ -139,7 +140,7 @@ function set_retention_period {
       kill -9 $pfPID
       exit 1
    else
-      log_info "Index management policy [$policy_name] loaded into Elasticsearch [$response]"
+      log_debug "Index management policy [$policy_name] loaded into Elasticsearch [$response]"
    fi
 }
 
@@ -204,7 +205,7 @@ if [[ $response != 2* ]]; then
    kill -9 $pfPID
    exit 1
 else
-   log_info "Ingest pipeline definition loaded into Elasticsearch [$response]"
+   log_debug "Ingest pipeline definition loaded into Elasticsearch [$response]"
 fi
 
 # Configure index template settings and link Ingest Pipeline to Index Template
@@ -215,7 +216,7 @@ if [[ $response != 2* ]]; then
    kill -9 $pfPID
    exit 1
 else
-   log_info "Index template settings loaded into Elasticsearch [$response]"
+   log_debug "Index template settings loaded into Elasticsearch [$response]"
 fi
 
 # METALOGGING: Create index management policy object & link policy to index template
@@ -234,7 +235,7 @@ if [[ $response != 2* ]]; then
    kill -9 $pfPID
    exit 1
 else
-   log_info "Monitoring index template template settings loaded into Elasticsearch [$response]"
+   log_debug "Monitoring index template template settings loaded into Elasticsearch [$response]"
 fi
 echo ""
 
@@ -245,11 +246,11 @@ if [[ $response != 2* ]]; then
    kill -9 $pfPID
    exit 1
 else
-   log_info "Cluster settings loaded into Elasticsearch [$response]"
+   log_debug "Cluster settings loaded into Elasticsearch [$response]"
 fi
 
 # terminate port-forwarding and remove tmpfile
-log_info "You may see a message below about a process being killed; it is expected and can be ignored."
+log_verbose "You may see a message below about a process being killed; it is expected and can be ignored."
 kill  -9 $pfPID
 rm -f $tmpfile
 

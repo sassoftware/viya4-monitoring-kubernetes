@@ -17,7 +17,7 @@ log_debug "Script [$this_script] has started [$(date)]"
 KIBANA_CONTENT_DEPLOY=${KIBANA_CONTENT_DEPLOY:-${ELASTICSEARCH_ENABLE:-true}}
 
 if [ "$KIBANA_CONTENT_DEPLOY" != "true" ]; then
-  log_info "Environment variable [KIBANA_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into Kibana"
+  log_verbose "Environment variable [KIBANA_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into Kibana"
   exit 0
 fi
 
@@ -46,11 +46,11 @@ fi
 # get credentials
 get_credentials_from_secret admin
 rc=$?
-if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
+if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 set -e
 
-log_info "Configuring Kibana"
+log_info "Configuring Kibana...this may take a few minutes"
 
 #### TEMP:  Remove if/when Helm chart supports defining nodePort
 KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-true}
@@ -62,7 +62,7 @@ if [ "$KB_KNOWN_NODEPORT_ENABLE" == "true" ]; then
    if [ "$SVC_TYPE" == "NodePort" ]; then
      KIBANA_PORT=31033
      kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
-     log_info "Setting Kibana service NodePort to 31033"
+     log_verbose "Setting Kibana service NodePort to 31033"
    fi
 else
   log_debug "Kibana service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
@@ -79,11 +79,11 @@ podready="FALSE"
 for pause in 40 30 20 15 10 10 10 15 15 15 30 30 30 30
 do
    if [[ "$( kubectl -n $LOG_NS get pod -l 'role=kibana' -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}')" == *"True"* ]]; then
-      log_info "The Kibana pod is ready...continuing"
+      log_verbose "The Kibana pod is ready...continuing"
       podready="TRUE"
       break
    else
-      log_info "The Kibana pod is not ready yet...sleeping for [$pause] more seconds before checking again."
+      log_verbose "The Kibana pod is not ready yet...sleeping for [$pause] more seconds before checking again."
       sleep ${pause}s
    fi
 done
@@ -106,10 +106,10 @@ do
    # TO DO: check for 503 specifically?
 
    if [[ $response != 2* ]]; then
-      log_info "The Kibana REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
+      log_debug "The Kibana REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
       sleep ${pause}s
    else
-      log_info "The Kibana REST endpoint appears to be ready...continuing"
+      log_verbose "The Kibana REST endpoint appears to be ready...continuing"
       kibanaready="TRUE"
       break
    fi
@@ -162,7 +162,7 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
          fi
       fi
 
-      log_info "Will attempt to migrate Kibana content from previous deployment."
+      log_verbose "Will attempt to migrate Kibana content from previous deployment."
 
       kb_migrate_response="$TMP_DIR/kb_migrate_response.json"
 
@@ -198,7 +198,7 @@ else
       log_error "There was an issue loading content into Kibana [$response]"
       exit 1
    else
-      log_info "Content loaded into Kibana [$response]"
+      log_verbose "Content loaded into Kibana [$response]"
    fi
 
 fi
