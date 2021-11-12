@@ -14,11 +14,13 @@ log_debug "Script [$this_script] has started [$(date)]"
 ELASTICSEARCH_EXPORTER_ENABLED=${ELASTICSEARCH_EXPORTER_ENABLED:-true}
 
 if [ "$ELASTICSEARCH_EXPORTER_ENABLED" != "true" ]; then
-  log_info "Environment variable [ELASTICSEARCH_EXPORTER_ENABLED] is not set to 'true'; exiting WITHOUT deploying Elasticsearch Exporter"
+  log_verbose "Environment variable [ELASTICSEARCH_EXPORTER_ENABLED] is not set to 'true'; exiting WITHOUT deploying Elasticsearch Exporter"
   exit
 fi
 
 set -e
+
+log_info "Deploying Elasticsearch metric exporter"
 
 # check for pre-reqs
 
@@ -31,7 +33,7 @@ fi
 # get credentials
 get_credentials_from_secret metricgetter
 rc=$?
-if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
+if [ "$rc" != "0" ] ;then log_verbose "RC=$rc"; exit $rc;fi
 
 
 # enable debug on Helm via env var
@@ -43,7 +45,7 @@ fi
 
 helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
 
-log_info "Updating helm repositories..."
+log_verbose "Updating Helm repositories..."
 helm repo update
 
 # Load any user customizations/overrides
@@ -59,7 +61,7 @@ LOG_NODE_PLACEMENT_ENABLE=${LOG_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-
 
 # Optional workload node placement support
 if [ "$LOG_NODE_PLACEMENT_ENABLE" == "true" ]; then
-  log_info "Enabling elasticsearch exporter for workload node placement"
+  log_verbose "Enabling elasticsearch exporter for workload node placement"
   wnpValuesFile="logging/node-placement/values-elasticsearch-exporter-wnp.yaml"
 else
   log_debug "Workload node placement support is disabled for the elasticsearch exporter"
@@ -69,15 +71,12 @@ fi
 
 # Point to OpenShift response file or dummy as appropriate
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
-  log_info "Deploying Elasticsearch metric exporter onto OpenShift cluster"
+  log_verbose "Deploying Elasticsearch metric exporter onto OpenShift cluster"
   openshiftValuesFile="logging/openshift/values-elasticsearch-exporter-openshift.yaml"
 else
   log_debug "Elasticsearch metric exporter is NOT being deployed on OpenShift cluster"
   openshiftValuesFile="$TMP_DIR/empty.yaml"
 fi
-
-
-log_info "Deploying Elasticsearch metric exporter"
 
 # Elasticsearch metric exporter
 helm2ReleaseCheck es-exporter-$LOG_NS

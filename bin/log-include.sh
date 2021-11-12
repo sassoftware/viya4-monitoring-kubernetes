@@ -12,8 +12,21 @@ if [ "$logVerbose" != "true" ]; then
   exec >/dev/null
 fi
 
-function add_notice {
+function add_notice_store {
   echo "$*"  >> $TMP_DIR/notices.txt
+}
+
+function add_notice {
+  width=$(tput cols 2>/dev/null)
+  if [ "$width" == "" ]; then
+    width=80
+  fi
+  n=$(expr $width - $(echo "$1" | wc -c))
+  if [ $n -lt 0 ]; then
+     n=0
+  fi
+  # Fill remaining characters with spaces
+  add_notice_store "$1$(printf %$(eval 'echo $n')s |tr ' ' ' ')"
 }
 
 function display_notices {
@@ -68,7 +81,7 @@ function log_info {
 
 function log_verbose {
   if [ "$logVerbose" == "true" ]; then
-		log_info $*
+		log_info $* >&3
   fi
 }
 
@@ -98,5 +111,5 @@ function log_error {
   fi
 }
 
-export -f log_notice log_message log_debug log_info log_warn log_error add_notice display_notices log_verbose
+export -f log_notice log_message log_debug log_info log_warn log_error add_notice add_notice_store display_notices log_verbose
 export colorEnable levelEnable logDebug

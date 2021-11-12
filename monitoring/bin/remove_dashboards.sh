@@ -8,8 +8,8 @@ source monitoring/bin/common.sh
 
 DASH_NS="${DASH_NS:-$MON_NS}"
 
-log_info "Removing SAS dashboards from [$DASH_NS] namespace..."
+log_info "Removing dashboards from [$DASH_NS] namespace..."
 
 kubectl delete --ignore-not-found cm -n $DASH_NS -l grafana_dashboard=1,sas.com/monitoring-base=kube-viya-monitoring,sas.com/dashboardType
 
-log_info "SAS dashboards removed from the [$DASH_NS] namespace"
+log_info "Removed dashboards from the [$DASH_NS] namespace"

@@ -54,20 +54,20 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     fi
 
     log_debug "Working directory: $(pwd)"
-    log_debug "User directory: $USER_DIR"
+    log_info "User directory: $USER_DIR"
 
     CHECK_HELM=${CHECK_HELM:-true}
     if [ "$CHECK_HELM" == "true" ]; then
        source bin/helm-include.sh
-       log_info "Helm client version: $HELM_VER_FULL"
+       log_verbose "Helm client version: $HELM_VER_FULL"
     fi
 
     CHECK_KUBERNETES=${CHECK_KUBERNETES:-true}
     if [ "$CHECK_KUBERNETES" == "true" ]; then
        source bin/kube-include.sh
 
-       log_info Kubernetes client version: "$KUBE_CLIENT_VER"
-       log_info Kubernetes server version: "$KUBE_SERVER_VER"
+       log_verbose Kubernetes client version: "$KUBE_CLIENT_VER"
+       log_verbose Kubernetes server version: "$KUBE_SERVER_VER"
 
        # Check that the current KUBECONFIG has admin access
        CHECK_ADMIN=${CHECK_ADMIN:-true}
