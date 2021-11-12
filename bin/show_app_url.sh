@@ -12,7 +12,7 @@ this_script=`basename "$0"`
 log_debug "Script [$this_script] has started [$(date)]"
 
 # Fixed-width version of add_notice
-function add_notice_wide {
+function add_notice_old {
   width=$(tput cols 2>/dev/null)
   if [ "$width" == "" ]; then
     width=80
@@ -30,9 +30,9 @@ set +e
 # call function to get HTTP/HTTPS ports from ingress controller
 get_ingress_ports
 
-add_notice_wide ""
-add_notice_wide "Accessing the monitoring applications"
-add_notice_wide ""
+add_notice ""
+add_notice "Accessing the monitoring applications"
+add_notice ""
 
 #start looping through services
 servicelist=${@:-"ALL"}
@@ -87,21 +87,21 @@ do
    service_url=$(get_service_url "$namespace" "$servicename"  "$tls_flag" "$ingressname")
 
    # Print URLs
-   add_notice_wide "*** $service ***"
+   # add_notice "*** $service ***"
    if [ ! -z "$service_url" ]; then
-      add_notice_wide "  You can access $service via the following URL:"
-      add_notice_wide "    $service_url"
-      add_notice_wide ""
+      add_notice "  You can access $service via the following URL:"
+      add_notice "    $service_url"
+      add_notice ""
    else
-      add_notice_wide "  It was not possible to determine the URL needed to access $service"
-      add_notice_wide ""
+      add_notice "  It was not possible to determine the URL needed to access $service"
+      add_notice ""
    fi
 done
 
 
-add_notice_wide " Note: These URLs may be incorrect if your ingress and/or other network"
-add_notice_wide "       configuration includes options this script does not handle."
-add_notice_wide ""
+add_notice " Note: These URLs may be incorrect if your ingress and/or other network"
+add_notice "       configuration includes options this script does not handle."
+add_notice ""
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}
 if [ "$LOGGING_DRIVER" != "true" ]; then
