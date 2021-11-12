@@ -14,7 +14,7 @@ function create_secret_from_file {
 
   if [ -z "$(kubectl -n $LOG_NS get secret $secret_name -o name 2>/dev/null)" ]; then
 
-    # log_debug "Will attempt to create secret [$secret_name]"
+    log_debug "Creating secret [$secret_name]"
 
     if [ -f "$USER_DIR/logging/$file" ]; then filepath=$USER_DIR/logging
     elif [ -f "logging/es/odfe/$file" ]; then filepath=logging/es/odfe

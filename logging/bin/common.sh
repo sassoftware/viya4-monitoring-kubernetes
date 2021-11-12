@@ -9,7 +9,7 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
 
     if [ -f "$USER_DIR/logging/user.env" ]; then
         userEnv=$(grep -v '^[[:blank:]]*$' $USER_DIR/logging/user.env | grep -v '^#' | xargs)
-        log_info "Loading user environment file: $USER_DIR/logging/user.env"
+        log_verbose "Loading user environment file: $USER_DIR/logging/user.env"
         if [ "$userEnv" ]; then
           export $userEnv
         fi

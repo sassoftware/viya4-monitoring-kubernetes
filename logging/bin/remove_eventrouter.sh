@@ -10,7 +10,7 @@ this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
-log_info "Removing eventrouter [$(date)]"
+log_info "Removing Event Router [$(date)]"
 kubectl delete --ignore-not-found -f logging/eventrouter.yaml
 
 log_debug "Script [$this_script] has completed [$(date)]"

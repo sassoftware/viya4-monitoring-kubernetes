@@ -52,7 +52,7 @@ if [ "$1" != "" ]; then
     if [[ $1 =~ .+\.json ]]; then
       # Deploy single dashboard
       f=$1
-      log_info "Deploying Grafana dashboard [$f]..."
+      log_info "Deploying Grafana dashboard [$f]"
       name=$(basename $f .json)
       kubectl create cm -n $DASH_NS $name --dry-run=client --from-file $f -o yaml | kubectl apply -f -
       kubectl label cm -n $DASH_NS $name --overwrite grafana_dashboard=1 sas.com/monitoring-base=kube-viya-monitoring sas.com/dashboardType=manual
@@ -65,7 +65,7 @@ if [ "$1" != "" ]; then
 
   if [ -d "$1" ]; then
     # Deploy specified directory of dashboards
-    log_verbose "Deploying Grafana dashboards in [$1]..."
+    log_verbose "Deploying Grafana dashboards in [$1]"
     deploy_dashboards "manual" "$1" 
     exit $?
   fi
@@ -74,51 +74,51 @@ if [ "$1" != "" ]; then
   exit 1
 fi
 
-log_info "Deploying dashboards to the [$DASH_NS] namespace..."
+log_info "Deploying dashboards to the [$DASH_NS] namespace ..."
 if [ "$WELCOME_DASH" == "true" ]; then
-  log_verbose "Deploying welcome dashboards..."
+  log_verbose "Deploying welcome dashboards"
   deploy_dashboards "welcome"
 fi
 
 if [ "$KUBE_DASH" == "true" ]; then
-  log_verbose "Deploying Kubernetes cluster dashboards..."
+  log_verbose "Deploying Kubernetes cluster dashboards"
   deploy_dashboards "kube"
 fi
 
 if [ "$ISTIO_DASH" == "true" ]; then
-  log_verbose "Deploying Istio dashboards..."
+  log_verbose "Deploying Istio dashboards"
   deploy_dashboards "istio"
 fi
 
 if [ "$LOGGING_DASH" == "true" ]; then
-  log_verbose "Deploying Logging dashboards..."
+  log_verbose "Deploying Logging dashboards"
   deploy_dashboards "logging"
 fi
 
 if [ "$VIYA_DASH" == "true" ]; then
-  log_verbose "Deploying SAS Viya dashboards..."
+  log_verbose "Deploying SAS Viya dashboards"
   deploy_dashboards "viya"
 fi
 
 if [ "$PGMONITOR_DASH" == "true" ]; then
-  log_verbose "Deploying Postgres dashboards..."  
+  log_verbose "Deploying Postgres dashboards"  
   deploy_dashboards "pgmonitor"
 fi
 
 if [ "$RABBITMQ_DASH" == "true" ]; then
-  log_verbose "Deploying RabbitMQ dashboards..."
+  log_verbose "Deploying RabbitMQ dashboards"
   deploy_dashboards "rabbitmq"
 fi
 
 if [ "$NGINX_DASH" == "true" ]; then
-  log_verbose "Deploying NGINX dashboards..."
+  log_verbose "Deploying NGINX dashboards"
   deploy_dashboards "nginx"
 fi
 
 if [ "$USER_DASH" == "true" ]; then
   userDashDir="$USER_DIR/monitoring/dashboards"
   if [ -d "$userDashDir" ]; then
-    log_verbose "Deploying user dashboards from [$userDashDir] ..."
+    log_verbose "Deploying user dashboards from [$userDashDir]"
     deploy_dashboards "user" "$userDashDir"
   fi
 fi

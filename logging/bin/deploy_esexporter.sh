@@ -20,7 +20,7 @@ fi
 
 set -e
 
-log_info "Deploying Elasticsearch metric exporter"
+log_info "Deploying Elasticsearch metric exporter ..."
 
 # check for pre-reqs
 
@@ -33,7 +33,7 @@ fi
 # get credentials
 get_credentials_from_secret metricgetter
 rc=$?
-if [ "$rc" != "0" ] ;then log_verbose "RC=$rc"; exit $rc;fi
+if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 
 # enable debug on Helm via env var
@@ -45,7 +45,7 @@ fi
 
 helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
 
-log_verbose "Updating Helm repositories..."
+log_verbose "Updating Helm repositories"
 helm repo update
 
 # Load any user customizations/overrides

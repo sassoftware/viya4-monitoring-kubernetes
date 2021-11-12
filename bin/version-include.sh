@@ -59,7 +59,7 @@ function deployV4MInfo() {
   valuesYAML=$TMP_DIR/v4mValues.yaml
   populateValuesYAML "$valuesYAML"
 
-  log_info "Updating Viya Monitoring for Kubernetes version information..."
+  log_info "Updating Viya Monitoring for Kubernetes version information"
   helm upgrade --install \
     -n "$NS" \
     --values $valuesYAML \
@@ -72,7 +72,7 @@ function removeV4MInfo() {
     log_error "No namespace specified for removing Viya Monitoring for Kubernetes version information"
     return 1
   fi
-  log_info "Removing Viya Monitoring for Kubernetes version information..."
+  log_info "Removing Viya Monitoring for Kubernetes version information"
   helm uninstall -n "$NS" v4m
 }
 

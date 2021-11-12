@@ -22,7 +22,7 @@ fi
 
 set -e
 
-log_info "Deploying Fluent Bit"
+log_info "Deploying Fluent Bit ..."
 
 # check for pre-reqs
 # Confirm namespace exists
@@ -34,7 +34,7 @@ fi
 # get credentials
 get_credentials_from_secret logcollector
 rc=$?
-if [ "$rc" != "0" ] ;then log_verbose "RC=$rc"; exit $rc;fi
+if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 
 HELM_DEBUG="${HELM_DEBUG:-false}"
@@ -91,7 +91,7 @@ else
    # use copy in repo
    FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_open.yaml"
 fi
-# log_info "Using FB ConfigMap:" $FB_CONFIGMAP
+log_debug "Using FB ConfigMap:" $FB_CONFIGMAP
 
 
 # Create ConfigMap containing Fluent Bit configuration
