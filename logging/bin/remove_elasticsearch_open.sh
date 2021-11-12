@@ -14,7 +14,7 @@ log_info "Removing Open Distro for Elasticsearch [$(date)]"
 helm delete -n $LOG_NS odfe
 
 
-log_info "Removing ConfigMaps"
+log_verbose "Removing ConfigMaps"
 kubectl -n $LOG_NS delete configmap run-securityadmin.sh  --ignore-not-found
 
 log_debug "Script [$this_script] has completed [$(date)]"

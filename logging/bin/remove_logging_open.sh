@@ -25,32 +25,28 @@ LOG_DELETE_NAMESPACE_ON_REMOVE=${LOG_DELETE_NAMESPACE_ON_REMOVE:-false}
 helm2ReleaseCheck odfe-$LOG_NS
 helm2ReleaseCheck es-exporter-$LOG_NS
 
-log_info "Removing logging components [$(date)]"
+log_notice "Removing logging components from the [$LOG_NS] namespace [$(date)]"
 
-log_info "Removing Fluent Bit..."
 logging/bin/remove_fluentbit_open.sh
 
-log_info "Removing Elasticsearch Metric Exporter..."
 logging/bin/remove_esexporter.sh
 
-log_info "Removing Open Distro for Elasticsearch..."
 logging/bin/remove_elasticsearch_open.sh
 
-log_info "Removing eventrouter..."
 logging/bin/remove_eventrouter.sh
 
 if [ "$LOG_DELETE_PVCS_ON_REMOVE" == "true" ]; then
-  log_info "Removing known logging PVCs..."
+  log_verbose "Removing known logging PVCs..."
   kubectl delete pvc --ignore-not-found -n $LOG_NS -l app=v4m-es
 fi
 
 if [ "$LOG_DELETE_SECRETS_ON_REMOVE" == "true" ]; then
-  log_info "Removing known logging secrets..."
+  log_verbose "Removing known logging secrets..."
   kubectl delete secret --ignore-not-found -n $LOG_NS -l managed-by=v4m-es-script
 fi
 
 if [ "$LOG_DELETE_CONFIGMAPS_ON_REMOVE" == "true" ]; then
-  log_info "Removing known logging configmaps..."
+  log_verbose "Removing known logging configmaps..."
   kubectl delete configmap --ignore-not-found -n $LOG_NS -l managed-by=v4m-es-script
 fi
 

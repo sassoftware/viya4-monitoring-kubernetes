@@ -22,7 +22,7 @@ log_info "Removing Fluent Bit components [$fbRelease] from the [$LOG_NS] namespa
 
 helm delete -n $LOG_NS $fbRelease
 
-log_info "Removing ConfigMaps"
+log_verbose "Removing ConfigMaps"
 kubectl -n $LOG_NS delete configmap fb-fluent-bit-config   --ignore-not-found
 kubectl -n $LOG_NS delete configmap fb-viya-parsers        --ignore-not-found
 
