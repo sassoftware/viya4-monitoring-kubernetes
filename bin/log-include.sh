@@ -36,17 +36,17 @@ function log_notice {
      n=0
   fi
   # Fill remaining characters with spaces
-  # echo "$1$(printf %$(eval 'echo $n')s |tr ' ' ' ')" >> $TMP_DIR/notices.txt
   text="$*$(printf %$(eval 'echo $n')s |tr ' ' ' ')"
+
   if [ "$colorEnable" = "true" ]; then
     whiteb "${bluebg}$text"
   else
-    echo $text >&3
+    echo "$text" >&3
   fi
 }
 
 function log_message {
-    echo $*  >&3
+    echo "$*"  >&3
 }
 
 function log_debug {

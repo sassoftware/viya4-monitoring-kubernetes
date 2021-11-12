@@ -11,20 +11,6 @@ this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
-# Fixed-width version of add_notice
-function add_notice_old {
-  width=$(tput cols 2>/dev/null)
-  if [ "$width" == "" ]; then
-    width=80
-  fi
-  n=$(expr $width - $(echo "$1" | wc -c))
-  if [ $n -lt 0 ]; then
-     n=0
-  fi
-  # Fill remaining characters with spaces
-  add_notice "$1$(printf %$(eval 'echo $n')s |tr ' ' ' ')"
-}
-
 set +e
 
 # call function to get HTTP/HTTPS ports from ingress controller
