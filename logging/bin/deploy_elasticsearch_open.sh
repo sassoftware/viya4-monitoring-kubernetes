@@ -122,9 +122,9 @@ if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
       #KB_GLOBAL_EXPORT_FILE="$TMP_DIR/kibana_global_content.ndjson"
 
       log_debug "Exporting exisiting content from global tenant to temporary file [$KB_GLOBAL_EXPORT_FILE]."
-
+      set +e
       get_kb_api_url
-
+      set -e
       content2export='{"type": ["config", "url","visualization", "dashboard", "search", "index-pattern"],"excludeExportDetails": false}'
 
       response=$(curl -s -o $KB_GLOBAL_EXPORT_FILE  -w  "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_export" -d "$content2export"  -H "kbn-xsrf: true" -H 'Content-Type: application/json' -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
