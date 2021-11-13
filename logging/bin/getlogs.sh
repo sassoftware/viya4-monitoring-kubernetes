@@ -33,8 +33,8 @@ default_maxrows=500
 
 # NOTE: the 'trim(foo.bar.keyword) as bar' syntax is needed to ensure nested fields appear
 #       as properly named columns rather than as nested fields "(e.g. foo={'bar'='baz'})"
-#default_output_vars="@timestamp, level, logsource,kube.namespace, kube.pod, kube.container, message"
-default_output_vars="@timestamp, level, logsource,trim(kube.namespace.keyword) as namespace, trim(kube.pod.keyword) as pod, trim(kube.container.keyword) as container, message"
+default_output_vars="@timestamp, level, logsource,kube.namespace as namespace, kube.pod as pod, kube.container as container, message"
+#default_output_vars="@timestamp, level, logsource,trim(kube.namespace.keyword) as namespace, trim(kube.pod.keyword) as pod, trim(kube.container.keyword) as container, message"
 
 valid_levels="PANIC,FATAL,ERROR,WARNING,INFO,DEBUG,NONE"
 
@@ -465,17 +465,15 @@ fi
 output_vars=${output_vars:-$default_output_vars}
 
 if [[ ! -z "$query_file" ]]; then
-   query_count=1
    log_info "Submitting query from file [$query_file] for processing."
-   listofqueries[0]=$query_file
 else
-   query_max_days=100
 
    # Date processing:
    #  if none provided, use last hour
    if [ -z "$end_dt" ]; then
       end_dt=$(date +"%Y-%m-%dT%H:%M:%S%z")
    fi
+
    if [ -z "$start_dt" ]; then
       start_dt=$(date -d "$end_dt -1 hour"  +"%Y-%m-%dT%H:%M:%S%z")
    fi
@@ -485,12 +483,14 @@ else
    end_tz=$(date -d "$end_dt" +"%Y-%m-%dT%H:%M:%S%z")
 
    # convert to UTC/GMT
-   start_date=$(date -u -d "$start_tz" +"%Y-%m-%dT%H:%M:%SZ")
-   end_date=$(date -u -d "$end_tz" +"%Y-%m-%dT%H:%M:%SZ")
+   start_date=$(date -u -d "$start_tz" +"%Y-%m-%d %H:%M:%S")
+   end_date=$(date -u -d "$end_tz" +"%Y-%m-%d %H:%M:%S")
 
    # format dates as epoch to allow validation/comparison
    start_date_epoch=$(date -d "$start_date" +"%s")
    end_date_epoch=$(date -d "$end_date" +"%s")
+
+   echo "start_dt:$start_dt start_tz:$start_tz start_date:$start_date start_date_epoch:$start_date_epoch"  #REMOVE
 
    # Validate provided date range
    if [[ "$end_date_epoch" -lt "$start_date_epoch" ]]; then
@@ -498,98 +498,61 @@ else
       exit 2
    fi
 
-   # Extract day and reformat to allow string comparison
-   start_day=$(date -d "$start_date" +"%Y%m%d")
-   end_day=$(date -d "$end_date" +"%Y%m%d")
+   query_file="$TMP_DIR/query.json"
 
-   today=$(date -u +"%Y%m%d")
+   #initialize query file
+   echo -n "" > $query_file
 
-   if [[ "$end_day" -le "$today" ]]; then
-      prevday="$end_day"
+   #start JSON
+   echo -n '{"query":"' >> $query_file
+
+   #build SELECT clause
+   echo -n "select $output_vars " >> $query_file
+
+   if [ "$OPS_INDEX" == "true" ]; then
+      index_date=$(date -d "$end_date"  +"%Y.%m.%d")  # TO DO: convert '-' to '.'
+      index_name="viya_ops-$index_date";
    else
-      prevday="$today"
+      # getting viya_logs
+      if [ -z "$namespace" ]; then
+         log_error "The REQUIRED option [--namespace] has not been specified."
+         exit 1
+      fi
+      index_name="viya_logs-*"
    fi
 
-   query_count=0
+   echo -n " from $index_name "  >> $query_file
 
-   while [[ "$start_day" -le  "$prevday" ]]           # Loop in reverse data to get most recent data first
-   do
-      pdayfmt=$(date -d "$prevday" +"%Y-%m-%d")       # format used for index names
-      listofdays[query_count]="$pdayfmt"              # add to list of dates
+   #WHERE clauses
+   echo  -n " where 1 = 1 " >> $query_file  # dummy always true
 
-      prevday=$(date -d "$prevday - 1 day" +"%Y%m%d") # decrement by 1 day
+   if [ ! -z "$namespace" ];  then echo -n " and kube.namespace ='$namespace'" >> $query_file; fi;
 
-      ((query_count++))
-      if [[ $query_count -ge $query_max_days ]]; then
-         log_error "Number of days requested exceeds expected maximum; your query will be limited to maximum [$query_max_days] days"
-         break
-      fi
-   done
-   log_debug "Query Count:$query_count  List of Days: ${listofdays[@]}"
+   if [ ! -z "$logsource" ];          then echo -n " and logsource          in $(csvlist $logsource)"         >> $query_file; fi;
+   if [ ! -z "$logsource_exclude" ];  then echo -n " and logsource      NOT in $(csvlist $logsource_exclude)" >> $query_file; fi;
+   if [ ! -z "$pod" ];                then echo -n " and kube.pod           in $(csvlist $pod)"               >> $query_file; fi;
+   if [ ! -z "$pod_exclude" ];        then echo -n " and kube.pod       NOT in $(csvlist $pod_exclude)"       >> $query_file; fi;
+   if [ ! -z "$container" ];          then echo -n " and kube.container     in $(csvlist $container)"         >> $query_file; fi;
+   if [ ! -z "$container_exclude" ];  then echo -n " and kube.container NOT in $(csvlist $container_exclude)" >> $query_file; fi;
+   if [ ! -z "$msglevel" ];           then echo -n " and level              in $(csvlist $msglevel)"          >> $query_file; fi;
+   if [ ! -z "$level_exclude" ];      then echo -n " and level          NOT in $(csvlist $level_exclude)"     >> $query_file; fi;
 
-   for ((i=0; i < $query_count; i++));
-   do   # construct queries
+   if [ ! -z "$search_string" ];  then echo -n " and multi_match('$search_string')">> $query_file; fi;
 
-      query_file="$TMP_DIR/query.$i.json"
-      listofqueries[i]="$query_file"
+   if [ ! -z "$start_date" ]; then echo -n " and @timestamp >= timestamp('$start_date')" >> $query_file; fi;
+   if [ ! -z "$end_date" ];   then echo -n " and @timestamp <  timestamp('$end_date')"   >> $query_file; fi;
 
-      #initialize query file
-      echo -n "" > $query_file
+   echo -n "order by @timestamp DESC " >> $query_file;
 
-      #start JSON
-      echo -n '{"query":"' >> $query_file
+   if [ ! -z "$maxrows" ];      then echo -n " limit $maxrows" >> $query_file ; fi;
 
-      #build SELECT clause
-      echo -n "select $output_vars " >> $query_file
-
-      if [ "$OPS_INDEX" == "true" ]; then
-         index_date=$(date -d "$end_date"  +"%Y.%m.%d")  # TO DO: convert '-' to '.'
-         index_name="viya_ops-$index_date";
-      else
-         # getting viya_logs
-         if [ -z "$namespace" ]; then
-            log_error "The REQUIRED option [--namespace] has not been specified."
-            exit 1
-         fi
-
-         index_name="viya_logs-$namespace-${listofdays[i]}";
-      fi
-
-      echo -n " from $index_name "  >> $query_file
-
-      #WHERE clauses
-      echo  -n " where 1 = 1 " >> $query_file  # dummy always true
-
-      if [ ! -z "$namespace" ];  then echo -n " and kube.namespace ='$namespace'" >> $query_file; fi;
-
-      if [ ! -z "$logsource" ];          then echo -n " and logsource          in $(csvlist $logsource)"         >> $query_file; fi;
-      if [ ! -z "$logsource_exclude" ];  then echo -n " and logsource      NOT in $(csvlist $logsource_exclude)" >> $query_file; fi;
-      if [ ! -z "$pod" ];                then echo -n " and kube.pod           in $(csvlist $pod)"               >> $query_file; fi;
-      if [ ! -z "$pod_exclude" ];        then echo -n " and kube.pod       NOT in $(csvlist $pod_exclude)"       >> $query_file; fi;
-      if [ ! -z "$container" ];          then echo -n " and kube.container     in $(csvlist $container)"         >> $query_file; fi;
-      if [ ! -z "$container_exclude" ];  then echo -n " and kube.container NOT in $(csvlist $container_exclude)" >> $query_file; fi;
-      if [ ! -z "$msglevel" ];           then echo -n " and level              in $(csvlist $msglevel)"          >> $query_file; fi;
-      if [ ! -z "$level_exclude" ];      then echo -n " and level          NOT in $(csvlist $level_exclude)"     >> $query_file; fi;
-
-      if [ ! -z "$search_string" ];  then echo -n " and multi_match('$search_string')">> $query_file; fi;
-
-      if [ ! -z "$start_date" ]; then echo -n " and @timestamp >= '$start_date'" >> $query_file; fi;
-      if [ ! -z "$end_date" ];   then echo -n " and @timestamp <  '$end_date'"   >> $query_file; fi;
-
-      echo "order by @timestamp DESC" >> $query_file;
-
-      if [ ! -z "$maxrows" ];      then echo -n " limit $maxrows" >> $query_file ; fi;
-
-      echo -n '"}'>> $query_file  #close json
-      echo '' >> $query_file
-
-   done # construct queries
+   echo -n ';"}' >> $query_file  #close json
+   echo '' >> $query_file
 fi
 
 if [ "$showquery" == "true" ]; then
-   log_info "The following query is an example of the queries that will be submitted."
-   log_info "More than one query may be submitted depending on the specified time range."
-   cat ${listofqueries[0]}
+   log_info "The following query will be submitted."
+   cat $query_file
 fi
 
 maxtime=${ESQUERY_MAXTIME:-180}
@@ -598,21 +561,15 @@ total_lines=0
 
 log_info "Search for matching log messages started... $(date)"
 
-for ((i=0; i < $query_count; i++));
-do # submit queries
 
-   query_file=${listofqueries[i]}
-   qresults_file="$TMP_DIR/query_results.$i.txt"
+   qresults_file="$TMP_DIR/query_results.txt"
 
-   log_debug "Query [$(($i+1))] of [$query_count] $(date)"
    response=$(curl -m $maxtime -s  -o $qresults_file -w "%{http_code}"  -XPOST "$protocol://$host:$port/_opendistro/_sql?format=$format" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $username:$password -k)
    rc=$?
    log_debug "curl command response: [$response] rc:[$rc]"
 
 
    if [[ $response != 2* ]]; then
-
-      listofoutputs[i]="bad response"    # remove out_file from list of files to return to user
 
       if [[ "$rc" == "28" ]]; then
          log_warn "Query [$(($i+1))] did not complete within the permitted time [$maxtime] seconds."
@@ -626,70 +583,52 @@ do # submit queries
             log_debug "IndexNotFoundException found in file [$qresults_file]"
          else
             # problem is something more than no index found, keep output to show user
-            listofbadouts+=("$qresults_file")
+            queryfailed="true"
+            log_debug "A problem other than no index found was encountered"  ##TO DO: DO WHAT HERE?
          fi # IndexNotFoundException
       fi  # handle non-200 responses
    else   # handle 2** response
-      listofoutputs[i]="$qresults_file"
-
       lines_returned=$(cat $qresults_file|wc -l)
-      #lines_returned=$((lines_returned-1))  # ignore header line
-      total_lines=$((total_lines+lines_returned));
-      log_debug "Query [$(($i+1))] returned [$lines_returned] lines; total lines returned so far [$total_lines]."
-
-      if [[ $total_lines -ge $maxrows ]]; then
-         log_debug "Total number of lines returned [$lines_returned] is equal to or greater than the maximum requested (--maxrows) [$maxrows]; skipping remaining queries"
-         query_count=$(($i+1));
-         break
-      fi
+      queryfailed="false"
    fi
-done  # submit queries
 
-log_debug "Approximately [$total_lines] log messages found"
+log_debug "Approximately [$lines_returned] log messages found"
 
-starting_row=1
-for ((i=0; i < $query_count; i++));
-do  # process output files
 
-   if [ ${#listofbadouts[@]} -ge $query_count ]; then
-      log_warn "None of the queries submitted to retrieve log messages completed successfully."
-      log_warn "This may only mean there were no log messages collected during the specified time period; or"
-      log_warn "this may indicate there were some other problems.  "
-      log_warn "The responses received will be displayed below; review them to determine if there is a problem."
-      break
-   elif [ -z "${listofoutputs[i]}" ]; then
-      continue
-   elif [ "${listofoutputs[i]}" == "bad response" ];then
-      log_debug "Output for query [$i] omitted since request exited with bad response code"
-   elif [ "$output_file_specified" == "true" ]; then
-      tail -n +$starting_row ${listofoutputs[i]} >> $target_file
-      echo ""  >> $target_file  #move to new line for next file
-      starting_row=2 # for subsequent files, skip first (header) row
+   #TODO: Review...probably need something comparable: to check for results before outputting them
+   #TODO: REVIEW ordering...probably can re-arrange the chunks below now that there is only 1 query
+
+   ##if [ ${#listofbadouts[@]} -ge $query_count ]; then
+   ##   log_warn "None of the queries submitted to retrieve log messages completed successfully."
+   ##   log_warn "This may only mean there were no log messages collected during the specified time period; or"
+   ##   log_warn "this may indicate there were some other problems.  "
+   ##   log_warn "The responses received will be displayed below; review them to determine if there is a problem."
+   ##   break
+   ## elif [ -z "${listofoutputs[i]}" ]; then
+   ##   continue
+   ## elif [ "${listofoutputs[i]}" == "bad response" ];then
+   ##   log_debug "Output for query [$i] omitted since request exited with bad response code"
+
+   if [ "$output_file_specified" == "true" ]; then
+      tail -n +1 ${qresults_file} >> $target_file
    else
-      tail -n +$starting_row ${listofoutputs[i]}
-      starting_row=2 # for subsequent files, skip first (header) row
+      tail -n +1 ${qresults_file}
    fi
 
-done # process output files
+if [ "$queryfailed" == "true" ]; then
+   log_warn "There were issues getting the requested log messages; the query returned an unexpected response code."
+   log_warn "These unexpected response returned the following message(s):"
 
-if [ ${#listofbadouts[@]} -gt 0 ]; then
-   log_warn "There were issues getting the requested log messages; one or more queries returned an unexpected response code."
-   log_warn "These unexpected responses returned the following message(s):"
-
-   for file in ${listofbadouts[@]}
-   do
-      cat  $file
-      echo ""
-   done
+   cat  $qresults_file
 fi
 
-if [ $total_lines -eq 0 ]; then
+if [ $lines_returned -eq 0 ]; then
    log_info "No log messages meeting the specified criteria were found."
    exit
 else
    # at least one good response
    if [ "$output_file_specified" == "true" ]; then
-      log_info "Output results (approx. $total_lines) written to requested output file [$target_file]"
+      log_info "Output results (approx. $lines_returned) written to requested output file [$target_file]"
    else
       echo "" # add line break after any output
    fi
