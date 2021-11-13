@@ -29,7 +29,6 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   kubectl create ns $LOG_NS
 fi
 
-set -e
 
 log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 
