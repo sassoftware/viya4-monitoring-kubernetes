@@ -257,6 +257,48 @@ The script creates the namespace into which the components are deployed. By defa
 Updates in place are supported. To update, re-run the
 `deploy_logging_open.sh` script to install the latest versions of all components, indexes, and dashboards.
 
+## Important Information about Kibana in the New Release
+
+### Overview
+
+**Notes:**
+
+* As of release 1.1.0, this project now uses Open Distro for Elasticsearch version 1.13.2, which includes updated versions of Elasticsearch and Kibana.
+* In this release, the multi-tenancy capabilities of Kibana have been enabled. This change requires that users select a Kibana tenant space after logging in. For the new procedure, see [Log Into Kibana](#login_kibana).
+* Kibana no longer provides a persistent navigation bar by default. Instead, a menu button ( ![menu button](../img/kibana_menu.png) ) that opens the navigation menu is now provided. You can choose to make the navigation menu persist on the page by clicking __Dock navigation__.
+
+### <a name="login_kibana"></a>Log In to Kibana
+
+Use the following steps to log in to Kibana:
+
+1. In the "Login to Kibana" window, enter your Kibana credentials and click __Log In__. The "Select your tenant" window appears.
+2. In the __Choose from custom__ list, confirm that your tenant is selected by default. If not, select your tenant from the list.
+
+     **Important:** Do not select __global_tenant__ if it appears in the list.
+
+3. Select the __Remember my selection next time I log in from this device__ check box.
+4. Click __Confirm__. Kibana opens.
+
+### Troubleshooting
+
+In rare instances, Kibana might open incorrectly: 
+
+* After logging into Kibana, you cannot locate your expected content. This happens when Kibana loads an incorrect Kibana tenant space. When this occurs it is possible that your selected Kibana tenant space is still listed in the __Account__ menu.
+* Kibana opens incorrectly on the "Create an Index Pattern" page.
+
+Use the following procedure to correct these problems:
+
+1. In the application banner, click the __Account__ menu.
+
+    ![The expanded Kibana account menu is located in the upper right corner of the page.](../img/kibana_account_menu.png)
+
+2. Click __Switch tenants__. The "Select your tenant" window appears.
+3. In the __Choose from custom__ list, select your Kibana tenant space. 
+
+     **Important:** Do not select __global_tenant__ if it appears on the list.
+4. Be sure to select the __Remember my selection next time I log in from this device__ check box.
+5. Click __Confirm__.
+
 ## <a name="lremove"></a>Remove Logging Components
 
 To remove all logging components, run the following command:
