@@ -18,15 +18,6 @@ if [ "$ES_CONTENT_DEPLOY" != "true" ]; then
   exit 0
 fi
 
-# Confirm NOT on OpenShift
-if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
-  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
-    log_error "This script should NOT be run on OpenShift clusters"
-    log_error "Run logging/bin/deploy_elasticsearch_content_open_openshift.sh instead"
-    exit 1
-  fi
-fi
-
 log_info "Loading Content into Elasticsearch"
 
 # temp file used to capture command output
@@ -218,6 +209,26 @@ if [[ $response != 2* ]]; then
 else
    log_debug "Index template settings loaded into Elasticsearch [$response]"
 fi
+
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+   # INFRASTRUCTURE LOGS
+   # Handle "infrastructure" logs differently
+   INFRA_LOG_RETENTION_PERIOD="${INFRA_LOG_RETENTION_PERIOD:-1}"
+   set_retention_period viya_infra_idxmgmt_policy INFRA_LOG_RETENTION_PERIOD
+   add_ism_template "viya_infra_idxmgmt_policy"  "viya_logs-openshift-*"
+fi
+
+# Link index management policy Index Template
+response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-infra-template "    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_infra_openshift.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+# request returns: {"acknowledged":true}
+if [[ $response != 2* ]]; then
+   log_error "There was an issue loading infrastructure index template settings into Elasticsearch [$response]"
+   kill -9 $pfPID
+   exit 1
+else
+   log_info "Infrastructure index template settings loaded into Elasticsearch [$response]"
+fi
+
 
 # METALOGGING: Create index management policy object & link policy to index template
 # ...index management policy automates the deletion of indexes after the specified time
