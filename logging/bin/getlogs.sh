@@ -15,27 +15,53 @@ source bin/common.sh
 
 this_script=`basename "$0"`
 
-function csvlist {
-   # this function parses the input
-   # (a comma separated list of values)
-   # and returns a comma separated
-   # list of escaped quoted values
-   # enclosed in parens.
-   local rawvalue values outvalue
-   rawvalue=$@
-   IFS=', ' read -a arr <<<"$rawvalue"
-   printf -v values ",'%s'" "${arr[@]}"
-   outvalue="(${values:1})"
-   echo "$outvalue"
+function silly_ors {
+   # this function parses the input,
+   # a field name and a comma
+   # separated list of values, and
+   # returns a WHERE sub-clause of the form:
+   #  and (field = value or field = value2)
+   # This is needed to get around a bug
+   # which makes the "in" operator NOT
+   # usable in ODFE 1.13.2
+
+   local value field orstr
+   field=$1
+   shift
+   IFS=', ' read -a arr <<<"$@"
+   echo -n " and ("
+   for value in "${arr[@]}"
+   do
+      echo -n "$orstr $field = '$value'";
+      orstr=" OR "
+   done;
+   echo -n ") "
+}
+function silly_ands {
+   # this function parses the input,
+   # a field name and a comma
+   # separated list of values, and
+   # returns a WHERE sub-clause of the form:
+   #  and (field != value and field != value2)
+   # This is needed to get around a bug
+   # which makes the "in" operator NOT
+   # usable in ODFE 1.13.2
+
+   local value field andstr
+   field=$1
+   shift
+   IFS=', ' read -a arr <<<"$@"
+   echo -n " and ("
+   for value in "${arr[@]}"
+   do
+      echo -n "$andstr $field != '$value'";
+      andstr=" AND "
+   done;
+   echo -n ") "
 }
 
 default_maxrows=500
-
-# NOTE: the 'trim(foo.bar.keyword) as bar' syntax is needed to ensure nested fields appear
-#       as properly named columns rather than as nested fields "(e.g. foo={'bar'='baz'})"
 default_output_vars="@timestamp, level, logsource,kube.namespace as namespace, kube.pod as pod, kube.container as container, message"
-#default_output_vars="@timestamp, level, logsource,trim(kube.namespace.keyword) as namespace, trim(kube.pod.keyword) as pod, trim(kube.container.keyword) as container, message"
-
 valid_levels="PANIC,FATAL,ERROR,WARNING,INFO,DEBUG,NONE"
 
 function show_usage {
@@ -46,11 +72,11 @@ function show_usage {
    log_info  ""
    log_info  "Submits a query to Elasticsearch for log messages meeting the specified criteria and directs results to stdout or specified file."
    log_info  "Results are returned in CSV (comma-separated value) format.  In most case, option values are expected to be a single value (exceptions noted below)."
-   log_info  "NOTE: The NAMESPACE option (-n|--namespace) is required.   Connection information is also required but may be provided via environment variables."
+   log_info  "NOTE: Connection information is required but may be provided via environment variables."
    log_info  ""
    log_info  "     ** Query Options **"
-   log_info  "     -n,  --namespace         NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace for which logs are sought"
-   log_info  ""
+   log_info  "     -n,  --namespace         NAMESPACE - Oneor more Viya deployments/Kubernetes Namespace for which logs are sought"
+   log_info  "     -nx, --namespace-exclude NAMESPACE - One or more namespaces for which logs should be excluded from the output"
    log_info  "     -p,  --pod               POD       - One or more pods for which logs are sought"
    log_info  "     -px, --pod-exclude       POD       - One or more pods for which logs should be excluded from the output"
    log_info  "     -c,  --container         CONTAINER - One or more containers for which logs are sought"
@@ -60,7 +86,7 @@ function show_usage {
    log_info  "     -l,  --level             INFO|etc  - One or more message levels for which logs are sought."
    log_info  "                                          Valid values for message level: $valid_levels"
    log_info  "     -lx, --level-exclude     INFO|etc  - One or more message levels for which logs should be excluded from the output."
-   log_info  '          NOTE: The POD*, CONTAINER*, LOGSOURCE* and LEVEL* options accept multiple, comma-separated, values (e.g. --level "INFO, NONE")'
+   log_info  '          NOTE: The NAMESPACE*, POD*, CONTAINER*, LOGSOURCE* and LEVEL* options accept multiple, comma-separated, values (e.g. --level "INFO, NONE")'
    log_info  ""
    log_info  '          --search            "joe smith"  - Word or phrase contained in log message.'
    log_info  ""
@@ -115,6 +141,19 @@ while (( "$#" )); do
         exit 2
       fi
       ;;
+
+    -nx|--namespace-exclude|-xn)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        namespace_exclude=$2
+        shift 2
+      else
+        log_error "Option [--namespace-exclude (Namespaces to Exclude)] has been specified but no value was provided." >&2
+        show_usage
+        exit 2
+      fi
+      ;;
+
+
     -p|--pod)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         pod=$2
@@ -415,7 +454,7 @@ if [ -z "$username" ]; then
 fi
 
 if [ -z "$password" ]; then
-   log_error "The REQUIRED field [password] is missing; please provide it via the --password option or via the ESPASSWD environment variable."
+   log_error "The REQUIRED field [PASSWORD] is missing; please provide it via the --password option or via the ESPASSWD environment variable."
    exit 1
 fi
 
@@ -425,7 +464,6 @@ elif [ "$protocol" != "http" ] && [ "$protocol" != "https" ]; then
    log_error "An invalid value [$protocol] was provided for the --protocol option; allowed values are \"https\" or \"http\""
    exit 1
 fi
-
 
 log_debug "Connection options PROTOCOL: $protocol HOST: $host PORT: $port  USERNAME: $username"
 
@@ -490,7 +528,7 @@ else
    start_date_epoch=$(date -d "$start_date" +"%s")
    end_date_epoch=$(date -d "$end_date" +"%s")
 
-   echo "start_dt:$start_dt start_tz:$start_tz start_date:$start_date start_date_epoch:$start_date_epoch"  #REMOVE
+   log_debug "start_dt:$start_dt start_tz:$start_tz start_date:$start_date start_date_epoch:$start_date_epoch"  #REMOVE?
 
    # Validate provided date range
    if [[ "$end_date_epoch" -lt "$start_date_epoch" ]]; then
@@ -510,14 +548,8 @@ else
    echo -n "select $output_vars " >> $query_file
 
    if [ "$OPS_INDEX" == "true" ]; then
-      index_date=$(date -d "$end_date"  +"%Y.%m.%d")  # TO DO: convert '-' to '.'
-      index_name="viya_ops-$index_date";
+      index_name="viya_ops-*";
    else
-      # getting viya_logs
-      if [ -z "$namespace" ]; then
-         log_error "The REQUIRED option [--namespace] has not been specified."
-         exit 1
-      fi
       index_name="viya_logs-*"
    fi
 
@@ -526,23 +558,23 @@ else
    #WHERE clauses
    echo  -n " where 1 = 1 " >> $query_file  # dummy always true
 
-   if [ ! -z "$namespace" ];  then echo -n " and kube.namespace ='$namespace'" >> $query_file; fi;
-
-   if [ ! -z "$logsource" ];          then echo -n " and logsource          in $(csvlist $logsource)"         >> $query_file; fi;
-   if [ ! -z "$logsource_exclude" ];  then echo -n " and logsource      NOT in $(csvlist $logsource_exclude)" >> $query_file; fi;
-   if [ ! -z "$pod" ];                then echo -n " and kube.pod           in $(csvlist $pod)"               >> $query_file; fi;
-   if [ ! -z "$pod_exclude" ];        then echo -n " and kube.pod       NOT in $(csvlist $pod_exclude)"       >> $query_file; fi;
-   if [ ! -z "$container" ];          then echo -n " and kube.container     in $(csvlist $container)"         >> $query_file; fi;
-   if [ ! -z "$container_exclude" ];  then echo -n " and kube.container NOT in $(csvlist $container_exclude)" >> $query_file; fi;
-   if [ ! -z "$msglevel" ];           then echo -n " and level              in $(csvlist $msglevel)"          >> $query_file; fi;
-   if [ ! -z "$level_exclude" ];      then echo -n " and level          NOT in $(csvlist $level_exclude)"     >> $query_file; fi;
+   if [ ! -z "$namespace" ];          then echo -n " $(silly_ors  kube.namespace $namespace) "          >> $query_file; fi;
+   if [ ! -z "$namespace_exclude" ];  then echo -n " $(silly_ands kube.namespace $namespace_exclude) "  >> $query_file; fi;
+   if [ ! -z "$logsource" ];          then echo -n " $(silly_ors  logsource      $logsource)"           >> $query_file; fi;
+   if [ ! -z "$logsource_exclude" ];  then echo -n " $(silly_ands logsource      $logsource_exclude)"   >> $query_file; fi;
+   if [ ! -z "$pod" ];                then echo -n " $(silly_ors  kube.pod       $pod)"                 >> $query_file; fi;
+   if [ ! -z "$pod_exclude" ];        then echo -n " $(silly_ands kube.podt      $pod_exclude)"         >> $query_file; fi;
+   if [ ! -z "$container" ];          then echo -n " $(silly_ors  kube.container $container)"           >> $query_file; fi;
+   if [ ! -z "$container_exclude" ];  then echo -n " $(silly_ands kube.container $container_exclude)"   >> $query_file; fi;
+   if [ ! -z "$msglevel" ];           then echo -n " $(silly_ors  level          $msglevel)"            >> $query_file; fi;
+   if [ ! -z "$level_exclude" ];      then echo -n " $(silly_ands level          $level_exclude)"       >> $query_file; fi;
 
    if [ ! -z "$search_string" ];  then echo -n " and multi_match('$search_string')">> $query_file; fi;
 
    if [ ! -z "$start_date" ]; then echo -n " and @timestamp >= timestamp('$start_date')" >> $query_file; fi;
    if [ ! -z "$end_date" ];   then echo -n " and @timestamp <  timestamp('$end_date')"   >> $query_file; fi;
 
-   echo -n "order by @timestamp DESC " >> $query_file;
+   echo -n " order by @timestamp DESC " >> $query_file;
 
    if [ ! -z "$maxrows" ];      then echo -n " limit $maxrows" >> $query_file ; fi;
 
@@ -561,75 +593,58 @@ total_lines=0
 
 log_info "Search for matching log messages started... $(date)"
 
+qresults_file="$TMP_DIR/query_results.txt"
 
-   qresults_file="$TMP_DIR/query_results.txt"
+response=$(curl -m $maxtime -s  -o $qresults_file -w "%{http_code}"  -XPOST "$protocol://$host:$port/_opendistro/_sql?format=$format" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $username:$password -k)
+rc=$?
+log_debug "curl (query submission) command response: [$response] rc:[$rc]"
 
-   response=$(curl -m $maxtime -s  -o $qresults_file -w "%{http_code}"  -XPOST "$protocol://$host:$port/_opendistro/_sql?format=$format" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $username:$password -k)
-   rc=$?
-   log_debug "curl command response: [$response] rc:[$rc]"
+if [[ $response != 2* ]]; then
 
-
-   if [[ $response != 2* ]]; then
-
-      if [[ "$rc" == "28" ]]; then
-         log_warn "Query [$(($i+1))] did not complete within the permitted time [$maxtime] seconds."
-         log_warn "This may indicate you do not have the right permissions to access this data.  Or, if you do have access, this may result in you having fewer results than you should."
-      elif [ "$response" == "000" ]; then
-         log_error "The curl command failed while attempting to submit query [$(($i+1))]; script exiting."
-         exit 2
+   if [[ "$rc" == "28" ]]; then
+      log_warn "Query did not complete within the permitted time [$maxtime] seconds."
+      log_warn "This may indicate you do not have the right permissions to access this data."
+   elif [ "$response" == "000" ]; then
+      log_error "The curl command failed while attempting to submit query; script exiting."
+      exit 2
+   else
+      # IndexNotFoundException should return 404 but doesn't
+      if [ $(grep -c "IndexNotFoundException" $qresults_file) -gt 0 ]; then
+         log_debug "IndexNotFoundException found in query response"
+         queryfailed="true"
       else
-         # IndexNotFoundException should return 404 but doesn't
-         if [ $(grep -c "IndexNotFoundException" $qresults_file) -gt 0 ]; then
-            log_debug "IndexNotFoundException found in file [$qresults_file]"
-         else
-            # problem is something more than no index found, keep output to show user
-            queryfailed="true"
-            log_debug "A problem other than no index found was encountered"  ##TO DO: DO WHAT HERE?
-         fi # IndexNotFoundException
-      fi  # handle non-200 responses
-   else   # handle 2** response
-      lines_returned=$(cat $qresults_file|wc -l)
-      queryfailed="false"
+         # problem is something more than no index found, keep output to show user
+         queryfailed="true"
+         log_debug "A problem other than 'no index found' was encountered"  ##TO DO: DO WHAT HERE?
+      fi # IndexNotFoundException
    fi
+else   # handle 2** response
+   lines_returned=$(cat $qresults_file|wc -l)
+   queryfailed="false"
+fi
 
 log_debug "Approximately [$lines_returned] log messages found"
-
-
-   #TODO: Review...probably need something comparable: to check for results before outputting them
-   #TODO: REVIEW ordering...probably can re-arrange the chunks below now that there is only 1 query
-
-   ##if [ ${#listofbadouts[@]} -ge $query_count ]; then
-   ##   log_warn "None of the queries submitted to retrieve log messages completed successfully."
-   ##   log_warn "This may only mean there were no log messages collected during the specified time period; or"
-   ##   log_warn "this may indicate there were some other problems.  "
-   ##   log_warn "The responses received will be displayed below; review them to determine if there is a problem."
-   ##   break
-   ## elif [ -z "${listofoutputs[i]}" ]; then
-   ##   continue
-   ## elif [ "${listofoutputs[i]}" == "bad response" ];then
-   ##   log_debug "Output for query [$i] omitted since request exited with bad response code"
-
-   if [ "$output_file_specified" == "true" ]; then
-      tail -n +1 ${qresults_file} >> $target_file
-   else
-      tail -n +1 ${qresults_file}
-   fi
 
 if [ "$queryfailed" == "true" ]; then
    log_warn "There were issues getting the requested log messages; the query returned an unexpected response code."
    log_warn "These unexpected response returned the following message(s):"
 
    cat  $qresults_file
-fi
-
-if [ $lines_returned -eq 0 ]; then
-   log_info "No log messages meeting the specified criteria were found."
-   exit
 else
-   # at least one good response
-   if [ "$output_file_specified" == "true" ]; then
-      log_info "Output results (approx. $lines_returned) written to requested output file [$target_file]"
+   # query did not fail
+
+   if [ $lines_returned -eq 0 ]; then
+      log_info "No log messages meeting the specified criteria were found."
+      exit 0
    else
-      echo "" # add line break after any output
+      # at least one good response
+
+      if [ "$output_file_specified" == "true" ]; then
+         log_info "Output results (approx. $lines_returned) written to requested output file [$target_file]"
+         tail -n +1 ${qresults_file} >> $target_file
+      else
+         tail -n +1 ${qresults_file}
+         echo "" # add line break after any output
+      fi
    fi
 fi
