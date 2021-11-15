@@ -2,6 +2,9 @@
 
 ## Version 1.1.0 (15NOV21)
 
+* **Overall**
+  * [FEATURE] A new flag LOG_VERBOSE_ENABLE is now available to suppress detailed logging during script execution. The default setting of this flag is true.
+
 * **Monitoring**
   * [CHANGE] Most monitoring component versions have been updated
     * kube-prometheus-stack Helm chart upgraded from 15.0.0 to 19.0.3
@@ -25,7 +28,7 @@
 ## Version 1.0.13 (20OCT21)
 
 * **Logging**
-  * [FIX] Addressed a serious issue (introduced in Version 1.0.12) that prevented the 
+  * [FIX] Addressed a serious issue (introduced in Version 1.0.12) that prevented the
     successful deployment of the logging components when configured using ingress
 
 ## Version 1.0.12 (18OCT21) 
