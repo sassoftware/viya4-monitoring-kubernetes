@@ -31,7 +31,7 @@
                 "index_patterns": [
                         "viya_logs-openshift-*"
                  ],
-                 "priority": 100
+                 "priority": 50
         }
     }
 }
