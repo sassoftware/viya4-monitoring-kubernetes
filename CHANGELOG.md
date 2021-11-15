@@ -1,10 +1,35 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.1.0 (15NOV21)
+
+* **Overall**
+  * [FEATURE] A new flag LOG_VERBOSE_ENABLE is now available to suppress detailed logging during script execution. The default setting of this flag is true.
+
+* **Monitoring**
+  * [CHANGE] Most monitoring component versions have been updated
+    * kube-prometheus-stack Helm chart upgraded from 15.0.0 to 19.0.3
+    * Prometheus Operatator upgraded from 0.47.0 to 0.51.2
+    * Prometheus upgraded from 2.26.1 to 2.30.3
+    * Alertmanager upgraded from 0.21.0 to 0.23.0
+    * Grafana upgraded from 7.5.4 to 8.2.1
+    * Node Exporter upgraded from 1.0.1 to 1.2.2
+    * kube-state-metrics upgraded from 1.9.8 to 2.2.1
+  * [FIX] Several dashboards were fixed to adjust to the kube-state-metrics 2.x metrics
+  * [FIX] The KubeHpaMaxedOut alert has been patched to not fire when max instances == current instances == 1
+
+* **Logging**
+  * [CHANGE] Open Distro for Elasticsearch (i.e. Elasticsearch and Kibana) upgraded to version 1.13.2. This includes significant changes to Kibana user-interface, see [Important Information About Kibana in the New Release](https://github.com/sassoftware/viya4-monitoring-kubernetes/tree/master/logging#important-information-about-kibana-in-the-new-release) for details.
+
+  * [FEATURE] A significant number of changes to support application multi-tenancy in SAS Viya; including the ability to limit users to log messages from a specific Viya deployment and tenant. See [Tenant Logging](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/Tenant_Logging.md) for details.
+
+* **Known Issues**
+  * On Openshift clusters, upgrading an existing deployment using Open Distro for Elasticsearch 1.7.0 to this release (which uses Open Distro for Elasticsearch 1.13.2) fails. Deploying this release onto a new OpenShift cluster is possible.
+
 ## Version 1.0.13 (20OCT21)
 
 * **Logging**
-  * [FIX] Addressed a serious issue (introduced in Version 1.0.12) that prevented the 
-    successful deployment of the logging components when configured using ingress.
+  * [FIX] Addressed a serious issue (introduced in Version 1.0.12) that prevented the
+    successful deployment of the logging components when configured using ingress
 
 ## Version 1.0.12 (18OCT21) 
 ---
@@ -12,12 +37,12 @@
 ---
 * **Overall**
   * [CHANGE] The minimum supported version of OpenShift is now 4.7. OpenShift
-    support itself is still experimental.
+    support itself is still experimental
   * [FIX] There is now a check for the presence of the `sha256sum` utility
     in the `PATH`
   * [FIX] There is now a timeout (default 10 min) when deleting namespaces
-    using `LOG_DELETE_NAMESPACE_ON_REMOVE` or `MON_DELETE_NAMESPACE_ON_REMOVE`.
-    The timeout can be set via `KUBE_NAMESPACE_DELETE_TIMEOUT`.
+    using `LOG_DELETE_NAMESPACE_ON_REMOVE` or `MON_DELETE_NAMESPACE_ON_REMOVE`
+    The timeout can be set via `KUBE_NAMESPACE_DELETE_TIMEOUT`
 
 * **Monitoring**
   * [FIX] Metrics will be properly collected from the SAS Deployment Operator
