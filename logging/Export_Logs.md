@@ -5,15 +5,15 @@
 There might be instances when you need to collect a set of log messages in a file. For 
 example, you might need to send log messages collected during a specific time period or for a specific pod to SAS Technical Support to help diagnose a problem. The `getlogs.sh` script enables you to obtain log messages from a specified time period and from specified sources and save those messages to a file. 
 
-When you submit the script, it requests a batch of log messages. Each request then generates one or more queries that are submitted to Elasticsearch. Even if multiple queries are submitted, the resulting output is combined to return a single set of messages to the user.
+When you submit the script, it requests a batch of log messages. Each request then generates a query that are submitted to Elasticsearch.
 
 To download the log messages, run the `getlogs.sh` script. This is the syntax for the script:
 
-`getlogs.sh -ns | -- namespace` *`namespace`* `[query options] [time period options] [output options] [connection options] [other options]`
+`getlogs.sh `[query options] [time period options] [output options] [connection options] [other options]`
 
-The `-- namespace` *`namespace`* option is required. This value specifies the Kubernetes namespace corresponding to the SAS Viya deployment for which you want to obtain log messages.
+NOTE: prior to release 1.1.0 of this project, the `-- namespace` *`namespace`* option was required. This option is no longer required.
 
-A query is cancelled if it does not complete within three minutes. If the script generates multiple queries, each query must complete within three minutes.
+A query is cancelled if it does not complete within three minutes.
 
 For options than accept multiple values, the values must be in quotes and must be separated by commas. 
 
@@ -23,6 +23,12 @@ script to enable HTTPS access to Elasticsearch and to obtain the host and port v
 ## Query Options
 
 The query options specify the source of the log messages.
+
+`-n|--namespace` *`"namespace-name[, namespace-name]"`*
+specifies the Kubernetes namespace or namespaces for which you want to obtain log messages.
+
+`-nx|--namespace-exclude` *`"namespace-name[, namespace-name]"`*
+specifies the namespaces that you want to exclude when obtaining log messages.
 
 `-p|--pod` *`"pod-name[, pod-name]"`*
 specifies the pod or pods for which you want to obtain log messages.
@@ -53,9 +59,7 @@ specifies the level or levels of the log messages that you want to exclude from 
 specifies that only messages containing the specified *`"search-text"`* are returned.
 
 `-m|--maxrows` *`max-messages`*
-specifies the maximum number of messages that are returned. The default value is 20. If the `--out-file` option is also specified, the default value is 500. If the script produces multiple queries, the value specified for `--maxrows` applies to each query. If the `--maxrows` value is reached before all queries have been submitted, the collected results are returned and the remaining queries are not run. 
-
-For example, if you specify `--maxrows 100` and the script generates three queries, each query returns a maximum of 100 messages. If the first query returns 90 messages, those 90 messages are returned. If the second query returns 100 messages, those 100 messages are also returned, because the first query did not reach the `maxrows` limit and the number of messages returned by the second query also does not exceed the limit for the query. However, because the first and second queries return a total of 190 messages, this total value exceeds the `maxrows` limit, so the third query does not run.
+specifies the maximum number of messages that are returned. The default value is 20. If the `--out-file` option is also specified, the default value is 500.
 
 `-q|--query-file` *`query-filename`*
 specifies a file that contains values for all of the query and time period options. If this option is specified, all other query and time period options are ignored.

@@ -14,19 +14,11 @@ log_debug "Script [$this_script] has started [$(date)]"
 ES_CONTENT_DEPLOY=${ES_CONTENT_DEPLOY:-${ELASTICSEARCH_ENABLE:-true}}
 
 if [ "$ES_CONTENT_DEPLOY" != "true" ]; then
-  log_info "Environment variable [ES_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into Open Distro for Elasticsearch"
+  log_verbose "Environment variable [ES_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into Open Distro for Elasticsearch"
   exit 0
 fi
 
-# Confirm NOT on OpenShift
-if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
-  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
-    log_error "This script should NOT be run on OpenShift clusters"
-    log_error "Run logging/bin/deploy_elasticsearch_content_open_openshift.sh instead"
-    exit 1
-  fi
-fi
-
+log_info "Loading Content into Elasticsearch"
 
 # temp file used to capture command output
 tmpfile=$TMP_DIR/output.txt
@@ -45,7 +37,7 @@ fi
 # get credentials
 get_credentials_from_secret admin
 rc=$?
-if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
+if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 
 # set up temporary port forwarding to allow curl access
@@ -85,10 +77,10 @@ do
    # TO DO: check for 503 specifically?
 
    if [[ $response != 2* ]]; then
-      log_info "The Elasticsearch REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
+      log_verbose "The Elasticsearch REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
       sleep ${pause}s
    else
-      log_info "The Elasticsearch REST endpoint appears to be ready...continuing"
+      log_debug "The Elasticsearch REST endpoint appears to be ready...continuing"
       esready="TRUE"
       break
    fi
@@ -139,12 +131,62 @@ function set_retention_period {
       kill -9 $pfPID
       exit 1
    else
-      log_info "Index management policy [$policy_name] loaded into Elasticsearch [$response]"
+      log_debug "Index management policy [$policy_name] loaded into Elasticsearch [$response]"
    fi
 }
 
+#Patch ODFE 1.7.0 ISM policies to ODFE 1.13.2 format
+function add_ism_template {
+   local policy_name pattern
+
+   #Arguments
+   policy_name=$1                                   # Name of policy
+   pattern=$2                                       # Index pattern to associate with policy
+
+   response=$(curl -s -o $TMP_DIR/ism_policy_patch.json -w "%{http_code}" -XGET "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/$policy_name" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+   if [[ $response != 2* ]]; then
+      log_debug "No ISM policy [$policy_name] found to patch; moving on.[$response]"
+      return
+   fi
+
+   if [ -n "$(cat $TMP_DIR/ism_policy_patch.json |grep '"ism_template":null')" ]; then
+      log_debug "No ISM Template on policy [$policy_name]; adding one."
+
+      #remove crud returned but not needed
+      sed -i'.bak'  "s/\"_id\":\"${policy_name}\",//;s/\"_version\":[0-9]*,//;s/\"_seq_no\":[0-9]*,//;s/\"_primary_term\":[0-9]*,//" $TMP_DIR/ism_policy_patch.json
+
+      #add ISM_Template to existing ISM policy
+      sed -i'.bak'  "s/\"ism_template\":null/\"ism_template\": {\"index_patterns\": \[\"${pattern}\"\]}/g" $TMP_DIR/ism_policy_patch.json
+
+      #delete exisiting policy
+      response=$(curl -s -o /dev/null   -w "%{http_code}" -XDELETE "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/$policy_name" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+      if [[ $response != 2* ]]; then
+         log_error "Error encountered deleting index management policy [$policy_name] before patching to add ISM template stanza [$response]."
+         log_error "Review the index managment policy [$policy_name] within Kibana to ensure it is properly configured and linked to appropriate indexes [$pattern]."
+         return
+      else
+         log_debug "Index policy [$policy_name] deleted [$response]."
+      fi
+
+      #load revised policy
+      response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_opendistro/_ism/policies/$policy_name"  -H 'Content-Type: application/json' -d "@$TMP_DIR/ism_policy_patch.json" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+      if [[ $response != 2* ]]; then
+         log_error "Unable to update index management policy [$policy_name] to add a ISM_TEMPLATE stanza [$response]"
+         log_error "Review/create the index managment policy [$policy_name] within Kibana to ensure it is properly configured and linked to appropriate indexes [$pattern]."
+         return
+      else
+         log_info "Index management policy [$policy_name] loaded into Elasticsearch [$response]"
+      fi
+   else
+      log_debug "The policy definition for [$policy_name] already includes an ISM Template stanza; no need to patch."
+      return
+   fi
+}
+
+
 LOG_RETENTION_PERIOD="${LOG_RETENTION_PERIOD:-3}"
 set_retention_period viya_logs_idxmgmt_policy LOG_RETENTION_PERIOD
+add_ism_template "viya_logs_idxmgmt_policy" "viya_logs-*"
 
 # Create Ingest Pipeline to "burst" incoming log messages to separate indexes based on namespace
 response=$(curl  -s -o /dev/null -w "%{http_code}"  -XPUT "https://localhost:$TEMP_PORT/_ingest/pipeline/viyaburstns" -H 'Content-Type: application/json' -d @logging/es/es_create_ns_burst_pipeline.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
@@ -154,10 +196,10 @@ if [[ $response != 2* ]]; then
    kill -9 $pfPID
    exit 1
 else
-   log_info "Ingest pipeline definition loaded into Elasticsearch [$response]"
+   log_debug "Ingest pipeline definition loaded into Elasticsearch [$response]"
 fi
 
-# Link index management policy and Ingest Pipeline to Index Template
+# Configure index template settings and link Ingest Pipeline to Index Template
 response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-logs-template "    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_logs.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 # request returns: {"acknowledged":true}
 if [[ $response != 2* ]]; then
@@ -165,14 +207,35 @@ if [[ $response != 2* ]]; then
    kill -9 $pfPID
    exit 1
 else
-   log_info "Index template settings loaded into Elasticsearch [$response]"
+   log_debug "Index template settings loaded into Elasticsearch [$response]"
 fi
+
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+   # INFRASTRUCTURE LOGS
+   # Handle "infrastructure" logs differently
+   INFRA_LOG_RETENTION_PERIOD="${INFRA_LOG_RETENTION_PERIOD:-1}"
+   set_retention_period viya_infra_idxmgmt_policy INFRA_LOG_RETENTION_PERIOD
+   add_ism_template "viya_infra_idxmgmt_policy"  "viya_logs-openshift-*"
+
+   # Link index management policy Index Template
+   response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-infra-template "    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_infra_openshift.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+   # request returns: {"acknowledged":true}
+   if [[ $response != 2* ]]; then
+      log_error "There was an issue loading infrastructure index template settings into Elasticsearch [$response]"
+      kill -9 $pfPID
+      exit 1
+   else
+      log_info "Infrastructure index template settings loaded into Elasticsearch [$response]"
+  fi
+fi
+
 
 # METALOGGING: Create index management policy object & link policy to index template
 # ...index management policy automates the deletion of indexes after the specified time
 
 OPS_LOG_RETENTION_PERIOD="${OPS_LOG_RETENTION_PERIOD:-1}"
 set_retention_period viya_ops_idxmgmt_policy OPS_LOG_RETENTION_PERIOD
+add_ism_template "viya_ops_idxmgmt_policy"  "viya_ops-*"
 
 # Load template
 response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "https://localhost:$TEMP_PORT/_template/viya-ops-template " -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_ops.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
@@ -183,7 +246,7 @@ if [[ $response != 2* ]]; then
    kill -9 $pfPID
    exit 1
 else
-   log_info "Monitoring index template template settings loaded into Elasticsearch [$response]"
+   log_debug "Monitoring index template template settings loaded into Elasticsearch [$response]"
 fi
 echo ""
 
@@ -194,11 +257,11 @@ if [[ $response != 2* ]]; then
    kill -9 $pfPID
    exit 1
 else
-   log_info "Cluster settings loaded into Elasticsearch [$response]"
+   log_debug "Cluster settings loaded into Elasticsearch [$response]"
 fi
 
 # terminate port-forwarding and remove tmpfile
-log_info "You may see a message below about a process being killed; it is expected and can be ignored."
+log_verbose "You may see a message below about a process being killed; it is expected and can be ignored."
 kill  -9 $pfPID
 rm -f $tmpfile
 

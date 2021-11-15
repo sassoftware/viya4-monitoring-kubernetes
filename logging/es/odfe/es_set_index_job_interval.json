@@ -1,5 +1,5 @@
 {
 	"persistent": {
-		"opendistro.index_state_management.job_interval": 120
+		"opendistro.index_state_management.job_interval": 5
 	}
 }

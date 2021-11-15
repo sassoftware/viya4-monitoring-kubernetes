@@ -1,5 +1,5 @@
 elasticsearch:
-  imageTag: 1.7.0
+  imageTag: 1.13.2
 
   config: 
     ######## OpenDistro for Elasticsearch Security Configuration - START ########
@@ -200,7 +200,7 @@ elasticsearch:
           weight: 25
 
 kibana:
-  imageTag: 1.7.0
+  imageTag: 1.13.2
 
   extraEnvs:
   - name: ELASTICSEARCH_USERNAME
@@ -231,9 +231,9 @@ kibana:
     elasticsearch.password: ${ELASTICSEARCH_PASSWORD}
 
     opendistro_security.multitenancy.enabled: true
+    opendistro_security.multitenancy.tenants.preferred: ["cluster_admins"]
     opendistro_security.multitenancy.tenants.enable_private: false
     opendistro_security.multitenancy.tenants.enable_global: false
-    # opendistro_security.multitenancy.tenants.preferred: ["Global","Private"]
     elasticsearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
 
     opendistro_security.readonly_mode.roles: ["kibana_read_only"]

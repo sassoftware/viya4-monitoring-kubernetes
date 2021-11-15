@@ -29,6 +29,7 @@
   ],
   "tenant_permissions": [],
   "cluster_permissions": [
-    "cluster_composite_ops"
+    "cluster_composite_ops",
+    "v4m_reporting"
   ]
 }

@@ -17,7 +17,7 @@ log_debug "Script [$this_script] has started [$(date)]"
 KIBANA_CONTENT_DEPLOY=${KIBANA_CONTENT_DEPLOY:-${ELASTICSEARCH_ENABLE:-true}}
 
 if [ "$KIBANA_CONTENT_DEPLOY" != "true" ]; then
-  log_info "Environment variable [KIBANA_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into Kibana"
+  log_verbose "Environment variable [KIBANA_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into Kibana"
   exit 0
 fi
 
@@ -46,11 +46,11 @@ fi
 # get credentials
 get_credentials_from_secret admin
 rc=$?
-if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
+if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 set -e
 
-log_info "Configuring Kibana"
+log_info "Configuring Kibana...this may take a few minutes"
 
 #### TEMP:  Remove if/when Helm chart supports defining nodePort
 KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-true}
@@ -62,7 +62,7 @@ if [ "$KB_KNOWN_NODEPORT_ENABLE" == "true" ]; then
    if [ "$SVC_TYPE" == "NodePort" ]; then
      KIBANA_PORT=31033
      kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
-     log_info "Setting Kibana service NodePort to 31033"
+     log_verbose "Setting Kibana service NodePort to 31033"
    fi
 else
   log_debug "Kibana service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
@@ -79,11 +79,11 @@ podready="FALSE"
 for pause in 40 30 20 15 10 10 10 15 15 15 30 30 30 30
 do
    if [[ "$( kubectl -n $LOG_NS get pod -l 'role=kibana' -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}')" == *"True"* ]]; then
-      log_info "The Kibana pod is ready...continuing"
+      log_verbose "The Kibana pod is ready...continuing"
       podready="TRUE"
       break
    else
-      log_info "The Kibana pod is not ready yet...sleeping for [$pause] more seconds before checking again."
+      log_verbose "The Kibana pod is not ready yet...sleeping for [$pause] more seconds before checking again."
       sleep ${pause}s
    fi
 done
@@ -95,10 +95,10 @@ if [ "$podready" != "TRUE" ]; then
    exit 1
 fi
 
+set +e
 get_kb_api_url
 
 # Confirm Kibana is ready
-set +e
 for pause in 30 30 30 30 30 30
 do
    response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "${kb_api_url}/api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
@@ -106,10 +106,10 @@ do
    # TO DO: check for 503 specifically?
 
    if [[ $response != 2* ]]; then
-      log_info "The Kibana REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
+      log_debug "The Kibana REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
       sleep ${pause}s
    else
-      log_info "The Kibana REST endpoint appears to be ready...continuing"
+      log_verbose "The Kibana REST endpoint appears to be ready...continuing"
       kibanaready="TRUE"
       break
    fi
@@ -132,7 +132,7 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
    # clobbering post-deployment changes made via Kibana).
 
    # get Security API URL
-   get_sec_api_url 
+   get_sec_api_url
 
    # Create cluster_admins Kibana tenant space (if it doesn't exist)
    if ! kibana_tenant_exists "cluster_admins"; then
@@ -146,25 +146,48 @@ if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
       log_debug "The Kibana tenant space [cluster_admins] exists."
    fi
 
+   #Migrating from ODFE 1.7.0 to ODFE 1.13.2 (file should only exist during migration)
+   if [ -f "$KB_GLOBAL_EXPORT_FILE" ]; then
+
+      # delete "demo" Kibana tenant space created (but not used) prior to V4m version 1.1.0
+      if kibana_tenant_exists "admin_tenant"; then
+
+         delete_kibana_tenant "admin_tenant"
+
+         rc=$?
+         if [ "$rc" == "0" ]; then
+            log_debug "The Kibana tenant space [admin_tenant] was deleted."
+         else
+            log_debug "Problems were encountered while attempting to delete tenant space [admin_tenant]."
+         fi
+      fi
+
+      log_verbose "Will attempt to migrate Kibana content from previous deployment."
+
+      kb_migrate_response="$TMP_DIR/kb_migrate_response.json"
+
+      #import previously exported content from global tenant
+      response=$(curl -s -o $kb_migrate_response  -w  "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_import?overwrite=false" -H "kbn-xsrf: true"  -H 'securitytenant: cluster_admins'  --form file="@$KB_GLOBAL_EXPORT_FILE"  -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
+
+      if [[ $response != 2* ]]; then
+         log_warn "There was an issue importing the cached existing Kibana content into the Kibana tenant space [cluster_admins]. [$response]"
+         log_debug "Failed response details: $(tail -n1 $kb_migrate_response)"
+         #TODO: Exit here?  Display messages as shown?  Add BIG MESSAGE about potential loss of content?
+      else
+         log_info "Existing Kibana imported to [cluster_admins] Kibana tenant space. [$response]"
+         log_debug "Import details: $(tail -n1 $kb_migrate_response)"
+      fi
+
+      # TODO: Confirm success?  But what do we do if not successful?
+   else
+      log_debug "Migration from ODFE 1.7.0 to ODFE 1.13.2 *NOT* detected"
+   fi
+
    # Import Kibana Searches, Visualizations and Dashboard Objects using curl
    ./logging/bin/import_kibana_content.sh logging/kibana/common          cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/cluster_admins  cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/namespace       cluster_admins
    ./logging/bin/import_kibana_content.sh logging/kibana/tenant          cluster_admins
-
-
-   # delete "demo" Kibana tenant space created (but not used) prior to version 1.1.0
-   if kibana_tenant_exists "admin_tenant"; then
-
-      delete_kibana_tenant "admin_tenant"
-
-      rc=$?
-      if [ "$rc" == "0" ]; then
-         log_debug "The Kibana tenant space [admin_tenant] was deleted."
-      else
-         log_debug "Problems were encountered while attempting to delete tenant space [admin_tenant]."
-      fi
-   fi
 
 else
    # Importing content into Global tenant for continuity, to be removed in future
@@ -175,7 +198,7 @@ else
       log_error "There was an issue loading content into Kibana [$response]"
       exit 1
    else
-      log_info "Content loaded into Kibana [$response]"
+      log_verbose "Content loaded into Kibana [$response]"
    fi
 
 fi
