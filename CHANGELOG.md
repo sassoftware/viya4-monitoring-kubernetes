@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Version 1.0.14 (15NOV21)
+## Version 1.1.0 (15NOV21)
 
 * **Monitoring**
   * [CHANGE] Most monitoring component versions have been updated
