@@ -13,7 +13,7 @@ if [ "$logVerbose" != "true" ]; then
 fi
 
 function add_notice {
-  echo "$*"  >> $TMP_DIR/notices.txt
+  echo $* >> $TMP_DIR/notices.txt
 }
 
 function display_notices {
@@ -27,15 +27,26 @@ function display_notices {
 }
 
 function log_notice {
+  width=$(tput cols 2>/dev/null)
+  if [ "$width" == "" ]; then
+    width=80
+  fi
+  n=$(expr $width - $(echo "$1" | wc -c))
+  if [ $n -lt 0 ]; then
+     n=0
+  fi
+  # Fill remaining characters with spaces
+  text="$*$(printf %$(eval 'echo $n')s |tr ' ' ' ')"
+
   if [ "$colorEnable" = "true" ]; then
-    whiteb "${bluebg}$*"
+    whiteb "${bluebg}$text"
   else
-    echo $* >&3
+    echo "$text" >&3
   fi
 }
 
 function log_message {
-    echo $*  >&3
+    echo "$*"  >&3
 }
 
 function log_debug {
@@ -68,7 +79,7 @@ function log_info {
 
 function log_verbose {
   if [ "$logVerbose" == "true" ]; then
-		log_info $*
+		log_info $* >&3
   fi
 }
 

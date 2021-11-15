@@ -52,14 +52,14 @@ function populateValuesYAML() {
 function deployV4MInfo() {
   NS=$1
   if [ -z "$NS" ]; then
-    log_error "No namespace specified for deploying version info"
+    log_error "No namespace specified for deploying Viya Monitoring for Kubernetes version information"
     return 1
   fi
 
   valuesYAML=$TMP_DIR/v4mValues.yaml
   populateValuesYAML "$valuesYAML"
 
-  log_info "Updating version info..."
+  log_info "Updating Viya Monitoring for Kubernetes version information"
   helm upgrade --install \
     -n "$NS" \
     --values $valuesYAML \
@@ -69,10 +69,10 @@ function deployV4MInfo() {
 function removeV4MInfo() {
   NS=$1
   if [ -z "$NS" ]; then
-    log_error "No namespace specified for removing version info"
+    log_error "No namespace specified for removing Viya Monitoring for Kubernetes version information"
     return 1
   fi
-  log_info "Removing version info..."
+  log_info "Removing Viya Monitoring for Kubernetes version information"
   helm uninstall -n "$NS" v4m
 }
 
@@ -81,7 +81,7 @@ if [ -z "$V4M_VERSION_INCLUDE" ]; then
   IFS=$'\n' v4mHelmVersionLines=($(helm list -n "$V4M_NS" --filter '^v4m$' -o yaml))
   IFS=$origIFS
   if [ -z "$v4mHelmVersionLines" ]; then
-    log_debug "No v4m release found in [$V4M_NS]"
+    log_debug "No Viya Monitoring for Kubernetes release found in [$V4M_NS]"
   else
     for (( i=0; i<${#v4mHelmVersionLines[@]}; i++ )); do 
       line=${v4mHelmVersionLines[$i]}

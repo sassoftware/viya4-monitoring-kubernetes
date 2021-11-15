@@ -14,7 +14,7 @@ function create_secret_from_file {
 
   if [ -z "$(kubectl -n $LOG_NS get secret $secret_name -o name 2>/dev/null)" ]; then
 
-    log_debug "Will attempt to create secret [$secret_name]"
+    log_debug "Creating secret [$secret_name]"
 
     if [ -f "$USER_DIR/logging/$file" ]; then filepath=$USER_DIR/logging
     elif [ -f "logging/es/odfe/$file" ]; then filepath=logging/es/odfe
@@ -24,7 +24,7 @@ function create_secret_from_file {
     fi
 
     if [ "$(kubectl -n $LOG_NS create secret generic $secret_name --from-file=$filepath/$file)" == "secret/$secret_name created" ]; then
-      log_info "Created secret for Elasticsearch config file [$file]"
+      log_verbose "Created secret for Elasticsearch config file [$file]"
 
       if [ "$label" != "" ]; then
          log_debug "Applying label [$label] to newly created secret [$secret_name]"
@@ -37,7 +37,7 @@ function create_secret_from_file {
       return 8
     fi
   else
-    log_info "Using existing secret [$secret_name]"
+    log_verbose "Using existing secret [$secret_name]"
     return 0
   fi
 }
@@ -50,7 +50,7 @@ function create_user_secret {
 
   if [ -z "$(kubectl -n $LOG_NS get secret $secret_name -o name 2>/dev/null)" ]; then
 
-    log_debug "Will attempt to create secret [$secret_name]"
+    # log_debug "Will attempt to create secret [$secret_name]"
 
     if [ "$password" == "" ]; then
        # generate password if one not provided
@@ -61,7 +61,7 @@ function create_user_secret {
 
     if [ "$(kubectl -n $LOG_NS create secret generic $secret_name  --from-literal=username=$username --from-literal=password=$password)" == "secret/$secret_name created" ]; then
 
-      log_info "Created secret for Elasticsearch user credentials [$username]"
+      log_verbose "Created secret for Elasticsearch user credentials [$username]"
 
       if [ "$label" != "" ]; then
          log_debug "Applying label [$label] to newly created secret [$secret_name]"
@@ -74,7 +74,7 @@ function create_user_secret {
       return 111
     fi
   else
-    log_info "Using existing secret [$secret_name]"
+    log_verbose "Using existing secret [$secret_name]"
     return 0
   fi
 }

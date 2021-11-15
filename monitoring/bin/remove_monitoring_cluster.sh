@@ -21,7 +21,9 @@ MON_DELETE_NAMESPACE_ON_REMOVE=${MON_DELETE_NAMESPACE_ON_REMOVE:-false}
 helm2ReleaseCheck prometheus-$MON_NS
 helm2ReleaseCheck v4m-$MON_NS
 
-log_info "Removing the Kube Prometheus Stack..."
+log_notice "Removing components from the [$MON_NS] namespace..."
+
+log_info "Removing the kube-prometheus stack..."
 if helm3ReleaseExists prometheus-operator $MON_NS; then
   promRelease=prometheus-operator
 else
@@ -43,24 +45,21 @@ if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
   fi
 fi
 
-log_info "Removing components from the [$MON_NS] namespace..."
-
-log_info "Removing dashboards..."
 monitoring/bin/remove_dashboards.sh
 
-log_info "Removing Prometheus rules..."
+log_verbose "Removing Prometheus rules"
 rules=( sas-launcher-job-rules )
 for rule in "${rules[@]}"
 do
   kubectl delete --ignore-not-found -n $MON_NS prometheusrule $rule
 done
 
-log_info "Removing configmaps and secrets..."
+log_verbose "Removing configmaps and secrets"
 kubectl delete cm --ignore-not-found -n $MON_NS -l sas.com/monitoring-base=kube-viya-monitoring
 kubectl delete secret --ignore-not-found -n $MON_NS -l sas.com/monitoring-base=kube-viya-monitoring
 
 if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
-  log_info "Removing known monitoring PVCs..."
+  log_verbose "Removing known monitoring PVCs"
   kubectl delete pvc --ignore-not-found -n $MON_NS -l app=alertmanager
   kubectl delete pvc --ignore-not-found -n $MON_NS -l app.kubernetes.io/name=grafana
   kubectl delete pvc --ignore-not-found -n $MON_NS -l app=prometheus
@@ -69,7 +68,7 @@ fi
 removeV4MInfo "$MON_NS"
 
 # Wait for resources to terminate
-log_info "Waiting 60 sec for resources to terminate..."
+log_info "Waiting 60 sec for resources to terminate"
 sleep 60
 
 log_info "Checking contents of the [$MON_NS] namespace:"
