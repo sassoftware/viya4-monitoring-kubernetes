@@ -15,9 +15,9 @@
   * [FIX] The KubeHpaMaxedOut alert has been patched to not fire when max instances == current instances == 1
 
 * **Logging**
-  * [CHANGE] Open Distro for Elasticsearch (i.e. Elasticsearch and Kibana) upgraded to version 1.13.2. This includes significant changes to Kibana user-interface, see [Tenant Logging](https://github.com/sassoftware/viya4-monitoring-kubernetes/tree/master/logging#important-information-about-kibana-in-the-new-release) for details.
+  * [CHANGE] Open Distro for Elasticsearch (i.e. Elasticsearch and Kibana) upgraded to version 1.13.2. This includes significant changes to Kibana user-interface, see [Important Information About Kibana in the New Release](https://github.com/sassoftware/viya4-monitoring-kubernetes/tree/master/logging#important-information-about-kibana-in-the-new-release) for details.
 
-  * [FEATURE] A significant number of changes to support application multi-tenancy in SAS Viya; including the ability to limit users to log messages from a specific Viya deployment and tenant. See [Tenant Logging](https://github.com/sassoftware/viya4-monitoring-kubernetes/tree/master/logging#important-information-about-kibana-in-the-new-release) for details.
+  * [FEATURE] A significant number of changes to support application multi-tenancy in SAS Viya; including the ability to limit users to log messages from a specific Viya deployment and tenant. See [Tenant Logging](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/Tenant_Logging.md) for details.
 
 * **Known Issues**
   * On Openshift clusters, upgrading an existing deployment using Open Distro for Elasticsearch 1.7.0 to this release (which uses Open Distro for Elasticsearch 1.13.2) fails. Deploying this release onto a new OpenShift cluster is possible.
