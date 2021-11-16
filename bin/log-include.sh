@@ -10,9 +10,16 @@ logVerbose=${LOG_VERBOSE_ENABLE:-true}
 
 # This must be run without 'set -e' being set
 # So it has to be done up here and not within log_notice
-noticeColWidth=${LOG_NOTICE_COL_WIDTH:-$(tput cols)} 2>/dev/null
-if [ "$noticeColWidth" == "" ]; then
-  noticeColWidth=100
+if [ -z "$TERM" ]; then
+  # Non-interactive shell
+  colorEnable=false
+  noticeColWidth=${LOG_NOTICE_COL_WIDTH:-100}
+else
+  # Terminal width should be accessible
+  noticeColWidth=${LOG_NOTICE_COL_WIDTH:-$(tput cols)}
+  if [ "$noticeColWidth" == "" ]; then
+    noticeColWidth=100
+  fi
 fi
 
 if [ "$logVerbose" != "true" ]; then
@@ -63,7 +70,7 @@ function log_debug {
     if [ "$colorEnable" = "true" ]; then
         echo -e "${whiteb}${level}${white}$*${end}" >&3
     else
-        echo $* >&3
+        echo "$level$*" >&3
     fi
   fi
 }
@@ -77,7 +84,7 @@ function log_info {
   if [ "$colorEnable" = "true" ]; then
     echo -e "${greenb}${level}${whiteb}$*${end}" >&3
   else
-    echo $* >&3
+    echo "$level$*" >&3
   fi
 }
 
@@ -96,7 +103,7 @@ function log_warn {
   if [ "$colorEnable" = "true" ]; then
     echo -e "${black}${yellowbg}${level}$*${end}" >&3
   else
-    echo $* >&3
+    echo "$level$*" >&3
   fi
 }
 
@@ -109,7 +116,7 @@ function log_error {
   if [ "$colorEnable" = "true" ]; then
     echo -e "${whiteb}${redbg}${level}$*${end}" >&3
   else
-    echo $* >&3
+    echo "$level$*" >&3
   fi
 }
 
