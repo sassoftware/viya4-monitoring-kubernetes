@@ -8,6 +8,13 @@ levelEnable=${LOG_LEVEL_ENABLE:-true}
 logDebug=${LOG_DEBUG_ENABLE:-false}
 logVerbose=${LOG_VERBOSE_ENABLE:-true}
 
+# This must be run without 'set -e' being set
+# So it has to be done up here and not within log_notice
+noticeColWidth=${LOG_NOTICE_COL_WIDTH:-$(tput cols)} 2>/dev/null
+if [ "$noticeColWidth" == "" ]; then
+  noticeColWidth=100
+fi
+
 if [ "$logVerbose" != "true" ]; then
   exec >/dev/null
 fi
@@ -27,10 +34,7 @@ function display_notices {
 }
 
 function log_notice {
-  width=$(tput cols 2>/dev/null)
-  if [ "$width" == "" ]; then
-    width=80
-  fi
+  width=$noticeColWidth
   n=$(expr $width - $(echo "$1" | wc -c))
   if [ $n -lt 0 ]; then
      n=0
