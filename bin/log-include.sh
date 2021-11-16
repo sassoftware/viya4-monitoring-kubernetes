@@ -1,4 +1,4 @@
-# Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # Logging helper functions
@@ -59,7 +59,7 @@ function log_debug {
     if [ "$colorEnable" = "true" ]; then
         echo -e "${whiteb}${level}${white}$*${end}" >&3
     else
-        echo $* >&3
+        echo "${level}$*" >&3
     fi
   fi
 }
@@ -73,7 +73,7 @@ function log_info {
   if [ "$colorEnable" = "true" ]; then
     echo -e "${greenb}${level}${whiteb}$*${end}" >&3
   else
-    echo $* >&3
+    echo "${level}$*" >&3
   fi
 }
 
@@ -92,7 +92,7 @@ function log_warn {
   if [ "$colorEnable" = "true" ]; then
     echo -e "${black}${yellowbg}${level}$*${end}" >&3
   else
-    echo $* >&3
+    echo "${level}$*" >&3
   fi
 }
 
@@ -105,7 +105,7 @@ function log_error {
   if [ "$colorEnable" = "true" ]; then
     echo -e "${whiteb}${redbg}${level}$*${end}" >&3
   else
-    echo $* >&3
+    echo "${level}$*" >&3
   fi
 }
 
