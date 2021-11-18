@@ -1,9 +1,24 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.1.1 (18NOV21)
+
+* **Overall**
+
+  * [FIX] Running in a non-interactive shell (no `$TERM`) caused automated
+    deployments to fail
+
+* **Known Issues**
+  * On Openshift clusters, upgrading an existing deployment using Open Distro
+    for Elasticsearch 1.7.0 to this release (which uses Open Distro for
+    Elasticsearch 1.13.2) fails. Deploying this release onto a new OpenShift
+    cluster is possible.
+
 ## Version 1.1.0 (15NOV21)
 
 * **Overall**
-  * [FEATURE] A new flag LOG_VERBOSE_ENABLE is now available to suppress detailed logging during script execution. The default setting of this flag is true.
+
+  * [FEATURE] A new flag LOG_VERBOSE_ENABLE is now available to suppress detailed
+    logging during script execution. The default setting of this flag is true.
 
 * **Monitoring**
   * [CHANGE] Most monitoring component versions have been updated
@@ -14,27 +29,40 @@
     * Grafana upgraded from 7.5.4 to 8.2.1
     * Node Exporter upgraded from 1.0.1 to 1.2.2
     * kube-state-metrics upgraded from 1.9.8 to 2.2.1
-  * [FIX] Several dashboards were fixed to adjust to the kube-state-metrics 2.x metrics
-  * [FIX] The KubeHpaMaxedOut alert has been patched to not fire when max instances == current instances == 1
+  * [FIX] Several dashboards were fixed to adjust to the kube-state-metrics
+    2.x metrics
+  * [FIX] The KubeHpaMaxedOut alert has been patched to not fire when max
+    instances == current instances == 1
 
 * **Logging**
-  * [CHANGE] Open Distro for Elasticsearch (i.e. Elasticsearch and Kibana) upgraded to version 1.13.2. This includes significant changes to Kibana user-interface, see [Important Information About Kibana in the New Release](https://github.com/sassoftware/viya4-monitoring-kubernetes/tree/master/logging#important-information-about-kibana-in-the-new-release) for details.
+  * [CHANGE] Open Distro for Elasticsearch (i.e. Elasticsearch and Kibana)
+    upgraded to version 1.13.2. This includes significant changes to Kibana
+    user-interface, see [Important Information About Kibana in the New Release](https://github.com/sassoftware/viya4-monitoring-kubernetes/tree/master/logging#important-information-about-kibana-in-the-new-release)
+    for details.
 
-  * [FEATURE] A significant number of changes to support application multi-tenancy in SAS Viya; including the ability to limit users to log messages from a specific Viya deployment and tenant. See [Tenant Logging](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/Tenant_Logging.md) for details.
+  * [FEATURE] A significant number of changes to support application
+    multi-tenancy in SAS Viya; including the ability to limit users to log
+    messages from a specific Viya deployment and tenant. See
+    [Tenant Logging](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/Tenant_Logging.md)
+    for details.
 
 * **Known Issues**
-  * On Openshift clusters, upgrading an existing deployment using Open Distro for Elasticsearch 1.7.0 to this release (which uses Open Distro for Elasticsearch 1.13.2) fails. Deploying this release onto a new OpenShift cluster is possible.
+  * On Openshift clusters, upgrading an existing deployment using Open Distro
+    for Elasticsearch 1.7.0 to this release (which uses Open Distro for
+    Elasticsearch 1.13.2) fails. Deploying this release onto a new OpenShift
+    cluster is possible.
 
 ## Version 1.0.13 (20OCT21)
 
 * **Logging**
-  * [FIX] Addressed a serious issue (introduced in Version 1.0.12) that prevented the
-    successful deployment of the logging components when configured using ingress
+  * [FIX] Addressed a serious issue (introduced in Version 1.0.12) that
+    prevented the successful deployment of the logging components when configured
+    using ingress
 
-## Version 1.0.12 (18OCT21) 
----
-#### **UPDATE: Due to a serious bug, do not use Version 1.0.12; use a more recent version.**
----
+## Version 1.0.12 (18OCT21)
+
+### **UPDATE: Due to a serious bug, do not use 1.0.12; use a more recent version
+
 * **Overall**
   * [CHANGE] The minimum supported version of OpenShift is now 4.7. OpenShift
     support itself is still experimental
