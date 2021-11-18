@@ -7,6 +7,12 @@
   * [FIX] Running in a non-interactive shell (no `$TERM`) caused automated
     deployments to fail
 
+* **Known Issues**
+  * On Openshift clusters, upgrading an existing deployment using Open Distro
+    for Elasticsearch 1.7.0 to this release (which uses Open Distro for
+    Elasticsearch 1.13.2) fails. Deploying this release onto a new OpenShift
+    cluster is possible.
+
 ## Version 1.1.0 (15NOV21)
 
 * **Overall**
