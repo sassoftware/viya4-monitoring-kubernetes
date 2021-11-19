@@ -89,7 +89,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "(\n  instance:node_cpu_utilisation:rate1m{job=\"node-exporter\", instance=~\"$instance\"}\n*\n  instance:node_num_cpu:sum{job=\"node-exporter\", instance=~\"$instance\"}\n/ ignoring (instance) group_left\n  sum without (instance) (instance:node_num_cpu:sum{job=\"node-exporter\", instance=~\"$instance\"})\n)\n",
+          "expr": "(\n  instance:node_cpu_utilisation:rate5m{job=\"node-exporter\", instance=~\"$instance\"}\n*\n  instance:node_num_cpu:sum{job=\"node-exporter\", instance=~\"$instance\"}\n/ ignoring (instance) group_left\n  sum without (instance) (instance:node_num_cpu:sum{job=\"node-exporter\", instance=~\"$instance\"})\n)\n",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -423,7 +423,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "instance:node_vmstat_pgmajfault:rate1m{job=\"node-exporter\", instance=~\"$instance\"}",
+          "expr": "instance:node_vmstat_pgmajfault:rate5m{job=\"node-exporter\", instance=~\"$instance\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -554,7 +554,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "instance:node_network_receive_bytes_excluding_lo:rate1m{job=\"node-exporter\", instance=~\"$instance\"}",
+          "expr": "instance:node_network_receive_bytes_excluding_lo:rate5m{job=\"node-exporter\", instance=~\"$instance\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -564,7 +564,7 @@
           "step": 10
         },
         {
-          "expr": "instance:node_network_transmit_bytes_excluding_lo:rate1m{job=\"node-exporter\", instance=~\"$instance\"}",
+          "expr": "instance:node_network_transmit_bytes_excluding_lo:rate5m{job=\"node-exporter\", instance=~\"$instance\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -682,7 +682,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "instance:node_network_receive_drop_excluding_lo:rate1m{job=\"node-exporter\", instance=~\"$instance\"}",
+          "expr": "instance:node_network_receive_drop_excluding_lo:rate5m{job=\"node-exporter\", instance=~\"$instance\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -692,7 +692,7 @@
           "step": 10
         },
         {
-          "expr": "instance:node_network_transmit_drop_excluding_lo:rate1m{job=\"node-exporter\", instance=~\"$instance\"}",
+          "expr": "instance:node_network_transmit_drop_excluding_lo:rate5m{job=\"node-exporter\", instance=~\"$instance\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -812,7 +812,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "(\n  instance_device:node_disk_io_time_seconds:rate1m{job=\"node-exporter\", instance=~\"$instance\"}\n/ ignoring (instance, device) group_left\n  count without (instance, device) (instance_device:node_disk_io_time_seconds:rate1m{job=\"node-exporter\", instance=~\"$instance\"})\n)\n",
+          "expr": "(\n  instance_device:node_disk_io_time_seconds:rate5m{job=\"node-exporter\", instance=~\"$instance\"}\n/ ignoring (instance, device) group_left\n  count without (instance, device) (instance_device:node_disk_io_time_seconds:rate5m{job=\"node-exporter\", instance=~\"$instance\"})\n)\n",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -915,7 +915,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "(\n  instance_device:node_disk_io_time_weighted_seconds:rate1m{job=\"node-exporter\", instance=~\"$instance\"}\n/ ignoring (instance, device) group_left\n  count without (instance, device) (instance_device:node_disk_io_time_weighted_seconds:rate1m{job=\"node-exporter\", instance=~\"$instance\"})\n)\n",
+          "expr": "(\n  instance_device:node_disk_io_time_weighted_seconds:rate5m{job=\"node-exporter\", instance=~\"$instance\"}\n/ ignoring (instance, device) group_left\n  count without (instance, device) (instance_device:node_disk_io_time_weighted_seconds:rate5m{job=\"node-exporter\", instance=~\"$instance\"})\n)\n",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
