@@ -70,7 +70,9 @@ function get_api_url {
    usetls=${3:-false}
    ingress=$4
 
+   set +e
    api_url=$(get_service_url "$LOG_NS" "$servicename" "$usetls" $ingress)
+   set -e
 
    if [ -z "$api_url" ] || [ "$LOG_ALWAYS_PORT_FORWARD" == "true" ]; then
       # set up temporary port forwarding to allow curl access
