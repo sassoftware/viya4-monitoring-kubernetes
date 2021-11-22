@@ -75,4 +75,6 @@ for type in "${types[@]}"; do
   kubectl delete --ignore-not-found $type -n $VIYA_NS -l "v4m.sas.com/tenant=$VIYA_TENANT" >/dev/null
 done
 
+removeV4MInfo "$VIYA_NS" "v4m-tenant-$VIYA_TENANT"
+
 log_notice "Successfully removed OpenShift tenant monitoring for [$VIYA_NS/$VIYA_TENANT]"

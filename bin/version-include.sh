@@ -51,6 +51,7 @@ function populateValuesYAML() {
 
 function deployV4MInfo() {
   NS=$1
+  releaseName=$2
   if [ -z "$NS" ]; then
     log_error "No namespace specified for deploying Viya Monitoring for Kubernetes version information"
     return 1
@@ -63,17 +64,18 @@ function deployV4MInfo() {
   helm upgrade --install \
     -n "$NS" \
     --values $valuesYAML \
-    v4m ./v4m-chart
+    $releaseName ./v4m-chart
 }
 
 function removeV4MInfo() {
   NS=$1
+  releaseName=$2
   if [ -z "$NS" ]; then
     log_error "No namespace specified for removing Viya Monitoring for Kubernetes version information"
     return 1
   fi
   log_info "Removing Viya Monitoring for Kubernetes version information"
-  helm uninstall -n "$NS" v4m
+  helm uninstall -n "$NS" "$releaseName"
 }
 
 if [ -z "$V4M_VERSION_INCLUDE" ]; then

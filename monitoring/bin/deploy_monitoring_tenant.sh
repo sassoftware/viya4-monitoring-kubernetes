@@ -187,6 +187,8 @@ DASH_NS=$VIYA_NS
 DASH_BASE=$tenantDir/dashboards
 deploy_tenant_dashboards monitoring/multitenant/dashboards
 
+deployV4MInfo "$VIYA_NS" "v4m-tenant-$VIYA_TENANT"
+
 if [ "$showPass" == "true" ]; then
   # Find the grafana pod
   grafanaPod="$(kubectl get po -n $VIYA_NS -l app.kubernetes.io/name=grafana --template='{{range .items}}{{.metadata.name}}{{end}}')"

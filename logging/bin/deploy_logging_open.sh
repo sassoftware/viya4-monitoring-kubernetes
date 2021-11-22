@@ -86,7 +86,7 @@ logging/bin/deploy_fluentbit_open.sh
 # Version Info                   #
 ##################################
 
-if ! deployV4MInfo "$LOG_NS"; then
+if ! deployV4MInfo "$LOG_NS" "v4m"; then
   log_warn "Unable to update SAS Viya Monitoring version information"
 fi
 
