@@ -65,6 +65,10 @@ kube-state-metrics:
     requests:
       cpu: "25m"
       memory: "50Mi"
+  # kube-state-metrics 2.0 requires explicitly defining which labels are
+  # collected for each resource type 
+  extraArgs:
+  - --metric-labels-allowlist=nodes=[*],namespaces=[*],pods=[*],deployments=[*],statefulsets=[*],daemonsets=[*],jobs=[*]
 
 # ==========
 # Prometheus

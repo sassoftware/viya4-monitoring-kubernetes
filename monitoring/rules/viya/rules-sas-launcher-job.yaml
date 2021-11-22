@@ -26,7 +26,7 @@ spec:
       record: ':sas_launcher_pod_fs_read_bytes_total:'
     - expr: :sas_launcher_pod_status:{phase="Running"} * on (namespace,pod) group_left sum(container_fs_writes_bytes_total{container!="",pod=~"sas-launcher-.+-.+-.+-.+"}) by (namespace,pod)
       record: ':sas_launcher_pod_fs_write_bytes_total:'
-    - expr: :sas_launcher_pod_status:{phase="Running"} * on (namespace,pod) group_left sum(container_network_receive_bytes_total{container="POD",pod=~"sas-launcher-.+-.+-.+-.+"}) by (namespace,pod)
+    - expr: :sas_launcher_pod_status:{phase="Running"} * on (namespace,pod) group_left sum(container_network_receive_bytes_total{container!="POD",pod=~"sas-launcher-.+-.+-.+-.+"}) by (namespace,pod)
       record: ':sas_launcher_pod_net_receive_bytes_total:'
-    - expr: :sas_launcher_pod_status:{phase="Running"} * on (namespace,pod) group_left sum(container_network_transmit_bytes_total{container="POD",pod=~"sas-launcher-.+-.+-.+-.+"}) by (namespace,pod)
+    - expr: :sas_launcher_pod_status:{phase="Running"} * on (namespace,pod) group_left sum(container_network_transmit_bytes_total{container!="POD",pod=~"sas-launcher-.+-.+-.+-.+"}) by (namespace,pod)
       record: ':sas_launcher_pod_net_transmit_bytes_total:'
