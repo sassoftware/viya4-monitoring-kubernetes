@@ -22,10 +22,12 @@ function stop_portforwarding {
    local pid
    pid=${1:-$pfPID}
 
-   if [ -n "$pid" ]; then
+   if ps -p "$pid" >/dev/null;  then
+      set +e
       log_debug "Killing port-forwarding process [$pid]."
-      kill  -9 $pid
+      kill -9 $pid 
       wait $pid 2>/dev/null  # suppresses message reporting process has been killed
+      set -e
    else
       log_debug "No portforwarding processID found; nothing to terminate."
    fi
