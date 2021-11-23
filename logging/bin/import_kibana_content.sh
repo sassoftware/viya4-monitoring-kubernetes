@@ -28,20 +28,42 @@ function import_file {
 
       if [[ $response == 2* ]]; then
          if grep -q '"success":true' $TMP_DIR/curl.response ; then
-            log_info "Deployed content from file [$f] - Success! [$response]"
+            log_verbose "Deployed content from file [$file] - Success! [$response]"
          else
-            log_warn "Unable to deploy content from file [$f]. [$response]"
-            log_warn "  Response received was: $(cat $TMP_DIR/curl.response)"
+            log_warn "Unable to deploy content from file [$file]. [$response]"
+            log_verbose "  Response received was: $(cat $TMP_DIR/curl.response)"
             #log_message "" # null line since response file may not contain LF
          fi
          return 0
       else
-         log_warn "Error encountered while deploying content from file [$f]. [$response]"
+         log_warn "Error encountered while deploying content from file [$file]. [$response]"
          return 1
       fi
    fi
 }
 
+function import_content_batch {
+   # Loads content from a directory in a single API call
+   #
+   # Returns: 0 - No load issues
+   #          1 - At least one load issue encountered
+
+   local dir rc f tmpfile
+   dir=$1
+
+   tmpfile=$TMP_DIR/batched.ndjson
+   touch $tmpfile
+
+   rc=0
+   for f in $dir/*.ndjson; do
+      log_debug "Adding $f to $tmpfile"
+      cat $f >>$tmpfile
+      echo " " >> $tmpfile
+   done
+
+   import_file $tmpfile
+   return $?
+}
 function import_content {
    # Loads content from a directory
    #
@@ -60,6 +82,7 @@ function import_content {
    done
    return $rc
 }
+
 
 if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
   log_debug "Multi-tenant feature flag is enabled"
@@ -89,6 +112,9 @@ fi
 
 #Flag to suppress file/directory not found error
 ignore_not_found="${IGNORE_NOT_FOUND:-false}"
+
+#Flag to force loading of directory files individually
+nobatch="${NOBATCH:-false}"
 
 get_kb_api_url
 if [ -z "$kb_api_url" ]; then
@@ -144,10 +170,18 @@ if [ -f "$1" ]; then
       exit 1
    fi
 elif [ -d "$1" ]; then
+
     # Deploy specified directory of Kibana content
     log_info "Importing Kibana content in [$1] to Kibana tenant space [$tenant]..."
-    import_content $1
+    if [ "$nobatch" == "true" ]; then
+       log_debug "'NO BATCH' flag set; loading files individually from directory"
+       import_content $1
+    else
+       import_content_batch $1
+    fi
+
     import_problems=$?
+
 elif [ "$ignore_not_found" == "true" ]; then
    log_debug "The specified file/directory to import [$1] does not exist or cannot be accessed but --ignore-not-found flag has been set."
    exit 0
