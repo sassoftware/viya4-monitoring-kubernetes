@@ -75,9 +75,7 @@ function get_api_url {
    usetls=${3:-false}
    ingress=$4
 
-   set +e
    api_url=$(get_service_url "$LOG_NS" "$servicename" "$usetls" $ingress)
-   set -e
 
    if [ -z "$api_url" ] || [ "$LOG_ALWAYS_PORT_FORWARD" == "true" ]; then
       # set up temporary port forwarding to allow curl access
@@ -105,7 +103,7 @@ function get_api_url {
          TEMP_PORT="${BASH_REMATCH[1]}";
          log_debug "TEMP_PORT=${TEMP_PORT}"
       else
-         log_error "Unable to obtain or identify the temporary port used for port-forwarding; exiting script.";
+         log_error "Unable to identify the temporary port used for port-forwarding [$servicename]; exiting script.";
          return 1
       fi
 
@@ -144,6 +142,7 @@ function get_es_api_url {
       trap_add stop_es_portforwarding EXIT
       return 0
    else
+      log_error "Unable to obtain the URL for the Elasticsearch API Endpoint"
       return 1
    fi
 }
@@ -170,6 +169,7 @@ function get_kb_api_url {
       trap_add stop_kb_portforwarding EXIT
       return 0
    else
+      log_error "Unable to obtain the URL for the Kibana API Endpoint"
       return 1
    fi
 }
@@ -194,6 +194,7 @@ function get_sec_api_url {
     return 0
  else
     sec_api_url=""
+    log_error "Unable to obtain the URL for the Security API Endpoint"
     return 1
  fi
 }
