@@ -10,7 +10,7 @@ logVerbose=${LOG_VERBOSE_ENABLE:-true}
 
 # This must be run without 'set -e' being set
 # So it has to be done up here and not within log_notice
-if [ -z "$TERM" ]; then
+if [ -z "$TERM" ] || ! tput cols >/dev/null 2>&1 ; then
   # Non-interactive shell
   colorEnable=false
   noticeColWidth=${LOG_NOTICE_COL_WIDTH:-100}
@@ -121,4 +121,4 @@ function log_error {
 }
 
 export -f log_notice log_message log_debug log_info log_warn log_error add_notice display_notices log_verbose
-export colorEnable levelEnable logDebug
+export colorEnable levelEnable logDebug noticeColWidth
