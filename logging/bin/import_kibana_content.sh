@@ -48,20 +48,29 @@ function import_content_batch {
    # Returns: 0 - No load issues
    #          1 - At least one load issue encountered
 
-   local dir rc f tmpfile
+   local dir rc f tmpfile item_count
    dir=$1
 
    tmpfile=$TMP_DIR/batched.ndjson
    touch $tmpfile
 
    rc=0
+   item_count=0
    for f in $dir/*.ndjson; do
-      log_debug "Adding $f to $tmpfile"
-      cat $f >>$tmpfile
-      echo " " >> $tmpfile
+      if [ -f "$f" ]; then
+         log_debug "Adding $f to $tmpfile"
+         cat $f >>$tmpfile
+         echo " " >> $tmpfile
+         ((item_count++))
+      fi
    done
 
-   import_file $tmpfile
+   if [[ "$item_count" -gt 0 ]]; then
+      log_debug "$item_count items packed into $tmpfile for loading"
+      import_file $tmpfile
+   else
+      log_debug "No content found in [$dir] to be loaded"
+   fi
    return $?
 }
 function import_content {
@@ -75,9 +84,11 @@ function import_content {
 
    rc=0
    for f in $dir/*.ndjson; do
-      import_file $f
-      if [ "$?" != "0" ]; then
-         rc=1
+      if [ -f "$f" ]; then
+         import_file $f
+         if [ "$?" != "0" ]; then
+            rc=1
+         fi
       fi
    done
    return $rc
