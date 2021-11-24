@@ -217,6 +217,34 @@ if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
 
    cd opendistro-build
 
+   # Update old Kubernetes resource versions to support 1.22+
+   log_debug "Patching OpenDistro helm chart resource versions"
+   roleFiles=( \
+      "helm/opendistro-es/templates/elasticsearch/role.yaml" \
+      "helm/opendistro-es/templates/kibana/role.yaml" \
+   )
+   for f in ${roleFiles[@]}; do
+      log_debug "Updating Role template file [$f]"
+      if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
+         sed -i '' "s/apiVersion: rbac.authorization.k8s.io\/v1beta1/apiVersion: rbac.authorization.k8s.io\/v1/g" $f
+      else
+         sed -i "s/apiVersion: rbac.authorization.k8s.io\/v1beta1/apiVersion: rbac.authorization.k8s.io\/v1/g" $f
+      fi
+   done
+
+   ingressFiles=( \
+      "helm/opendistro-es/templates/elasticsearch/es-client-ingress.yaml" \
+      "helm/opendistro-es/templates/kibana/kibana-ingress.yml" \
+   )
+   for f in ${ingressFiles[@]}; do
+       log_debug "Updating Ingress template file [$f]"
+      if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
+         sed -i '' "s/extensions\/v1beta1/networking.k8s.io\/v1/g" $f
+      else
+         sed -i "s/extensions\/v1beta1/networking.k8s.io\/v1/g" $f
+      fi
+   done
+
    # build package
    log_debug "Packaging Helm Chart for Elasticsearch"
 
