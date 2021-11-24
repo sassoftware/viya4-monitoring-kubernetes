@@ -35,7 +35,6 @@ logging/bin/remove_servicemonitors_open_openshift.sh
 export CHECK_OPENSHIFT_CLUSTER=false
 logging/bin/remove_logging_open.sh
 
-
 log_info "Log monitoring component removal script has completed."
 
 log_debug "Script [$this_script] has completed [$(date)]"

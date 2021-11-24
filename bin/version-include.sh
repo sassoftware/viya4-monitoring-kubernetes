@@ -65,6 +65,8 @@ function deployV4MInfo() {
     -n "$NS" \
     --values $valuesYAML \
     $releaseName ./v4m-chart
+
+  getHelmReleaseVersion "$NS" "$releaseName"
 }
 
 function removeV4MInfo() {
@@ -78,37 +80,66 @@ function removeV4MInfo() {
   helm uninstall -n "$NS" "$releaseName"
 }
 
-if [ -z "$V4M_VERSION_INCLUDE" ]; then
+function getHelmReleaseVersion() {
+  NS=$1
+  releaseName=$2
+
+  releaseVersionFull=""
+  releaseVersionMajor=""
+  releaseVersionMinor=""
+  releaseVersionPatch=""
+  releaseStatus=""
+
   origIFS=$IFS
-  IFS=$'\n' v4mHelmVersionLines=($(helm list -n "$V4M_NS" --filter '^v4m$' -o yaml))
+  IFS=$'\n' v4mHelmVersionLines=($(helm list -n "$NS" --filter "^$releaseName\$" -o yaml))
   IFS=$origIFS
   if [ -z "$v4mHelmVersionLines" ]; then
-    log_debug "No Viya Monitoring for Kubernetes release found in [$V4M_NS]"
+    log_debug "No [$releaseName] release found in [$NS]"
   else
     for (( i=0; i<${#v4mHelmVersionLines[@]}; i++ )); do 
       line=${v4mHelmVersionLines[$i]}
       vre='app_version: (([0-9]+).([[0-9]+).([0-9]+)\.?(-.+)?)'
       sre='status: (.+)'
       if [[ $line =~ $vre ]]; then
-        V4M_CURRENT_VERSION_FULL=${BASH_REMATCH[1]}
-        V4M_CURRENT_VERSION_MAJOR=${BASH_REMATCH[2]}
-        V4M_CURRENT_VERSION_MINOR=${BASH_REMATCH[3]}        
-        V4M_CURRENT_VERSION_PATCH=${BASH_REMATCH[4]}
+        # Set
+        releaseVersionFull=${BASH_REMATCH[1]}
+        releaseVersionMajor=${BASH_REMATCH[2]}
+        releaseVersionMinor=${BASH_REMATCH[3]}        
+        releaseVersionPatch=${BASH_REMATCH[4]}
       elif [[ "$line" =~ $sre ]]; then
-        V4M_CURRENT_STATUS=${BASH_REMATCH[1]}
+        releaseStatus=${BASH_REMATCH[1]}
       fi
     done
 
-    log_debug "V4M_CURRENT_VERSION_FULL=$V4M_CURRENT_VERSION_FULL"
-    log_debug "V4M_CURRENT_VERSION_MAJOR=$V4M_CURRENT_VERSION_MAJOR"
-    log_debug "V4M_CURRENT_VERSION_MINOR=$V4M_CURRENT_VERSION_MINOR"
-    log_debug "V4M_CURRENT_VERSION_PATCH=$V4M_CURRENT_VERSION_PATCH"
-    log_debug "V4M_CURRENT_STATUS=$V4M_CURRENT_STATUS"
-
-    export V4M_CURRENT_VERSION_FULL V4M_CURRENT_VERSION_MAJOR V4M_CURRENT_VERSION_MINOR V4M_CURRENT_VERSION_PATCH 
-    export V4M_CURRENT_STATUS
   fi
+  log_debug "releaseVersionFull=$releaseVersionFull"
+  log_debug "releaseVersionMajor=$releaseVersionMajor"
+  log_debug "releaseVersionMinor=$releaseVersionMinor"
+  log_debug "releaseVersionPatch=$releaseVersionPatch"
+  log_debug "releaseStatus=$releaseStatus"
 
-  export -f deployV4MInfo removeV4MInfo
+  export releaseVersionFull releaseVersionMajor releaseVersionMinor releaseVersionPatch releaseStatus
+}
+
+if [ -z "$V4M_VERSION_INCLUDE" ]; then
+  getHelmReleaseVersion "$V4M_NS" "v4m"
+  
+  V4M_CURRENT_VERSION_FULL=releaseVersionFull
+  V4M_CURRENT_VERSION_MAJOR=releaseVersionMajor
+  V4M_CURRENT_VERSION_MINOR=releaseVersionMinor
+  V4M_CURRENT_VERSION_PATCH=releaseVersionPatch
+  V4M_CURRENT_STATUS=releaseStatus
+  
+  log_debug "V4M_CURRENT_VERSION_FULL=$V4M_CURRENT_VERSION_FULL"
+  log_debug "V4M_CURRENT_VERSION_MAJOR=$V4M_CURRENT_VERSION_MAJOR"
+  log_debug "V4M_CURRENT_VERSION_MINOR=$V4M_CURRENT_VERSION_MINOR"
+  log_debug "V4M_CURRENT_VERSION_PATCH=$V4M_CURRENT_VERSION_PATCH"
+  log_debug "V4M_CURRENT_STATUS=$V4M_CURRENT_STATUS"
+
+  export V4M_CURRENT_VERSION_FULL V4M_CURRENT_VERSION_MAJOR V4M_CURRENT_VERSION_MINOR V4M_CURRENT_VERSION_PATCH 
+  export V4M_CURRENT_STATUS
+
+  export -f deployV4MInfo removeV4MInfo getHelmReleaseVersion
   export V4M_VERSION_INCLUDE=true
 fi
+
