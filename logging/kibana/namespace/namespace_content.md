@@ -6,4 +6,3 @@
 * 20_viz_update_checker.ndjson
 * 30_dash_k8s_events.ndjson
 * 30_dash_update_checker.ndjson
-* hello_namespace.ndjson

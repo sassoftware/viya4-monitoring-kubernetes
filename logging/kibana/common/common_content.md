@@ -18,4 +18,3 @@
 * 30_dash_msg_vol_lvl.ndjson
 * 30_dash_msg_vol_lvl_pc.ndjson
 * 30_dash_top10_errors.ndjson
-* hello_common.ndjson
