@@ -114,7 +114,7 @@ fi
 ignore_not_found="${IGNORE_NOT_FOUND:-false}"
 
 #Flag to force loading of directory files individually
-nobatch="${NOBATCH:-false}"
+batch_kibana_content="${BATCH_KIBANA_CONTENT:-true}"
 
 get_kb_api_url
 if [ -z "$kb_api_url" ]; then
@@ -173,8 +173,8 @@ elif [ -d "$1" ]; then
 
     # Deploy specified directory of Kibana content
     log_info "Importing Kibana content in [$1] to Kibana tenant space [$tenant]..."
-    if [ "$nobatch" == "true" ]; then
-       log_debug "'NO BATCH' flag set; loading files individually from directory"
+    if [ "$batch_kibana_content" != "true" ]; then
+       log_debug "'BATCH_KIBANA_CONTENT' flag set to 'false'; loading files individually from directory"
        import_content $1
     else
        import_content_batch $1
