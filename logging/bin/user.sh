@@ -193,8 +193,8 @@ case "$action" in
 
       # Check if user exists
       if [[ "$existing_user" == "true" ]]; then
-         log_error "A user with this name [$username] already exists. [$response]"
-          exit 1
+         log_error "A user with this name [$username] already exists."
+         exit 1
       fi
 
       index_prefix=viya_logs
