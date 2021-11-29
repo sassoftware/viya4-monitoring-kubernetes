@@ -254,7 +254,7 @@ case "$action" in
 
       # Check if user exists
       if [[ "$existing_user" != "true" ]]; then
-         log_error "There was an issue deleting the user [$username]; the user does NOT exists. [$response]"
+         log_error "There was an issue deleting the user [$username]; the user does NOT exists."
          exit 1
       else
          log_debug "User [$username] exists."
