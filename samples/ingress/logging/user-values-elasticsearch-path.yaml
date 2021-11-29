@@ -33,5 +33,6 @@ kibana:
         rewrite (?i)/kibana$ / break;
       nginx.ingress.kubernetes.io/rewrite-target: /kibana
     enabled: true
+    path: /kibana
     hosts:
-    - host.mycluster.example.com/kibana
+    - host.mycluster.example.com
