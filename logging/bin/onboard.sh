@@ -215,10 +215,16 @@ if [ "$createuser" == "true" ]; then
       passwdarg=""
    fi
 
-   if [ -z "$tenant" ]; then
-      ./logging/bin/user.sh CREATE -ns $namespace -u $inituser $passwdarg
+   if user_exists $inituser; then
+      log_warn "A user with the requested user name of  [$inituser] already exists; the initial user account you requested was NOT created."
+      log_warn "This existing user may have completely different access controls than you intended for the initial user."
+      log_warn "You can create a new user with the appropriate access controls by calling the logging/bin/user.sh script directly."
    else
-      ./logging/bin/user.sh CREATE -ns $namespace -t $tenant -u $inituser $passwdarg
+      if [ -z "$tenant" ]; then
+         ./logging/bin/user.sh CREATE -ns $namespace -u $inituser $passwdarg
+      else
+         ./logging/bin/user.sh CREATE -ns $namespace -t $tenant -u $inituser $passwdarg
+      fi
    fi
 else
    log_debug "An initial user will NOT be created."

@@ -340,3 +340,27 @@ function kibana_tenant_exists {
       return 1
    fi
 }
+
+#
+# USER Functions
+#
+
+function user_exists {
+   # Check if $user exists
+   #
+   # Returns: 0 - User exists
+   #          1 - User does not exist
+
+   local username response
+   username=$1
+
+   response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "${sec_api_url}/internalusers/$username" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+
+   if [[ $response == 2* ]]; then
+      log_debug "Confirmed Kibana user [$username] exists. [$response]"
+      return 0
+   else
+      log_debug "Kibana user [$username] does not exist. [$response]"
+      return 1
+   fi
+}
