@@ -183,8 +183,7 @@ else
    ./logging/bin/import_kibana_content.sh logging/kibana/tenant    $ktenant
 fi
 
-#TO DO: Load content from USER_DIR
-if [ -d "$USER_DIR/logging/kibana" && "$USER_DIR" != "$(pwd)" ]; then
+if [ -d "$USER_DIR/logging/kibana" ] && [ "$USER_DIR" != "$(pwd)" ]; then
 
    export IGNORE_NOT_FOUND="true"
    ./logging/bin/import_kibana_content.sh $USER_DIR/logging/kibana/common $ktenant
