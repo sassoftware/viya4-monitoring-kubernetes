@@ -168,8 +168,6 @@ fi
 
 
 # Check if user exists
-response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "$sec_api_url/internalusers/$username"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-if [[ $response == 404 ]]; then
 if user_exists $username; then
    existing_user=true
 else
