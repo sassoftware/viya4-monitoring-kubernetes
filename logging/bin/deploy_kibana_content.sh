@@ -104,9 +104,9 @@ do
    response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "${kb_api_url}/api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
    # returns 503 (and outputs "Kibana server is not ready yet") when Kibana isn't ready yet
    # TO DO: check for 503 specifically?
-
+   rc=$?
    if [[ $response != 2* ]]; then
-      log_debug "The Kibana REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
+      log_debug "The Kibana REST endpoint does not appear to be quite ready [$response/$rc]; sleeping for [$pause] more seconds before checking again."
       sleep ${pause}s
    else
       log_verbose "The Kibana REST endpoint appears to be ready...continuing"

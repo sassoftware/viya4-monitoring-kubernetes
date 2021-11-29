@@ -34,8 +34,8 @@ function get_k8s_info {
   if [ ! -z  "$info" ]; then
      echo "$info"
   else
+     v4m_rc=1
      echo ""
-     return 1
   fi
 }
 
@@ -65,18 +65,24 @@ function get_ingress_url {
   name=$2
 
   if [ ! "$(kubectl -n $namespace  get ingress/$name 2>/dev/null)" ]; then
-    # ingress object does not exist
-    return 1
+     # ingress object does not exist
+     v4m_rc=1
+     echo ""
+     return
   fi
 
   host=$(get_k8s_info "$namespace" "ingress/$name" "$json_ingress_host")
   if [ -z "$host" ]; then
-     return 1
+     v4m_rc=1
+     echo ""
+     return
   fi
 
   path=$(get_k8s_info "$namespace" "ingress/$name" "$json_ingress_path")
   if [ -z "$path" ]; then
-     return 1
+     v4m_rc=1
+     echo ""
+     return
   fi
 
   tls_info=$(get_k8s_info "$namespace" "ingress/$name" "$json_ingress_tls")
@@ -107,8 +113,9 @@ function get_route_url {
 
   host=$(get_k8s_info "$namespace" "route/$service" "$json_route_host")
   if [ -z "$host" ]; then
+     v4m_rc=1
      echo ""
-     return 1
+     return
   fi
 
   # OK if path is empty
@@ -136,7 +143,9 @@ function get_nodeport_url {
 
   if [ ! "$(kubectl -n $namespace get service/$service 2>/dev/null)" ]; then
     # ingress object does not exist
-    return 1
+     v4m_rc=1
+     echo ""
+     return
   fi
 
   # DEPRECATION: use of the NODE_NAME env var to override the node name used in the Kibana URL has been 
@@ -175,7 +184,9 @@ function get_service_url {
      url=$(get_route_url $namespace $service)
 
      if [ -z "$url" ]; then
-        return 1
+        v4m_rc=1
+        echo ""
+        return
      else
         echo "$url"
         return
@@ -191,7 +202,9 @@ function get_service_url {
      url=$(get_ingress_url $namespace $ingress)
 
      if [ -z "$url" ]; then
-        return 1
+        v4m_rc=1
+        echo ""
+        return
      else
         echo "$url"
      fi
@@ -199,23 +212,25 @@ function get_service_url {
      url=$(get_nodeport_url $namespace $service $use_tls)
 
      if [ -z "$url" ]; then
-        return 1
+        v4m_rc=1
+        echo ""
+        return
      else
         echo "$url"
      fi
  else
-    # uh-oh, how what?
-    return 1
+     # uh-oh, how what?
+     v4m_rc=1
+     echo ""
+     return
  fi
 }
 
 # USAGE NOTES
 #
-# #Exit on error
-#
-# These functions return with a non-zero return code when unable to generate the requested URL;
-# therefore, you may need to set +e before calling these functions if you want to handle that exception
-# rather than having the calling script fail.
+# #Return code
+# These functions always exit with a return code of 0.  If problems were encountered, they will return a
+# null value and set the v4m_rc variable to 1.
 #
 # #Setting ingress_http_port and ingress_https_port variables
 #
@@ -226,5 +241,4 @@ function get_service_url {
 #   grafana_url=$(get_service_url monitoring v4m-grafana  "/" "false")
 #
 # Returns generated URL or "" (null) string (if unable to generate URL)
-# Exit code: 0 = success 1 = failure to generate URL
 #

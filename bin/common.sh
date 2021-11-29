@@ -23,6 +23,9 @@ trap_add() {
       )" "${signal}"
    done
 }
+function errexit_msg {
+   log_error "Exiting script due to an error."
+}
 
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
     # Save standard out to a new descriptor
@@ -104,6 +107,8 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     }
     trap_add cleanup EXIT
 
+    trap_add errexit_msg ERR
+
     export SAS_COMMON_SOURCED=true
 fi
 
@@ -174,4 +179,5 @@ export -f checkDefaultStorageClass
 export -f validateTenantID
 export -f validateNamespace
 export -f randomPassword
-export -f  trap_add
+export -f trap_add
+export -f errexit_msg

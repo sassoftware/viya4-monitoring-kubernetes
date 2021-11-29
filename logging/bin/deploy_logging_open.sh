@@ -32,6 +32,7 @@ fi
 
 log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 
+set -e
 
 ##################################
 # Event Router                   #
@@ -60,6 +61,12 @@ logging/bin/deploy_elasticsearch_content_open.sh
 logging/bin/deploy_esexporter.sh
 
 ##################################
+# Fluent Bit                     #
+##################################
+
+logging/bin/deploy_fluentbit_open.sh
+
+##################################
 # Kibana Content                 #
 ##################################
 
@@ -67,19 +74,12 @@ logging/bin/deploy_esexporter.sh
 
 logging/bin/deploy_kibana_content.sh
 
-
 ##################################
 # Display Kibana URL             #
 ##################################
-
+set +e
 bin/show_app_url.sh KIBANA ELASTICSEARCH
-
-
-##################################
-# Fluent Bit                     #
-##################################
-
-logging/bin/deploy_fluentbit_open.sh
+set -e
 
 
 ##################################
