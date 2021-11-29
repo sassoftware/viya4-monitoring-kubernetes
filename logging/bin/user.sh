@@ -257,7 +257,7 @@ case "$action" in
          log_error "There was an issue deleting the user [$username]; the user does NOT exists. [$response]"
          exit 1
       else
-         log_debug "User [$username] exists. [$response]"
+         log_debug "User [$username] exists."
       fi
 
       # Delete user
