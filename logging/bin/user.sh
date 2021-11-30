@@ -168,13 +168,12 @@ fi
 
 
 # Check if user exists
-response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "$sec_api_url/internalusers/$username"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-if [[ $response == 404 ]]; then
-   user_exists=false
+if user_exists $username; then
+   existing_user=true
 else
-   user_exists=true
+   existing_user=false
 fi
-log_debug "USER_EXISTS: $user_exists"
+log_debug "USER_EXISTS: $existing_user"
 
 case "$action" in
    CREATE)
@@ -193,9 +192,9 @@ case "$action" in
       fi
 
       # Check if user exists
-      if [[ "$user_exists" == "true" ]]; then
-         log_error "A user with this name [$username] already exists. [$response]"
-          exit 1
+      if [[ "$existing_user" == "true" ]]; then
+         log_error "A user with this name [$username] already exists."
+         exit 1
       fi
 
       index_prefix=viya_logs
@@ -254,11 +253,11 @@ case "$action" in
       log_info "Attempting to remove user [$username] from the internal user database [$(date)]"
 
       # Check if user exists
-      if [[ "$user_exists" != "true" ]]; then
-         log_error "There was an issue deleting the user [$username]; the user does NOT exists. [$response]"
+      if [[ "$existing_user" != "true" ]]; then
+         log_error "There was an issue deleting the user [$username]; the user does NOT exists."
          exit 1
       else
-         log_debug "User [$username] exists. [$response]"
+         log_debug "User [$username] exists."
       fi
 
       # Delete user

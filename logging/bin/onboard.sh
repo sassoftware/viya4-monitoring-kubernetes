@@ -30,16 +30,6 @@ function show_usage {
 }
 
 
-if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
-  log_debug "Multi-tenant feature flag is enabled"
-else
-  log_error "Multi-tenant support is under active development and is not yet fully    "
-  log_error "functional. Set V4M_FEATURE_MULTITENANT_ENABLE=true to continue anyway.  "
-  log_message ""
-  exit 1
-fi
-
-
 # set flag indicating wrapper/driver script being run
 export LOGGING_DRIVER=true
 
@@ -193,8 +183,7 @@ else
    ./logging/bin/import_kibana_content.sh logging/kibana/tenant    $ktenant
 fi
 
-#TO DO: Load content from USER_DIR
-if [ -d "$USER_DIR/logging/kibana" && "$USER_DIR" != "$(pwd)" ]; then
+if [ -d "$USER_DIR/logging/kibana" ] && [ "$USER_DIR" != "$(pwd)" ]; then
 
    export IGNORE_NOT_FOUND="true"
    ./logging/bin/import_kibana_content.sh $USER_DIR/logging/kibana/common $ktenant
@@ -226,10 +215,16 @@ if [ "$createuser" == "true" ]; then
       passwdarg=""
    fi
 
-   if [ -z "$tenant" ]; then
-      ./logging/bin/user.sh CREATE -ns $namespace -u $inituser $passwdarg
+   if user_exists $inituser; then
+      log_warn "A user with the requested user name of  [$inituser] already exists; the initial user account you requested was NOT created."
+      log_warn "This existing user may have completely different access controls than you intended for the initial user."
+      log_warn "You can create a new user with the appropriate access controls by calling the logging/bin/user.sh script directly."
    else
-      ./logging/bin/user.sh CREATE -ns $namespace -t $tenant -u $inituser $passwdarg
+      if [ -z "$tenant" ]; then
+         ./logging/bin/user.sh CREATE -ns $namespace -u $inituser $passwdarg
+      else
+         ./logging/bin/user.sh CREATE -ns $namespace -t $tenant -u $inituser $passwdarg
+      fi
    fi
 else
    log_debug "An initial user will NOT be created."

@@ -44,11 +44,7 @@ namespace=$(echo "$namespace"| tr '[:upper:]' '[:lower:]')
 tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
 
 
-if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
-   create_ktenant_roles=${CREATE_KTENANT_ROLE:-true}
-else
-   create_ktenant_roles=${CREATE_KTENANT_ROLE:-false}
-fi
+create_ktenant_roles=${CREATE_KTENANT_ROLE:-true}
 
 
 if [ -z "$namespace" ]; then
@@ -130,12 +126,8 @@ if [ "$create_ktenant_roles" == "true" ]; then
 fi
 
 #kibana_user
-if [ "$V4M_FEATURE_MULTITENANT_ENABLE" == "true" ]; then
-   ensure_role_exists v4m_kibana_user $TMP_DIR/rbac/v4m_kibana_user_role.json
-   add_rolemapping v4m_kibana_user $BE_ROLENAME null
-else
-   add_rolemapping kibana_user $BE_ROLENAME null
-fi
+ensure_role_exists v4m_kibana_user $TMP_DIR/rbac/v4m_kibana_user_role.json
+add_rolemapping v4m_kibana_user $BE_ROLENAME null
 
 log_notice "Access controls created [$(date)]"
 echo ""
