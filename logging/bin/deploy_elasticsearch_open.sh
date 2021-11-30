@@ -215,9 +215,14 @@ if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
    log_verbose "Cloning Open Distro for Elasticsearch repo"
    git clone https://github.com/opendistro-for-elasticsearch/opendistro-build
 
-   cd opendistro-build
+   cd opendistro-build  
 
-   # Update old Kubernetes resource versions to support 1.22+
+   # Patch ingress objects to networking.k8s.io/v1 for 1.22 compatibility
+   log_debug "Updating ODFE ingress templates"
+   cp $baseDir/logging/es/odfe/ingress-patch/kibana-ingress.yml helm/opendistro-es/templates/kibana/kibana-ingress.yml
+   cp $baseDir/logging/es/odfe/ingress-patch/es-client-ingress.yaml helm/opendistro-es/templates/elasticsearch/es-client-ingress.yaml
+   
+   # Update old Kubernetes role versions to support 1.22+
    log_debug "Patching OpenDistro helm chart resource versions"
    roleFiles=( \
       "helm/opendistro-es/templates/elasticsearch/role.yaml" \
@@ -229,19 +234,6 @@ if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
          sed -i '' "s/apiVersion: rbac.authorization.k8s.io\/v1beta1/apiVersion: rbac.authorization.k8s.io\/v1/g" $f
       else
          sed -i "s/apiVersion: rbac.authorization.k8s.io\/v1beta1/apiVersion: rbac.authorization.k8s.io\/v1/g" $f
-      fi
-   done
-
-   ingressFiles=( \
-      "helm/opendistro-es/templates/elasticsearch/es-client-ingress.yaml" \
-      "helm/opendistro-es/templates/kibana/kibana-ingress.yml" \
-   )
-   for f in ${ingressFiles[@]}; do
-       log_debug "Updating Ingress template file [$f]"
-      if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-         sed -i '' "s/extensions\/v1beta1/networking.k8s.io\/v1/g" $f
-      else
-         sed -i "s/extensions\/v1beta1/networking.k8s.io\/v1/g" $f
       fi
    done
 
