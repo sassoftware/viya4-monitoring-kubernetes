@@ -48,6 +48,8 @@ function show_usage {
   esac
 }
 
+set -e
+
 POS_PARMS=""
 
 while (( "$#" )); do
@@ -136,21 +138,26 @@ namespace=$(echo "$namespace"| tr '[:upper:]' '[:lower:]')
 tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
 
 
-if [ -n "$tenant" ]; then
-   nst="${namespace}_${tenant}"
+if [ "$namespace" == "_all_" ] && [ "$tenant" == "_all_" ]; then
+   if [ -z "$username"  ]; then
+     log_error "Required parameter USERNAME not specified"
+     show_usage $action
+     exit 4
+   fi
+   cluster="true"
+   namespace=''
+   tenant=''
 else
-   nst="$namespace"
+   cluster="false"
+
+   if [ -z "$username"  ] && [ -z "$namespace" ]; then
+     log_error "Required parameter(s) NAMESPACE and/or USERNAME not specified"
+     show_usage $action
+     exit 4
+   fi
 fi
 
-if [ -z "$username"  ] && [ -z "$namespace" ]; then
-  log_error "Required parameter(s) NAMESPACE and/or USERNAME not specified"
-  show_usage $action
-  exit 4
-elif [ -z "$username" ]; then
-  username="${nst}_admin"
-fi
-
-log_debug "NAMESPACE: $namespace TENANT: $tenant NST: $nst USERNAME: $username"
+log_debug "CLUSTER: $cluster NAMESPACE: $namespace TENANT: $tenant NST: $nst USERNAME: $username"
 
 # get admin credentials
 export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
@@ -166,39 +173,44 @@ if [ -z "$sec_api_url" ]; then
 fi
 
 
-
-# Check if user exists
-if user_exists $username; then
-   existing_user=true
-else
-   existing_user=false
-fi
-log_debug "USER_EXISTS: $existing_user"
-
 case "$action" in
    CREATE)
-      if [ -z "$namespace" ]; then
-         log_error "Required argument NAMESPACE no specified"
-         echo ""
-         show_usage CREATE
-         exit 1
-      fi
-      if [ -n "$tenant" ]; then
-         nst="${namespace}_${tenant}"
-         log_info "Attempting to create user [$username] and grant them access to the tenant [$tenant] within the namespace [$namespace] [$(date)]"
+      if [ "$cluster" == "true" ]; then
+         berole="V4MCLUSTER_ADMIN_kibana_users"
+         rolename="search_index_-ALL-"
+         scope_msg="from ALL namespaces [$(date)]"
       else
-         nst="$namespace"
-         log_info "Attempting to create user [$username] and grant them access to namespace [$namespace] [$(date)]"
+         if [ -z "$namespace" ]; then
+            log_error "Required argument NAMESPACE no specified"
+            echo ""
+            show_usage CREATE
+            exit 1
+         fi
+
+         if [ -n "$tenant" ]; then
+            nst="${namespace}_${tenant}"
+            scope_msg="from the tenant [$tenant] within the namespace [$namespace] [$(date)]"
+         else
+            nst="$namespace"
+            scope_msg="from namespace [$namespace]"
+         fi
+
+         rolename=search_index_$nst
+         berole="${nst}_kibana_users"
+
+         if [ -z "$username" ]; then
+            username="${nst}_admin"
+         fi
+
       fi
 
+      log_info "Attempting to create user [$username] and grant them access to log messages $scope_msg [$(date)]"
+
       # Check if user exists
-      if [[ "$existing_user" == "true" ]]; then
+      if user_exists $username; then
          log_error "A user with this name [$username] already exists."
          exit 1
       fi
-
-      index_prefix=viya_logs
-      rolename=search_index_$nst
 
       #Check if role exists
       if ! role_exists $rolename; then
@@ -207,29 +219,32 @@ case "$action" in
       fi
 
       password=${password:-$username}
+
+      if [ -z "$namespace" ]; then
+         nsconstraint="-none-"
+      else
+         nsconstraint=$namespace
+      fi
       if [ -z "$tenant" ]; then
          tconstraint="-none-"
       else
          tconstraint=$tenant
       fi
 
-      cp logging/es/odfe/rbac $TMP_DIR -r
-
+      cp logging/es/odfe/rbac/user.json $TMP_DIR/user.json
       # Replace PLACEHOLDERS
-      sed -i'.bak' "s/xxIDXPREFIXxx/$index_prefix/g"  $TMP_DIR/rbac/*.json                  # IDXPREFIX
-      sed -i'.bak' "s/xxNSTxx/$nst/g"                 $TMP_DIR/rbac/*.json                  # NAMESPACE|NAMESPACE_TENANT
-      sed -i'.bak' "s/xxNAMESPACExx/$namespace/g"     $TMP_DIR/rbac/*.json                  # NAMESPACE
-      sed -i'.bak' "s/xxTENANTxx/$tenant/g"           $TMP_DIR/rbac/*.json                  # TENANT
-      sed -i'.bak' "s/xxTCONSTRAINTxx/$tconstraint/g" $TMP_DIR/rbac/*.json                  # TENANT|'-none-'
-      sed -i'.bak' "s/xxPASSWORDxx/$password/g"       $TMP_DIR/rbac/*.json                  # PASSWORD
-      sed -i'.bak' "s/xxCREATEDBYxx/$this_script/g"   $TMP_DIR/rbac/*.json                  # CREATEDBY
-      sed -i'.bak' "s/xxDATETIMExx/$(date)/g"         $TMP_DIR/rbac/*.json                  # DATE
+      sed -i'.bak' "s/xxBEROLExx/$berole/g"             $TMP_DIR/user.json      # (NAMESPACE|NAMESPACE_TENANT|'V4MCLUSTER_ADMIN') + '_kibana_users'
+      sed -i'.bak' "s/xxNSCONSTRAINTxx/$nsconstraint/g" $TMP_DIR/user.json      # NAMESPACE|'-none-'
+      sed -i'.bak' "s/xxTCONSTRAINTxx/$tconstraint/g"   $TMP_DIR/user.json      # TENANT|'-none-'
+      sed -i'.bak' "s/xxPASSWORDxx/$password/g"         $TMP_DIR/user.json      # PASSWORD
+      sed -i'.bak' "s/xxCREATEDBYxx/$this_script/g"     $TMP_DIR/user.json      # CREATEDBY
+      sed -i'.bak' "s/xxDATETIMExx/$(date)/g"           $TMP_DIR/user.json      # DATE
 
-      log_debug "Contents of user.json template file after substitutions: \n $(cat $TMP_DIR/rbac/user.json)"
+      log_debug "Contents of user.json template file after substitutions: \n $(cat $TMP_DIR/user.json)"
 
 
       # Create user
-      response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/internalusers/$username"  -H 'Content-Type: application/json' -d @$TMP_DIR/rbac/user.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+      response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/internalusers/$username"  -H 'Content-Type: application/json' -d @$TMP_DIR/user.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 
       if [[ $response != 2* ]]; then
          log_error "There was an issue creating the user [$username]. [$response]"
@@ -253,7 +268,7 @@ case "$action" in
       log_info "Attempting to remove user [$username] from the internal user database [$(date)]"
 
       # Check if user exists
-      if [[ "$existing_user" != "true" ]]; then
+      if ! user_exists $username; then
          log_error "There was an issue deleting the user [$username]; the user does NOT exists."
          exit 1
       else

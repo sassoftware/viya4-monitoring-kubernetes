@@ -10,8 +10,9 @@
 # [BACKEND_ROLE: {NST}_kibana_users]<                                  |{NST}_kibana_user backend-role IS deleted
 #                                    \--- [ROLE: search_index_{NST}]   |search_index_{NST} role IS deleted
 #                                     \-- [ROLE: tenant_{NST}]         |tenant_{NST} role IS deleted
-
 #
+# NOTE: When NAMESPACE='_all_' and TENANT='_all_' are specified, the artifacts involved are:
+#       backend role: 'V4MCLUSTER_ADMIN_kibana_users'  roles: 'tenant_cluster_admins' and 'search_index_-ALL-'
 #
 
 cd "$(dirname $BASH_SOURCE)/../.."
@@ -42,26 +43,41 @@ fi
 namespace=$(echo "$namespace"| tr '[:upper:]' '[:lower:]')
 tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
 
-validateNamespace "$namespace"
-
-if [ -n "$tenant" ]; then
-   validateTenantID $tenant
-
-   NST="${namespace}_${tenant}"
-
-   log_notice "Deleting access controls for the [$tenant] tenant within the namespace [$namespace] [$(date)]"
-
+if [ "$namespace" == "_all_" ] && [ "$tenant" == "_all_" ]; then
+   log_debug "Deleting of All cluster access RBACs requested"
+   cluster="true"
 else
-   NST="$namespace"
-   log_notice "Deleting access controls for namespace [$namespace] [$(date)]"
+   cluster="false"
 fi
 
+if [ "$cluster" == "true" ]; then
 
-ROLENAME=search_index_$NST
-BACKENDROLE=${NST}_kibana_users
+   # deleting cluster-wide RBACs
+   ROLENAME="search_index_-ALL-"
+   BACKENDROLE="V4MCLUSTER_ADMIN_kibana_users"
+   NST="cluster_admins"
 
-log_debug "NAMESPACE: $namespace TENANT: $tenant ROLENAME: $ROLENAME BACKENDROLE: $BACKENDROLE"
+else
+   # deleting namespace or tenant limited RBACs
+   validateNamespace "$namespace"
 
+   if [ -n "$tenant" ]; then
+      validateTenantID $tenant
+
+      NST="${namespace}_${tenant}"
+
+      log_notice "Deleting access controls for the [$tenant] tenant within the namespace [$namespace] [$(date)]"
+
+   else
+      NST="$namespace"
+      log_notice "Deleting access controls for namespace [$namespace] [$(date)]"
+   fi
+
+   ROLENAME="search_index_$NST"
+   BACKENDROLE="${NST}_kibana_users"
+
+   log_debug "NAMESPACE: $namespace TENANT: $tenant ROLENAME: $ROLENAME BACKENDROLE: $BACKENDROLE"
+fi
 
 # get admin credentials
 export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
@@ -76,21 +92,27 @@ if [ -z "$sec_api_url" ]; then
 fi
 
 # handle $ROLENAME
-delete_rolemappings $ROLENAME
-delete_role $ROLENAME
+if role_exists $ROLENAME; then
+   delete_rolemappings $ROLENAME
+   delete_role $ROLENAME
 
-# handle tenant_$NST
-delete_rolemappings tenant_${NST}
-delete_role tenant_${NST}
+   # handle tenant_$NST
+   delete_rolemappings tenant_${NST}
+   delete_role tenant_${NST}
+else
+  log_verbose "The role [$ROLENAME] does not exist; nothing to delete"
+fi
 
 # handle KIBANA_USER
-remove_rolemapping kibana_user     # Needed for RBACs created prior to MT support (should be no-op for post MT RBACs)
-remove_rolemapping v4m_kibana_user
+remove_rolemapping kibana_user     $BACKENDROLE    # Needed for RBACs created prior to MT support (should be no-op for post MT RBACs)
+remove_rolemapping v4m_kibana_user $BACKENDROLE
 
 
 log_notice "Access controls deleted [$(date)]"
 echo ""
-if [ -n "$tenant" ]; then
+if [ "$cluster" == "true" ]; then
+   log_verbose "You may want to consider deleting users whose *only* role(s) were 'V4MCLUSTER_ADMIN_kibana_users' and/or 'search_index_-ALL-'"
+elif [ -n "$tenant" ]; then
    log_notice "You should delete any users whose only purpose was to access log messages from the [$tenant] tenant within the [$namespace] namespace  "
 else
    log_notice "You should delete any users whose only purpose was to access log messages from the [$namespace] namespace  "

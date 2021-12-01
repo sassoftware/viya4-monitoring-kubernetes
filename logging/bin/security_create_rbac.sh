@@ -13,6 +13,8 @@
 #                                     \-- [ROLE: tenant_{NST}]       (allows access to Kibana tenant space for {NST})
 #
 #
+# NOTE: When NAMESPACE='_all_' and TENANT='_all_' are specified, the artifacts involved are:
+#       backend role: 'V4MCLUSTER_ADMIN_kibana_users' roles: 'tenant_cluster_admins' and 'search_index_-ALL-'
 #
 
 cd "$(dirname $BASH_SOURCE)/../.."
@@ -43,49 +45,69 @@ tenant=${2}
 namespace=$(echo "$namespace"| tr '[:upper:]' '[:lower:]')
 tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
 
+if [ "$namespace" == "_all_" ] && [ "$tenant" == "_all_" ]; then
+   log_debug "All cluster access RBACs requested"
+   cluster="true"
+else
+   log_debug "namespace: $namespace tenant: $tenant"
+fi
 
 create_ktenant_roles=${CREATE_KTENANT_ROLE:-true}
 
+if [ -n "$cluster" ]; then
 
-if [ -z "$namespace" ]; then
-  log_error "Required argument NAMESPACE no specified"
-  echo  ""
-  show_usage
-  exit 1
-elif [[ "$namespace" =~ -H|--HELP|-h|--help ]]; then
- show_usage
- exit
-fi
+   # creating cluster-wide RBACs
+   INDEX_PREFIX=viya_logs
+   INDEX_NST="*"
+   ROLENAME=search_index_-ALL-
+   BE_ROLENAME=V4MCLUSTER_ADMIN_kibana_users
+   NST="cluster_admins"
+   index_role_template="index_role_allcluster.json"
+   kibana_tenant_role_template="kibana_tenant_clusteradmins_role.json"
 
-validateNamespace "$namespace"
-
-if [[ "$tenant" =~ -H|--HELP|-h|--help ]]; then
-   show_usage
-   exit
-elif [ -n "$tenant" ]; then
-
-   validateTenantID $tenant
-
-   NST="${namespace}_${tenant}"
-   INDEX_NST="${namespace}-__${tenant}__"
 else
-   NST="$namespace"
-   INDEX_NST="${namespace}"
+   # creating namespace or tenant limited RBACs
+   if [ -z "$namespace" ]; then
+     log_error "Required argument NAMESPACE no specified"
+     echo  ""
+     show_usage
+     exit 1
+   elif [[ "$namespace" =~ -H|--HELP|-h|--help ]]; then
+    show_usage
+    exit
+   fi
+
+   validateNamespace "$namespace"
+
+   if [[ "$tenant" =~ -H|--HELP|-h|--help ]]; then
+      show_usage
+      exit
+   elif [ -n "$tenant" ]; then
+
+      validateTenantID $tenant
+
+      NST="${namespace}_${tenant}"
+      INDEX_NST="${namespace}-__${tenant}__"
+   else
+      NST="$namespace"
+      INDEX_NST="${namespace}"
+   fi
+
+   if [ -n "$tenant" ]; then
+     log_notice "Creating access controls for tenant [$tenant] within namespace [$namespace] [$(date)]"
+   else
+     log_notice "Creating access controls for namespace [$namespace] [$(date)]"
+   fi
+
+   INDEX_PREFIX=viya_logs
+   ROLENAME=search_index_$NST
+   BE_ROLENAME=${NST}_kibana_users
+   index_role_template="index_role.json"
+   kibana_tenant_role_template="kibana_tenant_limited_role.json"
+
+   log_debug "NST: $NST TENANT: $tenant NAMESPACE: $namespace ROLENAME: $ROLENAME"
+
 fi
-
-if [ -n "$tenant" ]; then
-  log_notice "Creating access controls for tenant [$tenant] within namespace [$namespace] [$(date)]"
-else
-  log_notice "Creating access controls for namespace [$namespace] [$(date)]"
-fi
-
-
-INDEX_PREFIX=viya_logs
-ROLENAME=search_index_$NST
-BE_ROLENAME=${NST}_kibana_users
-
-log_debug "NST: $NST TENANT: $tenant NAMESPACE: $namespace ROLENAME: $ROLENAME"
-
 
 # Copy RBAC templates
 cp logging/es/odfe/rbac $TMP_DIR -r
@@ -96,7 +118,6 @@ sed -i'.bak' "s/xxNAMESPACExx/$namespace/g"     $TMP_DIR/rbac/*.json     # NAMES
 sed -i'.bak' "s/xxTENANTxx/$tenant/g"           $TMP_DIR/rbac/*.json     # TENANT
 sed -i'.bak' "s/xxIDXNSTxx/$INDEX_NST/g"        $TMP_DIR/rbac/*.json     # NAMESPACE|NAMESPACE-__TENANT__    (used in index names)
 sed -i'.bak' "s/xxNSTxx/$NST/g"                 $TMP_DIR/rbac/*.json     # NAMESPACE|NAMESPACE_TENANT        (used in RBAC names)
-
 
 
 # get admin credentials
@@ -114,13 +135,13 @@ fi
 
 
 #index user (controls access to indexes)
-ensure_role_exists $ROLENAME $TMP_DIR/rbac/index_role.json
+ensure_role_exists $ROLENAME $TMP_DIR/rbac/$index_role_template
 add_rolemapping $ROLENAME $BE_ROLENAME
 
 #tenant role (controls access to Kibanas tenant spaces)
 if [ "$create_ktenant_roles" == "true" ]; then
 
-   ensure_role_exists tenant_${NST} $TMP_DIR/rbac/kibana_tenant_limited_role.json
+   ensure_role_exists tenant_${NST} $TMP_DIR/rbac/$kibana_tenant_role_template
    add_rolemapping  tenant_${NST} $BE_ROLENAME
 
 fi
@@ -132,12 +153,14 @@ add_rolemapping v4m_kibana_user $BE_ROLENAME null
 log_notice "Access controls created [$(date)]"
 echo ""
 
-add_notice    "   Assign users the back-end role of  [${BE_ROLENAME}] to                        "
-add_notice    "   grant them access to Kibana and limit their access to log messages            "
-if [ -n "$tenant" ]; then
-   add_notice "   from the [$tenant] tenant within the [$namespace] namespace          "
+add_notice    "Assign users the back-end role of  [${BE_ROLENAME}] to"
+add_notice    "grant them access to Kibana and log messages from"
+if [ -n "$cluster" ]; then
+   add_notice "ALL tenants and ALL namespaces"
+elif [ -n "$tenant" ]; then
+   add_notice "ONLY the [$tenant] tenant within the [$namespace] namespace"
 else
-   add_notice "   from the [$namespace] namespace.                               "
+   add_notice "ONLY the [$namespace] namespace."
 fi
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}
