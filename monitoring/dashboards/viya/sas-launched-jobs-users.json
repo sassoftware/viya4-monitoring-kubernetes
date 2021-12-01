@@ -89,15 +89,6 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum (rate(container_cpu_usage_seconds_total{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}[1m]) * on(pod) group_left(phase) kube_pod_status_phase{pod=~\"$pod\", phase=\"Running\"})",
-          "hide": true,
-          "instant": false,
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        },
-        {
-          "exemplar": true,
           "expr": "sum(:sas_launcher_pod_cpu_core_usage:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}) or vector(0)",
           "instant": false,
           "interval": "",
@@ -251,7 +242,7 @@
       "pluginVersion": "8.2.1",
       "targets": [
         {
-          "expr": "sum(kube_pod_status_phase{pod=~\"$pod\", phase=~\"Pending\"}) or vector(0)",
+          "expr": "sum(kube_pod_status_phase{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\",phase=~\"Pending\"}) or vector(0)",
           "instant": false,
           "interval": "",
           "legendFormat": "Pending",
@@ -334,7 +325,7 @@
       "pluginVersion": "8.2.1",
       "targets": [
         {
-          "expr": "sum(kube_pod_status_phase{pod=~\"$pod\", phase=~\"Running\"}) or vector(0)",
+          "expr": "sum(kube_pod_status_phase{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\",phase=~\"Running\"}) or vector(0)",
           "instant": false,
           "interval": "",
           "legendFormat": "Running",
@@ -547,7 +538,7 @@
       "pluginVersion": "8.2.1",
       "targets": [
         {
-          "expr": "sort_desc(topk($top,count(:sas_launcher_pod_status:{pod=~\"$pod\",phase=~\"Pending|Running\"}) by (label_launcher_sas_com_username)))",
+          "expr": "sort_desc(topk($top,count(:sas_launcher_pod_status:{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\",phase=~\"Pending|Running\"}) by (label_launcher_sas_com_username)))",
           "hide": false,
           "instant": true,
           "interval": "",
@@ -837,20 +828,6 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "topk($top,sum(kube_pod_labels{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"} + on (pod) group_right(label_launcher_sas_com_username) rate(container_fs_reads_bytes_total{container=\"\",pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username))",
-          "hide": true,
-          "interval": "",
-          "legendFormat": "{{label_launcher_sas_com_username}} - Reads",
-          "refId": "A"
-        },
-        {
-          "expr": "-(topk($top,sum(kube_pod_labels{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"} + on (pod) group_right(label_launcher_sas_com_username) rate(container_fs_writes_bytes_total{container=\"\",pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username)))",
-          "hide": true,
-          "interval": "",
-          "legendFormat": "{{label_launcher_sas_com_username}} - Writes",
-          "refId": "B"
-        },
-        {
           "exemplar": true,
           "expr": "topk($top,sum(rate(:sas_launcher_pod_fs_read_bytes_total:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}[1m])) by (label_launcher_sas_com_username))",
           "hide": false,
@@ -964,20 +941,6 @@
       "stack": false,
       "steppedLine": false,
       "targets": [
-        {
-          "expr": "topk($top,sum(kube_pod_labels{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"} + on (pod) group_right(label_launcher_sas_com_username) rate(container_network_receive_bytes_total{container=\"POD\",pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username))",
-          "hide": true,
-          "interval": "",
-          "legendFormat": "{{label_launcher_sas_com_username}} - Reads",
-          "refId": "A"
-        },
-        {
-          "expr": "-(topk($top,sum(kube_pod_labels{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"} + on (pod) group_right(label_launcher_sas_com_username) rate(container_network_transmit_bytes_total{container=\"POD\",pod=~\"$pod\"}[1m])) by (label_launcher_sas_com_username)))",
-          "hide": true,
-          "interval": "",
-          "legendFormat": "{{label_launcher_sas_com_username}} - Writes",
-          "refId": "B"
-        },
         {
           "exemplar": true,
           "expr": "topk($top,sum(rate(:sas_launcher_pod_net_receive_bytes_total:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}[1m])) by (label_launcher_sas_com_username))",
@@ -1364,7 +1327,7 @@
           "pluginVersion": "7.5.4",
           "targets": [
             {
-              "expr": ":sas_launcher_pod_cpu_core_usage:{phase=~\"Pending|Running\",pod=~\"$pod\"}",
+              "expr": ":sas_launcher_pod_cpu_core_usage:{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\",phase=~\"Pending|Running\"}",
               "format": "table",
               "hide": false,
               "instant": true,
@@ -1373,7 +1336,7 @@
               "refId": "A"
             },
             {
-              "expr": ":sas_launcher_pod_mem_usage_bytes:{phase=~\"Pending|Running\",pod=~\"$pod\"}",
+              "expr": ":sas_launcher_pod_mem_usage_bytes:{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\",phase=~\"Pending|Running\"}",
               "format": "table",
               "hide": false,
               "instant": true,
@@ -1382,7 +1345,7 @@
               "refId": "B"
             },
             {
-              "expr": "sum(:sas_launcher_pod_cpu_core_usage:{phase=~\"Pending|Running\",pod=~\"$pod\"}) by (pod,namespace) / sum(kube_pod_container_resource_limits{resource=\"cpu\",pod=~\"$pod\"}) by (pod,namespace)",
+              "expr": "sum(:sas_launcher_pod_cpu_core_usage:{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\",phase=~\"Pending|Running\"}) by (pod,namespace) / sum(kube_pod_container_resource_limits{resource=\"cpu\",namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}) by (pod,namespace)",
               "format": "table",
               "hide": false,
               "instant": true,
@@ -1391,7 +1354,7 @@
               "refId": "C"
             },
             {
-              "expr": "sum(:sas_launcher_pod_mem_usage_bytes:{phase=~\"Pending|Running\",pod=~\"$pod\"}) by (pod,namespace) / sum(kube_pod_container_resource_limits{resource=\"memory\",pod=~\"$pod\"}) by (pod,namespace)",
+              "expr": "sum(:sas_launcher_pod_mem_usage_bytes:{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\",phase=~\"Pending|Running\"}) by (pod,namespace) / sum(kube_pod_container_resource_limits{resource=\"memory\",namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}) by (pod,namespace)",
               "format": "table",
               "hide": false,
               "instant": true,
@@ -1700,40 +1663,6 @@
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
-      },
-      {
-        "allValue": "",
-        "current": {
-          "selected": true,
-          "text": [
-            "All"
-          ],
-          "value": [
-            "$__all"
-          ]
-        },
-        "datasource": "$datasource",
-        "definition": "label_values(:sas_launcher_pod_info:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"},pod)",
-        "description": null,
-        "error": null,
-        "hide": 2,
-        "includeAll": true,
-        "label": "Pod",
-        "multi": true,
-        "name": "pod",
-        "options": [],
-        "query": {
-          "query": "label_values(:sas_launcher_pod_info:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"},pod)",
-          "refId": "StandardVariableQuery"
-        },
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "tagValuesQuery": "",
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
       }
     ]
   },
