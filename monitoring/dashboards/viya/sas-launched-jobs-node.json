@@ -247,7 +247,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum(kube_pod_status_phase{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\",phase=~\"Pending\"}) or vector(0)",
+          "expr": "sum(:sas_launcher_pod_status:{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\",phase=~\"Pending\"}) or vector(0)",
           "instant": false,
           "interval": "",
           "intervalFactor": 1,
@@ -333,7 +333,7 @@
       "pluginVersion": "8.2.1",
       "targets": [
         {
-          "expr": "sum(kube_pod_status_phase{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\", phase=~\"Running\"}) or vector(0)",
+          "expr": "sum(:sas_launcher_pod_status:{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\", phase=~\"Running\"}) or vector(0)",
           "instant": false,
           "interval": "",
           "legendFormat": "Running",
