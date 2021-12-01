@@ -49,12 +49,13 @@ if [ "$namespace" == "_all_" ] && [ "$tenant" == "_all_" ]; then
    log_debug "All cluster access RBACs requested"
    cluster="true"
 else
+   cluster="false"
    log_debug "namespace: $namespace tenant: $tenant"
 fi
 
 create_ktenant_roles=${CREATE_KTENANT_ROLE:-true}
 
-if [ -n "$cluster" ]; then
+if [ "$cluster" == "true" ]; then
 
    # creating cluster-wide RBACs
    INDEX_PREFIX=viya_logs
@@ -155,7 +156,7 @@ echo ""
 
 add_notice    "Assign users the back-end role of  [${BE_ROLENAME}] to"
 add_notice    "grant them access to Kibana and log messages from"
-if [ -n "$cluster" ]; then
+if [ "$cluster" == "true" ]; then
    add_notice "ALL tenants and ALL namespaces"
 elif [ -n "$tenant" ]; then
    add_notice "ONLY the [$tenant] tenant within the [$namespace] namespace"
