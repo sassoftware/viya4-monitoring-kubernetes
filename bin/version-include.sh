@@ -51,7 +51,7 @@ function populateValuesYAML() {
 
 function deployV4MInfo() {
   NS=$1
-  releaseName=$2
+  releaseName=${2:-'v4m'}
   if [ -z "$NS" ]; then
     log_error "No namespace specified for deploying Viya Monitoring for Kubernetes version information"
     return 1
@@ -71,58 +71,18 @@ function deployV4MInfo() {
 
 function removeV4MInfo() {
   NS=$1
-  releaseName=$2
-  if [ -z "$NS" ]; then
-    log_error "No namespace specified for removing Viya Monitoring for Kubernetes version information"
+  releaseName=${2:-'v4m'}
+  if [ $(helm list -n "$NS" --filter "^$releaseName\$" -o yaml) ]; then
+    log_error "No Viya Monitoring for Kubernetes deployment in $NS namespace to remove"
     return 1
-  fi
-  log_info "Removing Viya Monitoring for Kubernetes version information"
-  helm uninstall -n "$NS" "$releaseName"
-}
-
-function getHelmReleaseVersion() {
-  NS=$1
-  releaseName=$2
-
-  releaseVersionFull=""
-  releaseVersionMajor=""
-  releaseVersionMinor=""
-  releaseVersionPatch=""
-  releaseStatus=""
-
-  origIFS=$IFS
-  IFS=$'\n' v4mHelmVersionLines=($(helm list -n "$NS" --filter "^$releaseName\$" -o yaml))
-  IFS=$origIFS
-  if [ -z "$v4mHelmVersionLines" ]; then
-    log_debug "No [$releaseName] release found in [$NS]"
   else
-    for (( i=0; i<${#v4mHelmVersionLines[@]}; i++ )); do 
-      line=${v4mHelmVersionLines[$i]}
-      vre='app_version: (([0-9]+).([[0-9]+).([0-9]+)\.?(-.+)?)'
-      sre='status: (.+)'
-      if [[ $line =~ $vre ]]; then
-        # Set
-        releaseVersionFull=${BASH_REMATCH[1]}
-        releaseVersionMajor=${BASH_REMATCH[2]}
-        releaseVersionMinor=${BASH_REMATCH[3]}        
-        releaseVersionPatch=${BASH_REMATCH[4]}
-      elif [[ "$line" =~ $sre ]]; then
-        releaseStatus=${BASH_REMATCH[1]}
-      fi
-    done
-
+    log_info "Removing Viya Monitoring for Kubernetes version information"
+    helm uninstall -n "$NS" "$releaseName"
   fi
-  log_debug "releaseVersionFull=$releaseVersionFull"
-  log_debug "releaseVersionMajor=$releaseVersionMajor"
-  log_debug "releaseVersionMinor=$releaseVersionMinor"
-  log_debug "releaseVersionPatch=$releaseVersionPatch"
-  log_debug "releaseStatus=$releaseStatus"
-
-  export releaseVersionFull releaseVersionMajor releaseVersionMinor releaseVersionPatch releaseStatus
 }
 
 if [ -z "$V4M_VERSION_INCLUDE" ]; then
-  getHelmReleaseVersion "$V4M_NS" "v4m"
+  getHelmReleaseVersion "$V4M_NS"
   
   V4M_CURRENT_VERSION_FULL=releaseVersionFull
   V4M_CURRENT_VERSION_MAJOR=releaseVersionMajor

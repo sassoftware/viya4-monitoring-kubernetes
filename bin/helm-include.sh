@@ -89,6 +89,47 @@ function helmRepoAdd {
   fi
 }
 
+function getHelmReleaseVersion() {
+  NS=$1
+  releaseName=$2
+
+  releaseVersionFull=""
+  releaseVersionMajor=""
+  releaseVersionMinor=""
+  releaseVersionPatch=""
+  releaseStatus=""
+
+  origIFS=$IFS
+  IFS=$'\n' v4mHelmVersionLines=($(helm list -n "$NS" --filter "^$releaseName\$" -o yaml))
+  IFS=$origIFS
+  if [ -z "$v4mHelmVersionLines" ]; then
+    log_debug "No [$releaseName] release found in [$NS]"
+  else
+    for (( i=0; i<${#v4mHelmVersionLines[@]}; i++ )); do 
+      line=${v4mHelmVersionLines[$i]}
+      vre='app_version: (([0-9]+).([[0-9]+).([0-9]+)\.?(-.+)?)'
+      sre='status: (.+)'
+      if [[ $line =~ $vre ]]; then
+        # Set
+        releaseVersionFull=${BASH_REMATCH[1]}
+        releaseVersionMajor=${BASH_REMATCH[2]}
+        releaseVersionMinor=${BASH_REMATCH[3]}        
+        releaseVersionPatch=${BASH_REMATCH[4]}
+      elif [[ "$line" =~ $sre ]]; then
+        releaseStatus=${BASH_REMATCH[1]}
+      fi
+    done
+
+  fi
+  log_debug "releaseVersionFull=$releaseVersionFull"
+  log_debug "releaseVersionMajor=$releaseVersionMajor"
+  log_debug "releaseVersionMinor=$releaseVersionMinor"
+  log_debug "releaseVersionPatch=$releaseVersionPatch"
+  log_debug "releaseStatus=$releaseStatus"
+
+  export releaseVersionFull releaseVersionMajor releaseVersionMinor releaseVersionPatch releaseStatus
+}
+
 export HELM_VER_FULL HELM_VER_MAJOR HELM_VER_MINOR HELM_VER_PATCH
 export -f helm2ReleaseExists
 export -f helm3ReleaseExists
