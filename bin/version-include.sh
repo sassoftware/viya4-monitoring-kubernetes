@@ -72,6 +72,11 @@ function deployV4MInfo() {
 function removeV4MInfo() {
   NS=$1
   releaseName=${2:-'v4m'}
+  if [ -z "$NS" ]; then
+    log_error "No namespace specified for removing Viya Monitoring for Kubernetes version information"
+    return 1
+  fi
+  
   if [ $(helm list -n "$NS" --filter "^$releaseName\$" -o yaml) ]; then
     log_error "No Viya Monitoring for Kubernetes deployment in $NS namespace to remove"
     return 1
