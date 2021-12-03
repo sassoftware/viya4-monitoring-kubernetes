@@ -76,8 +76,8 @@ function removeV4MInfo() {
     log_error "No namespace specified for removing Viya Monitoring for Kubernetes version information"
     return 1
   fi
-  
-  if [ $(helm list -n "$NS" --filter "^$releaseName\$" -o yaml) ]; then
+ 
+  if [ -z $(helm list -n "$NS" --filter "^$releaseName\$" -q) ]; then
     log_error "No Viya Monitoring for Kubernetes deployment in $NS namespace to remove"
     return 1
   else
@@ -89,11 +89,11 @@ function removeV4MInfo() {
 if [ -z "$V4M_VERSION_INCLUDE" ]; then
   getHelmReleaseVersion "$V4M_NS"
   
-  V4M_CURRENT_VERSION_FULL=releaseVersionFull
-  V4M_CURRENT_VERSION_MAJOR=releaseVersionMajor
-  V4M_CURRENT_VERSION_MINOR=releaseVersionMinor
-  V4M_CURRENT_VERSION_PATCH=releaseVersionPatch
-  V4M_CURRENT_STATUS=releaseStatus
+  V4M_CURRENT_VERSION_FULL=$releaseVersionFull
+  V4M_CURRENT_VERSION_MAJOR=$releaseVersionMajor
+  V4M_CURRENT_VERSION_MINOR=$releaseVersionMinor
+  V4M_CURRENT_VERSION_PATCH=$releaseVersionPatch
+  V4M_CURRENT_STATUS=$releaseStatus
   
   log_debug "V4M_CURRENT_VERSION_FULL=$V4M_CURRENT_VERSION_FULL"
   log_debug "V4M_CURRENT_VERSION_MAJOR=$V4M_CURRENT_VERSION_MAJOR"
@@ -104,7 +104,7 @@ if [ -z "$V4M_VERSION_INCLUDE" ]; then
   export V4M_CURRENT_VERSION_FULL V4M_CURRENT_VERSION_MAJOR V4M_CURRENT_VERSION_MINOR V4M_CURRENT_VERSION_PATCH 
   export V4M_CURRENT_STATUS
 
-  export -f deployV4MInfo removeV4MInfo getHelmReleaseVersion
+  export -f deployV4MInfo removeV4MInfo
   export V4M_VERSION_INCLUDE=true
 fi
 
