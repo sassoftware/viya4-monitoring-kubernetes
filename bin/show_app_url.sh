@@ -17,7 +17,7 @@ set +e
 get_ingress_ports
 
 add_notice ""
-add_notice "Accessing the monitoring applications"
+add_notice "**Accessing the monitoring applications**"
 add_notice ""
 
 #start looping through services

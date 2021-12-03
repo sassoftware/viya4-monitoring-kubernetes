@@ -201,6 +201,7 @@ if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
          log_debug "Creating a random password for the 'logadm' user"
          LOG_LOGADM_PASSWD="$(randomPassword)"
          add_notice ""
+         add_notice "**The Kibana 'logadm' Account**"
          add_notice "Generated 'logadm' password:  $LOG_LOGADM_PASSWD"
       fi
 
