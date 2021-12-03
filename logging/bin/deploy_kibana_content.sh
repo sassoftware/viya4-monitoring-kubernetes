@@ -183,6 +183,34 @@ fi
 ./logging/bin/import_kibana_content.sh logging/kibana/tenant          cluster_admins
 
 
+#TO DO:  This needs to be done ONLY if it has NOT been done before...need to add checks!
+
+# create the all logs RBACs
+LOGGING_DRIVER=true ./logging/bin/security_create_rbac.sh _all_ _all_
+
+# Create the 'logadm' Kibana user who can access all logs
+if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
+
+   log_debug "Creating the 'logadm' user"
+
+   export KB_LOGADM_PASSWD=${KB_LOGADM_PASSWD}
+   if [ -z "$KB_LOGADM_PASSWD" ]; then
+      log_debug "Creating a random password for the 'logadm' user"
+      KB_LOGMON_PASSWD="$(randomPassword)"
+      add_notice ""
+      add_notice "Generated 'logadm' password:  $KB_LOGADM_PASSWD"
+   fi
+
+   LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logmon -p $KB_LOGMON_PASSWD
+fi
+
+LOGGING_DRIVER=${LOGGING_DRIVER:-false}
+if [ "$LOGGING_DRIVER" != "true" ]; then
+   echo ""
+   display_notices
+   echo ""
+fi
+
 log_info "Configuring Kibana has been completed"
 
 log_debug "Script [$this_script] has completed [$(date)]"
