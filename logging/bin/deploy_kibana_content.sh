@@ -185,6 +185,7 @@ fi
 
 
 # create the all logs RBACs
+add_notice "**Elasticsearch/Kibana Access Controls**"
 LOGGING_DRIVER=true ./logging/bin/security_create_rbac.sh _all_ _all_
 
 # Create the 'logadm' Kibana user who can access all logs
