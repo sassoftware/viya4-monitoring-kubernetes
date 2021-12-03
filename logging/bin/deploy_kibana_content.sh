@@ -183,25 +183,30 @@ fi
 ./logging/bin/import_kibana_content.sh logging/kibana/tenant          cluster_admins
 
 
-#TO DO:  This needs to be done ONLY if it has NOT been done before...need to add checks!
 
 # create the all logs RBACs
 LOGGING_DRIVER=true ./logging/bin/security_create_rbac.sh _all_ _all_
 
 # Create the 'logadm' Kibana user who can access all logs
+LOG_CREATE_LOGADM_USER=${LOG_CREATE_LOGADM_USER:-false}
 if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
 
-   log_debug "Creating the 'logadm' user"
+   if user_exists logadm; then
+      log_warn "A user 'logadm' already exists; leaving that user as-is.  Review its definition in Kibana and update it, or create another user, as needed."
+   else
+      log_debug "Creating the 'logadm' user"
 
-   export KB_LOGADM_PASSWD=${KB_LOGADM_PASSWD}
-   if [ -z "$KB_LOGADM_PASSWD" ]; then
-      log_debug "Creating a random password for the 'logadm' user"
-      KB_LOGADM_PASSWD="$(randomPassword)"
-      add_notice ""
-      add_notice "Generated 'logadm' password:  $KB_LOGADM_PASSWD"
+      export KB_LOGADM_PASSWD=${KB_LOGADM_PASSWD}
+      if [ -z "$KB_LOGADM_PASSWD" ]; then
+         log_debug "Creating a random password for the 'logadm' user"
+         KB_LOGADM_PASSWD="$(randomPassword)"
+         add_notice ""
+         add_notice "Generated 'logadm' password:  $KB_LOGADM_PASSWD"
+      fi
+
+      #create the user
+      LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logadm -p $KB_LOGADM_PASSWD
    fi
-
-   LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logadm -p $KB_LOGADM_PASSWD
 fi
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}
