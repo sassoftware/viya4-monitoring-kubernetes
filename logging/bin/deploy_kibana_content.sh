@@ -196,16 +196,16 @@ if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
    else
       log_debug "Creating the 'logadm' user"
 
-      export KB_LOGADM_PASSWD=${KB_LOGADM_PASSWD}
-      if [ -z "$KB_LOGADM_PASSWD" ]; then
+      LOG_LOGADM_PASSWD=${LOG_LOGADM_PASSWD}
+      if [ -z "$LOG_LOGADM_PASSWD" ]; then
          log_debug "Creating a random password for the 'logadm' user"
-         KB_LOGADM_PASSWD="$(randomPassword)"
+         LOG_LOGADM_PASSWD="$(randomPassword)"
          add_notice ""
-         add_notice "Generated 'logadm' password:  $KB_LOGADM_PASSWD"
+         add_notice "Generated 'logadm' password:  $LOG_LOGADM_PASSWD"
       fi
 
       #create the user
-      LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logadm -p $KB_LOGADM_PASSWD
+      LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logadm -p $LOG_LOGADM_PASSWD
    fi
 fi
 
