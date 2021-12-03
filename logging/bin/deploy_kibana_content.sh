@@ -196,12 +196,12 @@ if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
    export KB_LOGADM_PASSWD=${KB_LOGADM_PASSWD}
    if [ -z "$KB_LOGADM_PASSWD" ]; then
       log_debug "Creating a random password for the 'logadm' user"
-      KB_LOGMON_PASSWD="$(randomPassword)"
+      KB_LOGADM_PASSWD="$(randomPassword)"
       add_notice ""
       add_notice "Generated 'logadm' password:  $KB_LOGADM_PASSWD"
    fi
 
-   LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logmon -p $KB_LOGMON_PASSWD
+   LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logadm -p $KB_LOGADM_PASSWD
 fi
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}
