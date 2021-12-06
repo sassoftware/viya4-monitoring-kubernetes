@@ -1880,14 +1880,14 @@
               "refId": "C"
             },
             {
-              "expr": "(max_over_time(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\"}[$__range]))",
+              "expr": "(max_over_time(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\"}[$__range]))",
               "format": "table",
               "instant": true,
               "legendFormat": "{{pod}} - Max",
               "refId": "E"
             },
             {
-              "expr": "(avg_over_time(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\"}[$__range]))",
+              "expr": "(avg_over_time(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\"}[$__range]))",
               "format": "table",
               "instant": true,
               "legendFormat": "{{pod}} - Avg",
