@@ -88,3 +88,6 @@ if [ "$(kubectl get crd servicemonitors.monitoring.coreos.com -o name 2>/dev/nul
 else
   log_warn "Prometheus Operator not found. Skipping deployment of ServiceMonitors."
 fi
+
+deployV4MInfo "$VIYA_NS" "v4m-viya"
+

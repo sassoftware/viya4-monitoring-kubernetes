@@ -252,6 +252,8 @@ if [ ! "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   fi
 fi
 
+deployV4MInfo "$VIYA_NS" "v4m-tenant-$VIYA_TENANT"
+
 log_notice "Grafana URL is https://$(kubectl get route -n $VIYA_NS v4m-grafana-$VIYA_TENANT -o jsonpath='{ .spec.host }/{ .spec.path }')"
 
 log_message ""

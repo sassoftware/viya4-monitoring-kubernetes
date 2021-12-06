@@ -208,7 +208,7 @@ if ! kubectl get route -n $MON_NS v4m-grafana 1>/dev/null 2>&1; then
   fi
 fi
 
-if ! deployV4MInfo "$MON_NS"; then
+if ! deployV4MInfo "$MON_NS" "v4m"; then
   log_warn "Unable to update SAS Viya Monitoring version info"
 fi
 
