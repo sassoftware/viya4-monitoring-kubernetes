@@ -86,6 +86,42 @@ function removeV4MInfo() {
   fi
 }
 
+function getHelmReleaseVersion() {
+  NS=$1
+  releaseName=${2:-'v4m'}
+
+  releaseVersionFull=""
+  releaseVersionMajor=""
+  releaseVersionMinor=""
+  releaseVersionPatch=""
+  releaseStatus=""
+
+  origIFS=$IFS
+  IFS=$'\n' v4mHelmVersionLines=($(helm list -n "$NS" --filter "^$releaseName\$" -o yaml))
+  IFS=$origIFS
+  if [ -z "$v4mHelmVersionLines" ]; then
+    log_debug "No [$releaseName] release found in [$NS]"
+  else
+    for (( i=0; i<${#v4mHelmVersionLines[@]}; i++ )); do 
+      line=${v4mHelmVersionLines[$i]}
+      vre='app_version: (([0-9]+).([[0-9]+).([0-9]+)\.?(-.+)?)'
+      sre='status: (.+)'
+      if [[ $line =~ $vre ]]; then
+        # Set
+        releaseVersionFull=${BASH_REMATCH[1]}
+        releaseVersionMajor=${BASH_REMATCH[2]}
+        releaseVersionMinor=${BASH_REMATCH[3]}        
+        releaseVersionPatch=${BASH_REMATCH[4]}
+      elif [[ "$line" =~ $sre ]]; then
+        releaseStatus=${BASH_REMATCH[1]}
+      fi
+    done
+
+  fi
+  
+  export releaseVersionFull releaseVersionMajor releaseVersionMinor releaseVersionPatch releaseStatus
+}
+
 if [ -z "$V4M_VERSION_INCLUDE" ]; then
   getHelmReleaseVersion "$V4M_NS"
   
@@ -104,7 +140,7 @@ if [ -z "$V4M_VERSION_INCLUDE" ]; then
   export V4M_CURRENT_VERSION_FULL V4M_CURRENT_VERSION_MAJOR V4M_CURRENT_VERSION_MINOR V4M_CURRENT_VERSION_PATCH 
   export V4M_CURRENT_STATUS
 
-  export -f deployV4MInfo removeV4MInfo
+  export -f deployV4MInfo removeV4MInfo getHelmReleaseVersion
   export V4M_VERSION_INCLUDE=true
 fi
 
