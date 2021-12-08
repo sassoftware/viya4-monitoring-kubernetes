@@ -69,7 +69,7 @@ if [ "$cluster" == "true" ]; then
 else
    # creating namespace or tenant limited RBACs
    if [ -z "$namespace" ]; then
-     log_error "Required argument NAMESPACE no specified"
+     log_error "Required argument NAMESPACE not specified"
      echo  ""
      show_usage
      exit 1
