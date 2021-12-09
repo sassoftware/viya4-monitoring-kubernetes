@@ -199,16 +199,17 @@ function delete_rolemappings {
 
 
 function remove_rolemapping {
-   # removes $BACKENDROLE from the rolemappings
+   # removes $berole2remove from the rolemappings
    # for $targetrole (if $targetrole exists)
 
    #
    # Returns: 0 - The rolemappings removed
    #          1 - The rolemappings were/could not be removed
 
- local targetrole regex json beroles newroles response
+ local targetrole regex json beroles newroles response berole2remove
  targetrole=$1
-
+ berole2remove=$2
+ log_debug "remove_rolemapping targetrole:$targetrole berole2remove:$berole2remove"
 
  if role_exists $targetrole; then
 
@@ -241,9 +242,9 @@ function remove_rolemapping {
              # ODFE 1.13 {"kibana_user":{"hosts":[],"users":[],"reserved":false,"hidden":false,"backend_roles":["kibanauser","d27886_kibana_users","d35396_kibana_users","d35396_acme_kibana_users","d35396A_kibana_users","d35396A_acme_kibana_users"],"and_backend_roles":[]}}
 
              # Extract and reconstruct backend_roles array from rolemapping json
-             newroles=$(echo $be_roles | sed "s/\"$BACKENDROLE\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/g;s/\[,/\[/g")
+             newroles=$(echo $be_roles | sed "s/\"$berole2remove\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/g;s/\[,/\[/g")
              if [ "$be_roles" == "$newroles" ]; then
-                log_debug "The backend role [$BACKENDROLE] is not mapped to [$targetrole]; moving on."
+                log_debug "The backend role [$berole2remove] is not mapped to [$targetrole]; moving on."
                 return 0
              else
 
@@ -258,10 +259,10 @@ function remove_rolemapping {
                 # Replace the rolemappings for the $targetrole with the revised list of backend roles
                 response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/rolesmapping/$targetrole"  -H 'Content-Type: application/json' -d @$TMP_DIR/${targetrole}_backend_rolemapping_delete.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
                 if [[ $response != 2* ]]; then
-                   log_error "There was an issue updating the rolesmapping for [$targetrole] to remove link with backend-role [$BACKENDROLE]. [$response]"
+                   log_error "There was an issue updating the rolesmapping for [$targetrole] to remove link with backend-role [$berole2remove]. [$response]"
                    return 1
                 else
-                   log_info "Security rolemapping deleted between [$targetrole] and backend-role [$BACKENDROLE]. [$response]"
+                   log_info "Security rolemapping deleted between [$targetrole] and backend-role [$berole2remove]. [$response]"
                    return 0
                 fi
              fi

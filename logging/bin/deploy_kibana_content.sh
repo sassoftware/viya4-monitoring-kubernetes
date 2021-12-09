@@ -183,6 +183,41 @@ fi
 ./logging/bin/import_kibana_content.sh logging/kibana/tenant          cluster_admins
 
 
+
+# create the all logs RBACs
+add_notice "**Elasticsearch/Kibana Access Controls**"
+LOGGING_DRIVER=true ./logging/bin/security_create_rbac.sh _all_ _all_
+
+# Create the 'logadm' Kibana user who can access all logs
+LOG_CREATE_LOGADM_USER=${LOG_CREATE_LOGADM_USER:-false}
+if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
+
+   if user_exists logadm; then
+      log_warn "A user 'logadm' already exists; leaving that user as-is.  Review its definition in Kibana and update it, or create another user, as needed."
+   else
+      log_debug "Creating the 'logadm' user"
+
+      LOG_LOGADM_PASSWD=${LOG_LOGADM_PASSWD}
+      if [ -z "$LOG_LOGADM_PASSWD" ]; then
+         log_debug "Creating a random password for the 'logadm' user"
+         LOG_LOGADM_PASSWD="$(randomPassword)"
+         add_notice ""
+         add_notice "**The Kibana 'logadm' Account**"
+         add_notice "Generated 'logadm' password:  $LOG_LOGADM_PASSWD"
+      fi
+
+      #create the user
+      LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logadm -p $LOG_LOGADM_PASSWD
+   fi
+fi
+
+LOGGING_DRIVER=${LOGGING_DRIVER:-false}
+if [ "$LOGGING_DRIVER" != "true" ]; then
+   echo ""
+   display_notices
+   echo ""
+fi
+
 log_info "Configuring Kibana has been completed"
 
 log_debug "Script [$this_script] has completed [$(date)]"

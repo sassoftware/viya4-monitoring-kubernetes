@@ -1,10 +1,10 @@
 {
   "password": "xxPASSWORDxx",
-  "backend_roles": ["xxNSTxx_kibana_users"],
+  "backend_roles": ["xxBEROLExx"],
   "attributes": {
     "createdBy": "xxCREATEDBYxx",
     "createdDate": "xxDATETIMExx",
-    "namespaceConstraint": "xxNAMESPACExx",
+    "namespaceConstraint": "xxNSCONSTRAINTxx",
     "tenantConstraint": "xxTCONSTRAINTxx"
   }
 }

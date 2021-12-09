@@ -1,0 +1,23 @@
+{
+  "index_permissions": [
+    {
+      "index_patterns": [
+        "viya_logs-*","viya_ops-*"
+      ],
+      "allowed_actions": [
+        "indices:monitor/settings/get"
+      ]
+    }
+  ],
+  "tenant_permissions": [
+    {
+      "tenant_patterns": [
+        "cluster_admins"
+      ],
+      "allowed_actions": [
+        "kibana_all_write"
+      ]
+    }
+  ],
+  "cluster_permissions": []
+}
