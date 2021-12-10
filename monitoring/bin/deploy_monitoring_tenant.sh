@@ -73,6 +73,12 @@ if [ "$MON_TLS_ENABLE" == "true" ] || [ "$TLS_ENABLE" == "true" ]; then
 fi
 
 # Grafana options
+v4mGrafanaReleasePrefix=v4m-grafana
+# Check for existing tenant instance with the old name
+if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS {
+  v4mGrafanaReleasePrefix=grafana
+}
+
 grafanaYAML=$tenantDir/mt-grafana-values.yaml
 
 # Grafana TLS
@@ -107,7 +113,7 @@ kubectl create secret generic \
   --from-file cluster-federate-job=$tenantDir/mt-federate-secret.yaml
 
 if [ "$TLS_ENABLE" == "true" ]; then
-  apps=( v4m-prometheus-$VIYA_TENANT v4m-grafana-$VIYA_TENANT )
+  apps=( v4m-prometheus-$VIYA_TENANT $v4mGrafanaReleasePrefix-$VIYA_TENANT )
   create_tls_certs $VIYA_NS monitoring ${apps[@]}
 fi
 
@@ -131,7 +137,7 @@ kubectl create secret generic -n $VIYA_NS grafana-datasource-$VIYA_TENANT --from
 kubectl label secret -n $VIYA_NS grafana-datasource-$VIYA_TENANT grafana_datasource-$VIYA_TENANT=1
 
 # Grafana
-if helm3ReleaseExists v4m-grafana-$VIYA_TENANT $VIYA_NS; then
+if helm3ReleaseExists $v4mGrafanaReleasePrefix-$VIYA_TENANT $VIYA_NS; then
   log_info "Upgrading Grafana via Helm...($(date) - timeout 10m)"
 else
   grafanaPwd="$GRAFANA_ADMIN_PASSWORD"
@@ -157,7 +163,7 @@ helm upgrade --install $helmDebug \
   --atomic \
   --timeout "10m" \
   $extraArgs \
-  v4m-grafana-$VIYA_TENANT \
+  $v4mGrafanaReleasePrefix-$VIYA_TENANT \
   grafana/grafana
 
 # Deploy ServiceMonitors

@@ -62,6 +62,12 @@ if [ -z "$(kubectl get ns $VIYA_NS -o name 2>/dev/null)" ]; then
   kubectl create ns $VIYA_NS
 fi
 
+v4mGrafanaReleasePrefix=v4m-grafana
+# Check for existing tenant instance with the old name
+if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS {
+  v4mGrafanaReleasePrefix=grafana
+}
+
 log_info "Deploying Prometheus Operator to the $VIYA_TENANT namespace..."
 oc apply -f $tenantDir/openshift/operator-group.yaml
 oc apply -f $tenantDir/openshift/operator-subscription.yaml
@@ -109,7 +115,7 @@ if [ -f "$USER_DIR/monitoring/user-values-openshift-grafana-$VIYA_TENANT.yaml" ]
   log_debug "User response file for Grafana found at [$userGrafanaYAML]"
 fi
 
-if ! helm3ReleaseExists v4m-grafana-$VIYA_TENANT $VIYA_NS; then
+if ! helm3ReleaseExists $v4mGrafanaReleasePrefix-$VIYA_TENANT $VIYA_NS; then
   firstTimeGrafana=true
 fi
 
@@ -183,7 +189,7 @@ if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   kubectl apply -n $VIYA_NS -f $tenantDir/openshift/trusted-ca-bundle.yaml
 
   log_info "Patching Grafana service for auto-generated TLS certs"
-  kubectl annotate service -n $VIYA_NS --overwrite v4m-grafana-$VIYA_TENANT "service.beta.openshift.io/serving-cert-secret-name=grafana-tls-$VIYA_TENANT"
+  kubectl annotate service -n $VIYA_NS --overwrite $v4mGrafanaReleasePrefix-$VIYA_TENANT "service.beta.openshift.io/serving-cert-secret-name=grafana-tls-$VIYA_TENANT"
 
   log_info "Patching Grafana pod with authenticating TLS proxy..."
   kubectl patch deployment -n $VIYA_NS v4m-grafana-$VIYA_NS-$VIYA_TENANT --patch "$(cat $grafanaProxyPatchYAML)"
@@ -223,21 +229,21 @@ done
 if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
   routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-$VIYA_TENANT-$VIYA_NS.$OPENSHIFT_ROUTE_DOMAIN}
 else
-  routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-v4m-grafana-$VIYA_TENANT-$VIYA_NS.$OPENSHIFT_ROUTE_DOMAIN}
+  routeHost=${OPENSHIFT_ROUTE_HOST_GRAFANA:-$v4mGrafanaReleasePrefix-$VIYA_TENANT-$VIYA_NS.$OPENSHIFT_ROUTE_DOMAIN}
 fi
 
-if ! kubectl get route -n $VIYA_NS v4m-grafana-$VIYA_TENANT 1>/dev/null 2>&1; then
+if ! kubectl get route -n $VIYA_NS $v4mGrafanaReleasePrefix-$VIYA_TENANT 1>/dev/null 2>&1; then
   log_debug "Exposing Grafana service as a route..."
   if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
     oc create route reencrypt \
       -n $VIYA_NS \
-      --service v4m-grafana-$VIYA_TENANT \
+      --service $v4mGrafanaReleasePrefix-$VIYA_TENANT \
       --hostname "$routeHost" \
       --path $OPENSHIFT_ROUTE_PATH_GRAFANA
   else
     oc create route reencrypt \
       -n $VIYA_NS \
-      --service v4m-grafana-$VIYA_TENANT \
+      --service $v4mGrafanaReleasePrefix-$VIYA_TENANT \
       --hostname "$routeHost"
   fi
 fi
@@ -247,14 +253,14 @@ if [ ! "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   if [ "$firstTimeGrafana" == "true" ]; then
     if [ -z "$GRAFANA_ADMIN_PASSWORD" ]; then
       log_notice "Obtain the inital Grafana password by running:"
-      log_notice "kubectl get secret --namespace monitoring v4m-grafana-$VIYA_TENANT -o jsonpath='{.data.admin-password}' | base64 --decode ; echo"
+      log_notice "kubectl get secret --namespace monitoring $v4mGrafanaReleasePrefix-$VIYA_TENANT -o jsonpath='{.data.admin-password}' | base64 --decode ; echo"
     fi
   fi
 fi
 
 deployV4MInfo "$VIYA_NS" "v4m-tenant-$VIYA_TENANT"
 
-log_notice "Grafana URL is https://$(kubectl get route -n $VIYA_NS v4m-grafana-$VIYA_TENANT -o jsonpath='{ .spec.host }/{ .spec.path }')"
+log_notice "Grafana URL is https://$(kubectl get route -n $VIYA_NS $v4mGrafanaReleasePrefix-$VIYA_TENANT -o jsonpath='{ .spec.host }/{ .spec.path }')"
 
 log_message ""
 log_notice "Successfully deployed SAS Viya tenant monitoring for [$VIYA_TENANT] on OpenShift"
