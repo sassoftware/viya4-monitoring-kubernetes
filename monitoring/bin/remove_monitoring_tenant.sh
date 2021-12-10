@@ -73,8 +73,8 @@ kubectl delete secret -n $VIYA_NS --ignore-not-found -l grafana_datasource-$VIYA
 
 log_info "Removing Prometheus"
 kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/mt-prometheus.yaml
-kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-cas-tenant.yaml
-kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-pushgateway-tenant.yaml
+kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/serviceMonitor-sas-cas-tenant.yaml
+kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/serviceMonitor-sas-pushgateway-tenant.yaml
 kubectl delete -n $VIYA_NS --ignore-not-found secret prometheus-federate-$VIYA_TENANT
 
 # Remove non-user-provided certificates
