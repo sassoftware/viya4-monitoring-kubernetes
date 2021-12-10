@@ -94,7 +94,7 @@ function set_retention_period {
    log_debug "$(cat $TMP_DIR/${policy_name}.json)"
 
    # Load policy into Elasticsearch via API
-   response=$(curl -s -o /tmp/sasgzs.txt  -w "%{http_code}" -XPUT "$es_api_url/_opendistro/_ism/policies/$policy_name" -H 'Content-Type: application/json' -d @$TMP_DIR/$policy_name.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+   response=$(curl -s -o /dev/null  -w "%{http_code}" -XPUT "$es_api_url/_opendistro/_ism/policies/$policy_name" -H 'Content-Type: application/json' -d @$TMP_DIR/$policy_name.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
    if [[ $response == 409 ]]; then
       log_info "The index management policy [$policy_name] already exist in Elasticsearch; skipping load and using existing policy."
    elif [[ $response != 2* ]]; then
