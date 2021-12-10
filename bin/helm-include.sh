@@ -93,5 +93,4 @@ export HELM_VER_FULL HELM_VER_MAJOR HELM_VER_MINOR HELM_VER_PATCH
 export -f helm2ReleaseExists
 export -f helm3ReleaseExists
 export -f helm2ReleaseCheck
-export -f getHelmReleaseVersion
 export -f helmRepoAdd
