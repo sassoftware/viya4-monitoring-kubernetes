@@ -64,9 +64,9 @@ fi
 
 v4mGrafanaReleasePrefix=v4m-grafana
 # Check for existing tenant instance with the old name
-if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS {
+if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS; then
   v4mGrafanaReleasePrefix=grafana
-}
+fi
 
 log_info "Deploying Prometheus Operator to the $VIYA_TENANT namespace..."
 oc apply -f $tenantDir/openshift/operator-group.yaml

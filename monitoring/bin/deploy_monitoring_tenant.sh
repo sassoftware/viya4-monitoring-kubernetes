@@ -75,9 +75,9 @@ fi
 # Grafana options
 v4mGrafanaReleasePrefix=v4m-grafana
 # Check for existing tenant instance with the old name
-if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS {
+if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS; then
   v4mGrafanaReleasePrefix=grafana
-}
+fi
 
 grafanaYAML=$tenantDir/mt-grafana-values.yaml
 
