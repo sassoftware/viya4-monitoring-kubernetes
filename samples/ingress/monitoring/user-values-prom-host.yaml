@@ -5,6 +5,8 @@ prometheus:
     nodePort: null
   # Define host-based ingress
   ingress:
+    annotations:
+      kubernetes.io/ingress.class: nginx  
     enabled: true
     hosts:
     - prometheus.host.mycluster.example.com
@@ -18,6 +20,8 @@ alertmanager:
     nodePort: null
   # Define host-based ingress
   ingress:
+    annotations:
+      kubernetes.io/ingress.class: nginx  
     enabled: true
     hosts:
     - alertmanager.host.mycluster.example.com
@@ -31,6 +35,8 @@ grafana:
     nodePort: null
   # Define host-based ingress
   ingress:
+    annotations:
+      kubernetes.io/ingress.class: nginx
     enabled: true
     hosts:
     - grafana.host.mycluster.example.com
