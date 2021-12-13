@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.14
+       Set  fb_configMap_version 0.2.15
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -18,6 +18,7 @@ data:
        Kube_URL            https://kubernetes.default.svc:443
        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+       Cache_Use_Docker_Id On
        Merge_Log           On
        Merge_Log_Key       json_log
        K8S-Logging.Parser  On
@@ -29,6 +30,7 @@ data:
        Kube_URL            https://kubernetes.default.svc:443
        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+       Cache_Use_Docker_Id On
        Buffer_Size         128KB
        Merge_Log           On
        Merge_Log_Key       json_log
