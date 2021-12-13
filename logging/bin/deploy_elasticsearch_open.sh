@@ -206,7 +206,7 @@ create_secret_from_file securityconfig/tenants.yml         security-tenants     
 # Open Distro for Elasticsearch
 log_info "Deploying Open Distro for Elasticsearch"
 
-odfe_tgz_file=opendistro-es-1.13.2.tgz
+odfe_tgz_file=opendistro-es-1.13.3.tgz
 
 baseDir=$(pwd)
 if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
@@ -216,13 +216,13 @@ if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
    log_verbose "Cloning Open Distro for Elasticsearch repo"
    git clone https://github.com/opendistro-for-elasticsearch/opendistro-build
 
-   cd opendistro-build  
+   cd opendistro-build
 
    # Patch ingress objects to networking.k8s.io/v1 for 1.22 compatibility
    log_debug "Updating ODFE ingress templates"
    cp $baseDir/logging/es/odfe/ingress-patch/kibana-ingress.yml helm/opendistro-es/templates/kibana/kibana-ingress.yml
    cp $baseDir/logging/es/odfe/ingress-patch/es-client-ingress.yaml helm/opendistro-es/templates/elasticsearch/es-client-ingress.yaml
-   
+
    # Update old Kubernetes role versions to support 1.22+
    log_debug "Patching OpenDistro helm chart resource versions"
    roleFiles=( \
