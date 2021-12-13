@@ -52,11 +52,17 @@ for f in $(find $tenantDir -name '*.yaml'); do
   fi
 done
 
-if helm3ReleaseExists v4m-grafana-$VIYA_TENANT $VIYA_NS; then
+v4mGrafanaReleasePrefix=v4m-grafana
+# Check for existing tenant instance with the old name
+if helm3ReleaseExists grafana-$VIYA_TENANT $VIYA_NS; then
+  v4mGrafanaReleasePrefix=grafana
+fi
+
+if helm3ReleaseExists $v4mGrafanaReleasePrefix-$VIYA_TENANT $VIYA_NS; then
   log_info "Removing Grafana..."
-  helm uninstall -n $VIYA_NS v4m-grafana-$VIYA_TENANT
+  helm uninstall -n $VIYA_NS $v4mGrafanaReleasePrefix-$VIYA_TENANT
 else
-  log_debug "Grafana helm release [grafana-$VIYA_TENANT] not found. Skipping uninstall."
+  log_debug "Grafana helm release [$v4mGrafanaReleasePrefix-$VIYA_TENANT] not found. Skipping uninstall."
 fi
 
 log_info "Removing Grafana dashboards..."
@@ -67,16 +73,16 @@ kubectl delete secret -n $VIYA_NS --ignore-not-found -l grafana_datasource-$VIYA
 
 log_info "Removing Prometheus"
 kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/mt-prometheus.yaml
-kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-cas-tenant.yaml
-kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/servicemonitor-sas-pushgateway-tenant.yaml
+kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/serviceMonitor-sas-cas-tenant.yaml
+kubectl delete -n $VIYA_NS --ignore-not-found -f $tenantDir/serviceMonitor-sas-pushgateway-tenant.yaml
 kubectl delete -n $VIYA_NS --ignore-not-found secret prometheus-federate-$VIYA_TENANT
 
 # Remove non-user-provided certificates
 kubectl delete -n $VIYA_NS --ignore-not-found certificate -l "v4m.sas.com/tenant=$VIYA_TENANT" 2>/dev/null
 
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
-  log_info "Deleting route for $VIYA_NS/v4m-grafana-$VIYA_TENANT..."
-  kubectl delete route -n $VIYA_NS v4m-grafana-$VIYA_TENANT
+  log_info "Deleting route for $VIYA_NS/$v4mGrafanaReleasePrefix-$VIYA_TENANT..."
+  kubectl delete route -n $VIYA_NS $v4mGrafanaReleasePrefix-$VIYA_TENANT
 fi
 
 removeV4MInfo "$VIYA_NS" "v4m-tenant-$VIYA_TENANT"
