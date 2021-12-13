@@ -47,13 +47,13 @@ function get_ingress_ports {
      ingress_service="service/${NGINX_SVCNAME:-ingress-nginx-controller}"
 
      ingress_http_port=$(get_k8s_info "$ingress_namespace" "$ingress_service" "$json_service_http_port")
-     if [ -z "$ingress_http_port" ]; then
-        ingress_http_port=80
+     if [ "$ingress_http_port" == "80" ]; then
+        ingress_http_port=""
      fi
 
      ingress_https_port=$(get_k8s_info "$ingress_namespace" "$ingress_service" "$json_service_https_port")
-     if [ -z "$ingress_https_port" ]; then
-        ingress_https_port=443
+     if [ "$ingress_https_port" == "443" ]; then
+        ingress_https_port=""
      fi
   fi
 }
@@ -86,8 +86,7 @@ function get_ingress_url {
   fi
 
   tls_info=$(get_k8s_info "$namespace" "ingress/$name" "$json_ingress_tls")
-  rc=$?
-  if [ "$rc" == "0" ]; then
+  if [ -n "$tls_info" ]; then
      port=$ingress_https_port
      protocol=https
   else
@@ -95,7 +94,7 @@ function get_ingress_url {
      protocol=http
   fi
 
-  if [ ! -z "$port" ]; then
+  if [ -n "$port" ]; then
      porttxt=":$port"
   fi
 
