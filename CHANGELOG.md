@@ -1,5 +1,27 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.1.2 (13DEC21)
+
+* **Overall**
+  * [CHANGE] Samples now use Ingress v1 for Kubernetes 1.22 compatibility
+
+* **Monitoring**
+  * [CHANGE] Monitoring components now use Ingress v1 for Kubernetes 1.22 compatibility
+  * [FIX] The SAS Jobs dashboards properly handle large numbers of jobs
+  * [FIX] The network metric recording rule for SAS Jobs has been fixed to support kube-state-metrics 2.x
+  * [FIX] Using LOG_COLOR_ENABLE=false now shows log levels in output
+  * [FIX] Deployments without an active TERM now run properly again
+  * [FIX] Perf/Utilization dashboard metrics display properly again
+
+* **Logging**
+  * [FEATURE] Access controls supporting a new class of users with access to all log messages are now created during the deployment process.
+  * [FEATURE] Kibana content in a given directory is loaded as a single 'batch' rather than individually during the deployment process.
+  * [TASK] Feature-flag logic controlling enablement of Kibana tenant spaces and other application multi-tenancy related capabilities has been removed since these capabilities are no longer optional.
+  * [FIX] The path-based ingress sample for accessing Kibana after the move to Open Distro for Elasticsearch 1.13.2 now works.
+  * [FIX] Improvements for handling failures when deploying specific components made in logging deployment scripts
+  * [FIX] New Fluent Bit configuration setting to prevent "stale" Kubernetes metadata being added to collected log messages.
+  * [SECURITY] Moved to Open Distro for Elasticsearch 1.13.3 (addresses LOG4J security vulnerability)
+
 ## Version 1.1.1 (18NOV21)
 
 * **Overall**
