@@ -217,6 +217,8 @@ if [ ! -f "$TMP_DIR/$odfe_tgz_file" ]; then
    git clone https://github.com/opendistro-for-elasticsearch/opendistro-build
 
    cd opendistro-build
+   git checkout b8f35fe
+
 
    # Patch ingress objects to networking.k8s.io/v1 for 1.22 compatibility
    log_debug "Updating ODFE ingress templates"
