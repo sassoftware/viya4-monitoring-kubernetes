@@ -1,0 +1,41 @@
+kibana:
+  service:
+    type: ClusterIP
+    nodePort: null
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/affinity: "cookie"
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        rewrite (?i)/kibana/(.*) /$1 break;
+        rewrite (?i)/kibana$ / break;
+      nginx.ingress.kubernetes.io/rewrite-target: /kibana
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    enabled: true
+    path: /
+    hosts:
+    - host.cluster.example.com
+    tls:
+    - secretName: kibana-ingress-tls-secret
+      hosts:
+      - host.cluster.example.com
+
+# Elasticsearch ingress is optional
+# Uncomment this section only if external API access is required
+elasticsearch:
+  client:
+    ingress:
+      annotations:
+        nginx.ingress.kubernetes.io/configuration-snippet: |
+          rewrite (?i)/kibana/(.*) /$1 break;
+          rewrite (?i)/kibana$ / break;
+        nginx.ingress.kubernetes.io/rewrite-target: /elasticsearch
+        nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+      enabled: true
+      path: /
+      hosts:
+      - host.cluster.example.com
+      tls:
+      - secretName: elasticsearch-ingress-tls-secret
+        hosts:
+        - host.cluster.example.com
