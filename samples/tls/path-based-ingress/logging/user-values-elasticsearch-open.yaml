@@ -18,8 +18,10 @@ kibana:
     type: ClusterIP
     nodePort: null
   ingress:
-    ingressClassName: nginx
+    # ingressClass is not currently supported by the Open Distro helm chart
+    # ingressClassName: nginx
     annotations:
+      kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/affinity: "cookie"
       nginx.ingress.kubernetes.io/configuration-snippet: |
         rewrite (?i)/kibana/(.*) /$1 break;
@@ -41,8 +43,10 @@ kibana:
 # elasticsearch:
 #   client:
 #     ingress:
-#       ingressClassName: nginx
+#       # ingressClass is not currently supported by the Open Distro helm chart
+#       # ingressClassName: nginx
 #       annotations:
+#         kubernetes.io/ingress.class: nginx
 #         nginx.ingress.kubernetes.io/configuration-snippet: |
 #           rewrite (?i)/elasticsearch/(.*) /$1 break;
 #           rewrite (?i)/elasticsearch$ / break;
