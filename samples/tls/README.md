@@ -8,5 +8,5 @@ traffic.
 
 For instructions, see the respective README files below:
 
-* [Monitoring](monitoring)
-* [Logging](logging)
+* [Monitoring](monitoring.md)
+* [Logging](logging.md)

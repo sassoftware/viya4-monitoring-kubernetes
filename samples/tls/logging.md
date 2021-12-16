@@ -1,4 +1,4 @@
-# Sample - TLS Enablement for Logging with path-based ingress
+# Sample - TLS Enablement for Logging
 
 ## Overview
 
@@ -70,6 +70,3 @@ log monitoring components and the correct ingress host information.
 
 3. If you are using an ingress controller other than NGINX, modify the annotation
 `nginx.ingress.kubernetes.io/backend-protocol: HTTPS` as needed in the `user-values-elasticsearch-open.yaml` file. Refer to the documentation for your ingress controller.
-
-
-

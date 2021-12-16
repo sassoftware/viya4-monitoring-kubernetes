@@ -1,4 +1,4 @@
-# Sample - TLS Enablement for Monitoring with path-based ingress
+# Sample - TLS Enablement for Monitoring
 
 ## Overview
 
@@ -8,7 +8,7 @@ If you enable TLS by specifying the `TLS_ENABLE=true` environment variable, in-c
 
 If you enable TLS by specifying `TLS_ENABLE=true` and are using nodeports, connections between the user and the monitoring components also use TLS.
 
-If you only use TLS (HTTPS) for ingress, you do not have to specify the environment variable `TLS_ENABLE=true`, but you must still manually populate Kubernetes ingress secrets as specified in the [TLS Monitoring sample](/samples/tls/monitoring).
+If you only use TLS (HTTPS) for ingress, you do not have to specify the environment variable `TLS_ENABLE=true`, but you must manually populate Kubernetes ingress secrets as specified in the [TLS Monitoring sample](/samples/tls/monitoring).
 
 ## Using This Sample
 
