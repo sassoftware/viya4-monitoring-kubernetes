@@ -4,16 +4,19 @@
 
 TLS enablement for SAS Viya logging is divided into two parts:
 
-- **TLS for in-cluster communications**, which is between logging components within
-the cluster (between the Elasticsearch nodes and between Elasticsearch and other logging components). TLS must be enabled on these connections.
+- **TLS for in-cluster communications**, which is between logging components
+within the cluster (between the Elasticsearch nodes and between Elasticsearch
+and other logging components). TLS must be enabled on these connections.
 
-In-cluster communications must always take place through TLS-enabled connections. TLS for in-cluster communications is configured using a separate process,
-either automatically (using cert-manager to generate certificates)
-or by manually generating certificates. See [Notes_on_using_TLS](../../../logging/Notes_on_using_TLS.md) for information about configuring TLS for
-in-cluster communications.
+In-cluster communications must always take place through TLS-enabled
+connections. TLS for in-cluster communications is configured using a separate
+process, either automatically (using cert-manager to generate certificates)
+or by manually generating certificates. See [Notes_on_using_TLS](../../../logging/Notes_on_using_TLS.md)
+for information about configuring TLS for in-cluster communications.
 
 - **TLS for communications into the cluster**, which is between Ingress or a
-user's browser (if NodePorts are used) and Kibana. TLS is optional on these connections, although enabling TLS is a best practice.
+user's browser (if NodePorts are used) and Kibana. TLS is optional on these
+connections, although enabling TLS is a best practice.
 
 This sample demonstrates how to enable TLS for communications into the
 cluster by deploying logging with TLS enabled for connections between the
@@ -22,28 +25,47 @@ connections to Kibana use TLS.
 
 ## Using This Sample
 
-You customize your logging deployment by specifying values in `user.env` and `*.yaml` files. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the
-[logging README](../../../logging/README.md#log_custom) for information about the customization process.
+You customize your logging deployment by specifying values in `user.env` and
+`*.yaml` files. These files are stored in a local directory outside of your
+repository that is identified by the `USER_DIR` environment variable. See the
+[logging README](../../../logging/README.md#log_custom) for information about
+the customization process.
 
-The customization files in this sample provide a starting point for the customization files for a deployment that supports logging with TLS enabled.
+The customization files in this sample provide a starting point for the
+customization files for a deployment that supports monitoring with TLS enabled.
 
-In order to use the values in this sample in the customization files for your deployment, copy the customization files from this sample to your local customization directory, then modify the files further as needed.
+There are two variations of this sample - one that uses host-based ingress and
+the other that uses path-based ingress. The difference between the two is
+in the URL used to access the applications. For host-based ingress, the
+application name will be part of the hostname itself (for example,
+`https://kibana.host.cluster.example.com/`). For path-based ingress, the
+hostname is fixed and the application name is appended as a path on the URL
+(for example, `https://host.cluster.example.com/kibana`).
 
-If you also need to use values from another sample, manually copy the values to your customization files after you add the values in this sample.
+In order to use the values in this sample in the customization files for your
+deployment, copy the customization files from either the `host-based-ingress`
+or `path-based-ingress` subdirectories to your local customization directory
+(your `USER_DIR`), then modify the files further as needed. The one required
+change is to replace all instances of `host.cluster.example.com` with the
+actual hostname to be used in your environment.
 
-After you finish modifying the customization files, deploy logging using the standard deployment script:
+After you finish modifying the customization files, deploy monitoring using the
+standard deployment script:
 
 ```bash
 my_repository_path/logging/bin/deploy_logging_open.sh
 ```
+
 ## Specifying TLS for Connections to Kibana
 
-Specify `TLS_ENABLE=true` in the `user.env` file to require TLS for connections to Kibana. Connections to Elasticsearch (when enabled) always use TLS, regardless of the value of `TLS_ENABLE`.
+Specify `TLS_ENABLE=true` in the `user.env` file to require TLS for connections
+to Kibana. Connections to Elasticsearch (when enabled) always use TLS,
+regardless of the value of `TLS_ENABLE`.
 
 If you specify `TLS_ENABLE=true`, the `kibana-tls-secret` Kubernetes secret
-must be present. By default, the `deploy_logging_open.sh` deployment script automatically obtains the certificates from cert-manager and creates
-the `kibana-tls-secret` secret.
-
+must be present. By default, the `deploy_logging_open.sh` deployment script
+automatically obtains the certificates from cert-manager and creates the
+`kibana-tls-secret` secret.
 
 See [Notes_on_using_TLS](../../../logging/Notes_on_using_TLS.md) for
 information about creating this secret manually.
@@ -53,20 +75,28 @@ information about creating this secret manually.
 If you are using ingress and want to enable TLS on traffic into the cluster,
 you must manually create two Kubernetes secrets.
 
-1. After you have obtained the certificates for the secrets, use this command to generate the secrets:
+1. After you have obtained the certificates for the secrets, use this command
+to generate the secrets:
 
 ```bash
 kubectl create secret tls $SECRET_NAME -n $NAMESPACE --key <cert-key> --cert <cert-file>
 ```
-By default, the value of `namespace` that is used during the deployment process is `logging`. Run the command for for each of these values of `secret-name`:
 
-Use `elasticsearch-ingress-tls-secret` and `kibana-ingress-tls-secret` as values for `$SECRET_NAME`. Use the name of the namespace into which the logging components
-were deployed (such as `logging`) for the value of `$NAMESPACE`.
+By default, the value of `namespace` that is used during the deployment process
+is `logging`. Run the command for for each of these values of `secret-name`:
+
+Use `elasticsearch-ingress-tls-secret` and `kibana-ingress-tls-secret` as
+values for `$SECRET_NAME`. Use the name of the namespace into which the logging
+components were deployed (such as `logging`) for the value of `$NAMESPACE`.
 
 2. In your local copy of the file
 `$USER_DIR\samples\tls\logging\user-values-elasticsearch-open.yaml`, update the
-values `kibana.logging.host.cluster.example.com` and `elasticsearch.logging.host.cluster.example.com` to reflect the namespace into which you have deployed the
-log monitoring components and the correct ingress host information.
+values `kibana.logging.host.cluster.example.com` and
+`elasticsearch.logging.host.cluster.example.com` to reflect the namespace into
+which you have deployed the log monitoring components and the correct ingress
+host information.
 
-3. If you are using an ingress controller other than NGINX, modify the annotation
-`nginx.ingress.kubernetes.io/backend-protocol: HTTPS` as needed in the `user-values-elasticsearch-open.yaml` file. Refer to the documentation for your ingress controller.
+3. If you are using an ingress controller other than NGINX, modify the
+annotation `nginx.ingress.kubernetes.io/backend-protocol: HTTPS` as needed in
+the `user-values-elasticsearch-open.yaml` file. Refer to the documentation for
+your ingress controller.
