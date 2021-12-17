@@ -77,10 +77,7 @@ function removeV4MInfo() {
     return 1
   fi
  
-  if [ -z $(helm list -n "$NS" --filter "^$releaseName\$" -q) ]; then
-    log_error "No Viya Monitoring for Kubernetes deployment in $NS namespace to remove"
-    return 1
-  else
+  if [ ! -z $(helm list -n "$NS" --filter "^$releaseName\$" -q) ]; then
     log_info "Removing Viya Monitoring for Kubernetes version information"
     helm uninstall -n "$NS" "$releaseName"
   fi
