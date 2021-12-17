@@ -69,7 +69,7 @@ metadata:
     app: prometheus
   name: prometheus-viya
 spec:
-  image: quay.io/prometheus/prometheus:v2.19.1
+  image: quay.io/prometheus/prometheus:v2.30.3
   alerting:
     alertmanagers:
     - apiVersion: v2

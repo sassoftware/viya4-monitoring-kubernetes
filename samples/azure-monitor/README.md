@@ -3,7 +3,8 @@
 ## Scrape Prometheus Metrics Endpoints
 
 SAS Viya components are natively instrumented to expose a Prometheus-compatible
-HTTP or HTTPS metrics endpoint. This sample shows how to configure Azure Monitor to automatically discover and scrape these endpoints. 
+HTTP or HTTPS metrics endpoint. This sample shows how to configure Azure
+Monitor to automatically discover and scrape these endpoints.
 
 See the [Azure documentation](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-prometheus-integration)
 to understand how Azure Monitor discovers and scrapes endpoints.
@@ -12,18 +13,23 @@ Follow these steps to enable Azure Monitor for your cluster.
 
 1. Download the
 [template](https://github.com/microsoft/Docker-Provider/blob/ci_dev/kubernetes/container-azm-ms-agentconfig.yaml)
-ConfigMap yaml. 
+ConfigMap yaml.
 
-2. Customize the `prometheus-data-collection-settings` section. Use the yaml file provided in this sample [here](container-azm-ms-agentconfig.yaml) as a guide. Recommended changes include:
+2. Customize the `prometheus-data-collection-settings` section. Use the yaml
+file provided in this sample [here](container-azm-ms-agentconfig.yaml) as a
+guide. Recommended changes include:
 
 - `interval` - Update from `1m` to `30s` (recommended, but not required)
 - `monitor_kubernetes_pods` - Set to `true`.
-- Set `monitor_kubernetes_pods` to `true` to enable Azure Monitor to auto-discover pods to monitor, based on the standard Prometheus annotations. SAS Viya
-components that expose metrics endpoints should include these annotations:
-   - `promethues.io/scrape` - `true` or `false`
-   - `promethues.io/path` - path to metrics endpoint
-   - `promethues.io/port`- metrics port
-   - `promethues.io/scheme`- `http` or `https`
+- Set `monitor_kubernetes_pods` to `true` to enable Azure Monitor to
+auto-discover pods to monitor, based on the standard Prometheus annotations.
+SAS Viya components that expose metrics endpoints should include these
+annotations:
+
+- `promethues.io/scrape` - `true` or `false`
+- `promethues.io/path` - path to metrics endpoint
+- `promethues.io/port`- metrics port
+- `promethues.io/scheme`- `http` or `https`
 
 3. After customizing the template, apply it to the cluster using this command:
 
@@ -136,5 +142,5 @@ KubeEvents
 
 ## Additional Information
 
-* [Azure Prometheus Integration](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-prometheus-integration)
-* [Querying Azure Metrics](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-log-search#search-logs-to-analyze-data)
+- [Azure Prometheus Integration](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-prometheus-integration)
+- [Querying Azure Metrics](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-log-search#search-logs-to-analyze-data)

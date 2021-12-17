@@ -12,7 +12,7 @@ PROM_PATH=${PROM_PATH:-/}
 
 # Stackdriver Prometheus sidecar version
 # https://console.cloud.google.com/gcr/images/stackdriver-prometheus/GLOBAL/stackdriver-prometheus-sidecar
-GKE_SIDECAR_VERSION=${SIDECAR_VERSION:-0.8.2}
+GKE_SIDECAR_VERSION=${SIDECAR_VERSION:-0.10.0}
 
 # Required user inputs
 if [ "$GCP_PROJECT" == "" ]; then

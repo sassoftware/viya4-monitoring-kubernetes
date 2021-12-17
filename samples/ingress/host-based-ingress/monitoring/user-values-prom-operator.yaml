@@ -1,0 +1,50 @@
+grafana:
+  # Disable default configuration of NodePort
+  service:
+    type: ClusterIP
+    nodePort: null
+  # Define host-based ingress
+  ingress:
+    enabled: true
+    hosts:
+    - grafana.monitoring.host.cluster.example.com
+    path: /
+  "grafana.ini":
+    server:
+      domain: monitoring.host.cluster.example.com
+      root_url: http://grafana.monitoring.host.cluster.example.com
+      serve_from_sub_path: false
+
+# Uncomment the following sections to expose Prometheus and/or
+# Alertmanager via Ingress. Note that Prometheus and Alertmanager
+# do not have any authentication configured by default, and exposing
+# an unauthenticated applicaton without other restrictions in place
+# is insecure.
+
+# prometheus:
+#   # Disable default configuration of NodePort
+#   service:
+#     type: ClusterIP
+#     nodePort: null
+#   # Define host-based ingress
+#   ingress:
+#     enabled: true
+#     hosts:
+#     - prometheus.monitoring.host.cluster.example.com
+#   prometheusSpec:
+#     # routePrefix: /prometheus
+#     externalUrl: http://prometheus.monitoring.host.cluster.example.com
+
+# alertmanager:
+#   # Disable default configuration of NodePort
+#   service:
+#     type: ClusterIP
+#     nodePort: null
+#   # Define host-based ingress
+#   ingress:
+#     enabled: true
+#     hosts:
+#     - alertmanager.monitoring.host.cluster.example.com
+#   alertmanagerSpec:
+#     # routePrefix: /alertmanager
+#     externalUrl: http://alertmanager.monitoring.host.cluster.example.com

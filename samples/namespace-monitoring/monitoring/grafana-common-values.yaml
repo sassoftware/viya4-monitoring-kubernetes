@@ -1,5 +1,5 @@
 image:
-  tag: "7.0.4"
+  tag: "8.2.1"
 plugins:
 - grafana-piechart-panel
 - grafana-clock-panel

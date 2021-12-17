@@ -8,7 +8,8 @@ no hard dependencies between the two.
 
 ## Monitoring - Metrics and Alerts
 
-The monitoring solution includes these components and your right to use each such component is governed by its applicable open source license:
+The monitoring solution includes these components and your right to use each
+such component is governed by its applicable open source license:
 
 - [Prometheus Operator](https://github.com/coreos/prometheus-operator)
   - [Prometheus](https://prometheus.io/docs/introduction/overview/)
@@ -84,18 +85,26 @@ including Fluent Bit, Elasticsearch, and Kibana.
 
 ## Customization
 
-For most deployment scenarios, the process of customizing the monitoring and logging deployments consists of:
+For most deployment scenarios, the process of customizing the monitoring and
+logging deployments consists of:
 
 - creating the location for your local customization files
-- using the `USER_DIR` environment variable to specify the location of the customization files
-- copying the customization files from one of the provided samples to your local directory
+- using the `USER_DIR` environment variable to specify the location of the
+  customization files
+- copying the customization files from one of the provided samples to your
+  local directory
 - specifying customization variables and parameters in the customization files
 
 Other scenarios use different customization steps that are specific to each scenario.
 
-Samples are provided for several common deployment scenarios. Each sample includes detailed information about the customization process and values for the scenario.
+Samples are provided for several common deployment scenarios. Each sample
+includes detailed information about the customization process and values for
+the scenario.
 
-See the [monitoring README](monitoring/README.md) and [logging README](logging/README.md) for detailed information about the customization process and about determining valid customization values. See the README file for each [sample](samples/README.md) for detailed information about customization for each deployment scenario.
+See the [monitoring README](monitoring/README.md) and [logging README](logging/README.md)
+for detailed information about the customization process and about determining
+valid customization values. See the README file for each [sample](samples/README.md)
+for detailed information about customization for each deployment scenario.
 
 ### Default StorageClass
 

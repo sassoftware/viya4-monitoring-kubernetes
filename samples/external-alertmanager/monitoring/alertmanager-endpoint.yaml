@@ -2,7 +2,7 @@ kind: Service
 apiVersion: v1
 metadata:
   # Edit the name of the service as needed, but match with the name below
-  name: my-alertmanager
+  name: my-external-alertmanager
 spec:
   type: ClusterIP
   ports:
@@ -13,10 +13,9 @@ kind: Endpoints
 apiVersion: v1
 metadata:
   # This must match the name of the service above
-  name: my-alertmanager
+  name: my-external-alertmanager
 subsets:
   - addresses:
-    # TODO: Fill in the external IP address of Alert Manager here
-    - ip: 10.1.2.3
+    - ip: 10.1.2.3 # ** Change this to the IP address of the external Alertmanager **
     ports:
     - port: 9093
