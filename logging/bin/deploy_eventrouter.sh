@@ -10,6 +10,19 @@ this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
+# Copy template files to temp
+logDir=$TMP_DIR/$LOG_NS
+mkdir -p $logDir
+cp -R logging/eventrouter/eventrouter.yaml $logDir/eventrouter.yaml
+
+# Replace placeholders
+log_debug "Replacing logging namespace for files in [$logDir]"
+  if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
+    sed -i '' "s/__LOG_NS__/$LOG_NS/g" $logDir/eventrouter.yaml
+  else
+    sed -i "s/__LOG_NS__/$LOG_NS/g" $logDir/eventrouter.yaml
+  fi
+
 # Output Kubernetes events as pseudo-log messages?
 EVENTROUTER_ENABLE=${EVENTROUTER_ENABLE:-true}
 
@@ -23,6 +36,13 @@ set -e
 # Enable workload node placement?
 LOG_NODE_PLACEMENT_ENABLE=${LOG_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
 
+# If performing an upgrade-in-place, check for/remove Event Router in kube-system namespace (if older than 1.1.3) 
+if [ ! -z "$V4M_CURRENT_VERSION_FULL" ]; then
+   # Remove existing instance of Event Router in the kube-system namespace (if present).
+   log_info "Removing instance of Event Router in the kube-system namespace"
+   kubectl delete --ignore-not-found -f logging/eventrouter/eventrouter_kubesystem.yaml
+fi
+
 log_info "Deploying Event Router ..."
 
 if [ "$LOG_NODE_PLACEMENT_ENABLE" == "true" ]; then
@@ -30,7 +50,7 @@ if [ "$LOG_NODE_PLACEMENT_ENABLE" == "true" ]; then
    kubectl apply -f logging/node-placement/eventrouter-wnp.yaml
 else
    log_debug "Workload node placement support is disabled for eventrouter"
-   kubectl apply -f logging/eventrouter.yaml
+   kubectl apply -f $logDir/eventrouter.yaml
 fi
 
 log_info "Event Router has been deployed"

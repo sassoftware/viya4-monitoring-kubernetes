@@ -10,8 +10,23 @@ this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
+# Copy template files to temp
+logDir=$TMP_DIR/$LOG_NS
+mkdir -p $logDir
+cp -R logging/eventrouter/eventrouter.yaml $logDir/eventrouter.yaml
+
+# Replace placeholders
+log_debug "Replacing logging namespace for files in [$logDir]"
+  if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
+    sed -i '' "s/__LOG_NS__/$LOG_NS/g" $logDir/eventrouter.yaml
+  else
+    sed -i "s/__LOG_NS__/$LOG_NS/g" $logDir/eventrouter.yaml
+  fi
+
 log_info "Removing Event Router [$(date)]"
-kubectl delete --ignore-not-found -f logging/eventrouter.yaml
+# Remove existing instance of Event Router in the kube-system namespace (if present).
+kubectl delete --ignore-not-found -f logging/eventrouter/eventrouter_kubesystem.yaml
+kubectl delete --ignore-not-found -f $logDir/eventrouter.yaml
 
 log_debug "Script [$this_script] has completed [$(date)]"
 

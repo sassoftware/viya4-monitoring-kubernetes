@@ -1,15 +1,15 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: eventrouter
+  name: v4m-eventrouter
   labels:
     sas.com/monitoring-base: kube-viya-monitoring
 spec:
   selector:
     matchLabels:
-      kubernetes.io/name: eventrouter
+      kubernetes.io/name: v4m-eventrouter
   namespaceSelector:
-    matchNames: [ "kube-system" ]
+    matchNames: [ "logging" ]
   podMetricsEndpoints:
   - relabelings:
     - sourceLabels: [__meta_kubernetes_pod_ip]
