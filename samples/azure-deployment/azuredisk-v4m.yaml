@@ -11,5 +11,5 @@ parameters:
 provisioner: kubernetes.io/azure-disk
 reclaimPolicy: Delete
 # Set binding mode to WaitForFirstConsumer to avoid
-# volume node affinity issues
+# volume node affinity issues with multiple availability zones
 volumeBindingMode: WaitForFirstConsumer

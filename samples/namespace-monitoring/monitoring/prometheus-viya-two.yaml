@@ -110,7 +110,7 @@ spec:
       sas.com/viya-namespace: viya-two
   ruleSelector: {}
 
-  version: v2.19.1
+  version: v2.30.3
 ---
 apiVersion: v1
 kind: Service

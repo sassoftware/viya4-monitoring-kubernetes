@@ -12,6 +12,12 @@
 # Sample ingress configuration
 # NOTE: Edit hostnames and ingress port
 
+# HTTP path-based ingress is included here for convenience, but it is highly
+# recommended to incorporate the values from one of the
+# [tls samples](/samples/tls).
+# The relevant AKS-specific settings for this sample are just the 'storageClassName:'
+# sections below referencing the custom azuredisk-v4m storage class.
+
 prometheus:
   service:
     type: ClusterIP

@@ -22,7 +22,7 @@ elasticsearch:
    master:
      replicas: 5
      persistence:
-       # Size of PVC per master node
+       # Increase the default size of the PVC for the consolidated nodes
        size: 30Gi
    data:
      replicas: 0

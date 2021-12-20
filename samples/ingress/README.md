@@ -3,7 +3,7 @@
 ## IMPORTANT NOTE: This sample is deprecated
 
 This sample should only be used for internal development and testing. It is
-highly recommended to use the [tls sample](../tls) which provides a more
+highly recommended to use the [tls sample](/samples/tls) which provides a more
 secure HTTPS-based ingress configuration.
 
 This sample will be removed at some point in the future and TLS (both

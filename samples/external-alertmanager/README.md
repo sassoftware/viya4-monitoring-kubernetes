@@ -4,7 +4,8 @@ In a typical deployment, each cluster uses a separate instance of Alertmanager.
 If you have multiple clusters, you might want alerts from all clusters to come
 from a single instance of Alertmanager. You might also have an existing
 instance of Alertmanager and want alerts to come from the existing instance.
-Use this sample to configure monitoring to use an external instance of Alertmanager.
+Use this sample to configure monitoring to use an external instance of
+Alertmanager.
 
 ## Using This Sample
 
@@ -25,13 +26,14 @@ customization directory, then modify the files further as needed.
 If you also need to use values from another sample, manually copy the values
 to your customization files after you add the values in this sample.
 
-1. The sample uses the value of `my-alertmanager` for the external Alertmanager
-instance. If you use a name other than `my-alertmanager`, change
-`alertmanager-endpoint.yaml` and
+1. The sample uses the value of `my-external-alertmanager` for the external
+Alertmanager instance. If you use a name other than `my-external-alertmanager`,
+change `alertmanager-endpoint.yaml` and
 `$USER_DIR/monitoring/user-values-prom-operator.yaml` to specify the name of
 your Alertmanager instance.
 
-2. Define a service that points to the Alertmanager instance that you want to use.
+2. Define a service that points to the Alertmanager instance that you want to
+use.
 
 3. Deploy monitoring using the standard deployment script:
 

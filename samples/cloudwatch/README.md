@@ -15,7 +15,7 @@ CloudWatch agents that you might want to use in your environment:
 
 - The CloudWatch agent with Prometheus monitoring scrapes metrics from
 Prometheus sources, such as SAS Viya. The metrics can then be converted and
-mapped for display in CloudWatch. 
+mapped for display in CloudWatch.
 
 - The default CloudWatch agent collects metrics from AWS nodes. Although
 these metrics are not specific to SAS Viya, you might want to use both agents
@@ -66,7 +66,7 @@ column.
 7. Select the check box next to `CloudWatchAgentServerPolicy`.
 8. Select `Attach Policy`.
 9. Repeat steps 4 through 8 for the role that contains `AWS service: ec2` in
-the `Trusted entities` column.  
+the `Trusted entities` column.
 
 ### Identify Cluster and Region
 
@@ -74,15 +74,16 @@ You must identify the Amazon EKS cluster on which SAS Viya is deployed and the
 region for the cluster. These values are needed to construct the correct
 endpoint for CloudWatch.
 
-
-Use values for your EKS cluster to set the `ClusterName` and `RegionName` environment variables.
+Use values for your EKS cluster to set the `ClusterName` and `RegionName`
+environment variables.
 
 ```bash
 ClusterName=my-cluster
 RegionName=us-east-1
 ```
 
-After you set these environment variables, you can copy and paste the command in the next section to deploy the Cloudwatch agent.
+After you set these environment variables, you can copy and paste the command
+in the next section to deploy the Cloudwatch agent.
 
 ### Deploy CloudWatch Agent for Prometheus
 
@@ -90,8 +91,8 @@ Run the following code from the command line to deploy the CloudWatch agent for
 Prometheus metrics:
 
 ```bash
-curl https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/service/cwagent-prometheus/prometheus-k8s.yaml | 
-sed "s/{{cluster_name}}/${ClusterName}/;s/{{region_name}}/${RegionName}/" | 
+curl https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/service/cwagent-prometheus/prometheus-k8s.yaml |
+sed "s/{{cluster_name}}/${ClusterName}/;s/{{region_name}}/${RegionName}/" |
 kubectl apply -f -
 ```
 
@@ -137,19 +138,31 @@ To access the metrics:
 2. In the navigation bar on the left, choose `Metrics`.
 3. Select the `ContainerInsights/Prometheus` namespace.
 
-The Cloudwatch **Metrics** view displays a set of tiles, with each tile corresponding to a common set of dimensions, You can hover over a tile's dimensions to display the complete list of dimensions associated with the tile. 
+The Cloudwatch **Metrics** view displays a set of tiles, with each tile
+corresponding to a common set of dimensions, You can hover over a tile's
+dimensions to display the complete list of dimensions associated with the tile.
 
-The dimensions for a metric correspond to the metric's Prometheus labels, and are used to specify attributes about the source of the metric. Metrics use different dimensions, depending on the type of data being collected, For example, a metric collecting the memory of a CAS node might include dimensions such as the cluster name, the CAS node name, and the CAS node type. A metric collecting the memory usage of a SAS service might also use the cluster name, but include the SAS service base and SAS service name. 
+The dimensions for a metric correspond to the metric's Prometheus labels, and
+are used to specify attributes about the source of the metric. Metrics use
+different dimensions, depending on the type of data being collected, For
+example, a metric collecting the memory of a CAS node might include dimensions
+such as the cluster name, the CAS node name, and the CAS node type. A metric
+collecting the memory usage of a SAS service might also use the cluster name,
+but include the SAS service base and SAS service name.
 
-All of the metrics that use a common set of dimensions are grouped under a tile that is labeled with the list of dimensions. In order to find the a specific metric, you must find the tile with the corresponding set of dimensions.
+All of the metrics that use a common set of dimensions are grouped under a tile
+that is labeled with the list of dimensions. In order to find the a specific
+metric, you must find the tile with the corresponding set of dimensions.
 
-Because each metric has many dimensions and because many SAS Viya metrics are collected for Cloudwatch, it can
-be difficult to find a specific metric or metrics. You can use
-the reference tables in [CloudWatch SAS Viya Metrics](reference.md) to locate
-SAS Viya metrics and identify the tile with which they are associated. The tables provide these cross-reference listings: 
+Because each metric has many dimensions and because many SAS Viya metrics are
+collected for Cloudwatch, it can be difficult to find a specific metric or
+metrics. You can use the reference tables in [CloudWatch SAS Viya Metrics](reference.md)
+to locate SAS Viya metrics and identify the tile with which they are
+associated. The tables provide these cross-reference listings:
 
 - the metrics associated with each set of dimensions
-- the dimensions and metrics associated with each type of source (such as CAS, SAS services written in Go, or SAS services written in Java)
+- the dimensions and metrics associated with each type of source (such as CAS,
+  SAS services written in Go, or SAS services written in Java)
 - the dimensions associated with each each metric
 
 After you find the metric you are interested in, you can create a graph from
@@ -190,7 +203,9 @@ tolerations:
   effect: NoSchedule
 ```
 
-See [Set Up the CloudWatch Agent to Collect Cluster Metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-setup-metrics.html) in the CloudWatch documentation for information about modifying the CloudWatch DaemonSet.
+See [Set Up the CloudWatch Agent to Collect Cluster Metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-setup-metrics.html)
+in the CloudWatch documentation for information about modifying the CloudWatch
+DaemonSet.
 
 ## Limitations
 

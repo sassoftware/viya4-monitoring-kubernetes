@@ -15,7 +15,7 @@ metadata:
   # This must match the name of the service above
   name: my-external-alertmanager
 subsets:
-  - addresses:
-    - ip: 10.1.2.3 # ** Change this to the IP address of the external Alertmanager **
-    ports:
+  - addresses:     # ***********
+    - ip: 10.1.2.3 # <=== Change this to the IP address of the external Alertmanager **
+    ports:         # ***********
     - port: 9093

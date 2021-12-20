@@ -15,7 +15,7 @@ customization process.
 
 The customization files in this sample provide a starting point for the
 customization files for a deployment that supports logging that minimizes
-resource usage. 
+resource usage.
 
 In order to use the values in this sample in the customization files for your
 deployment, copy the customization files from this sample to your local
