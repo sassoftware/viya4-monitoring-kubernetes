@@ -3,16 +3,16 @@
 
 # Logging helper functions
 
-colorEnable=${LOG_COLOR_ENABLE:-true}
-levelEnable=${LOG_LEVEL_ENABLE:-true}
-logDebug=${LOG_DEBUG_ENABLE:-false}
-logVerbose=${LOG_VERBOSE_ENABLE:-true}
+LOG_COLOR_ENABLE=${LOG_COLOR_ENABLE:-true}
+LOG_LEVEL_ENABLE=${LOG_LEVEL_ENABLE:-true}
+LOG_DEBUG_ENABLE=${LOG_DEBUG_ENABLE:-false}
+LOG_VERBOSE_ENABLE=${LOG_VERBOSE_ENABLE:-true}
 
 # This must be run without 'set -e' being set
 # So it has to be done up here and not within log_notice
 if [ -z "$TERM" ] || ! tput cols >/dev/null 2>&1 ; then
   # Non-interactive shell
-  colorEnable=false
+  LOG_COLOR_ENABLE=false
   noticeColWidth=${LOG_NOTICE_COL_WIDTH:-100}
 else
   # Terminal width should be accessible
@@ -22,7 +22,7 @@ else
   fi
 fi
 
-if [ "$logVerbose" != "true" ]; then
+if [ "$LOG_DEBUG_ENABLE" != "true" ]; then
   exec >/dev/null
 fi
 
@@ -49,7 +49,7 @@ function log_notice {
   # Fill remaining characters with spaces
   text="$*$(printf %$(eval 'echo $n')s |tr ' ' ' ')"
 
-  if [ "$colorEnable" = "true" ]; then
+  if [ "$LOG_COLOR_ENABLE" = "true" ]; then
     whiteb "${bluebg}$text"
   else
     echo "$text" >&3
@@ -61,13 +61,13 @@ function log_message {
 }
 
 function log_debug {
-  if [ "$logDebug" = "true" ]; then
-    if [ "$levelEnable" = "true" ]; then
+  if [ "$LOG_DEBUG_ENABLE" = "true" ]; then
+    if [ "$LOG_LEVEL_ENABLE" = "true" ]; then
         level="DEBUG "
     else
         level=""
     fi
-    if [ "$colorEnable" = "true" ]; then
+    if [ "$LOG_COLOR_ENABLE" = "true" ]; then
         echo -e "${whiteb}${level}${white}$*${end}" >&3
     else
         echo "${level}$*" >&3
@@ -76,12 +76,12 @@ function log_debug {
 }
 
 function log_info {
-  if [ "$levelEnable" = "true" ]; then
+  if [ "$LOG_LEVEL_ENABLE" = "true" ]; then
     level="INFO "
   else
     level=""
   fi
-  if [ "$colorEnable" = "true" ]; then
+  if [ "$LOG_COLOR_ENABLE" = "true" ]; then
     echo -e "${greenb}${level}${whiteb}$*${end}" >&3
   else
     echo "${level}$*" >&3
@@ -89,18 +89,18 @@ function log_info {
 }
 
 function log_verbose {
-  if [ "$logVerbose" == "true" ]; then
+  if [ "$LOG_DEBUG_ENABLE" == "true" ]; then
 		log_info $* >&3
   fi
 }
 
 function log_warn {
-  if [ "$levelEnable" = "true" ]; then
+  if [ "$LOG_LEVEL_ENABLE" = "true" ]; then
     level="WARN "
   else
     level=""
   fi
-  if [ "$colorEnable" = "true" ]; then
+  if [ "$LOG_COLOR_ENABLE" = "true" ]; then
     echo -e "${black}${yellowbg}${level}$*${end}" >&3
   else
     echo "${level}$*" >&3
@@ -108,12 +108,12 @@ function log_warn {
 }
 
 function log_error {
-  if [ "$levelEnable" = "true" ]; then
+  if [ "$LOG_LEVEL_ENABLE" = "true" ]; then
     level="ERROR "
   else
     level=""
   fi
-  if [ "$colorEnable" = "true" ]; then
+  if [ "$LOG_COLOR_ENABLE" = "true" ]; then
     echo -e "${whiteb}${redbg}${level}$*${end}" >&3
   else
     echo "${level}$*" >&3
@@ -121,4 +121,4 @@ function log_error {
 }
 
 export -f log_notice log_message log_debug log_info log_warn log_error add_notice display_notices log_verbose
-export colorEnable levelEnable logDebug noticeColWidth logVerbose
+export LOG_COLOR_ENABLE LOG_LEVEL_ENABLE LOG_DEBUG_ENABLE noticeColWidth LOG_DEBUG_ENABLE
