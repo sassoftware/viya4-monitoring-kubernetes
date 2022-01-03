@@ -9,7 +9,8 @@ reference links and variable listings.
 You customize your deployment by specifying values in `user.env` and `*.yaml`
 files. These files are stored in a local directory outside of your
 repository that is identified by the `USER_DIR` environment variable. See the
-[monitoring README](../../monitoring/README.md#mon_custom) or the [logging README](../../logging/README.md#log_custom) for information about the
+[monitoring README](../../monitoring/README.md#mon_custom) or the
+[logging README](../../logging/README.md#log_custom) for information about the
 customization process.
 
 The customization files in this sample provide a starting point for
@@ -36,6 +37,7 @@ my_repository_path/logging/bin/deploy_logging_open.sh
 
 ## Grafana Dashboards
 
-In addition to customizing the deployment, you can also use this sample to add your own Grafana dashboards. See the [dashboard Readme](monitoring/dashboards/README.md) for details
-on supplying additional Grafana dashboards that will be deployed (and removed)
-with the monitoring components.
+In addition to customizing the deployment, you can also use this sample to add
+your own Grafana dashboards. See the [dashboard Readme](monitoring/dashboards/README.md)
+for details on supplying additional Grafana dashboards that will be deployed
+(and removed) with the monitoring components.

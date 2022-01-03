@@ -1,10 +1,10 @@
-# Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # This file is not marked as executable as it is intended to be sourced
 # Current directory must be the root directory of the repo
 
-trap_add() {
+function trap_add() {
  # based on https://stackoverflow.com/questions/3338030/multiple-bash-traps-for-the-same-signal
  # but: prepends new cmd rather than append it, changed var names and eliminated messages
 

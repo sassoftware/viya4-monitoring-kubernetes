@@ -17,16 +17,13 @@
 #            * If adding "client" nodes, update the replicas value in the client stanza below to specify
 #              the number of _additional_ client nodes needed.  Remember that the master nodes will continue to
 #              serve as client nodes as well (i.e. the total # of client nodes = # of master nodes + # of client nodes).
-#
-#
 
 elasticsearch:
    master:
      replicas: 5
      persistence:
-       # Size of PVC per master node
+       # Increase the default size of the PVC for the consolidated nodes
        size: 30Gi
-
    data:
      replicas: 0
    client:

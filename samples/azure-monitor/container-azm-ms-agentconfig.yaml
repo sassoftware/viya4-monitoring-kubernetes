@@ -1,4 +1,4 @@
-# Template can be found at:
+# Original template with documentation for all options can be found at:
 # https://github.com/microsoft/Docker-Provider/blob/ci_dev/kubernetes/container-azm-ms-agentconfig.yaml
 kind: ConfigMap
 apiVersion: v1

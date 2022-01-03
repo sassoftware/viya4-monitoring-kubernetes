@@ -66,6 +66,3 @@
 #       root_url: http://host.mycluster.example.com:31100/
 #   persistence:
 #     storageClassName: myCustomStorageClass
-
-# nodeExporter:
-#   enabled: true

@@ -8,8 +8,6 @@
 #image:
 #  tag: 1.7.9
 
-
-
 # ***** extraVolumeMounts/extraVolumes - START *****
 #
 # Resolving symbolic links/Relocated Docker Root Dir

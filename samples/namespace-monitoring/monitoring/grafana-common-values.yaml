@@ -1,11 +1,5 @@
 image:
-  tag: "7.0.4"
-plugins:
-- grafana-piechart-panel
-- grafana-clock-panel
-- camptocamp-prometheus-alertmanager-datasource
-- flant-statusmap-panel
-- btplc-status-dot-panel
+  tag: "8.2.1"
 service:
   type: ClusterIP
 sidecar:
@@ -26,7 +20,6 @@ persistence:
   finalizers:
     - kubernetes.io/pvc-protection
   # subPath: ""
-  # existingClaim:
 datasources:
   datasources.yaml:
     apiVersion: 1
