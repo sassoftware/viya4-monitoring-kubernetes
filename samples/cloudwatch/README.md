@@ -43,10 +43,10 @@ use the CloudWatch agent, that value needs to be changed to `2`.
 To make the change to an existing cluster, you will need the InstanceId of each
 EC2 instance in the EKS cluster. To obtain the list, make sure you have the AWS
 CLI installed and configured as well as [`jq`](https://stedolan.github.io/jq/)
-and run:
+and run (replace your EKS cluster name in the command):
 
 ```bash
-EC2_IDS=$(aws ec2 describe-instances --filters 'Name=tag-key,Values=k8s.io/cluster/athena-eks' | jq -r '.Reservations[] | .Instances[] | .InstanceId' | tr '\r\n' ' ')
+EC2_IDS=$(aws ec2 describe-instances --filters 'Name=tag-key,Values=k8s.io/cluster/[your-eks-cluster]' | jq -r '.Reservations[] | .Instances[] | .InstanceId' | tr '\r\n' ' ')
 for id in $(echo $EC2_IDS); do; aws ec2 modify-instance-metadata-options --http-put-response-hop-limit=2 --instance-id $id; done
 ```
 
