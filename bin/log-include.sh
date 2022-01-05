@@ -22,8 +22,8 @@ else
   fi
 fi
 
-if [ "$LOG_DEBUG_ENABLE" != "true" ]; then
-  exec >/dev/null
+if [ "$LOG_VERBOSE_ENABLE" != "true" ]; then
+  exec 1>/dev/null
 fi
 
 function add_notice {
@@ -89,7 +89,7 @@ function log_info {
 }
 
 function log_verbose {
-  if [ "$LOG_DEBUG_ENABLE" == "true" ]; then
+  if [ "$LOG_VERBOSE_ENABLE" == "true" ]; then
 		log_info $* >&3
   fi
 }
