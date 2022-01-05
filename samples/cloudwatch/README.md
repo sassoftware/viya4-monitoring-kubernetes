@@ -27,23 +27,45 @@ DaemonSet definition so that the agent can run on nodes that are tainted to
 support SAS Viya workload node placement. See
 [CloudWatch Agent DaemonSet and Workload Node Placement](#wnp_tolerations).
 
-Because SAS Viya monitoring uses
-Prometheus, this sample focuses on deploying and configuring the
-CloudWatch agent for use with Prometheus.
+Because SAS Viya monitoring uses Prometheus, this sample focuses on deploying
+and configuring the CloudWatch agent for use with Prometheus.
+
+These instructions are based on deploying the EKS cluster using the
+[viya4-iac-aws](https://github.com/sassoftware/viya4-iac-aws) project.
+
+## EC2 Requirement - Set Hop Limit
+
+The [viya4-iac-aws](https://github.com/sassoftware/viya4-iac-aws) project
+configures the EC2 instances to use [IMDSv2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html).
+`viya4-iac-aws` configures the default `HttpPutResponseHopLimit` to `1`. To
+use the CloudWatch agent, that value needs to be changed to `2`.
+
+To make the change to an existing cluster, you will need the InstanceId of each
+EC2 instance in the EKS cluster. To obtain the list, make sure you have the AWS
+CLI installed and configured as well as [`jq`](https://stedolan.github.io/jq/)
+and run:
+
+```bash
+EC2_IDS=$(aws ec2 describe-instances --filters 'Name=tag-key,Values=k8s.io/cluster/athena-eks' | jq -r '.Reservations[] | .Instances[] | .InstanceId' | tr '\r\n' ' ')
+for id in $(echo $EC2_IDS); do; aws ec2 modify-instance-metadata-options --http-put-response-hop-limit=2 --instance-id $id; done
+```
+
+Alternatively, you could override the defaults in the [viya4-iac-aws](https://github.com/sassoftware/viya4-iac-aws)
+project and set the `HttpPutResponseHopLimit` values to 2 at cluster creation time.
 
 ## Deployment
 
 Follow these steps to deploy CloudWatch and enable it to collect metrics from
 SAS Viya:
 
-1. Attach CloudWatchAgentServerPolicy to IAM roles
+1. Attach CloudWatchAgentServerPolicy to the EC2 IAM role
 2. Identify the cluster and region
 3. Deploy the CloudWatch Prometheus agent
 4. Apply SAS Viya customizations
     - Customize the Prometheus scrape configuration
     - Customize the mapping of performance log events to CloudWatch metrics
 
-### Attach CloudWatchAgentServerPolicy to IAM Roles
+### Attach CloudWatchAgentServerPolicy to the EC2 IAM role
 
 The CloudWatch agent requires proper permissions to create performance log
 events and CloudWatch metrics. AWS uses Identity and Access Management (IAM)
@@ -53,20 +75,17 @@ documentation for more information.
 
 Follow these steps to set permissions:
 
-1. Sign in to the AWS Management Console and open the IAM console.
-2. In the navigation pane of the console, select `Roles`.
-3. In the Search field, enter the name of the Amazon EKS cluster on which SAS
-Viya is deployed (such as `my-cluster`) to filter the roles listed.
-4. Select the role that contains `AWS service: eks` in the `Trusted entities`
-column.
+1. Sign in to the AWS Management Console and open the EC2 console.
+2. Search for the EC2 instances used in the EKS cluster
+3. Click on one of the EC2 instances. Details will be available in the
+bottom pane.
+4. Click on the IAM Role for the instance
 5. Select `Attach Policies`.
 6. Search for `CloudWatchAgentServerPolicy`. If the
 `CloudWatchAgentServerPolicy` does not exist, see:
 [Creating IAM Roles for Use with the CloudWatch Agent](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/create-iam-roles-for-cloudwatch-agent-commandline.html).
 7. Select the check box next to `CloudWatchAgentServerPolicy`.
 8. Select `Attach Policy`.
-9. Repeat steps 4 through 8 for the role that contains `AWS service: ec2` in
-the `Trusted entities` column.
 
 ### Identify Cluster and Region
 
