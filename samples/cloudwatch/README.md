@@ -33,7 +33,7 @@ and configuring the CloudWatch agent for use with Prometheus.
 These instructions are based on deploying the EKS cluster using the
 [viya4-iac-aws](https://github.com/sassoftware/viya4-iac-aws) project.
 
-# EC2 Requirement - Set Hop Limit
+## EC2 Requirement - Set Hop Limit
 
 The [viya4-iac-aws](https://github.com/sassoftware/viya4-iac-aws) project
 configures the EC2 instances to use [IMDSv2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html).
@@ -42,7 +42,8 @@ use the CloudWatch agent, that value needs to be changed to `2`.
 
 To make the change to an existing cluster, you will need the InstanceId of each
 EC2 instance in the EKS cluster. To obtain the list, make sure you have the AWS
-CLI installed and configured as well as [`jq`]() and run:
+CLI installed and configured as well as [`jq`](https://stedolan.github.io/jq/)
+and run:
 
 ```bash
 EC2_IDS=$(aws ec2 describe-instances --filters 'Name=tag-key,Values=k8s.io/cluster/athena-eks' | jq -r '.Reservations[] | .Instances[] | .InstanceId' | tr '\r\n' ' ')
