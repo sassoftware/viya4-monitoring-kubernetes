@@ -6,6 +6,8 @@ kibana:
     annotations:
       kubernetes.io/ingress.class: nginx
     enabled: true
+    # ingressClass is not currently supported by the Open Distro helm chart
+    # ingressClassName: nginx
     path: /
     hosts:
     - kibana.logging.host.cluster.example.com
@@ -19,6 +21,8 @@ kibana:
 #         kubernetes.io/ingress.class: nginx
 #         nginx.ingress.kubernetes.io/backend-protocol: HTTPS
 #       enabled: true
+#       # ingressClass is not currently supported by the Open Distro helm chart
+#       # ingressClassName: nginx
 #       path: /
 #       hosts:
 #       - elasticsearch.logging.host.cluster.example.com

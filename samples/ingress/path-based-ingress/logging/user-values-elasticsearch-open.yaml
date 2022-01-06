@@ -28,6 +28,8 @@ kibana:
         rewrite (?i)/kibana$ / break;
       nginx.ingress.kubernetes.io/rewrite-target: /kibana
     enabled: true
+    # ingressClass is not currently supported by the Open Distro helm chart
+    # ingressClassName: nginx
     path: /kibana
     pathType: Prefix
     hosts:
@@ -48,6 +50,8 @@ kibana:
 #         nginx.ingress.kubernetes.io/rewrite-target: /elasticsearch
 #         nginx.ingress.kubernetes.io/backend-protocol: HTTPS
 #       enabled: true
+#       # ingressClass is not currently supported by the Open Distro helm chart
+#       # ingressClassName: nginx
 #       path: /elasticsearch
 #       pathType: Prefix
 #       hosts:
