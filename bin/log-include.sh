@@ -22,8 +22,12 @@ else
   fi
 fi
 
-if [ "$LOG_DEBUG_ENABLE" != "true" ]; then
-  exec >/dev/null
+if [ "$LOG_VERBOSE_ENABLE" != "true" ]; then
+  # Send stdout to /dev/null
+  # All non-error command output (kubectl, helm, etc.) will be suppressed
+  # for non-verbose mode. log_* calls will funtion normally since they are
+  # sent to &3, which is a copy of stdout
+  exec 1>/dev/null
 fi
 
 function add_notice {
@@ -88,8 +92,10 @@ function log_info {
   fi
 }
 
+# Verbose messages are basically optional, more detailed INFO messages
+# The value of LOG_VERBOSE_ENABLE determines whether they are displayed
 function log_verbose {
-  if [ "$LOG_DEBUG_ENABLE" == "true" ]; then
+  if [ "$LOG_VERBOSE_ENABLE" == "true" ]; then
 		log_info $* >&3
   fi
 }
