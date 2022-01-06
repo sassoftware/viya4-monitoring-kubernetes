@@ -23,6 +23,10 @@ else
 fi
 
 if [ "$LOG_VERBOSE_ENABLE" != "true" ]; then
+  # Send stdout to /dev/null
+  # All non-error command output (kubectl, helm, etc.) will be suppressed
+  # for non-verbose mode. log_* calls will funtion normally since they are
+  # sent to &3, which is a copy of stdout
   exec 1>/dev/null
 fi
 
