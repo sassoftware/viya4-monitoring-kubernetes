@@ -7,7 +7,7 @@ kibana:
       kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     enabled: true
-    # ingressClass is not currently supported by the Open Distro helm chart
+    # ingressClassName is not currently supported by the Open Distro helm chart
     # ingressClassName: nginx
     path: /
     hosts:
@@ -26,7 +26,7 @@ kibana:
 #         kubernetes.io/ingress.class: nginx
 #         nginx.ingress.kubernetes.io/backend-protocol: HTTPS
 #       enabled: true
-#       # ingressClass is not currently supported by the Open Distro helm chart
+#       # ingressClassName is not currently supported by the Open Distro helm chart
 #       # ingressClassName: nginx
 #       path: /
 #       hosts:
