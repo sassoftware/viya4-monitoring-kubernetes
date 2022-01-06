@@ -5,6 +5,7 @@ grafana:
     nodePort: null
   # Define host-based ingress
   ingress:
+    ingressClassName: nginx
     enabled: true
     hosts:
     - grafana.monitoring.host.cluster.example.com
@@ -28,6 +29,7 @@ grafana:
 #     nodePort: null
 #   # Define host-based ingress
 #   ingress:
+#     ingressClassName: nginx
 #     enabled: true
 #     hosts:
 #     - prometheus.monitoring.host.cluster.example.com
@@ -42,6 +44,7 @@ grafana:
 #     nodePort: null
 #   # Define host-based ingress
 #   ingress:
+#     ingressClassName: nginx
 #     enabled: true
 #     hosts:
 #     - alertmanager.monitoring.host.cluster.example.com

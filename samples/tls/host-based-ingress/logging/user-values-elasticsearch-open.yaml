@@ -4,6 +4,7 @@ kibana:
     nodePort: null
   ingress:
     annotations:
+      kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     enabled: true
     path: /
@@ -14,16 +15,19 @@ kibana:
       hosts:
       - kibana.logging.host.cluster.example.com
 
-elasticsearch:
-  client:
-    ingress:
-      annotations:
-        nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-      enabled: true
-      path: /
-      hosts:
-      - elasticsearch.logging.host.cluster.example.com
-      tls:
-      - secretName: elasticsearch-ingress-tls-secret
-        hosts:
-        - elasticsearch.logging.host.cluster.example.com
+# Elasticsearch ingress is optional
+# Uncomment this section only if external API access is required
+# elasticsearch:
+#   client:
+#     ingress:
+#       annotations:
+#         kubernetes.io/ingress.class: nginx
+#         nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+#       enabled: true
+#       path: /
+#       hosts:
+#       - elasticsearch.logging.host.cluster.example.com
+#       tls:
+#       - secretName: elasticsearch-ingress-tls-secret
+#         hosts:
+#         - elasticsearch.logging.host.cluster.example.com

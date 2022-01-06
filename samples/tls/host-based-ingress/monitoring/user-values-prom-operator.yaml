@@ -8,6 +8,7 @@ grafana:
     annotations:
       nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     enabled: true
+    ingressClassName: nginx
     tls:
     - hosts:
       - grafana.monitoring.host.cluster.example.com
@@ -37,6 +38,7 @@ grafana:
 #     annotations:
 #       nginx.ingress.kubernetes.io/backend-protocol: HTTPS
 #     enabled: true
+#     ingressClassName: nginx
 #     tls:
 #     - hosts:
 #       - prometheus.monitoring.host.cluster.example.com
@@ -55,6 +57,7 @@ grafana:
 #   # Define host-based ingress
 #   ingress:
 #     enabled: true
+#     ingressClassName: nginx
 #     tls:
 #     - hosts:
 #       - alertmanager.monitoring.host.cluster.example.com
