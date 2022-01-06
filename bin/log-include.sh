@@ -88,6 +88,8 @@ function log_info {
   fi
 }
 
+# Verbose messages are basically optional, more detailed INFO messages
+# The value of LOG_VERBOSE_ENABLE determines whether they are displayed
 function log_verbose {
   if [ "$LOG_VERBOSE_ENABLE" == "true" ]; then
 		log_info $* >&3
