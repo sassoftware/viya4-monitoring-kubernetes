@@ -37,7 +37,7 @@ set -e
 LOG_NODE_PLACEMENT_ENABLE=${LOG_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
 
 # If performing an upgrade-in-place, check for/remove Event Router in kube-system namespace (if older than 1.1.3) 
-if [ ! -z "$V4M_CURRENT_VERSION_FULL" ]; then
+if [[ $V4M_CURRENT_VERSION_FULL =~ 1.0 || $V4M_CURRENT_VERSION_FULL =~ 1.1.[0-2] ]]; then
    # Remove existing instance of Event Router in the kube-system namespace (if present).
    log_info "Removing instance of Event Router in the kube-system namespace"
    kubectl delete --ignore-not-found -f logging/eventrouter/eventrouter_kubesystem.yaml
