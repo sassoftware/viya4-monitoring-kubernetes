@@ -2,11 +2,11 @@
 
 ## Overview
 
-**Important:** As of the 1.1.3 release (mid-January 2022), a new 
+>**Important:** As of the 1.1.3 release (mid-January 2022), a new 
 administrator user, `logadm`, is available. The deployment process automatically 
 creates `logadm`. It is intended to be the
 primary account used for log-monitoring activity. With this change, the 
-original Kibana administrator account (admin) should be used only for Kibana 
+original Kibana administrator account (`admin`) should be used only for Kibana 
 administration tasks, such as reviewing security, adjusting index management 
 policies, or when the `logadm` account cannot be used.
 
@@ -60,18 +60,25 @@ You can disable the creation of the `logadm` user during the deployment process.
 In the `logging/user.env` file in USER_DIR, set the LOG_CREATE_LOGADM_USER 
 environment variable to 'false'. The default is to create the `logadm` user.
 
+To set the password for the `logadm` user, set the `LOG_LOGADM_PASSWD` 
+environment variable in the same file. If no password has been set for the 
+`logadm` user, but a password has been set for the `admin` user (by using 
+the `ES_ADMIN_PASSWD` environment variable), that password is used for the 
+`logadm` user also. If neither password has been set, random passwords are 
+generated for these accounts. These random passwords are displayed in the 
+log messages generated during the deployment process.
 
 ## <a name="manage_access"></a>Manage Access Controls for a Tenant or Namespace
 
 ### Introduction
 
-You can implement or remove logging access 
-controls for a namespace or SAS Viya tenant. 
+You can implement or remove logging access controls for a specific namespace or 
+individual SAS Viya tenants within a given namespace. 
 
 ### Implement Access Controls for a Tenant or Namespace
 
-Use the `/logging/bin/onboard.sh` script to implement logging access 
-controls for a namespace or SAS Viya tenant. 
+Use the `onboard.sh` script from the `logging/bin` subdirectory in the repository 
+to implement logging access controls for a namespace or SAS Viya tenant. 
 The script performs the following actions: 
 
 1. Create a Kibana-tenant space.
@@ -86,7 +93,7 @@ Kibana-tenant space.
 Here is the syntax for the script:
 
 <pre>
-/logging/bin/onboard.sh --namespace <i>namespace</i>  [--tenant <i>tenant</i>] 
+logging/bin/onboard.sh --namespace <i>namespace</i>  [--tenant <i>tenant</i>] 
 [--user][<i>user_name</i>] [--password <i>password</i>]
 </pre>
 
@@ -110,7 +117,8 @@ be `mynamespace_mytenant1_admin`.
 
 ### Remove Access for a Tenant or Namespace
 
-Use the `/logging/bin/offboard.sh` script to remove logging access for a 
+Use the `offboard.sh` script from the `logging/bin` subdirectory in the repository 
+to remove logging access for a 
 namespace or SAS Viya tenant. The script performs the following actions: 
 
 1. Remove the Kibana-tenant space.
@@ -122,7 +130,7 @@ created by the `onboard.sh` script.
 Here is the syntax for the script:
 
 <pre>
-/logging/bin/offboard.sh --namespace <i>namespace</i>  [--tenant <i>tenant</i>]
+logging/bin/offboard.sh --namespace <i>namespace</i>  [--tenant <i>tenant</i>]
 </pre>
 
 - *namespace* is required. It specifies the Kubernetes namespace for which the 
@@ -143,15 +151,16 @@ that have access to only the log messages and Kibana-tenant space
 associated with a specified namespace or SAS Viya tenant. 
 
 ### Creating User Accounts
-After you run the `onboard.sh` to implement access limitations for 
+After you run the `onboard.sh` to implement access controls for 
 the Kibana-tenant space, you can run 
-the  `/logging/bin/user.sh` script to create user accounts for a Kibana-tenant space. 
+the  `logging/bin/user.sh` script to create user accounts that are bound by 
+these access controls. 
 
 
 Here is the syntax for the script to add a user:
 
 <pre>```
-/logging/bin/user.sh CREATE --namespace <i>namespace</i> [--tenant <i>tenant</i>] 
+logging/bin/user.sh CREATE --namespace <i>namespace</i> [--tenant <i>tenant</i>] 
 [--user][<i>user_name</i>] [--password <i>password</i>]
 </pre>
 
@@ -168,14 +177,19 @@ user.sh script.  For example, to create a user called "chen" and link the user t
 access controls, submit the following command:
 
 <pre>
-/logging/bin/user.sh CREATE --user <i>user_name</i> --password <i>password</i> 
---namespace _all_ --tenant _all_
+logging/bin/user.sh CREATE --user <i>user_name</i> --password <i>password</i> 
+--namespace <i>namespace</i> --tenant <i>tenant</i>
 </pre>
 
 Where: 
 
 - *user_name* is "chen".
 - *password* is the password to sign in to Kibana as the user "chen".
+- *namespace* is "mynamespace".
+- *tenant* is "mytenant1".
+
+**Note:** When you specify `_all_` for *namespace* and *tenant*, the user acquires
+the same level of access as a `logadm` user.
 
 ### Deleting a User Account
 
@@ -216,8 +230,9 @@ namespace:
 | Back-end Role | Role | Purpose |
 | --- | --- | --- |
 |     | v4m_kibana_user | Grants access to Kibana |
-|     | tenant_production_acme | Grants access to Kibana-tenant space for `production_acme` |
-| production_acme_kibana_users | search_index_production_acme | Grants access to log messages from the `production` namespace and `acme` tenant |
+|     | tenant_production_acme | Grants access to the `production_acme` Kibana-tenant space |
+|     | search_index_production_acme | Grants access to log messages from the `acme` tenant within the `production` namespace  |
+| production_acme_kibana_users |   | Grants access to all of the above roles |
 
 After these access controls have been defined, you can assign the back-end role 
 of `production_acme_kibana_users` to a user. The back-end role 
@@ -228,7 +243,7 @@ enables the user to access only:
 
 In some cases, you might want to create users who cannot log in to Kibana but 
 can access the log messages collected from a specific namespace or 
-namespace_tenant combination. These users might be needed to allow some 
+namespace/tenant combination. These users might be needed to allow some 
 automated process to extract log messages through API calls. To do this, 
 assign the `search_index_production_acme` role to the user, rather than 
 the `production_acme_kibana_users` back-end role. Because the user has not 
@@ -253,3 +268,18 @@ process:
 
 Linking users to the back-end role V4MCLUSTER_ADMIN_kibana_users via the 
 Kibana security plug-in grants those users the access described in the table above.
+
+You can also use the user.sh script to grant a user the same level of access as 
+a `logadm` user. See the following syntax for an example:
+
+<pre>
+logging/bin/user.sh CREATE --user <i>user_name</i> --password <i>password</i> 
+--namespace <i>namespace</i> --tenant <i>tenant</i>
+</pre>
+
+Where: 
+
+- *user_name* is "chen".
+- *password* is the password to sign in to Kibana as the user "chen".
+- *namespace* is `_all_`.
+- *tenant* is `_all_`.

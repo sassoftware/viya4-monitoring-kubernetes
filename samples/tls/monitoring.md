@@ -2,7 +2,8 @@
 
 ## Overview
 
-This sample demonstrates how to deploy monitoring components with Transport Layer Security (TLS) enabled.
+This sample demonstrates how to deploy monitoring components with Transport 
+Layer Security (TLS) enabled.
 
 Using the `TLS_ENABLE=true` environment variable enables TLS for in-cluster
 communications between monitoring components.
@@ -18,34 +19,43 @@ Kubernetes ingress secrets as described below.
 
 Customize your monitoring deployment by specifying values in the `user.env` and
 `*.yaml` files. These files are stored in a local directory outside of your
-repository. The local directory is identified by the `USER_DIR` environment variable. See the
+repository. The local directory is identified by the `USER_DIR` environment 
+variable. See the
 [monitoring README](../../../monitoring/README.md#mon_custom) for information
 about the customization process.
 
 The customization files in this sample provide a starting point for the
-customization files required for a deployment that supports monitoring with TLS enabled.
+customization files required for a deployment that supports monitoring with TLS 
+enabled.
 
 There are two versions of this sample:
 
 - host-based ingress
 - path-based ingress
 
-The difference between the two is in the URL that is used to access the applications:
+The difference between the two is in the URL that is used to access the 
+applications:
 
 - For host-based ingress, the
 application name is part of the host name itself (for example,
 `https://grafana.host.cluster.example.com/`).
-- For path-based ingress, the host name is fixed and the application name is appended as a path on the URL
+- For path-based ingress, the host name is fixed and the application name is 
+  appended as a path on the URL
 (for example, `https://host.cluster.example.com/grafana`).
 
-In order to use the values in this sample in the customization files for your deployment, complete the following steps:
+In order to use the values in this sample in the customization files for your 
+deployment, complete the following steps:
 
 1. Copy the customization files from either the `host-based-ingress`
-or `path-based-ingress` subdirectories to your local customization directory (that is, your `USER_DIR`).
-2. In the configuration files, replace all instances of `host.cluster.example.com` with the host name that is used in your environment.
+or `path-based-ingress` subdirectories to your local customization directory 
+(that is, your `USER_DIR`).
+2. In the configuration files, replace all instances of 
+   `host.cluster.example.com` with the host name that is used in your 
+   environment.
 3. (Optional) Modify the files further as needed.
 
-After you finish modifying the customization files, deploy monitoring by using the standard deployment script:
+After you finish modifying the customization files, deploy monitoring by using 
+the standard deployment script:
 
 <pre>
 <i>repository_path</i>/monitoring/bin/deploy_monitoring_cluster.sh
@@ -63,10 +73,10 @@ between components.
 See [Limitations and Known Issues](#Limitations-and-Known-Issues) for
 details.
 
-- Edit the `$USER_DIR/monitoring/user-values-prom-operator.yaml` file and replace any
-sample host names with the host names for your deployment. Specifically, you must
-replace `host.cluster.example.com` with the name of the ingress node. Typically,
-the ingress node is the cluster primary node.
+- Edit the `$USER_DIR/monitoring/user-values-prom-operator.yaml` file and 
+replace any sample host names with the host names for your deployment. 
+Specifically, you must replace `host.cluster.example.com` with the name 
+of the ingress node. Typically, the ingress node is the cluster primary node.
 
 ## Specifying TLS for Ingress
 
@@ -77,33 +87,34 @@ Kubernetes secrets with TLS certificates before you deploy cluster monitoring:
 - `alertmanager-ingress-tls-secret`
 - `grafana-ingress-tls-secret`
 
-**Note:** The process of generating the TLS certificates for these secrets is outside the scope for this example.
+**Note:** The process of generating the TLS certificates for these secrets is 
+outside the scope for this example.
 
-1. After you have obtained the TLS certificates for each secret, use the following command to generate the secrets. You must run the command for each secret name.
+1. After you have obtained the TLS certificates for each secret, use the 
+following command to generate the secrets. You must run the command for each 
+secret name.
 
-```bash
-kubectl create secret tls $SECRET_NAME -n $NAMESPACE --key $CERT_KEY --cert $CERT_FILE
-```
+<pre>
+kubectl create secret tls <i>secret_name</i> --namespace <i>namespace</i> --key=<i>cert_key_file</i> --cert=<i>cert_file</i>
+</pre>
 
-    where:
+  where:
 
-- `$SECRET_NAME` is the one of the following values: 
-
+- *secret_name* is the one of the following values:
   - The first time use `prometheus-ingress-tls-secret`.
   - The second time use `alertmanager-ingress-tls-secret`.
   - The third time use `grafana-ingress-tls-secret`.
 
-- `$NAMESPACE` is the value `monitoring`.
-
-- `$CERT_KEY` is the TLS certificate key file associated with the secret name. Be sure to use the correct .key file in each instance of this command.
-
-- `$CERT_FILE` is the TLS certificate file associated with the secret name. Be sure to use the correct .crt file in each instance of this command.
+- *namespace* is the value `monitoring`.
+- *cert_key_file* is the TLS certificate key file associated with the secret name. 
+  Be sure to use the correct .key file in each instance of this command.
+- *cert_file* is the TLS certificate file associated with the secret name. 
+  Be sure to use the correct .crt file in each instance of this command.
 
 2. If you are using ingress and are using an ingress controller other than NGINX, modify the
 annotation `nginx.ingress.kubernetes.io/backend-protocol: HTTPS` as needed in
 the `user-values-prom-operator.yaml` file. Refer to the documentation for
 your ingress controller.
-
 
 ### Secrets for In-Cluster TLS
 
