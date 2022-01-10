@@ -159,7 +159,7 @@ these access controls.
 
 Here is the syntax for the script to add a user:
 
-<pre>```
+<pre>
 logging/bin/user.sh CREATE --namespace <i>namespace</i> [--tenant <i>tenant</i>] 
 [--user][<i>user_name</i>] [--password <i>password</i>]
 </pre>
@@ -177,19 +177,9 @@ user.sh script.  For example, to create a user called "chen" and link the user t
 access controls, submit the following command:
 
 <pre>
-logging/bin/user.sh CREATE --user <i>user_name</i> --password <i>password</i> 
---namespace <i>namespace</i> --tenant <i>tenant</i>
+logging/bin/user.sh CREATE --user chen --password chenspassword 
+--namespace mynamespace --tenant mytenant1
 </pre>
-
-Where: 
-
-- *user_name* is "chen".
-- *password* is the password to sign in to Kibana as the user "chen".
-- *namespace* is "mynamespace".
-- *tenant* is "mytenant1".
-
-**Note:** When you specify `_all_` for *namespace* and *tenant*, the user acquires
-the same level of access as a `logadm` user.
 
 ### Deleting a User Account
 
@@ -270,16 +260,10 @@ Linking users to the back-end role V4MCLUSTER_ADMIN_kibana_users via the
 Kibana security plug-in grants those users the access described in the table above.
 
 You can also use the user.sh script to grant a user the same level of access as 
-a `logadm` user. See the following syntax for an example:
+a `logadm` user. For example, to grant the user "chen" this level of  
+access controls, submit the following command:
 
 <pre>
-logging/bin/user.sh CREATE --user <i>user_name</i> --password <i>password</i> 
---namespace <i>namespace</i> --tenant <i>tenant</i>
+logging/bin/user.sh CREATE --user chen --password chenspassword 
+--namespace _all_ --tenant _all_
 </pre>
-
-Where: 
-
-- *user_name* is "chen".
-- *password* is the password to sign in to Kibana as the user "chen".
-- *namespace* is `_all_`.
-- *tenant* is `_all_`.
