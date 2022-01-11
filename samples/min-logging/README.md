@@ -19,7 +19,7 @@ resource usage.
 
 In order to use the values in this sample in the customization files for your
 deployment, copy the customization files from this sample to your local
-customization directory, then modify the files further as needed.
+customization directory and modify the files further as needed.
 
 If you also need to use values from another sample, manually copy the values to
 your customization files after you add the values in this sample.

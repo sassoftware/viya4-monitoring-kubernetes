@@ -21,7 +21,7 @@ guide. Recommended changes include:
 
 - `interval` - Update from `1m` to `30s` (recommended, but not required)
 - `monitor_kubernetes_pods` - Set to `true`.
-- Set `monitor_kubernetes_pods` to `true` to enable Azure Monitor to
+- `monitor_kubernetes_pods` - Set to `true` to enable Azure Monitor to
 auto-discover pods to monitor, based on the standard Prometheus annotations.
 SAS Viya components that expose metrics endpoints should include these
 annotations:
@@ -31,14 +31,14 @@ annotations:
 - `promethues.io/port`- metrics port
 - `promethues.io/scheme`- `http` or `https`
 
-3. After customizing the template, apply it to the cluster using this command:
+3. After customizing the template, apply it to the cluster by using this command:
 
 ```bash
 kubectl apply -f /path/to/container-azm-ms-agentconfig.yaml
 ```
 
-It might take 3-5 minutes for the monitoring agents to restart and for data
-collection to begin.
+**Note:** It might take 3-5 minutes for the monitoring agents to restart and for 
+data collection to begin.
 
 ## Example Queries - Metrics
 
@@ -66,7 +66,7 @@ InsightsMetrics
 | render timechart
 ```
 
-### Show a Metric Across Multiple Services
+### Show a Metric across Multiple Services
 
 ```text
 InsightsMetrics

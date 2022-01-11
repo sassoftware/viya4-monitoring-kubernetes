@@ -1,11 +1,11 @@
-# Using an External Alertmanager
+# Using an External AlertManager
 
-In a typical deployment, each cluster uses a separate instance of Alertmanager.
+In a typical deployment, each cluster uses a separate instance of AlertManager.
 If you have multiple clusters, you might want alerts from all clusters to come
-from a single instance of Alertmanager. You might also have an existing
-instance of Alertmanager and want alerts to come from the existing instance.
+from a single instance of AlertManager. You might also have an existing
+instance of AlertManager and want alerts to come from the existing instance.
 Use this sample to configure monitoring to use an external instance of
-Alertmanager.
+AlertManager.
 
 ## Using This Sample
 
@@ -17,22 +17,22 @@ about the customization process.
 
 The customization files in this sample provide a starting point for the
 customization files for a deployment that supports an external instance of
-Alertmanager.
+AlertManager.
 
 In order to use the values in this sample in the customization files for your
 deployment, copy the customization files from this sample to your local
-customization directory, then modify the files further as needed.
+customization directory and modify the files further as needed.
 
 If you also need to use values from another sample, manually copy the values
 to your customization files after you add the values in this sample.
 
 1. The sample uses the value of `my-external-alertmanager` for the external
-Alertmanager instance. If you use a name other than `my-external-alertmanager`,
+AlertManager instance. If you use a name other than `my-external-alertmanager`,
 change `alertmanager-endpoint.yaml` and
 `$USER_DIR/monitoring/user-values-prom-operator.yaml` to specify the name of
-your Alertmanager instance.
+your AlertManager instance.
 
-2. Define a service that points to the Alertmanager instance that you want to
+2. Define a service that points to the AlertManager instance that you want to
 use.
 
 3. Deploy monitoring using the standard deployment script:
