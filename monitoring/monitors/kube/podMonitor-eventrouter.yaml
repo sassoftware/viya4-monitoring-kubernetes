@@ -9,7 +9,10 @@ spec:
     matchLabels:
       kubernetes.io/name: eventrouter
   namespaceSelector:
-    matchNames: [ "kube-system" ]
+    any: true
+    # Optional: change 'any' to 'false' above to limit namespace(s)
+    # matchNames:
+    # - logging
   podMetricsEndpoints:
   - relabelings:
     - sourceLabels: [__meta_kubernetes_pod_ip]
