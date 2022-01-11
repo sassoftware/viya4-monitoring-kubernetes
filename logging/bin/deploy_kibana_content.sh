@@ -189,9 +189,9 @@ add_notice "**Elasticsearch/Kibana Access Controls**"
 LOGGING_DRIVER=true ./logging/bin/security_create_rbac.sh _all_ _all_
 
 # Create the 'logadm' Kibana user who can access all logs
-log_debug "LOG_CREATE_LOGADM_USER (before): [$LOG_CREATE_LOGADM_USER]"    #REMOVE
+log_info "LOG_CREATE_LOGADM_USER (before): [$LOG_CREATE_LOGADM_USER]"    #REMOVE
 LOG_CREATE_LOGADM_USER=${LOG_CREATE_LOGADM_USER:-false}
-log_debug "LOG_CREATE_LOGADM_USER (after): [$LOG_CREATE_LOGADM_USER]"     #REMOVE
+log_info "LOG_CREATE_LOGADM_USER (after): [$LOG_CREATE_LOGADM_USER]"     #REMOVE
 if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
 
    if user_exists logadm; then
@@ -212,7 +212,7 @@ if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
       LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logadm -p $LOG_LOGADM_PASSWD
    fi
 else
-   log_debug "Skipping creation of 'logadm' user because LOG_CREATE_LOGADM_USER not 'true' [LOG_CREATE_LOGADM_USER]"
+   log_info "Skipping creation of 'logadm' user because LOG_CREATE_LOGADM_USER not 'true' [LOG_CREATE_LOGADM_USER]"  #REMOVE?
 fi
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}
