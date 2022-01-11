@@ -357,8 +357,7 @@ fi
 # hitting https:/host:port -u adminuser:adminpwd --insecure 
 # returns "Open Distro Security not initialized." and 503 when up
 log_verbose "Waiting up to [5] minute to allow Elasticsearch to initialize [$(date)]"
-#sleep 120s
-kubectl -n $LOG_NS wait --for condition=available statefulset/v4m-es-master --timeout=300s
+sleep 120s
 
 set +e
 
