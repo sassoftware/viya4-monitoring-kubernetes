@@ -186,7 +186,7 @@ logging/bin/user.sh CREATE --user chen --password chenspassword
 Here is the syntax for the script to delete a user:
 
 <pre>
-/logging/bin/user.sh DELETE --user <i>user_name</i>
+logging/bin/user.sh DELETE --user <i>user_name</i>
 </pre>
 
 ## Concepts
