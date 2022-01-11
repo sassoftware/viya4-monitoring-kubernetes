@@ -25,8 +25,13 @@ log_debug "Replacing logging namespace for files in [$logDir]"
 
 log_info "Removing Event Router [$(date)]"
 # Remove existing instance of Event Router in the kube-system namespace (if present).
-kubectl delete --ignore-not-found -f logging/eventrouter/eventrouter_kubesystem.yaml
-kubectl delete --ignore-not-found -f $logDir/eventrouter.yaml
+if [[ $V4M_CURRENT_VERSION_FULL =~ 1.0 || $V4M_CURRENT_VERSION_FULL =~ 1.1.[0-2] ]]; then
+   # Remove existing instance of Event Router in the kube-system namespace (if present).
+   log_info "Removing instance of Event Router in the kube-system namespace"
+   kubectl delete --ignore-not-found -f logging/eventrouter/eventrouter_kubesystem.yaml
+else
+  kubectl delete --ignore-not-found -f $logDir/eventrouter.yaml
+fi
 
 log_debug "Script [$this_script] has completed [$(date)]"
 

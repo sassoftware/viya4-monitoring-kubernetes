@@ -195,7 +195,7 @@ data:
        Alias events_renames
        Name  modify
        Match kube.*
-       Condition Key_value_matches  PROPS__appname eventrouter*
+       Condition Key_value_equals  PROPS__appname eventrouter
        set    logsource            KUBE_EVENT
        # Replace eventrouter k8s metadata w/metadata from source object
        Remove_wildcard k8s_

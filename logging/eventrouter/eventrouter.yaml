@@ -1,13 +1,17 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: eventrouter-v4m
+  name: eventrouter
   namespace: "__LOG_NS__"
+  labels:
+    v4m.sas.com/name: viya4-monitoring-kubernetes
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: eventrouter-v4m
+  name: eventrouter
+  labels:
+    v4m.sas.com/name: viya4-monitoring-kubernetes
 rules:
 - apiGroups: [""]
   resources: ["events"]
@@ -16,14 +20,16 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: eventrouter-v4m
+  name: eventrouter
+  labels:
+    v4m.sas.com/name: viya4-monitoring-kubernetes
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: eventrouter-v4m
+  name: eventrouter
 subjects:
 - kind: ServiceAccount
-  name: eventrouter-v4m
+  name: eventrouter
   namespace: "__LOG_NS__"
 ---
 apiVersion: v1
@@ -34,28 +40,32 @@ data:
     }
 kind: ConfigMap
 metadata:
-  name: eventrouter-v4m-cm
+  name: eventrouter-cm
   namespace: "__LOG_NS__"
+  labels:
+    v4m.sas.com/name: viya4-monitoring-kubernetes
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: eventrouter-v4m
+  name: eventrouter
   namespace: "__LOG_NS__"
   labels:
     kubernetes.io/name: eventrouter
-    app: eventrouter-v4m
+    app: eventrouter
+    v4m.sas.com/name: viya4-monitoring-kubernetes
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: eventrouter-v4m
+      app: eventrouter
   template:
     metadata:
       labels:
         kubernetes.io/name: eventrouter
-        app: eventrouter-v4m
+        app: eventrouter
         tier: control-plane-addons
+        v4m.sas.com/name: viya4-monitoring-kubernetes
     spec:
       containers:
         - name: kube-eventrouter
@@ -64,8 +74,8 @@ spec:
           volumeMounts:
           - name: config-volume
             mountPath: /etc/eventrouter
-      serviceAccount: eventrouter-v4m
+      serviceAccount: eventrouter
       volumes:
         - name: config-volume
           configMap:
-            name: eventrouter-v4m-cm
+            name: eventrouter-cm
