@@ -14,7 +14,7 @@ in-cluster and for ingress) will become the default.
 This sample demonstrates how to deploy monitoring and logging components
 configured with ingress instead of node ports. You can choose to use host-based
 or path-based routing. Host-based routing makes the monitoring applications
-(Prometheus, AlertManager, and Grafana) available by using different host names.
+(Prometheus, Alertmanager, and Grafana) available by using different host names.
 Path-based routing allows the use of a common host name with a different path
 per application.
 
@@ -86,7 +86,7 @@ actual environment that you specified.
 
 - Grafana - `http://grafana.host.mycluster.example.com`
 - Prometheus - `http://prometheus.host.mycluster.example.com`
-- AlertManager - `http://alertmanager.host.mycluster.example.com`
+- Alertmanager - `http://alertmanager.host.mycluster.example.com`
 - Kibana - `http://kibana.host.mycluster.example.com`
 
 If you deploy using path-based ingress, the applications are available at the
@@ -95,5 +95,5 @@ actual environment that you specified.
 
 - Grafana - `http://host.mycluster.example.com/grafana`
 - Prometheus - `http://host.mycluster.example.com/prometheus`
-- AlertManager - `http://host.mycluster.example.com/alertmanager`
+- Alertmanager - `http://host.mycluster.example.com/alertmanager`
 - Kibana - `http://host.mycluster.example.com/kibana`
