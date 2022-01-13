@@ -211,7 +211,7 @@
     * TLS is always enabled for both ingress and in-cluster communication
     * OpenShift support is still under development. Usage and features may
       change until the feature set is finalized.
-    * Documentation is available in [Deploying Monitoring on OpenShift](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/monitoring/OpenShift.md)
+    * Documentation is available in [Deploying Monitoring on OpenShift](monitoring/OpenShift.md)
   * [FEATURE] The new `NGINX_DASH` environemnt variable now controls whether
   the NGINX dashboard gets deployed when using `deploy_monitoring_*.sh` or
   `deploy_dashboards.sh`.
@@ -222,7 +222,7 @@
       `logging/bin/deploy_logging_open_openshift.sh`
     * OpenShift support is still under development. Usage and features may
       change until the feature set is finalized.
-    * Documentation is available in [Deploying Log Monitoring on OpenShift](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/OpenShift.md)
+    * Documentation is available in [Deploying Log Monitoring on OpenShift](logging/OpenShift.md)
   * [FEATURE] Container runtimes other than Docker are now supported.
     The container runtime is now determined during script execution and
     will be used to determine the format of container logs.  However,
@@ -249,12 +249,12 @@
   * [FIX] Upgrade-in-place of the Prometheus Pushgateway fails
   * [FIX] CAS dashboard: Uptime widget format changed
   * [FIX] CAS dashboard: Dashboard errors with some CAS configurations
-  * [Instructions are now available](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/monitoring/Troubleshooting.md#issue-manually-deleting-the-monitoring-namespace-does-not-delete-all-components)
+  * [Instructions are now available](monitoring/Troubleshooting.md#issue-manually-deleting-the-monitoring-namespace-does-not-delete-all-components)
   for manual cleanup if the monitoring namespace is deleted instead of running
   the remove_* scripts
 
 * **Logging**
-  * [Instructions are now available](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/Troubleshooting.md#issue-manually-deleting-the-logging-namespace-does-not-delete-all-components)
+  * [Instructions are now available](logging/Troubleshooting.md#issue-manually-deleting-the-logging-namespace-does-not-delete-all-components)
   for manual cleanup if the logging namespace is deleted instead of running
   the remove_* scripts
   * [FIX] The change_internal_password.sh script no longer fails if Helm is not
