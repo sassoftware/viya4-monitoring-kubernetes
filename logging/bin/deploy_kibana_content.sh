@@ -189,7 +189,7 @@ add_notice "**Elasticsearch/Kibana Access Controls**"
 LOGGING_DRIVER=true ./logging/bin/security_create_rbac.sh _all_ _all_
 
 # Create the 'logadm' Kibana user who can access all logs
-LOG_CREATE_LOGADM_USER=${LOG_CREATE_LOGADM_USER:-false}
+LOG_CREATE_LOGADM_USER=${LOG_CREATE_LOGADM_USER:-true}
 if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
 
    if user_exists logadm; then
