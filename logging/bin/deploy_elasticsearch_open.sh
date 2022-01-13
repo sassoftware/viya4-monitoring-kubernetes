@@ -356,7 +356,7 @@ fi
 # TO DO: Convert to curl command to detect ES is up?
 # hitting https:/host:port -u adminuser:adminpwd --insecure 
 # returns "Open Distro Security not initialized." and 503 when up
-log_verbose "Waiting [2] minute to allow Elasticsearch to initialize [$(date)]"
+log_verbose "Waiting [2] minutes to allow Elasticsearch to initialize [$(date)]"
 sleep 120s
 
 set +e

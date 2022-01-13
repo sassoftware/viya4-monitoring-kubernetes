@@ -40,12 +40,14 @@ function stop_es_portforwarding {
    #
    # terminate ES port-forwarding process
    #
-   # Global vars:      espfpid - process id of ES portforwarding
+   # Global vars:      espfpid    - process id of ES portforwarding
+   #                   es_api_url - URL to access ES API/serivce
 
    if [ -n "$espfpid" ]; then
       log_debug "ES PF PID for stopping: $espfpid"
       stop_portforwarding $espfpid
       unset espfpid
+      unset es_api_url
    fi
 }
 
@@ -53,12 +55,14 @@ function stop_kb_portforwarding {
    #
    # terminate KB port-forwarding process
    #
-   # Global vars:      kbpfpid - process id of KB portforwarding
+   # Global vars:      kbpfpid    - process id of KB portforwarding
+   #                   kb_api_url - URL to access KB API/serivce
 
    if [ -n "$kbpfpid" ]; then
       log_debug "KB PF PID for stopping: $kbpfpid"
       stop_portforwarding $kbpfpid
       unset kbpfpid
+      unset kb_api_url
    fi
  }
 

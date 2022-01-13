@@ -197,7 +197,7 @@ if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
    else
       log_debug "Creating the 'logadm' user"
 
-      LOG_LOGADM_PASSWD=${LOG_LOGADM_PASSWD}
+      LOG_LOGADM_PASSWD=${LOG_LOGADM_PASSWD:-$ES_ADMIN_PASSWD}
       if [ -z "$LOG_LOGADM_PASSWD" ]; then
          log_debug "Creating a random password for the 'logadm' user"
          LOG_LOGADM_PASSWD="$(randomPassword)"
@@ -209,6 +209,8 @@ if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
       #create the user
       LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logadm -p $LOG_LOGADM_PASSWD
    fi
+else
+   log_debug "Skipping creation of 'logadm' user because LOG_CREATE_LOGADM_USER not 'true' [$LOG_CREATE_LOGADM_USER]"
 fi
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}
