@@ -1,5 +1,33 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.1.3 (14JAN22)
+
+* **Overall**
+  * [CHANGE] The [ingress sample](samples/ingress) is deprecated in favor of
+    the [TLS sample](samples/tls)
+  * [FIX] The [TLS Sample](samples/tls) is now more consistent across 
+    monitoring/logging and host/path-based ingress
+  * [FIX] The [CloudWatch sample](samples/cloudwatch) has been updated to support
+    IMDSv2, which is used by [viya4-iac-aws](https://github.com/sassoftware/viya4-iac-aws)
+  * [CHANGE] Samples have been reviewed and updated as needed for 
+    consistency and correctness
+
+* **Monitoring**
+  * No changes this release
+
+* **Logging**
+  * [FEATURE] A new Kibana user `logadm` has been created.  This user is intended
+    to be the _primary_ Kibana used for routine day-to-day log monitoring.  See
+    [The logadm User and Its Access Controls](logging/Limiting_Access_to_Logs.md#the-logadm-user-and-its-access-controls).
+  * [CHANGE] Documentation on security and controling access to log messages
+    has been revised extensively.  See [Limiting Access to Logs](logging/Limiting_Access_to_Logs.md)
+  * [CHANGE] The event router component is now deployed to the same namespace
+    as the other log monitoring components instead of to the `kube-system`
+    namespace.  It is also now moved to this namespace during upgrades of
+    existing deployments.
+  * [FIX] Upgrade of an existing deployment using Open Distro for Elasticsearch 1.7.0 to the
+    current release (which uses Open Distro for Elasticsearch 1.13.2) no longer fails.
+
 ## Version 1.1.2 (13DEC21)
 
 * **Overall**
@@ -68,14 +96,13 @@
 * **Logging**
   * [CHANGE] Open Distro for Elasticsearch (i.e. Elasticsearch and Kibana)
     upgraded to version 1.13.2. This includes significant changes to Kibana
-    user-interface, see [Important Information About Kibana in the New Release](https://github.com/sassoftware/viya4-monitoring-kubernetes/tree/master/logging#important-information-about-kibana-in-the-new-release)
+    user-interface, see [Important Information About Kibana in the New Release](logging/README.md#important-information-about-kibana-in-the-new-release)
     for details.
 
   * [FEATURE] A significant number of changes to support application
     multi-tenancy in SAS Viya; including the ability to limit users to log
     messages from a specific Viya deployment and tenant. See
-    [Tenant Logging](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/Tenant_Logging.md)
-    for details.
+    [Tenant Logging](logging/Tenant_Logging.md) for details.
 
 * **Known Issues**
   * On Openshift clusters, upgrading an existing deployment using Open Distro
