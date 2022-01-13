@@ -208,7 +208,8 @@ export -f get_sec_api_url stop_portforwarding get_es_api_url get_kb_api_url stop
 
 
 #initialize "global" vars
-export es_api_url kb_api_url espfpid kbpfpid sec_api_url pfPID
+LOG_ALWAYS_PORT_FORWARD=${LOG_ALWAYS_PORT_FORWARD:-true}
+export es_api_url kb_api_url espfpid kbpfpid sec_api_url pfPID LOG_ALWAYS_PORT_FORWARD
 
 #create a temp file to hold curl response
 if [ -z "$tmpfile" ]; then
