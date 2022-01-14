@@ -21,10 +21,10 @@
     [The logadm User and Its Access Controls](logging/Limiting_Access_to_Logs.md#the-logadm-user-and-its-access-controls).
   * [CHANGE] Documentation on security and controling access to log messages
     has been revised extensively.  See [Limiting Access to Logs](logging/Limiting_Access_to_Logs.md)
-  * [CHANGE] The event router component is now deployed to the same namespace
-    as the other log monitoring components instead of to the `kube-system`
-    namespace.  It is also now moved to this namespace during upgrades of
-    existing deployments.
+  * [CHANGE] The Event Router component is now deployed to the logging ($LOG_NS) namespace
+    instead of to the `kube-system` namespace. During upgrades of existing deployments,
+    Event Router will be removed from the `kube-system` namespace and redeployed in the
+    logging ($LOG_NS) namespace.
   * [FIX] Upgrade of an existing deployment using Open Distro for Elasticsearch 1.7.0 to the
     current release (which uses Open Distro for Elasticsearch 1.13.2) no longer fails.
 
