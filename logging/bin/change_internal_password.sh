@@ -79,7 +79,6 @@ if [ "$USER_NAME" != "logadm" ]; then
 else
   ES_USER=$USER_NAME
   ES_PASSWD="do_not_know_current_password"
-  #TODO: This will generate a WARNING referencing the currently stored password
 fi
 
 get_sec_api_url
