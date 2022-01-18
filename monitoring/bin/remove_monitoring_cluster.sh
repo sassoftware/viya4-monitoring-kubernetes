@@ -23,13 +23,19 @@ helm2ReleaseCheck v4m-$MON_NS
 
 log_notice "Removing components from the [$MON_NS] namespace..."
 
-log_info "Removing the kube-prometheus stack..."
 if helm3ReleaseExists prometheus-operator $MON_NS; then
   promRelease=prometheus-operator
-else
+elif helm3ReleaseExists v4m-prometheus-operator $MON_NS; then  
   promRelease=v4m-prometheus-operator
+else
+  promRelease=
 fi
-helm uninstall --namespace $MON_NS $promRelease
+
+if [ ! -z $promRelease ]; then
+  log_info "Removing the kube-prometheus stack..."
+  helm uninstall --namespace $MON_NS $promRelease
+fi 
+
 if [ $? != 0 ]; then
   log_warn "Uninstall of [$promRelease] was not successful. Check output above for details."
 fi
