@@ -21,13 +21,15 @@ function show_usage {
    log_info  "     USERNAME - REQUIRED; the internal username for which the password is be changed; "
    log_info  "                MUST be one of: admin, kibanaserver, logadm, logcollector or metricgetter"
    log_info  ""
-   log_info  "     PASSWORD - OPTIONAL; the new password.  If not provided, a random 32-character password will be generated"
+   log_info  "     PASSWORD - OPTIONAL; the new password.  If not provided, a random 32-character password will be generated."
+   log_info  "                Note: PASSWORD is REQUIRED when USERNAME is 'logadm'."
    log_info  ""
    echo ""
 }
 
 
 USER_NAME=${1}
+NEW_PASSWD="${2}"
 
 # if no user_name; ERROR and EXIT
 if [ "$USER_NAME" == "" ]; then
@@ -40,6 +42,10 @@ else
    logcollector)
      ;;
    logadm)
+     if [ -z "$NEW_PASSWD" ]; then
+        log_error "No password provided.  A new password is REQUIRED when using this script to change the [logadm] account password"
+        exit 1
+     fi
      ;;
    kibanaserver)
      ;;
@@ -57,7 +63,6 @@ else
   esac
 fi
 
-NEW_PASSWD="${2}"
 
 if [ "$NEW_PASSWD" == "" ]; then
    # generate password if one not provided
