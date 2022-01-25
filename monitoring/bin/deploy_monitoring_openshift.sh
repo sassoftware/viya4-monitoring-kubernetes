@@ -51,6 +51,15 @@ else
   log_warn "Ensure that user workload monitoring is enabled"
 fi
 
+# Elasticsearch Datasource for Grafana
+ELASTICSEARCH_DATASOURCE="${ELASTICSEARCH_DATASOURCE:-false}"
+if [ "$ELASTICSEARCH_DATASOURCE" == "true" ]; then
+  configureElasticsearchDatasource
+else
+  log_debug "ELASTICSEARCH_DATASOURCE not set"
+  log_debug "Skipping creation of Elasticsearch datasource for Grafana"
+fi
+
 log_info "Enabling Grafana to access OpenShift Prometheus instances..."
 if [ -z "$(kubectl get serviceAccount -n $MON_NS grafana-serviceaccount -o name 2>/dev/null)" ]; then
   log_info "Creating Grafana serviceAccount..."
