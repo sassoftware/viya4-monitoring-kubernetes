@@ -68,6 +68,9 @@ the `ES_ADMIN_PASSWD` environment variable), that password is used for the
 generated for these accounts. These random passwords are displayed in the 
 log messages generated during the deployment process.
 
+For more information about user accounts, including how to change passwords, 
+see [Internal Users and Passwords](https://documentation.sas.com/doc/en/sasadmincdc/default/callogging/p0d3645shytio6n1v2swjjd8faac.htm#p1t6bbyvf29tm4n1l47ujibv6r3i). 
+
 ## <a name="manage_access"></a>Manage Access Controls for a Tenant or Namespace
 
 ### Introduction
