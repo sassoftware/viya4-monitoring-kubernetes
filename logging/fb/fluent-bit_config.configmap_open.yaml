@@ -872,6 +872,7 @@ data:
        Exclude_Path     /var/log/containers/v4m-*.log
        Parser           ${KUBERNETES_RUNTIME_LOGFMT}
        Tag              kube.*
+       Multiline.parser    ${MULTILINE_ENABLED}
        Refresh_Interval    5
        Mem_Buf_Limit    5MB
        Skip_Long_Lines  On

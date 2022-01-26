@@ -90,9 +90,17 @@ if [ -f "$USER_DIR/logging/fluent-bit_config.configmap_open.yaml" ]; then
 else
    # use copy in repo
    FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_open.yaml"
+
+   
 fi
 log_debug "Using FB ConfigMap:" $FB_CONFIGMAP
 
+# Multiline parser setup
+if [ "$MULTILINE_ENABLED" == "true" ]; then
+  MULTILINE_ENABLED="docker, crio"
+else
+  MULTILINE_ENABLED=
+fi
 
 # Create ConfigMap containing Fluent Bit configuration
 kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
