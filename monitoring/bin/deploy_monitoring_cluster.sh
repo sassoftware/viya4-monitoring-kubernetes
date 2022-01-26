@@ -65,10 +65,7 @@ fi
 # Elasticsearch Datasource for Grafana
 ELASTICSEARCH_DATASOURCE="${ELASTICSEARCH_DATASOURCE:-false}"
 if [ "$ELASTICSEARCH_DATASOURCE" == "true" ]; then
-  log_verbose "Provisioning Elasticsearch datasource for Grafana"
-  kubectl delete secret -n $MON_NS --ignore-not-found grafana-datasource-es
-  kubectl create secret generic -n $MON_NS grafana-datasource-es --from-file monitoring/grafana-datasource-es.yaml
-  kubectl label secret -n $MON_NS grafana-datasource-es grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
+  configureElasticsearchDatasource
 else
   log_debug "ELASTICSEARCH_DATASOURCE not set"
   log_debug "Skipping creation of Elasticsearch datasource for Grafana"
