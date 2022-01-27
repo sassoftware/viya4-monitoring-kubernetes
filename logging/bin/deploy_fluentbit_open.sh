@@ -96,10 +96,10 @@ fi
 log_debug "Using FB ConfigMap:" $FB_CONFIGMAP
 
 # Multiline parser setup
-if [ "$MULTILINE_ENABLED" == "true" ]; then
-  MULTILINE_ENABLED="docker, crio"
+if [ "$LOG_MULTILINE_ENABLED" == "true" ]; then
+  LOG_MULTILINE_PARSER="docker, crio"
 else
-  MULTILINE_ENABLED=
+  LOG_MULTILINE_PARSER=
 fi
 
 # Create ConfigMap containing Fluent Bit configuration
