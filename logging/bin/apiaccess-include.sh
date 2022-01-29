@@ -164,7 +164,10 @@ function get_kb_api_url {
    fi
 
    pfPID=""
-   get_api_url "v4m-es-kibana-svc" '{.spec.ports[?(@.name=="kibana-svc")].port}' $LOG_KB_TLS_ENABLE v4m-es-kibana-ing
+
+   tlsrequired="$(kubectl -n $LOG_NS get pod -l role=kibana -o=jsonpath='{.items[*].metadata.annotations.tls_required}')"
+
+   get_api_url "v4m-es-kibana-svc" '{.spec.ports[?(@.name=="kibana-svc")].port}' $tlsrequired v4m-es-kibana-ing
    rc=$?
 
    if [ "$rc" == "0" ]; then
