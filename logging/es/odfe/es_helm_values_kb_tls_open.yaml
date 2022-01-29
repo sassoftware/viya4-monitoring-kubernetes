@@ -5,7 +5,7 @@
 
 kibana:
   podAnnotations:
-    tls_required: true
+    tls_required: "true"
   config:
     # Kibana TLS Config
     server.ssl.enabled: true
