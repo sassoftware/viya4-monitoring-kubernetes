@@ -113,7 +113,7 @@ if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
    log_debug "A Helm release [odfe] exists; upgrading the release."
    existingODFE="true"
 
-   #Migrate Kibana content if upgrading from ODFE 1.7.0 to 1.13.2
+   #Migrate Kibana content if upgrading from ODFE 1.7.0 to 1.13.x
    if [ "$(helm -n logging list -o yaml --filter odfe |grep app_version)" == "- app_version: 1.8.0" ]; then
 
       # Prior to 1.1.0 we used ODFE 1.7.0
@@ -141,7 +141,7 @@ if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
          log_debug "Export details: $(tail -n1 $KB_GLOBAL_EXPORT_FILE)"
       fi
 
-      # ODFE 1.13.2 uses a different name for Kibana ingress object,
+      # ODFE 1.13.x uses a different name for Kibana ingress object,
       # Helm update will fail if original ingress resource exists
       kubectl -n $LOG_NS delete ingress v4m-es-kibana --ignore-not-found
 

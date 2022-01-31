@@ -23,7 +23,7 @@ function silly_ors {
    #  and (field = value or field = value2)
    # This is needed to get around a bug
    # which makes the "in" operator NOT
-   # usable in ODFE 1.13.2
+   # usable in ODFE 1.13.x
 
    local value field orstr
    field=$1
@@ -45,7 +45,7 @@ function silly_ands {
    #  and (field != value and field != value2)
    # This is needed to get around a bug
    # which makes the "in" operator NOT
-   # usable in ODFE 1.13.2
+   # usable in ODFE 1.13.x
 
    local value field andstr
    field=$1
