@@ -141,7 +141,7 @@ else
    log_debug "The Kibana tenant space [cluster_admins] exists."
 fi
 
-#Migrating from ODFE 1.7.0 to ODFE 1.13.2 (file should only exist during migration)
+#Migrating from ODFE 1.7.0 to ODFE 1.13.x (file should only exist during migration)
 if [ -f "$KB_GLOBAL_EXPORT_FILE" ]; then
 
    # delete 'demo' Kibana tenant space created (but not used) prior to V4m version 1.1.0
@@ -173,7 +173,7 @@ if [ -f "$KB_GLOBAL_EXPORT_FILE" ]; then
       log_debug "Import details: $(tail -n1 $kb_migrate_response)"
    fi
 else
-   log_debug "Migration from ODFE 1.7.0 to ODFE 1.13.2 *NOT* detected"
+   log_debug "Migration from ODFE 1.7.0 to ODFE 1.13.x *NOT* detected"
 fi
 
 # Import Kibana Searches, Visualizations and Dashboard Objects using curl

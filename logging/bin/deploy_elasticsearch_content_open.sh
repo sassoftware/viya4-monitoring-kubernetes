@@ -105,7 +105,7 @@ function set_retention_period {
    fi
 }
 
-#Patch ODFE 1.7.0 ISM policies to ODFE 1.13.2 format
+#Patch ODFE 1.7.0 ISM policies to ODFE 1.13.x format
 function add_ism_template {
    local policy_name pattern
 
