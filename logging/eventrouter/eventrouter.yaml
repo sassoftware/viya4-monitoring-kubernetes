@@ -1,3 +1,5 @@
+# Default values: https://github.com/heptiolabs/eventrouter/blob/master/yaml/eventrouter.yaml
+
 apiVersion: v1
 kind: ServiceAccount
 metadata:

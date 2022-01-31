@@ -1,3 +1,6 @@
+# Helm Chart: https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-elasticsearch-exporter/Chart.yaml
+# Default values: https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-elasticsearch-exporter/values.yaml
+
 ## number of exporter instances
 ##
 replicaCount: 1
@@ -24,10 +27,10 @@ securityContext:
   enabled: true  # Should be set to false when running on OpenShift
   runAsUser: 1000
 
-resources: {}
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
   # limits:
   #   cpu: 100m
   #   memory: 128Mi

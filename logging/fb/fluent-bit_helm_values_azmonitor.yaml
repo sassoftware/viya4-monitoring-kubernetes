@@ -1,3 +1,6 @@
+# Chart:  https://github.com/fluent/helm-charts/blob/main/charts/fluent-bit/Chart.yaml
+# Default values: https://github.com/fluent/helm-charts/blob/main/charts/fluent-bit/values.yaml
+
 image:
   tag: 1.7.9
 podAnnotations: 
@@ -45,3 +48,11 @@ envFrom:
 # Be very tolerant
 tolerations:
 - operator: "Exists"
+
+resources:
+#   limits:
+#     cpu: 100m
+#     memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
