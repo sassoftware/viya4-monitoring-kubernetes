@@ -6,7 +6,7 @@
     security vulnerability)
 
 ## Version 1.1.3 (14JAN22)
-### **UPDATE: Due to incomplete remediation of the log4j issue, do not use 1.1.3; use a more recent version**
+### **UPDATE: Due to incomplete remediation of the log4j issue, do not use 1.1.3; use a more recent version
 
 * **Overall**
   * [CHANGE] The [ingress sample](samples/ingress) is deprecated in favor of
@@ -35,7 +35,7 @@
     current release (which uses Open Distro for Elasticsearch 1.13.2) no longer fails.
 
 ## Version 1.1.2 (13DEC21)
-### **UPDATE: Due to incomplete remediation of the log4j issue, do not use 1.1.2; use a more recent version**
+### **UPDATE: Due to incomplete remediation of the log4j issue, do not use 1.1.2; use a more recent version
 
 * **Overall**
   * [CHANGE] Samples now use Ingress v1 for Kubernetes 1.22 compatibility
