@@ -263,7 +263,7 @@ Updates in place are supported. To update, re-run the
 
 **Notes:**
 
-* As of release 1.1.0, this project now uses Open Distro for Elasticsearch version 1.13.2, which includes updated versions of Elasticsearch and Kibana.
+* As of release 1.1.0, this project now uses Open Distro for Elasticsearch version 1.13.x, which includes updated versions of Elasticsearch and Kibana.
 * In this release, the multi-tenancy capabilities of Kibana have been enabled. This change requires that users select a Kibana tenant space after logging in. For the new procedure, see [Log Into Kibana](#login_kibana).
 * Kibana no longer provides a persistent navigation bar by default. Instead, a menu button ( ![menu button](../img/kibana_menu.png) ) that opens the navigation menu is now provided. You can choose to make the navigation menu persist on the page by clicking __Dock navigation__.
 
