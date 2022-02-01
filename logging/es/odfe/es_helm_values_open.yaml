@@ -1,5 +1,5 @@
-# Helm Chart: https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-elasticsearch-exporter/Chart.yaml
-# Default values: https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-elasticsearch-exporter/v
+# Helm Chart: https://github.com/opendistro-for-elasticsearch/opendistro-build/blob/main/helm/opendistro-es/Chart.yaml
+# Default values: https://github.com/opendistro-for-elasticsearch/opendistro-build/blob/main/helm/opendistro-es/values.yaml
 
 elasticsearch:
   imageTag: 1.13.2
