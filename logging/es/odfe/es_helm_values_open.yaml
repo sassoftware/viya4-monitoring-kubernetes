@@ -1,3 +1,6 @@
+# Helm Chart: https://github.com/opendistro-for-elasticsearch/opendistro-build/blob/main/helm/opendistro-es/Chart.yaml
+# Default values: https://github.com/opendistro-for-elasticsearch/opendistro-build/blob/main/helm/opendistro-es/values.yaml
+
 elasticsearch:
   imageTag: 1.13.3
 
@@ -123,6 +126,13 @@ elasticsearch:
       enabled: true
       #storageClass: alt-storage
       size: 8Gi
+    resources:
+    #  limits:
+    #    cpu: 1
+    #    memory: 1024Mi
+      requests:
+        cpu: 200m
+        memory: 1024Mi
 
   data:
     enabled: true
@@ -163,6 +173,13 @@ elasticsearch:
       enabled: true
       #storageClass: alt-storage
       size: 30Gi
+    resources:
+    #  limits:
+    #    cpu: 1
+    #    memory: 1024Mi
+      requests:
+        cpu: 200m
+        memory: 1024Mi
 
   client:
     enabled: true
@@ -198,6 +215,15 @@ elasticsearch:
                 - "true"
             topologyKey: kubernetes.io/hostname
           weight: 25
+    resources:
+    #  limits:
+    #    cpu: 1
+    #    memory: 1024Mi
+      requests:
+        cpu: 200m
+        memory: 1024Mi
+
+
 
 kibana:
   # NOTE: ODFE 1.13.3 update incremented
@@ -216,6 +242,13 @@ kibana:
       secretKeyRef:
         name: internal-user-kibanaserver
         key: password
+  resources:
+  #  limits:
+  #    cpu: 2500m
+  #    memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
 
   service:
     type: NodePort
