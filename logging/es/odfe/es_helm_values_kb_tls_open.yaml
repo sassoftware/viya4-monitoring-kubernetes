@@ -4,6 +4,8 @@
 # This chart sets values to: REQUIRE HTTPS TO KIBANA
 
 kibana:
+  podAnnotations:
+    tls_required: "true"
   config:
     # Kibana TLS Config
     server.ssl.enabled: true

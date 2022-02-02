@@ -26,7 +26,7 @@ function stop_portforwarding {
 
    if ps -p "$pid" >/dev/null;  then
       log_debug "Killing port-forwarding process [$pid]."
-      kill -9 $pid 
+      kill -9 $pid
       wait $pid 2>/dev/null  # suppresses message reporting process has been killed
    else
       log_debug "No portforwarding processID found; nothing to terminate."
@@ -164,7 +164,11 @@ function get_kb_api_url {
    fi
 
    pfPID=""
-   get_api_url "v4m-es-kibana-svc" '{.spec.ports[?(@.name=="kibana-svc")].port}' $LOG_KB_TLS_ENABLE v4m-es-kibana-ing
+
+   tlsrequired="$(kubectl -n $LOG_NS get pod -l role=kibana -o=jsonpath='{.items[*].metadata.annotations.tls_required}')"
+   log_debug "TLS required to connect to Kibana? [$tlsrequired]"
+
+   get_api_url "v4m-es-kibana-svc" '{.spec.ports[?(@.name=="kibana-svc")].port}' $tlsrequired v4m-es-kibana-ing
    rc=$?
 
    if [ "$rc" == "0" ]; then
