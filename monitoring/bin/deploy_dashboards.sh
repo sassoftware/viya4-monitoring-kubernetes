@@ -13,6 +13,7 @@ DASH_NS="${DASH_NS:-$MON_NS}"
 WELCOME_DASH="${WELCOME_DASH:-true}"
 KUBE_DASH="${KUBE_DASH:-true}"
 VIYA_DASH="${VIYA_DASH:-true}"
+VIYA_DASH_LOGS="${VIYA_DASH_LOGS:-false}"
 PGMONITOR_DASH="${PGMONITOR_DASH:-$VIYA_DASH}"
 RABBITMQ_DASH="${RABBITMQ_DASH:-$VIYA_DASH}"
 NGINX_DASH="${NGINX_DASH:-true}"
@@ -98,6 +99,11 @@ fi
 if [ "$VIYA_DASH" == "true" ]; then
   log_verbose "Deploying SAS Viya dashboards"
   deploy_dashboards "viya"
+fi
+
+if [ "$VIYA_DASH_LOGS" == "true" ]; then
+  log_verbose "Deploying SAS Viya dashboards with log support"
+  deploy_dashboards "viya-logs"
 fi
 
 if [ "$PGMONITOR_DASH" == "true" ]; then
