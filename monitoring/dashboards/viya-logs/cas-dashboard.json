@@ -822,7 +822,10 @@
   "refresh": "30s",
   "schemaVersion": 31,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "sas-viya",
+    "welcome-viya"
+  ],
   "templating": {
     "list": [
       {
@@ -927,6 +930,6 @@
   },
   "timezone": "",
   "title": "SAS CAS Overview with Logs",
-  "uid": "MRrDtva7k",
+  "uid": "Ofw6e__Wk",
   "version": 2
 }

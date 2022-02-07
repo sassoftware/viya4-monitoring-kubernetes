@@ -3638,7 +3638,10 @@
   "refresh": "30s",
   "schemaVersion": 31,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "sas-viya",
+    "welcome-viya"
+  ],
   "templating": {
     "list": [
       {
@@ -3850,6 +3853,6 @@
   },
   "timezone": "browser",
   "title": "SAS Java Services with Logs",
-  "uid": "QTEX5Da7z",
+  "uid": "Z54Qf1IGk",
   "version": 2
 }
