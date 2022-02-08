@@ -87,6 +87,21 @@ oc login [cluster-hostname] -u [userID]
 monitoring/bin/deploy_monitoring_openshift.sh
 ```
 
+(EXPERIMENTAL) - On Azure Red Hat OpenShift, it is necessary to manually
+enable user workload monitoring. This can be done before or after running
+`monitoring/bin/deploy_monitoring_openshift.sh`.
+
+To enable user workload monitoring, add the following line to the
+`cluster-monitoring-config` configmap in the `openshift-monitoring` namespace
+under `config.yaml`:
+
+```plaintext
+enableUserWorkload: true
+```
+
+Once the configmap is updated, the user workload Prometheus instance will be
+created start monitoring user namespaces, including the SAS Viya namespace(s).
+
 4. Use this command to enable monitoring of each SAS Viya deployment:
 
 ```bash
