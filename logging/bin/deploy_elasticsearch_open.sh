@@ -338,8 +338,8 @@ kubectl -n $LOG_NS wait pods v4m-es-master-0 --for=condition=Ready --timeout=120
 # hitting https:/host:port -u adminuser:adminpwd --insecure 
 # returns "Open Distro Security not initialized." and 503 when up
 
-# log_verbose "Waiting [2] minutes to allow Elasticsearch to initialize [$(date)]"
-# sleep 120s
+ log_verbose "Waiting [2] minutes to allow Elasticsearch to initialize [$(date)]"
+ sleep 120s
 
 set +e
 

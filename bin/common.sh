@@ -24,7 +24,7 @@ function trap_add() {
    done
 }
 function errexit_msg {
-  # log_error "Exiting script due to an error."
+   log_error "Exiting script due to an error."
 }
 
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
