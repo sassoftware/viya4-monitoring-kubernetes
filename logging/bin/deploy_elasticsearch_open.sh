@@ -317,6 +317,10 @@ else
    log_debug "**********************************>Multirole Flag: $ES_MULTIROLE_NODES"
 fi
 
+# wait for pod to come up
+log_verbose "Waiting [90] seconds to allow PVCs for pod [v4m-es-master-0] to be matched with available PVs [$(date)]"
+sleep 90s
+
 # Confirm PVC is "bound" (matched) to PV
 pvc_status=$(kubectl -n $LOG_NS get pvc  data-v4m-es-master-0  -o=jsonpath="{.status.phase}")
 if [ "$pvc_status" != "Bound" ];  then
