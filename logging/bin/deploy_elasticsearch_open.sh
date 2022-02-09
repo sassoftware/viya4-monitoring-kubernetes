@@ -336,7 +336,7 @@ log_info "Checking on status of Elasticsearch pod before configuring [$(date)]"
 podready="FALSE"
 
 log_info "Waiting on Elasticsearch pods to be Ready"
-kubectl -n $LOG_NS wait pods v4m-es-master-0 --for=condition=Ready --timeout=600
+kubectl -n $LOG_NS wait pods v4m-es-master-0 --for=condition=Ready --timeout=10m
 
 # TO DO: Convert to curl command to detect ES is up?
 # hitting https:/host:port -u adminuser:adminpwd --insecure 

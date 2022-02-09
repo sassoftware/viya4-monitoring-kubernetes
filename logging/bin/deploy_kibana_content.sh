@@ -73,7 +73,7 @@ fi
 # and be ready to accept the curl commands below
 # wait up to 10 minutes for pod to show as "running" and "ready"
 log_info "Waiting for Kibana pods to be ready."
-kubectl -n logging wait  pods --selector app=v4m-es,role=kibana --for condition=Ready --timeout=600
+kubectl -n logging wait  pods --selector app=v4m-es,role=kibana --for condition=Ready --timeout=10m
 
 set +e
 get_kb_api_url
