@@ -14,13 +14,14 @@ log_debug "Script [$this_script] has started [$(date)]"
 logDir=$TMP_DIR/$LOG_NS
 mkdir -p $logDir
 cp -R logging/eventrouter/eventrouter.yaml $logDir/eventrouter.yaml
+cp -R logging/node-placement/eventrouter-wnp.yaml $logDir/eventrouter-wnp.yaml
 
 # Replace placeholders
 log_debug "Replacing logging namespace for files in [$logDir]"
   if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-    sed -i '' "s/__LOG_NS__/$LOG_NS/g" $logDir/eventrouter.yaml
+    sed -i '' "s/__LOG_NS__/$LOG_NS/g" $logDir/eventrouter*.yaml
   else
-    sed -i "s/__LOG_NS__/$LOG_NS/g" $logDir/eventrouter.yaml
+    sed -i "s/__LOG_NS__/$LOG_NS/g" $logDir/eventrouter*.yaml
   fi
 
 # Output Kubernetes events as pseudo-log messages?
