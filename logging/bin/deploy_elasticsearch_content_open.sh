@@ -51,7 +51,7 @@ do
 
    if [[ $response != 2* ]]; then
       log_verbose "The Elasticsearch REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
-      sleep ${pause}s
+      sleep ${pause}
    else
       log_debug "The Elasticsearch REST endpoint appears to be ready...continuing"
       esready="TRUE"

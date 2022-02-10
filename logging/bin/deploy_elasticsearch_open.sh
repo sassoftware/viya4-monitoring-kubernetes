@@ -343,7 +343,7 @@ do
       break
    else
       log_verbose "Pod  [v4m-es-master-0] is not ready yet...sleeping for [$pause] more seconds before checking again."
-      sleep ${pause}s
+      sleep ${pause}
    fi
 done
 
