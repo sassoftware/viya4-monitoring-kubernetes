@@ -84,7 +84,7 @@ do
       break
    else
       log_verbose "The Kibana pod is not ready yet...sleeping for [$pause] more seconds before checking again."
-      sleep ${pause}s
+      sleep ${pause}
    fi
 done
 
@@ -107,7 +107,7 @@ do
    rc=$?
    if [[ $response != 2* ]]; then
       log_debug "The Kibana REST endpoint does not appear to be quite ready [$response/$rc]; sleeping for [$pause] more seconds before checking again."
-      sleep ${pause}s
+      sleep ${pause}
    else
       log_verbose "The Kibana REST endpoint appears to be ready...continuing"
       kibanaready="TRUE"

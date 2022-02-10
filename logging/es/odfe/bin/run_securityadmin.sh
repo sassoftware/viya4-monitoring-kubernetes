@@ -21,7 +21,7 @@ counter=0
 
 while [ $rc != 0 ] && [ $counter -lt 3 ]; do
   echo "Looping: $counter $(date)"
-  if [ $rc -gt 0 ]; then sleep 30s; fi
+  if [ $rc -gt 0 ]; then sleep 30; fi
   $ES_PLUGINS_DIR/opendistro_security/tools/securityadmin.sh -cd "$ES_PLUGINS_DIR/opendistro_security/securityconfig" -icl -key "$ES_CONF_DIR/admin-key.pem" -cert "$ES_CONF_DIR/admin-crt.pem" -cacert "$ES_CONF_DIR/admin-root-ca.pem" -nhnv -rev >> $logfile
   rc=$?
   echo "RC: $rc"

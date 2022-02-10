@@ -97,7 +97,7 @@ function get_api_url {
       log_debug "pfPID: $pfPID"
 
       # pause to allow port-forwarding messages to appear
-      sleep 5s
+      sleep 5
 
       # determine which port port-forwarding is using
       pfRegex='Forwarding from .+:([0-9]+)'
