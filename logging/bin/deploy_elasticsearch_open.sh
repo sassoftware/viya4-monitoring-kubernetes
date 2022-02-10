@@ -289,7 +289,7 @@ ES_MULTIROLE_NODES=${ES_MULTIROLE_NODES:-false}
 # switch to multi-role ES nodes (if enabled)
 if [ "$ES_MULTIROLE_NODES" == "true" ]; then
 
-   sleep 10s
+   sleep 10
    log_debug "Configuring Elasticsearch to use multi-role nodes"
 
    # Reconfigure 'master' nodes to be 'multi-role' nodes (i.e. support master, data and client roles)
@@ -319,7 +319,7 @@ fi
 
 # wait for pod to come up
 log_verbose "Waiting [90] seconds to allow PVCs for pod [v4m-es-master-0] to be matched with available PVs [$(date)]"
-sleep 90s
+sleep 90
 
 # Confirm PVC is "bound" (matched) to PV
 pvc_status=$(kubectl -n $LOG_NS get pvc  data-v4m-es-master-0  -o=jsonpath="{.status.phase}")
@@ -357,7 +357,7 @@ fi
 # hitting https:/host:port -u adminuser:adminpwd --insecure 
 # returns "Open Distro Security not initialized." and 503 when up
 log_verbose "Waiting [2] minutes to allow Elasticsearch to initialize [$(date)]"
-sleep 120s
+sleep 120
 
 set +e
 
