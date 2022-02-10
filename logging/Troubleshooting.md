@@ -148,63 +148,9 @@ Longer retention periods require more storage.
 
 ### Solution
 
-**Note:** Some Kubernetes storageClass resources do not support expansion. To 
-determine whether the storageClass resources used by the Elasticsearch data node 
-PVCs support expansion, enter the following command: 
+For information about increasing storage, see 
+[Increasing the Storage for the Elasticsearch Data Nodes](Log_Retention.md#Increasing-the-Storage-for-the-Elasticsearch-Data-Nodes) in Log Message 
+Retention.
 
-`kubectl describe storageClass default` 
-
-* Where ***storageClass*** is the name of your specific storageClass.
-* Where ***default*** is the name of the storageClass that is used for the PVCs 
-that you are checking.  
-  
-If the `AllowVolumeExpansion` property is `True`, the expansion of existing PVCs 
-is supported and the following procedure should work.
-
-To increase storage, complete the following steps:
-
-1. Scale down the statefulSet that controls the Elasticsearch data nodes by 
-entering the following command:
-   
-    `kubectl -n logging scale statefulset v4m-es-data --replicas=0`
-
-   * Where ***logging*** is the namespace into which the log-monitoring 
-   components have been deployed in your installation.
-   * This command terminates the existing v4m-es-data-* pods.
-   * In some cases, it might be necessary to wait a few minutes until the 
-   PVCs are detached from the underlying Kubernetes nodes.  Be patient. 
-   Resizing the PVC fails if the PVCs are still attached.
-
-2. Resize the existing PVCs by entering the following command (all on one line):
-   
-   `kubectl -n logging patch pvc data_node -p '{"spec":{"resources":{"requests":{"storage":"xxGi"}}}}'`
-   * Where ***logging*** is the namespace into which the log-monitoring 
-   components have been deployed in your installation.
-   * Where ***data_node*** is the Elasticsearch data node (pod) to resize 
-   (for example, data-v4m-es-data-0).
-   * Where ***nnGi*** is the amount (for example, 70Gi) to increase the PVC 
-   storage.
-   * Repeat this command for each of the three Elasticsearch data nodes (that 
-   is, data-v4m-es-data-0, data-v4m-es-data-1, and data-v4m-es-data-2).
-
-3. Scale up the statefulSet that controls the Elasticsearch data nodes by 
-entering the following command:
-  
-    `kubectl -n logging scale statefulset v4m-es-data --replicas=3`
-   * Where ***logging*** is the namespace into which the log-monitoring 
-   components have been deployed in your installation.
-   * This command results in the creation of three new v4m-es-data-* pods that 
-   are linked to the existing (but now larger) PVCs.
-
-If you are maintaining customized configuration information (that is, using the 
-USER_DIR functionality), consider updating the contents of the 
-`logging/user-values-elasticsearch.yaml` file to reflect the larger PVC size. Doing 
-so ensures that your updated configuration is re-created if you redeploy 
-the log-monitoring components. 
-
-**Note:** This procedure adjusts only the size of the existing PVCs and does not 
-change the PVC specification included in the statefulSet definition.  If you 
-scale up the statefulSet to increase the number of Elasticsearch data nodes beyond 
-the existing three pods, the new pods are linked to PVCs using the original 
-size. At that point, you must repeat this procedure to increase the size of the 
-PVCs linked to the new pod.
+To understand how to increase storage and increase the log-retention period, 
+see [Log Message Retention](Log_Retention.md).

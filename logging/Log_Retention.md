@@ -30,14 +30,14 @@ policies:
   * Default retention period: 3 days 
   * To change the retention period for these messages prior to the initial 
   deployment of the log-monitoring components, modify the `LOG_RETENTION_PERIOD` 
-  environment variable.  After initial deployment, see [Adjusting the Retention Policy](#Adjusting-the-Retention-Policy). 
+  environment variable.  To change the retention period after initial deployment, see [Adjusting the Retention Policy](#Adjusting-the-Retention-Policy). 
 
 * Internal monitoring components (that is, Grafana, Elasticsearch, and so on)
   * Policy name: viya_ops_idxmgmt_policy
   * Default retention period: 1 day 
   * To change the retention period for these messages prior to the initial deployment 
   of the log-monitoring components, modify the `OPS_LOG_RETENTION_PERIOD` environment 
-  variable. After initial deployment, see 
+  variable. To change the retention period after initial deployment, see 
   [Adjusting the Retention Policy](#Adjusting-the-Retention-Policy). 
 
  If you are deploying on OpenShift, a third policy is added to manage log messages 
@@ -47,24 +47,12 @@ policies:
 * Default retention period: 1 day
 * To change the retention period for OpenShift infrastructure 
  messages prior to the initial deployment of the log-monitoring components, 
- modify the `INFRA_LOG_RETENTION_PERIOD` environment variable.  After initial 
+ modify the `INFRA_LOG_RETENTION_PERIOD` environment variable.  To change the retention period after initial 
  deployment, see [Adjusting the Retention Policy](#Adjusting-the-Retention-Policy).
 
 You can modify these policies or create your own. For information about index 
 management, see [Index State Management](https://opendistro.github.io/for-elasticsearch-docs/docs/ism/) 
 in the Open Distro for Elasticsearch documentation.
-
-## Important Considerations
-
->**IMPORTANT**: Elasticsearch performance tuning is very complicated. It is 
-very dependent on unique use patterns and activity. To ensure the best performance 
-in your specific environment, you might need to make other configuration changes 
-after changing the log-retention period. Such changes can include adjusting one 
-or more of the following:
-
-* the Java memory settings of the Elasticsearch nodes
-* the number of Elasticsearch nodes 
-* the specific mix of Elasticsearch node types
 
 >**IMPORTANT**: It is important to remember that SAS® Viya® Monitoring for 
 Kubernetes is focused on operational monitoring. That is, helping administrators 
@@ -79,7 +67,7 @@ support longer time frames. However, doing so would involve developing more
 complex index management policies and storage configurations.  Refer to the 
 Open Distro for Elasticsearch documentation for more information.
 
-## Estimating Potential Storage Requirements
+## Increasing Storage
 
 ### About Retention and Storage
 
@@ -98,21 +86,20 @@ can impact the required storage.  However, you can determine how much space
 currently is being consumed by the Elasticsearch indexes (the storage structures 
 used by Elasticsearch). Using that information, you can estimate a size increase.  
  
- To see the amount of storage consumed by each Elasticsearch index, complete the 
- following steps in Kibana:
+To see the amount of storage consumed by each Elasticsearch index, complete the 
+following steps in Kibana:
 
 1. From the main menu, navigate to the **Index Management** window.
 2. Select **Indices** from the menu on the left side.
-   A list of all of the indexes currently stored in Elasticsearch is displayed. The 
-   list might be multiple pages.  
+   A list of all of the indexes currently stored in Elasticsearch is displayed. The list might be multiple pages.  
 3. Adjust the number of indexes shown per page by using the control at the 
 bottom of the table. 
 4. In the **Search** field above the list of indexes, enter the filter criteria 
 to view all of the indexes that were created for one day. For example, enter 
 *2022\*01\*10* to view indexes created on January 10, 2022.
 5. For each index, the **Total Size** column shows the amount of storage 
-consumed by the index. Add  the values in the **Total Size** columns for 
-one day. The sum is the storage required for a day's worth of log messages.
+consumed by the index. Add the values in the **Total Size** columns for 
+one day. The sum is the storage required for that day's worth of log messages.
  
 **Note:** The volume of log messages varies day-by-day based on use. Calculate 
 the amount of storage consumed for a few days before making any assumptions.  
@@ -123,15 +110,17 @@ the amount of storage consumed for a few days before making any assumptions.
   cluster. The sums for your cluster can be different and potentially 
   significantly different.  
 
- [Figure 3](../image/Kibana_IM_IndexSizeOneDay.png) 
- shows the indexes for a single day (January 24, 2022) on a cluster.  The 
- filter criteria (2022\*01\*24) limits the list to that day. The sum of 
- the **Total Size** columns shows that about 28 GB of log messages were 
- collected on that day. Performing the same exercise for other days shows 
- comparable sums. To store 5 days of logs, you  need at least 140 GB (5 days 
- x 28 GB per day) of storage. Then, increasing the estimate by 50 or 100 
- percent is not unreasonable. The extra margin can allow for logging due 
- to increased user activity or problems.
+The "Indices" window shows the indexes for a single day (January 24, 2022) on a cluster. 
+
+![The "Indices" window](../img/Kibana_IM_IndexSizeOneDay.png)
+ 
+The filter criteria (2022\*01\*24) limits the list to that day. The sum of 
+the **Total Size** columns shows that about 28 GB of log messages were 
+collected on that day. Performing the same exercise for other days shows 
+comparable sums. To store 5 days of logs, you need at least 140 GB (5 days 
+x 28 GB per day) of storage. Then, increasing the estimate by 50 or 100 
+percent is not unreasonable. The extra margin can allow for logging due 
+to increased user activity or problems.
  
 The current default configuration creates three Elasticsearch data nodes 
 (that is, the pods responsible for storing the Elasticsearch indexes) and 
@@ -141,7 +130,7 @@ log-retention period to 3 days.  Although this default configuration
 might work for the sample cluster, it will not work when expanding the 
 log-retention period to 5 days.  And, even if the current retention 
 period is unchanged, there is no extra margin. Any increase in logging 
-levels might fill up the  available space.  
+levels might fill up the available space.  
 
 ### Consequences of Failing to Increase Storage
 
@@ -151,8 +140,77 @@ When all available space has been consumed, the Elasticsearch cluster fails:
 * The housekeeping process that purges old log messages does not run.
 * The cluster becomes unusable.
 
-To adjust the storage used by the Elasticsearch data nodes, see 
-[Log Messages Require More Storage](Troubleshooting.md#Issue:-Log-Messages-Require-More-Storage).
+### Increasing the Storage for the Elasticsearch Data Nodes
+
+Use the following information to increase the storage for the existing 
+Elasticsearch data nodes.
+
+#### Verify Support for Expansion
+
+Some Kubernetes storageClass resources do not support expansion. To 
+determine whether the storageClass resources used by the Elasticsearch data node 
+PVCs support expansion, enter the following command: 
+
+`kubectl describe storageClass default` 
+
+* Where ***storageClass*** is the name of your specific storageClass.
+* Where ***default*** is the name of the storageClass that is used for the PVCs 
+that you are checking.  
+  
+Review the command output. If the `AllowVolumeExpansion` property is `True`, the 
+expansion of existing PVCs is supported and the following procedure should work.
+
+#### Increase the Storage
+
+To increase storage, complete the following steps:
+
+1. Scale down the statefulSet that controls the Elasticsearch data nodes by 
+entering the following command:
+   
+    `kubectl -n logging scale statefulset v4m-es-data --replicas=0`
+
+   * Where ***logging*** is the namespace into which the log-monitoring 
+   components have been deployed in your installation.
+   * This command terminates the existing "v4m-es-data-*" pods.
+   * In some cases, it might be necessary to wait a few minutes until the 
+   PVCs are detached from the underlying Kubernetes nodes.  Be patient. 
+   Resizing the PVC fails if the PVCs are still attached.
+
+2. Resize the existing PVCs by entering the following command (all on one line):
+   
+   `kubectl -n logging patch pvc data_node -p '{"spec":{"resources":{"requests":{"storage":"nnGi"}}}}'`
+   * Where ***logging*** is the namespace into which the log-monitoring 
+   components have been deployed in your installation.
+   * Where ***data_node*** is the Elasticsearch data node (pod) to resize 
+   (for example, `data-v4m-es-data-0`).
+   * Where ***nnGi*** is the amount (for example, 70Gi) to increase the PVC 
+   storage.
+   * Repeat this command for each of the three Elasticsearch data nodes (that 
+   is, `data-v4m-es-data-0`, `data-v4m-es-data-1`, and `data-v4m-es-data-2`).
+
+3. Scale up the statefulSet that controls the Elasticsearch data nodes by 
+entering the following command:
+  
+    `kubectl -n logging scale statefulset v4m-es-data --replicas=3`
+   * Where ***logging*** is the namespace into which the log-monitoring 
+   components have been deployed in your installation.
+   * This command results in the creation of three new "v4m-es-data-*" pods that 
+   are linked to the existing (but now larger) PVCs.
+
+If you are maintaining customized configuration information (that is, using the 
+USER_DIR functionality), consider updating the contents of the 
+`logging/user-values-elasticsearch.yaml` file to reflect the larger PVC size. Doing 
+so ensures that your updated configuration is re-created if you redeploy 
+the log-monitoring components. For information about the USER_DIR feature, see 
+[Customize the Deployment](README.md#customize-the-deployment) in the README 
+for Logging.
+
+**Note:** This procedure adjusts only the size of the existing PVCs and does not 
+change the PVC specification included in the statefulSet definition.  If you 
+scale up the statefulSet to increase the number of Elasticsearch data nodes beyond 
+the existing three pods, the new pods are linked to PVCs using the original 
+size. At that point, you must repeat this procedure to increase the size of the 
+PVCs linked to the new pod.
 
 ## Adjusting the Retention Policy
 
@@ -164,7 +222,7 @@ indexes that already exist.
 * Newly created indexes use the updated retention policy. 
 * Existing indexes continue to be retained for 3 days.  
  
-If you want the updated policy to apply to existing indexes, you can apply the 
+If you want the updated policy to apply to existing indexes, you must apply the 
 updated policy to those existing indexes as well.
 
 ### Considerations
@@ -182,14 +240,11 @@ steps:
  1. Select **Index Management** from the main menu (that is, the menu that includes 
  **Discover** and  **Dashboard**).
  2. Select the policy that you want to edit.
- 3. Click **Edit**.
- 4. Locate the **min_index_age** value in the 
- **policy/states/name:"hot"/transitions/state_name: "doomed"/conditions** 
- section. 
+ 3. Click **Edit**. The "Edit policy" window appears. 
+ ![The "Edit policy" window](../img/Kibana_IM_EditPolicy_with_notice.png)
+ 4. In the **Define policy** pane, locate the **min_index_age** value. 
  5. Change the existing value of "3d" to the new value.
  6. Click **Update**. The updated policy is used for any newly created indexes.
-
-[Figure 1: The Edit Policy Screen] (../img/Kibana_IM_EditPolicy_with_notice.png)
 
 ### Apply an Updated Policy to an Existing Index
 
@@ -201,14 +256,15 @@ complete the following steps:
 includes **Discover** and  **Dashboard**).
 2. Select **Managed Indices** from the subsequent main menu.
 3. Click **Change Policy**. It is located in the upper-right area of the 
-window.
-4. In the **Choose managed indices** list box, enter: "*viya_logs-*" 
+window. The "Change policy" window appears. 
+    ![The "Change policy" window](../img/Kibana_IM_ChangePolicy.png)
+1. In the **Managed indices** list box, enter: *`viya_logs-`* 
    
-   **Tip:** The interface might suggest "**viya_logs-\***". Accept the suggestion 
+   **Tip:** The interface might suggest **viya_logs-\***. Accept the suggestion 
    by pressing the **Enter** key.
 
-5. Select **viya_logs_idxmgmt_policy** from the **New Policy** list.
-6. Make sure the **Keep indices in their current state after the policy takes effect** 
+2. Select **viya_logs_idxmgmt_policy** from the **New policy** list box.
+3. Make sure the **Keep indices in their current state after the policy takes effect** 
 option is selected.
 7. Click **Change**.
 
@@ -217,4 +273,14 @@ option is selected.
     changes might take a couple of hours to take effect and be reflected in 
     Kibana.
 
-[Figure 2: The Change Policy Screen] (../img/Kibana_IM_ChangePolicy.png)
+## Important Considerations
+
+Elasticsearch performance tuning is very complicated. It is 
+very dependent on unique use patterns and activity. To ensure the best performance 
+in your specific environment, you might need to make other configuration changes 
+after changing the log-retention period. Such changes can include adjusting one 
+or more of the following:
+
+* the Java memory settings of the Elasticsearch nodes
+* the number of Elasticsearch nodes 
+* the specific mix of Elasticsearch node types
