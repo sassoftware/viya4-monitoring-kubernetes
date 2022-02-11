@@ -331,15 +331,44 @@ if [ "$pvc_status" != "Bound" ];  then
 fi
 log_verbose "The PVC [data-v4m-es-master-0] have been bound to PVs"
 
+<<<<<<< HEAD
 log_info "Waiting on Elasticsearch pods to be Ready"
 kubectl -n $LOG_NS wait pods v4m-es-master-0 --for=condition=Ready --timeout=10m
+=======
+# Need to wait 2-3 minutes for the elasticsearch to come up and running
+log_info "Checking on status of Elasticsearch pod before configuring [$(date)]"
+podready="FALSE"
+
+for pause in 40 30 20 15 10 10 10 15 15 15 30 30 30 30
+do
+   if [[ "$( kubectl -n $LOG_NS get pod v4m-es-master-0 -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}')" == *"True"* ]]; then
+      log_verbose "Pod [v4m-es-master-0] is ready...continuing."
+      podready="TRUE"
+      break
+   else
+      log_verbose "Pod  [v4m-es-master-0] is not ready yet...sleeping for [$pause] more seconds before checking again."
+      sleep ${pause}
+   fi
+done
+
+if [ "$podready" != "TRUE" ]; then
+   log_error "The Elasticsearch pod [v4m-es-master-0] has NOT reached [Ready] status in the expected time; exiting."
+   log_error "Review pod's events and log to identify the issue and resolve it; run the remove_logging.sh script and try again."
+   exit 1
+fi
+>>>>>>> 358a3915dd1035c0cf040cde385b9e85904570c3
 
 # TO DO: Convert to curl command to detect ES is up?
 # hitting https:/host:port -u adminuser:adminpwd --insecure 
 # returns "Open Distro Security not initialized." and 503 when up
+<<<<<<< HEAD
 
  log_verbose "Waiting [2] minutes to allow Elasticsearch to initialize [$(date)]"
  sleep 120
+=======
+log_verbose "Waiting [2] minutes to allow Elasticsearch to initialize [$(date)]"
+sleep 120
+>>>>>>> 358a3915dd1035c0cf040cde385b9e85904570c3
 
 set +e
 

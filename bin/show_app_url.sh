@@ -35,7 +35,8 @@ do
         namespace=${LOG_NS:-"logging"}
         servicename="v4m-es-kibana-svc"
         ingressname="v4m-es-kibana-ing"
-        tls_flag="$LOG_KB_TLS_ENABLE"
+        tls_flag="$(kubectl -n $namespace get pod -l role=kibana -o=jsonpath='{.items[*].metadata.annotations.tls_required}')"
+        log_debug "TLS required to connect to Kibana? [$tls_flag]"
         ;;
      ELASTICSEARCH)
         namespace=${LOG_NS:-"logging"}

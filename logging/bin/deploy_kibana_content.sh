@@ -68,13 +68,69 @@ else
   log_debug "Kibana service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
 fi
 
+<<<<<<< HEAD
 # wait up to 10 minutes for pod to show as "running" and "ready"
 log_info "Waiting for Kibana pods to be ready."
 kubectl -n logging wait pods --selector app=v4m-es,role=kibana --for condition=Ready --timeout=10m
+=======
+
+# Need to wait 2-3 minutes for kibana to come up and
+# and be ready to accept the curl commands below
+# wait for pod to show as "running" and "ready"
+
+log_debug "Checking status of Kibana pod"
+podready="FALSE"
+
+for pause in 40 30 20 15 10 10 10 15 15 15 30 30 30 30
+do
+   if [[ "$( kubectl -n $LOG_NS get pod -l 'role=kibana' -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}')" == *"True"* ]]; then
+      log_verbose "The Kibana pod is ready...continuing"
+      podready="TRUE"
+      break
+   else
+      log_verbose "The Kibana pod is not ready yet...sleeping for [$pause] more seconds before checking again."
+      sleep ${pause}
+   fi
+done
+
+if [ "$podready" != "TRUE" ]; then
+   log_error "The Kibana pod has NOT reached [Ready] status in the expected time; exiting."
+   log_error "Review the Kibana pod's events and log to identify the issue and resolve it; run the remove_logging.sh script and try again."
+   kill -9 $pfPID
+   exit 1
+fi
+>>>>>>> 358a3915dd1035c0cf040cde385b9e85904570c3
 
 set +e
 get_kb_api_url
 
+<<<<<<< HEAD
+=======
+# Confirm Kibana is ready
+for pause in 30 30 30 30 30 30
+do
+   response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "${kb_api_url}/api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
+   # returns 503 (and outputs "Kibana server is not ready yet") when Kibana isn't ready yet
+   # TO DO: check for 503 specifically?
+   rc=$?
+   if [[ $response != 2* ]]; then
+      log_debug "The Kibana REST endpoint does not appear to be quite ready [$response/$rc]; sleeping for [$pause] more seconds before checking again."
+      sleep ${pause}
+   else
+      log_verbose "The Kibana REST endpoint appears to be ready...continuing"
+      kibanaready="TRUE"
+      break
+   fi
+done
+set -e
+
+if [ "$kibanaready" != "TRUE" ]; then
+   log_error "The Kibana REST endpoint has NOT become accessible in the expected time; exiting."
+   log_error "Review the Kibana pod's events and log to identify the issue and resolve it before trying again."
+   exit 1
+fi
+
+>>>>>>> 358a3915dd1035c0cf040cde385b9e85904570c3
 set +e  # disable exit on error
 
 # get Security API URL
