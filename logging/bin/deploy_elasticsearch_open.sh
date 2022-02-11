@@ -289,7 +289,7 @@ ES_MULTIROLE_NODES=${ES_MULTIROLE_NODES:-false}
 # switch to multi-role ES nodes (if enabled)
 if [ "$ES_MULTIROLE_NODES" == "true" ]; then
 
-   sleep 10s
+   sleep 10
    log_debug "Configuring Elasticsearch to use multi-role nodes"
 
    # Reconfigure 'master' nodes to be 'multi-role' nodes (i.e. support master, data and client roles)
@@ -319,7 +319,7 @@ fi
 
 # wait for pod to come up
 log_verbose "Waiting [90] seconds to allow PVCs for pod [v4m-es-master-0] to be matched with available PVs [$(date)]"
-sleep 90s
+sleep 90
 
 # Confirm PVC is "bound" (matched) to PV
 pvc_status=$(kubectl -n $LOG_NS get pvc  data-v4m-es-master-0  -o=jsonpath="{.status.phase}")
@@ -331,10 +331,6 @@ if [ "$pvc_status" != "Bound" ];  then
 fi
 log_verbose "The PVC [data-v4m-es-master-0] have been bound to PVs"
 
-# Need to wait 2-3 minutes for the elasticsearch to come up and running
-log_info "Checking on status of Elasticsearch pod before configuring [$(date)]"
-podready="FALSE"
-
 log_info "Waiting on Elasticsearch pods to be Ready"
 kubectl -n $LOG_NS wait pods v4m-es-master-0 --for=condition=Ready --timeout=10m
 
@@ -343,7 +339,7 @@ kubectl -n $LOG_NS wait pods v4m-es-master-0 --for=condition=Ready --timeout=10m
 # returns "Open Distro Security not initialized." and 503 when up
 
  log_verbose "Waiting [2] minutes to allow Elasticsearch to initialize [$(date)]"
- sleep 120s
+ sleep 120
 
 set +e
 
