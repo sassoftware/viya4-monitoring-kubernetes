@@ -331,7 +331,7 @@ if [ "$pvc_status" != "Bound" ];  then
 fi
 log_verbose "The PVC [data-v4m-es-master-0] have been bound to PVs"
 
-log_info "Waiting on Elasticsearch pods to be Ready"
+log_info "Waiting on Elasticsearch pods to be Ready ($(date) - timeout 10m)"
 kubectl -n $LOG_NS wait pods v4m-es-master-0 --for=condition=Ready --timeout=10m
 
 # TO DO: Convert to curl command to detect ES is up?
