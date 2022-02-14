@@ -90,6 +90,14 @@ else
    log_debug "No existing release of the deprecated stable/fluent-bit Helm chart was found"
 fi
 
+# Multiline parser setup
+LOG_MULTILINE_ENABLED=${LOG_MULTILINE_ENABLED}
+if [ "$LOG_MULTILINE_ENABLED" == "true" ]; then
+  LOG_MULTILINE_PARSER="docker, cri"
+else
+  LOG_MULTILINE_PARSER=""
+fi
+
 # Create ConfigMap containing Fluent Bit configuration
 kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 
