@@ -27,3 +27,6 @@ while [ $rc != 0 ] && [ $counter -lt 3 ]; do
   echo "RC: $rc"
   ((counter++))
 done
+
+echo "Exit message: $rc"
+exit $rc
