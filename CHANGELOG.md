@@ -2,9 +2,6 @@
 
 ## Version 1.1.5 (15FEB22)
 
-* **Overall**
-  * [FIX] Several spurious error messages have been suppressed
-
 * **Monitoring**
   * [CHANGE] - The SAS Viya Welcome dashboard has been updated with a
     cleaner design and an improved layout
@@ -21,17 +18,17 @@
 * **Logging**
   * [FEATURE] - Enhanced multi-line support is now enabled by default in
     Fluent Bit
+  * [FEATURE] - `logging/bin/change_internal_password.sh` now supports the
+    recently added `logadm` user
+  * [CHANGE] - Event router is now deployed to the `logging` namespace instead
+    of the `kube-system` namespace
+  * [CHANGE] - The deprecated `KB_TLS_ENABLE` flag has been removed. Kibana TLS
+    is now controlled via the normal `TLS_ENABLE` and `LOG_TLS_ENABLE` flags
   * [FIX] - Several status check  in scripts have been simplified to use
     `kubectl wait`
   * [FIX] - All logging components now specify Kubernetes resource requests
-  * [CHANGE] - Event router is now deployed to the `logging` namespace instead
-    of the `kube-system` namespace
-  * [DOC] - Documentation on log retention has been reviewed and re-worked to
-    be more clear and correct
-  * [CHANGE] - The deprecated `KB_TLS_ENABLE` flag has been removed. Kibana TLS
-    is now set via the normal `TLS_ENABLE` and `LOG_TLS_ENABLE` flags
-  * [FEATURE] - `logging/bin/change_internal_password.sh` now supports the
-    recently added `logadm` user
+  * [DOC] - The [documentation on how to adjust log retention](logging/LogRetention.md)
+    has been revised to improve clarity and correct errors.  Fixes #261.
 
 ## Version 1.1.4 (31JAN22)
 
