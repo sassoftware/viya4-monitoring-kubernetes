@@ -76,16 +76,6 @@ kubectl -n logging wait pods --selector app=v4m-es,role=kibana --for condition=R
 set +e
 get_kb_api_url
 
-set -e
-
-if [ "$kibanaready" != "TRUE" ]; then
-   log_error "The Kibana REST endpoint has NOT become accessible in the expected time; exiting."
-   log_error "Review the Kibana pod's events and log to identify the issue and resolve it before trying again."
-   exit 1
-fi
-
-set +e  # disable exit on error
-
 # get Security API URL
 get_sec_api_url
 
