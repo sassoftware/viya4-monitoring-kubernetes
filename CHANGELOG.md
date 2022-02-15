@@ -1,11 +1,45 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Version 1.1.4 (31JAN22)
+## Version 1.1.5 (15FEB22)
+
+* **Monitoring**
+  * [CHANGE] - The SAS Viya Welcome dashboard has been updated with a
+    cleaner design and an improved layout
+  * [EXPERIMENTAL] - Setting `ELASTICSEARCH_DATASOURCE=true` when running
+    `monitoring/bin/deploy_monitoring_cluster.sh`  will configure an
+    Elasicsearch data source for Grafana that enables viewing and querying of
+    logs from Grafana dashboards. Logging must already be deployed for this
+    to function properly.
+  * [EXPERIMENTAL] - Enhanced dashboards for SAS Go services, SAS Java
+    services, and CAS support viewing logs in Grafana. Setting
+    `ELASTICSEARCH_DATASOURCE=true` or `VIYA_LOGS_DASH=true` will deploy
+    the updated dashboards to replace the prior versions.
+
 * **Logging**
+  * [FEATURE] - Enhanced multi-line support is now enabled by default in
+    Fluent Bit
+  * [FEATURE] - `logging/bin/change_internal_password.sh` now supports the
+    recently added `logadm` user
+  
+  * [CHANGE] - The deprecated `KB_TLS_ENABLE` flag has been removed. Kibana TLS
+    is now controlled via the normal `TLS_ENABLE` and `LOG_TLS_ENABLE` flags
+  * [FIX] - Several status check  in scripts have been simplified to use
+    `kubectl wait`
+  * [FIX] - All logging components now specify Kubernetes resource requests
+  * [FIX] - Event router is now properly deployed to the `logging` namespace
+    when setting `NODE_PLACEMENT_ENABLE=true` or `LOG_NODE_PLACEMENT_ENABLE=true`
+  * [DOC] - The [documentation on how to adjust log retention](logging/LogRetention.md)
+    has been revised to improve clarity and correct errors.  Fixes #261.
+
+## Version 1.1.4 (31JAN22)
+
+* **Logging**
+
   * [SECURITY] Move to use Open Distro for Elasticsearch 1.13.3 (addresses LOG4J
     security vulnerability)
 
 ## Version 1.1.3 (14JAN22)
+
 ### **UPDATE: Due to incomplete remediation of the log4j issue, do not use 1.1.3; use a more recent version
 
 * **Overall**
@@ -19,6 +53,7 @@
     consistency and correctness
 
 * **Monitoring**
+
   * No changes this release
 
 * **Logging**
@@ -35,6 +70,7 @@
     current release (which uses Open Distro for Elasticsearch 1.13.2) no longer fails.
 
 ## Version 1.1.2 (13DEC21)
+
 ### **UPDATE: Due to incomplete remediation of the log4j issue, do not use 1.1.2; use a more recent version
 
 * **Overall**
