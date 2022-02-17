@@ -14,20 +14,16 @@ fi
 KUBE_CLIENT_VER=$(kubectl version --short | grep 'Client Version' | awk '{print $3}' 2>/dev/null)
 KUBE_SERVER_VER=$(kubectl version --short | grep 'Server Version' | awk '{print $3}' 2>/dev/null)
 
-# Minimuim version: 1.18
-if [[ $KUBE_CLIENT_VER =~ v1.1[8-9] ]]; then
-  :
-elif [[ $KUBE_CLIENT_VER =~ v1.2[0-9] ]]; then
+# Minimuim version: 1.20
+if [[ $KUBE_CLIENT_VER =~ v1.2[0-9] ]]; then
   :
 else 
   echo "Unsupported kubectl version: [$KUBE_CLIENT_VER]"
   exit 1
 fi
 
-# Minimuim version: 1.18
-if [[ $KUBE_SERVER_VER =~ v1.1[8-9] ]]; then
-  :
-elif [[ $KUBE_SERVER_VER =~ v1.2[0-9] ]]; then
+# Minimuim version: 1.20
+if [[ $KUBE_SERVER_VER =~ v1.2[0-9] ]]; then
   :
 else 
   echo "Unsupported Kubernetes server version: [$KUBE_SERVER_VER]"
