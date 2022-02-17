@@ -73,17 +73,18 @@ fi
 
 # Check if Prometheus Operator CRDs are already installed
 PROM_OPERATOR_CRD_UPDATE=${PROM_OPERATOR_CRD_UPDATE:-true}
-PROM_OPERATOR_CRD_VERSION=${PROM_OPERATOR_CRD_VERSION:-v0.51.2}
+PROM_OPERATOR_CRD_VERSION=${PROM_OPERATOR_CRD_VERSION:-v0.54.0}
 if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
   log_verbose "Updating Prometheus Operator custom resource definitions"
-  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml
-  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml
-  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
-  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml
-  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml
-  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
-  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml
-  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml
+  crds=( alertmanagerconfigs alertmanagers prometheuses prometheusrules podmonitors servicemonitors thanosrulers probes )
+  for crd in "${crds[@]}"; do
+    crdURL="https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_$crd.yaml"
+    if kubectl get crd $crd.monitoring.coreos.com 1>/dev/null 2>&1; then
+      kubectl replace -f $crdURL
+    else
+      kubectl create -f $crdURL
+    fi
+  done
 else
   log_debug "Prometheus Operator CRD update disabled"
 fi
@@ -147,7 +148,15 @@ else
   fi
   log_verbose "Installing via Helm ($(date) - timeout 20m)"
 fi
-KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-19.2.2}
+
+# See https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#from-21x-to-22x
+if [ "$V4M_CURRENT_VERSION_MAJOR" == "1" ] && [[ "$V4M_CURRENT_VERSION_MINOR" =~ [0-5] ]]; then
+  kubectl delete -n $MON_NS --ignore-not-found \
+    deployments.apps \
+    -l app.kubernetes.io/instance=v4m-prometheus-operator,app.kubernetes.io/name=kube-state-metrics
+fi
+
+KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-32.2.1}
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
   -f monitoring/values-prom-operator.yaml \

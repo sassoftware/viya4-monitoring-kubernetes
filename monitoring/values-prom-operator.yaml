@@ -18,12 +18,10 @@ commonLabels:
 # https://github.com/coreos/prometheus-operator
 prometheusOperator:
   image:
-    tag: v0.51.2
+    tag: v0.54.0
   logFormat: json
   logLevel: info
   createCustomResource: false
-  prometheusConfigReloaderImage:
-    tag: v0.51.2
   resources:
     requests:
       cpu: "100m"
@@ -36,6 +34,10 @@ prometheusOperator:
       requests:
         cpu: "50m"
         memory: "25Mi"
+  prometheusConfigReloader:
+    image:
+      repository: quay.io/prometheus-operator/prometheus-config-reloader
+      tag: v0.54.0
 
 # ======================
 # kubelet ServiceMonitor
@@ -60,7 +62,7 @@ kubeStateMetrics:
 # https://github.com/helm/charts/tree/master/stable/kube-state-metrics
 kube-state-metrics:
   image:
-    tag: v2.2.1
+    tag: v2.3.0
   resources:
     requests:
       cpu: "25m"
@@ -81,7 +83,7 @@ prometheus:
     nodePort: null  
   prometheusSpec:
     image:
-      tag: v2.30.3
+      tag: v2.33.3
     logLevel: info
     logFormat: json
     podAntiAffinity: soft
@@ -142,7 +144,7 @@ alertmanager:
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
 prometheus-node-exporter:
   image:
-    tag: v1.2.2
+    tag: v1.3.1
   service:
     # Override the default port of 9100 to avoid potential conflicts
     port: 9110
@@ -157,16 +159,15 @@ prometheus-node-exporter:
   # Be very tolerant
   tolerations:
   - operator: "Exists"
-
-nodeExporter:
-  serviceMonitor:
-    relabelings:
-    - sourceLabels: [__meta_kubernetes_pod_node_name]
-      separator: ;
-      regex: ^(.*)$
-      targetLabel: nodename
-      replacement: $1
-      action: replace
+  prometheus:
+    monitor:
+      relabelings:
+      - sourceLabels: [__meta_kubernetes_pod_node_name]
+        separator: ;
+        regex: ^(.*)$
+        targetLabel: nodename
+        replacement: $1
+        action: replace
 
 # =======
 # Grafana
@@ -174,7 +175,7 @@ nodeExporter:
 # https://github.com/grafana/helm-charts/tree/main/charts/grafana
 grafana:
   image:
-    tag: "8.2.1"
+    tag: "8.3.6"
   "grafana.ini":
     analytics:
       check_for_updates: false
