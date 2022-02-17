@@ -22,8 +22,6 @@ prometheusOperator:
   logFormat: json
   logLevel: info
   createCustomResource: false
-  prometheusConfigReloaderImage:
-    tag: v0.54.0
   resources:
     requests:
       cpu: "100m"
@@ -36,6 +34,10 @@ prometheusOperator:
       requests:
         cpu: "50m"
         memory: "25Mi"
+  prometheusConfigReloader:
+    image:
+      repository: quay.io/prometheus-operator/prometheus-config-reloader
+      tag: v0.54.0
 
 # ======================
 # kubelet ServiceMonitor
@@ -157,16 +159,15 @@ prometheus-node-exporter:
   # Be very tolerant
   tolerations:
   - operator: "Exists"
-
-nodeExporter:
-  serviceMonitor:
-    relabelings:
-    - sourceLabels: [__meta_kubernetes_pod_node_name]
-      separator: ;
-      regex: ^(.*)$
-      targetLabel: nodename
-      replacement: $1
-      action: replace
+  prometheus:
+    monitor:
+      relabelings:
+      - sourceLabels: [__meta_kubernetes_pod_node_name]
+        separator: ;
+        regex: ^(.*)$
+        targetLabel: nodename
+        replacement: $1
+        action: replace
 
 # =======
 # Grafana

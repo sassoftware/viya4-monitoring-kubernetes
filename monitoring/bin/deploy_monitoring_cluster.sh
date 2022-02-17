@@ -148,6 +148,14 @@ else
   fi
   log_verbose "Installing via Helm ($(date) - timeout 20m)"
 fi
+
+# See https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#from-21x-to-22x
+if [ "$V4M_CURRENT_VERSION_MAJOR" == "1" ] && [[ "$V4M_CURRENT_VERSION_MINOR" =~ [0-5] ]]; then
+  kubectl delete -n $MON_NS --ignore-not-found \
+    deployments.apps \
+    -l app.kubernetes.io/instance=v4m-prometheus-operator,app.kubernetes.io/name=kube-state-metrics
+fi
+
 KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-32.2.1}
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
