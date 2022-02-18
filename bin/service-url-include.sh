@@ -147,9 +147,7 @@ function get_nodeport_url {
      return
   fi
 
-  # DEPRECATION: use of the NODE_NAME env var to override the node name used in the Kibana URL has been 
-  #              deprecated with release 1.0.5 (09MAR21) and will support removed completely in an upcoming release
-  host=${NODE_NAME:-$(kubectl get node --selector='node-role.kubernetes.io/master' | awk 'NR==2 { print $1 }')}
+  host="$(kubectl get node --selector='node-role.kubernetes.io/master' | awk 'NR==2 { print $1 }')"
   if [ -z "$host" ]; then
      host=$(kubectl get nodes | awk 'NR==2 { print $1 }')  # use first node
   fi
