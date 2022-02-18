@@ -71,7 +71,7 @@ fi
 
 # wait up to 10 minutes for pod to show as "running" and "ready"
 log_info "Waiting for Kibana pods to be ready ($(date) - timeout 10m)"
-kubectl -n logging wait pods --selector app=v4m-es,role=kibana --for condition=Ready --timeout=10m
+kubectl -n $LOG_NS wait pods --selector app=v4m-es,role=kibana --for condition=Ready --timeout=10m
 
 set +e
 get_kb_api_url
