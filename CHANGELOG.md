@@ -28,7 +28,7 @@
   * [FIX] - All logging components now specify Kubernetes resource requests
   * [FIX] - Event router is now properly deployed to the `logging` namespace
     when setting `NODE_PLACEMENT_ENABLE=true` or `LOG_NODE_PLACEMENT_ENABLE=true`
-  * [DOC] - The [documentation on how to adjust log retention](logging/LogRetention.md)
+  * [DOC] - The [documentation on how to adjust log retention](logging/Log_Retention.md)
     has been revised to improve clarity and correct errors.  Fixes #261.
 
 ## Version 1.1.4 (31JAN22)
