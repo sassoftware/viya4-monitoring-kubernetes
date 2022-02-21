@@ -23,8 +23,15 @@ function trap_add() {
       )" "${signal}"
    done
 }
+
 function errexit_msg {
-   log_error "Exiting script due to an error."
+   local scriptname
+   failing_command="$BASH_COMMAND[0]"
+   if [ -o errexit ]; then
+      log_error "Exiting script due to an error executing the command [$failing_command]."
+   else
+      log_debug "errexit trap function [$failing_command] called"
+   fi
 }
 
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
