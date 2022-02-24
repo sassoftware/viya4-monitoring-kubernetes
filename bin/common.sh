@@ -23,14 +23,19 @@ function trap_add() {
       )" "${signal}"
    done
 }
+
 function errexit_msg {
-   log_error "Exiting script due to an error."
+   if [ -o errexit ]; then
+      log_error "Exiting script [`basename $0`] due to an error executing the command [$BASH_COMMAND]."
+   else
+      log_debug "Trap [ERR] triggered in [`basename $0`] while executing the command [$BASH_COMMAND]."
+   fi
 }
 
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
     # Save standard out to a new descriptor
     exec 3>&1
-    
+
     # Includes
     source bin/colors-include.sh
     source bin/log-include.sh
