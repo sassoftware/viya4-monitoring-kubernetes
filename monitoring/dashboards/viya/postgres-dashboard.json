@@ -1,4 +1,30 @@
 {
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "6.3.5"
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "singlestat",
+      "name": "Singlestat",
+      "version": ""
+    }
+  ],
   "annotations": {
     "list": [
       {
@@ -16,13 +42,12 @@
   "editable": true,
   "gnetId": 9628,
   "graphTooltip": 0,
-  "id": 64,
-  "iteration": 1587733505491,
+  "id": null,
+  "iteration": 1568751813814,
   "links": [],
   "panels": [
     {
       "collapsed": false,
-      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -75,6 +100,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -158,10 +184,11 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
-      "postfixFontSize": "100%",
+      "postfixFontSize": "110%",
       "prefix": "",
-      "prefixFontSize": "100%",
+      "prefixFontSize": "110%",
       "rangeMaps": [
         {
           "from": "null",
@@ -178,7 +205,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "process_start_time_seconds{release=\"$release\", instance=\"$instance\"} * 1000",
+          "expr": "pg_postmaster_start_time_seconds{release=\"$release\", instance=\"$instance\"} * 1000",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "",
@@ -240,6 +267,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -322,6 +350,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -404,6 +433,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -485,6 +515,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -539,7 +570,6 @@
         "x": 0,
         "y": 3
       },
-      "hiddenSeries": false,
       "id": 22,
       "legend": {
         "alignAsTable": true,
@@ -631,7 +661,6 @@
         "x": 8,
         "y": 3
       },
-      "hiddenSeries": false,
       "id": 24,
       "legend": {
         "alignAsTable": true,
@@ -731,7 +760,6 @@
         "x": 16,
         "y": 3
       },
-      "hiddenSeries": false,
       "id": 26,
       "legend": {
         "alignAsTable": true,
@@ -811,7 +839,6 @@
     },
     {
       "collapsed": false,
-      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -864,6 +891,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -944,6 +972,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1024,6 +1053,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1104,6 +1134,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1186,6 +1217,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1266,6 +1298,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1346,6 +1379,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1426,6 +1460,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1506,6 +1541,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1547,7 +1583,6 @@
     },
     {
       "collapsed": false,
-      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1573,7 +1608,6 @@
         "x": 0,
         "y": 15
       },
-      "hiddenSeries": false,
       "id": 1,
       "legend": {
         "alignAsTable": true,
@@ -1670,7 +1704,6 @@
         "x": 8,
         "y": 15
       },
-      "hiddenSeries": false,
       "id": 60,
       "legend": {
         "alignAsTable": true,
@@ -1769,7 +1802,6 @@
         "x": 16,
         "y": 15
       },
-      "hiddenSeries": false,
       "id": 8,
       "legend": {
         "alignAsTable": true,
@@ -1865,7 +1897,6 @@
         "x": 0,
         "y": 22
       },
-      "hiddenSeries": false,
       "id": 5,
       "legend": {
         "alignAsTable": true,
@@ -1960,7 +1991,6 @@
         "x": 8,
         "y": 22
       },
-      "hiddenSeries": false,
       "id": 6,
       "legend": {
         "alignAsTable": true,
@@ -2056,7 +2086,6 @@
         "x": 16,
         "y": 22
       },
-      "hiddenSeries": false,
       "id": 3,
       "legend": {
         "alignAsTable": true,
@@ -2153,7 +2182,6 @@
         "x": 0,
         "y": 29
       },
-      "hiddenSeries": false,
       "id": 14,
       "legend": {
         "alignAsTable": true,
@@ -2248,7 +2276,6 @@
         "x": 8,
         "y": 29
       },
-      "hiddenSeries": false,
       "id": 4,
       "legend": {
         "alignAsTable": true,
@@ -2343,7 +2370,6 @@
         "x": 16,
         "y": 29
       },
-      "hiddenSeries": false,
       "id": 7,
       "legend": {
         "alignAsTable": true,
@@ -2454,6 +2480,7 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {},
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -2541,6 +2568,7 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {},
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -2656,6 +2684,7 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {},
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -2750,6 +2779,7 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {},
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -2835,6 +2865,7 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {},
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -2901,20 +2932,30 @@
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 22,
+  "schemaVersion": 19,
   "style": "dark",
   "tags": [
-    "sas-viya",
-    "postgres"
+    "postgres",
+    "db",
+    "stats"
   ],
   "templating": {
     "list": [
+      {
+        "hide": 0,
+        "label": "datasource",
+        "name": "DS_PROMETHEUS",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
       {
         "auto": true,
         "auto_count": 200,
         "auto_min": "1s",
         "current": {
-          "selected": false,
           "text": "auto",
           "value": "$__auto_interval_interval"
         },
@@ -2975,14 +3016,13 @@
         "definition": "",
         "hide": 0,
         "includeAll": false,
-        "index": -1,
         "label": "Namespace",
         "multi": false,
         "name": "namespace",
         "options": [],
         "query": "query_result(pg_exporter_last_scrape_duration_seconds)",
         "refresh": 2,
-        "regex": "/.*namespace=\"([^\"]+).*/",
+        "regex": "/.*kubernetes_namespace=\"([^\"]+).*/",
         "skipUrlSync": false,
         "sort": 1,
         "tagValuesQuery": "",
@@ -2993,22 +3033,16 @@
       },
       {
         "allValue": null,
-        "current": {
-          "isNone": true,
-          "selected": false,
-          "text": "None",
-          "value": ""
-        },
+        "current": {},
         "datasource": "Prometheus",
-        "definition": "query_result(pg_exporter_last_scrape_duration_seconds{namespace=\"$namespace\"})",
-        "hide": 2,
+        "definition": "",
+        "hide": 0,
         "includeAll": false,
-        "index": -1,
         "label": "Release",
         "multi": false,
         "name": "release",
         "options": [],
-        "query": "query_result(pg_exporter_last_scrape_duration_seconds{namespace=\"$namespace\"})",
+        "query": "query_result(pg_exporter_last_scrape_duration_seconds{kubernetes_namespace=\"$namespace\"})",
         "refresh": 2,
         "regex": "/.*release=\"([^\"]+)/",
         "skipUrlSync": false,
@@ -3021,20 +3055,16 @@
       },
       {
         "allValue": null,
-        "current": {
-          "text": "10.254.3.15:9187",
-          "value": "10.254.3.15:9187"
-        },
+        "current": {},
         "datasource": "Prometheus",
-        "definition": "query_result(pg_static{release=\"$release\"})",
+        "definition": "",
         "hide": 0,
         "includeAll": false,
-        "index": -1,
         "label": "Instance",
         "multi": false,
         "name": "instance",
         "options": [],
-        "query": "query_result(pg_static{release=\"$release\"})",
+        "query": "query_result(pg_up{release=\"$release\"})",
         "refresh": 1,
         "regex": "/.*instance=\"([^\"]+).*/",
         "skipUrlSync": false,
@@ -3047,16 +3077,11 @@
       },
       {
         "allValue": null,
-        "current": {
-          "selected": false,
-          "text": "All",
-          "value": "$__all"
-        },
+        "current": {},
         "datasource": "Prometheus",
         "definition": "",
         "hide": 0,
         "includeAll": true,
-        "index": -1,
         "label": "Database",
         "multi": true,
         "name": "datname",
@@ -3074,16 +3099,11 @@
       },
       {
         "allValue": null,
-        "current": {
-          "selected": false,
-          "text": "All",
-          "value": "$__all"
-        },
+        "current": {},
         "datasource": "Prometheus",
         "definition": "",
         "hide": 0,
         "includeAll": true,
-        "index": -1,
         "label": "Lock table",
         "multi": true,
         "name": "mode",
@@ -3133,8 +3153,5 @@
   "timezone": "",
   "title": "PostgreSQL Database",
   "uid": "000000039",
-  "variables": {
-    "list": []
-  },
-  "version": 1
+  "version": 2
 }
