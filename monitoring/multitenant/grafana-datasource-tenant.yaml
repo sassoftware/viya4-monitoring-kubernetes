@@ -5,7 +5,7 @@ datasources:
     type: prometheus
     access: proxy
     orgId: 1
-    url: http://prometheus-__TENANT__:9090
+    url: http://v4m-prometheus-__TENANT__:9090
     password:
     user:
     database:

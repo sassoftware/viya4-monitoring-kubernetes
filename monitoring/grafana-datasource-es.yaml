@@ -5,9 +5,9 @@ datasources:
   type: elasticsearch
   access: proxy
   database: viya_logs-*
-  url: https://v4m-es-client-service.__logNS__:9200
+  url: https://v4m-es-client-service.__namespace__:9200
   basicAuth: true
-  basicAuthUser: admin
+  basicAuthUser: __userID__
   jsonData:
     tlsSkipVerify: true
     timeField: "@timestamp"
@@ -16,5 +16,5 @@ datasources:
     logLevelField: level
   secureJsonData:
     # Change this value
-    basicAuthPassword: __adminPass__
+    basicAuthPassword: __passwd__
   editable: true
