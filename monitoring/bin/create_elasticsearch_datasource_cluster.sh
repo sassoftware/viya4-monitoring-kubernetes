@@ -54,7 +54,7 @@ else
   sed -i "s/__passwd__/$adminPass/g" $monDir/grafana-datasource-es.yaml
 fi
 
-if [ ! -z "$(kubectl get secret -n $MON_NS grafana-datasource-es -o custom-columns=:metadata.name --no-headers --ignore-not-found)"]; then
+if [ -n "$(kubectl get secret -n $MON_NS grafana-datasource-es -o custom-columns=:metadata.name --no-headers --ignore-not-found)"]; then
   log_info "Removing existing Elasticsearch data source ..."
   kubectl delete secret -n $MON_NS --ignore-not-found grafana-datasource-es
 fi

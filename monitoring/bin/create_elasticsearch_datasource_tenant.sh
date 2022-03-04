@@ -11,7 +11,9 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 CHECK_HELM=false
 source monitoring/bin/common.sh
+source logging/bin/apiaccess-include.sh
 source logging/bin/rbac-include.sh
+source logging/bin/secrets-include.sh
 export LOG_NS="${LOG_NS:-logging}"
 
 function show_usage {
@@ -127,7 +129,11 @@ fi
 
 # Check to see if tenant has been deployed in logging.
 log_info "Checking that $tenant has been onboarded to Elasticsearch in the $LOG_NS namespace ..."
-if [[ $(kibana_tenant_exists $tenant) == 1 ]]; then
+
+get_sec_api_url
+get_credentials_from_secret admin
+
+if ! kibana_tenant_exists "${tenantNS}_${tenant}"; then
   log_error "Unable to configure Elasticsearch data source.  The $tenant tenant has not been onboarded.";
   exit 1
 else
@@ -151,7 +157,7 @@ else
   sed -i "s/__passwd__/$passwd/g" $tenantDir/grafana-datasource-es.yaml
 fi
 
-if [ ! -z "$(kubectl get secret -n $tenantNS v4m-grafana-datasource-es-$tenant -o custom-columns=:metadata.name --no-headers --ignore-not-found)" ]; then
+if [ -n "$(kubectl get secret -n $tenantNS v4m-grafana-datasource-es-$tenant -o custom-columns=:metadata.name --no-headers --ignore-not-found)" ]; then
   log_info "Removing existing Elasticsearch data source for [$tenantNS/$tenant] ..."
   kubectl delete secret -n $tenantNS --ignore-not-found v4m-grafana-datasource-es-$tenant
 fi
