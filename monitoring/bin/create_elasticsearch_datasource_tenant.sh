@@ -11,6 +11,7 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 CHECK_HELM=false
 source monitoring/bin/common.sh
+source logging/bin/rbac-include.sh
 export LOG_NS="${LOG_NS:-logging}"
 
 function show_usage {
@@ -58,7 +59,6 @@ while (( "$#" )); do
         userID=$2
         shift 2
       else
-        # no initial user name provided, assign default name
         log_error "A value for parameter [USER] has not been provided." >&2
         show_usage
         exit 2
@@ -90,6 +90,27 @@ while (( "$#" )); do
   esac
 done
 
+# Check to make sure all parameters have been provided
+if [ -z "$tenantNS" ]; then
+  log_error "A value for parameter [NAMESPACE] was not been provided."
+  exit 2
+fi
+
+if [ -z "$tenant" ]; then
+  log_error "A value for parameter [TENANT] was not been provided."
+  exit 2
+fi
+
+if [ -z "$userID" ]; then
+  log_error "A value for parameter [USER] was not been provided."
+  exit 2
+fi
+
+if [ -z "$passwd" ]; then
+  log_error "A value for parameter [PASSWORD] was not been provided."
+  exit 2
+fi
+
 # Convert namespace and tenant to all lower-case
 tenantNS=$(echo "$tenantNS"| tr '[:upper:]' '[:lower:]')
 tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
@@ -97,22 +118,29 @@ tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
 # Check to see if monitoring deployment could be found for tenant in provided namespace
 log_info "Checking the $tenantNS namespace for monitoring deployment for the $tenant tenant ..."
 if [[ $(kubectl get pods -n $tenantNS -l app.kubernetes.io/instance=v4m-grafana-$tenant -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]]; then
-    log_error "No monitoring components found in the $tenantNS namespace.  Monitoring needs to be deployed in this namespace in order to configure Elasticsearch with this script.";
-    exit 1
+  log_error "No monitoring components were found for $tenant in the $tenantNS namespace."
+  log_error "Monitoring needs to be deployed in this namespace in order to configure Elasticsearch with this script.";
+  exit 1
 else
-    log_verbose "Monitoring deployment was found for the $tenant tenant in the $tenantNS namespace.  Continuing."
+  log_debug "Monitoring deployment was found for the $tenant tenant in the $tenantNS namespace.  Continuing."
 fi
 
-# Verify that the password is correct?
-
+# Check to see if tenant has been deployed in logging.
+log_info "Checking that $tenant has been onboarded to Elasticsearch in the $LOG_NS namespace ..."
+if [[ $(kibana_tenant_exists $tenant) == 1 ]]; then
+  log_error "Unable to configure Elasticsearch data source.  The $tenant tenant has not been onboarded.";
+  exit 1
+else
+  log_debug "The $tenant tenant has been been onboarded in the Elasticsearch.  Continuing."
+fi 
 
 # Create temporary directory for string replacement in the grafana-datasource-es.yaml file
-tenantDir=$TMP_DIR/$VIYA_TENANT
+tenantDir=$TMP_DIR/$tenant
 mkdir -p $tenantDir
-cp -R monitoring/grafana-datasource-es.yaml $tenantDir/grafana-datasource-es.yaml
+cp monitoring/grafana-datasource-es.yaml $tenantDir/grafana-datasource-es.yaml
 
 # Replace placeholders
-log_debug "Replacing logging namespace for files in [$tenantDir]"
+log_debug "Replacing variables in $tenantDir/grafana-datasource-es.yaml file"
 if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
   sed -i '' "s/__namespace__/$LOG_NS/g" $tenantDir/grafana-datasource-es.yaml
   sed -i '' "s/__userID__/$userID/g" $tenantDir/grafana-datasource-es.yaml
@@ -123,13 +151,17 @@ else
   sed -i "s/__passwd__/$passwd/g" $tenantDir/grafana-datasource-es.yaml
 fi
 
-log_info "Provisioning Elasticsearch data source for Grafana"
-kubectl delete secret -n $tenantNS --ignore-not-found v4m-grafana-datasource-es-$tenant
+if [ ! -z "$(kubectl get secret -n $tenantNS v4m-grafana-datasource-es-$tenant -o custom-columns=:metadata.name --no-headers --ignore-not-found)" ]; then
+  log_info "Removing existing Elasticsearch data source for [$tenantNS/$tenant] ..."
+  kubectl delete secret -n $tenantNS --ignore-not-found v4m-grafana-datasource-es-$tenant
+fi
+
+log_info "Provisioning Elasticsearch data source for [$tenantNS/$tenant] instance of Grafana"
 kubectl create secret generic -n $tenantNS v4m-grafana-datasource-es-$tenant --from-file $tenantDir/grafana-datasource-es.yaml
 kubectl label secret -n $tenantNS v4m-grafana-datasource-es-$tenant grafana_datasource-$tenant=true sas.com/monitoring-base=kube-viya-monitoring
 
 # Delete pods so that they can be restarted with the change.
-iog_info "Elasticsearch data source provisioned.  Restarting pods to apply the change"
-kubectl delete pods -n $tenantNS -l "app.kubernetes.io/instance=v4m-grafana-acme"
-kubectl -n $tenantNS wait pods --selector app.kubernetes.io/instance=v4m-grafana-acme --for condition=Ready --timeout=2m
-log_info "Elasticsearch data source has been configured for the $tenant tenant in the $tenantNS namespace."
+log_info "Elasticsearch data source provisioned.  Restarting pods to apply the change"
+kubectl delete pods -n $tenantNS -l "app.kubernetes.io/instance=v4m-grafana-$tenant"
+kubectl -n $tenantNS wait pods --selector app.kubernetes.io/instance=v4m-grafana-$tenant --for condition=Ready --timeout=2m
+log_info "Elasticsearch data source has been configured for [$tenantNS/$tenant]."
