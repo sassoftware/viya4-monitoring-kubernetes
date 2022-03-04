@@ -134,7 +134,8 @@ get_sec_api_url
 get_credentials_from_secret admin
 
 if ! kibana_tenant_exists "${tenantNS}_${tenant}"; then
-  log_error "Unable to configure Elasticsearch data source.  The $tenant tenant has not been onboarded.";
+  log_error "Unable to configure Elasticsearch data source."
+  log_error "The $tenant tenant in the $tenantNS namespace has not been onboarded.";
   exit 1
 else
   log_debug "The $tenant tenant has been been onboarded in the Elasticsearch.  Continuing."
