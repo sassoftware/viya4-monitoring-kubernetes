@@ -109,8 +109,12 @@ if [ "$TLS_ENABLE" == "true" ]; then
   log_debug "Including TLS response file $tlsValuesFile"
 
   log_verbose "Provisioning TLS-enabled Prometheus datasource for Grafana"
+  grafanaDS=grafana-datasource-prom-https.yaml
+  if [ "$MON_TLS_PATH_INGRESS" == "true" ]; then
+    grafanaDS=grafana-datasource-prom-https-path.yaml
+  fi
   kubectl delete cm -n $MON_NS --ignore-not-found grafana-datasource-prom-https
-  kubectl create cm -n $MON_NS grafana-datasource-prom-https --from-file monitoring/tls/grafana-datasource-prom-https.yaml
+  kubectl create cm -n $MON_NS grafana-datasource-prom-https --from-file monitoring/tls/$grafanaDS
   kubectl label cm -n $MON_NS grafana-datasource-prom-https grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
 
   # node-exporter TLS
