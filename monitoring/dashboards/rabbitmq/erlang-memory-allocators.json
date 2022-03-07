@@ -29,10 +29,7 @@
   "liveNow": false,
   "panels": [
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "tluPrN-nz"
-      },
+      "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -108,10 +105,7 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "tluPrN-nz"
-      },
+      "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -187,10 +181,7 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "tluPrN-nz"
-      },
+      "datasource": "Prometheus",
       "description": "Total Size of Allocated Blocks\n\nMemory that is actively used by Erlang data.\n\nThe smallest unit of memory that an allocator can work with is called a `block`. When you call an allocator to allocate a certain amount of memory what you get back is a block. It is also blocks that you give as an argument to the allocator when you want to deallocate memory.\n\nThe allocator does not allocate blocks from the operating system directly though. Instead the allocator allocates a carrier from the operating system, either through `sys_alloc` or through `mseg_alloc`, which in turn uses `malloc` or `mmap`. If `sys_alloc` is used the carrier is placed on the C-heap and if `mseg_alloc` is used the carrier is placed in a segment.\n\nSmall blocks are placed in a multiblock carrier. A multiblock carrier can as the name suggests contain many blocks. Larger blocks are placed in a singleblock carrier, which as the name implies on contains one block.\n\nWhat’s considered a small and a large block is determined by the parameter singleblock carrier threshold (`sbct`).\n\n* [erts_alloc](http://erlang.org/doc/man/erts_alloc.html)\n* [The Memory Subsystem](https://github.com/happi/theBeamBook/blob/master/chapters/memory.asciidoc)",
       "fieldConfig": {
         "defaults": {
@@ -264,10 +255,7 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "tluPrN-nz"
-      },
+      "datasource": "Prometheus",
       "description": "Allocated Carriers - Allocated Blocks\n\n* [erts_alloc](http://erlang.org/doc/man/erts_alloc.html)\n* [The Memory Subsystem](https://github.com/happi/theBeamBook/blob/master/chapters/memory.asciidoc)",
       "fieldConfig": {
         "defaults": {
@@ -341,10 +329,7 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "tluPrN-nz"
-      },
+      "datasource": "Prometheus",
       "description": "Total Size of Allocated Carriers\n\nMemory that is reserved by the Erlang VM, which fits  one of the following descriptions:\n\n* actively used memory\n* memory given by the OS, yet-to-be-used\n* deallocated memory kept around before it is destroyed\n* carrier gaps in multi-block carriers (a.k.a. memory fragmentation)\n\nThe total size of allocated carriers can be either larger or smaller than the Erlang VM system process RSS memory.\n\n* [erts_alloc](http://erlang.org/doc/man/erts_alloc.html)\n* [The Memory Subsystem](https://github.com/happi/theBeamBook/blob/master/chapters/memory.asciidoc)",
       "fieldConfig": {
         "defaults": {
@@ -418,10 +403,7 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "tluPrN-nz"
-      },
+      "datasource": "Prometheus",
       "description": "Erlang VM Resident Set Size (RSS)\n\nAs reported by the OS",
       "fieldConfig": {
         "defaults": {
@@ -513,10 +495,7 @@
           "value": "current"
         }
       ],
-      "datasource": {
-        "type": "prometheus",
-        "uid": "tluPrN-nz"
-      },
+      "datasource": "Prometheus",
       "fontSize": "100%",
       "gridPos": {
         "h": 7,
@@ -591,10 +570,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "tluPrN-nz"
-      },
+      "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
           "links": []
@@ -708,10 +684,7 @@
     },
     {
       "collapsed": false,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "tluPrN-nz"
-      },
+      "datasource": "Prometheus",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -742,10 +715,7 @@
           "value": "current"
         }
       ],
-      "datasource": {
-        "type": "prometheus",
-        "uid": "tluPrN-nz"
-      },
+      "datasource": "Prometheus",
       "description": "",
       "fontSize": "100%",
       "gridPos": {
@@ -811,10 +781,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "tluPrN-nz"
-      },
+      "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
           "links": []
@@ -908,10 +875,7 @@
     },
     {
       "collapsed": true,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "tluPrN-nz"
-      },
+      "datasource": "Prometheus",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -921,10 +885,7 @@
       "id": 63,
       "panels": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "tluPrN-nz"
-          },
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -999,10 +960,7 @@
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "tluPrN-nz"
-          },
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1074,10 +1032,7 @@
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "tluPrN-nz"
-          },
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1149,10 +1104,7 @@
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "tluPrN-nz"
-          },
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1227,10 +1179,7 @@
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "tluPrN-nz"
-          },
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1302,10 +1251,7 @@
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "tluPrN-nz"
-          },
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1377,10 +1323,7 @@
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "tluPrN-nz"
-          },
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1455,10 +1398,7 @@
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "tluPrN-nz"
-          },
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1530,10 +1470,7 @@
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "tluPrN-nz"
-          },
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1623,10 +1560,7 @@
               "value": "current"
             }
           ],
-          "datasource": {
-            "type": "prometheus",
-            "uid": "tluPrN-nz"
-          },
+          "datasource": "Prometheus",
           "description": "",
           "fontSize": "100%",
           "gridPos": {
@@ -1718,10 +1652,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "tluPrN-nz"
-          },
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -1875,10 +1806,7 @@
               "value": "current"
             }
           ],
-          "datasource": {
-            "type": "prometheus",
-            "uid": "tluPrN-nz"
-          },
+          "datasource": "Prometheus",
           "description": "",
           "fontSize": "100%",
           "gridPos": {
@@ -1970,10 +1898,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "tluPrN-nz"
-          },
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "links": []
@@ -2145,10 +2070,7 @@
           "text": "d42829",
           "value": "d42829"
         },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "tluPrN-nz"
-        },
+        "datasource": "Prometheus",
         "definition": "label_values(rabbitmq_identity_info, namespace)",
         "hide": 0,
         "includeAll": false,
@@ -2175,10 +2097,7 @@
           "text": "rabbit@sas-rabbitmq-server-0.sas-rabbitmq-server.d42829.svc.cluster.local",
           "value": "rabbit@sas-rabbitmq-server-0.sas-rabbitmq-server.d42829.svc.cluster.local"
         },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "tluPrN-nz"
-        },
+        "datasource": "Prometheus",
         "definition": "label_values(rabbitmq_identity_info{namespace=\"$namespace\"}, rabbitmq_cluster)",
         "hide": 0,
         "includeAll": false,
@@ -2205,10 +2124,7 @@
           "text": "rabbit@sas-rabbitmq-server-0.sas-rabbitmq-server.d42829.svc.cluster.local",
           "value": "rabbit@sas-rabbitmq-server-0.sas-rabbitmq-server.d42829.svc.cluster.local"
         },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "tluPrN-nz"
-        },
+        "datasource": "Prometheus",
         "definition": "label_values(rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\"}, rabbitmq_node)",
         "hide": 0,
         "includeAll": false,
@@ -2235,10 +2151,7 @@
           "text": "All",
           "value": "$__all"
         },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "tluPrN-nz"
-        },
+        "datasource": "Prometheus",
         "definition": "label_values(erlang_vm_allocators, alloc)",
         "hide": 0,
         "includeAll": true,
@@ -2288,6 +2201,6 @@
   "timezone": "",
   "title": "RabbitMQ-Erlang",
   "uid": "20210118",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
