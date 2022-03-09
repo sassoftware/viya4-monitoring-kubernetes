@@ -64,7 +64,7 @@ kubectl create secret generic -n $MON_NS grafana-datasource-es --from-file $monD
 kubectl label secret -n $MON_NS grafana-datasource-es grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
 
 # Delete pods so that they can be restarted with the change.
-iog_info "Elasticsearch data source provisioned.  Restarting pods to apply the change"
+log_info "Elasticsearch data source provisioned.  Restarting pods to apply the change"
 kubectl delete pods -n $MON_NS -l "app.kubernetes.io/instance=v4m-grafana"
 kubectl -n $MON_NS wait pods --selector app.kubernetes.io/instance=v4m-grafana --for condition=Ready --timeout=2m
 log_info "Elasticsearch data source has been configured."
