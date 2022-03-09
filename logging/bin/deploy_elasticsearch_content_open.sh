@@ -177,7 +177,7 @@ else
 fi
 
 # Configure index template settings and link Ingest Pipeline to Index Template
-response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-logs-template "    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_logs.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-logs-template"    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_logs.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 # request returns: {"acknowledged":true}
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading index template settings into Elasticsearch [$response]"
@@ -194,7 +194,7 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
    add_ism_template "viya_infra_idxmgmt_policy"  "viya_logs-openshift-*"   5
 
    # Link index management policy Index Template
-   response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-infra-template "    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_infra_openshift.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+   response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-infra-template"    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_infra_openshift.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
    # request returns: {"acknowledged":true}
    if [[ $response != 2* ]]; then
       log_error "There was an issue loading infrastructure index template settings into Elasticsearch [$response]"
