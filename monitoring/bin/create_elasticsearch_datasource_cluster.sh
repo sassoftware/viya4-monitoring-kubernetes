@@ -54,7 +54,7 @@ else
   sed -i "s/__passwd__/$adminPass/g" $monDir/grafana-datasource-es.yaml
 fi
 
-if [ -n "$(kubectl get secret -n $MON_NS grafana-datasource-es -o custom-columns=:metadata.name --no-headers --ignore-not-found)"]; then
+if [[ -n "$(kubectl get secret -n $MON_NS grafana-datasource-es -o custom-columns=:metadata.name --no-headers --ignore-not-found)" ]]; then
   log_info "Removing existing Elasticsearch data source ..."
   kubectl delete secret -n $MON_NS --ignore-not-found grafana-datasource-es
 fi
@@ -65,6 +65,6 @@ kubectl label secret -n $MON_NS grafana-datasource-es grafana_datasource=1 sas.c
 
 # Delete pods so that they can be restarted with the change.
 log_info "Elasticsearch data source provisioned.  Restarting pods to apply the change"
-kubectl delete pods -n $MON_NS -l "app.kubernetes.io/instance=v4m-grafana"
+kubectl delete pods -n $MON_NS -l "app.kubernetes.io/instance=v4m-prometheus-operator" -l "app.kubernetes.io/name=grafana"
 kubectl -n $MON_NS wait pods --selector app.kubernetes.io/instance=v4m-grafana --for condition=Ready --timeout=2m
 log_info "Elasticsearch data source has been configured."
