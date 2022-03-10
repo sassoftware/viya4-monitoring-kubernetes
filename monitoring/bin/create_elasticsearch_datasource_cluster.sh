@@ -11,7 +11,7 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 CHECK_HELM=false
 source monitoring/bin/common.sh
-export LOG_NS="${LOG_NS:-logging}"
+source logging/bin/common.sh
 
 # Check to see if monitoring namespace provided exists and components have already been deployed
 log_info "Checking for Grafana pods in the $MON_NS namespace ..."
@@ -25,9 +25,10 @@ fi
 
 # Check to see if logging namespace provided exists and components have already been deployed
 log_info "Checking for Elasticsearch pods in the $LOG_NS namespace ..."
-if [[ $(kubectl get pods -A -l app=v4m-es -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]]; then
+if [[ $(kubectl get pods -n $LOG_NS -l app=v4m-es -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]]; then
   log_error "No logging components found in the $LOG_NS namespace."
   log_error "Logging needs to be deployed in this namespace in order to configure Elasticsearch with this script.";
+  exit 1
 else
   log_debug "Logging found in $LOG_NS namespace.  Continuing."
 fi

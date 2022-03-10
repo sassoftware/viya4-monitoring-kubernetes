@@ -11,10 +11,10 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 CHECK_HELM=false
 source monitoring/bin/common.sh
+source logging/bin/common.sh
 source logging/bin/apiaccess-include.sh
 source logging/bin/rbac-include.sh
 source logging/bin/secrets-include.sh
-export LOG_NS="${LOG_NS:-logging}"
 
 function show_usage {
   log_message  "Usage: $this_script --namespace NAMESPACE --tenant TENANT --user USER --password PASSWORD"
