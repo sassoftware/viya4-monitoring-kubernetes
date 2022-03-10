@@ -318,8 +318,14 @@ else
 fi
 
 # wait for pod to come up
-log_verbose "Waiting [90] seconds to allow PVCs for pod [v4m-es-master-0] to be matched with available PVs [$(date)]"
-sleep 90
+pvcCounter=0
+echo "PVC Counter = $pvcCounter seconds elapsed"
+until [ $(kubectl -n $LOG_NS get pvc data-v4m-es-master-0 -o=jsonpath="{.status.phase}")=="Bound" ] || [ $pvcCounter !=90 ]; 
+do 
+   pvcCounter=$((pvcCounter+=5))
+   echo "PVC Counter = $pvcCounter seconds elapsed"
+   sleep 5s;
+done
 
 # Confirm PVC is "bound" (matched) to PV
 pvc_status=$(kubectl -n $LOG_NS get pvc  data-v4m-es-master-0  -o=jsonpath="{.status.phase}")
@@ -338,8 +344,15 @@ kubectl -n $LOG_NS wait pods v4m-es-master-0 --for=condition=Ready --timeout=10m
 # hitting https:/host:port -u adminuser:adminpwd --insecure 
 # returns "Open Distro Security not initialized." and 503 when up
 
-log_verbose "Waiting [2] minutes to allow Elasticsearch to initialize [$(date)]"
-sleep 120
+log_verbose "Waiting for Elasticsearch to initialize - timeout 2 min [$(date)]"
+esCounter=0
+echo "ES Counter = $esCounter seconds elapsed"
+until [ -n "$(kubectl logs -n $LOG_NS v4m-es-master-0 | grep "Node 'v4m-es-master-0' initialized")" ] || [ $esCounter!=120 ];
+do
+   esCounter=$((esCounter+=5))
+   echo "ES Counter = $esCounter seconds elapsed"
+   sleep 5s;
+done
 
 set +e
 
