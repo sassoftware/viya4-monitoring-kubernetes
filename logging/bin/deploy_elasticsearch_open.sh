@@ -317,14 +317,14 @@ else
    log_debug "**********************************>Multirole Flag: $ES_MULTIROLE_NODES"
 fi
 
-# wait for pod to come up
+# waiting for PVCs to be bound
 pvcCounter=0
 echo "PVC Counter = $pvcCounter seconds elapsed"
-until [ $(kubectl -n $LOG_NS get pvc data-v4m-es-master-0 -o=jsonpath="{.status.phase}")=="Bound" ] || [ $pvcCounter !=90 ]; 
+until [ $(kubectl -n $LOG_NS get pvc data-v4m-es-master-0 -o=jsonpath="{.status.phase}")=="Bound" ] || [ $pvcCounter==90 ]; 
 do 
    pvcCounter=$((pvcCounter+=5))
    echo "PVC Counter = $pvcCounter seconds elapsed"
-   sleep 5s;
+   sleep 5
 done
 
 # Confirm PVC is "bound" (matched) to PV
@@ -347,11 +347,11 @@ kubectl -n $LOG_NS wait pods v4m-es-master-0 --for=condition=Ready --timeout=10m
 log_verbose "Waiting for Elasticsearch to initialize - timeout 2 min [$(date)]"
 esCounter=0
 echo "ES Counter = $esCounter seconds elapsed"
-until [ -n "$(kubectl logs -n $LOG_NS v4m-es-master-0 | grep "Node 'v4m-es-master-0' initialized")" ] || [ $esCounter!=120 ];
+until [ -n "$(kubectl logs -n $LOG_NS v4m-es-master-0 | grep "Node 'v4m-es-master-0' initialized")" ] || [ $esCounter==120 ];
 do
-   esCounter=$((esCounter+=5))
+   sleep 20
+   esCounter=$((esCounter+=20))
    echo "ES Counter = $esCounter seconds elapsed"
-   sleep 5s;
 done
 
 set +e
