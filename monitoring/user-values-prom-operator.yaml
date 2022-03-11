@@ -36,24 +36,29 @@
     # See issue: https://github.com/coreos/prometheus-operator/issues/926
     # https: true
 
+# Use this snippit to change URL, storage, or retention 
 # prometheus:
 #   enabled: true
 #   prometheusSpec:
 #     externalUrl: http://host.mycluster.example.com:31090
-#      storageSpec:
-#        volumeClaimTemplate:
-#          spec:
-#            storageClassName: myCustomStorageClass
-
+#     retention: 7d
+#     retentionSize: 20GiB
+#     storageSpec:
+#       volumeClaimTemplate:
+#         spec:
+#           storageClassName: myCustomStorageClass
+#           resources:
+#             requests:
+#               storage: 25Gi
 
 # alertmanager:
 #   enabled:true
 #   alertManagerSpec:
 #     externalUrl: http://host.mycluster.example.com:31091
-#      storage:
-#        volumeClaimTemplate:
-#          spec:
-#            storageClassName: myCustomStorageClass
+#     storage:
+#       volumeClaimTemplate:
+#         spec:
+#           storageClassName: myCustomStorageClass
 
 # grafana:
 #   enabled: true
