@@ -318,14 +318,14 @@ else
 fi
 
 # waiting for PVCs to be bound
-pvcCounter=0
+declare -i pvcCounter=0
 pvc_status=$(kubectl -n $LOG_NS get pvc  data-v4m-es-master-0  -o=jsonpath="{.status.phase}")
 echo "PVC Counter = $pvcCounter seconds elapsed"
 echo "PVC Status = $pvc_status"
-until [ $pvc_status=="Bound" ] || [ $pvcCounter==90 ]; 
+until [ $pvc_status=="Bound" ] || (( $pvcCounter>90 )); 
 do 
    sleep 5
-   pvcCounter=$((pvcCounter+=5))
+   pvcCounter=$((pvcCounter+5))
    $(kubectl -n $LOG_NS get pvc data-v4m-es-master-0 -o=jsonpath="{.status.phase}")
    echo "PVC Counter = $pvcCounter seconds elapsed"
    echo "PVC Status = $pvc_status"
@@ -350,19 +350,23 @@ kubectl -n $LOG_NS wait pods v4m-es-master-0 --for=condition=Ready --timeout=10m
 
 set -e
 
-log_verbose "Waiting for Elasticsearch to initialize - timeout 2 min [$(date)]"
-esCounter=0
+log_verbose "Waiting for Elasticsearch to initialize - timeout 3 min [$(date)]"
+declare -i esCounter=0
 es_status=$(echo $(kubectl logs -n $LOG_NS v4m-es-master-0 | grep -s "Node 'v4m-es-master-0' initialized"))
 echo "ES Counter = $esCounter seconds elapsed"
 echo "ES Status = $es_status"
-until [ -n $es_status ] || [ $esCounter==120 ];
+until [ -n "$es_status" ] || (( $esCounter>180 ));
 do
    sleep 20
-   esCounter=$((esCounter+=20))
+   esCounter=$((esCounter+20))
    es_status=$(echo $(kubectl logs -n $LOG_NS v4m-es-master-0 | grep -s "Node 'v4m-es-master-0' initialized"))
    echo "ES Counter = $esCounter seconds elapsed"
    echo "ES Status = $es_status"
 done
+
+if [ -z "$es_status" ];  then
+      log_warn "Unable to verify that the Elasticsearch pod [v4m-es-master-0] has initialized."
+fi
 
 set +e
 
