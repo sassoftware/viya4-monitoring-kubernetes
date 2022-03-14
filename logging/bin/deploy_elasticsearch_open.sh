@@ -319,16 +319,20 @@ fi
 
 # waiting for PVCs to be bound
 pvcCounter=0
+pvc_status=$(kubectl -n $LOG_NS get pvc  data-v4m-es-master-0  -o=jsonpath="{.status.phase}")
 echo "PVC Counter = $pvcCounter seconds elapsed"
-until [ $(kubectl -n $LOG_NS get pvc data-v4m-es-master-0 -o=jsonpath="{.status.phase}")=="Bound" ] || [ $pvcCounter==90 ]; 
+echo "PVC Status = $pvc_status"
+until [ $pvc_status=="Bound" ] || [ $pvcCounter==90 ]; 
 do 
-   pvcCounter=$((pvcCounter+=5))
-   echo "PVC Counter = $pvcCounter seconds elapsed"
    sleep 5
+   pvcCounter=$((pvcCounter+=5))
+   $(kubectl -n $LOG_NS get pvc data-v4m-es-master-0 -o=jsonpath="{.status.phase}")
+   echo "PVC Counter = $pvcCounter seconds elapsed"
+   echo "PVC Status = $pvc_status"
 done
 
 # Confirm PVC is "bound" (matched) to PV
-pvc_status=$(kubectl -n $LOG_NS get pvc  data-v4m-es-master-0  -o=jsonpath="{.status.phase}")
+
 if [ "$pvc_status" != "Bound" ];  then
       log_error "It appears that the PVC [data-v4m-es-master-0] associated with the [v4m-es-master-0] node has not been bound to a PV."
       log_error "The status of the PVC is [$pvc_status]"
@@ -344,14 +348,20 @@ kubectl -n $LOG_NS wait pods v4m-es-master-0 --for=condition=Ready --timeout=10m
 # hitting https:/host:port -u adminuser:adminpwd --insecure 
 # returns "Open Distro Security not initialized." and 503 when up
 
+set -e
+
 log_verbose "Waiting for Elasticsearch to initialize - timeout 2 min [$(date)]"
 esCounter=0
+es_status=$(echo $(kubectl logs -n $LOG_NS v4m-es-master-0 | grep -s "Node 'v4m-es-master-0' initialized"))
 echo "ES Counter = $esCounter seconds elapsed"
-until [ -n "$(kubectl logs -n $LOG_NS v4m-es-master-0 | grep "Node 'v4m-es-master-0' initialized")" ] || [ $esCounter==120 ];
+echo "ES Status = $es_status"
+until [ -n $es_status ] || [ $esCounter==120 ];
 do
    sleep 20
    esCounter=$((esCounter+=20))
+   es_status=$(echo $(kubectl logs -n $LOG_NS v4m-es-master-0 | grep -s "Node 'v4m-es-master-0' initialized"))
    echo "ES Counter = $esCounter seconds elapsed"
+   echo "ES Status = $es_status"
 done
 
 set +e
