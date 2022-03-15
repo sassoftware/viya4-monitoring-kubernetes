@@ -357,7 +357,7 @@ do
 done
 
 if [ -z "$es_status" ];  then
-      log_warn "Unable to verify that the Elasticsearch pod [v4m-es-master-0] has initialized."
+      log_debug "Unable to verify that the Elasticsearch pod [v4m-es-master-0] has initialized."
 fi
 
 set +e
