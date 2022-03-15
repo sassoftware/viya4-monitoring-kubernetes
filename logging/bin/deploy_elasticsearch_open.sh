@@ -320,7 +320,7 @@ fi
 # waiting for PVCs to be bound
 declare -i pvcCounter=0
 pvc_status=$(kubectl -n $LOG_NS get pvc  data-v4m-es-master-0  -o=jsonpath="{.status.phase}")
-until [ $pvc_status=="Bound" ] || (( $pvcCounter>90 )); 
+until [ "$pvc_status" == "Bound" ] || (( $pvcCounter>90 )); 
 do 
    sleep 5
    pvcCounter=$((pvcCounter+5))
