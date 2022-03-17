@@ -365,3 +365,29 @@ function user_exists {
       return 1
    fi
 }
+
+function delete_user {
+   # Deletes $user from internal user 
+   #
+   # Returns: 0 - User deleted
+   #          1 - User NOT deleted
+
+   local username response
+   username=$1
+
+   if user_exists $username; then
+      response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "${sec_api_url}/internalusers/$username" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+
+      if [[ $response == 2* ]]; then
+         log_debug "User [$username] deleted. [$response]"
+         return 0
+      else
+         log_error "There was an issue deleting the user role [$username]. [$response]"
+         return 1
+      fi
+   else
+      #username does not exist, nothing to do
+      log_debug "User [$userename] does not exist; not able to delete it."
+      return 1
+   fi
+}
