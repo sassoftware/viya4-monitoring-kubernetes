@@ -168,6 +168,13 @@ fi
 # Delete access controls
 ./logging/bin/security_delete_rbac.sh $namespace $tenant
 
+# Delete Grafana Datasource utility user (if exists)
+grfds_user="${nst}_grafana_ds"
+if user_exists $grfds_user; then
+   log_verbose "Removing the [$grfds_user] utility account."
+   delete_user $grfds_user
+fi
+
 # Reminder that users are not deleted
 add_notice "                                                                 "
 add_notice "   The off-boarding process does NOT remove any users.  If there "
