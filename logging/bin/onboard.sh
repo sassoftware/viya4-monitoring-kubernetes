@@ -207,15 +207,6 @@ if [ "$CREATE_GRFDSUSER" == "true" ]; then
       delete_user $grfds_user
    fi
 
-   #grfds_secret=$(echo internal-user-grafanads-$nst | tr "_" "-")
-   #if [ -z "$(kubectl -n $LOG_NS get secret $grfds_secret -o name 2>/dev/null)" ]; then
-   #   log_verbose "Using existing secret [$grfds_secret]"
-   #else
-   #   log_verbose "Creating secret [$grfds_secret]";
-   #   create_user_secret $grfds_secret $grfds_user ""  managed-by=v4m-es-script
-   #fi
-   #grfds_passwd=$(kubectl -n $LOG_NS get secret $grfds_secret -o=jsonpath="{.data.password}" |base64 --decode)
-
    grfds_passwd="$(randomPassword)"
 
    if [ -z "$tenant" ]; then
