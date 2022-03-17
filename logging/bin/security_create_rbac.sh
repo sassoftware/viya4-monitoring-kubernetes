@@ -187,9 +187,3 @@ if [ "$LOGGING_DRIVER" != "true" ]; then
    echo ""
 fi
 
-
-
-
-
-
-

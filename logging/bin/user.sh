@@ -94,6 +94,10 @@ while (( "$#" )); do
         exit 2
       fi
       ;;
+    -g|--grafanads)
+      grafanads_user="true"
+      shift 
+      ;;
     -h|--help)
       show_usage=1
       shift
@@ -139,7 +143,7 @@ tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
 
 
 if [ "$namespace" == "_all_" ] && [ "$tenant" == "_all_" ]; then
-   if [ -z "$username"  ]; then
+   if [ -z "$username"  ] && [ "$grafanads_user" != "true" ]; then
      log_error "Required parameter USERNAME not specified"
      show_usage $action
      exit 4
@@ -176,7 +180,12 @@ fi
 case "$action" in
    CREATE)
       if [ "$cluster" == "true" ]; then
-         berole="V4MCLUSTER_ADMIN_kibana_users"
+         if [ "$grafanads_user" == "true" ]; then
+            berole="V4MCLUSTER_ADMIN_grafana_dsusers"
+            username="v4m_clusterwide_grafana_ds"
+         else
+            berole="V4MCLUSTER_ADMIN_kibana_users"
+         fi
          rolename="search_index_-ALL-"
          scope_msg="from ALL namespaces [$(date)]"
       else
@@ -196,12 +205,18 @@ case "$action" in
          fi
 
          rolename=search_index_$nst
-         berole="${nst}_kibana_users"
 
-         if [ -z "$username" ]; then
-            username="${nst}_admin"
+         if [ "$grafanads_user" == "true" ]; then
+            berole="${nst}_grafana_dsusers"
+            username="${nst}_grafana_ds"
+            pwdchangetxt="MUST use change_internal_password.sh script"
+         else
+            berole="${nst}_kibana_users"
+
+            if [ -z "$username" ]; then
+               username="${nst}_admin"
+            fi
          fi
-
       fi
 
       log_info "Attempting to create user [$username] and grant them access to log messages $scope_msg [$(date)]"
@@ -231,6 +246,10 @@ case "$action" in
          tconstraint=$tenant
       fi
 
+      if [ -z "$pwdchangetxt" ]; then
+         pwdchangetxt="Use Kibana or API"
+      fi
+
       cp logging/es/odfe/rbac/user.json $TMP_DIR/user.json
       # Replace PLACEHOLDERS
       sed -i'.bak' "s/xxBEROLExx/$berole/g"             $TMP_DIR/user.json      # (NAMESPACE|NAMESPACE_TENANT|'V4MCLUSTER_ADMIN') + '_kibana_users'
@@ -238,6 +257,7 @@ case "$action" in
       sed -i'.bak' "s/xxTCONSTRAINTxx/$tconstraint/g"   $TMP_DIR/user.json      # TENANT|'-none-'
       sed -i'.bak' "s/xxPASSWORDxx/$password/g"         $TMP_DIR/user.json      # PASSWORD
       sed -i'.bak' "s/xxCREATEDBYxx/$this_script/g"     $TMP_DIR/user.json      # CREATEDBY
+      sed -i'.bak' "s/xxPWDCHANGEXX/$pwdchangetxt/g"    $TMP_DIR/user.json      # PASSWORD CHANGE MECHANISM (Kibana|change_internal_password.sh script)
       sed -i'.bak' "s/xxDATETIMExx/$(date)/g"           $TMP_DIR/user.json      # DATE
 
       log_debug "Contents of user.json template file after substitutions: \n $(cat $TMP_DIR/user.json)"
