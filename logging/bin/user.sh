@@ -16,33 +16,33 @@ function show_usage {
   which_action=$1
   case "$which_action" in
     "CREATE")
-       log_info  ""
-       log_info  "Usage: $this_script CREATE [REQUIRED_PARAMETERS] [OPTIONS] "
-       log_info  ""
-       log_info  "Creates a user in the internal user database and limits their access to only log messages from the specified namespace and, optionally, more narrowly, to the specified tenant within the specified namespace"
-       log_info  ""
-       log_info  "     -ns, --namespace   NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace to which this user should be granted access"
-       log_info  "     -t,  --tenant      TENANT    - (Optional) The tenant within the specific Viya deployment/Kubernetes Namespace to which this user should be granted access."
-       log_info  "     -u,  --user        USERNAME  - (Optional) The username to be created (default: [NAMESPACE]|[NAMESPACE_TENANT]_admin)"
-       log_info  "     -p,  --password    PASSWORD  - (Optional) The password for the newly created account (default: [USERNAME])"
+       log_message  ""
+       log_message  "Usage: $this_script CREATE [REQUIRED_PARAMETERS] [OPTIONS] "
+       log_message  ""
+       log_message  "Creates a user in the internal user database and limits their access to only log messages from the specified namespace and, optionally, more narrowly, to the specified tenant within the specified namespace"
+       log_message  ""
+       log_message  "     -ns, --namespace   NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace to which this user should be granted access"
+       log_message  "     -t,  --tenant      TENANT    - (Optional) The tenant within the specific Viya deployment/Kubernetes Namespace to which this user should be granted access."
+       log_message  "     -u,  --user        USERNAME  - (Optional) The username to be created (default: [NAMESPACE]|[NAMESPACE_TENANT]_admin)"
+       log_message  "     -p,  --password    PASSWORD  - (Optional) The password for the newly created account (default: [USERNAME])"
        echo ""
        ;;
     "DELETE")
-       log_info  "Usage: $this_script DELETE [REQUIRED_PARAMETERS]"
-       log_info  ""
-       log_info  "Removes the specified user from the internal user database"
-       log_info  ""
-       log_info  "     -u,  --user        USERNAME  - (Required) The username to be deleted."
+       log_message  "Usage: $this_script DELETE [REQUIRED_PARAMETERS]"
+       log_message  ""
+       log_message  "Removes the specified user from the internal user database"
+       log_message  ""
+       log_message  "     -u,  --user        USERNAME  - (Required) The username to be deleted."
        ;;
     *)
-       log_info  ""
-       log_info  "Usage: $this_script ACTION [REQUIRED_PARAMETERS] [OPTIONS] "
-       log_info  ""
-       log_info  "Creates or deletes a user in the internal user database.  Newly created users are granted permission limiting their access to log messages for the specified namespace, and, optionally, to a specific tenant within that namespace."
-       log_info  ""
-       log_info  "        ACTION - (Required) one of the following actions: [CREATE, DELETE]"
-       log_info  ""
-       log_info  "        Additional help information, including details of required and optional parameters, can be displayed by submitting the command: $this_script ACTION --help"
+       log_message  ""
+       log_message  "Usage: $this_script ACTION [REQUIRED_PARAMETERS] [OPTIONS] "
+       log_message  ""
+       log_message  "Creates or deletes a user in the internal user database.  Newly created users are granted permission limiting their access to log messages for the specified namespace, and, optionally, to a specific tenant within that namespace."
+       log_message  ""
+       log_message  "        ACTION - (Required) one of the following actions: [CREATE, DELETE]"
+       log_message  ""
+       log_message  "        Additional help information, including details of required and optional parameters, can be displayed by submitting the command: $this_script ACTION --help"
        echo ""
        ;;
   esac
@@ -96,7 +96,7 @@ while (( "$#" )); do
       ;;
     -g|--grafanads)
       grafanads_user="true"
-      shift 
+      shift
       ;;
     -h|--help)
       show_usage=1
@@ -117,8 +117,20 @@ done
 # set positional arguments in their proper place
 eval set -- "$POS_PARMS"
 
-action=$(echo $1|tr '[a-z]' '[A-Z]')
-shift
+if [ "$#" -lt 1 ]; then
+    log_error "No ACTION specified; exiting."
+    show_usage
+    exit 1
+else
+   action=$(echo $1|tr '[a-z]' '[A-Z]')
+   shift
+
+   if [ "$action" != "CREATE" ] &&  [ "$action" != "DELETE" ] ; then
+      log_error "Invalid action [$action] specified; exiting"
+      show_usage
+      exit 1
+   fi
+fi
 
 log_debug "Action: $action"
 
@@ -186,7 +198,7 @@ case "$action" in
             berole="V4MCLUSTER_ADMIN_kibana_users"
          fi
          rolename="search_index_-ALL-"
-         scope_msg="from ALL namespaces [$(date)]"
+         scope="ALL namespaces"
       else
          if [ -z "$namespace" ]; then
             log_error "Required argument NAMESPACE no specified"
@@ -197,10 +209,10 @@ case "$action" in
 
          if [ -n "$tenant" ]; then
             nst="${namespace}_${tenant}"
-            scope_msg="from the tenant [$tenant] within the namespace [$namespace] [$(date)]"
+            scope="the tenant [$tenant] within the namespace [$namespace]"
          else
             nst="$namespace"
-            scope_msg="from namespace [$namespace]"
+            scope="namespace [$namespace]"
          fi
 
          rolename=search_index_$nst
@@ -217,7 +229,7 @@ case "$action" in
          fi
       fi
 
-      log_info "Attempting to create user [$username] and grant them access to log messages $scope_msg [$(date)]"
+      log_info "Attempting to create user [$username] and grant them access to log messages from $scope [$(date)]"
 
       # Check if user exists
       if user_exists $username; then
@@ -227,7 +239,10 @@ case "$action" in
 
       #Check if role exists
       if ! role_exists $rolename; then
-         log_error "The expected access control role [$rolename] does NOT exist; the role must be created before users can be linked to that role."
+         log_error "The expected access control role [$rolename] does NOT exist."
+         if [ "$cluster" != "true" ]; then
+            log_error "You must on-oboard $scope to create required the access control role."
+         fi
          exit 1
       fi
 
