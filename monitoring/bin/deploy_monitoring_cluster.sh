@@ -242,7 +242,7 @@ gf_url=$(get_service_url $MON_NS v4m-grafana  "false")
 # am_url=$(get_url $MON_NS v4m-alertmanager  "false")
 set -e
 
-if ! deployV4MInfo "$MON_NS"; then
+if ! deployV4MInfo "$MON_NS" "v4m-monitoring"; then
   log_warn "Unable to update SAS Viya Monitoring version information"
 fi
 

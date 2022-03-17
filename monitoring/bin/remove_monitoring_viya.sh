@@ -40,6 +40,6 @@ if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
   kubectl delete pvc -n $MON_NS -l app=prometheus-pushgateway
 fi
 
-removeV4MInfo "$VIYA_NS" "v4m-viya"
+removeV4MInfo "$VIYA_NS" "v4m-monitoring-$VIYA_NS"
 
 log_info "Removed monitoring components from the [$VIYA_NS] namespace"

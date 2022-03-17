@@ -86,7 +86,7 @@ set -e
 # Version Info                   #
 ##################################
 
-if ! deployV4MInfo "$LOG_NS"; then
+if ! deployV4MInfo "$LOG_NS" "v4m-logging"; then
   log_warn "Unable to update SAS Viya Monitoring version information"
 fi
 

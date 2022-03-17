@@ -34,7 +34,7 @@ log_info "Removing clusterrole and clusterrolebinding..."
 kubectl delete --ignore-not-found clusterrole v4m-grafana-clusterrole
 kubectl delete --ignore-not-found clusterrolebinding v4m-grafana-clusterrolebinding
 
-removeV4MInfo "$MON_NS" "v4m"
+removeV4MInfo "$MON_NS" "v4m-monitoring"
 
 if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
   log_info "Deleting the [$MON_NS] namespace..."

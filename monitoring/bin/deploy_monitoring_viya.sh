@@ -89,5 +89,5 @@ else
   log_warn "Prometheus Operator not found. Skipping deployment of ServiceMonitors."
 fi
 
-deployV4MInfo "$VIYA_NS" "v4m-viya"
+deployV4MInfo "$VIYA_NS" "v4m-monitoring-$VIYA_NS"
 

@@ -193,7 +193,7 @@ DASH_NS=$VIYA_NS
 DASH_BASE=$tenantDir/dashboards
 deploy_tenant_dashboards monitoring/multitenant/dashboards
 
-deployV4MInfo "$VIYA_NS" "v4m-tenant-$VIYA_TENANT"
+deployV4MInfo "$VIYA_NS" "v4m-monitoring-${VIYA_NS}-${VIYA_TENANT}"
 
 if [ "$showPass" == "true" ]; then
   # Find the grafana pod
