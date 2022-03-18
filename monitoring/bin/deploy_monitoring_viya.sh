@@ -89,5 +89,11 @@ else
   log_warn "Prometheus Operator not found. Skipping deployment of ServiceMonitors."
 fi
 
-deployV4MInfo "$VIYA_NS" "v4m-monitoring-$VIYA_NS"
+# If a deployment with the old name exists, remove it first
+if helm3ReleaseExists "v4m-viya" $MON_NS; then
+  log_verbose "Removing outdated instance of SAS Viya Monitoring"
+  helm uninstall -n "$MON_NS" "v4m-viya"
+fi
+
+deployV4MInfo "$VIYA_NS" "v4m-metrics-viya"
 

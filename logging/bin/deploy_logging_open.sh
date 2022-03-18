@@ -86,7 +86,13 @@ set -e
 # Version Info                   #
 ##################################
 
-if ! deployV4MInfo "$LOG_NS" "v4m-logging"; then
+# If a deployment with the old name exists, remove it first
+if helm3ReleaseExists v4m $LOG_NS; then
+  log_verbose "Removing outdated instance of SAS Viya Monitoring"
+  helm uninstall -n "$LOG_NS" "v4m"
+fi
+
+if ! deployV4MInfo "$LOG_NS" "v4m-log"; then
   log_warn "Unable to update SAS Viya Monitoring version information"
 fi
 

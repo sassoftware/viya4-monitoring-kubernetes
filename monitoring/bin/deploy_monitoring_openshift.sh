@@ -217,7 +217,13 @@ if ! kubectl get route -n $MON_NS v4m-grafana 1>/dev/null 2>&1; then
   fi
 fi
 
-if ! deployV4MInfo "$MON_NS" "v4m"; then
+# If a deployment with the old name exists, remove it first
+if helm3ReleaseExists v4m $MON_NS; then
+  log_verbose "Removing outdated instance of SAS Viya Monitoring"
+  helm uninstall -n "$MON_NS" "v4m"
+fi
+
+if ! deployV4MInfo "$MON_NS" "v4m-metrics"; then
   log_warn "Unable to update SAS Viya Monitoring version info"
 fi
 

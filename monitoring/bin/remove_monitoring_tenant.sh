@@ -85,6 +85,11 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
   kubectl delete route -n $VIYA_NS $v4mGrafanaReleasePrefix-$VIYA_TENANT
 fi
 
-removeV4MInfo "$VIYA_NS" "v4m-monitoring-$VIYA_NS-$VIYA_TENANT"
+# If a deployment with the old name exists, remove it first
+if helm3ReleaseExists "v4m-tenant-$VIYA_TENANT" $VIYA_NS; then
+  removeV4MInfo "$VIYA_NS" "v4m-tenant-$VIYA_TENANT"
+else
+  removeV4MInfo "$VIYA_NS" "v4m-metrics-${VIYA_TENANT}"
+fi
 
 log_notice "Uninstalled monitoring for [$VIYA_NS/$VIYA_TENANT]"
