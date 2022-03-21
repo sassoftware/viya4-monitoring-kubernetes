@@ -40,11 +40,7 @@ if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
   kubectl delete pvc -n $MON_NS -l app=prometheus-pushgateway
 fi
 
-# If a deployment with the old name exists, remove it first
-if helm3ReleaseExists "v4m-viya" $VIYA_NS; then
-  removeV4MInfo "$VIYA_NS" "v4m-viya"
-else
-  removeV4MInfo "$VIYA_NS" "v4m-metrics-viya"
-fi
+removeV4MInfo "$VIYA_NS" "v4m-viya"
+removeV4MInfo "$VIYA_NS" "v4m-metrics-viya"
 
 log_info "Removed monitoring components from the [$VIYA_NS] namespace"

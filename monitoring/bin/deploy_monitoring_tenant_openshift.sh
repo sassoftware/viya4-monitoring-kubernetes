@@ -260,7 +260,7 @@ fi
 
 # If a deployment with the old name exists, remove it first
 if helm3ReleaseExists "v4m-tenant-$VIYA_TENANT" $MON_NS; then
-  log_verbose "Removing outdated instance of SAS Viya Monitoring"
+  log_verbose "Removing outdated [${VIYA_NS}/${VIYA_TENANT}] SAS Viya Monitoring Helm chart release"
   helm uninstall -n "$MON_NS" "v4m-tenant-$VIYA_TENANT"
 fi
 
