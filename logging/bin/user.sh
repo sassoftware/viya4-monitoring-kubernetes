@@ -194,6 +194,7 @@ case "$action" in
       if [ "$cluster" == "true" ]; then
          if [ "$grafanads_user" == "true" ]; then
             berole="V4MCLUSTER_ADMIN_grafana_dsusers"
+            pwdchangetxt="Do NOT use Kibana or API, MUST re-run Grafana datasource creation script"
          else
             berole="V4MCLUSTER_ADMIN_kibana_users"
          fi
@@ -219,7 +220,7 @@ case "$action" in
 
          if [ "$grafanads_user" == "true" ]; then
             berole="${nst}_grafana_dsusers"
-            pwdchangetxt="Use Kibana or API but MUST update datasource in Grafana as well"
+            pwdchangetxt="Do NOT use Kibana or API, MUST re-run Grafana datasource creation script"
          else
             berole="${nst}_kibana_users"
 

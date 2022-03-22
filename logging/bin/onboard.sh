@@ -199,24 +199,6 @@ fi
 # Create access controls
 ./logging/bin/security_create_rbac.sh $namespace $tenant
 
-if [ "$CREATE_GRFDSUSER" == "true" ]; then
-   grfds_user="${nst}_grafana_ds"
-
-   if user_exists $grfds_user; then
-      log_verbose "Removing the existing [$grfds_user] utility account."
-      delete_user $grfds_user
-   fi
-
-   grfds_passwd="$(randomPassword)"
-
-   if [ -z "$tenant" ]; then
-      ./logging/bin/user.sh CREATE -ns $namespace  -u $grfds_user -p "$grfds_passwd" -g
-   else
-      ./logging/bin/user.sh CREATE -ns $namespace -t $tenant -u $grfds_user -p "$grfds_passwd" -g
-   fi
-fi
-
-
 # Create an initial user
 if [ "$createuser" == "true" ]; then
 
