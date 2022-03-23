@@ -93,7 +93,7 @@ if helm3ReleaseExists v4m $LOG_NS; then
 fi
 
 if ! deployV4MInfo "$LOG_NS" "v4m-logs"; then
-  log_warn "Unable to update SAS Viya Monitoring version information"
+  log_warn "Unable to update SAS Viya Monitoring Helm chart release"
 fi
 
 # Write any "notices" to console

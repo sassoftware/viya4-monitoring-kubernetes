@@ -249,7 +249,7 @@ if helm3ReleaseExists v4m $MON_NS; then
 fi
 
 if ! deployV4MInfo "$MON_NS" "v4m-metrics"; then
-  log_warn "Unable to update SAS Viya Monitoring version information"
+  log_warn "Unable to update SAS Viya Monitoring Helm chart release"
 fi
 
 # Print URL to access web apps
