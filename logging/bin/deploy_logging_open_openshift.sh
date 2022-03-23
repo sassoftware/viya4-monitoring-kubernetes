@@ -127,7 +127,14 @@ logging/bin/deploy_servicemonitors_open_openshift.sh
 # Version Info                   #
 ##################################
 log_info "STEP 7: Updating version info"
-if ! deployV4MInfo "$LOG_NS" "v4m"; then
+
+# If a deployment with the old name exists, remove it first
+if helm3ReleaseExists v4m $LOG_NS; then
+  log_verbose "Removing outdated SAS Viya Monitoring Helm chart release from [$LOG_NS] namespace"
+  helm uninstall -n "$LOG_NS" "v4m"
+fi
+
+if ! deployV4MInfo "$LOG_NS" "v4m-logs"; then
   log_warn "Unable to update SAS Viya Monitoring version info"
 fi
 

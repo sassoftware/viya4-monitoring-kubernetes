@@ -50,7 +50,10 @@ if [ "$LOG_DELETE_CONFIGMAPS_ON_REMOVE" == "true" ]; then
   kubectl delete configmap --ignore-not-found -n $LOG_NS -l managed-by=v4m-es-script
 fi
 
-removeV4MInfo "$LOG_NS"
+# Check for and remove any v4m deployments with old naming convention
+removeV4MInfo "$LOG_NS" "v4m"
+
+removeV4MInfo "$LOG_NS" "v4m-logs"
 
 if [ "$LOG_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
   log_info "Deleting the [$LOG_NS] namespace..."

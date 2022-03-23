@@ -193,7 +193,13 @@ DASH_NS=$VIYA_NS
 DASH_BASE=$tenantDir/dashboards
 deploy_tenant_dashboards monitoring/multitenant/dashboards
 
-deployV4MInfo "$VIYA_NS" "v4m-tenant-$VIYA_TENANT"
+# If a deployment with the old name exists, remove it first
+if helm3ReleaseExists "v4m-tenant-$VIYA_TENANT" $MON_NS; then
+  log_verbose "Removing outdated SAS Viya Monitoring Helm chart release for tenant [${VIYA_NS}/${VIYA_TENANT}]"
+  helm uninstall -n "$MON_NS" "v4m-tenant-$VIYA_TENANT"
+fi
+
+deployV4MInfo "$VIYA_NS" "v4m-metrics-${VIYA_TENANT}"
 
 if [ "$showPass" == "true" ]; then
   # Find the grafana pod

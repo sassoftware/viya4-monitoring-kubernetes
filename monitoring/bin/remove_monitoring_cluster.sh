@@ -71,7 +71,10 @@ if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
   kubectl delete pvc --ignore-not-found -n $MON_NS -l app=prometheus
 fi
 
-removeV4MInfo "$MON_NS"
+# Check for and remove any v4m deployments with old naming convention
+removeV4MInfo "$MON_NS" "v4m"
+
+removeV4MInfo "$MON_NS" "v4m-metrics"
 
 # Wait for resources to terminate
 log_info "Waiting 60 sec for resources to terminate"

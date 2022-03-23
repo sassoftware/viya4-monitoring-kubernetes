@@ -242,8 +242,14 @@ gf_url=$(get_service_url $MON_NS v4m-grafana  "false")
 # am_url=$(get_url $MON_NS v4m-alertmanager  "false")
 set -e
 
-if ! deployV4MInfo "$MON_NS"; then
-  log_warn "Unable to update SAS Viya Monitoring version information"
+# If a deployment with the old name exists, remove it first
+if helm3ReleaseExists v4m $MON_NS; then
+  log_verbose "Removing outdated SAS Viya Monitoring Helm chart release from [$MON_NS] namespace"
+  helm uninstall -n "$MON_NS" "v4m"
+fi
+
+if ! deployV4MInfo "$MON_NS" "v4m-metrics"; then
+  log_warn "Unable to update SAS Viya Monitoring Helm chart release"
 fi
 
 # Print URL to access web apps
