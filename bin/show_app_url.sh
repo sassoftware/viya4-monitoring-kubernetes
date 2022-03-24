@@ -31,6 +31,18 @@ log_debug "Application URLs requested for [$servicelist]"
 for service in $servicelist
 do
    case  "$service" in
+     OPENSEARCHDASHBOARD|OSD)
+        namespace=${LOG_NS:-"logging"}
+        servicename="v4m-osd"
+        ingressname=""
+        tls_flag="$LOG_KB_TLS_ENABLE"
+        ;;
+     OPENSEARCH|OS)
+        namespace=${LOG_NS:-"logging"}
+        servicename="opensearch-cluster-master"
+        ingressname=""
+        tls_flag="true"
+        ;;
      KIBANA)
         namespace=${LOG_NS:-"logging"}
         servicename="v4m-es-kibana-svc"

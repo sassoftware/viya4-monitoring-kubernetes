@@ -36,6 +36,11 @@ rc=$?
 if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 
+##04MAR22 TODO: Need to:
+##              - change Helm release name (differentiate b/w OpenSearch and ODFE)
+##              - remove ODFE Helm release (optional - to allow parallel deployments?) 
+
+
 # enable debug on Helm via env var
 export HELM_DEBUG="${HELM_DEBUG:-false}"
 
@@ -47,6 +52,14 @@ helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-cha
 
 log_verbose "Updating Helm repositories"
 helm repo update
+
+if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
+   primaryValuesFile="logging/esexporter/values-es-exporter_opensearch.yaml"
+   log_debug "Deploying Elasticsearch Exporter for [$LOG_SEARCH_BACKEND]"
+else
+   primaryValuesFile="logging/esexporter/values-es-exporter_open.yaml"
+   log_debug "Deploying Elasticsearch Exporter for [$LOG_SEARCH_BACKEND]"
+fi
 
 # Load any user customizations/overrides
 ES_OPEN_EXPORTER_USER_YAML="${ES_OPEN_EXPORTER_USER_YAML:-$USER_DIR/logging/user-values-es-exporter.yaml}"
@@ -83,7 +96,7 @@ helm2ReleaseCheck es-exporter-$LOG_NS
 
 helm $helmDebug upgrade --install es-exporter \
  --namespace $LOG_NS \
- -f logging/esexporter/values-es-exporter_open.yaml \
+ -f $primaryValuesFile \
  -f $wnpValuesFile \
  -f $openshiftValuesFile \
  -f $ES_OPEN_EXPORTER_USER_YAML \

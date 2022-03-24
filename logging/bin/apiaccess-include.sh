@@ -22,7 +22,11 @@ function stop_portforwarding {
    local pid
    pid=${1:-$pfPID}
 
-   set +e
+   if [ -o errexit ]; then
+      restore_errexit=Y
+      log_debug "Toggling errexit: Off"
+      set +e
+   fi
 
    if ps -p "$pid" >/dev/null;  then
       log_debug "Killing port-forwarding process [$pid]."
@@ -32,7 +36,10 @@ function stop_portforwarding {
       log_debug "No portforwarding processID found; nothing to terminate."
    fi
 
-   set -e
+   if [ -n "$restore_errexit" ]; then
+      log_debug "Toggling errexit: On"
+      set -e
+   fi
 
 }
 
@@ -137,7 +144,8 @@ function get_es_api_url {
    fi
 
    pfPID=""
-   get_api_url "v4m-es-client-service" '{.spec.ports[?(@.name=="http")].port}' true
+   get_api_url "$ES_SERVICENAME" '{.spec.ports[?(@.name=="http")].port}' true
+
    rc=$?
 
    if [ "$rc" == "0" ]; then
@@ -168,7 +176,7 @@ function get_kb_api_url {
    tlsrequired="$(kubectl -n $LOG_NS get pod -l role=kibana -o=jsonpath='{.items[*].metadata.annotations.tls_required}')"
    log_debug "TLS required to connect to Kibana? [$tlsrequired]"
 
-   get_api_url "v4m-es-kibana-svc" '{.spec.ports[?(@.name=="kibana-svc")].port}' $tlsrequired v4m-es-kibana-ing
+   get_api_url "$KB_SERVICENAME" '{.spec.ports[?(@.name=="http")].port}'  $tlsrequired  $KB_INGRESSNAME
    rc=$?
 
    if [ "$rc" == "0" ]; then
@@ -197,7 +205,8 @@ function get_sec_api_url {
  rc=$?
 
  if [ "$rc" == "0" ]; then
-    sec_api_url="${es_api_url}/_opendistro/_security/api"
+    sec_api_url="${es_api_url}/$ES_PLUGINS_DIR/_security/api"
+
     log_debug "Security API Endpoint: [$sec_api_url]"
     return 0
  else

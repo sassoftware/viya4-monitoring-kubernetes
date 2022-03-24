@@ -26,6 +26,30 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     # TLS is required for logging components so hard-code to 'true'
     export TLS_ENABLE="true"
 
+    # OpenSearch or OpenDistro for Elasticsearch
+    export LOG_SEARCH_BACKEND="${LOG_SEARCH_BACKEND:-ODFE}"
+    log_debug "Search Backend set to [$LOG_SEARCH_BACKEND]"
+
+    if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
+       export ES_SERVICENAME="v4m-es"
+       export ES_INGRESSNAME="v4m-es"
+
+       export KB_SERVICENAME="v4m-osd"
+       export KB_INGRESSNAME="v4m-osd"
+
+       export ES_PLUGINS_DIR="_plugins"
+       export LOG_XSRF_HEADER="osd-xsrf:true"
+    else
+       export ES_SERVICENAME="v4m-es-client-service"
+       export ES_INGRESSNAME="v4m-es-client-service"
+
+       export KB_SERVICENAME="v4m-es-kibana-svc"
+       export KB_INGRESSNAME="v4m-es-kibana-ing"
+
+       export ES_PLUGINS_DIR="_opendistro"
+       export LOG_XSRF_HEADER="kbn-xsrf: true"
+    fi
+
     export V4M_NS=$LOG_NS
     source bin/version-include.sh
 
