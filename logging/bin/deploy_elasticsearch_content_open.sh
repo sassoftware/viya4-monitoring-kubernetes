@@ -40,7 +40,7 @@ get_credentials_from_secret admin
 rc=$?
 if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
-get_es_api_url
+get_ism_api_url
 
 # Confirm Open Distro for Elasticsearch is ready
 for pause in 30 30 30 30 30 30 60
@@ -94,7 +94,7 @@ function set_retention_period {
    log_debug "$(cat $TMP_DIR/${policy_name}.json)"
 
    # Load policy into Elasticsearch via API
-   response=$(curl -s -o /dev/null  -w "%{http_code}" -XPUT "$es_api_url/_opendistro/_ism/policies/$policy_name" -H 'Content-Type: application/json' -d @$TMP_DIR/$policy_name.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+   response=$(curl -s -o /dev/null  -w "%{http_code}" -XPUT "$ism_api_url/policies/$policy_name" -H 'Content-Type: application/json' -d @$TMP_DIR/$policy_name.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
    if [[ $response == 409 ]]; then
       log_info "The index management policy [$policy_name] already exist in Elasticsearch; skipping load and using existing policy."
    elif [[ $response != 2* ]]; then
@@ -114,7 +114,7 @@ function add_ism_template {
    pattern=$2                                       # Index pattern to associate with policy
    priority=${3:-100}                               # Index Priority (Higher values ==> reloaded first)
 
-   response=$(curl -s -o $TMP_DIR/ism_policy_patch.json -w "%{http_code}" -XGET "$es_api_url/_opendistro/_ism/policies/$policy_name" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+   response=$(curl -s -o $TMP_DIR/ism_policy_patch.json -w "%{http_code}" -XGET "$ism_api_url/policies/$policy_name" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
    if [[ $response != 2* ]]; then
       log_debug "No ISM policy [$policy_name] found to patch; moving on.[$response]"
       return
@@ -130,7 +130,7 @@ function add_ism_template {
       sed -i'.bak'  "s/\"ism_template\":null/\"ism_template\": {\"index_patterns\": \[\"${pattern}\"\],\"priority\":${priority}}/g" $TMP_DIR/ism_policy_patch.json
 
       #delete exisiting policy
-      response=$(curl -s -o /dev/null   -w "%{http_code}" -XDELETE "$es_api_url/_opendistro/_ism/policies/$policy_name" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+      response=$(curl -s -o /dev/null   -w "%{http_code}" -XDELETE "$ism_api_url/policies/$policy_name" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
       if [[ $response != 2* ]]; then
          log_warn "Error encountered deleting index management policy [$policy_name] before patching to add ISM template stanza [$response]."
          log_warn "Review the index managment policy [$policy_name] within Kibana to ensure it is properly configured and linked to appropriate indexes [$pattern]."
@@ -147,7 +147,7 @@ function add_ism_template {
 
 
       #load revised policy
-      response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_opendistro/_ism/policies/$policy_name"  -H 'Content-Type: application/json' -d "@$TMP_DIR/ism_policy_patch.json" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+      response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$ism_api_url/policies/$policy_name"  -H 'Content-Type: application/json' -d "@$TMP_DIR/ism_policy_patch.json" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
       if [[ $response != 2* ]]; then
          log_warn "Unable to update index management policy [$policy_name] to add a ISM_TEMPLATE stanza [$response]"
          log_warn "Review/create the index managment policy [$policy_name] within Kibana to ensure it is properly configured and linked to appropriate indexes [$pattern]."
@@ -177,7 +177,7 @@ else
 fi
 
 # Configure index template settings and link Ingest Pipeline to Index Template
-response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-logs-template"    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_logs.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-logs-template"  -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_logs.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 # request returns: {"acknowledged":true}
 if [[ $response != 2* ]]; then
    log_error "There was an issue loading index template settings into Elasticsearch [$response]"
@@ -194,7 +194,7 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
    add_ism_template "viya_infra_idxmgmt_policy"  "viya_logs-openshift-*"   5
 
    # Link index management policy Index Template
-   response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-infra-template"    -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_infra_openshift.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+   response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-infra-template"   -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_infra_openshift.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
    # request returns: {"acknowledged":true}
    if [[ $response != 2* ]]; then
       log_error "There was an issue loading infrastructure index template settings into Elasticsearch [$response]"
@@ -213,7 +213,7 @@ set_retention_period viya_ops_idxmgmt_policy OPS_LOG_RETENTION_PERIOD
 add_ism_template "viya_ops_idxmgmt_policy"  "viya_ops-*"  50
 
 # Load template
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-ops-template " -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_ops.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-ops-template" -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_ops.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 # request returns: {"acknowledged":true}
 
 if [[ $response != 2* ]]; then

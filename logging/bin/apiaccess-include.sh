@@ -11,6 +11,7 @@
 #    kb_api_url  - URL to access KB API/serivce
 #    espfpid     - process id of ES portforwarding
 #    kbpfpid     - process id of KB portforwarding
+#    ism_api_url - URL to access Index State Management (ISM) API/serivce
 #    sec_api_url - URL to access ODFE Security API/serivce
 #    pfPID       - process id used for portforwardign
 
@@ -216,8 +217,34 @@ function get_sec_api_url {
  fi
 }
 
+function get_ism_api_url {
+   #
+   # obtain Index State Managment API/service URL (calls get_es_api_url function, if necessary)
+   #
+   # Global vars:      ism_api_url - URL to access ISM API/serivce
 
-export -f get_sec_api_url stop_portforwarding get_es_api_url get_kb_api_url stop_es_portforwarding stop_kb_portforwarding
+ if [ -n "$ism_api_url" ]; then
+    log_debug "Index Statement Management API Endpoint already set [$ism_api_url]"
+    return 0
+ fi
+
+ get_es_api_url
+ rc=$?
+
+ if [ "$rc" == "0" ]; then
+    ism_api_url="${es_api_url}/$ES_PLUGINS_DIR/_ism/api"
+
+    log_debug "Index State Management API Endpoint: [$ism_api_url]"
+    return 0
+ else
+    ism_api_url=""
+    log_error "Unable to obtain the URL for the Index State Management API Endpoint"
+    return 1
+ fi
+}
+
+
+export -f get_ism_api_url get_sec_api_url stop_portforwarding get_es_api_url get_kb_api_url stop_es_portforwarding stop_kb_portforwarding
 
 
 #initialize "global" vars
