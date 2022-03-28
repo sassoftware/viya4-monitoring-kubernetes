@@ -1,5 +1,5 @@
-#image:
-#  tag: 1.2.0
+image:
+  tag: 1.2.4
 
 ##09MAR22: Not sure how this was working w/o this (default references a service which does not exist
 ##         Not sure if we need to include this in the opensearch_dashboard.yml file (below) as well
