@@ -232,7 +232,7 @@ function get_ism_api_url {
  rc=$?
 
  if [ "$rc" == "0" ]; then
-    ism_api_url="${es_api_url}/$ES_PLUGINS_DIR/_ism/api"
+    ism_api_url="${es_api_url}/$ES_PLUGINS_DIR/_ism"
 
     log_debug "Index State Management API Endpoint: [$ism_api_url]"
     return 0
