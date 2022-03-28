@@ -1,0 +1,68 @@
+#image:
+#  tag: 1.2.0
+
+##09MAR22: Not sure how this was working w/o this (default references a service which does not exist
+##         Not sure if we need to include this in the opensearch_dashboard.yml file (below) as well
+opensearchHosts: "https://v4m-es:9200"
+
+extraEnvs:
+- name: OSD_ENABLE_TLS
+  valueFrom:
+    secretKeyRef: 
+      name: v4m-osd-tls-enabled
+      key: enable_tls
+- name: OPENSEARCH_USERNAME
+  valueFrom:
+    secretKeyRef:
+      name: internal-user-kibanaserver
+      key: username
+- name: OPENSEARCH_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: internal-user-kibanaserver
+      key: password
+extraVolumes:
+- name: kibana-certs
+  secret:
+    secretName: kibana-tls-secret
+extraVolumeMounts:
+- name: kibana-certs
+  mountPath: "/usr/share/opensearchdashboards/certs/kibana-crt.pem"
+  subPath: tls.crt
+- name: kibana-certs
+  mountPath: "/usr/share/opensearchdashboards/certs/kibana-key.pem"
+  subPath: tls.key
+- name: kibana-certs
+  mountPath: "/usr/share/opensearchdashboards/certs/kibana-root-ca.pem"
+  subPath: ca.crt
+
+config:
+  opensearch_dashboards.yml: |
+    server.name: kibana
+    server.host: 0.0.0.0
+    server.ssl.enabled: ${OSD_ENABLE_TLS}
+    server.ssl.key: /usr/share/opensearchdashboards/certs/kibana-key.pem
+    server.ssl.certificate: /usr/share/opensearchdashboards/certs/kibana-crt.pem
+
+    opensearch.ssl.verificationMode: certificate
+    opensearch.ssl.certificateAuthorities: /usr/share/opensearchdashboards/certs/kibana-root-ca.pem
+
+    #11FEB22: Looks like pod has an env var (OPENSEARCH_HOSTS) defining where to find OpenSearch
+    #opensearchHhosts: https://opensearch-cluster-master:9200
+    #24FEB22: commenting the following out b/c including TLS settings in this file now
+    #opensearch.ssl.verificationMode: none
+
+    opensearch.username: ${OPENSEARCH_USERNAME}
+    opensearch.password: ${OPENSEARCH_PASSWORD}
+
+    opensearch_security.multitenancy.enabled: true
+    opensearch_security.multitenancy.tenants.preferred: ["cluster_admins"]
+    opensearch_security.multitenancy.tenants.enable_private: false
+    opensearch_security.multitenancy.tenants.enable_global: false
+    opensearch_security.readonly_mode.roles: ["kibana_read_only"]
+
+    opensearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
+
+
+
+

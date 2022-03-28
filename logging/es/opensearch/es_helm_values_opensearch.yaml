@@ -1,0 +1,236 @@
+#09FEB22 - TO DO: Don't forget the Worknode Node Placements yaml files too
+#
+
+#09FEB22 - TBD: Do we need this top-level elasticsearch: item?  A: REMOVED
+#          I suspect NOT since Kibana is now in its own Helm chart
+
+#09FEB22 imageTag becomes image.tag  DONE
+image:
+  tag: 1.2.4
+
+ #O9FEB22 - config stanza show be good
+config: 
+  opensearch.yml: |
+    ######## ODFE ==> OpenSearch Security Configuration - START ########
+    # Based on V4M existing es_helm_values_open.yaml security config
+    #
+    # Changes: global change opendistro_security.==>plugins.security.
+    #          added opensearch.yaml line and indented previous content
+
+    plugins.security.ssl.transport.pemcert_filepath: elk-transport-crt.pem
+    plugins.security.ssl.transport.pemkey_filepath: elk-transport-key.pem
+    plugins.security.ssl.transport.pemtrustedcas_filepath: elk-transport-root-ca.pem
+    plugins.security.ssl.transport.enforce_hostname_verification: false
+    plugins.security.ssl.http.enabled: true
+    plugins.security.ssl.http.pemcert_filepath: elk-rest-crt.pem
+    plugins.security.ssl.http.pemkey_filepath: elk-rest-key.pem
+    plugins.security.ssl.http.pemtrustedcas_filepath: elk-rest-root-ca.pem
+    plugins.security.allow_unsafe_democertificates: false
+    plugins.security.allow_default_init_securityindex: false
+    plugins.security.authcz.admin_dn:
+    - "CN=es-admin,O=cert-manager"
+    plugins.security.nodes_dn:
+    - "CN=es-transport,O=cert-manager"
+
+    plugins.security.audit.type: internal_opensearch
+    plugins.security.enable_snapshot_restore_privilege: true
+    plugins.security.check_snapshot_restore_write_privileges: true
+    plugins.security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
+    cluster.routing.allocation.disk.threshold_enabled: false
+    node.max_local_storage_nodes: 3
+    ######## ODFE ==> OpenSearch Security Configuration - END ########
+
+## 09FEB22 - TBD: Not sure how to handle this section
+##           May need to use secretMounts
+## 10FEB22 - path needs updating - elasticsearch ==> opensearch
+#secretMounts:
+#  - name: es-transport-tls-secret
+#    secretName: es-transport-tls-secret
+#    path: /usr/share/opensearch/config/
+#  - name: es-rest-tls-secret
+#    secretName: es-rest-tls-secret
+#    path: /usr/share/opensearch/config/
+#  - name: es-admin-tls-secret
+#    secretName: es-admin-tls-secret
+#    path: /usr/share/opensearch/config/
+
+#ssl:
+#  transport:
+#    # TLS is mandatory for transport layer(cannot be disabled)
+#    existingCertSecret: es-transport-tls-secret
+#    existingCertSecretCertSubPath: tls.crt
+#    existingCertSecretKeySubPath: tls.key
+#    existingCertSecretRootCASubPath: ca.crt
+#  rest:
+#    enabled: true
+#    existingCertSecret: es-rest-tls-secret
+#    existingCertSecretCertSubPath: tls.crt
+#    existingCertSecretKeySubPath: tls.key
+#    existingCertSecretRootCASubPath: ca.crt
+#  admin:
+#    enabled: true
+#    existingCertSecret: es-admin-tls-secret
+#    existingCertSecretCertSubPath: tls.crt
+#    existingCertSecretKeySubPath: tls.key
+#    existingCertSecretRootCASubPath: ca.crt
+
+ #09FEB22: securityConfig key-values checked, acceptable in OpenSearch
+ #10FEB22: path updates: elasticsearch --> opensearch
+ #10FEB22: path updates: opendistro_security --> opensearch-security
+
+securityConfig:
+  enabled: true
+  path: "/usr/share/opensearch/plugins/opensearch-security/securityconfig"
+  actionGroupsSecret: security-action-groups
+  configSecret: security-config
+  internalUsersSecret: security-internal-users
+  rolesSecret: security-roles
+  rolesMappingSecret: security-roles-mapping
+  tenantsSecret: security-tenants
+
+#09FEB22: Looks like creating extra env vars from secrets uses different syntax
+#         extraEnvs.valueFrom ==> envFrom
+#         A: I believe envFrom will automatically create env vars from key-value pairs inside secret
+#         but this does NOT allow you to specify an env var name that differs from the key name. If 
+#         you need/want to specify a different env var name, I believe the existing syntax is needed.
+#         KEEP AS-IS
+#10FEB22: Added DISABLE_INSTAL_DEMO_CONFIG based on doc
+
+extraEnvs:
+ - name: DISABLE_INSTALL_DEMO_CONFIG
+   value: "true"
+ - name: ES_ADMIN_PASSWD
+   valueFrom:
+     secretKeyRef:
+       name: internal-user-admin
+       key: password
+ # Need ES_KIBANASESRVER_PASSWD available when ES starts
+ # b/c it's referenced in securityconfig/internal_users.yaml
+ - name: ES_KIBANASERVER_PASSWD
+   valueFrom:
+     secretKeyRef:
+       name: internal-user-kibanaserver
+       key: password
+ - name: ES_LOGCOLLECTOR_PASSWD
+   valueFrom:
+     secretKeyRef:
+       name: internal-user-logcollector
+       key: password
+ - name: ES_METRICGETTER_PASSWD
+   valueFrom:
+     secretKeyRef:
+       name: internal-user-metricgetter
+       key: password
+
+#09FEB22: extraVolumes/extraVolumeMounts should be ok
+#10FEB22: added TLS-related extraVolumes/extreVolumeMounts
+extraVolumes:
+- name: v4m-security-script
+  configMap:
+    name: run-securityadmin.sh
+    defaultMode: 0755
+- name: transport-certs
+  secret:
+    secretName: es-transport-tls-secret
+ #   items:
+ #   - key: ca.crt
+ #     path: elk-transport-root-ca.pem
+ #   - key: tls.crt
+ #     path: elk-transport-crt.pem
+ #   - key: tls.key
+ #     path: elk-transport-key.pem
+- name: rest-certs
+  secret:
+    secretName: es-rest-tls-secret
+#    items:
+#    - key: ca.crt
+#      path: elk-rest-root-ca.pem
+#    - key: tls.crt
+#      path: elk-rest-crt.pem
+#    - key: tls.key
+#      path: elk-rest-key.pem
+- name: admin-certs
+  secret:
+    secretName: es-admin-tls-secret
+#    items:
+#    - key: ca.crt
+#      path: admin-root-ca.pem
+#    - key: tls.crt
+#      path: admin-crt.pem
+#    - key: tls.key
+#      path: admin-key.pem
+
+extraVolumeMounts: 
+- mountPath: "/usr/share/opensearch/config/run_securityadmin.sh"
+  name: v4m-security-script
+  readOnly: true
+  subPath: run_securityadmin.sh
+
+- name: transport-certs
+  mountPath: "/usr/share/opensearch/config/elk-transport-crt.pem"
+  subPath: tls.crt
+- name: transport-certs
+  mountPath: "/usr/share/opensearch/config/elk-transport-key.pem"
+  subPath: tls.key
+- name: transport-certs
+  mountPath: "/usr/share/opensearch/config/elk-transport-root-ca.pem"
+  subPath: ca.crt
+- name: rest-certs
+  mountPath: "/usr/share/opensearch/config/elk-rest-crt.pem"
+  subPath: tls.crt
+- name: rest-certs
+  mountPath: "/usr/share/opensearch/config/elk-rest-key.pem"
+  subPath: tls.key
+- name: rest-certs
+  mountPath: "/usr/share/opensearch/config/elk-rest-root-ca.pem"
+  subPath: ca.crt
+- name: admin-certs
+  mountPath: "/usr/share/opensearch/config/admin-crt.pem"
+  subPath: tls.crt
+- name: admin-certs
+  mountPath: "/usr/share/opensearch/config/admin-key.pem"
+  subPath: tls.key
+- name: admin-certs
+  mountPath: "/usr/share/opensearch/config/admin-root-ca.pem"
+  subPath: ca.crt
+
+
+#09FEB22 looks like the master/data/client stanza will need to be replaced with:
+#        roles.master, roles.ingest, roles.data and/or roles.remote_cluster_client
+#        replicas is now a sibling/peer of roles
+#        podAnnotations is now a sibling/peer of roles
+#        TBD: affinity.podAntiAffinity ==> nodeAffinity?
+#        javaOpts ==> opensearchJavaOpts (peer of roles)
+#        persistence - peer of roles
+roles:
+  - master
+  - ingest
+  - data
+
+replicas: 3
+
+opensearchJavaOpts: "-Xms1024m -Xmx1024m"
+
+podAnnotations: 
+  fluentbit.io/parser: elasticsearch
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app
+            operator: In
+            values:
+            - v4m-es
+          - key: role
+            operator: In
+            values:
+            - master
+        topologyKey: kubernetes.io/hostname
+      weight: 100
+persistence:
+  enabled: true
+  #storageClass: alt-storage
+  size: 30Gi
