@@ -36,6 +36,7 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
 
        export KB_SERVICENAME="v4m-osd"
        export KB_INGRESSNAME="v4m-osd"
+       export KB_SERVICEPORT="http"
 
        export ES_PLUGINS_DIR="_plugins"
        export LOG_XSRF_HEADER="osd-xsrf:true"
@@ -45,6 +46,8 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
 
        export KB_SERVICENAME="v4m-es-kibana-svc"
        export KB_INGRESSNAME="v4m-es-kibana-ing"
+       export KB_SERVICEPORT="kibana-svc"
+
 
        export ES_PLUGINS_DIR="_opendistro"
        export LOG_XSRF_HEADER="kbn-xsrf: true"

@@ -55,6 +55,8 @@ log_info "Configuring Kibana...this may take a few minutes"
 
 if [ "$LOG_SEARCH_BACKEND" == "ODFE" ]; then                  ####   ODFE SUPPORT-start
 
+   pod_selector="app=v4m-es,role=kibana"
+
    KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-true}
 
    if [ "$KB_KNOWN_NODEPORT_ENABLE" == "true" ]; then
@@ -69,15 +71,18 @@ if [ "$LOG_SEARCH_BACKEND" == "ODFE" ]; then                  ####   ODFE SUPPOR
    else
      log_debug "Kibana service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
    fi
+else
+   # OPENSEARCH DASHBOARDS
+   pod_selector="app=opensearch-dashboards"
+
 fi                                                            ####   ODFE SUPPORT-end
 
 
 # Need to wait 2-3 minutes for kibana to come up and
 # and be ready to accept the curl commands below
 # wait for pod to show as "running" and "ready"
-
 log_info "Waiting for Kibana pods to be ready ($(date) - timeout 10m)"
-kubectl -n $LOG_NS wait pods --selector app=opensearch-dashboards --for condition=Ready --timeout=10m
+kubectl -n $LOG_NS wait pods --selector $pod_selector  --for condition=Ready --timeout=10m
 
 set +e
 

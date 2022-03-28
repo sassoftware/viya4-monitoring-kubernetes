@@ -176,7 +176,7 @@ function get_kb_api_url {
    tlsrequired="$(kubectl -n $LOG_NS get pod -l role=kibana -o=jsonpath='{.items[*].metadata.annotations.tls_required}')"
    log_debug "TLS required to connect to Kibana? [$tlsrequired]"
 
-   get_api_url "$KB_SERVICENAME" '{.spec.ports[?(@.name=="http")].port}'  $tlsrequired  $KB_INGRESSNAME
+   get_api_url "$KB_SERVICENAME" '{.spec.ports[?(@.name=="'${KB_SERVICEPORT}'")].port}'  $tlsrequired  $KB_INGRESSNAME
    rc=$?
 
    if [ "$rc" == "0" ]; then
