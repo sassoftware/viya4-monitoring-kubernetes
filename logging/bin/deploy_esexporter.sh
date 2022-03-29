@@ -37,9 +37,19 @@ if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 
 ##04MAR22 TODO: Need to:
-##              - change Helm release name (differentiate b/w OpenSearch and ODFE)
+##              - change Helm release name (differentiate b/w OpenSearch and ODFE)  ##29MAR22: Added Pod label to indicate OPENSEARCH
 ##              - remove ODFE Helm release (optional - to allow parallel deployments?) 
-
+if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
+   if helm3ReleaseExists es-exporter $LOG_NS; then
+      #remove an existing instance if it targets ODFE
+      if [ -z $(kubectl -n $LOG_NS get pods -l "app=prometheus-elasticsearch-exporter,searchbackend=opensearch" -o name 2>/dev/null) ]; then
+         log_debug "Removing an outdated version of Helm release [es-exporter]"
+         helm -n $LOG_NS delete es-exporter
+      fi
+   else
+      log_debug "No existing Helm release [es-exporter] found."
+   fi
+fi
 
 # enable debug on Helm via env var
 export HELM_DEBUG="${HELM_DEBUG:-false}"

@@ -41,6 +41,9 @@ nodeSelector: {}
 
 tolerations: []
 
+podLabels:
+  searchbackend: opensearch
+
 service:
   type: ClusterIP
   httpPort: 9108
