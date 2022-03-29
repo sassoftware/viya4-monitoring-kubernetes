@@ -11,6 +11,13 @@
 #                                    \--- [ROLE: search_index_{NST}]   |search_index_{NST} role IS deleted
 #                                     \-- [ROLE: tenant_{NST}]         |tenant_{NST} role IS deleted
 #
+#
+#
+#                                       /--- [ROLE: v4m_grafana_dsuser] |only link to backend role is deleted; v4m_grafana_dsuser role NOT deleted
+# [BACKEND_ROLE: {NST}_grfana_dsusers]<-
+#                                       \--- [ROLE: search_index_{NST}] |search_index_{NST} role IS deleted
+#
+#
 # NOTE: When NAMESPACE='_all_' and TENANT='_all_' are specified, the artifacts involved are:
 #       backend role: 'V4MCLUSTER_ADMIN_kibana_users'  roles: 'tenant_cluster_admins' and 'search_index_-ALL-'
 #
@@ -55,6 +62,7 @@ if [ "$cluster" == "true" ]; then
    # deleting cluster-wide RBACs
    ROLENAME="search_index_-ALL-"
    BACKENDROLE="V4MCLUSTER_ADMIN_kibana_users"
+   GFDS_BACKENDROLE="V4MCLUSTER_ADMIN_grafana_dsusers"
    NST="cluster_admins"
 
 else
@@ -75,8 +83,9 @@ else
 
    ROLENAME="search_index_$NST"
    BACKENDROLE="${NST}_kibana_users"
+   GFDS_BACKENDROLE="${NST}_grafana_dsusers"
 
-   log_debug "NAMESPACE: $namespace TENANT: $tenant ROLENAME: $ROLENAME BACKENDROLE: $BACKENDROLE"
+   log_debug "NAMESPACE: $namespace TENANT: $tenant ROLENAME: $ROLENAME BACKENDROLE: $BACKENDROLE GFDS_BACKENDROLE: $GFDS_BACKENDROLE"
 fi
 
 # get admin credentials
@@ -107,6 +116,8 @@ fi
 remove_rolemapping kibana_user     $BACKENDROLE    # Needed for RBACs created prior to MT support (should be no-op for post MT RBACs)
 remove_rolemapping v4m_kibana_user $BACKENDROLE
 
+# handle Grafana Data Source user
+remove_rolemapping v4m_grafana_dsuser $GFDS_BACKENDROLE
 
 log_notice "Access controls deleted [$(date)]"
 echo ""

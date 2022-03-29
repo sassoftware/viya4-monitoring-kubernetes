@@ -2,9 +2,10 @@
   "password": "xxPASSWORDxx",
   "backend_roles": ["xxBEROLExx"],
   "attributes": {
-    "createdBy": "xxCREATEDBYxx",
-    "createdDate": "xxDATETIMExx",
+    "passwordChangeMechanism": "xxPWDCHANGEXX",
     "namespaceConstraint": "xxNSCONSTRAINTxx",
-    "tenantConstraint": "xxTCONSTRAINTxx"
+    "tenantConstraint": "xxTCONSTRAINTxx",
+    "createdDate": "xxDATETIMExx",
+    "createdBy": "xxCREATEDBYxx"
   }
 }

@@ -13,6 +13,12 @@
 #                                     \-- [ROLE: tenant_{NST}]       (allows access to Kibana tenant space for {NST})
 #
 #
+#                                       /--- [ROLE: v4m_grafana_dsuser] (grants perms req. for Grafana datasource access)
+# [BACKEND_ROLE: {NST}_grfana_dsusers]<-
+#                                       \--- [ROLE: search_index_{NST}] (allows access to log messages from {NST})
+#
+
+#
 # NOTE: When NAMESPACE='_all_' and TENANT='_all_' are specified, the artifacts involved are:
 #       backend role: 'V4MCLUSTER_ADMIN_kibana_users' roles: 'tenant_cluster_admins' and 'search_index_-ALL-'
 #
@@ -63,6 +69,7 @@ if [ "$cluster" == "true" ]; then
    ROLENAME=search_index_-ALL-
    BE_ROLENAME=V4MCLUSTER_ADMIN_kibana_users
    NST="cluster_admins"
+   BE_GFDS_ROLENAME=V4MCLUSTER_ADMIN_grafana_dsusers
    index_role_template="index_role_allcluster.json"
    kibana_tenant_role_template="kibana_tenant_clusteradmins_role.json"
 
@@ -103,6 +110,7 @@ else
    INDEX_PREFIX=viya_logs
    ROLENAME=search_index_$NST
    BE_ROLENAME=${NST}_kibana_users
+   BE_GFDS_ROLENAME=${NST}_grafana_dsusers
    index_role_template="index_role.json"
    kibana_tenant_role_template="kibana_tenant_limited_role.json"
 
@@ -139,6 +147,12 @@ fi
 ensure_role_exists $ROLENAME $TMP_DIR/rbac/$index_role_template
 add_rolemapping $ROLENAME $BE_ROLENAME
 
+#grafana_ds_user (used by Grafana datasource)
+ensure_role_exists v4m_grafana_dsuser $TMP_DIR/rbac/v4m_grafana_dsuser_role.json
+add_rolemapping v4m_grafana_dsuser $BE_GFDS_ROLENAME null
+add_rolemapping $ROLENAME $BE_GFDS_ROLENAME
+
+
 #tenant role (controls access to Kibanas tenant spaces)
 if [ "$create_ktenant_roles" == "true" ]; then
 
@@ -172,5 +186,4 @@ if [ "$LOGGING_DRIVER" != "true" ]; then
    log_notice    "================================================================================="
    echo ""
 fi
-
 

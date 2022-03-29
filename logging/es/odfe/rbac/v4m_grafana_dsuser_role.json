@@ -1,0 +1,9 @@
+{"description": "Provides permissions to allow Grafana datasource utility accounts to access collected log messages",
+ "index_permissions": [{
+    "index_patterns": ["viya_logs-*"],
+    "dls": "",
+    "fls": [],
+    "masked_fields": [],
+    "allowed_actions": ["indices:admin/mappings/get"]
+ }]
+}
