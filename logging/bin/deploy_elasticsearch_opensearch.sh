@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2022, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname $BASH_SOURCE)/../.."
@@ -118,34 +118,35 @@ helm2ReleaseCheck odfe-$LOG_NS
 
 # OPENSEARCH UPGRADE
 # TODO: MIGRATION
-
 # Check for existing Open Distro helm release
-if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "opensearch" ]; then
+if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
    log_debug "A Helm release [odfe] exists; upgrading the release."
    existingODFE="true"
 
-   #01MAR22 - Add "xxx" to prevent MIGRATION logic (for now) and for NODEPORT logic (for now)
-   #Migrate Kibana content if upgrading from ODFE 1.7.0 to 1.13.2
-   if [ "$(helm -n logging list -o yaml --filter odfeXXX |grep app_version)" == "- app_version: 1.8.0" ]; then
+   #Migrate Kibana content if upgrading from ODFE 1.7.0
+   if [ "$(helm -n logging list -o yaml --filter odfe |grep app_version)" == "- app_version: 1.8.0" ]; then
 
-      # Prior to 1.1.0 we used ODFE 1.7.0
-      log_info "Migrating from Open Distro for Elasticsearch 1.7.0"
+      # Prior to our 1.1.0 release we used ODFE 1.7.0
+      log_info "Migrating content from Open Distro for Elasticsearch 1.7.0"
 
       #export exisiting content from global tenant
       #KB_GLOBAL_EXPORT_FILE="$TMP_DIR/kibana_global_content.ndjson"
 
       log_debug "Exporting exisiting content from global tenant to temporary file [$KB_GLOBAL_EXPORT_FILE]."
 
-      ##03MAR22 - Would need to connect to ODFE KB here...which would need ODFE-specific service names!
-      ##          Can we set LOG_SEARCH_BACKEND before calling get_kb_api_url and then reset it to OPENSEARCH after 
-      ##          finsihing our interactions with the existing ODFE instance?
-      ##          Also: keep kb-xsrf reference below since we are interacting with ODFE KB
       set +e
+
+      #Need to connect to existing ODFE instance:
+      #   set LOG_SEARCH_BACKEND (temporarily) to get ODFE-specific values
+      #   unset vars returned by call to get_kb_api_url
+      export LOG_SEARCH_BACKEND="ODFE"
+      unset kb_api_url
+      unset kbpfpid
       get_kb_api_url
-      #set -e
 
       content2export='{"type": ["config", "url","visualization", "dashboard", "search", "index-pattern"],"excludeExportDetails": false}'
 
+      #The 'kb-xsrf' reference below is correct since we are interacting with ODFE KB
       response=$(curl -s -o $KB_GLOBAL_EXPORT_FILE  -w  "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_export" -d "$content2export"  -H "kbn-xsrf: true" -H 'Content-Type: application/json' -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
 
       if [[ $response != 2* ]]; then
@@ -153,37 +154,38 @@ if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "opensearch" ]; then
          log_debug "Failed response details: $(tail -n1 $KB_GLOBAL_EXPORT_FILE)"
          #TODO: Exit here?  Display messages as shown?  Add BIG MESSAGE about potential loss of content?
       else
-         log_info "Existing Kibana content cached for migration. [$response]"
+         log_info "Content from existing Kibana instance cached for migration. [$response]"
          log_debug "Export details: $(tail -n1 $KB_GLOBAL_EXPORT_FILE)"
       fi
 
-      # ODFE 1.13.2 uses a different name for Kibana ingress object,
-      # Helm update will fail if original ingress resource exists
-      kubectl -n $LOG_NS delete ingress v4m-es-kibana --ignore-not-found
-
-   fi
-
-
-   # Check to see if Nodeport for Elasticsearch API has been enabled
-   # If so, Will be re-enabled at end of script
-   ES_PORT=$(kubectl -n $LOG_NS get service v4m-es-client-serviceXXX -o=jsonpath='{.spec.ports[?(@.name=="http")].nodePort}' 2>/dev/null)
-   if [ -n "$ES_PORT" ]; then
-      log_debug "NodePort for Elasticsearch detected [$ES_PORT]"
-      logging/bin/es_nodeport_disable_open.sh
-      ES_NODEPORT_ENABLE=true
-      export ES_PORT
+      #Remove traces of ODFE interaction
+      #and re-set LOG_SEARCH_BACKEND
+      stop_kb_port_forwarding
+      unset kb_api_url
+      unset kbpfpid
+      export LOG_SEARCH_BACKEND="OPENSEARCH"
    fi
 else
-   log_debug "A Helm release [opensearch] do NOT exist; deploying a new release."
+   log_debug "No obsolete Helm release of [odfe] was found."
    existingODFE="false"
 fi
 
-# Upgrade from ODFE to OpenSearch
-UPGRADE2OPENSHIFT=${UPGRADE2OPENSEARCH:-false}
-if [ "$UPGRADE2OPENSEARCH" == "true" ]; then
-   
 
-   if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
+# Check for existing OpenSearch helm release
+if [ "$(helm -n $LOG_NS list --filter 'opensearch' -q)" == "opensearch" ]; then
+   log_debug "A Helm release [opensearch] exists; upgrading the release."
+   existingSearch="true"
+else
+   log_debug "A Helm release [opensearch] does NOT exist; deploying a new release."
+   existingSearch="false"
+fi
+
+# 29MAR22: Set UPGRADE2OPENSEARCH based on existingODFE var?
+# Upgrade from ODFE to OpenSearch
+UPGRADE2OPENSEARCH=${UPGRADE2OPENSEARCH:-false}
+if [ "$UPGRADE2OPENSEARCH" == "true" ]; then
+
+   if [ "$existingODFE" == "true" ]; then
       # Remove the existing ODFE Helm release
       log_debug "Removing an existing ODFE Helm release"
       helm -n $LOG_NS delete odfe
@@ -205,7 +207,7 @@ if [ "$UPGRADE2OPENSEARCH" == "true" ]; then
 
    ## 09MAR22: Upgrade Testing
    ## to bypass security setup
-   existingODFE=true    #temp fix?
+   existingSearch=true    #temp fix?
 fi
 
 
@@ -243,15 +245,13 @@ else
   wnpValuesFile="$TMP_DIR/empty.yaml"
 fi
 
-# OPENSEARCH UPGRADE
-# TODO: OPENSHIFT
 ES_PATH_INGRESS_YAML=$TMP_DIR/empty.yaml
 if [ "$OPENSHIFT_CLUSTER:$OPENSHIFT_PATH_ROUTES" == "true:true" ]; then
     ES_PATH_INGRESS_YAML=logging/openshift/values-elasticsearch-path-route-openshift.yaml
 fi
 
-# Deploy Elasticsearch via Helm chart
-## 08MAR22: nodeGroup - part of upgrade testing
+# Deploy OpenSearch via Helm chart
+# NOTE: nodeGroup needed to get resource names we want
 helm $helmDebug upgrade --install opensearch \
     --namespace $LOG_NS \
     --values logging/es/opensearch/es_helm_values_opensearch.yaml \
@@ -262,8 +262,6 @@ helm $helmDebug upgrade --install opensearch \
     --set masterService=v4m-es \
     --set fullnameOverride=v4m-es opensearch/opensearch
 
-## 08MAR22: Upgrade Testing
-## Upgrade Testing - Deploy MASTER-only nodes
 ## 11MAR22: Change to check for flag set in migrate_pvcs logic instead!
 if [ "$UPGRADE2OPENSEARCH" == "true" ]; then
 
@@ -281,48 +279,16 @@ if [ "$UPGRADE2OPENSEARCH" == "true" ]; then
        --set fullnameOverride=v4m-master opensearch/opensearch
 fi
 
-# OPENSEARCH UPGRADE
-# TODO: Support Multi-Role?  Only deploy in multi-role?
 
-# Use multi-purpose Elasticsearch nodes?
-ES_MULTIROLE_NODES=${ES_MULTIROLE_NODES:-false}
-##10MAR22: Disabled since we should NOT need this 
-##         OpenSearch uses multi-role nodes
-## 
-# switch to multi-role ES nodes (if enabled)
-if [ "$ES_MULTIROLE_NODES" == "XXXXtrueXXXX" ]; then
-
-   sleep 10
-   log_debug "Configuring Elasticsearch to use multi-role nodes"
-
-   # Reconfigure 'master' nodes to be 'multi-role' nodes (i.e. support master, data and client roles)
-   log_debug "Patching statefulset [v4m-es-master]"
-   kubectl -n $LOG_NS patch statefulset v4m-es-master --patch "$(cat logging/es/odfe/es_multirole_nodes_patch.yml)"
-
-   # Delete existing (unpatched) master pod
-   kubectl -n $LOG_NS delete pod v4m-es-0 --ignore-not-found
-
-   # By default, there will be no single-role 'client' or 'data' nodes; but patching corresponding
-   # K8s objects to ensure proper labels are used in case user chooses to configure additional single-role nodes
-   log_debug "Patching deployment [v4m-es-client]"
-   kubectl -n $LOG_NS patch deployment v4m-es-client --type=json --patch '[{"op": "add","path": "/spec/template/metadata/labels/esclient","value": "true" }]'
-
-   log_debug "Patching statefulset [v4m-es-data]"
-   kubectl -n $LOG_NS patch statefulset v4m-es-data  --type=json --patch '[{"op": "add","path": "/spec/template/metadata/labels/esdata","value": "true" }]'
-
-   # patching 'client' and 'data' _services_ to use new multi-role labels for node selection
-   log_debug "Patching  service [v4m-es-client-service]"
-   kubectl -n $LOG_NS patch service v4m-es-client-service --type=json --patch '[{"op": "remove","path": "/spec/selector/role"},{"op": "add","path": "/spec/selector/esclient","value": "true" }]'
-
-   log_debug "Patching  service [v4m-es-data-service]"
-   kubectl -n $LOG_NS patch service v4m-es-data-svc --type=json --patch '[{"op": "remove","path": "/spec/selector/role"},{"op": "add","path": "/spec/selector/esdata","value": "true" }]'
-else
-   log_debug "**********************************>Multirole Flag: $ES_MULTIROLE_NODES"
-fi
-
-# wait for pod to come up
-log_verbose "Waiting [90] seconds to allow PVCs for pod [v4m-es-0] to be matched with available PVs [$(date)]"
-sleep 90
+# waiting for PVCs to be bound
+declare -i pvcCounter=0
+pvc_status=$(kubectl -n $LOG_NS get pvc  v4m-es-v4m-es-0  -o=jsonpath="{.status.phase}")
+until [ "$pvc_status" == "Bound" ] || (( $pvcCounter>90 ));
+do
+   sleep 5
+   pvcCounter=$((pvcCounter+5))
+   pvc_status=$(kubectl -n $LOG_NS get pvc v4m-es-v4m-es-0 -o=jsonpath="{.status.phase}")
+done
 
 # Confirm PVC is "bound" (matched) to PV
 pvc_status=$(kubectl -n $LOG_NS get pvc  v4m-es-v4m-es-0  -o=jsonpath="{.status.phase}")
@@ -343,9 +309,8 @@ kubectl -n $LOG_NS wait pods v4m-es-0 --for=condition=Ready --timeout=10m
 # hitting https:/host:port -u adminuser:adminpwd --insecure 
 # returns "OpenDisro Security not initialized." and 503 when up
 log_verbose "Waiting [2] minutes to allow OpenSearch to initialize [$(date)]"
-sleep 120s
+sleep 120
 
-##09MAR22: OpenSearch Upgrade
 if [ "$UPGRADE2OPENSEARCH" == "true" ]; then
    ## Confirm ES is up and working?
    ## Or does the sleep above do that?  To be replaced with better logic
@@ -379,7 +344,7 @@ set +e
 
 # Run the security admin script on the pod
 # Add some logic to find ES release
-if [ "$existingODFE" == "false" ]; then
+if [ "$existingSearch" == "false" ]; then
   kubectl -n $LOG_NS exec v4m-es-0 -c opensearch -- config/run_securityadmin.sh
   # Retrieve log file from security admin script
   kubectl -n $LOG_NS cp v4m-es-0:config/run_securityadmin.log $TMP_DIR/run_securityadmin.log
@@ -391,15 +356,7 @@ if [ "$existingODFE" == "false" ]; then
   # show output from run_securityadmin.sh script
   sed 's/^/   | /' $TMP_DIR/run_securityadmin.log
 else
-  log_verbose "Existing Open Distro release found. Skipping Elasticsearh security initialization."
-fi
-
-
-# (Re-)Enable Nodeport for Elasticsearch API?
-ES_NODEPORT_ENABLE=${ES_NODEPORT_ENABLE:-false}
-if [ "$ES_NODEPORT_ENABLE" == "true" ]; then
-   log_debug "(Re)Enabling NodePort for Elasticsearch"
-   SHOW_ES_URL=false logging/bin/es_nodeport_enable_open.sh
+  log_verbose "Existing OpenSearch release found. Skipping OpenSearch security initialization."
 fi
 
 set -e
