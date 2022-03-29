@@ -27,6 +27,13 @@ function show_usage {
    echo ""
 }
 
+if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
+   pod="v4m-es-0"
+   toolsrootdir="/usr/share/opensearch/plugins/opensearch-security"
+else
+   pod="v4m-es-master-0"
+   toolsrootdir="/usr/share/elasticsearch/plugins/opendistro_security"
+fi
 
 USER_NAME=${1}
 NEW_PASSWD="${2}"
@@ -103,9 +110,9 @@ if [[ $response == 4* ]]; then
       ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
 
       # make sure hash utility is executable
-      kubectl -n $LOG_NS exec v4m-es-master-0 --  chmod +x /usr/share/elasticsearch/plugins/opendistro_security/tools/hash.sh
+      kubectl -n $LOG_NS exec targetpod --  chmod +x $toolsrootdir/tools/hash.sh
       # get hash of new password
-      hashed_passwd=$(kubectl -n $LOG_NS exec v4m-es-master-0 --  /usr/share/elasticsearch/plugins/opendistro_security/tools/hash.sh -p $NEW_PASSWD)
+      hashed_passwd=$(kubectl -n $LOG_NS exec targetpod --  $toolsrootdir/tools/hash.sh -p $NEW_PASSWD)
       rc=$?
       if [ "$rc" == "0" ]; then
 
@@ -144,9 +151,9 @@ if [[ $response == 4* ]]; then
       log_debug "Attempting to change password for user [admin] using the admin certs rather than cached password"
 
       # make sure hash utility is executable
-      kubectl -n $LOG_NS exec v4m-es-master-0 --  chmod +x /usr/share/elasticsearch/plugins/opendistro_security/tools/hash.sh
+      kubectl -n $LOG_NS exec targetpod --  chmod +x $toolsrootdir/tools/hash.sh
       # get hash of new password
-      hashed_passwd=$(kubectl -n $LOG_NS exec v4m-es-master-0 --  /usr/share/elasticsearch/plugins/opendistro_security/tools/hash.sh -p $NEW_PASSWD)
+      hashed_passwd=$(kubectl -n $LOG_NS exec targetpod --  $toolsrootdir/tools/hash.sh -p $NEW_PASSWD)
 
       #obtain admin cert
       rm -f $TMP_DIR/tls.crt
@@ -248,10 +255,17 @@ if [ "$success" == "true" ]; then
           log_notice "                        *********** IMPORTANT NOTE ***********                        "
           log_notice "                                                                                      "
           log_notice " After changing the password for the [kibanaserver] user, you need to restart the     "
-          log_notice " Kibana pod to ensure Kibana can still be accessed and used.                          "
-          log_notice "                                                                                      "
-          log_notice " This can be done by submitting the following command:                                "
-          log_notice "              kubectl -n $LOG_NS delete pods -l 'app=v4m-es,role=kibana'              "
+          if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
+             log_notice " OpenSearch Dashboards pod to ensure OpenSearch Dashboards can still be accessed and used. "
+             log_notice "                                                                                      "
+             log_notice " This can be done by submitting the following command:                                "
+             log_notice "              kubectl -n $LOG_NS delete pods -l 'app=opensearch-dashboards'"
+          else
+             log_notice " Kibana pod to ensure Kibana can still be accessed and used."
+             log_notice ""
+             log_notice " This can be done by submitting the following command:"
+             log_notice "       kubectl -n $LOG_NS delete pods -l 'app=v4m-es,role=kibana'"
+          fi
           echo ""
           ;;
         metricgetter)
