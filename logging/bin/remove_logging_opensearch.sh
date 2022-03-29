@@ -32,6 +32,8 @@ logging/bin/remove_fluentbit_open.sh
 
 logging/bin/remove_esexporter.sh
 
+logging/bin/remove_kibana_opensearch.sh
+
 logging/bin/remove_elasticsearch_opensearch.sh
 
 logging/bin/remove_eventrouter.sh

@@ -138,6 +138,8 @@ kubectl -n $LOG_NS create configmap fb-env-vars \
                    --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}"         \
                    --from-literal=SEARCH_SERVICENAME="${ES_SERVICENAME}"
 
+kubectl -n $LOG_NS label configmap fb-env-vars   managed-by=v4m-es-script
+
 
 # Delete any existing Fluent Bit pods in the $LOG_NS namepace (otherwise Helm chart may assume an upgrade w/o reloading updated config
 kubectl -n $LOG_NS delete pods -l "app.kubernetes.io/name=fluent-bit, fbout=es"
