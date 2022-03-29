@@ -36,9 +36,6 @@ rc=$?
 if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 
-##04MAR22 TODO: Need to:
-##              - change Helm release name (differentiate b/w OpenSearch and ODFE)  ##29MAR22: Added Pod label to indicate OPENSEARCH
-##              - remove ODFE Helm release (optional - to allow parallel deployments?) 
 if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
    if helm3ReleaseExists es-exporter $LOG_NS; then
       #remove an existing instance if it targets ODFE
