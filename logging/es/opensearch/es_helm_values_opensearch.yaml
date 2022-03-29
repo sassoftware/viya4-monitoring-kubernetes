@@ -1,14 +1,9 @@
 #09FEB22 - TO DO: Don't forget the Worknode Node Placements yaml files too
 #
 
-#09FEB22 - TBD: Do we need this top-level elasticsearch: item?  A: REMOVED
-#          I suspect NOT since Kibana is now in its own Helm chart
-
-#09FEB22 imageTag becomes image.tag  DONE
 image:
   tag: 1.2.4
 
- #O9FEB22 - config stanza show be good
 config: 
   opensearch.yml: |
     ######## ODFE ==> OpenSearch Security Configuration - START ########
@@ -40,44 +35,6 @@ config:
     node.max_local_storage_nodes: 3
     ######## ODFE ==> OpenSearch Security Configuration - END ########
 
-## 09FEB22 - TBD: Not sure how to handle this section
-##           May need to use secretMounts
-## 10FEB22 - path needs updating - elasticsearch ==> opensearch
-#secretMounts:
-#  - name: es-transport-tls-secret
-#    secretName: es-transport-tls-secret
-#    path: /usr/share/opensearch/config/
-#  - name: es-rest-tls-secret
-#    secretName: es-rest-tls-secret
-#    path: /usr/share/opensearch/config/
-#  - name: es-admin-tls-secret
-#    secretName: es-admin-tls-secret
-#    path: /usr/share/opensearch/config/
-
-#ssl:
-#  transport:
-#    # TLS is mandatory for transport layer(cannot be disabled)
-#    existingCertSecret: es-transport-tls-secret
-#    existingCertSecretCertSubPath: tls.crt
-#    existingCertSecretKeySubPath: tls.key
-#    existingCertSecretRootCASubPath: ca.crt
-#  rest:
-#    enabled: true
-#    existingCertSecret: es-rest-tls-secret
-#    existingCertSecretCertSubPath: tls.crt
-#    existingCertSecretKeySubPath: tls.key
-#    existingCertSecretRootCASubPath: ca.crt
-#  admin:
-#    enabled: true
-#    existingCertSecret: es-admin-tls-secret
-#    existingCertSecretCertSubPath: tls.crt
-#    existingCertSecretKeySubPath: tls.key
-#    existingCertSecretRootCASubPath: ca.crt
-
- #09FEB22: securityConfig key-values checked, acceptable in OpenSearch
- #10FEB22: path updates: elasticsearch --> opensearch
- #10FEB22: path updates: opendistro_security --> opensearch-security
-
 securityConfig:
   enabled: true
   path: "/usr/share/opensearch/plugins/opensearch-security/securityconfig"
@@ -87,14 +44,6 @@ securityConfig:
   rolesSecret: security-roles
   rolesMappingSecret: security-roles-mapping
   tenantsSecret: security-tenants
-
-#09FEB22: Looks like creating extra env vars from secrets uses different syntax
-#         extraEnvs.valueFrom ==> envFrom
-#         A: I believe envFrom will automatically create env vars from key-value pairs inside secret
-#         but this does NOT allow you to specify an env var name that differs from the key name. If 
-#         you need/want to specify a different env var name, I believe the existing syntax is needed.
-#         KEEP AS-IS
-#10FEB22: Added DISABLE_INSTAL_DEMO_CONFIG based on doc
 
 extraEnvs:
  - name: DISABLE_INSTALL_DEMO_CONFIG
@@ -122,8 +71,6 @@ extraEnvs:
        name: internal-user-metricgetter
        key: password
 
-#09FEB22: extraVolumes/extraVolumeMounts should be ok
-#10FEB22: added TLS-related extraVolumes/extreVolumeMounts
 extraVolumes:
 - name: v4m-security-script
   configMap:
@@ -132,33 +79,12 @@ extraVolumes:
 - name: transport-certs
   secret:
     secretName: es-transport-tls-secret
- #   items:
- #   - key: ca.crt
- #     path: elk-transport-root-ca.pem
- #   - key: tls.crt
- #     path: elk-transport-crt.pem
- #   - key: tls.key
- #     path: elk-transport-key.pem
 - name: rest-certs
   secret:
     secretName: es-rest-tls-secret
-#    items:
-#    - key: ca.crt
-#      path: elk-rest-root-ca.pem
-#    - key: tls.crt
-#      path: elk-rest-crt.pem
-#    - key: tls.key
-#      path: elk-rest-key.pem
 - name: admin-certs
   secret:
     secretName: es-admin-tls-secret
-#    items:
-#    - key: ca.crt
-#      path: admin-root-ca.pem
-#    - key: tls.crt
-#      path: admin-crt.pem
-#    - key: tls.key
-#      path: admin-key.pem
 
 extraVolumeMounts: 
 - mountPath: "/usr/share/opensearch/config/run_securityadmin.sh"
@@ -195,13 +121,7 @@ extraVolumeMounts:
   subPath: ca.crt
 
 
-#09FEB22 looks like the master/data/client stanza will need to be replaced with:
-#        roles.master, roles.ingest, roles.data and/or roles.remote_cluster_client
-#        replicas is now a sibling/peer of roles
-#        podAnnotations is now a sibling/peer of roles
-#        TBD: affinity.podAntiAffinity ==> nodeAffinity?
-#        javaOpts ==> opensearchJavaOpts (peer of roles)
-#        persistence - peer of roles
+#09FEB22 TBD: affinity.podAntiAffinity ==> nodeAffinity?
 roles:
   - master
   - ingest
@@ -209,7 +129,7 @@ roles:
 
 replicas: 3
 
-opensearchJavaOpts: "-Xms1024m -Xmx1024m"
+opensearchJavaOpts: "-Xms4096m -Xmx4096m"
 
 podAnnotations: 
   fluentbit.io/parser: elasticsearch
