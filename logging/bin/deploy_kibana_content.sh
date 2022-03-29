@@ -78,21 +78,15 @@ else
 fi                                                            ####   ODFE SUPPORT-end
 
 
-# Need to wait 2-3 minutes for kibana to come up and
-# and be ready to accept the curl commands below
 # wait for pod to show as "running" and "ready"
 log_info "Waiting for Kibana pods to be ready ($(date) - timeout 10m)"
 kubectl -n $LOG_NS wait pods --selector $pod_selector  --for condition=Ready --timeout=10m
 
-set +e
+set +e  # disable exit on error
 
+# Need to wait 2-3 minutes for kibana to come up and
+# and be ready to accept the curl commands below
 # Confirm Kibana is ready
-#25FEB22 - May need to lengthen/alter waits
-#          OSD takes a few minutes to be ready (the info below is from a recent run w/(6 x30 waits)
-#          [000/52]  connection refused - 3 times 
-#          [000/56]  Timeout occurred - 3 times
-#          Had cases where unsuccessful port-forwarding link remained broken even after OSD was up
-#          therefore, (re)establishing port-forwarding with at top of loop
 for pause in 30 30 60 30 30 30 30 30 30
 do
 
@@ -111,6 +105,7 @@ do
       break
    fi
 done
+
 set -e
 
 if [ "$kibanaready" != "TRUE" ]; then
