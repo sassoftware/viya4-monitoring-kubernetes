@@ -39,7 +39,7 @@ do
         ;;
      OPENSEARCH|OS)
         namespace=${LOG_NS:-"logging"}
-        servicename="opensearch-cluster-master"
+        servicename="v4m-es"
         ingressname=""
         tls_flag="true"
         ;;
