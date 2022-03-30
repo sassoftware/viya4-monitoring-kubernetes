@@ -264,6 +264,7 @@ if [ "$deploy_temp_masters" == "true" ]; then
        --values "$ES_OPEN_USER_YAML" \
        --values "$ES_PATH_INGRESS_YAML" \
        --set nodeGroup=temp_masters  \
+       --set ingress.enabled=false \
        --set replicas=2 \
        --set roles={master} \
        --set masterService=v4m-es \
@@ -337,9 +338,18 @@ if [ "$deploy_temp_masters" == "true" ]; then
    kubectl -n $LOG_NS delete pvc v4m-master-v4m-master-0 v4m-master-v4m-master-1 v4m-master-v4m-master-2 --ignore-not-found
 fi
 
-# 30MAR22: TO DO
-# ODFE => OpenSearch Migration
 # Reconcile count of 'data' nodes
+if [ "$existingODFE" == "true" ]; then
+
+   min_data_nodes=$((odfe_data_pvc_count - 1))
+   search_node_count=$(kubectl -n $LOG_NS get statefulset v4m-es -o jsonpath='{.spec.replicas}' 2>/dev/null)
+
+   if [ "$search_node_count" -gt "0" ] && [ "$min_data_nodes" -gt "0" ] && [ "$search_node_count" -lt "$min_data_nodes" ]; then
+      log_warn "There were insufficient OpenSearch nodes [$search_node_count] configured to handle all of the data from the original ODFE 'data' nodes"
+      log_warn "This OpenSearch cluster has been scaled up to [$min_data_nodes] nodes to ensure no loss of data."
+      kubectl -n $LOG_NS scale statefulset v4m-es --replicas=$min_data_nodes
+   fi
+fi
 
 set +e
 
