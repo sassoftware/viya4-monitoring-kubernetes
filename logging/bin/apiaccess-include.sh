@@ -174,7 +174,11 @@ function get_kb_api_url {
 
    pfPID=""
 
-   tlsrequired="$(kubectl -n $LOG_NS get pod -l role=kibana -o=jsonpath='{.items[*].metadata.annotations.tls_required}')"
+   if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ]; then
+      tlsrequired="$(kubectl -n $LOG_NS get pod -l role=kibana -o=jsonpath='{.items[*].metadata.annotations.tls_required}')"
+   else
+      tlsrequired="$(kubectl -n $LOG_NS get secret v4m-osd-tls-enabled -o=jsonpath={.data.enable_tls} |base64 --decode)"
+   fi
    log_debug "TLS required to connect to Kibana? [$tlsrequired]"
 
    get_api_url "$KB_SERVICENAME" '{.spec.ports[?(@.name=="'${KB_SERVICEPORT}'")].port}'  $tlsrequired  $KB_INGRESSNAME
