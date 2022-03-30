@@ -9,15 +9,41 @@ this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
+
+function get_pvcs {
+  local namespace role
+  namespace=$1
+  role=$2
+
+  kubectl -n $namespace get pvc -l role=$role -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.volumeName}{"\t"}{.spec.resources.requests.storage}{"\n"}{end}' 
+}
+
 # get list of existing ODFE 'master' pvcs
-IFS=$'\n' odfe_master_pvcs=($(kubectl -n $LOG_NS get pvc -l role=master -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.volumeName}{"\t"}{.spec.resources.requests.storage}{"\n"}{end}'))
+#IFS=$'\n' odfe_master_pvcs=($(kubectl -n $LOG_NS get pvc -l role=master -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.volumeName}{"\t"}{.spec.resources.requests.storage}{"\n"}{end}'))
+IFS=$'\n' odfe_master_pvcs=($(get_pvcs $LOG_NS master))
 odfe_master_pvc_count=${#odfe_master_pvcs[@]}
 log_debug "Detected [$odfe_master_pvc_count] PVCs associated with role [master]"
 
 # get list of existing ODFE 'data' pvcs
-IFS=$'\n' odfe_data_pvcs=($(kubectl -n $LOG_NS get pvc -l role=data -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.volumeName}{"\t"}{.spec.resources.requests.storage}{"\n"}{end}'))
+#IFS=$'\n' odfe_data_pvcs=($(kubectl -n $LOG_NS get pvc -l role=data -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.volumeName}{"\t"}{.spec.resources.requests.storage}{"\n"}{end}'))
+IFS=$'\n' odfe_data_pvcs=($(get_pvcs $LOG_NS data))
 odfe_data_pvc_count=${#odfe_data_pvcs[@]}
 log_debug "Detected [$odfe_data_pvc_count] PVCs associated with role [data]"
+
+echo "MASTER"
+   for (( i=0; i<${#odfe_master_pvcs[@]}; i++ )); do
+      thispvc=(${odfe_master_pvcs[$i]})
+      echo "$i $thispvc"
+   done
+
+echo "DATA"
+   for (( i=0; i<${#odfe_data_pvcs[@]}; i++ )); do
+      thispvc=(${odfe_data_pvcs[$i]})
+      echo "$i $thispvc"
+   done
+echo "$odfe_data_pvcs"
+
+exit  #REMOVE
 
 if [ "$odfe_master_pvc_count" -gt 0 ] && [ "$odfe_data_pvc_count" -eq 0 ]; then
 
