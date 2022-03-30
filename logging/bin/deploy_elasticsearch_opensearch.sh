@@ -114,16 +114,27 @@ if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
 
+
+# Check for existing OpenSearch helm release
+if [ "$(helm -n $LOG_NS list --filter 'opensearch' -q)" == "opensearch" ]; then
+   log_debug "The Helm release [opensearch] already exists; upgrading the release."
+   existingSearch="true"
+else
+   log_debug "The Helm release [opensearch] does NOT exist; deploying a new release."
+   existingSearch="false"
+fi
+
 helm2ReleaseCheck odfe-$LOG_NS
 
-# OPENSEARCH UPGRADE
-# TODO: MIGRATION
 # Check for existing Open Distro helm release
 if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
+
    log_debug "A Helm release [odfe] exists; upgrading the release."
    existingODFE="true"
 
+   #
    #Migrate Kibana content if upgrading from ODFE 1.7.0
+   #
    if [ "$(helm -n logging list -o yaml --filter odfe |grep app_version)" == "- app_version: 1.8.0" ]; then
 
       # Prior to our 1.1.0 release we used ODFE 1.7.0
@@ -165,49 +176,29 @@ if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
       unset kbpfpid
       export LOG_SEARCH_BACKEND="OPENSEARCH"
    fi
-else
-   log_debug "No obsolete Helm release of [odfe] was found."
-   existingODFE="false"
-fi
 
+   #
+   # Upgrade from ODFE to OpenSearch
+   #
 
-# Check for existing OpenSearch helm release
-if [ "$(helm -n $LOG_NS list --filter 'opensearch' -q)" == "opensearch" ]; then
-   log_debug "A Helm release [opensearch] exists; upgrading the release."
-   existingSearch="true"
-else
-   log_debug "A Helm release [opensearch] does NOT exist; deploying a new release."
-   existingSearch="false"
-fi
+   # Remove the existing ODFE Helm release
+   log_debug "Removing an existing ODFE Helm release"
+   helm -n $LOG_NS delete odfe
+   sleep 20
 
-# 29MAR22: Set UPGRADE2OPENSEARCH based on existingODFE var?
-# Upgrade from ODFE to OpenSearch
-UPGRADE2OPENSEARCH=${UPGRADE2OPENSEARCH:-false}
-if [ "$UPGRADE2OPENSEARCH" == "true" ]; then
-
-   if [ "$existingODFE" == "true" ]; then
-      # Remove the existing ODFE Helm release
-      log_debug "Removing an existing ODFE Helm release"
-      helm -n $LOG_NS delete odfe
-      sleep 20
-   else
-      log_debug "No existing ODFE Helm release found"
-   fi
-
-   ## Migrate PVCs here
+   ## Migrate PVCs
    ### source odfe2opensearch-include
    ### call functions to handle 'data' pvcs
    ### call functions to handle 'master' pvcs
    ### call migrate PVC script for now
-   ./logging/bin/migrate_pvcs.sh
+   source logging/bin/migrate_odfe_pvcs.sh
 
-   ## Move to AFTER the various YAML file processing 
-   ## (to avoid messing with PVCs until we are "good"?
-   ## What else is needed before deploying OpenSearch
-
-   ## 09MAR22: Upgrade Testing
-   ## to bypass security setup
+   ## bypass security setup since 
+   ## it was already configured
    existingSearch=true    #temp fix?
+else
+   log_debug "No obsolete Helm release of [odfe] was found."
+   existingODFE="false"
 fi
 
 
@@ -262,8 +253,8 @@ helm $helmDebug upgrade --install opensearch \
     --set masterService=v4m-es \
     --set fullnameOverride=v4m-es opensearch/opensearch
 
-## 11MAR22: Change to check for flag set in migrate_pvcs logic instead!
-if [ "$UPGRADE2OPENSEARCH" == "true" ]; then
+# ODFE => OpenSearch Migration
+if [ "$deploy_temp_masters" == "true" ]; then
 
    log_debug "Upgrade from ODFE to OpenSearch detected; creating temporary master-only nodes."
    helm $helmDebug upgrade --install opensearch-master \
@@ -311,15 +302,21 @@ kubectl -n $LOG_NS wait pods v4m-es-0 --for=condition=Ready --timeout=10m
 log_verbose "Waiting [2] minutes to allow OpenSearch to initialize [$(date)]"
 sleep 120
 
-if [ "$UPGRADE2OPENSEARCH" == "true" ]; then
+# ODFE => OpenSearch Migration
+if [ "$deploy_temp_masters" == "true" ]; then
    ## Confirm ES is up and working?
    ## Or does the sleep above do that?  To be replaced with better logic
 
    #TODO: Remove 'master-only' nodes from list of 'master-eligible' ES nodes via API call?
-   #      If so, probably can skip the scale down and just uninstall Helm release
+   # get_es_api_url
+   # curl call to remove 'master-only' nodes from list of 'master-eligible' nodes
+   # curl -X POST $es_api_url/_cluster/voting_config_exclusions?node_names=v4m-master-0,v4m-master-1,v4m-master-2
+   # sleep 60
+   # Probably (?) can skip the scale down and just uninstall Helm release
+
 
    # Scale down master statefulset by 1 (to 1)
-   log_debug "Removing 'master-only' ES nodes needed only during upgrade"
+   log_debug "Removing 'master-only' ES nodes needed only during upgrade to OpenSearch"
 
    kubectl -n $LOG_NS scale statefulset v4m-master --replicas 1
    ## wait for 1 minute (probably excessive, but...)
@@ -340,11 +337,15 @@ if [ "$UPGRADE2OPENSEARCH" == "true" ]; then
    kubectl -n $LOG_NS delete pvc v4m-master-v4m-master-0 v4m-master-v4m-master-1 v4m-master-v4m-master-2 --ignore-not-found
 fi
 
+# 30MAR22: TO DO
+# ODFE => OpenSearch Migration
+# Reconcile count of 'data' nodes
+
 set +e
 
 # Run the security admin script on the pod
 # Add some logic to find ES release
-if [ "$existingSearch" == "false" ]; then
+if [ "$existingSearch" == "false" ] && [ "$existingODFE" != "true" ]; then
   kubectl -n $LOG_NS exec v4m-es-0 -c opensearch -- config/run_securityadmin.sh
   # Retrieve log file from security admin script
   kubectl -n $LOG_NS cp v4m-es-0:config/run_securityadmin.log $TMP_DIR/run_securityadmin.log
