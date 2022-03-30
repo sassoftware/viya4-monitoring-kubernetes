@@ -1,12 +1,10 @@
 ingress:
   annotations:
-    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
   enabled: true
-    # ingressClassName is not currently supported by the Open Distro helm chart
-    # ingressClassName: nginx
+  ingressClassName: nginx
   hosts:
-    - host: kibana.logging.host.cluster.example.com
+    - host: dashboards.logging.host.cluster.example.com
       paths:
         - path: /
           backend:
@@ -15,4 +13,4 @@ ingress:
   tls:
     - secretName: kibana-ingress-tls-secret
       hosts:
-        - kibana.logging.host.cluster.example.com
+        - dashboards.logging.host.cluster.example.com

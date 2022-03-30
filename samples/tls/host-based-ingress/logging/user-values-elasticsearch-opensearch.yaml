@@ -1,4 +1,4 @@
-## Elasticsearch ingress is optional
+## OpenSearch ingress is optional
 #ingress:
 #  ingressClassName: nginx
 #  annotations:
@@ -6,8 +6,8 @@
 #  enabled: true
 #  path: /
 #  hosts:
-#    - elasticsearch.logging.host.cluster.example.com
+#    - search.logging.host.cluster.example.com
 #  tls:
 #    - secretName: elasticsearch-ingress-tls-secret
 #      hosts:
-#        - elasticsearch.logging.host.cluster.example.com
+#        - search.logging.host.cluster.example.com
