@@ -9,25 +9,26 @@ function get_odfe_pvcs {
   namespace=$1
   role=$2
 
-  kubectl -n $namespace get pvc -l role=$role -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.volumeName}{"\t"}{.spec.resources.requests.storage}{"\n"}{end}' 
+  kubectl -n $namespace get pvc -l role=$role -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.volumeName}{"\t"}{.spec.resources.requests.storage}{"\t"}{.spec.storageClassName}{"\n"}{end}' 
 }
 
 function patch_odfe_pvc {
-   local somepvc newPVCName pvc pv size
+   local somepvc newPVCName pvc pv size storageClass
    somepvc=$1
    newPVCName=$2
 
    pvcName=$(echo "$somepvc" | awk '{ print $1}')
    pvName=$(echo "$somepvc" | awk '{ print $2}')
    pvcSize=$(echo "$somepvc" | awk '{ print $3}')
+   storageClass=$(echo "$somepvc" | awk '{ print $4}')
 
-   echo "PVC: $pvcName PV:$pvName SIZE:$pvcSize New PVC Name:$newPVCName"
+   echo "PVC: $pvcName PV:$pvName SIZE:$pvcSize StorageClass: $storageClass New PVC Name:$newPVCName"
 
    log_debug "Patching reclaimPolicy on PV [pvName:$pvName]";
    kubectl patch pv $pvName -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}';
 
    log_debug "Creating new PVC [$newPVCName]"
-   printf "apiVersion: v1 \nkind: PersistentVolumeClaim \nmetadata:\n  name: $newPVCName\nspec:\n  accessModes:\n  - ReadWriteOnce\n  resources:\n    requests:\n      storage: $pvcSize\n  volumeName: $pvName" |kubectl -n logging apply -f -
+   printf "apiVersion: v1 \nkind: PersistentVolumeClaim \nmetadata:\n  name: $newPVCName\nspec:\n  accessModes:\n  - ReadWriteOnce\n  storageClassName: $storageClass\n  resources:\n    requests:\n      storage: $pvcSize\n  volumeName: $pvName" |kubectl -n logging apply -f -
 
    # delete ODFE pvc
    log_debug "Deleting existing ODFE PVC [$pvcName]"
