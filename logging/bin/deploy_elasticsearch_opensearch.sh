@@ -63,12 +63,9 @@ apps=( es-transport es-rest es-admin kibana)
 create_tls_certs $LOG_NS logging ${apps[@]}
 
 # Create ConfigMap for securityadmin script
-if [ -z "$(kubectl -n $LOG_NS get configmap run-securityadmin.sh -o name 2>/dev/null)" ]; then
-  kubectl -n $LOG_NS create configmap run-securityadmin.sh --from-file logging/es/opensearch/bin/run_securityadmin.sh
-  kubectl -n $LOG_NS label  configmap run-securityadmin.sh managed-by=v4m-es-script
-else
-  log_verbose "Using existing ConfigMap [run-securityadmin.sh]"
-fi
+kubectl -n $LOG_NS delete configmap run-securityadmin.sh --ignore-not-found
+kubectl -n $LOG_NS create configmap run-securityadmin.sh --from-file logging/es/opensearch/bin/run_securityadmin.sh
+kubectl -n $LOG_NS label  configmap run-securityadmin.sh managed-by=v4m-es-script search-backend=opensearch
 
 # Need to retrieve these from secrets in case secrets pre-existed
 export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
@@ -193,12 +190,12 @@ if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
    helm -n $LOG_NS delete odfe
    sleep 20
 
-   ## Migrate PVCs
-   source logging/bin/migrate_odfe_pvcs.sh
-
    ## bypass security setup since 
    ## it was already configured
    existingSearch=true
+
+   ## Migrate PVCs
+   source logging/bin/migrate_odfe_pvcs.sh
 else
    log_debug "No obsolete Helm release of [odfe] was found."
    existingODFE="false"
