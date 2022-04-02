@@ -53,7 +53,7 @@ set -e
 log_info "Configuring Kibana...this may take a few minutes"
 
 
-if [ "$LOG_SEARCH_BACKEND" == "ODFE" ]; then                  ####   ODFE SUPPORT-start
+if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ]; then            ####   ODFE SUPPORT-start
 
    pod_selector="app=v4m-es,role=kibana"
 
