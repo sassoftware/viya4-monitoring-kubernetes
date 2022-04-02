@@ -39,7 +39,9 @@ function patch_odfe_pvc {
    log_debug "Removing obsolete link between PVC [$pvcName] and PV [$pvName]"
    kubectl patch pv $pvName  --type json -p '[{"op": "remove", "path": "/spec/claimRef"}]'
 
-   # new OpenSearch PVC already includes link to this PV, so they are immediately bound
+   # link PV to new PVC
+   log_debug "Explicitly linking PV [$pvName] to new PVC [$newPVCName]"
+   kubectl patch pv $pvName -p '{"spec": {"claimRef": {"kind": "PersistentVolumeClaim", "namespace": "'$LOG_NS'", "name": "'$newPVCName'"}}}'
 
    # Reset policy so PV is deleted when PVC is deleted
    log_debug "Resetting reclaimPolicy on PV [pvName:$pvName]";
@@ -60,18 +62,17 @@ log_debug "Detected [$odfe_data_pvc_count] PVCs associated with role [data]"
 
 ####################################
 ### DEBUG CODE - START - REMOVE ####
-echo "MASTER"
+log_debug "MASTER PVCs"
    for (( i=0; i<${#odfe_master_pvcs[@]}; i++ )); do
       thispvc=(${odfe_master_pvcs[$i]})
-      echo "$i $thispvc"
+      log_debug "\t $i $thispvc"
    done
 
-echo "DATA"
+log_debug "DATA PVCs"
    for (( i=0; i<${#odfe_data_pvcs[@]}; i++ )); do
       thispvc=(${odfe_data_pvcs[$i]})
-      echo "$i $thispvc"
+      log_debug "\t $i $thispvc"
    done
-echo "$odfe_data_pvcs"
 ### DEBUG CODE - END  - REMOVE #####
 ####################################
 
@@ -84,6 +85,16 @@ if [ "$odfe_master_pvc_count" -gt 0 ] && [ "$odfe_data_pvc_count" -eq 0 ]; then
    master_target="v4m-es-v4m-es-"          # map ODFE 'master' PVCs to primary OpenSearch PVCs
    deploy_temp_masters="false"             # do NOT deploy temporary 'master' nodes
 
+elif [ "$odfe_master_pvc_count" -eq 1 ] && [ "$odfe_data_pvc_count" -eq 1 ]; then
+   # min-logging sample configuration
+   log_error "The current ODFE configuration (likely based on the min-logging sample) can NOT be migrated to OpenSearch"
+   log_error "You may be able to redeploy using an earlier release of Viya 4 Monitoring for Kubernetes to restore the current ODFE."
+   log_error "However, the underlying Open Distro for Elasticsearch technology is no longer actively maintained and doing so will make you vulnerable."
+   log_error ""
+   log_error "Or, you can re-run the deployment script and deploy an entirely new OpenSearch-based deployment of Viya 4 Monitoring for Kubernetes"
+   log_error "Note: any previously captured log messages will no longer be available."
+   exit 1
+
 elif [ "$odfe_master_pvc_count" -gt 0 ] && [ "$odfe_data_pvc_count" -gt 0 ]; then
 
    log_debug "A mix of ODFE 'master' and 'data' nodes detected."
@@ -95,8 +106,6 @@ elif [ "$odfe_master_pvc_count" -gt 0 ] && [ "$odfe_data_pvc_count" -gt 0 ]; the
 
 elif [ "$odfe_master_pvc_count" -eq 0 ] && [ "$odfe_data_pvc_count" -gt 0 ]; then
 
-   # LOGGING_MIN use-case?
-
    log_debug "Only ODFE 'data' PVCs detected"
    log_debug "The 'data' PVCs will be mapped to the primary OpenSearch PVCs"
 
@@ -105,8 +114,7 @@ elif [ "$odfe_master_pvc_count" -eq 0 ] && [ "$odfe_data_pvc_count" -gt 0 ]; the
 
 else
    log_warn "No existing ODFE PVCs detected; nothing to migrate."
-   #error and exit?
-   #warn and remove ODFE=>OpenSearch migration flag?
+   existingODFE=false
 fi
 
 #Handle ODFE Master PVCs

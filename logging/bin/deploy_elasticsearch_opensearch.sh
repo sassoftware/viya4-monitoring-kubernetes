@@ -129,7 +129,7 @@ helm2ReleaseCheck odfe-$LOG_NS
 # Check for existing Open Distro helm release
 if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
 
-   log_debug "A Helm release [odfe] exists; upgrading the release."
+   log_info "An existing ODFE-based deployment was detected; migrating to an OpenSearch-based deployment."
    existingODFE="true"
 
    #
@@ -181,21 +181,24 @@ if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
    # Upgrade from ODFE to OpenSearch
    #
 
+   # Remove Fluent Bit Helm release to 
+   # avoid losing log messages during transition
+   if helm3ReleaseExists v4m-fb $LOG_NS; then
+      log_debug "Removing the Fluent Bit Helm release"
+      helm -n $LOG_NS delete v4m-fb
+   fi
+
    # Remove the existing ODFE Helm release
    log_debug "Removing an existing ODFE Helm release"
    helm -n $LOG_NS delete odfe
    sleep 20
 
    ## Migrate PVCs
-   ### source odfe2opensearch-include
-   ### call functions to handle 'data' pvcs
-   ### call functions to handle 'master' pvcs
-   ### call migrate PVC script for now
    source logging/bin/migrate_odfe_pvcs.sh
 
    ## bypass security setup since 
    ## it was already configured
-   existingSearch=true    #temp fix?
+   existingSearch=true
 else
    log_debug "No obsolete Helm release of [odfe] was found."
    existingODFE="false"
