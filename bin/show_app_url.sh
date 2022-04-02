@@ -32,12 +32,20 @@ for service in $servicelist
 do
    case  "$service" in
      OPENSEARCHDASHBOARD|OSD)
+        if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ];then
+           reset_search_backend="true"
+           LOG_SEARCH_BACKEND="OPENSEARCH"
+        fi
         namespace=${LOG_NS:-"logging"}
         servicename="v4m-osd"
         ingressname=""
         tls_flag="$LOG_KB_TLS_ENABLE"
         ;;
      OPENSEARCH|OS)
+        if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ];then
+           reset_search_backend="true"
+           LOG_SEARCH_BACKEND="OPENSEARCH"
+        fi
         namespace=${LOG_NS:-"logging"}
         servicename="v4m-es"
         ingressname=""
@@ -84,6 +92,10 @@ do
    # get URLs for requested services
    log_debug "Function call: get_service_url $namespace $servicename $tls_flag $ingressname"
    service_url=$(get_service_url "$namespace" "$servicename"  "$tls_flag" "$ingressname")
+
+   if [ "$reset_search_backend" == "true" ]; then
+      LOG_SEARCH_BACKEND="ODFE"
+   fi
 
    # Print URLs
    # add_notice "*** $service ***"
