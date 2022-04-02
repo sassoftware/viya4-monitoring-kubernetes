@@ -28,10 +28,10 @@ function show_usage {
 }
 
 if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
-   pod="v4m-es-0"
+   targetpod="v4m-es-0"
    toolsrootdir="/usr/share/opensearch/plugins/opensearch-security"
 else
-   pod="v4m-es-master-0"
+   targetpod="v4m-es-master-0"
    toolsrootdir="/usr/share/elasticsearch/plugins/opendistro_security"
 fi
 
@@ -110,9 +110,9 @@ if [[ $response == 4* ]]; then
       ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
 
       # make sure hash utility is executable
-      kubectl -n $LOG_NS exec targetpod --  chmod +x $toolsrootdir/tools/hash.sh
+      kubectl -n $LOG_NS exec $targetpod --  chmod +x $toolsrootdir/tools/hash.sh
       # get hash of new password
-      hashed_passwd=$(kubectl -n $LOG_NS exec targetpod --  $toolsrootdir/tools/hash.sh -p $NEW_PASSWD)
+      hashed_passwd=$(kubectl -n $LOG_NS exec $targetpod --  $toolsrootdir/tools/hash.sh -p $NEW_PASSWD)
       rc=$?
       if [ "$rc" == "0" ]; then
 
@@ -151,9 +151,9 @@ if [[ $response == 4* ]]; then
       log_debug "Attempting to change password for user [admin] using the admin certs rather than cached password"
 
       # make sure hash utility is executable
-      kubectl -n $LOG_NS exec targetpod --  chmod +x $toolsrootdir/tools/hash.sh
+      kubectl -n $LOG_NS exec $targetpod --  chmod +x $toolsrootdir/tools/hash.sh
       # get hash of new password
-      hashed_passwd=$(kubectl -n $LOG_NS exec targetpod --  $toolsrootdir/tools/hash.sh -p $NEW_PASSWD)
+      hashed_passwd=$(kubectl -n $LOG_NS exec $targetpod --  $toolsrootdir/tools/hash.sh -p $NEW_PASSWD)
 
       #obtain admin cert
       rm -f $TMP_DIR/tls.crt
