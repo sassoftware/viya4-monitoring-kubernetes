@@ -95,6 +95,10 @@ elif [ "$odfe_master_pvc_count" -eq 1 ] && [ "$odfe_data_pvc_count" -eq 1 ]; the
    log_info "You can delete the existing PVCs that cannot be migrated and free up storage space by submitting a command:"
    log_info "      kubectl -n $LOG_NS delete pvc -l 'app=v4m-es, release=odfe'  " 
    log_info "Note: any previously captured log messages will no longer be available."
+
+   # Remove OpenSearch-specific configMap
+   kubectl -n $LOG_NS delete configmap run-securityadmin.sh --ignore-not-found
+
    exit 1
 
 elif [ "$odfe_master_pvc_count" -gt 0 ] && [ "$odfe_data_pvc_count" -gt 0 ]; then
