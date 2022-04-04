@@ -132,7 +132,7 @@ if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
    #
    #Migrate Kibana content if upgrading from ODFE 1.7.0
    #
-   if [ "$(helm -n logging list -o yaml --filter odfe |grep app_version)" == "- app_version: 1.8.0" ]; then
+   if [ "$(helm -n $LOG_NS list -o yaml --filter odfe |grep app_version)" == "- app_version: 1.8.0" ]; then
 
       # Prior to our 1.1.0 release we used ODFE 1.7.0
       log_info "Migrating content from Open Distro for Elasticsearch 1.7.0"
