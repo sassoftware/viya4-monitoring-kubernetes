@@ -3,7 +3,6 @@ grafana:
   service:
     type: ClusterIP
     nodePort: null
-  # Define host-based ingress
   ingress:
     annotations:
       nginx.ingress.kubernetes.io/backend-protocol: HTTPS
