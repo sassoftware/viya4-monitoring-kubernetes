@@ -28,7 +28,7 @@ function patch_odfe_pvc {
    kubectl patch pv $pvName -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}';
 
    log_debug "Creating new PVC [$newPVCName]"
-   printf "apiVersion: v1 \nkind: PersistentVolumeClaim \nmetadata:\n  name: $newPVCName\nspec:\n  accessModes:\n  - ReadWriteOnce\n  storageClassName: $storageClass\n  resources:\n    requests:\n      storage: $pvcSize\n  volumeName: $pvName" |kubectl -n l$LOG_NS apply -f -
+   printf "apiVersion: v1 \nkind: PersistentVolumeClaim \nmetadata:\n  name: $newPVCName\nspec:\n  accessModes:\n  - ReadWriteOnce\n  storageClassName: $storageClass\n  resources:\n    requests:\n      storage: $pvcSize\n  volumeName: $pvName" |kubectl -n $LOG_NS apply -f -
 
    # delete ODFE pvc
    log_debug "Deleting existing ODFE PVC [$pvcName]"
