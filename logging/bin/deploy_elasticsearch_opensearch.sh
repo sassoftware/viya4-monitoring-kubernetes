@@ -111,6 +111,9 @@ if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
 
+helmRepoAdd opensearch  https://opensearch-project.github.io/helm-charts
+log_verbose "Updating Helm repositories"
+helm repo update
 
 # Check for existing OpenSearch helm release
 if [ "$(helm -n $LOG_NS list --filter 'opensearch' -q)" == "opensearch" ]; then

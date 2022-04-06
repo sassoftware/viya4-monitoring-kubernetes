@@ -63,6 +63,11 @@ if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
 
+helmRepoAdd opensearch  https://opensearch-project.github.io/helm-charts
+log_verbose "Updating Helm repositories"
+helm repo update
+
+
 KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-false}
 
 if [ "$KB_KNOWN_NODEPORT_ENABLE" == "true" ]; then
