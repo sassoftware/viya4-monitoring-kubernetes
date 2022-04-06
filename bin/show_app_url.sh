@@ -36,11 +36,12 @@ do
            reset_search_backend="true"
            LOG_SEARCH_BACKEND="OPENSEARCH"
         fi
+
         service="OpenSearch Dashboards"
         namespace=${LOG_NS:-"logging"}
         servicename="v4m-osd"
-        ingressname=""
-        tls_flag="$LOG_KB_TLS_ENABLE"
+        ingressname="v4m-osd"
+        tls_flag="$(kubectl -n $namespace get secret v4m-osd-tls-enabled -o=jsonpath={.data.enable_tls} |base64 --decode)"
         ;;
      OPENSEARCH|OS)
         if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ];then
@@ -50,7 +51,7 @@ do
         service="OpenSearch"
         namespace=${LOG_NS:-"logging"}
         servicename="v4m-es"
-        ingressname=""
+        ingressname="v4m-es"
         tls_flag="true"
         ;;
      KIBANA)
@@ -93,6 +94,7 @@ do
 
    # get URLs for requested services
    log_debug "Function call: get_service_url $namespace $servicename $tls_flag $ingressname"
+
    service_url=$(get_service_url "$namespace" "$servicename"  "$tls_flag" "$ingressname")
 
    if [ "$reset_search_backend" == "true" ]; then
