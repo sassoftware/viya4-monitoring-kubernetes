@@ -80,15 +80,13 @@ logging/bin/deploy_kibana_opensearch.sh
 # Kibana Content                 #
 ##################################
 
-# NOTE: For ODFE, Kibana is deployed as part of ES Helm chart
-
 logging/bin/deploy_kibana_content.sh
 
 ##################################
 # Display Kibana URL             #
 ##################################
 set +e
-bin/show_app_url.sh KIBANA ELASTICSEARCH
+bin/show_app_url.sh OSD OS
 set -e
 
 

@@ -36,6 +36,7 @@ do
            reset_search_backend="true"
            LOG_SEARCH_BACKEND="OPENSEARCH"
         fi
+        service="OpenSearch Dashboards"
         namespace=${LOG_NS:-"logging"}
         servicename="v4m-osd"
         ingressname=""
@@ -46,6 +47,7 @@ do
            reset_search_backend="true"
            LOG_SEARCH_BACKEND="OPENSEARCH"
         fi
+        service="OpenSearch"
         namespace=${LOG_NS:-"logging"}
         servicename="v4m-es"
         ingressname=""
