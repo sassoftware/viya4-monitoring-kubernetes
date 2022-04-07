@@ -113,7 +113,7 @@ LOG_NODE_PLACEMENT_ENABLE=${LOG_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-
 # Optional workload node placement support
 if [ "$LOG_NODE_PLACEMENT_ENABLE" == "true" ]; then
   log_verbose "Enabling OpenSearch Dashboards for workload node placement"
-  wnpValuesFile="logging/node-placement/values-opensearchdash-opensearch-wnp.yaml"
+  wnpValuesFile="logging/node-placement/values-osd-opensearch-wnp.yaml"
 else
   log_debug "Workload node placement support is disabled for OpenSearch Dashboards"
   wnpValuesFile="$TMP_DIR/empty.yaml"
