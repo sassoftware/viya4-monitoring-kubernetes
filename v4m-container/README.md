@@ -36,7 +36,10 @@ To ensure that your kubeconfig files are available from within the Docker contai
 
 ### (Optional) Custom Deployment Configurations
 
-If you have made changes using a USER_DIR directory, you can copy the contents of this directory to the `./v4m-container/user_dir` directory or mount the file or directory during your `docker run` command.
+You can customize the Viya 4 Monitoring for Kubernetes deployment by editing files in a USER_DIR directory. See the [monitoring README](../monitoring/README.md) and [logging README](../logging/README.md)
+) for detailed information about the customization process and about determining valid customization values.
+
+If you make any customization, you can place the files in the provided `./v4m-container/user_dir` directory to make them available within the container.  If you want to update your custom deployment configuration, you will need to update the contents of the `./v4m-container/user_dir` directory and rebuild the Docker container.
 
 ## Running the Docker Container
 
