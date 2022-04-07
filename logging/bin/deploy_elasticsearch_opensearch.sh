@@ -308,8 +308,10 @@ sleep 120
 
 # ODFE => OpenSearch Migration
 if [ "$deploy_temp_masters" == "true" ]; then
-   ## Confirm ES is up and working?
-   ## Or does the sleep above do that?  To be replaced with better logic
+
+   log_verbose "Upgrade to OpenSearch from Open Distro for Elasticsearch processing continues..."
+   log_info "Waiting up to [3] minutes for 'master-only' ES pods to be Ready [$(date)]"
+   kubectl -n $LOG_NS wait pods  -l app.kubernetes.io/instance=opensearch-master --for=condition=Ready --timeout=3m
 
    #TODO: Remove 'master-only' nodes from list of 'master-eligible' ES nodes via API call?
    # get_es_api_url
