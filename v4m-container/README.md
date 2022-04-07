@@ -55,7 +55,9 @@ The main files that you will be working with in the Docker container are in the 
 /opt/v4m/user_dir/
 ```
 
-### Connecting to the Docker Container
+## Connecting to the Docker Container
+
+### Option 1: Running Commands from Within the Docker Container
 
 To connect to the Docker container, run the following command:
 
@@ -72,7 +74,7 @@ export $KUBECONFIG=/opt/v4m/.kube/<name of kubeconfig file>.conf
 
 Now you can run any script from the `/opt/v4m/viya4-monitoring-kubernetes` directory in the Docker container.
 
-### Running Commands from Outside of the Docker Container
+### Option 2: Running Commands from Outside of the Docker Container
 
 To run commands from outside of the Docker Container, you can run commands similar to the ones below:
 
