@@ -1,5 +1,5 @@
 
-# Version of the V4M Deployment
+# Version of the Viya Monitoring for Kubernetes deployment to download to the container
 ARG V4M_TAG="stable"
 
 ARG ALPINE_TAG=latest
@@ -16,6 +16,7 @@ ARG KUBECTL_VER=v1.23.4
 # oc versions: https://mirror.openshift.com/pub/openshift-v4/clients/oc/
 ARG OC_VER=4.8
 
+# Setting environment variables
 ENV V4M_PATH=/opt/v4m
 ENV KUBECONFIG=$V4M_PATH/.kube/config
 ENV PATH=$V4M_PATH/bin:$PATH
@@ -24,15 +25,14 @@ ENV KEEP_TMP_DIR=true
 RUN mkdir -p $V4M_PATH/bin $V4M_PATH/.kube $V4M_PATH/user_dir
 WORKDIR $V4M_PATH
 
-# Set default 
-
-# Copy KUBECONFIG and USER_DIR in container directory
+# Copy contents from kubeconfig and user_dir to the container
 COPY kubeconfig/* /opt/v4m/.kube
 COPY user_dir/* /opt/v4m/user_dir/
 
 ENV USER_DIR=/opt/v4m/user_dir
 ENV TERM=xterm-256color
 
+# Download necessary executables
 RUN set -eux; \
 	apk add --no-cache \
 		bash \
@@ -71,7 +71,6 @@ RUN mkdir oc; \
 	rm -rf oc/
 
 # viya4-monitoring-kubernetes
-# Should remove dependency on git and just download the archive via wget
 RUN git clone https://github.com/sassoftware/viya4-monitoring-kubernetes; \
 	cd viya4-monitoring-kubernetes; \
 	V4M_BRANCH="$V4M_TAG"; \

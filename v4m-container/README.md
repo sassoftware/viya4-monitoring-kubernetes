@@ -1,13 +1,20 @@
-# V4M Docker Container
+# Viya Monitoring for Kubernetes Docker Container
 
 **EXPERIMENTAL**:  Container of the [viya4-monitoring-kubernetes](https://github.com/sassoftware/viya4-monitoring-kubernetes)
 project
 
+_The Viya Monitoring for Kubernetes Docker Container allows you to work with the Viya 4 Monitoring for Kubernetes project in a containerized environment. By using the container, you don't have to worry about:_
+
+* _Configuring your own shell environment with all of the prerequisite modules and routines needed by the monitoring solution_
+* _Which version of a given module you have installed_
+
+ _All of those dependencies have been packaged into the container. The only prerequisites for running the container are listed below._
+
 ## Pre-requisites
 
-- Docker installed on your workstation
+* Docker should be installed on your workstation
 
-## Preparating the Docker Container
+## Preparing the Docker Container
 
 ### Docker Image
 
@@ -21,13 +28,13 @@ cd v4m-container
 docker build --no-cache -t v4m .
 ```
 
-The Docker image `v4m` will contain Helm, kubectl, and other executables needed to run the v4m deployment.
+The Docker image `v4m` will contain Helm, kubectl, and other executables needed to run the Viya Monitoring for Kubernetes deployment.
 
-#### Kubeconfig File
+### Kubeconfig File
 
 To ensure that your kubeconfig files are available from within the Docker container, you can copy the kubeconfig files to the `./v4m-container/kubeconfig` directory or mount the file or directory during your `docker run` command.
 
-#### (Optional) Custom Deployment Configurations
+### (Optional) Custom Deployment Configurations
 
 If you have made changes using a USER_DIR directory, you can copy the contents of this directory to the `./v4m-container/user_dir` directory or mount the file or directory during your `docker run` command.
 
@@ -38,7 +45,7 @@ If you have made changes using a USER_DIR directory, you can copy the contents o
 The main files that you will be working with in the Docker container are in the following locations:
 
 ```bash
-# V4M Deployment:
+# Viya Monitoring for Kubernetes Deployment:
 /opt/v4m/viya4-monitoring-kubernetes/
 
 # kubeconfig Files:
