@@ -16,7 +16,7 @@ _The Viya Monitoring for Kubernetes Docker Container allows you to work with the
 
 ## Preparing the Docker Container
 
-### Docker Image
+### Building the Docker Image
 
 Run the following command to create the `v4m` Docker image using the provided Dockerfile
 
