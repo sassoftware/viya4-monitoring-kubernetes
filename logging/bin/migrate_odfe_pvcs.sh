@@ -34,8 +34,7 @@ function patch_odfe_pvc {
    log_debug "Deleting existing ODFE PVC [$pvcName]"
    kubectl -n $LOG_NS delete pvc $pvcName
 
-   ## remove link w/ODFE PVC from PV
-   # kubectl patch pv pvc-504a2370-19ea-4e1e-8769-f136b10ce383  --type json -p '[{"op": "remove", "path": "/spec/claimRef"}]'
+   # remove link w/ODFE PVC from PV
    log_debug "Removing obsolete link between PVC [$pvcName] and PV [$pvName]"
    kubectl patch pv $pvName  --type json -p '[{"op": "remove", "path": "/spec/claimRef"}]'
 
@@ -60,21 +59,19 @@ odfe_data_pvc_count=${#odfe_data_pvcs[@]}
 log_debug "Detected [$odfe_data_pvc_count] PVCs associated with role [data]"
 
 
-####################################
-### DEBUG CODE - START - REMOVE ####
-log_debug "MASTER PVCs"
+if [ "$LOG_DEBUG_ENABLE" == "true" ]; then
+   log_debug "List of MASTER PVCs found"
    for (( i=0; i<${#odfe_master_pvcs[@]}; i++ )); do
       thispvc=(${odfe_master_pvcs[$i]})
       log_debug "\t $i $thispvc"
    done
 
-log_debug "DATA PVCs"
+   log_debug "List of DATA PVCs found"
    for (( i=0; i<${#odfe_data_pvcs[@]}; i++ )); do
       thispvc=(${odfe_data_pvcs[$i]})
       log_debug "\t $i $thispvc"
    done
-### DEBUG CODE - END  - REMOVE #####
-####################################
+fi
 
 
 if [ "$odfe_master_pvc_count" -gt 0 ] && [ "$odfe_data_pvc_count" -eq 0 ]; then

@@ -13,7 +13,7 @@ source logging/bin/common.sh
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
     log_error "This script should NOT be run on OpenShift clusters"
-    log_error "Run logging/bin/deploy_logging_open_openshift.sh instead"
+    log_error "Run logging/bin/deploy_logging_opensearch_openshift.sh instead"
     exit 1
   fi
 fi
@@ -42,12 +42,10 @@ set -e
 # Event Router                   #
 ##################################
 
-# Collect Kubernetes events as pseudo-log messages?
-
 logging/bin/deploy_eventrouter.sh
 
 ##################################
-# Open Distro for Elasticsearch  #
+# OpenSearch                     #
 ##################################
 
 logging/bin/deploy_elasticsearch_opensearch.sh
