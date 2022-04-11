@@ -22,7 +22,7 @@ function patch_odfe_pvc {
    pvcSize=$(echo "$somepvc" | awk '{ print $3}')
    storageClass=$(echo "$somepvc" | awk '{ print $4}')
 
-   echo "PVC: $pvcName PV:$pvName SIZE:$pvcSize StorageClass: $storageClass New PVC Name:$newPVCName"
+   log_debug "PVC: $pvcName PV:$pvName SIZE:$pvcSize StorageClass: $storageClass New PVC Name:$newPVCName"
 
    log_debug "Patching reclaimPolicy on PV [pvName:$pvName]";
    kubectl patch pv $pvName -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}';
