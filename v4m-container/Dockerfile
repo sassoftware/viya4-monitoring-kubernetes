@@ -13,7 +13,7 @@ ARG ARCH=amd64
 
 ARG HELM_VER=v3.8.0
 ARG KUBECTL_VER=v1.23.4
-# oc versions: https://mirror.openshift.com/pub/openshift-v4/clients/oc/
+# oc versions: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/
 ARG OC_VER=4.8
 
 # Setting environment variables
@@ -64,14 +64,14 @@ RUN	wget https://get.helm.sh/helm-$HELM_VER-$OS-$ARCH.tar.gz; \
 # oc
 RUN mkdir oc; \
     cd oc; \
-    wget https://mirror.openshift.com/pub/openshift-v4/clients/oc/$OC_VER/linux/oc.tar.gz; \
-	tar -xvf oc.tar.gz; \
+    wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-${OC_VER}/openshift-client-${OS}.tar.gz; \
+	tar -xvf openshift-client-${OS}.tar.gz; \
 	mv oc $V4M_PATH/bin/; \
 	cd ..; \
 	rm -rf oc/
 
 # viya4-monitoring-kubernetes
-RUN git clone https://github.com/sassoftware/viya4-monitoring-kubernetes; \
+RUN git clone -v https://github.com/sassoftware/viya4-monitoring-kubernetes; \
 	cd viya4-monitoring-kubernetes; \
 	V4M_BRANCH="$V4M_TAG"; \
 	if [ "$V4M_BRANCH" == "latest" ]; then V4M_BRANCH="stable"; fi; \
