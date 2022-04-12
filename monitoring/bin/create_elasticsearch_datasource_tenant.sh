@@ -141,6 +141,10 @@ else
   log_debug "The $tenant tenant has been been onboarded in the Elasticsearch.  Continuing."
 fi 
 
+
+
+
+
 # Create temporary directory for string replacement in the grafana-datasource-es.yaml file
 tenantDir=$TMP_DIR/$tenant
 mkdir -p $tenantDir
