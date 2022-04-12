@@ -71,14 +71,10 @@ RUN mkdir oc; \
 	rm -rf oc/
 
 # viya4-monitoring-kubernetes
-RUN git clone -v https://github.com/sassoftware/viya4-monitoring-kubernetes; \
+RUN git clone https://github.com/sassoftware/viya4-monitoring-kubernetes; \
 	cd viya4-monitoring-kubernetes; \
 	V4M_BRANCH="$V4M_TAG"; \
 	if [ "$V4M_BRANCH" == "latest" ]; then V4M_BRANCH="stable"; fi; \
-	git checkout "$V4M_BRANCH"
-
-
-# Extra utilities
-COPY bin/$OS-$ARCH/* $V4M_PATH/bin/
+	git checkout ${V4M_BRANCH}
 
 WORKDIR $V4M_PATH/viya4-monitoring-kubernetes
