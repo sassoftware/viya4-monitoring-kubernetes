@@ -157,7 +157,7 @@ sysctl:
 
 extraInitContainers:
 - name: init-sysctl
-  image: busybox
+  image: busybox:latest
   command:
   - sysctl
   - '-w'
