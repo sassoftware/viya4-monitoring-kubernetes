@@ -122,8 +122,15 @@ fi
 #11FEB22 TODO: OpenShift
 OSD_PATH_INGRESS_YAML=$TMP_DIR/empty.yaml
 if [ "$OPENSHIFT_CLUSTER:$OPENSHIFT_PATH_ROUTES" == "true:true" ]; then
-    OSD_PATH_INGRESS_YAML=logging/openshift/values-opensearchdash-path-route-openshift.yaml
+    OSD_PATH_INGRESS_YAML=logging/openshift/values-osd-path-route-openshift.yaml
 fi
+
+
+OPENSHIFT_SPECIFIC_YAML=$TMP_DIR/empty.yaml
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+    OPENSHIFT_SPECIFIC_YAML=logging/openshift/values-osd-openshift.yaml
+fi
+
 
 # Deploy Elasticsearch via Helm chart
 helm $helmDebug upgrade --install v4m-osd \
@@ -132,6 +139,7 @@ helm $helmDebug upgrade --install v4m-osd \
     --values "$wnpValuesFile" \
     --values "$nodeport_yaml" \
     --values "$OSD_USER_YAML" \
+    --values "$OPENSHIFT_SPECIFIC_YAML" \
     --values "$OSD_PATH_INGRESS_YAML" \
     --set fullnameOverride=v4m-osd opensearch/opensearch-dashboards
 
