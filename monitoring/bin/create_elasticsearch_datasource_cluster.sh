@@ -33,38 +33,28 @@ else
   log_debug "Logging found in $LOG_NS namespace.  Continuing."
 fi
 
-# Create temporary user and password for the data source
-grfds_user="V4M_ALL_grafana_ds"
-grfds_passwd="$(randomPassword)"
-
-# Removes the user if they already exist so it can be remade
-if user_exists "$grfds_user"; then
-   log_verbose "Removing the existing [$grfds_user] utility account."
-   delete_user $grfds_user
-fi
-
-./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u $grfds_user -p "$grfds_passwd" -g
-
 # Create temporary directory for string replacement in the grafana-datasource-es.yaml file
   monDir=$TMP_DIR/$MON_NS
   mkdir -p $monDir
   cp monitoring/grafana-datasource-es.yaml $monDir/grafana-datasource-es.yaml
+
+# Retrieving Elasticsearch password for data source setup
+adminPass="$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" | base64 --decode)"
 
 # Replace placeholders
 log_debug "Replacing variables in $monDir/grafana-datasource-es.yaml file"
 if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
   sed -i '' "s/__sourceName__/Elastic/g" $monDir/grafana-datasource-es.yaml
   sed -i '' "s/__namespace__/$LOG_NS/g" $monDir/grafana-datasource-es.yaml
-  sed -i '' "s/__userID__/$grfds_user/g" $monDir/grafana-datasource-es.yaml
-  sed -i '' "s/__passwd__/$grfds_passwd/g" $monDir/grafana-datasource-es.yaml
+  sed -i '' "s/__userID__/admin/g" $monDir/grafana-datasource-es.yaml
+  sed -i '' "s/__passwd__/$adminPass/g" $monDir/grafana-datasource-es.yaml
 else
   sed -i "s/__sourceName__/Elastic/g" $monDir/grafana-datasource-es.yaml
   sed -i "s/__namespace__/$LOG_NS/g" $monDir/grafana-datasource-es.yaml
-  sed -i "s/__userID__/$grfds_user/g" $monDir/grafana-datasource-es.yaml
-  sed -i "s/__passwd__/$grfds_passwd/g" $monDir/grafana-datasource-es.yaml
+  sed -i "s/__userID__/admin/g" $monDir/grafana-datasource-es.yaml
+  sed -i "s/__passwd__/$adminPass/g" $monDir/grafana-datasource-es.yaml
 fi
 
-# Removes old Elasticsearch data source if one exists
 if [[ -n "$(kubectl get secret -n $MON_NS grafana-datasource-es -o custom-columns=:metadata.name --no-headers --ignore-not-found)" ]]; then
   log_info "Removing existing Elasticsearch data source ..."
   kubectl delete secret -n $MON_NS --ignore-not-found grafana-datasource-es
