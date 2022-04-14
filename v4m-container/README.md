@@ -42,7 +42,30 @@ in a directory named `viya4-monitoring-kubernetes-<release_number>`.
 5. Change to the `viya4-monitoring-kubernetes` directory.
 6. Enter the command `git checkout <release_number>`. If you used the command `git clone --branch <my_branch> <https_url>` in Step 4 to specify the branch, release, or tag, you do not have to perform this step
 
-### Building the Docker Image
+### Populate v4m-container Directories
+
+#### Kubeconfig Directory
+
+To ensure that your kubeconfig files are available from within the Docker container, you can copy the kubeconfig files to the `./v4m-container/kubeconfig` directory or mount the file or directory during your `docker run` command.  By default, the `KUBECONFIG` environment variable is set to use a file called `config`; therefore, if multiple kubeconfig files are being provided, rename the one you would like to use to `config`.
+
+#### (Optional) user_dir Directory
+
+You can customize the Viya 4 Monitoring for Kubernetes deployment by editing files in a USER_DIR directory. See the [monitoring README](../monitoring/README.md) and [logging README](../logging/README.md) for detailed information about the customization process and about determining valid customization values.
+
+If you would like to customize your deployment, you will need to copy the contents of your USER_DIR directory to the `./v4m-container/user_dir` directory or mount the file or directory during your `docker run` command.
+
+### Mounting Files and Directories to your Docker Container
+
+If you do not move your files to the provided `./v4m-container/kubeconfig` and `./v4m-container/user_dir` directories, add the following parameters to your `docker run` commands to include these files and directories:
+```bash
+# Add to your docker run commands to mount a kubeconfig file
+--mount type=bind,source=<path/to/kubeconfig/file>,target=/opt/v4m/.kube/config
+
+# Add to your docker run commands to mount a USER_DIR directory
+--mount type=bind,source=<path/to/userdir/directory>,target=/opt/v4m/user_dir
+```
+
+## Building the Docker Image
 
 Run the following command to create the `v4m` Docker image using the provided Dockerfile
 
@@ -55,15 +78,6 @@ docker build --no-cache -t v4m .
 ```
 
 The Docker image `v4m` will contain Helm, kubectl, and other executables needed to run the Viya Monitoring for Kubernetes scripts.
-
-### Kubeconfig File
-
-To ensure that your kubeconfig files are available from within the Docker container, you can copy the kubeconfig files to the `./v4m-container/kubeconfig` directory or mount the file or directory during your `docker run` command.
-
-### (Optional) Custom Deployment Configurations
-
-You can customize the Viya 4 Monitoring for Kubernetes deployment by editing files in a USER_DIR directory. See the [monitoring README](../monitoring/README.md) and [logging README](../logging/README.md)
-) for detailed information about the customization process and about determining valid customization values.
 
 ## Running the Docker Container
 
@@ -81,8 +95,6 @@ The main files that you will be working with in the Docker container are in the 
 # User Directory
 /opt/v4m/user_dir/
 ```
-
-## Connecting to the Docker Container
 
 ### Option 1: Running Commands from Within the Docker Container
 
@@ -102,42 +114,21 @@ export KUBECONFIG=/opt/v4m/.kube/<name of kubeconfig file>.conf
 
 Now you can run any script from the `/opt/v4m/viya4-monitoring-kubernetes` directory in the Docker container.
 
-**NOTE**:  With this option, if you update any files in either the `./v4m-container/user_dir` or `./v4m-container/kubeconfig` directories, you will need to rebuild the Docker container in order for them to be updated in the Docker container.
-
 ### Option 2: Running Commands from Outside of the Docker Container
 
 To run commands from outside of the Docker Container, you can run commands similar to the ones below:
 
 ```bash
-docker run \
---mount type=bind,source=<path/to/kubeconfig/file>,target=/opt/v4m/.kube/config \
-v4m \
-<script/to/run>
+docker run v4m <script/to/run>
 ```
 
 For example, if you wanted to run `deploy_monitoring_cluster.sh`, your command would look like:
 
 ```bash
-docker run \
---mount type=bind,source=<path/to/kubeconfig/file>,target=/opt/v4m/.kube/config \
-v4m \
-monitoring/bin/deploy_monitoring_cluster.sh
+docker run v4m monitoring/bin/deploy_monitoring_cluster.sh
 ```
 
-**NOTE**: If you want to include customizations to your deployment using a USER_DIR directory, you would need to add the following line to your command:
-
-```bash
---mount type=bind,source=<path/to/userdir/directory>,target=/opt/v4m/user_dir
-```
-
-The final product would look similar to this:
-
-```bash
-docker run \
---mount type=bind,source=<path/to/kubeconfig/file>,target=/opt/v4m/.kube/config \
---mount type=bind,source=<path/to/userdir/directory>,target=/opt/v4m/user_dir \
-v4m \
-monitoring/bin/deploy_monitoring_cluster.sh
-```
-
-**NOTE**: With this option, you do not need to rebuild the Docker container after making changes in the mounted directories.
+### Updating kubeconfig and user_dir Directories used by Docker Container
+If the files in the `./v4m-container/kubeconfig` or `./v4m-container/user_dir` directories, you will need to do one of the following in order for the change to reflect in your Docker container:
+* Run the `docker build` command to rebuild the Docker container (see **Building the Docker Image**)
+* Add the `--mount` parameters to your `docker run` commands (see **Mounting Files and Directories to your Docker Container**)
