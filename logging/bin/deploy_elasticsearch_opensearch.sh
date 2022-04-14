@@ -239,9 +239,9 @@ else
   wnpValuesFile="$TMP_DIR/empty.yaml"
 fi
 
-ES_PATH_INGRESS_YAML=$TMP_DIR/empty.yaml
-if [ "$OPENSHIFT_CLUSTER:$OPENSHIFT_PATH_ROUTES" == "true:true" ]; then
-    ES_PATH_INGRESS_YAML=logging/openshift/values-elasticsearch-path-route-openshift.yaml
+OPENSHIFT_SPECIFIC_YAML=$TMP_DIR/empty.yaml
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+    OPENSHIFT_SPECIFIC_YAML=logging/openshift/values-opensearch-openshift.yaml
 fi
 
 # Deploy OpenSearch via Helm chart
@@ -251,7 +251,7 @@ helm $helmDebug upgrade --install opensearch \
     --values logging/es/opensearch/es_helm_values_opensearch.yaml \
     --values "$wnpValuesFile" \
     --values "$ES_OPEN_USER_YAML" \
-    --values "$ES_PATH_INGRESS_YAML" \
+    --values "$OPENSHIFT_SPECIFIC_YAML" \
     --set nodeGroup=primary  \
     --set masterService=v4m-es \
     --set fullnameOverride=v4m-es opensearch/opensearch
@@ -265,7 +265,7 @@ if [ "$deploy_temp_masters" == "true" ]; then
        --values logging/es/opensearch/es_helm_values_opensearch.yaml \
        --values "$wnpValuesFile" \
        --values "$ES_OPEN_USER_YAML" \
-       --values "$ES_PATH_INGRESS_YAML" \
+       --values "$OPENSHIFT_SPECIFIC_YAML" \
        --set nodeGroup=temp_masters  \
        --set ingress.enabled=false \
        --set replicas=2 \
