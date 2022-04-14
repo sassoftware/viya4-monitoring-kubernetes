@@ -65,7 +65,7 @@ case "$app" in
       route_name="$service_name"
       if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
         route_host=${OPENSHIFT_ROUTE_HOST_ELASTICSEARCH:-v4m-$namespace.$OPENSHIFT_ROUTE_DOMAIN}
-        route_path="/elasticsearch"
+        route_path="/opensearch"
       else
         route_host=${OPENSHIFT_ROUTE_HOST_ELASTICSEARCH:-$service_name-$namespace.$OPENSHIFT_ROUTE_DOMAIN}
         route_path="/"
@@ -81,7 +81,7 @@ case "$app" in
       route_name="$service_name"
       if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
         route_host=${OPENSHIFT_ROUTE_HOST_KIBANA:-v4m-$namespace.$OPENSHIFT_ROUTE_DOMAIN}
-        route_path="/kibana"
+        route_path="/dashboards"
       else
         route_host=${OPENSHIFT_ROUTE_HOST_KIBANA:-$service_name-$namespace.$OPENSHIFT_ROUTE_DOMAIN}
         route_path="/"
