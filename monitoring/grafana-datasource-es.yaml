@@ -13,7 +13,7 @@ datasources:
     timeField: "@timestamp"
     esVersion: 70
     logMessageField: message
-    logLevelField: level
+    logLevelField: level_keyword
   secureJsonData:
     # Change this value
     basicAuthPassword: __passwd__
