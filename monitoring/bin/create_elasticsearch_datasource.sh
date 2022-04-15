@@ -11,13 +11,14 @@ source logging/bin/rbac-include.sh
 this_script=`basename "$0"`
 
 function show_usage {
-  log_message  "Usage: $this_script --namespace NAMESPACE --tenant TENANT --user USER --password PASSWORD"
+  log_message  "Usage: $this_script [--namespace NAMESPACE --tenant TENANT]"
   log_message  ""
-  log_message  "'Creates the Elasticsearch data source for a Viya tenant given using user-provided "
-  log_message  "namespace, tenant, and user credentials."
+  log_message  "Creates the Elasticsearch data source to allow log messages to be viewed in Grafana."
   log_message  ""
-  log_message  "    Arguments:"
-  log_message  "     -ns, --namespace NAMESPACE   - The namespace where the Viya tenant is resides."
+  log_message  "To create the Elasticsearch data source at the cluster level, do not pass any "
+  log_message  "arguments.  To create the Elasticsearch data source at the tenant level, you need"
+  log_message  "to provide the following arguments:"
+  log_message  "     -ns, --namespace NAMESPACE   - The namespace where the Viya tenant resides."
   log_message  "     -t,  --tenant TENANT         - The tenant whose Elasticsearch data source you want to set up."
   log_message  ""
 }
@@ -74,7 +75,8 @@ if [ -z "$tenantNS" ] && [ -z "$tenant" ]; then
 elif [ -n "$tenantNS" ] && [ -n "$tenant" ]; then
     nst="${tenantNS}_${tenant}"
 else
-   log_error ""
+   log_error "Both a [NAMESPACE] and a [TENANT] are required in order to set up the data source.";
+   exit 1
 fi
 
 # Check to see if monitoring/Viya namespace provided exists and components have already been deployed
@@ -82,7 +84,7 @@ if [ "$cluster" == "true" ]; then
     log_info "Checking for Grafana pods in the $MON_NS namespace ..."
     if [[ $(kubectl get pods -n $MON_NS -l app.kubernetes.io/instance=v4m-prometheus-operator -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]]; then
         log_error "No monitoring components found in the [$MON_NS] namespace."
-        log_error "Monitoring needs to be deployed in this namespace in order to configure Elasticsearch with this script.";
+        log_error "Monitoring needs to be deployed in this namespace in order to configure the Elasticsearch data source in Grafana.";
         exit 1
     else
         log_debug "Monitoring found in $MON_NS namespace.  Continuing."
@@ -91,7 +93,7 @@ else
     log_info "Checking the [$tenantNS] namespace for monitoring deployment for the [$tenant] tenant ..."
     if [[ $(kubectl get pods -n $tenantNS -l app.kubernetes.io/instance=v4m-grafana-$tenant -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]]; then
         log_error "No monitoring components were found for [$tenant] in the [$tenantNS] namespace."
-        log_error "Monitoring needs to be deployed using the deploy_monitoring_tenant script in order to configure Elasticsearch with this script.";
+        log_error "Monitoring needs to be deployed using the deploy_monitoring_tenant script in order to configure the Elasticsearch data source in Grafana.";
         exit 1
     else
         log_debug "Monitoring deployment was found for the [$tenant] tenant in the [$tenantNS] namespace.  Continuing."
@@ -170,18 +172,18 @@ fi
 # Removes old Elasticsearch data source if one exists
 if [ "$cluster" == "true" ]; then
     if [[ -n "$(kubectl get secret -n $MON_NS grafana-datasource-es -o custom-columns=:metadata.name --no-headers --ignore-not-found)" ]]; then
-        log_info "Removing existing Elasticsearch data source ..."
+        log_info "Removing existing Elasticsearch data source secret ..."
         kubectl delete secret -n $MON_NS --ignore-not-found grafana-datasource-es
     fi
 else
     if [ -n "$(kubectl get secret -n $tenantNS v4m-grafana-datasource-es-$tenant -o custom-columns=:metadata.name --no-headers --ignore-not-found)" ]; then
-        log_info "Removing existing Elasticsearch data source for [$tenantNS/$tenant] ..."
+        log_info "Removing existing Elasticsearch data source secret for [$tenantNS/$tenant] ..."
         kubectl delete secret -n $tenantNS --ignore-not-found v4m-grafana-datasource-es-$tenant
     fi
 fi
 
 # Adds the Elasticsearch data source to Grafana
-log_info "Provisioning Elasticsearch data source for Grafana"
+log_info "Provisioning Elasticsearch data source in Grafana"
 if [ "$cluster" == "true" ]; then
     kubectl create secret generic -n $MON_NS grafana-datasource-es --from-file $monDir/grafana-datasource-es.yaml
     kubectl label secret -n $MON_NS grafana-datasource-es grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
@@ -191,13 +193,13 @@ else
 fi
 
 # Delete pods so that they can be restarted with the change.
-log_info "Elasticsearch data source provisioned.  Restarting pods to apply the change"
+log_info "Elasticsearch ata source provisioned in Grafana.  Restarting pods to apply the change"
 if [ "$cluster" == "true" ]; then
     kubectl delete pods -n $MON_NS -l "app.kubernetes.io/instance=v4m-prometheus-operator" -l "app.kubernetes.io/name=grafana"
     kubectl -n $MON_NS wait pods --selector "app.kubernetes.io/instance=v4m-prometheus-operator","app.kubernetes.io/name=grafana" --for condition=Ready --timeout=2m
-    log_info "Elasticsearch data source has been configured."
+    log_info "Elasticsearch data source in Grafana has been configured."
 else
     kubectl delete pods -n $tenantNS -l "app.kubernetes.io/instance=v4m-grafana-$tenant"
     kubectl -n $tenantNS wait pods --selector app.kubernetes.io/instance=v4m-grafana-$tenant --for condition=Ready --timeout=2m
-    log_info "Elasticsearch data source has been configured for [$tenantNS/$tenant]."
+    log_info "Elasticsearch data source in Grafana has been configured for [$tenantNS/$tenant]."
 fi
