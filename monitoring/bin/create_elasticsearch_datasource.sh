@@ -13,7 +13,7 @@ this_script=`basename "$0"`
 function show_usage {
   log_message  "Usage: $this_script --namespace NAMESPACE --tenant TENANT --user USER --password PASSWORD"
   log_message  ""
-  log_message  "'Creates the Elasticsearch datasource for a Viya tenant given using user-provided "
+  log_message  "'Creates the Elasticsearch data source for a Viya tenant given using user-provided "
   log_message  "namespace, tenant, and user credentials."
   log_message  ""
   log_message  "    Arguments:"
@@ -71,10 +71,10 @@ tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
 # Check for parameters - set with cluster or tenant
 if [ -z "$tenantNS" ] && [ -z "$tenant" ]; then
    cluster="true"
-elif [ -n "$tenant" ]; then
+elif [ -n "$tenantNS" ] && [ -n "$tenant" ]; then
     nst="${tenantNS}_${tenant}"
 else
-   nst="$tenantNS"
+   log_error ""
 fi
 
 # Check to see if monitoring/Viya namespace provided exists and components have already been deployed
@@ -90,22 +90,22 @@ if [ "$cluster" == "true" ]; then
 else
     log_info "Checking the [$tenantNS] namespace for monitoring deployment for the [$tenant] tenant ..."
     if [[ $(kubectl get pods -n $tenantNS -l app.kubernetes.io/instance=v4m-grafana-$tenant -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]]; then
-        log_error "No monitoring components were found for $tenant in the $tenantNS namespace."
-        log_error "Monitoring needs to be deployed in this namespace in order to configure Elasticsearch with this script.";
+        log_error "No monitoring components were found for [$tenant] in the [$tenantNS] namespace."
+        log_error "Monitoring needs to be deployed using the deploy_monitoring_tenant script in order to configure Elasticsearch with this script.";
         exit 1
     else
-        log_debug "Monitoring deployment was found for the $tenant tenant in the $tenantNS namespace.  Continuing."
+        log_debug "Monitoring deployment was found for the [$tenant] tenant in the [$tenantNS] namespace.  Continuing."
     fi
 fi
 
 # Check to see if logging namespace provided exists and components have already been deployed
-log_info "Checking for Elasticsearch pods in the $LOG_NS namespace ..."
+log_info "Checking for Elasticsearch pods in the [$LOG_NS] namespace ..."
 if [[ $(kubectl get pods -n $LOG_NS -l app=v4m-es -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]]; then
-  log_error "No logging components found in the $LOG_NS namespace."
-  log_error "Logging needs to be deployed in this namespace in order to configure Elasticsearch with this script.";
+  log_error "Elasticsearch was not found in the [$LOG_NS] namespace."
+  log_error "All of the required log monitoring components need to be deployed in this namespace before this script can configure the requested Grafana datasource "
   exit 1
 else
-  log_debug "Logging deployment found in $LOG_NS namespace.  Continuing."
+  log_debug "Logging deployment found in [$LOG_NS] namespace.  Continuing."
 fi
 
 # get admin credentials
@@ -181,7 +181,7 @@ else
 fi
 
 # Adds the Elasticsearch data source to Grafana
-log_info "Provisioning Elasticsearch datasource for Grafana"
+log_info "Provisioning Elasticsearch data source for Grafana"
 if [ "$cluster" == "true" ]; then
     kubectl create secret generic -n $MON_NS grafana-datasource-es --from-file $monDir/grafana-datasource-es.yaml
     kubectl label secret -n $MON_NS grafana-datasource-es grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
