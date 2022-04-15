@@ -119,14 +119,14 @@ get_credentials_from_secret admin
 
 # FOR TENANT - Check to see if tenant has been deployed in logging.
 if [ "$cluster" != "true" ]; then
-    log_info "Checking that [$tenant] has been onboarded to Elasticsearch in the $LOG_NS namespace ..."
+    log_info "Verify that the log monitoring onboarding process has been performed for [${tenantNS}/${tenant}] tenant ..."
 
     if ! kibana_tenant_exists "${tenantNS}_${tenant}"; then
-        log_error "Unable to configure Elasticsearch data source."
-        log_error "The [$tenant] tenant in the $tenantNS namespace has not been onboarded.";
+        log_error "Unable to configure a Grafana datasource for this tenant because the log monitoring onboarding process has not been completed for the [$tenant] in the [$tenantNS] namespace."
+        log_error "This can be done by running the logging/onboard.sh script"
         exit 1
     else
-        log_debug "The [$tenant] tenant has been been onboarded in the Elasticsearch.  Continuing."
+        log_debug "The [${tenantNS}/${tenant}] tenant has been been onboarded.  Continuing."
     fi 
 fi
 
@@ -193,7 +193,7 @@ else
 fi
 
 # Delete pods so that they can be restarted with the change.
-log_info "Elasticsearch ata source provisioned in Grafana.  Restarting pods to apply the change"
+log_info "Elasticsearch data source provisioned in Grafana.  Restarting pods to apply the change"
 if [ "$cluster" == "true" ]; then
     kubectl delete pods -n $MON_NS -l "app.kubernetes.io/instance=v4m-prometheus-operator" -l "app.kubernetes.io/name=grafana"
     kubectl -n $MON_NS wait pods --selector "app.kubernetes.io/instance=v4m-prometheus-operator","app.kubernetes.io/name=grafana" --for condition=Ready --timeout=2m
