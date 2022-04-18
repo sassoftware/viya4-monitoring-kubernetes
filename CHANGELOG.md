@@ -3,14 +3,17 @@
 ## Version 1.1.7 (19APR22)
 
 * **Overall**
+  * [FEATURE] - Added a document to the project repository, [Image_Inventory.md](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/Image_Inventory.md),
+    listing all container images used by pods when deploying this
+    project using default values and deploying all components.
+  * [FIX] - Modified naming of Helm releases of the internal V4M chart used
+    to capture deployment information to support deploying log and metric
+    monitoring components in the same namespace.
   * [EXPERIMENTAL] - A [Docker file](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/v4m-container/Dockerfile)
     to allow you to work with this project in a containerized environment.
     This eliminates virtually all pre-requisites and concerns about properly
     configuring your environment. See the associated [README.md](https://github.com/sassoftware/viya4-monitoring-kubernetes/tree/master/v4m-container#readme)
     for more information.
-  * [FEATURE] - Added a document to the project repository, [Image_Inventory.md](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/Image_Inventory.md),
-    listing all container images used by pods when deploying this
-    project using default values and deploying all components.
 
 * **Monitoring**
   * [EXPERIMENTAL] - A new script, `create_elasticsearch_datasource.sh`, that
@@ -22,9 +25,6 @@
     initial deployment and the onboarding process to facilitate the creation 
     of datasource(s) which allow collected log messages collected to be 
     viewed in Grafana.
-  * [FIX] - Modified naming of Helm releases of the internal V4M chart used
-    to capture deployment information to support deploying log and metric
-    monitoring components in the same namespace.
   * [FIX] - Corrected annotations on Grafana ingress objects in the Azure 
     Deployment sample. (Fixes #318)
   * [EXPERIMENTAL] - Running `logging/bin/deploy_logging_opensearch.sh` instead
