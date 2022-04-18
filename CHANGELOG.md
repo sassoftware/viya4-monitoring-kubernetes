@@ -1,5 +1,41 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.1.7 (19APR22)
+
+* **Overall**
+  * [EXPERIMENTAL] - A [Docker file](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/v4m-container/Dockerfile)
+    to allow you to work with this project in a containerized environment.
+    This eliminates virtually all pre-requisites and concerns about properly
+    configuring your environment. See the associated [README.md](https://github.com/sassoftware/viya4-monitoring-kubernetes/tree/master/v4m-container#readme)
+    for more information.
+  * [FEATURE] - Added a document to the project repository, [Image_Inventory.md](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/Image_Inventory.md),
+    listing all container images used by pods when deploying this
+    project using default values and deploying all components.
+
+* **Monitoring**
+  * [EXPERIMENTAL] - A new script, `create_elasticsearch_datasource.sh`, that
+    creates datasource(s) which allow collected log messages collected to be 
+    viewed within Grafana.
+
+* **Logging**
+  * [FEATURE] - New role-based access controls and roles are created during
+    initial deployment and the onboarding process to facilitate the creation 
+    of datasource(s) which allow collected log messages collected to be 
+    viewed in Grafana.
+  * [FIX] - Modified naming of Helm releases of the internal V4M chart used
+    to capture deployment information to support deploying log and metric
+    monitoring components in the same namespace.
+  * [FIX] - Corrected annotations on Grafana ingress objects in the Azure 
+    Deployment sample. (Fixes #318)
+  * [EXPERIMENTAL] - Running `logging/bin/deploy_logging_opensearch.sh` instead
+    of `logging/bin/deploy_logging_opensearch.sh` will deploy log monitoring with
+    OpenSearch 1.3.1 (instead of Open Distro for Elasticsearch 1.13.3) as the 
+    search back-end.  [OpenSearch](http://opensearch.org) will become the default (only) back-end
+    in a coming release.  The files `user-values-elasticsearh-opensearch.yaml` 
+    and `user-values-osd-opensearch.yaml` replace the `user-values-elasticsearch.yaml` 
+    file for providing user-supplied values during the Helm deployment process 
+    and use a different set of keys.
+
 ## Version 1.1.6 (15MAR22)
 
 * **Monitoring**
