@@ -13,7 +13,7 @@ ARG ARCH=amd64
 
 ARG HELM_VER=v3.8.0
 ARG KUBECTL_VER=v1.23.4
-# oc versions: https://mirror.openshift.com/pub/openshift-v4/clients/oc/
+# oc versions: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/
 ARG OC_VER=4.8
 
 # Setting environment variables
@@ -26,7 +26,7 @@ RUN mkdir -p $V4M_PATH/bin $V4M_PATH/.kube $V4M_PATH/user_dir
 WORKDIR $V4M_PATH
 
 # Copy contents from kubeconfig and user_dir to the container
-COPY kubeconfig/* /opt/v4m/.kube
+COPY kubeconfig/* /opt/v4m/.kube/
 COPY user_dir/* /opt/v4m/user_dir/
 
 ENV USER_DIR=/opt/v4m/user_dir
@@ -64,8 +64,8 @@ RUN	wget https://get.helm.sh/helm-$HELM_VER-$OS-$ARCH.tar.gz; \
 # oc
 RUN mkdir oc; \
     cd oc; \
-    wget https://mirror.openshift.com/pub/openshift-v4/clients/oc/$OC_VER/linux/oc.tar.gz; \
-	tar -xvf oc.tar.gz; \
+    wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-${OC_VER}/openshift-client-${OS}.tar.gz; \
+	tar -xvf openshift-client-${OS}.tar.gz; \
 	mv oc $V4M_PATH/bin/; \
 	cd ..; \
 	rm -rf oc/
@@ -75,10 +75,6 @@ RUN git clone https://github.com/sassoftware/viya4-monitoring-kubernetes; \
 	cd viya4-monitoring-kubernetes; \
 	V4M_BRANCH="$V4M_TAG"; \
 	if [ "$V4M_BRANCH" == "latest" ]; then V4M_BRANCH="stable"; fi; \
-	git checkout "$V4M_BRANCH"
-
-
-# Extra utilities
-COPY bin/$OS-$ARCH/* $V4M_PATH/bin/
+	git checkout ${V4M_BRANCH}
 
 WORKDIR $V4M_PATH/viya4-monitoring-kubernetes
