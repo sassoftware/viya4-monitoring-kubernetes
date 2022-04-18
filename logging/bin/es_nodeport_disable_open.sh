@@ -8,7 +8,8 @@ source logging/bin/common.sh
 
 set -e
 
-export SVC=v4m-es-client-service
+#export SVC=v4m-es-client-service
+SVC=$ES_SERVICENAME
 
 log_info "Removing NodePort for Elasticsearch instance [$SVC] in [$LOG_NS]"
 

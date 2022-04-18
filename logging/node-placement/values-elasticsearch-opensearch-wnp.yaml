@@ -1,0 +1,36 @@
+tolerations:
+- key: "workload.sas.com/class"
+  operator: "Equal"
+  value: "stateful"
+  effect: "NoSchedule"
+- key: "workload.sas.com/class"
+  operator: "Equal"
+  value: "stateless"
+  effect: "NoSchedule"
+
+nodeAffinity:
+  preferredDuringSchedulingIgnoredDuringExecution:
+  - weight: 100
+    preference:
+      matchExpressions:
+      - key: workload.sas.com/class
+        operator: In
+        values:
+        - stateful
+  - weight: 50
+    preference:
+      matchExpressions:
+       - key: workload.sas.com/class
+         operator: NotIn
+         values:
+         - compute
+         - cas
+         - stateless
+         - connect
+  requiredDuringSchedulingIgnoredDuringExecution:
+    nodeSelectorTerms:
+    - matchExpressions:
+      - key: kubernetes.azure.com/mode
+        operator: NotIn
+        values:
+        - system

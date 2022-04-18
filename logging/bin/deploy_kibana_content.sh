@@ -52,29 +52,69 @@ set -e
 
 log_info "Configuring Kibana...this may take a few minutes"
 
-#### TEMP:  Remove if/when Helm chart supports defining nodePort
-KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-true}
 
-if [ "$KB_KNOWN_NODEPORT_ENABLE" == "true" ]; then
-   SVC=v4m-es-kibana-svc
-   SVC_TYPE=$(kubectl get svc -n $LOG_NS $SVC -o jsonpath='{.spec.type}')
+if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ]; then            ####   ODFE SUPPORT-start
 
-   if [ "$SVC_TYPE" == "NodePort" ]; then
-     KIBANA_PORT=31033
-     kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
-     log_verbose "Setting Kibana service NodePort to 31033"
+   pod_selector="app=v4m-es,role=kibana"
+
+   KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-true}
+
+   if [ "$KB_KNOWN_NODEPORT_ENABLE" == "true" ]; then
+      SVC=v4m-es-kibana-svc
+      SVC_TYPE=$(kubectl get svc -n $LOG_NS $SVC -o jsonpath='{.spec.type}')
+
+      if [ "$SVC_TYPE" == "NodePort" ]; then
+        KIBANA_PORT=31033
+        kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
+        log_verbose "Setting Kibana service NodePort to 31033"
+       fi
+   else
+     log_debug "Kibana service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
    fi
 else
-  log_debug "Kibana service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
+   # OPENSEARCH DASHBOARDS
+   pod_selector="app=opensearch-dashboards"
+
+fi                                                            ####   ODFE SUPPORT-end
+
+
+# wait for pod to show as "running" and "ready"
+log_info "Waiting for Kibana pods to be ready ($(date) - timeout 10m)"
+kubectl -n $LOG_NS wait pods --selector $pod_selector  --for condition=Ready --timeout=10m
+
+set +e  # disable exit on error
+
+# Need to wait 2-3 minutes for kibana to come up and
+# and be ready to accept the curl commands below
+# Confirm Kibana is ready
+for pause in 30 30 60 30 30 30 30 30 30
+do
+
+   get_kb_api_url
+   response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "${kb_api_url}/api/status"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
+   # returns 503 (and outputs "Kibana server is not ready yet") when Kibana isn't ready yet
+   # TO DO: check for 503 specifically?
+   rc=$?
+   if [[ $response != 2* ]]; then
+      log_debug "The Kibana REST endpoint does not appear to be quite ready [$response/$rc]; sleeping for [$pause] more seconds before checking again."
+      stop_kb_portforwarding
+      sleep ${pause}
+   else
+      log_verbose "The Kibana REST endpoint appears to be ready...continuing"
+      kibanaready="TRUE"
+      break
+   fi
+done
+
+set -e
+
+if [ "$kibanaready" != "TRUE" ]; then
+   log_error "The Kibana REST endpoint has NOT become accessible in the expected time; exiting."
+   log_error "Review the Kibana pod's events and log to identify the issue and resolve it before trying again."
+   exit 1
 fi
 
-
-# wait up to 10 minutes for pod to show as "running" and "ready"
-log_info "Waiting for Kibana pods to be ready ($(date) - timeout 10m)"
-kubectl -n $LOG_NS wait pods --selector app=v4m-es,role=kibana --for condition=Ready --timeout=10m
-
-set +e
-get_kb_api_url
+set +e  # disable exit on error
 
 # get Security API URL
 get_sec_api_url

@@ -23,7 +23,8 @@ export ES_PORT="${ES_PORT:-0}"
 
 # set env var with service name
 #export SVC=elasticsearch-master
-export SVC=v4m-es-client-service
+#export SVC=v4m-es-client-service
+SVC=$ES_SERVICENAME
 
 if [ "$ES_PORT" != "0" ]; then
    log_info "Making Elasticsearch instance [$SVC] in [$LOG_NS] namespace available on port [$ES_PORT]"
@@ -39,12 +40,12 @@ export NODE_NAME=$(kubectl get nodes | awk 'NR==2 { print $1 }')
 kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"},{"op":"replace","path":"/spec/ports/0/nodePort","value":'${ES_PORT}'}]'
 
 # Determine which port was ultimately used
-ACTUAL_ES_PORT=$(kubectl -n $LOG_NS get service v4m-es-client-service -o=jsonpath='{.spec.ports[?(@.name=="http")].nodePort}')
+ACTUAL_ES_PORT=$(kubectl -n $LOG_NS get service $SVC -o=jsonpath='{.spec.ports[?(@.name=="http")].nodePort}')
 log_debug "ES NodePort enabled on [$ACTUAL_ES_PORT]"
 
 # Print URL to access Elasticsearch
 SHOW_ES_URL="${SHOW_ES_URL:-true}"
 if [ "$SHOW_ES_URL" == "true" ]; then
-   bin/show_app_url.sh ELASTICSEARCH
+   bin/show_app_url.sh ELASTICSEARCH OPENSEARCH
 fi
 

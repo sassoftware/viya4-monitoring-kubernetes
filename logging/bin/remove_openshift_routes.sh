@@ -12,6 +12,8 @@ log_debug "Script [$this_script] has started [$(date)]"
 
 oc -n $LOG_NS delete route v4m-es-kibana-svc     --ignore-not-found
 oc -n $LOG_NS delete route v4m-es-client-service --ignore-not-found
+oc -n $LOG_NS delete route v4m-es                --ignore-not-found
+oc -n $LOG_NS delete route v4m-osd               --ignore-not-found
 
 log_info "OpenShift Routes have been removed."
 

@@ -1,0 +1,44 @@
+# This sample configures path-based ingress (w/o TLS)
+
+extraEnvs:
+# SERVER_BASEPATH needed for path-based ingress only
+- name: SERVER_BASEPATH
+  value: /dashboards
+# NOTE: OSD_ENABLE_TLS, OPENSEARCH_USERNAME & OPENSEARCH_PASSWORD
+# need to be set here since Helm *replaces* array values
+- name: OSD_ENABLE_TLS
+  valueFrom:
+    secretKeyRef:
+      name: v4m-osd-tls-enabled
+      key: enable_tls
+- name: OPENSEARCH_USERNAME
+  valueFrom:
+    secretKeyRef:
+      name: internal-user-kibanaserver
+      key: username
+- name: OPENSEARCH_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: internal-user-kibanaserver
+      key: password
+
+service:
+  type: ClusterIP
+  nodePort: null
+
+ingress:
+  ingressClassName: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite (?i)/dashboards/(.*) /$1 break;
+      rewrite (?i)/dashboards$ / break;
+    nginx.ingress.kubernetes.io/rewrite-target: /dashboards
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+  enabled: true
+  hosts:
+    - host: host.cluster.example.com
+      paths:
+        - path: /dashboards
+
+

@@ -11,6 +11,7 @@
 #    kb_api_url  - URL to access KB API/serivce
 #    espfpid     - process id of ES portforwarding
 #    kbpfpid     - process id of KB portforwarding
+#    ism_api_url - URL to access Index State Management (ISM) API/serivce
 #    sec_api_url - URL to access ODFE Security API/serivce
 #    pfPID       - process id used for portforwardign
 
@@ -22,7 +23,11 @@ function stop_portforwarding {
    local pid
    pid=${1:-$pfPID}
 
-   set +e
+   if [ -o errexit ]; then
+      restore_errexit=Y
+      log_debug "Toggling errexit: Off"
+      set +e
+   fi
 
    if ps -p "$pid" >/dev/null;  then
       log_debug "Killing port-forwarding process [$pid]."
@@ -32,7 +37,10 @@ function stop_portforwarding {
       log_debug "No portforwarding processID found; nothing to terminate."
    fi
 
-   set -e
+   if [ -n "$restore_errexit" ]; then
+      log_debug "Toggling errexit: On"
+      set -e
+   fi
 
 }
 
@@ -137,7 +145,8 @@ function get_es_api_url {
    fi
 
    pfPID=""
-   get_api_url "v4m-es-client-service" '{.spec.ports[?(@.name=="http")].port}' true
+   get_api_url "$ES_SERVICENAME" '{.spec.ports[?(@.name=="http")].port}' true
+
    rc=$?
 
    if [ "$rc" == "0" ]; then
@@ -165,10 +174,14 @@ function get_kb_api_url {
 
    pfPID=""
 
-   tlsrequired="$(kubectl -n $LOG_NS get pod -l role=kibana -o=jsonpath='{.items[*].metadata.annotations.tls_required}')"
+   if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ]; then
+      tlsrequired="$(kubectl -n $LOG_NS get pod -l role=kibana -o=jsonpath='{.items[*].metadata.annotations.tls_required}')"
+   else
+      tlsrequired="$(kubectl -n $LOG_NS get secret v4m-osd-tls-enabled -o=jsonpath={.data.enable_tls} |base64 --decode)"
+   fi
    log_debug "TLS required to connect to Kibana? [$tlsrequired]"
 
-   get_api_url "v4m-es-kibana-svc" '{.spec.ports[?(@.name=="kibana-svc")].port}' $tlsrequired v4m-es-kibana-ing
+   get_api_url "$KB_SERVICENAME" '{.spec.ports[?(@.name=="'${KB_SERVICEPORT}'")].port}'  $tlsrequired  $KB_INGRESSNAME
    rc=$?
 
    if [ "$rc" == "0" ]; then
@@ -197,7 +210,8 @@ function get_sec_api_url {
  rc=$?
 
  if [ "$rc" == "0" ]; then
-    sec_api_url="${es_api_url}/_opendistro/_security/api"
+    sec_api_url="${es_api_url}/$ES_PLUGINS_DIR/_security/api"
+
     log_debug "Security API Endpoint: [$sec_api_url]"
     return 0
  else
@@ -207,8 +221,34 @@ function get_sec_api_url {
  fi
 }
 
+function get_ism_api_url {
+   #
+   # obtain Index State Managment API/service URL (calls get_es_api_url function, if necessary)
+   #
+   # Global vars:      ism_api_url - URL to access ISM API/serivce
 
-export -f get_sec_api_url stop_portforwarding get_es_api_url get_kb_api_url stop_es_portforwarding stop_kb_portforwarding
+ if [ -n "$ism_api_url" ]; then
+    log_debug "Index Statement Management API Endpoint already set [$ism_api_url]"
+    return 0
+ fi
+
+ get_es_api_url
+ rc=$?
+
+ if [ "$rc" == "0" ]; then
+    ism_api_url="${es_api_url}/$ES_PLUGINS_DIR/_ism"
+
+    log_debug "Index State Management API Endpoint: [$ism_api_url]"
+    return 0
+ else
+    ism_api_url=""
+    log_error "Unable to obtain the URL for the Index State Management API Endpoint"
+    return 1
+ fi
+}
+
+
+export -f get_ism_api_url get_sec_api_url stop_portforwarding get_es_api_url get_kb_api_url stop_es_portforwarding stop_kb_portforwarding
 
 
 #initialize "global" vars
