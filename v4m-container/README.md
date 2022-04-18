@@ -119,7 +119,7 @@ docker run v4m monitoring/bin/deploy_monitoring_cluster.sh
 
 ### Updating kubeconfig and user_dir Directories used by Docker Container
 
-If the files in the `./v4m-container/kubeconfig` or `./v4m-container/user_dir` directories, you will need to do one of the following in order for the change to reflect in your Docker container:
+If you change the files in the `./v4m-container/kubeconfig` or `./v4m-container/user_dir` directories, you will need to do one of the following in order for the change to reflect in your Docker container:
 
 * Run the `docker build` command to rebuild the Docker container (see [**Building the Docker Image**](#building-the-docker-image))
 * Add the `--mount` parameters to your `docker run` commands (see [**Mounting Files and Directories to your Docker Container**](#mounting-files-and-directories-to-your-docker-container))
