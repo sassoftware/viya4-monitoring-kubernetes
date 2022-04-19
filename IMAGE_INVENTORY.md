@@ -11,6 +11,7 @@ quay.io/prometheus-operator/prometheus-operator:v0.54.0
 quay.io/prometheus/alertmanager:v0.23.0
 quay.io/prometheus/node-exporter:v1.3.1
 quay.io/prometheus/prometheus:v2.33.3
+squareup/ghostunnel:v1.5.2
 ```
 
 ## Viya- and Tenant-Level Monitoring Images
@@ -47,5 +48,7 @@ quay.io/prometheus/alertmanager:v0.23.0
 quay.io/prometheus/node-exporter:v1.3.1
 quay.io/prometheus/prometheus:v2.33.3
 quay.io/prometheuscommunity/elasticsearch-exporter:v1.2.1
+squareup/ghostunnel:v1.5.2
 ```
+**NOTE:**  This is a consolidated list of all images deployed by the Viya 4 Monitoring for Kubernetes project.
 
