@@ -3,7 +3,7 @@
 ## Version 1.1.7 (19APR22)
 
 * **Overall**
-  * [FEATURE] - Added a document to the project repository, [Image_Inventory.md](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/Image_Inventory.md),
+  * [FEATURE] - Added a document to the project repository, [IMAGE_INVENTORY.md](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/IMAGE_INVENTORY.md),
     listing all container images used by pods when deploying this
     project using default values and deploying all components.
   * [FIX] - Modified naming of Helm releases of the internal V4M chart used
