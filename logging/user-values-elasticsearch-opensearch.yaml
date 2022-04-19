@@ -1,0 +1,58 @@
+# Chart: https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch
+# Default values: https://github.com/opensearch-project/helm-charts/blob/main/charts/opensearch/values.yaml
+
+## Number of OpenSearch node (pods)
+# replicas: 3
+
+## Java heap settings for OpenSearch nodes
+# opensearchJavaOpts: "-Xms4096m -Xmx4096m"
+
+## OpenSearch storage configuration
+# persistence:
+#   enabled: true
+#   #storageClass: alt-storage
+#   size: 30Gi
+
+
+# The following properties should ONLY be
+# modified if you are using your own TLS
+# certificates rather than having the
+# deployment process obtain TLS certificates
+# from cert-manager.  Refer to the section
+# "Configure TLS without Using cert-manager" in
+# the document logging/tls.md for more information
+#
+#  *** DO NOT MODIFY ***
+#
+#   config:
+#     opensearch.yml: |
+#       plugins.security.authcz.admin_dn:
+#       - "CN=es-admin,O=cert-manager"
+#       plugins.security.nodes_dn:
+#      - "CN=es-transport,O=cert-manager"
+
+
+
+## The following stanzas 'sysctl' and 'extraInitContainers'
+## are needed to configure the Kubernetes cluster nodes
+## to run OpenSearch. It is not expected that you will
+## need to modify these setttings.
+##
+## If you define any extra initContainers, you
+## MUST uncomment the lines defining the init-sysctl
+## initContainer and add your extra initContainers
+## definitions after the init-sysctl initContainer.
+
+#sysctl:
+#  enabled: false
+
+#extraInitContainers:
+#- name: init-sysctl
+#  image: busybox
+#  command:
+#  - sysctl
+#  - '-w'
+#  - vm.max_map_count=262144
+#  securityContext:
+#    privileged: true
+#    runAsUser: 0

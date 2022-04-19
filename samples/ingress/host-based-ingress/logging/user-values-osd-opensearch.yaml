@@ -1,0 +1,11 @@
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+  enabled: true
+  ingressClassName: nginx
+  hosts:
+    - host: dashboards.logging.host.cluster.example.com
+      paths:
+        - path: /
+          backend:
+            serviceName: v4m-osd
