@@ -77,7 +77,7 @@
       },
       "id": 19,
       "options": {
-        "content": "![](https://optimalbi.com/wp-content/uploads/2016/12/sasviyalogomidnight.png)\n",
+        "content": "![](https://raw.githubusercontent.com/sassoftware/viya4-monitoring-kubernetes/master/img/sasViyaLogo_classicBlue.png)\n",
         "mode": "markdown"
       },
       "pluginVersion": "8.2.1",
