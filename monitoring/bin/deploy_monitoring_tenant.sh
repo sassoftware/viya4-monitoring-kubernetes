@@ -203,7 +203,7 @@ deployV4MInfo "$VIYA_NS" "v4m-metrics-${VIYA_TENANT}"
 
 if [ "$showPass" == "true" ]; then
   # Find the grafana pod
-  grafanaPod="$(kubectl get po -n $VIYA_NS -l app.kubernetes.io/name=grafana --template='{{range .items}}{{.metadata.name}}{{end}}')"
+  grafanaPod="$(kubectl get pods -n $VIYA_NS -l app.kubernetes.io/name=grafana -l app.kubernetes.io/instance=v4m-grafana-${VIYA_TENANT} --template='{{range .items}}{{.metadata.name}}{{end}}')"
 
   log_notice "====================================================================="
   log_notice "Generated Grafana admin password is: $grafanaPwd"
