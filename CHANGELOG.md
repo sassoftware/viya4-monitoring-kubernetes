@@ -28,7 +28,7 @@
   * [FIX] - Corrected annotations on Grafana ingress objects in the Azure 
     Deployment sample. (Fixes #318)
   * [EXPERIMENTAL] - Running `logging/bin/deploy_logging_opensearch.sh` instead
-    of `logging/bin/deploy_logging_opensearch.sh` will deploy log monitoring with
+    of `logging/bin/deploy_logging_open.sh` will deploy log monitoring with
     OpenSearch 1.3.1 (instead of Open Distro for Elasticsearch 1.13.3) as the 
     search back-end.  [OpenSearch](http://opensearch.org) will become the default (only) back-end
     in a coming release.  The files `user-values-elasticsearh-opensearch.yaml` 
