@@ -7,7 +7,7 @@
 # Assumes bin/common.sh has been sourced
 
 if [ ! $(which kubectl) ]; then
-  echo "kubectl not found on the current PATH"
+  log_error "kubectl not found on the current PATH"
   exit 1
 fi
 
@@ -18,7 +18,7 @@ KUBE_SERVER_VER=$(kubectl version --short | grep 'Server Version' | awk '{print 
 if [[ $KUBE_CLIENT_VER =~ v1.2[0-9] ]]; then
   :
 else 
-  echo "Unsupported kubectl version: [$KUBE_CLIENT_VER]"
+  log_error "Unsupported kubectl version: [$KUBE_CLIENT_VER]"
   exit 1
 fi
 
@@ -26,7 +26,7 @@ fi
 if [[ $KUBE_SERVER_VER =~ v1.2[0-9] ]]; then
   :
 else 
-  echo "Unsupported Kubernetes server version: [$KUBE_SERVER_VER]"
+  log_error "Unsupported Kubernetes server version: [$KUBE_SERVER_VER]"
   exit 1
 fi
 
