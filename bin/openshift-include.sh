@@ -42,30 +42,37 @@ function ocVersionCheck {
   done
   log_info "OpenShift client version: $OC_FULL_VERSION"
   log_info "OpenShift server version: $OSHIFT_FULL_VERSION"
+  
   # Version enforcement
   if [ "$OPENSHIFT_VERSION_CHECK" == "true" ]; then
-    if [ "$OC_MAJOR_VERSION" -lt 4 ]; then
-      log_error "Unsupported 'oc' version: $OC_FULL_VERSION. Version 4+ is required."
-      exit 1
-    fi
-    if [ "$OSHIFT_MAJOR_VERSION" -eq 4 ] && [ "$OSHIFT_MINOR_VERSION" -lt 9 ]; then
-      log_debug "OpenShift version check OK"
-    elif [ "$OSHIFT_MAJOR_VERSION" -lt 4 ]; then
-      log_error "Unsupported OpenShift version: $OSHIFT_FULL_VERSION"
+    ## Server Version
+    ### Openshift versions that do not start with a 4 should produce an error.
+    if (( "$OSHIFT_MAJOR_VERSION" != 4 )); then
+      log_error "Unsupported OpenShift server version: $OSHIFT_FULL_VERSION"
       log_error "Version 4.7+ is required"
       exit 1
-    elif [ "$OSHIFT_MAJOR_VERSION" -eq 4 ] && [ "$OSHIFT_MINOR_VERSION" -lt 7 ]; then
-      log_error "Unsupported OpenShift version: $OSHIFT_FULL_VERSION"
+    ### Openshift versions between  and  should give warnings.
+    elif (( "$OSHIFT_MINOR_VERSION" < 7 )); then
+      log_error "Unsupported OpenShift server version: $OSHIFT_FULL_VERSION"
       log_error "Version 4.7+ is required"
       exit 1
-    elif [ "$OSHIFT_MAJOR_VERSION" -eq 4 ] && [ "$OSHIFT_MINOR_VERSION" -gt 8 ]; then
-      # 4.7+ (not 5+) should still work, so just issue a warning
-      log_warn "OpenShift version is higher than expected: $OSHIFT_FULL_VERSION"
-      log_warn "Only version 4.7.x or 4.8.x is supported"
     else
-      log_error "Unsupported OpenShift version: $OSHIFT_FULL_VERSION"
+      log_debug "OpenShift server version check OK"
+    fi
+
+    ## Client Version
+    ### Openshift versions that do not start with a 4 should produce an error.
+    if (( "$OC_MAJOR_VERSION" != 4 )); then
+      log_error "Unsupported OpenShift client version: $OC_FULL_VERSION"
       log_error "Version 4.7+ is required"
       exit 1
+    ### Openshift versions between  and  should give warnings.
+    elif (( "$OC_MINOR_VERSION" < 7 )); then
+      log_error "Unsupported OpenShift client version: $OC_FULL_VERSION"
+      log_error "Version 4.7+ is required"
+      exit 1
+    else
+      log_debug "OpenShift client version check OK"
     fi
   fi
 }
