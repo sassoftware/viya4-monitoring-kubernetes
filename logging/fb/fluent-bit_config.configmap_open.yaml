@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.18-singlestore3
+       Set  fb_configMap_version 0.2.18-singlestore5a
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -100,13 +100,14 @@ data:
        Copy           labels_role    temp_role
        Copy           labels_pgo-pg-database temp_pgo-pg-database
        # following used for 'standard' k8s labels
-       Copy           labels_app_kubernetes_io_name       temp_k8sapp_name
-       Copy           labels_app_kubernetes_io_instance   temp_k8sapp_instance
-       Copy           labels_app_kubernetes_io_version    temp_k8sapp_version
-       Copy           labels_app_kubernetes_io_component  temp_k8sapp_component
-       Copy           labels_app_kubernetes_io_part_of    temp_k8sapp_partof
-       Copy           labels_app_kubernetes_io_managed_by temp_k8sapp_managedby
-       Copy           labels_app_kubernetes_io_created_by temp_k8sapp_createdby
+       Copy           labels_name temp_labels_name
+       Copy           labels_app.kubernetes.io/name       temp_k8sapp_name
+       Copy           labels_app.kubernetes.io/instance   temp_k8sapp_instance
+       Copy           labels_app.kubernetes.io/version    temp_k8sapp_version
+       Copy           labels_app.kubernetes.io/component  temp_k8sapp_component
+       Copy           labels_app.kubernetes.io/part_of    temp_k8sapp_partof
+       Copy           labels_app.kubernetes.io/managed_by temp_k8sapp_managedby
+       Copy           labels_app.kubernetes.io/created_by temp_k8sapp_createdby
     [FILTER]
        #
        # Use kubernetes.labels.k8s-app for appname
@@ -666,16 +667,24 @@ data:
        #
        # SingleStore
        #
-       Alias           flag_singlestore
+       Alias           flag_s2
        Name            modify
        Match           kube.*
        Condition       Key_value_matches  temp_k8sapp_name memsql-cluster
        Copy            message            singlestore_message
        Rename          message            unparsed_message
        Add             flagged4parsing    singlestore
-       Add             DB__s2found        TRUE
     [FILTER]
-       Alias           parse_singlestore_msgs
+       Alias           flag_s2operator
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_matches  temp_labels_name memsql-operator
+       Condition       Key_value_matches  k8s_container    memsql-operator
+       Copy            message            singlestore_message
+       Rename          message            unparsed_message
+       Add             flagged4parsing    s2operator
+    [FILTER]
+       Alias           parse_s2
        Name            parser
        Match           kube.*
        Key_name        singlestore_message
@@ -684,10 +693,10 @@ data:
        Parser          singlestore_operator
        Reserve_Data    On
     [FILTER]
-       Alias           post_singlestore
+       Alias           post_s2
        Name            modify
        Match           kube.*
-       Condition       Key_value_matches  temp_k8sapp_name memsql-cluster
+       Condition       Key_value_matches  flagged4parsing s2operator
        Rename          source      PROPS__source
        Rename          component   PROPS__component
     [FILTER]
