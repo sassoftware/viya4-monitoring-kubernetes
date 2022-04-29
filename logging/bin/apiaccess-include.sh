@@ -167,6 +167,13 @@ function get_kb_api_url {
    # Global vars:      kb_api_url - URL to access KB API/serivce
    #                   kbpfpid    - process id of KB portforwarding
 
+   #NOTE: Use of args implemented to support migration of
+   # ODFE 1.7 Kibana content to OpenSearch Dashoards ONLY!
+   LOG_SEARCH_BACKEND=${1:-$LOG_SEARCH_BACKEND}
+   KB_SERVICENAME=${2:-$KB_SERVICENAME}
+   KB_SERVICEPORT=${3:-$KB_SERVICEPORT}
+   KB_INGRESSNAME=${4:-$KB_INGRESSNAME}
+
    if [ -n "$kb_api_url" ]; then
       log_debug "Kibana API Endpoint already set [$kb_api_url]"
       return 0
