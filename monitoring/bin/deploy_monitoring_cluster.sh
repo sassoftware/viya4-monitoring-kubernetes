@@ -62,15 +62,6 @@ else
   log_debug "Skipping deployment of federated scrape of Istio Prometheus instance"
 fi
 
-# Elasticsearch Datasource for Grafana
-ELASTICSEARCH_DATASOURCE="${ELASTICSEARCH_DATASOURCE:-false}"
-if [ "$ELASTICSEARCH_DATASOURCE" == "true" ]; then
-  configureElasticsearchDatasource
-else
-  log_debug "ELASTICSEARCH_DATASOURCE not set"
-  log_debug "Skipping creation of Elasticsearch datasource for Grafana"
-fi
-
 # Check if Prometheus Operator CRDs are already installed
 PROM_OPERATOR_CRD_UPDATE=${PROM_OPERATOR_CRD_UPDATE:-true}
 PROM_OPERATOR_CRD_VERSION=${PROM_OPERATOR_CRD_VERSION:-v0.54.0}
@@ -227,6 +218,24 @@ if [ $? == 0 ]; then
   kubectl patch prometheusrule --type='json' -n $MON_NS v4m-kubernetes-apps --patch "$(cat monitoring/kube-hpa-alert-patch.json)"
 else
   log_debug "PrometheusRule $MON_NS/v4m-kubernetes-apps does not exist"
+fi
+
+# Elasticsearch Datasource for Grafana
+# Moved down to make sure Grafana pods exist
+ELASTICSEARCH_DATASOURCE="${ELASTICSEARCH_DATASOURCE:-false}"
+if [ "$ELASTICSEARCH_DATASOURCE" == "true" ]; then
+  set +e
+  monitoring/bin/create_elasticsearch_datasource.sh
+
+  if (( $? == 1 )); then
+    log_warn "Unable to configure the Elasticsearch data source at this time."
+    log_warn "Please address the errors and re-run the follow command:"
+    log_warn "monitoring/bin/create_elasticsearch_datasource.sh"
+  fi
+  set -e
+else
+  log_debug "ELASTICSEARCH_DATASOURCE not set"
+  log_debug "Skipping creation of Elasticsearch datasource for Grafana"
 fi
 
 echo ""
