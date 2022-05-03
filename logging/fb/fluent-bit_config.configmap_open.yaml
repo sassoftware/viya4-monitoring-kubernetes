@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.17
+       Set  fb_configMap_version 0.2.18-singlestore6
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -99,6 +99,15 @@ data:
        Copy           labels_vendor  temp_vendor
        Copy           labels_role    temp_role
        Copy           labels_pgo-pg-database temp_pgo-pg-database
+       # following used for 'standard' k8s labels
+       Copy           labels_name temp_labels_name
+       Copy           labels_app.kubernetes.io/name       temp_k8sapp_name
+       Copy           labels_app.kubernetes.io/instance   temp_k8sapp_instance
+       Copy           labels_app.kubernetes.io/version    temp_k8sapp_version
+       Copy           labels_app.kubernetes.io/component  temp_k8sapp_component
+       Copy           labels_app.kubernetes.io/part_of    temp_k8sapp_partof
+       Copy           labels_app.kubernetes.io/managed_by temp_k8sapp_managedby
+       Copy           labels_app.kubernetes.io/created_by temp_k8sapp_createdby
     [FILTER]
        #
        # Use kubernetes.labels.k8s-app for appname
@@ -654,6 +663,45 @@ data:
        Parser          nginx-ingress-stderr1
        Parser          misc-stderr2
        Reserve_Data    On
+    [FILTER]
+       #
+       # SingleStore
+       #
+       Alias           flag_s2
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_matches  temp_k8sapp_name memsql-cluster
+       #NOTE: app.kubernetes.io/name=memsql-cluster (above) currently works for both internal/external SingleStore config
+       #      app.kubernetes.io/instance (below) not currently needed.
+       #Condition       Key_value_matches  temp_k8sapp_instance memsql-cluster|sas-singlestore-cluster
+       Copy            message            singlestore_message
+       Rename          message            unparsed_message
+       Add             flagged4parsing    singlestore
+    [FILTER]
+       Alias           flag_s2operator
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_matches  temp_labels_name memsql-operator|sas-singlestore-operator
+       Condition       Key_value_matches  k8s_container    memsql-operator|sas-singlestore-operator
+       Copy            message            singlestore_message
+       Rename          message            unparsed_message
+       Add             flagged4parsing    s2operator
+    [FILTER]
+       Alias           parse_s2
+       Name            parser
+       Match           kube.*
+       Key_name        singlestore_message
+       Parser          singlestore_exporter
+       Parser          singlestore_node
+       Parser          singlestore_operator
+       Reserve_Data    On
+    [FILTER]
+       Alias           post_s2
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_matches  flagged4parsing s2operator
+       Rename          source      PROPS__source
+       Rename          component   PROPS__component
     [FILTER]
        #
        # Try some misc. parsers for unparsed messages (stderr)
