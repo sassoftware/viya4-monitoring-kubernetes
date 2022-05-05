@@ -170,6 +170,24 @@ helm upgrade --install $helmDebug \
 kubectl apply -n $VIYA_NS -f $tenantDir/serviceMonitor-sas-cas-tenant.yaml
 kubectl apply -n $VIYA_NS -f $tenantDir/serviceMonitor-sas-pushgateway-tenant.yaml
 
+# Elasticsearch Datasource for Grafana
+# Moved down to make sure Grafana pods exist
+ELASTICSEARCH_DATASOURCE="${ELASTICSEARCH_DATASOURCE:-false}"
+if [ "$ELASTICSEARCH_DATASOURCE" == "true" ]; then
+  set +e
+  log_debug "Creating Elasticsearch datasource using the create_elasticesearch_datasource script"
+  monitoring/bin/create_elasticsearch_datasource.sh -ns ${VIYA_NS} -t ${VIYA_TENANT}
+  if (( $? == 1 )); then
+    log_warn "Unable to configure the Elasticsearch data source at this time."
+    log_warn "Please address the errors and re-run the follow command to create the data source at a later time:"
+    log_warn "monitoring/bin/create_elasticsearch_datasource.sh -ns ${VIYA_NS} -t ${VIYA_TENANT}"
+  fi
+  set -e
+else
+  log_debug "ELASTICSEARCH_DATASOURCE not set"
+  log_debug "Skipping creation of Elasticsearch datasource for Grafana"
+fi
+
 function deploy_tenant_dashboards {
    dir=$1
    
