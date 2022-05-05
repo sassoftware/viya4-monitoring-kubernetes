@@ -175,10 +175,11 @@ kubectl apply -n $VIYA_NS -f $tenantDir/serviceMonitor-sas-pushgateway-tenant.ya
 ELASTICSEARCH_DATASOURCE="${ELASTICSEARCH_DATASOURCE:-false}"
 if [ "$ELASTICSEARCH_DATASOURCE" == "true" ]; then
   set +e
+  log_debug "Creating Elasticsearch datasource using the create_elasticesearch_datasource script"
   monitoring/bin/create_elasticsearch_datasource.sh -ns ${VIYA_NS} -t ${VIYA_TENANT}
   if (( $? == 1 )); then
     log_warn "Unable to configure the Elasticsearch data source at this time."
-    log_warn "Please address the errors and re-run the follow command:"
+    log_warn "Please address the errors and re-run the follow command to create the data source at a later time:"
     log_warn "monitoring/bin/create_elasticsearch_datasource.sh -ns ${VIYA_NS} -t ${VIYA_TENANT}"
   fi
   set -e
