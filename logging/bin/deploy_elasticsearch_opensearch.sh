@@ -152,7 +152,22 @@ if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
       #   *pass ODFE-specific values to get_kb_api_url
       unset kb_api_url
       unset kbpfpid
-      get_kb_api_url "ODFE" "v4m-es-kibana-svc"  "kibana-svc" "v4m-es-kibana-ing"
+      get_kb_api_url "ODFE" "v4m-es-kibana-svc"  "kibana-svc" "v4m-es-kibana-ing" "false"
+
+      #Need to confirm KB URL works...might not if TLS enabled.
+      #If that's the case, reset things and do it again with TLS=true.
+
+      response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET "${kb_api_url}/status" -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
+
+      if [[ $response != 2* ]]; then
+         log_debug "Unable to connect to Kibana using HTTP; will try using HTTPS"
+         stop_kb_portforwarding
+         unset kb_api_url
+         unset kbpfpid
+         get_kb_api_url "ODFE" "v4m-es-kibana-svc"  "kibana-svc" "v4m-es-kibana-ing" "true"
+      else
+         log_debug "Confirmed connection to Kibana"
+      fi
 
       content2export='{"type": ["config", "url","visualization", "dashboard", "search", "index-pattern"],"excludeExportDetails": false}'
 

@@ -164,7 +164,7 @@ function get_kb_api_url {
    #
    # obtain KB API/service URL (establish port-forwarding, if necessary)
    #
-   # Global vars:      kb_api_url - URL to access KB API/serivce
+   # Global vars:      kb_api_url - URL to access KB API/service
    #                   kbpfpid    - process id of KB portforwarding
 
    #NOTE: Use of args implemented to support migration of
@@ -173,6 +173,7 @@ function get_kb_api_url {
    KB_SERVICENAME=${2:-$KB_SERVICENAME}
    KB_SERVICEPORT=${3:-$KB_SERVICEPORT}
    KB_INGRESSNAME=${4:-$KB_INGRESSNAME}
+   KB_TLS_ENABLED=${5}
 
    if [ -n "$kb_api_url" ]; then
       log_debug "Kibana API Endpoint already set [$kb_api_url]"
@@ -181,7 +182,10 @@ function get_kb_api_url {
 
    pfPID=""
 
-   if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ]; then
+   if [ -n "$KB_TLS_ENABLED" ]; then
+      tlsrequired="$KB_TLS_ENABLED"
+      log_debug "Kibana TLS setting [$KB_TLS_ENABLED] explicitly passed to get_kb_api_url"
+   elif [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ]; then
       tlsrequired="$(kubectl -n $LOG_NS get pod -l role=kibana -o=jsonpath='{.items[*].metadata.annotations.tls_required}')"
    else
       tlsrequired="$(kubectl -n $LOG_NS get secret v4m-osd-tls-enabled -o=jsonpath={.data.enable_tls} |base64 --decode)"
