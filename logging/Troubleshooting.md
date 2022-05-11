@@ -9,7 +9,7 @@ are created to the directory from which Fluent Bit reads log files. However,
 Fluent Bit cannot read the files in the directory, 
 which are present only as links. Because Fluent Bit can see the directory, it 
 does not issue an error message, but it does not process any logs to be 
-displayed in Kibana.
+displayed in OpenSearch Dashboards.
 
 ### Solution
 
@@ -101,29 +101,29 @@ other than the logging namespace.
 kubectl delete psp v4m-es-psp
 ```
 
-## Issue: Deployment Does Not Complete If the Deployment Machine Cannot Reach Kibana
+## Issue: Deployment Does Not Complete If the Deployment Machine Cannot Reach OpenSearch Dashboards
 
 ### Description
 
-The deployment fails during the "Configuring Kibana" step of the process with 
+The deployment fails during the "Configuring OpenSearch Dashboards" step of the process with 
 messages similar to the following:
 
 ```
-INFO STEP 4: Configuring Kibana
-INFO Configuring Kibana
-INFO The Kibana pod is ready...continuing
-INFO The Kibana REST endpoint does not appear to be quite ready [000]; sleeping for [30] more seconds before checking again.
-INFO The Kibana REST endpoint does not appear to be quite ready [000]; sleeping for [30] more seconds before checking again.
-INFO The Kibana REST endpoint does not appear to be quite ready [000]; sleeping for [30] more seconds before checking again.
-The Kibana REST endpoint has NOT become accessible in the expected time; exiting.
-Review the Kibana pod's events and log to identify the issue and resolve it before trying again.
+INFO STEP 4: Configuring OpenSearch Dashboards
+INFO Configuring OpenSearch Dashboards
+INFO The OpenSearch Dashboards pod is ready...continuing
+INFO The OpenSearch Dashboards REST endpoint does not appear to be quite ready [000]; sleeping for [30] more seconds before checking again.
+INFO The OpenSearch Dashboards REST endpoint does not appear to be quite ready [000]; sleeping for [30] more seconds before checking again.
+INFO The OpenSearch Dashboards REST endpoint does not appear to be quite ready [000]; sleeping for [30] more seconds before checking again.
+The OpenSearch Dashboards REST endpoint has NOT become accessible in the expected time; exiting.
+Review the OpenSearch Dashboards pod's events and log to identify the issue and resolve it before trying again.
 ```
 
-This happens when Kibana cannot be accessed from the machine on which the deployment process is running via the same
-URL your end-users will be using.  This might the case if your environment has been configured to allow access only via
+This happens when OpenSearch Dashboards cannot be accessed from the machine on which the deployment process is running via the same
+URL your end-users will be using.  This might be the case if your environment has been configured to allow access only via
 a private network inaccessible to the deployment machine.  In these situations, setting the `LOG_ALWAYS_PORT_FORWARD` 
-property to `true` forces the deployment scripts to use Kubernetes port-forwarding when accessing the Kibana and/or 
-Elasticsearch APIs rather than the end-user URLs.
+property to `true` forces the deployment scripts to use Kubernetes port-forwarding when accessing the OpenSearch Dashboards and/or 
+OpenSearch APIs rather than the end-user URLs.
 
 ### Solution
 
@@ -137,7 +137,7 @@ for information about the customization process and how to set up a USER_DIR.
 
 You might need to increase storage in the following situations:
 
-* The persistent volume claims (PVCs) associated with the Elasticsearch nodes 
+* The persistent volume claims (PVCs) associated with the OpenSearch nodes 
 (pods) that are used for storage (that is, the nodes with a role of "data") are 
 running low on space. 
 * You are considering an increase to how long log messages are retained. 
@@ -149,7 +149,7 @@ Longer retention periods require more storage.
 ### Solution
 
 For information about increasing storage, see 
-[Increasing the Storage for the Elasticsearch Data Nodes](Log_Retention.md#Increasing-the-Storage-for-the-Elasticsearch-Data-Nodes) in Log Message 
+[Increasing the Storage for the OpenSearch Data Nodes](Log_Retention.md#Increasing-the-Storage-for-the-OpenSearch-Data-Nodes) in Log Message 
 Retention.
 
 To understand how to increase storage and increase the log-retention period, 

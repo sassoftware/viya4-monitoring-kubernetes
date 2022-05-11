@@ -5,25 +5,25 @@
 TLS enablement for SAS Viya logging is divided into two parts:
 
 - **TLS for in-cluster communications**, which is between logging components within
-the cluster (between the Elasticsearch nodes and between Elasticsearch and other logging components). TLS must be enabled on these connections.
+the cluster (between the OpenSearch nodes and between OpenSearch and other logging components). TLS must be enabled on these connections.
 
 The information in this document explains how to configure TLS 
 for in-cluster communications, either automatically (using 
 cert-manager to generate certificates) or by manually generating certificates.
 
 - **TLS for communications into the cluster**, which is between Ingress or a 
-user's browser (if NodePorts are used) and Kibana. TLS is optional on these connections, although enabling TLS is a best practice.
+user's browser (if NodePorts are used) and OpenSearch Dashboards. TLS is optional on these connections, although enabling TLS is a best practice.
 
 For information about configuring TLS for communications into the cluster, see 
 the [TLS logging sample](../samples/tls/logging/README.md).
 
-TLS requires the use of digital security certificates. These certificates allow the Elasticsearch nodes to verify their identity when establishing communication connections. For SAS Viya Monitoring, these certificates are persisted as Kubernetes secrets. Kubernetes mounts these secrets onto the various Elasticsearch and Kibana pods where they appear as files on disk. The name and location of these files is fixed by the Open Distro for Elasticsearch Helm chart and cannot be changed. 
+TLS requires the use of digital security certificates. These certificates allow the OpenSearch nodes to verify their identity when establishing communication connections. For SAS Viya Monitoring, these certificates are persisted as Kubernetes secrets. Kubernetes mounts these secrets onto the various OpenSearch and OpenSearch Dashboards pods where they appear as files on disk. The name and location of these files is fixed by the OpenSearch Helm chart and cannot be changed. 
 
 ## Configure TLS Using cert-manager
 
 By default, the deployment process for the SAS Viya Monitoring solution uses cert-manager to obtain and manage the digital security certificates. Version v1.0 or later of cert-manager is required.
 
-The `deploy_logging_open.sh` deployment script automatically obtains the certificates from cert-manager and creates the Kubernetes secrets with the required structure and expected names. The script ensures that the certificates are mounted on the Elasticsearch and Kibana pods in the correct locations.
+The `deploy_logging_open.sh` deployment script automatically obtains the certificates from cert-manager and creates the Kubernetes secrets with the required structure and expected names. The script ensures that the certificates are mounted on the OpenSearch and OpenSearch Dashboards pods in the correct locations.
 
 ## Configure TLS Without Using cert-manager
 
@@ -43,11 +43,11 @@ kubectl -n <namespace> create secret generic <secret-name> --from-file=tls.crt=<
 
 By default, the value of `namespace` that is used during the deployment process is `logging`. The value of `secret-name` can be one of the following:
 
-   - `es-transport-tls-secret`: used to establish communications between Elasticsearch nodes
-   - `es-rest-tls-secret`: used to establish communications between Elasticsearch and incoming REST call traffic
-   - `es-admin-tls-secret`: used to establish communications for internal administration actions that are performed locally on the Elasticsearch nodes
+   - `es-transport-tls-secret`: used to establish communications between OpenSearch nodes
+   - `es-rest-tls-secret`: used to establish communications between OpenSearch and incoming REST call traffic
+   - `es-admin-tls-secret`: used to establish communications for internal administration actions that are performed locally on the OpenSearch nodes
    - `kibana-tls-secret`: used for TLS connections between Ingress or a 
-   user's browser (if NodePorts are used) and Kibana.   
+   user's browser (if NodePorts are used) and OpenSearch Dashboards.   
 
 Use the appropriate values for `tls_cert_name`, `key_name`, and `CA_key_name` for each secret that that is being generated.
 
@@ -71,9 +71,9 @@ mkdir -p ~/my-cluster-files/ops/user-dir/logging
 export USER_DIR=~/my-cluster-files/ops/user-dir
 ```
 
-6. Modify the file `$USER_DIR\logging\user-values-elasticsearch-open.yaml`.
+6. Modify the file `$USER_DIR\logging\user-values-opensearch.yaml`.
 
-   - Uncomment the line `#elasticsearch` as well as these lines:
+   - Uncomment the following lines:
    
      ```bash
      #   config:

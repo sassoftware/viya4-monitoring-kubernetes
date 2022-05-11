@@ -15,17 +15,27 @@ namespace or a subset of namespaces.
 
 **Note:** If you are deploying SAS Viya Logging on OpenShift, you must follow the deployment process documented in [SAS Viya Logging on OpenShift](/logging/OpenShift.md).
 
+### Important Information about OpenSearch and OpenSearch Dashboards
+
+As of release 1.1.9, this project uses OpenSearch and OpenSearch Dashboards version 1.3.
+
+**Notes:**
+
+* OpenSearch replaces Elasticsearch.
+* OpenSearch Dashboards replaces Kibana.
+* Some configuration options, environment variables, and other aspects of this project might still include references to the prior product names. This is intentional. Doing so supports backward compatibility and continuity for users of this project. These references might change at a later date.
+
 ### Components
 
 These components are deployed:
 
 * [Fluent Bit](https://fluentbit.io/) - Log collection with limited transformation
-* [Elasticsearch](https://www.elastic.co/) - Unstructured document storage and query engine
-* [Kibana](https://www.elastic.co/kibana) - User interface for query and visualization
+* [OpenSearch](http://opensearch.org/docs/1.3) - Unstructured document storage and query engine
+* [OpenSearch Dashboards](http://opensearch.org/docs/1.3/dashboards) - User interface for query and visualization
 * [Prometheus Exporter for Elasticsearch](https://github.com/prometheus-community/elasticsearch_exporter) - Provides detailed Elasticsearch performance information for Prometheus
 
-If you are using a cloud provider, you must use ingress, rather than
-NodePorts. Specify the information needed to use ingress during the customization process.
+If you are using a cloud provider, you must use Ingress, rather than
+NodePorts. Specify the information needed to use Ingress during the customization process.
 
 ## <a name="l_pre_dep"></a>Perform Pre-Deployment Tasks
 
@@ -34,7 +44,7 @@ Before deploying, you must perform these tasks:
 - [create a local copy of the repository](#log_loc_copy)
 - [customize your deployment](#log_custom)
 
-Note: If you are deploying in a highly secure environment in which the deployment scripts are run on a machine whose network traffic is routed through a proxy server, ensure that `localhost` is included in the list of hosts that are not routed through the proxy server. If it is not included, the Elasticsearch deployment fails, because the deployment scripts use port forwarding to make REST API calls to Elasticsearch and Kibana.  
+Note: If you are deploying in a highly secure environment in which the deployment scripts are run on a machine whose network traffic is routed through a proxy server, ensure that `localhost` is included in the list of hosts that are not routed through the proxy server. If it is not included, the OpenSearch deployment fails, because the deployment scripts use port forwarding to make REST API calls to OpenSearch and OpenSearch Dashboards.  
 
 ### <a name="log_loc_copy"></a>Create a Local Copy of the Repository
 
@@ -105,7 +115,7 @@ After you create the location for your customization files, you can customize th
 my-viya4mon-user-dir/user.env
 
 my-viya4mon-user-dir/logging/user.env
-my-viya4mon-user-dir/logging/user-values-elasticsearch-open.yaml
+my-viya4mon-user-dir/logging/user-values-opensearch-open.yaml
 my-viya4mon-user-dir/logging/user-values-es-exporter.yaml
 my-viya4mon-user-dir/logging/user-values-fluent-bit-open.yaml
 ```
@@ -132,15 +142,15 @@ Environment variables control script behavior and high-level options such as TLS
 
 Any line whose first character is `#` is treated as a comment and ignored.
 
-#### Specifying the Default Kibana Password
+#### Specifying the Default OpenSearch Dashboards Password
 
-You can set the `ES_ADMIN_PASSWD` environment variable to specify the default password for Kibana. If you do not specify a default password, one is randomly generated.
+You can set the `ES_ADMIN_PASSWD` environment variable to specify the default password for OpenSearch Dashboards. If you do not specify a default password, one is randomly generated.
 
 #### Using Ingress for Cloud Providers
 
-If you are using a cloud provider, you must use ingress, rather than
+If you are using a cloud provider, you must use Ingress, rather than
 NodePorts. Use the samples in the [samples/ingress](/samples/ingress)
-area of this repository to set up either host-based or path-based ingress.
+area of this repository to set up either host-based or path-based Ingress.
 
 #### Specifying the Retention Period for Log Messages
 
@@ -148,15 +158,18 @@ You can also modify values in the `user.env` file to change the retention period
 
 #### TLS Support
 
-The [TLS Logging sample](/samples/tls/logging) contains information about specifying the `TLS_ENABLE` environment variable to use TLS for connections between the user (or an ingress object) and the logging components. In-cluster communications between logging components always use TLS. If you use ingress and also use TLS for communication between the user and the logging components, you must also manually populate Kubernetes secrets as listed in the sample. 
+The [TLS Logging sample](/samples/tls/logging) contains information about specifying the `TLS_ENABLE` environment variable to use TLS for connections between the user (or an Ingress object) and the logging components. In-cluster communications between logging components always use TLS. If you use Ingress and also use TLS for communication between the user and the logging components, you must also manually populate Kubernetes secrets as listed in the sample. 
 
 #### Modify user-values-*.yaml to Change Helm Chart Values
 
 The logging stack uses the following Helm charts:
 
-* **Opendistro Elasticsearch**
+* **OpenSearch**
   * [Chart](https://github.com/opendistro-for-elasticsearch/opendistro-build/tree/master/helm)
   * [Default values](https://github.com/opendistro-for-elasticsearch/opendistro-build/blob/master/helm/opendistro-es/values.yaml)
+* **OpenSearch Dashboards**
+  * [Chart](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch-dashboards)
+  * [Default values](https://github.com/opensearch-project/helm-charts/blob/main/charts/opensearch-dashboards/values.yaml)
 * **Fluent Bit**
   * [Chart](https://github.com/helm/charts/tree/master/stable/fluent-bit)
   * [Default values](https://github.com/helm/charts/blob/master/stable/fluent-bit/values.yaml)
@@ -164,12 +177,13 @@ The logging stack uses the following Helm charts:
   * [Chart](https://github.com/helm/charts/tree/master/stable/elasticsearch-exporter)
   * [Default values](https://github.com/helm/charts/blob/master/stable/elasticsearch-exporter/values.yaml)
 
-To change any of the Helm chart values used by either the Elasticsearch
-(including Kibana) or Fluent Bit charts, edit the appropriate
+To change any of the Helm chart values used by either the OpenSearch
+(including OpenSearch Dashboards) or Fluent Bit charts, edit the appropriate
 `user-values-*.yaml` file listed below:
 
-* For Elasticsearch (and Kibana), modify
-`logging/user-values-elasticsearch-open.yaml`.
+* For OpenSearch, modify
+`logging/user-values-opensearch.yaml`.
+* For OpenSearch Dashboards, modify `logging/user-values-osd.yaml`
 
 * For Fluent Bit, modify `logging/user-values-fluent-bit-open.yaml`.
 Note that the Fluent Bit configuration files are generated from a
@@ -179,19 +193,17 @@ make in the `user-values-fluent-bit-open.yaml` file that are intended to
 affect the Fluent Bit configuration files are ignored. However, edits
 affecting other aspects of the Fluent Bit Helm chart execution are processed.
 
-When you edit the `user-values-fluent-bit.yaml` file, ensure that the parent
+When you edit the `user-values-opensearch.yaml` file, ensure that the parent
 item of any item that you uncomment is also uncommented.  For
-example, if you uncommented the `storageClass` item for the Elasticsearch
+example, if you uncommented the `storageClass` item for the OpenSearch
 master nodes, you must also uncomment the `persistence` item, the
 `master` item and the `elasticsearch` item, as shown below:
 
 ```yaml
-# Sample user-values-elasticsearch-open.yaml
+# Sample user-values-opensearch-open.yaml
 
-elasticsearch:     # Uncommented b/c 'master' is uncommented
-  master:          # Uncommented b/c 'persistenance' is uncommented
-    persistence:   # Uncommented b/c 'storageClass' is uncommented
-      storageClass: alt-storage  # Uncommented to direct ES to alt-storage storageClass
+persistence:                   #uncomment b/c storageClass is uncommented
+  storageClass: alt-storage    #uncomment to direct OpenSearch to use the alt-storageClass 
 ```
 
 #### Workload Node Placement
@@ -213,7 +225,7 @@ placement strategy rather than use this recommended deployment, set `NODE_PLACEM
 
 #### Provision Persistent Volumes or Persistent Volume Claims
 
-Multiple persistent volume claims (PVCs) are created when Elasticsearch is
+Multiple persistent volume claims (PVCs) are created when OpenSearch is
 installed. The deployment script assumes that your cluster has some form of
 dynamic volume provisioning in place that will automatically provision
 storage to support PVCs. However, if your cluster
@@ -222,18 +234,18 @@ necessary persistent volumes (PVs) before you run the deployment scripts.
 
 #### Using a Different Kubernetes Storage Class
 
-To prevent Elasticsearch and your SAS Viya deployment from competing for
-the same disk space, you might want to direct the Elasticsearch PVCs
+To prevent OpenSearch and your SAS Viya deployment from competing for
+the same disk space, you might want to direct the OpenSearch PVCs
 to a different Kubernetes storageClass. This prevents contention
 and insulates each one from storage issues that are caused by the other. For
 example, if you use different storageClasses and your SAS Viya deployment
-runs out of disk space, Elasticsearch continues to operate.
+runs out of disk space, OpenSearch continues to operate.
 
 To specify an alternate storageClass to use, modify the appropriate
 `user-values-*.yaml` file used for Helm processing, as described above.
 By default, the lines referencing the storageClass in the persistence stanza of the
 `user-values-*.yaml` file are commented out, which specifies that
-the default storage class is used. To direct the Elasticsearch PVCs to use an
+the default storage class is used. To direct the OpenSearch PVCs to use an
 alternate storageClass, edit the file to uncomment the appropriate lines
 and confirm the storageClassName matches your preferred storageClass.
 The example used in the section ___"Modify user-values-*.yaml"___ above
@@ -245,7 +257,7 @@ To deploy the logging components, ensure that you are in the directory into
 which you cloned the repository and issue this command:
 
 ```bash
-./logging/bin/deploy_logging_open.sh
+./logging/bin/deploy_logging.sh
 ```
 
 The script creates the namespace into which the components are deployed. By default, the components are deployed into the namespace `logging`.
@@ -255,49 +267,15 @@ The script creates the namespace into which the components are deployed. By defa
 ## Update Logging Components
 
 Updates in place are supported. To update, re-run the
-`deploy_logging_open.sh` script to install the latest versions of all components, indexes, and dashboards.
+`deploy_logging.sh` script to install the latest versions of all components, indexes, and dashboards.
 
-## Important Information about Kibana in the New Release
+## <a name="login_kibana"></a>Log In to OpenSearch Dashboards
 
-### Overview
+Use the following steps to log in to OpenSearch Dashboards:
 
-**Notes:**
-
-* As of release 1.1.0, this project now uses Open Distro for Elasticsearch version 1.13.x, which includes updated versions of Elasticsearch and Kibana.
-* In this release, the multi-tenancy capabilities of Kibana have been enabled. This change requires that users select a Kibana tenant space after logging in. For the new procedure, see [Log Into Kibana](#login_kibana).
-* Kibana no longer provides a persistent navigation bar by default. Instead, a menu button ( ![menu button](../img/kibana_menu.png) ) that opens the navigation menu is now provided. You can choose to make the navigation menu persist on the page by clicking __Dock navigation__.
-
-### <a name="login_kibana"></a>Log In to Kibana
-
-Use the following steps to log in to Kibana:
-
-1. In the "Login to Kibana" window, enter your Kibana credentials and click __Log In__. The "Select your tenant" window appears.
+1. In the "Login to OpenSearch Dashboards" window, enter your OpenSearch Dashboards credentials and click __Log In__. The "Select your tenant" window appears.
 2. In the __Choose from custom__ list, confirm that your tenant is selected by default. If not, select your tenant from the list.
-
-     **Important:** Do not select __global_tenant__ if it appears in the list.
-
-3. Select the __Remember my selection next time I log in from this device__ check box.
-4. Click __Confirm__. Kibana opens.
-
-### Troubleshooting
-
-In rare instances, Kibana might open incorrectly: 
-
-* After logging into Kibana, you cannot locate your expected content. This happens when Kibana loads an incorrect Kibana tenant space. When this occurs it is possible that your selected Kibana tenant space is still listed in the __Account__ menu.
-* Kibana opens incorrectly on the "Create an Index Pattern" page.
-
-Use the following procedure to correct these problems:
-
-1. In the application banner, click the __Account__ menu.
-
-    ![The expanded Kibana account menu is located in the upper right corner of the page.](../img/kibana_account_menu.png)
-
-2. Click __Switch tenants__. The "Select your tenant" window appears.
-3. In the __Choose from custom__ list, select your Kibana tenant space. 
-
-     **Important:** Do not select __global_tenant__ if it appears on the list.
-4. Be sure to select the __Remember my selection next time I log in from this device__ check box.
-5. Click __Confirm__.
+4. Click __Confirm__. OpenSearch Dashboards opens.
 
 ## <a name="lremove"></a>Remove Logging Components
 
@@ -306,7 +284,7 @@ To remove all logging components, run the following command:
 ```bash
 cd <viya4-monitoring-kubernetes repo directory>
 
-logging/bin/remove_logging_open.sh
+logging/bin/remove_logging.sh
 ```
 
 The script removes configmaps and secrets that were created by the deployment script. PersistentVolumeClaims and Kubernetes secrets that were created manually are not removed.  
@@ -315,24 +293,24 @@ The script removes configmaps and secrets that were created by the deployment sc
 ```bash
 cd <viya4-monitoring-kubernetes repo directory>
 
-logging/bin/remove_logging_open_openshift.sh
+logging/bin/remove_logging_openshift.sh
 ```
 
 ## Validate Your Deployment
 
-### Access Kibana
+### Access OpenSearch Dashboards
 
 If the deployment process completes without errors, a message 
-appears in the console window containing the URL address for Kibana and the URL for Elasticsearch (if you enabled access to Elasticsearch). The URL for Kibana is different depending on whether you use nodeports or ingress to access Kibana. 
+appears in the console window containing the URL address for OpenSearch Dashboards and the URL for OpenSearch (if you enabled access to OpenSearch). The URL for OpenSearch Dashboards is different depending on whether you use nodeports or Ingress to access OpenSearch Dashboards. 
 
 To validate that the deployment was successful and confirm that all of the logging components
-are working, access Kibana and review the log messages that are collected.
+are working, access OpenSearch Dashboards and review the log messages that are collected.
 
-__Note:__ The displayed URL for Kibana might not be correct if your networking rules alter how hosts are accessed. If this is the case, contact your Kubernetes administrator to determine the proper host, port and/or path to access Kibana.
+__Note:__ The displayed URL for OpenSearch Dashboards might not be correct if your networking rules alter how hosts are accessed. If this is the case, contact your Kubernetes administrator to determine the proper host, port and/or path to access OpenSearch Dashboards.
 
-### Use Kibana to Validate Logging
+### Use OpenSearch Dashboards to Validate Logging
 
-* Obtain the default password for the Kibana admin user. Unless you set the `ES_ADMIN_PASSWD` environment variable (either in the `user.env` file or on the command line) to specify a default password during deployment, the default password is randomly generated and displayed during deployment.
+* Obtain the default password for the OpenSearch Dashboards admin user. Unless you set the `ES_ADMIN_PASSWD` environment variable (either in the `user.env` file or on the command line) to specify a default password during deployment, the default password is randomly generated and displayed during deployment.
 
 If you want to change the password, issue this command:
 
@@ -340,7 +318,7 @@ If you want to change the password, issue this command:
 logging/bin/change_internal_password.sh admin <newPassword>
 ```
   
-* Start Kibana in a browser using the URL provided at the end of the
+* Start OpenSearch Dashboards in a browser using the URL provided at the end of the
 deployment process.
 * Click on the __Dashboard__ icon in the toolbar.
   * If the Dashboard page displays the header __Editing New Dashboard__, select
@@ -359,31 +337,30 @@ deployment process.
 this page to review the collected log messages. You can use the query box or
 __Add filter__ to filter the messages that are displayed.
 
-## Enable Users to Access Elasticsearch (optional)
+## Enable Users to Access OpenSearch (optional)
 
-You can choose to enable users to access Elasticsearch so that they can issue queries using API calls or scripts. Run this command to enable nodeport connections to Elasticsearch:
+You can choose to enable users to access OpenSearch so that they can issue queries using API calls or scripts. Run this command to enable nodeport connections to OpenSearch:
 
 ```bash
-./logging/bin/es_nodeport_enable_open.sh
+./logging/bin/es_nodeport_enable.sh
 ``` 
 
 When the script completes, a message such as this appears in the console window:
 
 ```text
 =============================================
-== Access Elasticsearch using this URL: https://myK8snode:<portnumber>/ ==
+== Access OpenSearch using this URL: https://myK8snode:<portnumber>/ ==
 =============================================
 ```
 
-The message provides the URL address for the Elasticsearch application. The `<portnumber>` value is specific to your deployment.
+The message provides the URL address for the OpenSearch application. The `<portnumber>` value is specific to your deployment.
 
-User connections to Elasticsearch always use TLS.
+User connections to OpenSearch always use TLS.
 
-To disable nodeport connections to Elasticsearch, run this command:
+To disable nodeport connections to OpenSearch, run this command:
 
 ```bash
-./logging/bin/es_nodeport_disable_open.sh
+./logging/bin/es_nodeport_disable.sh
 ```  
 
-You can use these scripts to temporarily enable user access to Elasticsearch.
-
+You can use these scripts to temporarily enable user access to OpenSearch.

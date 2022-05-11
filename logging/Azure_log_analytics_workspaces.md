@@ -2,7 +2,7 @@
 
 ## Introduction
 
-If you use Microsoft Azure and want to use Azure Monitor *instead* of Elasticsearch 
+If you use Microsoft Azure and want to use Azure Monitor *instead* of OpenSearch 
 to explore, filter, and report on log messages from a SAS Viya environment, you 
 can deploy the logging solution described in this document. This solution uses a 
 combination of Fluent Bit and an Azure Log Analytics workspace to handle log 
@@ -24,7 +24,7 @@ parse and process log messages from all SAS Viya components, including
 third-party products. As a result, log messages are handled consistently, 
 regardless of the original source. 
 
-In the standard solution, Fluent Bit sends the log messages to Elasticsearch. 
+In the standard solution, Fluent Bit sends the log messages to OpenSearch. 
 In this solution, the log messages are loaded into a Log Analytics workspace 
 as a "custom log" source. You can then use Azure Monitor to explore, filter, and 
 report on the collected log messages. By default, this solution also includes 
@@ -115,7 +115,7 @@ when you run the deployment script, the script obtains the connection informatio
 After deploying this solution, the collected log messages appear as
 a new table, **viya_logs_CL**, in the ***Custom Logs*** grouping within the
 specified Log Analytics workspace.  The structure of this table is similar
-to the structure of the log messages that are surfaced in Kibana when using the 
+to the structure of the log messages that are surfaced in OpenSearch Dashboards when using the 
 standard logging solution. However, due to features of the Azure
 API, the names of some fields are slightly different. The tables feature
 a flattened data model, so multi-level JSON fields appear as multiple

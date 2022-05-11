@@ -5,7 +5,7 @@
 There might be instances when you need to collect a set of log messages in a file. For 
 example, you might need to send log messages collected during a specific time period or for a specific pod to SAS Technical Support to help diagnose a problem. The `getlogs.sh` script enables you to obtain log messages from a specified time period and from specified sources and save those messages to a file. 
 
-When you submit the script, it requests a batch of log messages. Each request then generates a query that are submitted to Elasticsearch.
+When you submit the script, it requests a batch of log messages. Each request then generates a query that are submitted to OpenSearch.
 
 To download the log messages, run the `getlogs.sh` script. This is the syntax for the script:
 
@@ -17,8 +17,8 @@ A query is cancelled if it does not complete within three minutes.
 
 For options than accept multiple values, the values must be in quotes and must be separated by commas. 
 
-If you are using nodeports, an administrator must run the `logging/bin/es_nodeport_enable_open.sh` 
-script to enable HTTPS access to Elasticsearch and to obtain the host and port values to use when specifying the connection options. After this script is run, HTTPS access to Elasticsearch remains enabled until either the `logging/bin/es_nodeport_disable_open.sh` script is run or the logging components are redeployed.
+If you are using nodeports, an administrator must run the `logging/bin/es_nodeport_enable.sh` 
+script to enable HTTPS access to OpenSearch and to obtain the host and port values to use when specifying the connection options. After this script is run, HTTPS access to OpenSearch remains enabled until either the `logging/bin/es_nodeport_disable.sh` script is run or the logging components are redeployed.
 
 ## Query Options
 
@@ -91,24 +91,24 @@ overwrites the output file if it exists.
 
 ## Connection Options
 
-The connection options specify the information needed to connect to Elasticsearch and Kibana.
+The connection options specify the information needed to connect to OpenSearch.
 
 If you are using ingress, the *`hostname`* and *`port-num`* are the host and port number for the ingress object.
 
 `-us|--user` *`username`* 
-specifies the user name to use to connect to Elasticsearch and Kibana in order to return the log messages.
+specifies the user name to use to connect to OpenSearch in order to return the log messages.
 
 `-pw|--password` *`password`*
-specifies the password to use to connect to Elasticsearch and Kibana in order to return log messages.
+specifies the password to use to connect to OpenSearch in order to return log messages.
 
 `-h|--host` *`hostname`*
-specifies the host name to use to connect to Elasticsearch and Kibana. If you are using ingress, the *`hostname`* is the host for the ingress object.
+specifies the host name to use to connect to OpenSearch. If you are using ingress, the *`hostname`* is the host for the ingress object.
 
 `-po|--port` *`port-num`*
-specifies the port number to use when connecting to Elasticsearch and Kibana. If you are using ingress, the *`port-num`* is the port number for the ingress object.
+specifies the port number to use when connecting to OpenSearch. If you are using ingress, the *`port-num`* is the port number for the ingress object.
 
 `-pr|--protocol` `https | http`
-specifies whether to use HTTPS or HTTP to connect to Elasticsearch and Kibana. The default value is `https`.
+specifies whether to use HTTPS or HTTP to connect to OpenSearch. The default value is `https`.
 
 You can also specify these environment variables in order to provide connection information:
 - `ESUSER=`*`username`*

@@ -6,7 +6,7 @@
 administrator user, `logadm`, is available. The deployment process automatically 
 creates `logadm`. It is intended to be the
 primary account used for log-monitoring activity. With this change, the 
-original Kibana administrator account (`admin`) should be used only for Kibana 
+original OpenSearch Dashboards administrator account (`admin`) should be used only for OpenSearch Dashboards 
 administration tasks, such as reviewing security, adjusting index management 
 policies, or when the `logadm` account cannot be used.
 
@@ -26,7 +26,7 @@ only for a specified namespace.
 each tenant administrator's access so that they can access the 
 log information only for their SAS Viya tenant.
 
-This access is controlled by a combination of Kibana-tenant spaces and 
+This access is controlled by a combination of OpenSearch Dashboards-tenant spaces and 
 Open Distro for Elasticsearch roles, back-end roles, and role mappings. 
 Scripts are provided to create everything that is needed for each 
 scenario. For details, see 
@@ -45,16 +45,16 @@ has access to the following messages:
   infrastructure namespaces
  
 Although the `logadm` user can access all of the log messages, `logadm` can 
-access only the "cluster_admins" Kibana-tenant space.
+access only the "cluster_admins" OpenSearch Dashboards-tenant space.
 
 The access controls are designed to provide `logadm` users with full cluster 
 access to perform the log-monitoring activities needed for their job.
-Limiting these users to the "cluster_admins" Kibana-tenant space helps in the 
+Limiting these users to the "cluster_admins" OpenSearch Dashboards-tenant space helps in the 
 following ways:
 
-- simplifies the Kibana user experience
+- simplifies the OpenSearch Dashboards user experience
 - eliminates the potential confusion that could otherwise occur if the user 
-  could access Kibana content in the other Kibana-tenant spaces
+  could access OpenSearch Dashboards content in the other OpenSearch Dashboards-tenant spaces
 
 You can disable the creation of the `logadm` user during the deployment process. 
 In the `logging/user.env` file in USER_DIR, set the LOG_CREATE_LOGADM_USER 
@@ -84,14 +84,13 @@ Use the `onboard.sh` script from the `logging/bin` subdirectory in the repositor
 to implement logging access controls for a namespace or SAS Viya tenant. 
 The script performs the following actions: 
 
-1. Create a Kibana-tenant space.
-2. Load Kibana content such as visualizations and dashboards in to the Kibana 
-tenant space.
+1. Create a OpenSearch Dashboards-tenant space.
+2. Load OpenSearch Dashboards content such as visualizations and dashboards into the OpenSearch Dashboards-tenant space.
 3. Create the access controls to limit access to only the appropriate 
 back-end data.
-4. Link the access controls to the Kibana-tenant space.
+4. Link the access controls to the OpenSearch Dashboards-tenant space.
 5. (Optional) Create a new user that can access only the information in this 
-Kibana-tenant space.
+OpenSearch Dashboards-tenant space.
 
 Here is the syntax for the script:
 
@@ -104,16 +103,16 @@ logging/bin/onboard.sh --namespace <i>namespace</i>  [--tenant <i>tenant</i>]
   limitations are applied.
 - *tenant* specifies the SAS Viya tenant to which access limitations are applied.
 - *user* specifies to create an initial user with access to the 
-Kibana-tenant space. 
+OpenSearch Dashboards-tenant space. 
 
-The Kibana-tenant space name is a combination of the namespace name and the 
+The OpenSearch Dashboards-tenant space name is a combination of the namespace name and the 
 SAS Viya tenant name (if used). For example, if you ran the script and specified 
-only `--namespace mynamespace`, the Kibana-tenant space name would be `mynamespace`. 
+only `--namespace mynamespace`, the OpenSearch Dashboards-tenant space name would be `mynamespace`. 
 If you ran the script and specified `--namespace mynamespace --tenant mytenant1`, 
-the Kibana-tenant space name would be `mynamespace_mytenant1`. 
+the OpenSearch Dashboards-tenant space name would be `mynamespace_mytenant1`. 
 
 If you do not specify a name for the user, a user is 
-created with the default name of `<Kibana tenant space name>_admin`. 
+created with the default name of `<OpenSearch Dashboards tenant space name>_admin`. 
 For example, if you ran the script and specified `--namespace mynamespace 
 --tenant mytenant1 --user`, the initial user would 
 be `mynamespace_mytenant1_admin`.
@@ -124,8 +123,8 @@ Use the `offboard.sh` script from the `logging/bin` subdirectory in the reposito
 to remove logging access for a 
 namespace or SAS Viya tenant. The script performs the following actions: 
 
-1. Remove the Kibana-tenant space.
-2. Remove the access controls for the Kibana-tenant space.
+1. Remove the OpenSearch Dashboards-tenant space.
+2. Remove the access controls for the OpenSearch Dashboards-tenant space.
 
 The `offboard.sh` script does not remove the initial user, if one was 
 created by the `onboard.sh` script.
@@ -137,25 +136,25 @@ logging/bin/offboard.sh --namespace <i>namespace</i>  [--tenant <i>tenant</i>]
 </pre>
 
 - *namespace* is required. It specifies the Kubernetes namespace for which the 
-  corresponding Kibana-tenant space and access controls are removed.
+  corresponding OpenSearch Dashboards-tenant space and access controls are removed.
 - *tenant* specifies the SAS Viya tenant for which the corresponding 
-  Kibana-tenant space and access controls are removed.
+  OpenSearch Dashboards-tenant space and access controls are removed.
 
-As with the `onboard.sh` script, the Kibana-tenant space name is a 
-combination of the namespace name and the SAS Viya tenant name (if used). For example, if you ran the script and specified only `--namespace mynamespace`, the script would remove the Kibana-tenant space named `mynamespace`. If you ran the script and specified 
-`--namespace mynamespace --tenant mytenant1`, the script would remove the Kibana-tenant space named `mynamespace_mytenant1`. 
+As with the `onboard.sh` script, the OpenSearch Dashboards-tenant space name is a 
+combination of the namespace name and the SAS Viya tenant name (if used). For example, if you ran the script and specified only `--namespace mynamespace`, the script would remove the OpenSearch Dashboards-tenant space named `mynamespace`. If you ran the script and specified 
+`--namespace mynamespace --tenant mytenant1`, the script would remove the OpenSearch Dashboards-tenant space named `mynamespace_mytenant1`. 
 
 ## Managing User Accounts for Restricted Access
 
 ### Introduction
 
-You can create or delete Kibana accounts 
-that have access to only the log messages and Kibana-tenant space 
+You can create or delete OpenSearch Dashboards accounts 
+that have access to only the log messages and OpenSearch Dashboards-tenant space 
 associated with a specified namespace or SAS Viya tenant. 
 
 ### Creating User Accounts
 After you run the `onboard.sh` to implement access controls for 
-the Kibana-tenant space, you can run 
+the OpenSearch Dashboards-tenant space, you can run 
 the  `logging/bin/user.sh` script to create user accounts that are bound by 
 these access controls. 
 
@@ -171,7 +170,7 @@ logging/bin/user.sh CREATE --namespace <i>namespace</i> [--tenant <i>tenant</i>]
   user can access.
 - *tenant* specifies the SAS Viya tenant to which the user can access.
 - *user* specifies a user name. If you do not specify a user name, a user is 
-created with the default name of `<Kibana tenant space name>_admin`. 
+created with the default name of `<OpenSearch Dashboards tenant space name>_admin`. 
 For example, if you ran the script and specified 
 `--namespace mynamespace --tenant mytenant1 --user`, the user would be `mynamespace_mytenant1_admin`.
 
@@ -198,7 +197,7 @@ logging/bin/user.sh DELETE --user <i>user_name</i>
 
 The Open Distro for Elasticsearch security plug-in uses roles to 
 control access to the logging information from 
-a cluster, an index, or a Kibana-tenant space. A role contains 
+a cluster, an index, or a OpenSearch Dashboards-tenant space. A role contains 
 permissions for actions (such as cluster 
 access and index access) that correspond to sources and type of log 
 information. You can then assign users to roles in order to grant them 
@@ -213,7 +212,7 @@ essentially be assigned to multiple roles at once.
 
 ### Roles and Role Mappings for a Tenant or Namespace
 
-When you run the `onboard.sh` script to add Kibana-tenant space, two new roles 
+When you run the `onboard.sh` script to add OpenSearch Dashboards-tenant space, two new roles 
 are created and role mappings are defined to link the new roles (and one 
 pre-existing role) to a new back-end role.  The following table depicts the 
 roles, back-end roles and role mappings that are created when the script is 
@@ -222,8 +221,8 @@ namespace:
 
 | Back-end Role | Role | Purpose |
 | --- | --- | --- |
-|     | v4m_kibana_user | Grants access to Kibana |
-|     | tenant_production_acme | Grants access to the `production_acme` Kibana-tenant space |
+|     | v4m_kibana_user | Grants access to OpenSearch Dashboards |
+|     | tenant_production_acme | Grants access to the `production_acme` OpenSearch Dashboards-tenant space |
 |     | search_index_production_acme | Grants access to log messages from the `acme` tenant within the `production` namespace  |
 | production_acme_kibana_users |   | Grants access to all of the above roles |
 
@@ -232,35 +231,37 @@ of `production_acme_kibana_users` to a user. The back-end role
 enables the user to access only:
 -  log messages collected from the pods associated with the SAS Viya tenant 
   `acme` in the `production` namespace
-- Kibana-tenant space `production_acme` 
+- OpenSearch Dashboards-tenant space `production_acme` 
 
-In some cases, you might want to create users who cannot log in to Kibana but 
+In some cases, you might want to create users who cannot log in to OpenSearch Dashboards but 
 can access the log messages collected from a specific namespace or 
 namespace/tenant combination. These users might be needed to allow some 
 automated process to extract log messages through API calls. To do this, 
 assign the `search_index_production_acme` role to the user, rather than 
 the `production_acme_kibana_users` back-end role. Because the user has not 
 also been assigned the `v4m_kibana_user` or `tenant_production_acme` 
-roles, the user cannot log in to Kibana and cannot access the 
-`production_acme` Kibana-tenant space.
+roles, the user cannot log in to OpenSearch Dashboards and cannot access the 
+`production_acme` OpenSearch Dashboards-tenant space.
 
 ### Roles and Role Mappings for the `logadm` User
 
-As of the 1.1.3 release, the following items are created during the deployment 
-process:
+As of the 1.1.3 release, the following items are created during the deployment process:
 
 - a set of role-based access controls (RBACs)
-- the `logadm` user, which is linked to the new RBACs
-  
-| Back-end Role | Role | Purpose |
-| --- | --- | --- |
-|     | v4m_kibana_user | Grants user access to the Kibana functionality needed. (This role is not unique to the `logadm` user). |
-|     | search_index | Grants access to all collected log messages. |
-|     | tenant_cluster_admins | Grants access to the cluster_admins Kibana-tenant space.|
-|V4MCLUSTER_ADMIN_kibana_users |    | Provides an easy way to link the above roles with a user.
+- the `logadm` user (also called a ***back-end role***), which is linked to the set of RBACs
 
-Linking users to the back-end role V4MCLUSTER_ADMIN_kibana_users via the 
-Kibana security plug-in grants those users the access described in the table above.
+The back-end role provides an easy way to link the set of RBACs with a user. For example, a back-end role called production_acme_osd_users is created. The back-end role is linked to a set of RBAC roles by the OpenSearch Dashboards security plug-in.
+  
+![The `logadm` user is linked to the three new role-based access controls](../img/OpenSearch_Dashboards_users_rbacs.png) 
+
+The following table shows the RBAC roles that are linked to the `logadm` back-end role. The table also shows the access granted to the RBAC roles by the plug-in.
+
+| Role | Access |
+| --- | --- |
+| v4m_kibana_user | Grants the user access to OpenSearch Dashboards. (This role is not unique to the `logadm` user). |
+| tenant_production_acme | Grants access to the OpenSearch Dashboards-tenant space called 'production_acme'.|
+| search_index-production_acme | Grants access to log messages from the 'acme' tenant within the 'production' namespace. |
+|
 
 You can also use the user.sh script to grant a user the same level of access as 
 a `logadm` user. For example, to grant the user "chen" this level of  
