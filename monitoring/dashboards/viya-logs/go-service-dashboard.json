@@ -1132,7 +1132,7 @@
       "id": 146,
       "panels": [
         {
-          "datasource": "Elastic",
+          "datasource": "ViyaLogs",
           "gridPos": {
             "h": 24,
             "w": 18,
