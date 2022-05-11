@@ -193,7 +193,7 @@ else
 fi
 
 # Create the logging dashboard
-WELCOME_DASH="false" KUBE_DASH="false" VIYA_DASH="false" VIYA_LOGS_DASH="false" PGMONITOR_DASH="false" RABBITMQ_DASH="false" NGINX_DASH="false" LOGGING_DASH="true" USER_DASH="false" monitoring/bin/deploy_dashboards.sh
+WELCOME_DASH="false" KUBE_DASH="false" VIYA_DASH="false" VIYA_LOGS_DASH="true" PGMONITOR_DASH="false" RABBITMQ_DASH="false" NGINX_DASH="false" LOGGING_DASH="false" USER_DASH="false" monitoring/bin/deploy_dashboards.sh
 
 
 # Delete pods so that they can be restarted with the change.

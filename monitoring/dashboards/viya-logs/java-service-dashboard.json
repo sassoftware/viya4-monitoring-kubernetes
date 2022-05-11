@@ -3591,7 +3591,7 @@
       "id": 157,
       "panels": [
         {
-          "datasource": "Elastic",
+          "datasource": "ViyaLogs",
           "gridPos": {
             "h": 18,
             "w": 24,
