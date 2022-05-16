@@ -115,7 +115,7 @@ After you create the location for your customization files, you can customize th
 my-viya4mon-user-dir/user.env
 
 my-viya4mon-user-dir/logging/user.env
-my-viya4mon-user-dir/logging/user-values-opensearch-open.yaml
+my-viya4mon-user-dir/logging/user-values-opensearch.yaml
 my-viya4mon-user-dir/logging/user-values-es-exporter.yaml
 my-viya4mon-user-dir/logging/user-values-fluent-bit-open.yaml
 ```
@@ -200,7 +200,7 @@ master nodes, you must also uncomment the `persistence` item, the
 `master` item and the `elasticsearch` item, as shown below:
 
 ```yaml
-# Sample user-values-opensearch-open.yaml
+# Sample user-values-opensearch.yaml
 
 persistence:                   #uncomment b/c storageClass is uncommented
   storageClass: alt-storage    #uncomment to direct OpenSearch to use the alt-storageClass 
