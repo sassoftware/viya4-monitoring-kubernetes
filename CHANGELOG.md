@@ -1,5 +1,26 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.1.8 (17MAY22)
+
+* **Overall**
+  * [FIX] - Fixed some Kubernetes-related messages were being displayed without log levels.
+  * [CHANGE] The minimum supported version of OpenShift is now 4.9.
+
+* **Monitoring**
+  * [FIX] - Updated SAS Viya logo on the Grafana Welcome screen so that it is easier to see on darker background.
+  * [FIX] - Fixed an issue that pod names were concatenated when multiple instances of tenant monitoring have been deployed.
+  * [CHANGE] - Combined the functionality of the create_elasticsearch_datasource_cluster.sh and create_elasticsearch_datasource_tenant.sh scripts into one script (create_elasticsearch_datasource.sh).
+  
+* **Logging**
+  * [ANNOUNCEMENT] - In our next release, we expect to move to using OpenSearch rather than Open Distro for Elasticseach as the search back-end supporting our log monitoring capabilities. While this change will have only minor impact on the user interface (primarily some cosmetic changes), it will have a more significant impact on the deployment process. Therefore, this should be considered a breaking change. It will involve:
+    * changes to many script names, including the names of the primary deployment and removal scripts;
+    * changes to the names and structure of the user value (yaml) files used with the Helm charts;
+    * changes to the topology and configuration of search pod; and,
+    * changes in product/application terminology (OpenSearch replacing Elasticsearch; OpenSearch Dashboards replacing Kibana).
+  * Organizations wanting to get more familiar with the new technology stack are encouraged to deploy it on an experimental basis on a test cluster separate from their current "production" cluster.  This can be done by running the deploy_logging_opensearch.sh script in the logging/bin sub-directory.  Customizations to the OpenSearch and OpenSearch Dashboards configuration can be provided via the user-values-elasticsearch-opensearch.yaml and user-values-osd-opensearch.yaml files, respectively, in the logging sub-directory of the directory identified via the USER_DIR environment variable.  We have OpenSearch-specific files in the Azure Deployment, Ingress and TLS samples to handle two of the most common customization scenarios.  Please note that file names may change as this moves from experimental to production status.
+  * The deployment process handles migrating the current set of collected log messages in the many scenarios. However, migration is not supported in some scenarios, such as the configuration documented in the min-logging sample (i.e. sample/min-logging) in the project repository.
+  * [CHANGE] - Improved handling of log messages emitted by SingleStore.
+
 ## Version 1.1.7 (19APR22)
 
 * **Overall**
