@@ -4,7 +4,7 @@
 
 * **Overall**
   * [FIX] - Fixed some Kubernetes-related messages were being displayed without log levels.
-  * [CHANGE] The minimum supported version of OpenShift is now 4.9.
+  * [CHANGE] Running scripts on OpenShift 4.9 no longer generates a WARNING message.
 
 * **Monitoring**
   * [FIX] - Updated SAS Viya logo on the Grafana Welcome screen so that it is easier to see on darker background.
