@@ -53,14 +53,14 @@ oauth-proxy sidecar. To disable OpenShift authentication, set the
 be set in `$USER_DIR/monitoring/user.env`. Regardless of the value of
 `OPENSHIFT_AUTH_ENABLE`, in-cluster TLS (from the ingress controller
 to Grafana) and ingress TLS (browser to cluster) is enabled on the Grafana
-[route](https://docs.openshift.com/container-platform/4.7/rest_api/network_apis/route-route-openshift-io-v1.html)
+[route](https://docs.openshift.com/container-platform/4.8/rest_api/network_apis/route-route-openshift-io-v1.html)
 (OpenShift's version of ingress).
 
 ## Prerequisites
 
-* [Kubernetes](https://kubernetes.io/) version 1.19+
-* [OpenShift](https://www.openshift.com/) 4.7
-* [`kubectl`](https://kubernetes.io/docs/tasks/tools/) 1.19+
+* [Kubernetes](https://kubernetes.io/) version 1.21+
+* [OpenShift](https://www.openshift.com/) 4.8
+* [`kubectl`](https://kubernetes.io/docs/tasks/tools/) 1.21+
 * [`Helm`](https://helm.sh/docs/intro/install/) 3.0+ (3.5+ recommended)
 * OpenShift [`oc`](https://docs.openshift.com/container-platform/3.6/cli_reference/get_started_cli.html)
 command-line tool 4.0+
