@@ -49,12 +49,12 @@ function ocVersionCheck {
     ### Openshift versions that do not start with a 4 should produce an error.
     if (( "$OSHIFT_MAJOR_VERSION" != 4 )); then
       log_error "Unsupported OpenShift server version: $OSHIFT_FULL_VERSION"
-      log_error "Version 4.7+ is required"
+      log_error "Version 4.8+ is required"
       exit 1
-    ### Openshift versions between  and  should give warnings.
-    elif (( "$OSHIFT_MINOR_VERSION" < 7 )); then
+    ### Openshift 4 versions earlier than 4.8 should produce an error.
+    elif (( "$OSHIFT_MINOR_VERSION" < 8 )); then
       log_error "Unsupported OpenShift server version: $OSHIFT_FULL_VERSION"
-      log_error "Version 4.7+ is required"
+      log_error "Version 4.8+ is required"
       exit 1
     else
       log_debug "OpenShift server version check OK"
@@ -64,12 +64,12 @@ function ocVersionCheck {
     ### Openshift versions that do not start with a 4 should produce an error.
     if (( "$OC_MAJOR_VERSION" != 4 )); then
       log_error "Unsupported OpenShift client version: $OC_FULL_VERSION"
-      log_error "Version 4.7+ is required"
+      log_error "Version 4.8+ is required"
       exit 1
-    ### Openshift versions between  and  should give warnings.
-    elif (( "$OC_MINOR_VERSION" < 7 )); then
+    ### Openshift 4 versions earlier than 4.8 should produce an error.
+    elif (( "$OC_MINOR_VERSION" < 8 )); then
       log_error "Unsupported OpenShift client version: $OC_FULL_VERSION"
-      log_error "Version 4.7+ is required"
+      log_error "Version 4.8+ is required"
       exit 1
     else
       log_debug "OpenShift client version check OK"
@@ -92,7 +92,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
     log_debug "Skipping OpenShift detection. OPENSHIFT_CLUSTER=[$OPENSHIFT_CLUSTER]"
   fi
 
-  if [ "$OPENSHIFT_CLUSTER" == "true" ]; then    
+  if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
     if [ "${OPENSHIFT_OC_CHECK:-true}" == "true" ]; then
       if [ ! $(which oc) ]; then
         echo "'oc' is required for OpenShift and not found on the current PATH"
@@ -111,7 +111,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
 
       export OPENSHIFT_ROUTE_DOMAIN
       export OC_MAJOR_VERSION OC_MINOR_VERSION OC_PATCH_VERSION
-      export OSHIFT_MAJOR_VERSION OSHIFT_MINOR_VERSION OSHIFT_PATCH_VERSION 
+      export OSHIFT_MAJOR_VERSION OSHIFT_MINOR_VERSION OSHIFT_PATCH_VERSION
     fi
   else
     log_debug "OpenShift not detected. Skipping 'oc' checks."
