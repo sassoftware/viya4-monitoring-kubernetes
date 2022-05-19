@@ -154,7 +154,7 @@ if [ -f "$KB_GLOBAL_EXPORT_FILE" ]; then
    kb_migrate_response="$TMP_DIR/kb_migrate_response.json"
 
    #import previously exported content from global tenant
-   response=$(curl -s -o $kb_migrate_response  -w  "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_import?overwrite=false" -H "kbn-xsrf: true"  -H 'securitytenant: cluster_admins'  --form file="@$KB_GLOBAL_EXPORT_FILE"  -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
+   response=$(curl -s -o $kb_migrate_response  -w  "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_import?overwrite=false" -H "$LOG_XSRF_HEADER"  -H 'securitytenant: cluster_admins'  --form file="@$KB_GLOBAL_EXPORT_FILE"  -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
 
    if [[ $response != 2* ]]; then
       log_warn "There was an issue importing the cached existing Kibana content into the Kibana tenant space [cluster_admins]. [$response]"
