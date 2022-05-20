@@ -92,6 +92,9 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
        fi
     fi
 
+    # Set default timeout for kubectl namespace delete command
+    export KUBE_NAMESPACE_DELETE_TIMEOUT=${KUBE_NAMESPACE_DELETE_TIMEOUT:-5m}
+
     export TMP_DIR=$(mktemp -d -t sas.mon.XXXXXXXX)
     if [ ! -d "$TMP_DIR" ]; then
       log_error "Could not create temporary directory [$TMP_DIR]"
