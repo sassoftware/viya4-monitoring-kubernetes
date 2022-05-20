@@ -73,7 +73,7 @@ KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-false}
 if [ "$KB_KNOWN_NODEPORT_ENABLE" == "true" ]; then
    KIBANA_PORT=31034
    log_verbose "Setting Kibana service NodePort to $KIBANA_PORT"
-   nodeport_yaml=logging/es/opensearch/osd_helm_values_nodeport_opensearch.yaml
+   nodeport_yaml=logging/es/opensearch/osd_helm_values_nodeport.yaml
 else
    nodeport_yaml=$TMP_DIR/empty.yaml
    log_debug "Kibana service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
@@ -81,7 +81,7 @@ fi
 
 
 # OpenSearch Dashboards user customizations
-OSD_USER_YAML="${OSD_USER_YAML:-$USER_DIR/logging/user-values-osd-opensearch.yaml}"
+OSD_USER_YAML="${OSD_USER_YAML:-$USER_DIR/logging/user-values-osd.yaml}"
 if [ ! -f "$OSD_USER_YAML" ]; then
   log_debug "[$OSD_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
   OSD_USER_YAML=$TMP_DIR/empty.yaml
@@ -113,7 +113,7 @@ LOG_NODE_PLACEMENT_ENABLE=${LOG_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-
 # Optional workload node placement support
 if [ "$LOG_NODE_PLACEMENT_ENABLE" == "true" ]; then
   log_verbose "Enabling OpenSearch Dashboards for workload node placement"
-  wnpValuesFile="logging/node-placement/values-osd-opensearch-wnp.yaml"
+  wnpValuesFile="logging/node-placement/values-osd-wnp.yaml"
 else
   log_debug "Workload node placement support is disabled for OpenSearch Dashboards"
   wnpValuesFile="$TMP_DIR/empty.yaml"
@@ -135,7 +135,7 @@ fi
 # Deploy Elasticsearch via Helm chart
 helm $helmDebug upgrade --install v4m-osd \
     --namespace $LOG_NS \
-    --values logging/es/opensearch/osd_helm_values_opensearch.yaml \
+    --values logging/es/opensearch/osd_helm_values.yaml \
     --values "$wnpValuesFile" \
     --values "$nodeport_yaml" \
     --values "$OSD_USER_YAML" \

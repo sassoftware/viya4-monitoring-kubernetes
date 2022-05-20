@@ -217,8 +217,8 @@ else
 fi
 
 
-# Elasticsearch user customizations
-ES_OPEN_USER_YAML="${ES_OPEN_USER_YAML:-$USER_DIR/logging/user-values-elasticsearch-opensearch.yaml}"
+# OpenSearch user customizations
+ES_OPEN_USER_YAML="${ES_OPEN_USER_YAML:-$USER_DIR/logging/user-values-opensearch.yaml}"
 if [ ! -f "$ES_OPEN_USER_YAML" ]; then
   log_debug "[$ES_OPEN_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
   ES_OPEN_USER_YAML=$TMP_DIR/empty.yaml
@@ -244,10 +244,10 @@ LOG_NODE_PLACEMENT_ENABLE=${LOG_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-
 
 # Optional workload node placement support
 if [ "$LOG_NODE_PLACEMENT_ENABLE" == "true" ]; then
-  log_verbose "Enabling elasticsearch for workload node placement"
-  wnpValuesFile="logging/node-placement/values-elasticsearch-opensearch-wnp.yaml"
+  log_verbose "Enabling OpenSearch for workload node placement"
+  wnpValuesFile="logging/node-placement/values-opensearch-wnp.yaml"
 else
-  log_debug "Workload node placement support is disabled for elasticsearch"
+  log_debug "Workload node placement support is disabled for OpenSearch"
   wnpValuesFile="$TMP_DIR/empty.yaml"
 fi
 
@@ -260,7 +260,7 @@ fi
 # NOTE: nodeGroup needed to get resource names we want
 helm $helmDebug upgrade --install opensearch \
     --namespace $LOG_NS \
-    --values logging/es/opensearch/es_helm_values_opensearch.yaml \
+    --values logging/es/opensearch/opensearch_helm_values.yaml \
     --values "$wnpValuesFile" \
     --values "$ES_OPEN_USER_YAML" \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
@@ -274,7 +274,7 @@ if [ "$deploy_temp_masters" == "true" ]; then
    log_debug "Upgrade from ODFE to OpenSearch detected; creating temporary master-only nodes."
    helm $helmDebug upgrade --install opensearch-master \
        --namespace $LOG_NS \
-       --values logging/es/opensearch/es_helm_values_opensearch.yaml \
+       --values logging/es/opensearch/opensearch_helm_values.yaml \
        --values "$wnpValuesFile" \
        --values "$ES_OPEN_USER_YAML" \
        --values "$OPENSHIFT_SPECIFIC_YAML" \
@@ -302,13 +302,13 @@ pvc_status=$(kubectl -n $LOG_NS get pvc  v4m-es-v4m-es-0  -o=jsonpath="{.status.
 if [ "$pvc_status" != "Bound" ];  then
       log_error "It appears that the PVC [v4m-es-v4m-es-0] associated with the [v4m-es-0] node has not been bound to a PV."
       log_error "The status of the PVC is [$pvc_status]"
-      log_error "After ensuring all claims shown as Pending can be satisfied; run the remove_elasticsearch_open.sh script and try again."
+      log_error "After ensuring all claims shown as Pending can be satisfied; run the remove_opensearch.sh script and try again."
       exit 1
 fi
 log_verbose "The PVC [v4m-es-v4m-es-0] have been bound to PVs"
 
-# Need to wait 2-3 minutes for the elasticsearch to come up and running
-log_info "Waiting on Elasticsearch pods to be Ready"
+# Need to wait 2-3 minutes for the OpenSsearch to come up and running
+log_info "Waiting on OpenSearch pods to be Ready"
 kubectl -n $LOG_NS wait pods v4m-es-0 --for=condition=Ready --timeout=10m
 
 

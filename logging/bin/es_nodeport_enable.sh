@@ -10,7 +10,7 @@ source logging/bin/common.sh
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
     log_error "This script should NOT be run on OpenShift clusters"
-    log_error "Run 'logging/bin/create_openshift_route.sh ELASTICSEARCH' instead"
+    log_error "Run 'logging/bin/create_openshift_route.sh OpenSearch' instead"
     exit 1
   fi
 fi
@@ -27,10 +27,10 @@ export ES_PORT="${ES_PORT:-0}"
 SVC=$ES_SERVICENAME
 
 if [ "$ES_PORT" != "0" ]; then
-   log_info "Making Elasticsearch instance [$SVC] in [$LOG_NS] namespace available on port [$ES_PORT]"
+   log_info "Making OpenSearch instance [$SVC] in [$LOG_NS] namespace available on port [$ES_PORT]"
    echo
 else
-   log_debug "No specific port was provided, will make Elasticsearch instance available on a random port"
+   log_debug "No specific port was provided, will make OpenSearch instance available on a random port"
 fi
 
 # set env var to a node in cluster
@@ -41,9 +41,9 @@ kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":
 
 # Determine which port was ultimately used
 ACTUAL_ES_PORT=$(kubectl -n $LOG_NS get service $SVC -o=jsonpath='{.spec.ports[?(@.name=="http")].nodePort}')
-log_debug "ES NodePort enabled on [$ACTUAL_ES_PORT]"
+log_debug "Search NodePort enabled on [$ACTUAL_ES_PORT]"
 
-# Print URL to access Elasticsearch
+# Print URL to access OpenSearch
 SHOW_ES_URL="${SHOW_ES_URL:-true}"
 if [ "$SHOW_ES_URL" == "true" ]; then
    bin/show_app_url.sh ELASTICSEARCH OPENSEARCH

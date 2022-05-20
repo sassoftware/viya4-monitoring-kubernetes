@@ -67,7 +67,7 @@ fi
 
 
 # Fluent Bit user customizations
-FB_OPEN_USER_YAML="${FB_OPEN_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-open.yaml}"
+FB_OPEN_USER_YAML="${FB_OPEN_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-opensearch.yaml}"
 if [ ! -f "$FB_OPEN_USER_YAML" ]; then
   log_debug "[$FB_OPEN_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
   FB_OPEN_USER_YAML=$TMP_DIR/empty.yaml
@@ -146,7 +146,7 @@ kubectl -n $LOG_NS delete pods -l "app.kubernetes.io/name=fluent-bit, fbout=es"
 
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
-  --values logging/fb/fluent-bit_helm_values_open.yaml  \
+  --values logging/fb/fluent-bit_helm_values_opensearch.yaml  \
   --values $openshiftValuesFile \
   --values $FB_OPEN_USER_YAML   \
   --set fullnameOverride=v4m-fb fluent/fluent-bit

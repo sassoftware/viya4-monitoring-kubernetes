@@ -16,7 +16,7 @@ source logging/bin/common.sh
 if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
     log_error "This script should only be run on OpenShift clusters"
-    log_error "Run logging/bin/deploy_logging_open.sh instead"
+    log_error "Run logging/bin/deploy_logging.sh instead"
     exit 1
   fi
 fi
