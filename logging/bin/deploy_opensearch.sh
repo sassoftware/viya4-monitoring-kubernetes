@@ -61,7 +61,7 @@ create_tls_certs $LOG_NS logging ${apps[@]}
 
 # Create ConfigMap for securityadmin script
 kubectl -n $LOG_NS delete configmap run-securityadmin.sh --ignore-not-found
-kubectl -n $LOG_NS create configmap run-securityadmin.sh --from-file logging/es/opensearch/bin/run_securityadmin.sh
+kubectl -n $LOG_NS create configmap run-securityadmin.sh --from-file logging/opensearch/bin/run_securityadmin.sh
 kubectl -n $LOG_NS label  configmap run-securityadmin.sh managed-by=v4m-es-script search-backend=opensearch
 
 # Need to retrieve these from secrets in case secrets pre-existed
@@ -226,8 +226,6 @@ fi
 
 
 # Create secrets containing SecurityConfig files
-## 28MAR22: TO DO: secrets-include.sh has hard-coded path to logging/es/odfe
-##          needs to become logging/es/opensearch when ODFE support dropped
 create_secret_from_file securityconfig/action_groups.yml   security-action-groups   managed-by=v4m-es-script
 create_secret_from_file securityconfig/config.yml          security-config          managed-by=v4m-es-script
 create_secret_from_file securityconfig/internal_users.yml  security-internal-users  managed-by=v4m-es-script
@@ -260,7 +258,7 @@ fi
 # NOTE: nodeGroup needed to get resource names we want
 helm $helmDebug upgrade --install opensearch \
     --namespace $LOG_NS \
-    --values logging/es/opensearch/opensearch_helm_values.yaml \
+    --values logging/opensearch/opensearch_helm_values.yaml \
     --values "$wnpValuesFile" \
     --values "$ES_OPEN_USER_YAML" \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
@@ -274,7 +272,7 @@ if [ "$deploy_temp_masters" == "true" ]; then
    log_debug "Upgrade from ODFE to OpenSearch detected; creating temporary master-only nodes."
    helm $helmDebug upgrade --install opensearch-master \
        --namespace $LOG_NS \
-       --values logging/es/opensearch/opensearch_helm_values.yaml \
+       --values logging/opensearch/opensearch_helm_values.yaml \
        --values "$wnpValuesFile" \
        --values "$ES_OPEN_USER_YAML" \
        --values "$OPENSHIFT_SPECIFIC_YAML" \

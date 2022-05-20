@@ -264,7 +264,7 @@ case "$action" in
          pwdchangetxt="Use Kibana or API"
       fi
 
-      cp logging/es/odfe/rbac/user.json $TMP_DIR/user.json
+      cp logging/opensearch/rbac/user.json $TMP_DIR/user.json
       # Replace PLACEHOLDERS
       sed -i'.bak' "s/xxBEROLExx/$berole/g"             $TMP_DIR/user.json      # (NAMESPACE|NAMESPACE_TENANT|'V4MCLUSTER_ADMIN') + '_kibana_users'
       sed -i'.bak' "s/xxNSCONSTRAINTxx/$nsconstraint/g" $TMP_DIR/user.json      # NAMESPACE|'-none-'

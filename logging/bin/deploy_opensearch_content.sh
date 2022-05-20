@@ -15,11 +15,11 @@ log_debug "Script [$this_script] has started [$(date)]"
 ES_CONTENT_DEPLOY=${ES_CONTENT_DEPLOY:-${ELASTICSEARCH_ENABLE:-true}}
 
 if [ "$ES_CONTENT_DEPLOY" != "true" ]; then
-  log_verbose "Environment variable [ES_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into Open Distro for Elasticsearch"
+  log_verbose "Environment variable [ES_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into OpenSearch"
   exit 0
 fi
 
-log_info "Loading Content into Elasticsearch"
+log_info "Loading Content into OpenSearch"
 
 # temp file used to capture command output
 tmpfile=$TMP_DIR/output.txt
@@ -42,7 +42,7 @@ if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 get_ism_api_url
 
-# Confirm Open Distro for Elasticsearch is ready
+# Confirm Open Distro for OpenSearch is ready
 for pause in 30 30 30 30 30 30 60
 do
    response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "$es_api_url"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
@@ -50,18 +50,18 @@ do
    # TO DO: check for 503 specifically?
 
    if [[ $response != 2* ]]; then
-      log_verbose "The Elasticsearch REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
+      log_verbose "The OpenSearch REST endpoint does not appear to be quite ready [$response]; sleeping for [$pause] more seconds before checking again."
       sleep ${pause}
    else
-      log_debug "The Elasticsearch REST endpoint appears to be ready...continuing"
+      log_debug "The OpenSearch REST endpoint appears to be ready...continuing"
       esready="TRUE"
       break
    fi
 done
 
 if [ "$esready" != "TRUE" ]; then
-   log_error "The Elasticsearch REST endpoint has NOT become accessible in the expected time; exiting."
-   log_error "Review the Elasticsearch pod's events and log to identify the issue and resolve it before trying again."
+   log_error "The OpenSearch REST endpoint has NOT become accessible in the expected time; exiting."
+   log_error "Review the OpenSearch pod's events and log to identify the issue and resolve it before trying again."
    exit 1
 fi
 
@@ -79,7 +79,7 @@ function set_retention_period {
 
    digits_re='^[0-9]+$'
 
-   cp logging/es/odfe/es_${policy_name}.json $TMP_DIR/$policy_name.json
+   cp logging/opensearch/${policy_name}.json $TMP_DIR/$policy_name.json
 
    # confirm value is number
    if ! [[ $retention_period =~ $digits_re ]]; then
@@ -93,15 +93,15 @@ function set_retention_period {
    log_debug "Contents of $policy_name.json after substitution:"
    log_debug "$(cat $TMP_DIR/${policy_name}.json)"
 
-   # Load policy into Elasticsearch via API
+   # Load policy into OpenSearch via API
    response=$(curl -s -o /dev/null  -w "%{http_code}" -XPUT "$ism_api_url/policies/$policy_name" -H 'Content-Type: application/json' -d @$TMP_DIR/$policy_name.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
    if [[ $response == 409 ]]; then
-      log_info "The index management policy [$policy_name] already exist in Elasticsearch; skipping load and using existing policy."
+      log_info "The index management policy [$policy_name] already exist in OpenSearch; skipping load and using existing policy."
    elif [[ $response != 2* ]]; then
-      log_error "There was an issue loading index management policy [$policy_name] into Elasticsearch [$response]"
+      log_error "There was an issue loading index management policy [$policy_name] into OpenSearch [$response]"
       exit 1
    else
-      log_debug "Index management policy [$policy_name] loaded into Elasticsearch [$response]"
+      log_debug "Index management policy [$policy_name] loaded into OpenSearch [$response]"
    fi
 }
 
@@ -153,7 +153,7 @@ function add_ism_template {
          log_warn "Review/create the index managment policy [$policy_name] within Kibana to ensure it is properly configured and linked to appropriate indexes [$pattern]."
          return
       else
-         log_info "Index management policy [$policy_name] loaded into Elasticsearch [$response]"
+         log_info "Index management policy [$policy_name] loaded into OpenSearch [$response]"
       fi
    else
       log_debug "The policy definition for [$policy_name] already includes an ISM Template stanza; no need to patch."
@@ -167,23 +167,23 @@ set_retention_period viya_logs_idxmgmt_policy LOG_RETENTION_PERIOD
 add_ism_template "viya_logs_idxmgmt_policy" "viya_logs-*"  100
 
 # Create Ingest Pipeline to "burst" incoming log messages to separate indexes based on namespace
-response=$(curl  -s -o /dev/null -w "%{http_code}"  -XPUT "$es_api_url/_ingest/pipeline/viyaburstns" -H 'Content-Type: application/json' -d @logging/es/es_create_ns_burst_pipeline.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+response=$(curl  -s -o /dev/null -w "%{http_code}"  -XPUT "$es_api_url/_ingest/pipeline/viyaburstns" -H 'Content-Type: application/json' -d @logging/opensearch/create_ns_burst_pipeline.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 # request returns: {"acknowledged":true}
 if [[ $response != 2* ]]; then
-   log_error "There was an issue loading ingest pipeline into Elasticsearch [$response]"
+   log_error "There was an issue loading ingest pipeline into OpenSearch [$response]"
    exit 1
 else
-   log_debug "Ingest pipeline definition loaded into Elasticsearch [$response]"
+   log_debug "Ingest pipeline definition loaded into OpenSearch [$response]"
 fi
 
 # Configure index template settings and link Ingest Pipeline to Index Template
-response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-logs-template"  -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_logs.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-logs-template"  -H 'Content-Type: application/json' -d @logging/opensearch/set_index_template_settings_logs.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 # request returns: {"acknowledged":true}
 if [[ $response != 2* ]]; then
-   log_error "There was an issue loading index template settings into Elasticsearch [$response]"
+   log_error "There was an issue loading index template settings into OpenSearch [$response]"
    exit 1
 else
-   log_debug "Index template settings loaded into Elasticsearch [$response]"
+   log_debug "Index template settings loaded into OpenSearch [$response]"
 fi
 
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
@@ -194,13 +194,13 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
    add_ism_template "viya_infra_idxmgmt_policy"  "viya_logs-openshift-*"   5
 
    # Link index management policy Index Template
-   response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-infra-template"   -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_infra_openshift.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
+   response=$(curl  -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-infra-template"   -H 'Content-Type: application/json' -d @logging/opensearch/set_index_template_settings_infra_openshift.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
    # request returns: {"acknowledged":true}
    if [[ $response != 2* ]]; then
-      log_error "There was an issue loading infrastructure index template settings into Elasticsearch [$response]"
+      log_error "There was an issue loading infrastructure index template settings into OpenSearch [$response]"
       exit 1
    else
-      log_info "Infrastructure index template settings loaded into Elasticsearch [$response]"
+      log_info "Infrastructure index template settings loaded into OpenSearch [$response]"
   fi
 fi
 
@@ -213,27 +213,19 @@ set_retention_period viya_ops_idxmgmt_policy OPS_LOG_RETENTION_PERIOD
 add_ism_template "viya_ops_idxmgmt_policy"  "viya_ops-*"  50
 
 # Load template
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-ops-template" -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_template_settings_ops.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-ops-template" -H 'Content-Type: application/json'  -d @logging/opensearch/set_index_template_settings_ops.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 # request returns: {"acknowledged":true}
 
 if [[ $response != 2* ]]; then
-   log_error "There was an issue loading monitoring index template settings into Elasticsearch [$response]"
+   log_error "There was an issue loading monitoring index template settings into OpenSearch [$response]"
    exit 1
 else
-   log_debug "Monitoring index template template settings loaded into Elasticsearch [$response]"
+   log_debug "Monitoring index template template settings loaded into OpenSearch [$response]"
 fi
 echo ""
 
-# Set ISM Job Interval to 120 minutes (from default 5 minutes)
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_cluster/settings" -H 'Content-Type: application/json' -d @logging/es/odfe/es_set_index_job_interval.json --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
-if [[ $response != 2* ]]; then
-   log_error "There was an issue loading cluster setttings into Elasticsearch [$response]"
-   exit 1
-else
-   log_debug "Cluster settings loaded into Elasticsearch [$response]"
-fi
 
-log_info "Content has been loaded into Elasticsearch"
+log_info "Content has been loaded into OpenSearch"
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""

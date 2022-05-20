@@ -73,7 +73,7 @@ KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-false}
 if [ "$KB_KNOWN_NODEPORT_ENABLE" == "true" ]; then
    KIBANA_PORT=31034
    log_verbose "Setting Kibana service NodePort to $KIBANA_PORT"
-   nodeport_yaml=logging/es/opensearch/osd_helm_values_nodeport.yaml
+   nodeport_yaml=logging/opensearch/osd_helm_values_nodeport.yaml
 else
    nodeport_yaml=$TMP_DIR/empty.yaml
    log_debug "Kibana service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
@@ -135,7 +135,7 @@ fi
 # Deploy Elasticsearch via Helm chart
 helm $helmDebug upgrade --install v4m-osd \
     --namespace $LOG_NS \
-    --values logging/es/opensearch/osd_helm_values.yaml \
+    --values logging/opensearch/osd_helm_values.yaml \
     --values "$wnpValuesFile" \
     --values "$nodeport_yaml" \
     --values "$OSD_USER_YAML" \
