@@ -30,7 +30,7 @@ logging/bin/remove_openshift_routes.sh
 
 # remove ServiceMonitors
 export DEPLOY_SERVICEMONITORS=${DEPLOY_SERVICEMONITORS:-true}
-logging/bin/remove_servicemonitors_open_openshift.sh
+logging/bin/remove_servicemonitors_openshift.sh
 
 #
 # remove logging components
