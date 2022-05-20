@@ -10,7 +10,7 @@ source logging/bin/common.sh
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
     log_error "This script should NOT be run on OpenShift clusters"
-    log_error "Run logging/bin/remove_logging_open_openshift.sh instead"
+    log_error "Run logging/bin/remove_logging_openshift.sh instead"
     exit 1
   fi
 fi
@@ -28,13 +28,13 @@ helm2ReleaseCheck es-exporter-$LOG_NS
 
 log_notice "Removing logging components from the [$LOG_NS] namespace [$(date)]"
 
-logging/bin/remove_fluentbit_open.sh
+logging/bin/remove_fluentbit_opensearch.sh
 
 logging/bin/remove_esexporter.sh
 
-logging/bin/remove_kibana_opensearch.sh
+logging/bin/remove_osd.sh
 
-logging/bin/remove_elasticsearch_opensearch.sh
+logging/bin/remove_opensearch.sh
 
 logging/bin/remove_eventrouter.sh
 

@@ -60,14 +60,14 @@ logging/bin/deploy_eventrouter.sh
 # OpenSearch                     #
 ##################################
 log_info "STEP 2: OpenSearch"
-logging/bin/deploy_elasticsearch_opensearch.sh
+logging/bin/deploy_opensearch.sh
 
 
 ##################################
 # OpenSearch Content (OpenShift) #
 ##################################
 log_info "STEP 2a: Loading Content into OpenSearch"
-logging/bin/deploy_elasticsearch_content_open.sh
+logging/bin/deploy_opensearch_content.sh
 
 
 ##################################
@@ -81,14 +81,14 @@ logging/bin/deploy_esexporter.sh
 # Fluent Bit                     #
 ##################################
 log_info "STEP 4: Deploying Fluent Bit"
-logging/bin/deploy_fluentbit_open.sh
+logging/bin/deploy_fluentbit_opensearch.sh
 
 
 ##################################
 # OpenSearch Dashboards (Kibana) #
 ##################################
 log_info "STEP 5: OpenSearch Dashboards"
-logging/bin/deploy_kibana_opensearch.sh
+logging/bin/deploy_osd.sh
 
 
 ##################################
@@ -132,7 +132,7 @@ KB_KNOWN_NODEPORT_ENABLE=false logging/bin/deploy_kibana_content.sh
 ##################################
 log_info "STEP 6: Deploying Service Monitors"
 export DEPLOY_SERVICEMONITORS=${DEPLOY_SERVICEMONITORS:-true}
-logging/bin/deploy_servicemonitors_open_openshift.sh
+logging/bin/deploy_servicemonitors_openshift.sh
 
 
 ##################################

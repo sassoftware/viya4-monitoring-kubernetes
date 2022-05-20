@@ -13,7 +13,7 @@ source logging/bin/common.sh
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
     log_error "This script should NOT be run on OpenShift clusters"
-    log_error "Run logging/bin/deploy_logging_opensearch_openshift.sh instead"
+    log_error "Run logging/bin/deploy_logging_openshift.sh instead"
     exit 1
   fi
 fi
@@ -48,13 +48,13 @@ logging/bin/deploy_eventrouter.sh
 # OpenSearch                     #
 ##################################
 
-logging/bin/deploy_elasticsearch_opensearch.sh
+logging/bin/deploy_opensearch.sh
 
 ##################################
 # Open Distro Content            #
 ##################################
 
-logging/bin/deploy_elasticsearch_content_open.sh
+logging/bin/deploy_opensearch_content.sh
 
 ##################################
 # Elasticsearch Metric Exporter  #
@@ -66,13 +66,13 @@ logging/bin/deploy_esexporter.sh
 # Fluent Bit                     #
 ##################################
 
-logging/bin/deploy_fluentbit_open.sh
+logging/bin/deploy_fluentbit_opensearch.sh
 
 ##################################
 # OpenSearch Dashboards (Kibana) #
 ##################################
 
-logging/bin/deploy_kibana_opensearch.sh
+logging/bin/deploy_osd.sh
 
 ##################################
 # Kibana Content                 #

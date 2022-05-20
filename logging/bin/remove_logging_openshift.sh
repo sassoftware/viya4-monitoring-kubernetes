@@ -18,7 +18,7 @@ log_debug "Script [$this_script] has started [$(date)]"
 if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
     log_error "This script should only be run on OpenShift clusters"
-    log_error "Run logging/bin/remove_logging_open.sh instead"
+    log_error "Run logging/bin/remove_logging.sh instead"
     exit 1
   fi
 fi
