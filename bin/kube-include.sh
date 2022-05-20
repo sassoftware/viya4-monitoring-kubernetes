@@ -14,8 +14,9 @@ fi
 KUBE_CLIENT_VER=$(kubectl version --short | grep 'Client Version' | awk '{print $3}' 2>/dev/null)
 KUBE_SERVER_VER=$(kubectl version --short | grep 'Server Version' | awk '{print $3}' 2>/dev/null)
 
-# Minimuim version: 1.21  effective: 14JUN22
-if [[ $KUBE_CLIENT_VER =~ v1.2[1-9] ]]; then
+# Minimuim Client version: 1.20  effective: 14JUN22
+# Client version allowed to be one minor version earlier than minimum server version
+if [[ $KUBE_CLIENT_VER =~ v1.2[0-9] ]]; then
   :
 else 
   log_error "Unsupported kubectl version: [$KUBE_CLIENT_VER]"
@@ -32,4 +33,3 @@ fi
 
 export KUBE_CLIENT_VER="$KUBE_CLIENT_VER"
 export KUBE_SERVER_VER="$KUBE_SERVER_VER"
-export KUBE_NAMESPACE_DELETE_TIMEOUT=${KUBE_NAMESPACE_DELETE_TIMEOUT:-5m}
