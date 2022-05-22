@@ -1,7 +1,7 @@
 image:
   tag: 1.3.1
 
-opensearchHosts: "https://v4m-es:9200"
+opensearchHosts: "https://v4m-search:9200"
 
 extraEnvs:
 - name: OSD_ENABLE_TLS

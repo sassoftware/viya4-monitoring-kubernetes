@@ -263,8 +263,8 @@ helm $helmDebug upgrade --install opensearch \
     --values "$ES_OPEN_USER_YAML" \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
     --set nodeGroup=primary  \
-    --set masterService=v4m-es \
-    --set fullnameOverride=v4m-es opensearch/opensearch
+    --set masterService=v4m-search \
+    --set fullnameOverride=v4m-search opensearch/opensearch
 
 # ODFE => OpenSearch Migration
 if [ "$deploy_temp_masters" == "true" ]; then
@@ -280,14 +280,14 @@ if [ "$deploy_temp_masters" == "true" ]; then
        --set ingress.enabled=false \
        --set replicas=2 \
        --set roles={master} \
-       --set masterService=v4m-es \
+       --set masterService=v4m-search \
        --set fullnameOverride=v4m-master opensearch/opensearch
 fi
 
 
 # waiting for PVCs to be bound
 declare -i pvcCounter=0
-pvc_status=$(kubectl -n $LOG_NS get pvc  v4m-es-v4m-es-0  -o=jsonpath="{.status.phase}")
+pvc_status=$(kubectl -n $LOG_NS get pvc  v4m-search-v4m-search-0  -o=jsonpath="{.status.phase}")
 until [ "$pvc_status" == "Bound" ] || (( $pvcCounter>90 ));
 do
    sleep 5
@@ -296,18 +296,18 @@ do
 done
 
 # Confirm PVC is "bound" (matched) to PV
-pvc_status=$(kubectl -n $LOG_NS get pvc  v4m-es-v4m-es-0  -o=jsonpath="{.status.phase}")
+pvc_status=$(kubectl -n $LOG_NS get pvc  v4m-search-v4m-search-0  -o=jsonpath="{.status.phase}")
 if [ "$pvc_status" != "Bound" ];  then
-      log_error "It appears that the PVC [v4m-es-v4m-es-0] associated with the [v4m-es-0] node has not been bound to a PV."
+      log_error "It appears that the PVC [v4m-search-v4m-search-0] associated with the [v4m-es-0] node has not been bound to a PV."
       log_error "The status of the PVC is [$pvc_status]"
       log_error "After ensuring all claims shown as Pending can be satisfied; run the remove_opensearch.sh script and try again."
       exit 1
 fi
-log_verbose "The PVC [v4m-es-v4m-es-0] have been bound to PVs"
+log_verbose "The PVC [v4m-search-v4m-search-0] have been bound to PVs"
 
-# Need to wait 2-3 minutes for the OpenSsearch to come up and running
+# Need to wait 2-3 minutes for the OpenSearch to come up and running
 log_info "Waiting on OpenSearch pods to be Ready"
-kubectl -n $LOG_NS wait pods v4m-es-0 --for=condition=Ready --timeout=10m
+kubectl -n $LOG_NS wait pods v4m-search-0 --for=condition=Ready --timeout=10m
 
 
 # TO DO: Convert to curl command to detect ES is up?
@@ -357,12 +357,12 @@ fi
 if [ "$existingODFE" == "true" ]; then
 
    min_data_nodes=$((odfe_data_pvc_count - 1))
-   search_node_count=$(kubectl -n $LOG_NS get statefulset v4m-es -o jsonpath='{.spec.replicas}' 2>/dev/null)
+   search_node_count=$(kubectl -n $LOG_NS get statefulset v4m-search -o jsonpath='{.spec.replicas}' 2>/dev/null)
 
    if [ "$search_node_count" -gt "0" ] && [ "$min_data_nodes" -gt "0" ] && [ "$search_node_count" -lt "$min_data_nodes" ]; then
       log_warn "There were insufficient OpenSearch nodes [$search_node_count] configured to handle all of the data from the original ODFE 'data' nodes"
       log_warn "This OpenSearch cluster has been scaled up to [$min_data_nodes] nodes to ensure no loss of data."
-      kubectl -n $LOG_NS scale statefulset v4m-es --replicas=$min_data_nodes
+      kubectl -n $LOG_NS scale statefulset v4m-search --replicas=$min_data_nodes
    fi
 fi
 
@@ -371,9 +371,9 @@ set +e
 # Run the security admin script on the pod
 # Add some logic to find ES release
 if [ "$existingSearch" == "false" ] && [ "$existingODFE" != "true" ]; then
-  kubectl -n $LOG_NS exec v4m-es-0 -c opensearch -- config/run_securityadmin.sh
+  kubectl -n $LOG_NS exec v4m-search-0 -c opensearch -- config/run_securityadmin.sh
   # Retrieve log file from security admin script
-  kubectl -n $LOG_NS cp v4m-es-0:config/run_securityadmin.log $TMP_DIR/run_securityadmin.log
+  kubectl -n $LOG_NS cp v4m-search-0:config/run_securityadmin.log $TMP_DIR/run_securityadmin.log
   if [ "$(tail -n1  $TMP_DIR/run_securityadmin.log)" == "Done with success" ]; then
     log_verbose "The run_securityadmin.log script appears to have run successfully; you can review its output below:"
   else

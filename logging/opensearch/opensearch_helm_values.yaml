@@ -140,7 +140,7 @@ affinity:
           - key: app
             operator: In
             values:
-            - v4m-es
+            - v4m-search
           - key: role
             operator: In
             values:

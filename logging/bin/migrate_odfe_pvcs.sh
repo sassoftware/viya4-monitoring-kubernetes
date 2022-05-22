@@ -79,7 +79,7 @@ if [ "$odfe_master_pvc_count" -gt 0 ] && [ "$odfe_data_pvc_count" -eq 0 ]; then
    log_debug "Only ODFE 'master' PVCs detected"
    log_debug "The 'master' PVCs will be mapped to the primary OpenSearch PVCs"
 
-   master_target="v4m-es-v4m-es-"          # map ODFE 'master' PVCs to primary OpenSearch PVCs
+   master_target="v4m-search-v4m-search-"  # map ODFE 'master' PVCs to primary OpenSearch PVCs
    deploy_temp_masters="false"             # do NOT deploy temporary 'master' nodes
 
 elif [ "$odfe_master_pvc_count" -eq 1 ] && [ "$odfe_data_pvc_count" -eq 1 ]; then
@@ -103,7 +103,7 @@ elif [ "$odfe_master_pvc_count" -gt 0 ] && [ "$odfe_data_pvc_count" -gt 0 ]; the
    log_debug "A mix of ODFE 'master' and 'data' nodes detected."
    log_debug "The 'data' PVCs will be mapped to the primary OpenSearch PVCs and the 'master' PVCs to temporary PVCs to allow upgrade"
 
-   data_target="v4m-es-v4m-es-"             # map ODFE 'data' PVCs to primary OpenSearch PVCs
+   data_target="v4m-search-v4m-search-"     # map ODFE 'data' PVCs to primary OpenSearch PVCs
    master_target="v4m-master-v4m-master-"   # map ODFE 'master' PVCs to temporary OpenSearch temp_master PVCs
    deploy_temp_masters="true"               # deploy temporary 'master' nodes
 
@@ -112,7 +112,7 @@ elif [ "$odfe_master_pvc_count" -eq 0 ] && [ "$odfe_data_pvc_count" -gt 0 ]; the
    log_debug "Only ODFE 'data' PVCs detected"
    log_debug "The 'data' PVCs will be mapped to the primary OpenSearch PVCs"
 
-   master_target="v4m-es-v4m-es-"          # map ODFE 'master' PVCs to primary OpenSearch PVCs
+   master_target="v4m-search-v4m-search-"  # map ODFE 'master' PVCs to primary OpenSearch PVCs
    deploy_temp_masters="false"             # do NOT deploy temporary 'master' nodes
 
 else

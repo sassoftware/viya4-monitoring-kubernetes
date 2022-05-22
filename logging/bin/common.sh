@@ -27,12 +27,12 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     export TLS_ENABLE="true"
 
     # OpenSearch or OpenDistro for Elasticsearch
-    export LOG_SEARCH_BACKEND="${LOG_SEARCH_BACKEND:-ODFE}"
+    export LOG_SEARCH_BACKEND="${LOG_SEARCH_BACKEND:-OPENSEARCH}"
     log_debug "Search Backend set to [$LOG_SEARCH_BACKEND]"
 
     if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
-       export ES_SERVICENAME="v4m-es"
-       export ES_INGRESSNAME="v4m-es"
+       export ES_SERVICENAME="v4m-search"
+       export ES_INGRESSNAME="v4m-search"
 
        export KB_SERVICENAME="v4m-osd"
        export KB_INGRESSNAME="v4m-osd"
