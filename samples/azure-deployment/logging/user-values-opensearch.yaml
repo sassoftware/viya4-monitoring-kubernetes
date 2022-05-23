@@ -2,17 +2,17 @@ persistence:
   storageClass: azuredisk-v4m
 
 
-## Elasticsearch ingress is optional
+## OpenSearch ingress is optional
 #ingress:
 #  ingressClassName: nginx
 #  annotations:
 #    nginx.ingress.kubernetes.io/configuration-snippet: |
 #      rewrite (?i)/elasticsearch/(.*) /$1 break;
 #      rewrite (?i)/elasticsearch$ / break;
-#    nginx.ingress.kubernetes.io/rewrite-target: /elasticsearch
+#    nginx.ingress.kubernetes.io/rewrite-target: /opensearch
 #    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
 #  enabled: true
-#  path: /elasticsearch
+#  path: /opensearch
 #  pathType: Prefix
 #  hosts:
 #    - host.cluster.example.com
