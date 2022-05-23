@@ -67,10 +67,10 @@ fi
 
 
 # Fluent Bit user customizations
-FB_OPEN_USER_YAML="${FB_OPEN_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-opensearch.yaml}"
-if [ ! -f "$FB_OPEN_USER_YAML" ]; then
-  log_debug "[$FB_OPEN_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
-  FB_OPEN_USER_YAML=$TMP_DIR/empty.yaml
+FB_OPENSEARCH_USER_YAML="${FB_OPENSEARCH_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-opensearch.yaml}"
+if [ ! -f "$FB_OPENSEARCH_USER_YAML" ]; then
+  log_debug "[$FB_OPENSEARCH_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
+  FB_OPENSEARCH_USER_YAML=$TMP_DIR/empty.yaml
 fi
 
 
@@ -84,14 +84,14 @@ else
 fi
 
 
-if [ -f "$USER_DIR/logging/fluent-bit_config.configmap_open.yaml" ]; then
+if [ -f "$USER_DIR/logging/fluent-bit_config.configmap_opensearch.yaml" ]; then
    # use copy in USER_DIR
-   FB_CONFIGMAP="$USER_DIR/logging/fluent-bit_config.configmap_open.yaml"
+   FB_CONFIGMAP="$USER_DIR/logging/fluent-bit_config.configmap_opensearch.yaml"
 else
    # use copy in repo
-   FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_open.yaml"
+   FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_opensearch.yaml"
 
-   
+
 fi
 log_debug "Using FB ConfigMap:" $FB_CONFIGMAP
 
@@ -148,7 +148,7 @@ kubectl -n $LOG_NS delete pods -l "app.kubernetes.io/name=fluent-bit, fbout=es"
 helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
   --values logging/fb/fluent-bit_helm_values_opensearch.yaml  \
   --values $openshiftValuesFile \
-  --values $FB_OPEN_USER_YAML   \
+  --values $FB_OPENSEARCH_USER_YAML   \
   --set fullnameOverride=v4m-fb fluent/fluent-bit
 
 log_info "Fluent Bit deployment completed"
