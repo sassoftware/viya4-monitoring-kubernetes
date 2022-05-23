@@ -292,7 +292,7 @@ until [ "$pvc_status" == "Bound" ] || (( $pvcCounter>90 ));
 do
    sleep 5
    pvcCounter=$((pvcCounter+5))
-   pvc_status=$(kubectl -n $LOG_NS get pvc v4m-es-v4m-es-0 -o=jsonpath="{.status.phase}")
+   pvc_status=$(kubectl -n $LOG_NS get pvc v4m-search-v4m-search-0 -o=jsonpath="{.status.phase}")
 done
 
 # Confirm PVC is "bound" (matched) to PV
