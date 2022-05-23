@@ -169,10 +169,10 @@ else
 fi
 
 # Import Kibana Searches, Visualizations and Dashboard Objects using curl
-./logging/bin/import_kibana_content.sh logging/kibana/common          cluster_admins
-./logging/bin/import_kibana_content.sh logging/kibana/cluster_admins  cluster_admins
-./logging/bin/import_kibana_content.sh logging/kibana/namespace       cluster_admins
-./logging/bin/import_kibana_content.sh logging/kibana/tenant          cluster_admins
+./logging/bin/import_osd_content.sh logging/kibana/common          cluster_admins
+./logging/bin/import_osd_content.sh logging/kibana/cluster_admins  cluster_admins
+./logging/bin/import_osd_content.sh logging/kibana/namespace       cluster_admins
+./logging/bin/import_osd_content.sh logging/kibana/tenant          cluster_admins
 
 
 
