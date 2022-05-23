@@ -37,7 +37,7 @@ logging/bin/remove_servicemonitors_openshift.sh
 #
 # override-openshift check
 export CHECK_OPENSHIFT_CLUSTER=false
-logging/bin/remove_logging_opensearch.sh
+logging/bin/remove_logging.sh
 
 log_info "Log monitoring component removal script has completed."
 
