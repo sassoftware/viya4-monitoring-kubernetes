@@ -298,7 +298,7 @@ done
 # Confirm PVC is "bound" (matched) to PV
 pvc_status=$(kubectl -n $LOG_NS get pvc  v4m-search-v4m-search-0  -o=jsonpath="{.status.phase}")
 if [ "$pvc_status" != "Bound" ];  then
-      log_error "It appears that the PVC [v4m-search-v4m-search-0] associated with the [v4m-es-0] node has not been bound to a PV."
+      log_error "It appears that the PVC [v4m-search-v4m-search-0] associated with the [v4m-search-0] node has not been bound to a PV."
       log_error "The status of the PVC is [$pvc_status]"
       log_error "After ensuring all claims shown as Pending can be satisfied; run the remove_opensearch.sh script and try again."
       exit 1
