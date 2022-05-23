@@ -75,10 +75,10 @@ logging/bin/deploy_fluentbit_opensearch.sh
 logging/bin/deploy_osd.sh
 
 ##################################
-# Kibana Content                 #
+# OSD Content                    #
 ##################################
 
-logging/bin/deploy_kibana_content.sh
+logging/bin/deploy_osd_content.sh
 
 ##################################
 # Display Kibana URL             #

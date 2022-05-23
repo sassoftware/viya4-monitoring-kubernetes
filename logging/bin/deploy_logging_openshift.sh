@@ -119,11 +119,11 @@ fi
 
 
 ##################################
-# Kibana Content                 #
+# OSD Content                    #
 ##################################
-log_info "STEP 5b: Configuring Kibana"
+log_info "STEP 5b: Configuring OpenSearch Dashboards"
 
-KB_KNOWN_NODEPORT_ENABLE=false logging/bin/deploy_kibana_content.sh
+KB_KNOWN_NODEPORT_ENABLE=false logging/bin/deploy_osd_content.sh
 
 
 
