@@ -50,8 +50,8 @@ do
         fi
         service="OpenSearch"
         namespace=${LOG_NS:-"logging"}
-        servicename="v4m-es"
-        ingressname="v4m-es"
+        servicename="v4m-search"
+        ingressname="v4m-search"
         tls_flag="true"
         ;;
      KIBANA)
