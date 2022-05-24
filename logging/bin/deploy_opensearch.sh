@@ -210,7 +210,7 @@ if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
    existingSearch=true
 
    #Migrate PVCs
-   source logging/bin/migrate_odfe_pvcs.sh
+   source logging/bin/migrate_odfe_pvcs-include.sh
 else
    log_debug "No obsolete Helm release of [odfe] was found."
    existingODFE="false"
