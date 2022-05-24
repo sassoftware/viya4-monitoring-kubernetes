@@ -598,6 +598,7 @@ qresults_file="$TMP_DIR/query_results.txt"
 # ES_PLUGINS_DIR is set in logging/common.sh
 # but that file is NOT sourced by this script;
 # so we are explicitly setting it here.
+LOG_SEARCH_BACKEND="${LOG_SEARCH_BACKEND:-OPENSEARCH}"
 if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
    ES_PLUGINS_DIR=_plugins
 else
