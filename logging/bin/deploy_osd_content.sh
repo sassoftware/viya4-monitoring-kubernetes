@@ -17,7 +17,7 @@ log_debug "Script [$this_script] has started [$(date)]"
 KIBANA_CONTENT_DEPLOY=${KIBANA_CONTENT_DEPLOY:-${ELASTICSEARCH_ENABLE:-true}}
 
 if [ "$KIBANA_CONTENT_DEPLOY" != "true" ]; then
-  log_verbose "Environment variable [KIBANA_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into Kibana"
+  log_verbose "Environment variable [KIBANA_CONTENT_DEPLOY] is not set to 'true'; exiting WITHOUT deploying content into OpenSearch Dashboards"
   exit 0
 fi
 
@@ -30,17 +30,17 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   exit 1
 fi
 
-# Require TLS into Kibana?
+# Require TLS into OSD?
 LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-false}
 
 if [ "$LOG_KB_TLS_ENABLE" == "true" ]; then
    # w/TLS: use HTTPS in curl commands
    KB_CURL_PROTOCOL=https
-   log_debug "TLS enabled for Kibana"
+   log_debug "TLS enabled for OpenSearch Dashboards"
 else
    # w/o TLS: use HTTP in curl commands
    KB_CURL_PROTOCOL=http
-   log_debug "TLS not enabled for Kibana"
+   log_debug "TLS not enabled for OpenSearch Dashboards"
 fi
 
 # get credentials
@@ -50,7 +50,7 @@ if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 set -e
 
-log_info "Configuring Kibana...this may take a few minutes"
+log_info "Configuring OpenSearch Dashboards...this may take a few minutes"
 
 
 if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ]; then            ####   ODFE SUPPORT-start
@@ -79,14 +79,14 @@ fi                                                            ####   ODFE SUPPOR
 
 
 # wait for pod to show as "running" and "ready"
-log_info "Waiting for Kibana pods to be ready ($(date) - timeout 10m)"
+log_info "Waiting for OpenSearch Dashboards pods to be ready ($(date) - timeout 10m)"
 kubectl -n $LOG_NS wait pods --selector $pod_selector  --for condition=Ready --timeout=10m
 
 set +e  # disable exit on error
 
-# Need to wait 2-3 minutes for kibana to come up and
+# Need to wait 2-3 minutes for OSD to come up and
 # and be ready to accept the curl commands below
-# Confirm Kibana is ready
+# Confirm OSD is ready
 for pause in 30 30 60 30 30 30 30 30 30
 do
 
@@ -96,11 +96,11 @@ do
    # TO DO: check for 503 specifically?
    rc=$?
    if [[ $response != 2* ]]; then
-      log_debug "The Kibana REST endpoint does not appear to be quite ready [$response/$rc]; sleeping for [$pause] more seconds before checking again."
+      log_debug "The OpenSearch Dashboards REST endpoint does not appear to be quite ready [$response/$rc]; sleeping for [$pause] more seconds before checking again."
       stop_kb_portforwarding
       sleep ${pause}
    else
-      log_verbose "The Kibana REST endpoint appears to be ready...continuing"
+      log_verbose "The OpenSearch Dashboards REST endpoint appears to be ready...continuing"
       kibanaready="TRUE"
       break
    fi
@@ -109,8 +109,8 @@ done
 set -e
 
 if [ "$kibanaready" != "TRUE" ]; then
-   log_error "The Kibana REST endpoint has NOT become accessible in the expected time; exiting."
-   log_error "Review the Kibana pod's events and log to identify the issue and resolve it before trying again."
+   log_error "The OpenSearch Dashboards REST endpoint has NOT become accessible in the expected time; exiting."
+   log_error "Review the OpenSearch Dashboards pod's events and log to identify the issue and resolve it before trying again."
    exit 1
 fi
 
@@ -119,18 +119,18 @@ set +e  # disable exit on error
 # get Security API URL
 get_sec_api_url
 
-# Create cluster_admins Kibana tenant space (if it doesn't exist)
+# Create cluster_admins OSD tenant space (if it doesn't exist)
 #   Should only be true during UIP scenario b/c our updated securityconfig processing
-#   is bypassed (to prevent clobbering post-deployment changes made via Kibana).
+#   is bypassed (to prevent clobbering post-deployment changes made via OSD).
 if ! kibana_tenant_exists "cluster_admins"; then
-   create_kibana_tenant "cluster_admins" "Kibana tenant space for Cluster Administrators"
+   create_kibana_tenant "cluster_admins" "Tenant space for Cluster Administrators"
    rc=$?
    if [ "$rc" != "0" ]; then
       log_error "Problems were encountered while attempting to create tenant space [cluster_admins]."
       exit 1
    fi
 else
-   log_debug "The Kibana tenant space [cluster_admins] exists."
+   log_debug "The OpenSearch Dashboards tenant space [cluster_admins] exists."
 fi
 
 #Migrating from ODFE 1.7.0 to ODFE 1.13.x (file should only exist during migration)
@@ -143,13 +143,13 @@ if [ -f "$KB_GLOBAL_EXPORT_FILE" ]; then
 
       rc=$?
       if [ "$rc" == "0" ]; then
-         log_debug "The Kibana tenant space [admin_tenant] was deleted."
+         log_debug "The tenant space [admin_tenant] was deleted."
       else
          log_debug "Problems were encountered while attempting to delete tenant space [admin_tenant]."
       fi
    fi
 
-   log_verbose "Will attempt to migrate Kibana content from previous deployment."
+   log_verbose "Will attempt to migrate content from previous deployment."
 
    kb_migrate_response="$TMP_DIR/kb_migrate_response.json"
 
@@ -157,18 +157,18 @@ if [ -f "$KB_GLOBAL_EXPORT_FILE" ]; then
    response=$(curl -s -o $kb_migrate_response  -w  "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_import?overwrite=false" -H "$LOG_XSRF_HEADER"  -H 'securitytenant: cluster_admins'  --form file="@$KB_GLOBAL_EXPORT_FILE"  -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
 
    if [[ $response != 2* ]]; then
-      log_warn "There was an issue importing the cached existing Kibana content into the Kibana tenant space [cluster_admins]. [$response]"
+      log_warn "There was an issue importing the cached existing content into the OpenSearch Dashboards tenant space [cluster_admins]. [$response]"
       log_warn "Some of your existing content may need to be recreated or restored from your backup files."
       log_debug "Failed response details: $(tail -n1 $kb_migrate_response)"
    else
-      log_info "Existing Kibana imported to [cluster_admins] Kibana tenant space. [$response]"
+      log_info "Existing content imported to [cluster_admins] OpenSearh Dashboards tenant space. [$response]"
       log_debug "Import details: $(tail -n1 $kb_migrate_response)"
    fi
 else
-   log_debug "Migration from ODFE 1.7.0 to ODFE 1.13.x *NOT* detected"
+   log_debug "Migration from ODFE 1.7.0 *NOT* detected"
 fi
 
-# Import Kibana Searches, Visualizations and Dashboard Objects using curl
+# Import OSD Searches, Visualizations and Dashboard Objects using curl
 ./logging/bin/import_osd_content.sh logging/kibana/common          cluster_admins
 ./logging/bin/import_osd_content.sh logging/kibana/cluster_admins  cluster_admins
 ./logging/bin/import_osd_content.sh logging/kibana/namespace       cluster_admins
@@ -177,15 +177,15 @@ fi
 
 
 # create the all logs RBACs
-add_notice "**Elasticsearch/Kibana Access Controls**"
+add_notice "**OpenSearch/OSD Access Controls**"
 LOGGING_DRIVER=true ./logging/bin/security_create_rbac.sh _all_ _all_
 
-# Create the 'logadm' Kibana user who can access all logs
+# Create the 'logadm' OS/OSD user who can access all logs
 LOG_CREATE_LOGADM_USER=${LOG_CREATE_LOGADM_USER:-true}
 if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
 
    if user_exists logadm; then
-      log_warn "A user 'logadm' already exists; leaving that user as-is.  Review its definition in Kibana and update it, or create another user, as needed."
+      log_warn "A user 'logadm' already exists; leaving that user as-is.  Review its definition in OpenSearch Dashboards and update it, or create another user, as needed."
    else
       log_debug "Creating the 'logadm' user"
 
@@ -194,7 +194,7 @@ if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
          log_debug "Creating a random password for the 'logadm' user"
          LOG_LOGADM_PASSWD="$(randomPassword)"
          add_notice ""
-         add_notice "**The Kibana 'logadm' Account**"
+         add_notice "**The OpenSearch 'logadm' Account**"
          add_notice "Generated 'logadm' password:  $LOG_LOGADM_PASSWD"
       fi
 
@@ -212,7 +212,7 @@ if [ "$LOGGING_DRIVER" != "true" ]; then
    echo ""
 fi
 
-log_info "Configuring Kibana has been completed"
+log_info "Configuring OpenSearch Dashboards has been completed"
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""
