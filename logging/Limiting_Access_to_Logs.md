@@ -195,7 +195,7 @@ logging/bin/user.sh DELETE --user <i>user_name</i>
 
 ### Overview
 
-The Open Distro for Elasticsearch security plug-in uses roles to 
+The OpenSearch security plug-in uses roles to 
 control access to the logging information from 
 a cluster, an index, or an OpenSearch Dashboards-tenant space. A role contains 
 permissions for actions (such as cluster 
