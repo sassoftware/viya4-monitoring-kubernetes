@@ -3,9 +3,6 @@
 # Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-# identify backend search provider
-export LOG_SEARCH_BACKEND="OPENSEARCH"
-
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
