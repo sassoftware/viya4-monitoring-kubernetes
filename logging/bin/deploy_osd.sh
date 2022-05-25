@@ -32,6 +32,9 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   exit 1
 fi
 
+# Get/Set Helm Chart Version
+OSD_HELM_CHART_VERSION=${OSD_HELM_CHART_VERSION:-"1.5.1"}
+
 # get credentials
 export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD}
 
@@ -134,6 +137,7 @@ fi
 
 # Deploy Elasticsearch via Helm chart
 helm $helmDebug upgrade --install v4m-osd \
+    --version $OSD_HELM_CHART_VERSION \
     --namespace $LOG_NS \
     --values logging/opensearch/osd_helm_values.yaml \
     --values "$wnpValuesFile" \

@@ -34,6 +34,8 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   exit 1
 fi
 
+# Get/Set Helm Chart Version
+OPENSEARCH_HELM_CHART_VERSION=${OPENSEARCH_HELM_CHART_VERSION:-"1.11.1"}
 
 # get credentials
 export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD}
@@ -257,6 +259,7 @@ fi
 # Deploy OpenSearch via Helm chart
 # NOTE: nodeGroup needed to get resource names we want
 helm $helmDebug upgrade --install opensearch \
+    --version $OPENSEARCH_HELM_CHART_VERSION \
     --namespace $LOG_NS \
     --values logging/opensearch/opensearch_helm_values.yaml \
     --values "$wnpValuesFile" \
@@ -271,6 +274,7 @@ if [ "$deploy_temp_masters" == "true" ]; then
 
    log_debug "Upgrade from ODFE to OpenSearch detected; creating temporary master-only nodes."
    helm $helmDebug upgrade --install opensearch-master \
+       --version $OPENSEARCH_HELM_CHART_VERSION \
        --namespace $LOG_NS \
        --values logging/opensearch/opensearch_helm_values.yaml \
        --values "$wnpValuesFile" \
