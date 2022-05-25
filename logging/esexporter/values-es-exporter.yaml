@@ -74,7 +74,7 @@ es:
   ## basic auth is needed, specify as:
   ## <proto>://<user>:<password>@<host>:<port>. e.g., http://admin:pass@localhost:9200.
   ##
-  uri: https://$(ES_USER):$(ES_PASSWORD)@v4m-es:9200
+  uri: https://$(ES_USER):$(ES_PASSWORD)@v4m-search:9200
 
   ## If true, query stats for all nodes in the cluster, rather than just the
   ## node we connect to.
