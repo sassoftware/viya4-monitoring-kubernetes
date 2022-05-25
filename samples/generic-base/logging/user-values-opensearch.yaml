@@ -3,6 +3,8 @@
 
 #image:
 #  tag: 1.3.2
+#  repository: "opensearchproject/opensearch"
+#  pullPolicy: "IfNotPresent"
 
 ## Number of OpenSearch node (pods)
 # replicas: 3

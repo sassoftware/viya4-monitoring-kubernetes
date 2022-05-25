@@ -1,6 +1,11 @@
 # Chart: https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch
 # Default values: https://github.com/opensearch-project/helm-charts/blob/main/charts/opensearch/values.yaml
 
+#image:
+#  tag: 1.3.2
+#  repository: "opensearchproject/opensearch"
+#  pullPolicy: "IfNotPresent"
+
 ## Number of OpenSearch node (pods)
 # replicas: 3
 
