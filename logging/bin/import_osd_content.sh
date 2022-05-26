@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2022,2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname $BASH_SOURCE)/../.."
@@ -13,7 +13,7 @@ source logging/bin/rbac-include.sh
 
 
 function import_file {
-   # Loads a .ndjson file into Kibana
+   # Loads a .ndjson file into OpenSearch Dashboards
    #
    # Returns: 0 - Content loaded successfully
    #          1 - Content was not loaded successfully
@@ -104,10 +104,10 @@ if [ "$#" != "2" ]; then
    log_message  ""
    log_message  "Usage: $this_script [CONTENT_LOCATION] [TENANT_SPACE]"
    log_message  ""
-   log_message  "Loads content from the specified location into the specified Kibana tenant space."
+   log_message  "Loads content from the specified location into the specified tenant space."
    log_message  ""
-   log_message  "     CONTENT_LOCATION  - (Required) The location, either a single file or a directory, containing content to be imported into Kibana. Note: content must be in form of .ndjson files."
-   log_message  "     TENANT_SPACE      - (Required) The Kibana tenant space to which the content should be imported.  Note: the tenant space must already exist."
+   log_message  "     CONTENT_LOCATION  - (Required) The location, either a single file or a directory, containing content to be imported. Note: content must be in form of .ndjson files."
+   log_message  "     TENANT_SPACE      - (Required) The tenant space to which the content should be imported.  Note: the tenant space must already exist."
    log_message  ""
    exit 1
 fi
@@ -120,10 +120,10 @@ batch_kibana_content="${BATCH_KIBANA_CONTENT:-true}"
 
 get_kb_api_url
 if [ -z "$kb_api_url" ]; then
-   log_error "Unable to determine Kibana URL"
+   log_error "Unable to determine OpenSearch Dashboards URL"
    exit 1
 else
-   log_debug "Kibana URL: $kb_api_url"
+   log_debug "OSD URL: $kb_api_url"
 fi
 
 
@@ -134,7 +134,7 @@ if [ -z "$sec_api_url" ]; then
 fi
 
 if [ -z "$2" ]; then
-   log_error "The required parameter [TENANT_SPACE] was NOT specified; please specify a Kibana tenant space."
+   log_error "The required parameter [TENANT_SPACE] was NOT specified; please specify a OpenSearch Dashboards tenant space."
    exit 1
 else
    tenant=$2
@@ -153,7 +153,7 @@ if kibana_tenant_exists $tenant; then
 elif [ "$tenant" == "global" ];then
    log_debug "Kibana tenant space [global] specified."
 else
-   log_error "Specified Kibana tenant space [$tenant] does not exist. Target Kibana tenant space must exist."
+   log_error "Specified tenant space [$tenant] does not exist. Target OpenSearch Dashboards tenant space must exist."
    exit 1
 fi
 
@@ -163,7 +163,7 @@ if [ -f "$1" ]; then
    if [[ $1 =~ .+\.ndjson ]]; then
       # Deploy single content file
       f=$1
-      log_info "Importing Kibana content from file [$f] to Kibana tenant space [$tenant]..."
+      log_info "Importing content from file [$f] to tenant space [$tenant]..."
 
       import_file $f
       import_problems=$?
@@ -174,7 +174,7 @@ if [ -f "$1" ]; then
 elif [ -d "$1" ]; then
 
     # Deploy specified directory of Kibana content
-    log_info "Importing Kibana content in [$1] to Kibana tenant space [$tenant]..."
+    log_info "Importing content in [$1] to tenant space [$tenant]..."
     if [ "$batch_kibana_content" != "true" ]; then
        log_debug "'BATCH_KIBANA_CONTENT' flag set to 'false'; loading files individually from directory"
        import_content $1
@@ -194,8 +194,8 @@ fi
 
 
 if [ "$import_problems" == "0" ]; then
- log_info "Imported content into Kibana tenant space [$tenant]."
+ log_info "Imported content into tenant space [$tenant]."
 else
- log_warn "There were one or more issues deploying the requested content to Kibana.  Review the messages above."
+ log_warn "There were one or more issues deploying the requested content to OpenSearch Dasboards.  Review the messages above."
 fi
 
