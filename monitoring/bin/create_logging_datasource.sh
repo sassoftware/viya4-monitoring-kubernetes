@@ -13,13 +13,13 @@ this_script=`basename "$0"`
 function show_usage {
   log_message  "Usage: $this_script [--namespace NAMESPACE --tenant TENANT]"
   log_message  ""
-  log_message  "Creates the Elasticsearch data source to allow log messages to be viewed in Grafana."
+  log_message  "Creates the logging data source to allow log messages to be viewed in Grafana."
   log_message  ""
-  log_message  "To create the Elasticsearch data source at the cluster level, do not pass any "
-  log_message  "arguments.  To create the Elasticsearch data source at the tenant level, you need"
+  log_message  "To create the logging data source at the cluster level, do not pass any "
+  log_message  "arguments.  To create the logging data source at the tenant level, you need"
   log_message  "to provide the following arguments:"
   log_message  "     -ns, --namespace NAMESPACE   - The namespace where the Viya tenant resides."
-  log_message  "     -t,  --tenant TENANT         - The tenant whose Elasticsearch data source you want to set up."
+  log_message  "     -t,  --tenant TENANT         - The tenant whose logging data source you want to set up."
   log_message  ""
 }
 
@@ -101,14 +101,29 @@ else
 fi
 
 # Check to see if logging namespace provided exists and components have already been deployed
-log_info "Checking for Elasticsearch pods in the [$LOG_NS] namespace ..."
-if [[ $(kubectl get pods -n $LOG_NS -l app=v4m-es -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]]; then
-  log_error "Elasticsearch was not found in the [$LOG_NS] namespace."
-  log_error "All of the required log monitoring components need to be deployed in this namespace before this script can configure the requested Grafana datasource "
-  exit 1
-else
+if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
+  log_info "Checking for Opensearch pods in the [$LOG_NS] namespace ..."
+  if [[ $(kubectl get pods -n $LOG_NS -l app.kubernetes.io/component=v4m-es -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]]; then
+    log_error "Opensearch was not found in the [$LOG_NS] namespace."
+    log_error "All of the required log monitoring components need to be deployed in this namespace before this script can configure the requested Grafana datasource "
+    exit 1
+  else
   log_debug "Logging deployment found in [$LOG_NS] namespace.  Continuing."
+  fi
+elif [ "$LOG_SEARCH_BACKEND" == "ODFE" ]; then
+  log_info "Checking for Elasticsearch pods in the [$LOG_NS] namespace ..."
+  if [[ $(kubectl get pods -n $LOG_NS -l app=v4m-es -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]]; then
+    log_error "Elasticsearch was not found in the [$LOG_NS] namespace."
+    log_error "All of the required log monitoring components need to be deployed in this namespace before this script can configure the requested Grafana datasource "
+    exit 1
+  else
+  log_debug "Logging deployment found in [$LOG_NS] namespace.  Continuing."
+  fi
+else
+  log_error "Invalid logging backend."
 fi
+
+
 
 # get admin credentials
 export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
@@ -157,14 +172,18 @@ monDir=$TMP_DIR/$MON_NS
 mkdir -p $monDir
 cp monitoring/grafana-datasource-es.yaml $monDir/grafana-datasource-es.yaml
 
+echo "ES SERVICENAME = $ES_SERVICENAME"
+
 # Replace placeholders
 log_debug "Replacing variables in $monDir/grafana-datasource-es.yaml file"
 if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
     sed -i '' "s/__namespace__/$LOG_NS/g" $monDir/grafana-datasource-es.yaml
+    sed -i '' "s/__ES_SERVICENAME__/$ES_SERVICENAME/g" $monDir/grafana-datasource-es.yaml    
     sed -i '' "s/__userID__/$grfds_user/g" $monDir/grafana-datasource-es.yaml
     sed -i '' "s/__passwd__/$grfds_passwd/g" $monDir/grafana-datasource-es.yaml
 else
     sed -i "s/__namespace__/$LOG_NS/g" $monDir/grafana-datasource-es.yaml
+    sed -i "s/__ES_SERVICENAME__/$ES_SERVICENAME/g" $monDir/grafana-datasource-es.yaml
     sed -i "s/__userID__/$grfds_user/g" $monDir/grafana-datasource-es.yaml
     sed -i "s/__passwd__/$grfds_passwd/g" $monDir/grafana-datasource-es.yaml
 fi

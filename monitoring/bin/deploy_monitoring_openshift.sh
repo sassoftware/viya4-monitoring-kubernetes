@@ -52,11 +52,11 @@ else
 fi
 
 # Elasticsearch Datasource for Grafana
-ELASTICSEARCH_DATASOURCE="${ELASTICSEARCH_DATASOURCE:-false}"
-if [ "$ELASTICSEARCH_DATASOURCE" == "true" ]; then
+LOGGING_DATASOURCE="${LOGGING_DATASOURCE:-false}"
+if [ "$LOGGING_DATASOURCE" == "true" ]; then
   configureElasticsearchDatasource
 else
-  log_debug "ELASTICSEARCH_DATASOURCE not set"
+  log_debug "LOGGING_DATASOURCE not set"
   log_debug "Skipping creation of Elasticsearch datasource for Grafana"
 fi
 
