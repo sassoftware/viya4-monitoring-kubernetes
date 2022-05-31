@@ -251,7 +251,7 @@ function remove_rolemapping {
                 log_debug "Updated Back-end Role ($targetrole): $newroles"
 
                 # Copy RBAC template
-                cp logging/es/odfe/rbac/backend_rolemapping_delete.json $TMP_DIR/${targetrole}_backend_rolemapping_delete.json
+                cp logging/opensearch/rbac/backend_rolemapping_delete.json $TMP_DIR/${targetrole}_backend_rolemapping_delete.json
 
                 #update json template file w/revised list of backend roles
                 sed -i'.bak' "s/xxBACKENDROLESxx/$newroles/g"     $TMP_DIR/${targetrole}_backend_rolemapping_delete.json # BACKENDROLES

@@ -595,8 +595,19 @@ log_info "Search for matching log messages started... $(date)"
 
 qresults_file="$TMP_DIR/query_results.txt"
 
-response=$(curl -m $maxtime -s  -o $qresults_file -w "%{http_code}"  -XPOST "$protocol://$host:$port/_opendistro/_sql?format=$format" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $username:$password -k)
+# ES_PLUGINS_DIR is set in logging/common.sh
+# but that file is NOT sourced by this script;
+# so we are explicitly setting it here.
+LOG_SEARCH_BACKEND="${LOG_SEARCH_BACKEND:-OPENSEARCH}"
+if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
+   ES_PLUGINS_DIR=_plugins
+else
+   ES_PLUGINS_DIR=_opendistro
+fi
+
+response=$(curl -m $maxtime -s  -o $qresults_file -w "%{http_code}"  -XPOST "$protocol://$host:$port/$ES_PLUGINS_DIR/_sql?format=$format" -H 'Content-Type: application/json' -d @$query_file  $output_txt  --user $username:$password -k)
 rc=$?
+
 log_debug "curl (query submission) command response: [$response] rc:[$rc]"
 
 if [[ $response != 2* ]]; then

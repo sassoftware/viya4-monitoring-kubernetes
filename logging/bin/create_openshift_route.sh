@@ -57,7 +57,7 @@ case "$app" in
       ;;
    "OPENSEARCH"|"opensearch"|"OS"|"os")
       namespace="$LOG_NS"
-      service_name="v4m-es"
+      service_name="v4m-search"
       port="http"
       tls_enable="true"
       tls_secret="es-rest-tls-secret"

@@ -17,7 +17,7 @@ function create_secret_from_file {
     log_debug "Creating secret [$secret_name]"
 
     if [ -f "$USER_DIR/logging/$file" ]; then filepath=$USER_DIR/logging
-    elif [ -f "logging/es/odfe/$file" ]; then filepath=logging/es/odfe
+    elif [ -f "logging/opensearch/$file" ]; then filepath=logging/opensearch
     else
       log_error "Could not create secret [$secret_name] because file [$file] could not be found"
       return 9

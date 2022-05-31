@@ -61,7 +61,7 @@ log_verbose "Updating Helm repositories"
 helm repo update
 
 if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
-   primaryValuesFile="logging/esexporter/values-es-exporter_opensearch.yaml"
+   primaryValuesFile="logging/esexporter/values-es-exporter.yaml"
    log_debug "Deploying Elasticsearch Exporter for [$LOG_SEARCH_BACKEND]"
 else
    primaryValuesFile="logging/esexporter/values-es-exporter_open.yaml"
@@ -92,7 +92,7 @@ fi
 # Point to OpenShift response file or dummy as appropriate
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
   log_verbose "Deploying Elasticsearch metric exporter onto OpenShift cluster"
-  openshiftValuesFile="logging/openshift/values-elasticsearch-exporter-openshift.yaml"
+  openshiftValuesFile="logging/openshift/values-elasticsearch-exporter.yaml"
 else
   log_debug "Elasticsearch metric exporter is NOT being deployed on OpenShift cluster"
   openshiftValuesFile="$TMP_DIR/empty.yaml"

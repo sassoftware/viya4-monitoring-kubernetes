@@ -28,7 +28,7 @@ function show_usage {
 }
 
 if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
-   targetpod="v4m-es-0"
+   targetpod="v4m-search-0"
    toolsrootdir="/usr/share/opensearch/plugins/opensearch-security"
 else
    targetpod="v4m-es-master-0"

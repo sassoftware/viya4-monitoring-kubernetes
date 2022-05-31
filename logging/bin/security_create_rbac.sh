@@ -119,7 +119,7 @@ else
 fi
 
 # Copy RBAC templates
-cp logging/es/odfe/rbac $TMP_DIR -r
+cp logging/opensearch/rbac $TMP_DIR -r
 
 # Replace PLACEHOLDERS
 sed -i'.bak' "s/xxIDXPREFIXxx/$INDEX_PREFIX/g"  $TMP_DIR/rbac/*.json     # IDXPREFIX

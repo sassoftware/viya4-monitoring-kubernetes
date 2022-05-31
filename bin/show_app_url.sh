@@ -23,7 +23,7 @@ add_notice ""
 #start looping through services
 servicelist=${@:-"ALL"}
 if [ "$servicelist" == "ALL" ]; then
-   servicelist="KIBANA ELASTICSEARCH GRAFANA"
+   servicelist="GRAFANA OS OSD"
 fi
 
 log_debug "Application URLs requested for [$servicelist]"
@@ -50,19 +50,21 @@ do
         fi
         service="OpenSearch"
         namespace=${LOG_NS:-"logging"}
-        servicename="v4m-es"
-        ingressname="v4m-es"
+        servicename="v4m-search"
+        ingressname="v4m-search"
         tls_flag="true"
         ;;
-     KIBANA)
+     KIBANA|KB)
         namespace=${LOG_NS:-"logging"}
+        service="Kibana"
         servicename="v4m-es-kibana-svc"
         ingressname="v4m-es-kibana-ing"
         tls_flag="$(kubectl -n $namespace get pod -l role=kibana -o=jsonpath='{.items[*].metadata.annotations.tls_required}')"
         log_debug "TLS required to connect to Kibana? [$tls_flag]"
         ;;
-     ELASTICSEARCH)
+     ELASTICSEARCH|ES)
         namespace=${LOG_NS:-"logging"}
+        service="Elasticsearch"
         servicename="v4m-es-client-service"
         ingressname=""
         tls_flag="true"
@@ -87,7 +89,7 @@ do
         ;;
 
      *)
-        log_error "Invalid service [$service] specified; valid values are [GRAFANA, KIBANA, ELASTICSEARCH or ALL]"
+        log_error "Invalid service [$service] specified; valid values are [GRAFANA, OPENSEARCH, OPENSEARCHDASHBOARDS, KIBANA, ELASTICSEARCH or ALL(does not inc. KIBANA or ELASTICSEARCH)]"
         exit 1
         ;;
    esac
