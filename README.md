@@ -1,9 +1,9 @@
 # SAS® Viya® Monitoring for Kubernetes
 
 SAS® Viya® Monitoring for Kubernetes provides simple scripts and customization
-options to deploy monitoring, alerts, and log aggregation for SAS Viya 4.x.
+options to deploy monitoring, alerts, and log aggregation for SAS Viya 4.
 
-Monitoring and logging may be deployed independently or together. There are
+Monitoring and logging can be deployed independently or together. There are
 no hard dependencies between the two.
 
 ## Monitoring - Metrics and Alerts
@@ -48,23 +48,23 @@ The logging solution includes these components and your right to use each such c
 
 - [Fluent Bit](https://fluentbit.io/)
   - Custom Fluent Bit parsers
-- [Elasticsearch](https://www.elastic.co/products/elasticsearch)
+- [OpenSearch](https://opensearch.org/docs/latest/opensearch/index/)
   - Custom index pattern for logs
   - Namespace separation
   - [Elasticsearch Exporter](https://github.com/helm/charts/tree/master/stable/elasticsearch-exporter)
-- [Kibana](https://www.elastic.co/products/kibana)
-  - Custom Kibana dashboards
+- [OpenSearch Dashboards](https://opensearch.org/docs/latest/dashboards/index/)
+  - Custom dashboards for OpenSearch Dashboards
 
-  This is an example of a Kibana dashboard displaying log message volumes.
+  This is an example of OpenSearch Dashboards displaying log message volumes.
 
-  ![Kibana - Log Message Volume Dashboard](img/screenshot-logs-dashboard.png)
+  ![OpenSearch Dashboards - Log Message Volume Dashboard](img/screenshot-logs-dashboard.png)
 
 See the documentation at [SAS Viya: Logging](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=titlepage.htm)
 for more information about using the logging components.
 
 ## Prerequisites
 
-- A Kubernetes cluster that meets the prerequisites for SAS Viya
+- A Kubernetes cluster that meets the prerequisites for SAS Viya 4
 - [Helm](https://helm.sh) version 3.x
 - `kubectl` version 1.21+ with cluster-admin access
 - [Git](https://git-scm.com/) version 1.8 or later
@@ -81,7 +81,7 @@ metric exporters, service monitors, and custom dashboards.
 ### Logging
 
 See the [logging README](logging/README.md) to deploy the logging components,
-including Fluent Bit, Elasticsearch, and Kibana.
+including Fluent Bit, OpenSearch, and OpenSearch Dashboards.
 
 ## Customization
 

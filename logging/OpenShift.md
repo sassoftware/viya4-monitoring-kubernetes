@@ -27,7 +27,7 @@ in two separate storage systems.
 ## Deploy SAS Viya Logging on OpenShift
 
 You must use this procedure to deploy SAS Viya Logging on OpenShift. Do not use
-the standard logging deployment script (deploy_logging_open.sh).
+the standard logging deployment script (deploying_logging.sh).
 
 1. Follow the instructions in the [logging README](../README.md#l_pre_dep) to
 perform the standard predeployment tasks (create a local copy of the
@@ -43,7 +43,7 @@ oc login [cluster-hostname] -u [userID]
 3. Use this command to deploy SAS Viya Logging for OpenShift:
 
 ```bash
-./logging/bin/deploy_logging_open_openshift.sh
+./logging/bin/deploying_logging_openshift.sh
 ```
 
 ## <a name="l_os_cust"></a>Customization
@@ -62,9 +62,9 @@ about the customization process.
 
 An additional index management policy, named `viya_infra_idxmgmt_policy`, is added
 in an OpenShift environment. The policy manages log messages from OpenShift
-infrastructure namespaces (which is ny namespace that starts with "openshift").
+infrastructure namespaces (which is any namespace that starts with "openshift").
 Because the OpenShift infrastructure namespaces can generate a large number of
-log messages, you can use the policy to change the number of days tha t these
+log messages, you can use the policy to change the number of days that these
 log messages are retained. To change the retention period, modify the
 `INFRA_LOG_RETENTION_PERIOD` environment variable. The default value is `1` (1 day).
 
@@ -75,11 +75,11 @@ and logging components.
 #### Access Using Route Objects
 
 OpenShift uses [route](https://docs.openshift.com/enterprise/3.0/architecture/core_concepts/routes.html)
-objects, a feature unique to OpenShift, to access Kibana and (optionally) the
-Elasticsearch API endpoint. This makes it unnecessary to configure ingress
+objects, a feature unique to OpenShift, to access OpenSearch Dashboards and (optionally) the
+OpenSearch API endpoint. This makes it unnecessary to configure Ingress
 objects or surface nodePorts. No customizations are required, even if you are
-using ingress, because the `deploy_logging_open_openshift.sh` script defines
-a route for Kibana.
+using Ingress, because the `deploying_logging_openshift.sh` script defines
+a route for OpenSearch Dashboards.
 
 #### TLS
 
@@ -97,8 +97,8 @@ OpenShift come from the same Kubernetes secrets as a standard logging deployment
 
 ***Ingress TLS:***
 
-- `kibana-ingress-tls-secret`
-- `elasticsearch-ingress-tls-secret`
+- `osd-ingress-tls-secret`
+- `opensearch-ingress-tls-secret`
 
 By default, the deployment process uses cert-manager to obtain and manage the
 certificates used for in-cluster TLS. If the Ingress secrets are not populated,
@@ -109,24 +109,24 @@ See [Notes_on_using_TLS](Notes_on_using_TLS.md) for information about replacing
 the in-cluster secrets and [Sample - TLS Enablement for Logging](../samples/tls/logging/README.md)
 for information about replacing the Ingress secrets.
 
-#### Enable Access to the Elasticsearch API Endpoint
+#### Enable Access to the OpenSearch API Endpoint
 
-You can make the Elasticsearch API accessible so that users can query Elasticsearch
+You can make the OpenSearch API accessible so that users can query OpenSearch
 by using the `getlogs.sh` script or curl commands. To make the API endpoint
 accessible, set the `OPENSHIFT_ES_ROUTE_ENABLE` environment variable to `true` before
 you deploy the logging components.
 
 If you need to make the API endpoint accessible after deployment is complete, run
-the `create_openshift_route.sh` script and pass the `ELASTICSEARCH` argument:
+the `create_openshift_route.sh` script and pass the `OPENSEARCH` argument:
 
 ```bash
-./logging/bin/create_openshift_route.sh ELASTICSEARCH
+./logging/bin/create_openshift_route.sh OPENSEARCH
 ```
 
 To remove access to the API endpoint, use the oc command to delete the route:
 
 ```bash
-oc -n $LOG_NS delete route v4m-es-client-service
+oc -n $LOG_NS delete route v4m-es
 ```
 
 ***Note:*** Do not use the `es_nodeport_enable_open.sh` and `es_nodeport_disable_open.sh` scripts
@@ -137,18 +137,18 @@ in an OpenShift environment.
 Routes may be configured to be host-based (default) or path-based. When
 using host-based routes, the name of the application is part of the hostname
 in the URL (for example:
-`https://v4m-kibana-monitoring.apps.my-openshift-cluster.com`).
+`https://v4m-osd-logging.apps.my-openshift-cluster.com`).
 When using path-based routes, the application name only appears as part of the
 path at the end of the URL (for example:
-`https://v4m-logging.apps.my-openshift-cluster.com/kibana`).
+`https://v4m-logging.apps.my-openshift-cluster.com/osd`).
 
 Specify `OPENSHIFT_PATH_ROUTES=true` in the `$USER_DIR/user.env` file
 (applies to both logging and monitoring) or the `$USER_DIR/logging/user.env`
 file (for only logging components) to use path-based routes.
 
-The hostnames for Kibana and Elasticsearch can be configured using
+The hostnames for OpenSearch Dashboards and OpenSearch can be configured using
 `OPENSHIFT_ROUTE_HOST_KIBANA` and/or `OPENSHIFT_ROUTE_HOST_ELASTICSEARCH`
-(if the Elasticsearch route is enabled) in `$USER_DIR/user.env` or
+(if the OpenSearch route is enabled) in `$USER_DIR/user.env` or
 `$USER_DIR/logging/user.env`. Note that OpenShift does not allow the use
 of the same route hostname across namespaces, so do not use the same custom
 hostname across logging and monitoring.
@@ -158,7 +158,7 @@ hostname across logging and monitoring.
 To remove the monitoring components, run this command:
 
 ```bash
-./logging/bin/remove_logging_open_openshift.sh
+./logging/bin/remove_logging_openshift.sh
 ```
 
 By default, the removal script does not remove all of the associated Kubernetes
