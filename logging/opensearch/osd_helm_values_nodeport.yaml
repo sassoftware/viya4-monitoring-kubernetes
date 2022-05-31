@@ -1,4 +1,4 @@
 service:
   type: NodePort
-  nodePort: 31034
+  nodePort: 31033
 
