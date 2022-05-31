@@ -77,20 +77,20 @@ export USER_DIR=/home/my_directory
 5. If you previously deployed the logging components, run the Fluent Bit deployment script to redeploy only the Fluent Bit pods:
 
 ```bash
-./logging/bin/deploy_logging_fluentbit_open.sh
+./logging/bin/deploy_logging_fluentbit_opensearch.sh
 ```
 
 If you have not yet deployed the logging components, run the standard deployment script:
 
 ```bash
-./logging/bin/deploy_logging_open.sh
+./logging/bin/deploy_logging.sh
 ```
 
 ## Issue: Manually Deleting the Logging Namespace Does Not Delete All Components 
 
 ### Description
 
-The logging components should be removed by using the `remove_logging_open.sh` script. See [Remove Logging Components](README.md#lremove) for more information. If you attempt to remove the logging components by only deleting the namespace into which the components are deployed, components in other locations are not removed and redeployment of logging fails.
+The logging components should be removed by using the `remove_logging.sh` script. See [Remove Logging Components](README.md#lremove) for more information. If you attempt to remove the logging components by only deleting the namespace into which the components are deployed, components in other locations are not removed and redeployment of logging fails.
 
 ### Solution
 
@@ -144,7 +144,7 @@ running low on space.
 Longer retention periods require more storage.
  
 **Tip:** In the default configuration, these pods have names that start with 
-"v4m-es-data-*". 
+"v4m-search-*". 
 
 ### Solution
 
