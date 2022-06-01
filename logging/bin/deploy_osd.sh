@@ -7,6 +7,7 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 source bin/tls-include.sh
+source bin/tls-include2.sh
 source logging/bin/apiaccess-include.sh
 
 this_script=`basename "$0"`
@@ -41,17 +42,19 @@ export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD}
 # Create secrets containing internal user credentials
 create_user_secret internal-user-kibanaserver kibanaserver "$ES_KIBANASERVER_PASSWD"  managed-by=v4m-es-script
 
+cert_generator="${CERT_GENERATOR:-openssl}"
+
 # Verify cert-manager is available (if necessary)
-if verify_cert_manager $LOG_NS kibana; then
-  log_debug "cert-manager check OK"
+if verify_cert_generator $LOG_NS kibana; then
+  log_debug "cert generator check OK [$cert_generator_ok]"
 else
-  log_error "One or more required TLS certs do not exist and cert-manager is not available to create the missing certs"
+  log_error "A required TLS cert does not exist and the expected certificate generator mechanism [$cert_generator] is not available to create the missing cert"
   exit 1
 fi
 
 # Create/Get necessary TLS certs
 apps=( kibana )
-create_tls_certs $LOG_NS logging ${apps[@]}
+create_tls_certs_new $LOG_NS logging ${apps[@]}
 
 
 # Need to retrieve these from secrets in case secrets pre-existed
