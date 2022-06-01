@@ -7,7 +7,6 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 source bin/tls-include.sh
-source bin/tls-include2.sh
 source logging/bin/apiaccess-include.sh
 
 this_script=`basename "$0"`
@@ -50,23 +49,18 @@ create_user_secret internal-user-kibanaserver kibanaserver "$ES_KIBANASERVER_PAS
 create_user_secret internal-user-logcollector logcollector "$ES_LOGCOLLECTOR_PASSWD"  managed-by=v4m-es-script
 create_user_secret internal-user-metricgetter metricgetter "$ES_METRICGETTER_PASSWD"  managed-by=v4m-es-script
 
-cert_generator="${CERT_GENERATOR:-openssl}"
+#cert_generator="${CERT_GENERATOR:-openssl}"
 
-# Verify cert-manager is available (if necessary)
-##if verify_cert_manager $LOG_NS es-transport es-rest es-admin kibana; then
-if verify_cert_generator $LOG_NS es-transport es-rest es-admin kibana; then
-   ##log_debug "cert-manager check OK"
+# Verify cert generator is available (if necessary)
+if verify_cert_generator $LOG_NS es-transport es-rest es-admin; then
    log_debug "cert generator check OK [$cert_generator_ok]"
-
 else
-   ##log_error "One or more required TLS certs do not exist and cert-manager is not available to create the missing certs"
-   log_error "One or more required TLS certs do not exist and the expected certificate generator mechanism [$cert_generator] is not available to create the missing certs"
+   log_error "One or more required TLS certs do not exist and the expected certificate generator mechanism [$CERT_GENERATOR] is not available to create the missing certs"
    exit 1
 fi
 
 # Create/Get necessary TLS certs
-apps=( es-transport es-rest es-admin )
-create_tls_certs_new $LOG_NS logging ${apps[@]}
+create_tls_certs $LOG_NS logging es-transport es-rest es-admin
 
 # Create ConfigMap for securityadmin script
 kubectl -n $LOG_NS delete configmap run-securityadmin.sh --ignore-not-found

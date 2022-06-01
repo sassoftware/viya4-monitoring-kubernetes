@@ -16,10 +16,10 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
 fi
 
 source bin/tls-include.sh
-if verify_cert_manager $MON_NS prometheus alertmanager grafana; then
-  log_debug "cert-manager check OK"
+if verify_cert_generator $MON_NS prometheus alertmanager grafana; then
+  log_debug "cert generator check OK [$cert_generator_ok]"
 else
-  log_error "cert-manager is required but is not available"
+  log_error "One or more required TLS certs do not exist and the expected certificate generator mechanism [$cert_generator] is not available to create the missing certs"
   exit 1
 fi
 
