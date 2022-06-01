@@ -100,6 +100,8 @@ else
     fi
 fi
 
+echo "ES SERVICENAME = $ES_SERVICENAME"
+
 # Check to see if logging namespace provided exists and components have already been deployed
 if [[ $(kubectl get pods -n $LOG_NS -l app.kubernetes.io/component=$ES_SERVICENAME -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]]; then
     log_error "Search backend was not found in the [$LOG_NS] namespace."
