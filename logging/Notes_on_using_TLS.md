@@ -23,7 +23,7 @@ TLS requires the use of digital security certificates. These certificates allow 
 
 By default, the deployment process for the SAS Viya Monitoring solution uses cert-manager to obtain and manage the digital security certificates. Version v1.0 or later of cert-manager is required.
 
-The `deploy_logging_open.sh` deployment script automatically obtains the certificates from cert-manager and creates the Kubernetes secrets with the required structure and expected names. The script ensures that the certificates are mounted on the OpenSearch and OpenSearch Dashboards pods in the correct locations.
+The `deploy_logging.sh` deployment script automatically obtains the certificates from cert-manager and creates the Kubernetes secrets with the required structure and expected names. The script ensures that the certificates are mounted on the OpenSearch and OpenSearch Dashboards pods in the correct locations.
 
 ## Configure TLS Without Using cert-manager
 
@@ -71,7 +71,7 @@ mkdir -p ~/my-cluster-files/ops/user-dir/logging
 export USER_DIR=~/my-cluster-files/ops/user-dir
 ```
 
-6. Modify the file `$USER_DIR\logging\user-values-opensearch.yaml`.
+6. Modify the file `$USER_DIR/logging/user-values-opensearch.yaml`.
 
    - Uncomment the following lines:
    
