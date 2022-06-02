@@ -256,13 +256,13 @@ The following table shows the RBAC roles that are linked to the `logadm` back-en
 
 | Back-end Role | Role | Purpose |
 | --- | --- | --- |
-|     | v4m_kibana_user | Grants user access to the Kibana functionality needed. (This role is not unique to the `logadm` user). |
+|     | v4m_kibana_user | Grants user access to the OpenSearch Dashboards functionality needed. (This role is not unique to the `logadm` user). |
 |     | search_index | Grants access to all collected log messages. |
-|     | tenant_cluster_admins | Grants access to the cluster_admins Kibana-tenant space.|
+|     | tenant_cluster_admins | Grants access to the cluster_admins OpenSearch Dashboards-tenant space.|
 |V4MCLUSTER_ADMIN_kibana_users |    | Provides an easy way to link the above roles with a user.
 
 Linking users to the back-end role V4MCLUSTER_ADMIN_kibana_users via the 
-Kibana security plug-in grants those users the access described in the table above.
+OpenSearch security plug-in grants those users the access described in the table above.
 You can also use the user.sh script to grant a user the same level of access as 
 a `logadm` user. For example, to grant the user "chen" this level of  
 access controls, submit the following command:
