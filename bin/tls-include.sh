@@ -226,8 +226,11 @@ function create_cert_secret {
     local namespace app
     namespace="$1"
     app="$2"
+    secretName="$3"
 
-    secretName="${app}-tls-secret"
+    if [ -z "$secretName" ]; then
+       secretName="${app}-tls-secret"
+    fi
     log_debug "Storing TLS Cert for [$app] in secret [$secretName] in namespace [$namespace]"
 
     expiration_date=$(openssl x509 -enddate -noout -in  $TMP_DIR/${app}.pem | awk -F "=" '{print $2}')
@@ -261,11 +264,11 @@ function create_tls_certs_openssl {
          #Hmmm, if we're doing a big install, the TMP_DIR would/might? exist and the first root-ca-key.pem file would be
          # used for all subsequent certs...is that a problem?
 
-         if [ -n "$(kubectl get secret -n $namespace root-ca-tls-secret -o name 2>/dev/null)" ]; then
+         if [ -n "$(kubectl get secret -n $namespace v4m-root-ca-tls-secret -o name 2>/dev/null)" ]; then
             #IF secret $namespace/root-ca-tls-secret exists THEN extract the rootca key & key from it
-            log_debug "Extracting Root CA from secret [root-ca-tls-secret]"
-            kubectl -n $namespace get secret root-ca-tls-secret -o=jsonpath="{.data.tls\.crt}" |base64 --decode > $TMP_DIR/root-ca.pem
-            kubectl -n $namespace get secret root-ca-tls-secret -o=jsonpath="{.data.tls\.key}" |base64 --decode > $TMP_DIR/root-ca-key.pem
+            log_debug "Extracting Root CA from secret [v4m-root-ca-tls-secret]"
+            kubectl -n $namespace get secret v4m-root-ca-tls-secret -o=jsonpath="{.data.tls\.crt}" |base64 --decode > $TMP_DIR/root-ca.pem
+            kubectl -n $namespace get secret v4m-root-ca-tls-secret -o=jsonpath="{.data.tls\.key}" |base64 --decode > $TMP_DIR/root-ca-key.pem
          else
             #ELSE create things from scratch
             log_debug "Creating Root CA using OpenSSL"
@@ -274,7 +277,7 @@ function create_tls_certs_openssl {
             openssl req -new -x509 -sha256 -key $TMP_DIR/root-ca-key.pem -subj "$cert_subject" -out $TMP_DIR/root-ca.pem -days $cert_life
 
             #Store Root CA in a secret
-           create_cert_secret $namespace root-ca
+           create_cert_secret $namespace root-ca v4m-root-ca-tls-secret
          fi
 
       else
