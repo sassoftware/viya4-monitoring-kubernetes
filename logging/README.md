@@ -17,7 +17,7 @@ namespace or a subset of namespaces.
 
 ### Important Information about OpenSearch and OpenSearch Dashboards
 
-As of release 1.1.9, this project uses OpenSearch and OpenSearch Dashboards version 1.3.
+>As of release 1.2.0, this project uses OpenSearch and OpenSearch Dashboards version 1.3.
 
 **Notes:**
 
@@ -33,9 +33,6 @@ These components are deployed:
 * [OpenSearch](http://opensearch.org/docs/1.3) - Unstructured document storage and query engine
 * [OpenSearch Dashboards](http://opensearch.org/docs/1.3/dashboards) - User interface for query and visualization
 * [Prometheus Exporter for Elasticsearch](https://github.com/prometheus-community/elasticsearch_exporter) - Provides detailed Elasticsearch performance information for Prometheus
-
-If you are using a cloud provider, you must use Ingress, rather than
-NodePorts. Specify the information needed to use Ingress during the customization process.
 
 ## <a name="l_pre_dep"></a>Perform Pre-Deployment Tasks
 
@@ -116,6 +113,7 @@ my-viya4mon-user-dir/user.env
 
 my-viya4mon-user-dir/logging/user.env
 my-viya4mon-user-dir/logging/user-values-opensearch.yaml
+my-viya4mon-user-dir/logging/user-values-osd.yaml
 my-viya4mon-user-dir/logging/user-values-es-exporter.yaml
 my-viya4mon-user-dir/logging/user-values-fluent-bit-open.yaml
 ```
@@ -165,11 +163,11 @@ The [TLS Logging sample](/samples/tls/logging) contains information about specif
 The logging stack uses the following Helm charts:
 
 * **OpenSearch**
-  * [Chart](https://github.com/opendistro-for-elasticsearch/opendistro-build/tree/master/helm)
-  * [Default values](https://github.com/opendistro-for-elasticsearch/opendistro-build/blob/master/helm/opendistro-es/values.yaml)
+  * [Chart](https://github.com/opensearch-project/helm-charts/tree/1.x/charts/opensearch) 
+  * [Default values](https://github.com/opensearch-project/helm-charts/blob/1.x/charts/opensearch/values.yaml)
 * **OpenSearch Dashboards**
-  * [Chart](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch-dashboards)
-  * [Default values](https://github.com/opensearch-project/helm-charts/blob/main/charts/opensearch-dashboards/values.yaml)
+  * [Chart](https://github.com/opensearch-project/helm-charts/tree/1.x/charts/opensearch-dashboards)
+  * [Default values](https://github.com/opensearch-project/helm-charts/blob/1.x/charts/opensearch-dashboards/values.yaml)
 * **Fluent Bit**
   * [Chart](https://github.com/helm/charts/tree/master/stable/fluent-bit)
   * [Default values](https://github.com/helm/charts/blob/master/stable/fluent-bit/values.yaml)
@@ -193,11 +191,11 @@ make in the `user-values-fluent-bit-open.yaml` file that are intended to
 affect the Fluent Bit configuration files are ignored. However, edits
 affecting other aspects of the Fluent Bit Helm chart execution are processed.
 
-When you edit the `user-values-opensearch.yaml` file, ensure that the parent
+When you edit any of the `user-values-*.yaml` files, ensure that the parent
 item of any item that you uncomment is also uncommented.  For
-example, if you uncommented the `storageClass` item for the OpenSearch
-master nodes, you must also uncomment the `persistence` item, the
-`master` item and the `elasticsearch` item, as shown below:
+example, in the `user-values-opensearch.yaml` file, if you uncommented 
+the `storageClass` item for the OpenSearch master nodes, you must also 
+uncomment the `persistence` item, as shown below:
 
 ```yaml
 # Sample user-values-opensearch.yaml
@@ -244,7 +242,7 @@ runs out of disk space, OpenSearch continues to operate.
 To specify an alternate storageClass to use, modify the appropriate
 `user-values-*.yaml` file used for Helm processing, as described above.
 By default, the lines referencing the storageClass in the persistence stanza of the
-`user-values-*.yaml` file are commented out, which specifies that
+`user-values-opensearch.yaml` file are commented out, which specifies that
 the default storage class is used. To direct the OpenSearch PVCs to use an
 alternate storageClass, edit the file to uncomment the appropriate lines
 and confirm the storageClassName matches your preferred storageClass.
@@ -279,7 +277,7 @@ Use the following steps to log in to OpenSearch Dashboards:
 
 ## <a name="lremove"></a>Remove Logging Components
 
-To remove all logging components, run the following command:
+To remove the logging components, run the following command:
 
 ```bash
 cd <viya4-monitoring-kubernetes repo directory>
