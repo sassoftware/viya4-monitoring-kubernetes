@@ -169,7 +169,7 @@ log_notice "Access controls created [$(date)]"
 echo ""
 
 add_notice    "Assign users the back-end role of  [${BE_ROLENAME}] to"
-add_notice    "grant them access to Kibana and log messages from"
+add_notice    "grant them access to OpenSearch Dashboards and log messages from"
 if [ "$cluster" == "true" ]; then
    add_notice "ALL tenants and ALL namespaces"
 elif [ -n "$tenant" ]; then
