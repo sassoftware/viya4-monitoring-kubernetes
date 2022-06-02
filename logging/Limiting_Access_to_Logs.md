@@ -226,6 +226,7 @@ namespace:
 |     | search_index_production_acme | Grants access to log messages from the `acme` tenant within the `production` namespace  |
 | production_acme_kibana_users |   | Grants access to all of the above roles |
 
+The back-end role provides an easy way to link the set of RBACs with a user.
 After these access controls have been defined, you can assign the back-end role 
 of `production_acme_kibana_users` to a user. The back-end role 
 enables the user to access only:
@@ -248,21 +249,20 @@ roles, the user cannot log in to OpenSearch Dashboards and cannot access the
 As of the 1.1.3 release, the following items are created during the deployment process:
 
 - a set of role-based access controls (RBACs)
-- the `logadm` user (also called a ***back-end role***), which is linked to the set of RBACs
+- the `logadm` user which is linked to the set of RBACs
 
-The back-end role provides an easy way to link the set of RBACs with a user. For example, a back-end role called production_acme_osd_users is created. The back-end role is linked to a set of RBAC roles by the OpenSearch Dashboards security plug-in.
-  
-![The `logadm` user is linked to the three new role-based access controls](../img/OpenSearch_Dashboards_users_rbacs.png) 
 
 The following table shows the RBAC roles that are linked to the `logadm` back-end role. The table also shows the access granted to the RBAC roles by the plug-in.
 
-| Role | Access |
-| --- | --- |
-| v4m_kibana_user | Grants the user access to OpenSearch Dashboards. (This role is not unique to the `logadm` user). |
-| tenant_production_acme | Grants access to the OpenSearch Dashboards-tenant space called 'production_acme'.|
-| search_index-production_acme | Grants access to log messages from the 'acme' tenant within the 'production' namespace. |
-|
+| Back-end Role | Role | Purpose |
+| --- | --- | --- |
+|     | v4m_kibana_user | Grants user access to the Kibana functionality needed. (This role is not unique to the `logadm` user). |
+|     | search_index | Grants access to all collected log messages. |
+|     | tenant_cluster_admins | Grants access to the cluster_admins Kibana-tenant space.|
+|V4MCLUSTER_ADMIN_kibana_users |    | Provides an easy way to link the above roles with a user.
 
+Linking users to the back-end role V4MCLUSTER_ADMIN_kibana_users via the 
+Kibana security plug-in grants those users the access described in the table above.
 You can also use the user.sh script to grant a user the same level of access as 
 a `logadm` user. For example, to grant the user "chen" this level of  
 access controls, submit the following command:

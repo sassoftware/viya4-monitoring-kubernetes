@@ -34,9 +34,6 @@ These components are deployed:
 * [OpenSearch Dashboards](http://opensearch.org/docs/1.3/dashboards) - User interface for query and visualization
 * [Prometheus Exporter for Elasticsearch](https://github.com/prometheus-community/elasticsearch_exporter) - Provides detailed Elasticsearch performance information for Prometheus
 
-If you are using a cloud provider, you must use Ingress, rather than
-NodePorts. Specify the information needed to use Ingress during the customization process.
-
 ## <a name="l_pre_dep"></a>Perform Pre-Deployment Tasks
 
 Before deploying, you must perform these tasks:
