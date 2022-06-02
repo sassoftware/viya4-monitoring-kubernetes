@@ -264,10 +264,9 @@ The following table shows the RBAC roles that are linked to the `logadm` back-en
 Linking users to the back-end role V4MCLUSTER_ADMIN_kibana_users via the 
 OpenSearch security plug-in grants those users the access described in the table above.
 You can also use the user.sh script to grant a user the same level of access as 
-a `logadm` user. For example, to grant the user "chen" this level of  
-access controls, submit the following command:
+a `logadm` user. For example, to grant the user "chen" this level of access 
+controls, submit the following command:
 
 <pre>
-logging/bin/user.sh CREATE --user chen --password chenspassword 
---namespace _all_ --tenant _all_
+logging/bin/user.sh CREATE --user chen --password chenspassword --namespace _all_ --tenant _all_
 </pre>
