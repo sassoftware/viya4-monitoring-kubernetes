@@ -82,7 +82,7 @@ function deploy_app_cert {
   namespace=$1
   context=$2
   app=$3
-  
+
   contextDir=${TLS_CONTEXT_DIR:-$context/tls}
 
   # Create the certificate using cert-manager
@@ -99,7 +99,7 @@ function create_tls_certs_cm {
   context=$2
   shift 2
   apps=("$@")
- 
+
   deployedIssuers="false"
     # Certs honor USER_DIR for overrides/customizations
   for app in "${apps[@]}"; do
@@ -234,10 +234,10 @@ function create_cert_secret {
     log_debug "Storing TLS Cert for [$app] in secret [$secretName] in namespace [$namespace]"
 
     expiration_date=$(openssl x509 -enddate -noout -in  $TMP_DIR/${app}.pem | awk -F "=" '{print $2}')
-    # Secret Type: TLS (two sub-parts: cert + key
+    # Secret Type: TLS (two sub-parts: cert + key)
     #kubectl -n $namespace create secret tls $secretName --cert $TMP_DIR/${app}.pem --key $TMP_DIR/${app}-key.pem
 
-    # Secret Type: GENERIC (3 sub-parts: cert + key + CACert
+    # Secret Type: GENERIC (3 sub-parts: cert + key + CACert)
     kubectl -n $namespace create secret generic $secretName --from-file=tls.crt=$TMP_DIR/${app}.pem --from-file=tls.key=$TMP_DIR/${app}-key.pem --from-file=ca.crt=$TMP_DIR/root-ca.pem
     kubectl -n $namespace annotate secret $secretName  expiration="$expiration_date"
 
@@ -261,23 +261,17 @@ function create_tls_certs_openssl {
 
       if [ ! -f  $TMP_DIR/root-ca-key.pem ]; then
 
-         #Hmmm, if we're doing a big install, the TMP_DIR would/might? exist and the first root-ca-key.pem file would be
-         # used for all subsequent certs...is that a problem?
-
          if [ -n "$(kubectl get secret -n $namespace v4m-root-ca-tls-secret -o name 2>/dev/null)" ]; then
-            #IF secret $namespace/root-ca-tls-secret exists THEN extract the rootca key & key from it
-            log_debug "Extracting Root CA from secret [v4m-root-ca-tls-secret]"
+            log_debug "Extracting Root CA cert from secret [v4m-root-ca-tls-secret]"
             kubectl -n $namespace get secret v4m-root-ca-tls-secret -o=jsonpath="{.data.tls\.crt}" |base64 --decode > $TMP_DIR/root-ca.pem
             kubectl -n $namespace get secret v4m-root-ca-tls-secret -o=jsonpath="{.data.tls\.key}" |base64 --decode > $TMP_DIR/root-ca-key.pem
          else
-            #ELSE create things from scratch
-            log_debug "Creating Root CA using OpenSSL"
-            cert_subject="/O=cert-manager/CN=rootca"
-            openssl genrsa -out $TMP_DIR/root-ca-key.pem 2048
+            log_debug "Creating Root CA cert using OpenSSL"
+            cert_subject="/O=v4m/CN=rootca"
+            openssl genrsa -out $TMP_DIR/root-ca-key.pem 2048 2>/dev/null
             openssl req -new -x509 -sha256 -key $TMP_DIR/root-ca-key.pem -subj "$cert_subject" -out $TMP_DIR/root-ca.pem -days $cert_life
 
-            #Store Root CA in a secret
-           create_cert_secret $namespace root-ca v4m-root-ca-tls-secret
+            create_cert_secret $namespace root-ca v4m-root-ca-tls-secret
          fi
 
       else
@@ -285,17 +279,14 @@ function create_tls_certs_openssl {
       fi
 
       log_debug "Creating TLS Cert for [$app] using OpenSSL"
-      cert_subject="/O=cert-manager/CN=$app"
-      openssl genrsa -out $TMP_DIR/${app}-key-temp.pem 2048
+      cert_subject="/O=v4m/CN=$app"
+      openssl genrsa -out $TMP_DIR/${app}-key-temp.pem 2048 2>/dev/null
       openssl pkcs8 -inform PEM -outform PEM -in $TMP_DIR/${app}-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out $TMP_DIR/${app}-key.pem
       openssl req -new -key $TMP_DIR/${app}-key.pem -subj "$cert_subject" -out $TMP_DIR/${app}.csr
-      openssl x509 -req -in $TMP_DIR/${app}.csr -CA $TMP_DIR/root-ca.pem  -CAkey $TMP_DIR/root-ca-key.pem -CAcreateserial -sha256 -out $TMP_DIR/${app}.pem -days $cert_life
+      openssl x509 -req -in $TMP_DIR/${app}.csr -CA $TMP_DIR/root-ca.pem  -CAkey $TMP_DIR/root-ca-key.pem -CAcreateserial -sha256 -out $TMP_DIR/${app}.pem -days $cert_life 2>/dev/null
 
       create_cert_secret $namespace $app
 
-      # TO DO: For TRANSPORT and ADMIN certs, create env vars w/subject...to be used in opensearch.yaml
-      log_debug "Subject for [$app]"
-      openssl x509 -subject -nameopt RFC2253 -noout -in $TMP_DIR/${app}.pem 
     done
 
 

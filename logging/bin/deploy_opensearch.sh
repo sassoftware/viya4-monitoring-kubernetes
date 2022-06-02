@@ -62,6 +62,28 @@ fi
 # Create/Get necessary TLS certs
 create_tls_certs $LOG_NS logging es-transport es-rest es-admin
 
+# need to wait for cert-manager to create all certs and secrets
+sleep 10
+
+# Get subject from admin and transport cert for opensearch.yaml
+if [ ! -f  $TMP_DIR/es-transport.pem ]; then
+   log_debug "Extracting es-transport cert from secret"
+   kubectl -n $LOG_NS get secret es-transport-tls-secret -o=jsonpath="{.data.tls\.crt}" |base64 --decode > $TMP_DIR/es-transport.pem
+fi
+node_dn=$(openssl x509 -subject -nameopt RFC2253 -noout -in $TMP_DIR/es-transport.pem | sed  "s/subject= \(\S*\)/\1/")
+
+if [ ! -f  $TMP_DIR/es-admin.pem ]; then
+   log_debug "Extracting es-admin cert from secret"
+   kubectl -n $LOG_NS get secret es-admin-tls-secret -o=jsonpath="{.data.tls\.crt}" |base64 --decode > $TMP_DIR/es-admin.pem
+fi
+admin_dn=$(openssl x509 -subject -nameopt RFC2253 -noout -in $TMP_DIR/es-admin.pem    | sed  "s/subject= \(\S*\)/\1/")
+
+log_debug "Subjects node_dn:$node_dn admin_dn $admin_dn"
+
+#write cert subjects to secret to be mounted as env var
+kubectl -n $LOG_NS delete secret opensearch-cert-subjects --ignore-not-found
+kubectl -n $LOG_NS create secret generic opensearch-cert-subjects  --from-literal=node_dn="$node_dn" --from-literal=admin_dn="$admin_dn"
+
 # Create ConfigMap for securityadmin script
 kubectl -n $LOG_NS delete configmap run-securityadmin.sh --ignore-not-found
 kubectl -n $LOG_NS create configmap run-securityadmin.sh --from-file logging/opensearch/bin/run_securityadmin.sh
