@@ -101,10 +101,10 @@ else
 fi
 
 # Check to see if logging namespace provided exists and components have already been deployed
-if [[ $(kubectl get pods -n $LOG_NS -l app.kubernetes.io/component=$ES_SERVICENAME -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]]; then
-    log_error "Search backend was not found in the [$LOG_NS] namespace."
-    log_error "All of the required log monitoring components need to be deployed in this namespace before this script can configure the logging data source."
-    exit 1
+if [[ $(kubectl get pods -n $LOG_NS -l app.kubernetes.io/component=$ES_SERVICENAME -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]] || [[ $(kubectl get pods -n $LOG_NS -l app=v4m-es -o custom-columns=:metadata.namespace --no-headers | uniq | wc -l) == 0 ]]; then
+  log_error "Search backend was not found in the [$LOG_NS] namespace."
+  log_error "All of the required log monitoring components need to be deployed in this namespace before this script can configure the logging data source."
+  exit 1
 else
   log_debug "Logging deployment found in [$LOG_NS] namespace.  Continuing."
 fi
