@@ -249,7 +249,7 @@ function create_tls_certs_openssl {
     shift
     apps=("$@")
 
-    cert_life=180
+    cert_life=${OPENSSL_CERT_LIFE:-550}
 
     for app in "${apps[@]}"; do
       secretName="${app}-tls-secret"
@@ -268,7 +268,7 @@ function create_tls_certs_openssl {
          else
             log_debug "Creating Root CA cert using OpenSSL"
             cert_subject="/O=v4m/CN=rootca"
-            openssl genrsa -out $TMP_DIR/root-ca-key.pem 2048 2>/dev/null
+            openssl genrsa -out $TMP_DIR/root-ca-key.pem 4096 2>/dev/null
             openssl req -new -x509 -sha256 -key $TMP_DIR/root-ca-key.pem -subj "$cert_subject" -out $TMP_DIR/root-ca.pem -days $cert_life
 
             create_cert_secret $namespace root-ca v4m-root-ca-tls-secret
@@ -280,7 +280,7 @@ function create_tls_certs_openssl {
 
       log_debug "Creating TLS Cert for [$app] using OpenSSL"
       cert_subject="/O=v4m/CN=$app"
-      openssl genrsa -out $TMP_DIR/${app}-key-temp.pem 2048 2>/dev/null
+      openssl genrsa -out $TMP_DIR/${app}-key-temp.pem 4096 2>/dev/null
       openssl pkcs8 -inform PEM -outform PEM -in $TMP_DIR/${app}-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out $TMP_DIR/${app}-key.pem
       openssl req -new -key $TMP_DIR/${app}-key.pem -subj "$cert_subject" -out $TMP_DIR/${app}.csr
       openssl x509 -req -in $TMP_DIR/${app}.csr -CA $TMP_DIR/root-ca.pem  -CAkey $TMP_DIR/root-ca-key.pem -CAcreateserial -sha256 -out $TMP_DIR/${app}.pem -days $cert_life 2>/dev/null
