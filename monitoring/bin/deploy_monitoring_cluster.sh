@@ -69,11 +69,13 @@ if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
   log_verbose "Updating Prometheus Operator custom resource definitions"
   crds=( alertmanagerconfigs alertmanagers prometheuses prometheusrules podmonitors servicemonitors thanosrulers probes )
   for crd in "${crds[@]}"; do
+    echo "CRD = $crd"
     crdURL="https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_$crd.yaml"
+    echo "CRD URL = $crdURL"
     if kubectl get crd $crd.monitoring.coreos.com 1>/dev/null 2>&1; then
-      kubectl replace -f $crdURL
+      kubectl replace -f $crdURL --insecure-skip-tls-verify
     else
-      kubectl create -f $crdURL
+      kubectl create -f $crdURL --insecure-skip-tls-verify
     fi
   done
 else
@@ -221,22 +223,21 @@ else
 fi
 
 # Elasticsearch Datasource for Grafana
-# Moved down to make sure Grafana pods exist
-ELASTICSEARCH_DATASOURCE="${ELASTICSEARCH_DATASOURCE:-false}"
-if [ "$ELASTICSEARCH_DATASOURCE" == "true" ]; then
+LOGGING_DATASOURCE="${LOGGING_DATASOURCE:-false}"
+if [ "$LOGGING_DATASOURCE" == "true" ]; then
   set +e
-  log_debug "Creating Elasticsearch datasource using the create_elasticesearch_datasource script"
-  monitoring/bin/create_elasticsearch_datasource.sh
+  log_debug "Creating the logging data source using the create_logging_datasource script"
+  monitoring/bin/create_logging_datasource.sh
 
   if (( $? == 1 )); then
-    log_warn "Unable to configure the Elasticsearch data source at this time."
+    log_warn "Unable to configure the logging data source at this time."
     log_warn "Please address the errors and re-run the follow command to create the data source at a later time:"
-    log_warn "monitoring/bin/create_elasticsearch_datasource.sh"
+    log_warn "monitoring/bin/create_logging_datasource.sh"
   fi
   set -e
 else
-  log_debug "ELASTICSEARCH_DATASOURCE not set"
-  log_debug "Skipping creation of Elasticsearch datasource for Grafana"
+  log_debug "LOGGING_DATASOURCE not set"
+  log_debug "Skipping creation of logging data source for Grafana"
 fi
 
 echo ""
