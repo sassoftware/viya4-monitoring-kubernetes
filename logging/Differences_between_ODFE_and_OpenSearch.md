@@ -47,9 +47,9 @@ The topology of the search back-end is different.
 
 If you had not configured access via Ingress, the Open Distro for Elasticsearch-based deployment script automatically made Kibana accessible via NodePort.
 
-The OpenSearch deployment script does not do this automatically. If you want to make OpenSearch Dashboards accessible via NodePort, you must set the environment variable `KB_KNOWN_NODEPORT_ENABLE` to `True` before running the `logging/bin/deploy_logging_opensearch.sh` script.
+The OpenSearch deployment script does not do this automatically. If you want to make OpenSearch Dashboards accessible via NodePort, you must set the environment variable `KB_KNOWN_NODEPORT_ENABLE` to `true` before running the `logging/bin/deploy_logging.sh` script.
 
-Both Kibana and OpenSearch Dashboards are accessible from port 31033.
+When this option is set, OpenSearch Dashboards is accessible on the same port (31033) that was used by Kibana.
 
 **Note:** NodePorts are not suitable for production deployments.
 
