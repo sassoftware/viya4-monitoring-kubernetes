@@ -23,7 +23,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 9628,
   "graphTooltip": 0,
-  "iteration": 1654198147997,
+  "iteration": 1655128296597,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -2816,9 +2816,13 @@
       },
       {
         "current": {
-          "selected": false,
-          "text": "d48534",
-          "value": "d48534"
+          "selected": true,
+          "text": [
+            "d48534"
+          ],
+          "value": [
+            "d48534"
+          ]
         },
         "datasource": {
           "type": "prometheus",
@@ -2826,9 +2830,9 @@
         },
         "definition": "",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Namespace",
-        "multi": false,
+        "multi": true,
         "name": "namespace",
         "options": [],
         "query": {
@@ -2846,46 +2850,15 @@
       },
       {
         "current": {
-          "isNone": true,
           "selected": false,
-          "text": "None",
-          "value": ""
+          "text": "10.254.12.225:9187",
+          "value": "10.254.12.225:9187"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "PBFA97CFB590B2093"
         },
-        "definition": "query_result(pg_exporter_last_scrape_duration_seconds{namespace=\"$namespace\"})",
-        "hide": 0,
-        "includeAll": false,
-        "label": "Release",
-        "multi": false,
-        "name": "release",
-        "options": [],
-        "query": {
-          "query": "query_result(pg_exporter_last_scrape_duration_seconds{namespace=\"$namespace\"})",
-          "refId": "StandardVariableQuery"
-        },
-        "refresh": 2,
-        "regex": "/.*release=\"([^\"]+)/",
-        "skipUrlSync": false,
-        "sort": 1,
-        "tagValuesQuery": "",
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "current": {
-          "selected": false,
-          "text": "10.254.12.211:9187",
-          "value": "10.254.12.211:9187"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
-        },
-        "definition": "",
+        "definition": "query_result(pg_up{namespace=\"$namespace\"})",
         "hide": 0,
         "includeAll": false,
         "label": "Instance",
@@ -2893,8 +2866,8 @@
         "name": "instance",
         "options": [],
         "query": {
-          "query": "query_result(pg_up{release=\"$release\"})",
-          "refId": "Prometheus-instance-Variable-Query"
+          "query": "query_result(pg_up{namespace=\"$namespace\"})",
+          "refId": "StandardVariableQuery"
         },
         "refresh": 1,
         "regex": "/.*instance=\"([^\"]+).*/",
