@@ -272,6 +272,8 @@ helm $helmDebug upgrade --install opensearch \
 # ODFE => OpenSearch Migration
 if [ "$deploy_temp_masters" == "true" ]; then
 
+   #NOTE: rbac.create set to 'false' since ServiceAccount
+   #      was created during prior Helm chart deployment
    log_debug "Upgrade from ODFE to OpenSearch detected; creating temporary master-only nodes."
    helm $helmDebug upgrade --install opensearch-master \
        --version $OPENSEARCH_HELM_CHART_VERSION \
@@ -284,6 +286,7 @@ if [ "$deploy_temp_masters" == "true" ]; then
        --set ingress.enabled=false \
        --set replicas=2 \
        --set roles={master} \
+       --set rbac.create=false \
        --set masterService=v4m-search \
        --set fullnameOverride=v4m-master opensearch/opensearch
 fi
