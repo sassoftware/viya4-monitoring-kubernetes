@@ -272,8 +272,8 @@ helm $helmDebug upgrade --install opensearch \
 # ODFE => OpenSearch Migration
 if [ "$deploy_temp_masters" == "true" ]; then
 
-   #NOTE: OpenShift-specific (OPENSHIFT_SPECIFIC_YAML) is *intentionally* 
-   #      omitted below to prevent redundant creation of serviceAccount.
+   #NOTE: rbac.create set to 'false' since ServiceAccount
+   #      was created during prior Helm chart deployment
    log_debug "Upgrade from ODFE to OpenSearch detected; creating temporary master-only nodes."
    helm $helmDebug upgrade --install opensearch-master \
        --version $OPENSEARCH_HELM_CHART_VERSION \
@@ -281,10 +281,12 @@ if [ "$deploy_temp_masters" == "true" ]; then
        --values logging/opensearch/opensearch_helm_values.yaml \
        --values "$wnpValuesFile" \
        --values "$ES_OPEN_USER_YAML" \
+       --values "$OPENSHIFT_SPECIFIC_YAML" \
        --set nodeGroup=temp_masters  \
        --set ingress.enabled=false \
        --set replicas=2 \
        --set roles={master} \
+       --set rbac.create=false \
        --set masterService=v4m-search \
        --set fullnameOverride=v4m-master opensearch/opensearch
 fi
