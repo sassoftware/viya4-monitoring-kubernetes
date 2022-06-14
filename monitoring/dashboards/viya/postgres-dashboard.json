@@ -23,7 +23,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 9628,
   "graphTooltip": 0,
-  "iteration": 1655230689597,
+  "iteration": 1655230689639,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -1761,6 +1761,7 @@
         "x": 0,
         "y": 22
       },
+      "hiddenSeries": false,
       "id": 5,
       "legend": {
         "alignAsTable": true,
@@ -1779,6 +1780,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
       "pluginVersion": "8.4.1",
       "pointradius": 5,
@@ -1851,6 +1855,7 @@
         "x": 8,
         "y": 22
       },
+      "hiddenSeries": false,
       "id": 6,
       "legend": {
         "alignAsTable": true,
@@ -1869,6 +1874,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
       "pluginVersion": "8.4.1",
       "pointradius": 5,
@@ -1942,6 +1950,7 @@
         "x": 16,
         "y": 22
       },
+      "hiddenSeries": false,
       "id": 3,
       "legend": {
         "alignAsTable": true,
@@ -1961,6 +1970,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
       "pluginVersion": "8.4.1",
       "pointradius": 5,
@@ -2854,7 +2866,7 @@
           "type": "prometheus",
           "uid": "PBFA97CFB590B2093"
         },
-        "definition": "query_result(pg_up{namespace=\"$namespace\"})",
+        "definition": "query_result(pg_up{namespace=~\"$namespace\"})",
         "hide": 0,
         "includeAll": false,
         "label": "Instance",
@@ -2862,7 +2874,7 @@
         "name": "instance",
         "options": [],
         "query": {
-          "query": "query_result(pg_up{namespace=\"$namespace\"})",
+          "query": "query_result(pg_up{namespace=~\"$namespace\"})",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
