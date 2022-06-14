@@ -23,7 +23,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 9628,
   "graphTooltip": 0,
-  "iteration": 1655128296597,
+  "iteration": 1655218053189,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -2828,7 +2828,7 @@
           "type": "prometheus",
           "uid": "PBFA97CFB590B2093"
         },
-        "definition": "",
+        "definition": "query_result(pg_exporter_last_scrape_duration_seconds)",
         "hide": 0,
         "includeAll": true,
         "label": "Namespace",
@@ -2837,7 +2837,7 @@
         "options": [],
         "query": {
           "query": "query_result(pg_exporter_last_scrape_duration_seconds)",
-          "refId": "Prometheus-namespace-Variable-Query"
+          "refId": "StandardVariableQuery"
         },
         "refresh": 2,
         "regex": "/.*namespace=\"([^\"]+).*/",
@@ -2850,23 +2850,27 @@
       },
       {
         "current": {
-          "selected": false,
-          "text": "10.254.12.225:9187",
-          "value": "10.254.12.225:9187"
+          "selected": true,
+          "text": [
+            "10.254.12.225:9187"
+          ],
+          "value": [
+            "10.254.12.225:9187"
+          ]
         },
         "datasource": {
           "type": "prometheus",
           "uid": "PBFA97CFB590B2093"
         },
-        "definition": "query_result(pg_up{namespace=\"$namespace\"})",
+        "definition": "query_result(pg_up{namespace=~\"$namespace\"})",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Instance",
-        "multi": false,
+        "multi": true,
         "name": "instance",
         "options": [],
         "query": {
-          "query": "query_result(pg_up{namespace=\"$namespace\"})",
+          "query": "query_result(pg_up{namespace=~\"$namespace\"})",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
