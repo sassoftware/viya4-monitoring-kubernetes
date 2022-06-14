@@ -1,10 +1,23 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.2.0 (14JUN22)
+
+* **Overall**
+  * [CHANGE] - Support for Kubernetes 1.20 and OpenStack 4.7 has been dropped.
+
+* **Monitoring**
+  * [CHANGE] - create_elasticsearch_datasource script has been changed to create_logging_datasource and supports both Opensearch and Elasticsearch data source creation.
+  * [FIX] - Fixed issue where namespace dropdown on "PostgreSQL" and "PostgreSQL Database" dashboards would not correctly filter information on the dashboards.
+
+* **Logging**
+  * [CHANGE] - OpenSearch 1.3.2 replaces Open Distro for Elasticsearch as the search technology used for log monitoring.  This change includes replacing Elasticsearch with OpenSearch and Kibana with OpenSearch Dashboards.  This involves changes in the names and format of the yaml files used with Helm.  See [Differences between Open Distro for Elasticsearch and OpenSearch](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/logging/Differences_between_ODFE_and_OpenSearch.md) for details.  Documentation has been updated to reflect the move to OpenSearch.
+  * [CHANGE] - Script and files names related to the deployment of log monitoring components were simplified and standardized.
+
 ## Version 1.1.8 (17MAY22)
 
 * **Overall**
   * [FIX] - Fixed some Kubernetes-related messages were being displayed without log levels.
-  * [CHANGE] Running scripts on OpenShift 4.9 no longer generates a WARNING message.
+  * [CHANGE] - Running scripts on OpenShift 4.9 no longer generates a WARNING message.
 
 * **Monitoring**
   * [FIX] - Updated SAS Viya logo on the Grafana Welcome screen so that it is easier to see on darker background.

@@ -69,9 +69,7 @@ if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
   log_verbose "Updating Prometheus Operator custom resource definitions"
   crds=( alertmanagerconfigs alertmanagers prometheuses prometheusrules podmonitors servicemonitors thanosrulers probes )
   for crd in "${crds[@]}"; do
-    echo "CRD = $crd"
     crdURL="https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_$crd.yaml"
-    echo "CRD URL = $crdURL"
     if kubectl get crd $crd.monitoring.coreos.com 1>/dev/null 2>&1; then
       kubectl replace -f $crdURL --insecure-skip-tls-verify
     else
