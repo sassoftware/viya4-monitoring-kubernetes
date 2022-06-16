@@ -231,13 +231,13 @@ Node Exporter. Links to the charts and default values are included in the
 
 #### TLS Support
 
-The [TLS Monitoring sample](/samples/tls/monitoring) contains information about
+The [TLS Monitoring sample](/samples/tls/monitoring.md) contains information about
 specifying the `TLS_ENABLE` environment variable to use TLS for in-cluster
 communications between the components and to use TLS for connections between
 the user and the monitoring components when using NodePorts. If you only use
 TLS (HTTPS) for ingress, you do not have to specify the environment variable
 `TLS_ENABLE=true`, but you must manually populate Kubernetes ingress secrets
-as specified in the [TLS Monitoring sample](/samples/tls/monitoring).
+as specified in the [TLS Monitoring sample](/samples/tls/monitoring.md).
 
 The standard deployment script for the monitoring components use these TLS secrets for the TLS certificates that handle interactions between components:
 
