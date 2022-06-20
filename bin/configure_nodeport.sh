@@ -3,7 +3,7 @@
 # Copyright Â© 2022, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-cd "$(dirname $BASH_SOURCE)/../.."
+cd "$(dirname $BASH_SOURCE)/.."
 source logging/bin/common.sh
 
 #TO DO: Should be done in bin/common?
@@ -22,6 +22,8 @@ fi
 set -e
 
 app=${1}
+arg1=$(echo "$arg1"| tr '[:lower:]' '[:upper:]')
+
 arg2=${2}
 arg2=$(echo "$arg2"| tr '[:lower:]' '[:upper:]')
 
@@ -44,7 +46,7 @@ case "$app" in
    "OPENSEARCH"|"OS")
       namespace=$LOG_NS
       servicename=$ES_SERVICENAME
-      appname="OPENSEARCH"
+      appname="OpenSearch"
       target_port="${target_port:-0}"
       ;;
    "ELASTICSEARCH"|"ES")
@@ -56,7 +58,7 @@ case "$app" in
    "OPENSEARCHDASHBOARDS"|"DASHBOARDS"|"OSD")
       namespace=$LOG_NS
       servicename=$KB_SERVICENAME
-      appname="OPENSEARCHDASHBOARDS"
+      appname="OpenSearchDashboards"
       target_port="${target_port:-31033}"
       ;;
    "KIBANA"|"KB")
@@ -67,25 +69,26 @@ case "$app" in
       ;;
    "ALERTMANAGER"|"AM")
       namespace=$MON_NS
-      appname="ALERTMANAGER"
+      appname="AlertManager"
       servicename="v4m-alertmanager"
       target_port="${target_port:-31091}"
       ;;
    "PROMETHEUS"|"PROM"|"PRO"|"PR")
       namespace=$MON_NS
-      appname="PROMETHEUS"
+      appname="Prometheus"
       servicename="v4m-prometheus"
       target_port="${target_port:-31090}"
       ;;
    "GRAFANA"|"GRAF"|"GR")
       namespace=$MON_NS
-      appname="GRAFANA"
+      appname="Grafana"
       servicename="v4m-grafana"
       target_port="${target_port:-31100}"
       ;;
   ""|*)
       log_error "Application name is invalid or missing."
-      log_error "The APPLICATION NAME is required; valid values are: OPENSEARCH, OPENSEARCHDASHBOARDS, ELASTICSEARCH or KIBANA"
+      log_error "The APPLICATION NAME is required; valid values are:"
+      log_error "OPENSEARCH, OPENSEARCHDASHBOARDS, GRAFANA, PROMETHEUS or ALERTMANAGER"
       exit 1
       ;;
 esac

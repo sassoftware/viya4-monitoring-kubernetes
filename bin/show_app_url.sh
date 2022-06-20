@@ -22,6 +22,8 @@ add_notice ""
 
 #start looping through services
 servicelist=${@:-"ALL"}
+servicelist=$(echo "$servicelist"| tr '[:lower:]' '[:upper:]')
+
 if [ "$servicelist" == "ALL" ]; then
    servicelist="GRAFANA OS OSD"
 fi
@@ -31,12 +33,7 @@ log_debug "Application URLs requested for [$servicelist]"
 for service in $servicelist
 do
    case  "$service" in
-     OPENSEARCHDASHBOARD|OSD)
-        if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ];then
-           reset_search_backend="true"
-           LOG_SEARCH_BACKEND="OPENSEARCH"
-        fi
-
+     OPENSEARCHDASHBOARDS|OPENSEARCHDASHBOARD|OSD)
         service="OpenSearch Dashboards"
         namespace=${LOG_NS:-"logging"}
         servicename="v4m-osd"
@@ -55,6 +52,11 @@ do
         tls_flag="true"
         ;;
      KIBANA|KB)
+        if [ "$LOG_SEARCH_BACKEND" != "ODFE" ];then
+           reset_search_backend="true"
+           LOG_SEARCH_BACKEND="ODFE"
+        fi
+
         namespace=${LOG_NS:-"logging"}
         service="Kibana"
         servicename="v4m-es-kibana-svc"
@@ -63,6 +65,11 @@ do
         log_debug "TLS required to connect to Kibana? [$tls_flag]"
         ;;
      ELASTICSEARCH|ES)
+        if [ "$LOG_SEARCH_BACKEND" != "ODFE" ];then
+           reset_search_backend="true"
+           LOG_SEARCH_BACKEND="ODFE"
+        fi
+
         namespace=${LOG_NS:-"logging"}
         service="Elasticsearch"
         servicename="v4m-es-client-service"
@@ -100,7 +107,7 @@ do
    service_url=$(get_service_url "$namespace" "$servicename"  "$tls_flag" "$ingressname")
 
    if [ "$reset_search_backend" == "true" ]; then
-      LOG_SEARCH_BACKEND="ODFE"
+      LOG_SEARCH_BACKEND="OPENSEARCH"
    fi
 
    # Print URLs
