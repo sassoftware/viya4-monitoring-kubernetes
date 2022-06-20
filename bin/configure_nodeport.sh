@@ -7,7 +7,7 @@ cd "$(dirname $BASH_SOURCE)/.."
 source logging/bin/common.sh
 
 #TO DO: Should be done in bin/common?
-export LOG_NS="${LOG_NS:-logging}"
+#export LOG_NS="${LOG_NS:-logging}"
 export MON_NS="${MON_NS:-monitoring}"
 
 # Confirm NOT on OpenShift
@@ -107,7 +107,7 @@ fi
 kubectl -n "$namespace" patch svc "$servicename" --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"}]'
 kubectl -n "$namespace" patch svc "$servicename" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":'${target_port}'}]'
 
-show_url="${SHOW_ES_URL:-true}"
+show_url="${SHOW_URL:-true}"
 if [ "$show_url" == "true" ]; then
    bin/show_app_url.sh $appname
 fi

@@ -33,7 +33,7 @@ log_debug "Application URLs requested for [$servicelist]"
 for service in $servicelist
 do
    case  "$service" in
-     OPENSEARCHDASHBOARDS|OPENSEARCHDASHBOARD|OSD)
+     OPENSEARCHDASHBOARDS|OPENSEARCHDASHBOARD|DASHBOARDS|OSD)
         service="OpenSearch Dashboards"
         namespace=${LOG_NS:-"logging"}
         servicename="v4m-osd"
@@ -76,19 +76,19 @@ do
         ingressname=""
         tls_flag="true"
         ;;
-     GRAFANA)
+     GRAFANA|GRAF|GR)
         namespace=${MON_NS:-"monitoring"}
         servicename="v4m-grafana"
         ingressname="v4m-grafana"
         tls_flag="$TLS_ENABLE"
         ;;
-     PROMETHEUS)
+     PROMETHEUS|PROM|PR)
         namespace=${MON_NS:-"monitoring"}
         servicename="v4m-prometheus"
         ingressname="v4m-prometheus"
         tls_flag="$TLS_ENABLE"
         ;;
-     ALERTMANAGER)
+     ALERTMANAGER|AM)
         namespace=${MON_NS:-"monitoring"}
         servicename="v4m-alertmanager"
         ingressname="v4m-alertmanager"
@@ -96,7 +96,8 @@ do
         ;;
 
      *)
-        log_error "Invalid service [$service] specified; valid values are [GRAFANA, OPENSEARCH, OPENSEARCHDASHBOARDS, KIBANA, ELASTICSEARCH or ALL(does not inc. KIBANA or ELASTICSEARCH)]"
+        log_error "Invalid application [$service] specified".
+        log_error "Valid values are [GRAFANA, OPENSEARCH, OPENSEARCHDASHBOARDS, KIBANA, ELASTICSEARCH or ALL(does not inc. KIBANA or ELASTICSEARCH)]"
         exit 1
         ;;
    esac
