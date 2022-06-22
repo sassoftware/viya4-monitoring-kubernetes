@@ -19,71 +19,68 @@ the [TLS logging sample](../samples/tls/logging/README.md).
 
 TLS requires the use of digital security certificates. These certificates allow the OpenSearch nodes to verify their identity when establishing communication connections. For SAS Viya Monitoring, these certificates are persisted as Kubernetes secrets. Kubernetes mounts these secrets onto the various OpenSearch and OpenSearch Dashboards pods where they appear as files on disk. The name and location of these files is fixed by the OpenSearch Helm chart and cannot be changed. 
 
-## Configure TLS Using cert-manager
+## Configure TLS Using Generated Certificates
 
-By default, the deployment process for the SAS Viya Monitoring solution uses cert-manager to obtain and manage the digital security certificates. Version v1.0 or later of cert-manager is required.
+**Note:** This topic applies to release 1.2.0 and later.
 
-The `deploy_logging.sh` deployment script automatically obtains the certificates from cert-manager and creates the Kubernetes secrets with the required structure and expected names. The script ensures that the certificates are mounted on the OpenSearch and OpenSearch Dashboards pods in the correct locations.
+When you deploy the SAS Viya Monitoring for Kubernetes solution, the deployment process detects whether pre-existing certificates are present. If none are detected, by default the deployment process uses OpenSSL to generate the TLS certificates that it requires. After generating the certificates, they are stored as Kubernetes secrets for subsequent use.  
 
-## Configure TLS Without Using cert-manager
+**Note:** Earlier releases used cert-manager to generate certificates.  You can still use cert-manager to generate the TLS certificates.  Before you run the deployment script, set the environment variable `CERT_GENERATOR` to `cert-manager`.
 
-To enable TLS without using cert-manager, you must perform manual steps to obtain the digital certificates and create the corresponding Kubernetes secrets.
+## Configure TLS to Use Your Own TLS Certificates
 
-1. Use the method of your choice to create the files that are required to generate the Kubernetes secrets. The certificate that you use for the `es-admin-tls-secret` secret cannot be re-used for any of the other TLS certificates. Create these files: 
+**Note:** This topic applies to release 1.2.0 and later.
 
-   - TLS certificate (the "cert"): used to generate the tls.crt; must be an X.509 PEM certificate
-   - TLS key (the "key"): used to generate the tls.key; must be an X.509 PEM key
-   - key from the certificate authority (the "CA key"): used to generate the ca.crt; must be an X.509 PEM certificate
+Your organization might have TLS certificates already. You must have certificates for the following Kubernetes secrets:
 
-2. Create each of the Kubernetes secrets:
+* `es-transport-tls-secret`
+    used to establish communications between OpenSearch nodes.
+
+* `es-rest-tls-secret`
+    used to establish communications between OpenSearch and incoming REST-call traffic.
+
+* `es-admin-tls-secret`
+    used to establish communications for internal administration actions that are performed locally on the OpenSearch nodes.
+
+* `kibana-tls-secret`
+    used for TLS connections between Ingress or a user's browser (if NodePorts are used) and OpenSearch Dashboards.
+
+**Note:** To maintain compatibility, the secrets have not been renamed to indicate their support of OpenSearch and OpenSearch Dashboards.
+
+You must pre-populate the Kubernetes secrets with your certificates before running the deployment script. Use the following steps:
+
+1.  For each of the required certificates, you must have the following three files:
+
+* **TLS certificate (the "cert"):** 
+    used to generate the tls.crt file. It must be an X.509 PEM certificate.
+* **TLS key (the "key"):** 
+    used to generate the tls.key file. It must be an X.509 PEM key.
+* **key from the certificate authority (the "CA key"):** 
+    used to generate the ca.crt file. It must be an X.509 PEM certificate.
+
+**Note:** The certificate that you use for the `es-admin-tls-secret` secret cannot be reused for any of the other TLS certificates. 
+
+2. Create a Kubernetes secret by entering the following command: 
 
 ```bash
 kubectl -n <namespace> create secret generic <secret-name> --from-file=tls.crt=<tls_cert_name>.pem --from-file=tls.key=<key_name>.key --from-file=ca.crt=<CA_key_name>.pem
 ```
+Where: 
+- *namespace* is the namespace used during the deployment process. By default, this value is `logging`. If you changed the default, be sure to specify the name of your namespace instead of the default.
 
-By default, the value of `namespace` that is used during the deployment process is `logging`. The value of `secret-name` can be one of the following:
+- *secret_name* is one of the following values: 
 
-   - `es-transport-tls-secret`: used to establish communications between OpenSearch nodes
-   - `es-rest-tls-secret`: used to establish communications between OpenSearch and incoming REST call traffic
-   - `es-admin-tls-secret`: used to establish communications for internal administration actions that are performed locally on the OpenSearch nodes
-   - `kibana-tls-secret`: used for TLS connections between Ingress or a 
-   user's browser (if NodePorts are used) and OpenSearch Dashboards.   
+   - `es-transport-tls-secret` 
+    used to establish communications between OpenSearch nodes.
+   - `es-rest-tls-secret`
+    used to establish communications between OpenSearch and incoming REST-call traffic.
+   - `es-admin-tls-secret`
+    used to establish communications for internal administration actions that are performed locally on the OpenSearch nodes.
+  - `kibana-tls-secret`
+    used for TLS connections between Ingress or a user's browser (if NodePorts are used) and OpenSearch Dashboards.
 
+- *tls_cert_name*, *key_name*, and *CA_key_name* is a set of files that you created in the step 1. You created a set for each secret that you want to generate.
+  
 Use the appropriate values for `tls_cert_name`, `key_name`, and `CA_key_name` for each secret that that is being generated.
 
-3. Repeat Step 2 to create all three of the required Kubernetes secrets.
-
-4. Obtain the subject information from the certificates in order to modify the Helm chart. Run this command for the `es-transport-tls` certificate and the `es-admin-tls` certificates:
-
-```bash
-openssl x509 -subject -nameopt RFC2253 -noout -in <tls_cert_name>.pem
-```
-
-This command returns the subject information that is specified in the certificate in this form:
-
-```bash
-subject= CN=<common_name>,OU=<organization_unit>,O=<organization>,L=<location>,C=XX
-```
-5. If you have not already set up your `USER_DIR` directory (as discussed in the [main README](../README.md#customization) file), set up an empty directory with a `logging` subdirectory to contain the customization files. Export a `USER_DIR` environment variable that points to this location. For example:
-
-```bash
-mkdir -p ~/my-cluster-files/ops/user-dir/logging
-export USER_DIR=~/my-cluster-files/ops/user-dir
-```
-
-6. Modify the file `$USER_DIR/logging/user-values-opensearch.yaml`.
-
-   - Uncomment the following lines:
-   
-     ```bash
-     #   config:
-     #     opendistro_security.authcz.admin_dn:
-     #     - "CN=es-admin,O=cert-manager"
-     #     opendistro_security.nodes_dn:
-     #     - "CN=es-transport,O=cert-manager"
-      ```
-   - For the value of the key `opendistro_security.authcz.admin_dn`, specify the subject information that you obtained from the `es-admin-tls` certificate.
-
-   - For the value of the key `opendistro_security.nodes_dn`, specify the subject information that you obtained from the `es-transport-tls` certificate.
-
-***Note:*** You must specify the subject information exactly as it was returned from the certificate (without any spaces after the commas). 
+3. Repeat Step 2 until you have created all four of the required Kubernetes secrets.
