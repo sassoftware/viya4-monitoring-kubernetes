@@ -167,11 +167,11 @@ To increase storage, complete the following steps:
 1. Scale down the statefulSet that controls the OpenSearch nodes by 
 entering the following command:
    
-    `kubectl -n logging scale statefulset v4m-es --replicas=0`
+    `kubectl -n logging scale statefulset v4m-search --replicas=0`
 
    * Where ***logging*** is the namespace into which the log-monitoring 
    components have been deployed in your installation.
-   * This command terminates the existing "v4m-es-*" pods.
+   * This command terminates the existing "v4m-search-*" pods.
    * In some cases, it might be necessary to wait a few minutes until the 
    PVCs are detached from the underlying Kubernetes nodes.  Be patient. 
    Resizing the PVC fails if the PVCs are still attached.
@@ -182,19 +182,19 @@ entering the following command:
    * Where ***logging*** is the namespace into which the log-monitoring 
    components have been deployed in your installation.
    * Where ***data_node*** is the OpenSearch node (pod) to resize 
-   (for example, `v4m-es-v4m-es-0`).
+   (for example, `v4m-search-v4m-search-0`).
    * Where ***nnGi*** is the amount (for example, 70Gi) to increase the PVC 
    storage.
    * Repeat this command for each of the three OpenSearch nodes (that 
-   is, `v4m-es-v4m-es-0`, `v4m-es-v4m-es-1`, and `v4m-es-v4m-es-2`).
+   is, `v4m-search-v4m-search-0`, `v4m-search-v4m-search-1`, and `v4m-search-v4m-search-2`).
 
 3. Scale up the statefulSet that controls the OpenSearch nodes by 
 entering the following command:
   
-    `kubectl -n logging scale statefulset v4m-es --replicas=3`
+    `kubectl -n logging scale statefulset v4m-search --replicas=3`
    * Where ***logging*** is the namespace into which the log-monitoring 
    components have been deployed in your installation.
-   * This command results in the creation of three new "v4m-es-*" pods that 
+   * This command results in the creation of three new "v4m-search-*" pods that 
    are linked to the existing (but now larger) PVCs.
 
 If you are maintaining customized configuration information (that is, using the 

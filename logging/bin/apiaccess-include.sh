@@ -98,6 +98,7 @@ function get_api_url {
       log_debug "serviceport: $serviceport"
 
       # command is sent to run in background
+
       kubectl -n $LOG_NS port-forward --address localhost svc/$servicename :$serviceport > $tmpfile 2>/dev/null &
 
       # get PID to allow us to kill process later

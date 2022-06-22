@@ -52,12 +52,20 @@ else
 fi
 
 # Elasticsearch Datasource for Grafana
-ELASTICSEARCH_DATASOURCE="${ELASTICSEARCH_DATASOURCE:-false}"
-if [ "$ELASTICSEARCH_DATASOURCE" == "true" ]; then
-  configureElasticsearchDatasource
+LOGGING_DATASOURCE="${LOGGING_DATASOURCE:-false}"
+if [ "$LOGGING_DATASOURCE" == "true" ]; then
+  set +e
+  log_debug "Creating the logging datasource using the create_logging_datasource script"
+  monitoring/bin/create_logging_datasource.sh
+  if (( $? == 1 )); then
+    log_warn "Unable to configure the logging data source at this time."
+    log_warn "Please address the errors and re-run the follow command to create the data source at a later time:"
+    log_warn "monitoring/bin/create_logging_datasource.sh"
+  fi
+  set -e
 else
-  log_debug "ELASTICSEARCH_DATASOURCE not set"
-  log_debug "Skipping creation of Elasticsearch datasource for Grafana"
+  log_debug "LOGGING_DATASOURCE not set"
+  log_debug "Skipping creation of logging data source for Grafana"
 fi
 
 log_info "Enabling Grafana to access OpenShift Prometheus instances..."

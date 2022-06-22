@@ -5,7 +5,7 @@ datasources:
   type: elasticsearch
   access: proxy
   database: viya_logs-*
-  url: https://v4m-es-client-service.__namespace__:9200
+  url: https://__ES_SERVICENAME__.__namespace__:9200
   basicAuth: true
   basicAuthUser: __userID__
   jsonData:
