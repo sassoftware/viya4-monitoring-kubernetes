@@ -49,17 +49,40 @@ create_user_secret internal-user-kibanaserver kibanaserver "$ES_KIBANASERVER_PAS
 create_user_secret internal-user-logcollector logcollector "$ES_LOGCOLLECTOR_PASSWD"  managed-by=v4m-es-script
 create_user_secret internal-user-metricgetter metricgetter "$ES_METRICGETTER_PASSWD"  managed-by=v4m-es-script
 
-# Verify cert-manager is available (if necessary)
-if verify_cert_manager $LOG_NS es-transport es-rest es-admin kibana; then
-  log_debug "cert-manager check OK"
+#cert_generator="${CERT_GENERATOR:-openssl}"
+
+# Verify cert generator is available (if necessary)
+if verify_cert_generator $LOG_NS es-transport es-rest es-admin; then
+   log_debug "cert generator check OK [$cert_generator_ok]"
 else
-  log_error "One or more required TLS certs do not exist and cert-manager is not available to create the missing certs"
-  exit 1
+   log_error "One or more required TLS certs do not exist and the expected certificate generator mechanism [$CERT_GENERATOR] is not available to create the missing certs"
+   exit 1
 fi
 
 # Create/Get necessary TLS certs
-apps=( es-transport es-rest es-admin kibana)
-create_tls_certs $LOG_NS logging ${apps[@]}
+create_tls_certs $LOG_NS logging es-transport es-rest es-admin
+
+# need to wait for cert-manager to create all certs and secrets
+sleep 10
+
+# Get subject from admin and transport cert for opensearch.yaml
+if [ ! -f  $TMP_DIR/es-transport.pem ]; then
+   log_debug "Extracting es-transport cert from secret"
+   kubectl -n $LOG_NS get secret es-transport-tls-secret -o=jsonpath="{.data.tls\.crt}" |base64 --decode > $TMP_DIR/es-transport.pem
+fi
+node_dn=$(openssl x509 -subject -nameopt RFC2253 -noout -in $TMP_DIR/es-transport.pem | sed  "s/subject=\s*\(\S*\)/\1/")
+
+if [ ! -f  $TMP_DIR/es-admin.pem ]; then
+   log_debug "Extracting es-admin cert from secret"
+   kubectl -n $LOG_NS get secret es-admin-tls-secret -o=jsonpath="{.data.tls\.crt}" |base64 --decode > $TMP_DIR/es-admin.pem
+fi
+admin_dn=$(openssl x509 -subject -nameopt RFC2253 -noout -in $TMP_DIR/es-admin.pem    | sed  "s/subject=\s*\(\S*\)/\1/")
+
+log_debug "Subjects node_dn:[$node_dn] admin_dn:[$admin_dn]"
+
+#write cert subjects to secret to be mounted as env var
+kubectl -n $LOG_NS delete secret opensearch-cert-subjects --ignore-not-found
+kubectl -n $LOG_NS create secret generic opensearch-cert-subjects  --from-literal=node_dn="$node_dn" --from-literal=admin_dn="$admin_dn"
 
 # Create ConfigMap for securityadmin script
 kubectl -n $LOG_NS delete configmap run-securityadmin.sh --ignore-not-found

@@ -20,10 +20,9 @@ config:
     plugins.security.allow_unsafe_democertificates: false
     plugins.security.allow_default_init_securityindex: false
     plugins.security.authcz.admin_dn:
-    - "CN=es-admin,O=cert-manager"
+    - "${OPENSEARCH_ADMIN_DN}"
     plugins.security.nodes_dn:
-    - "CN=es-transport,O=cert-manager"
-
+    - "${OPENSEARCH_NODE_DN}"
     plugins.security.audit.type: internal_opensearch
     plugins.security.enable_snapshot_restore_privilege: true
     plugins.security.check_snapshot_restore_write_privileges: true
@@ -67,6 +66,17 @@ extraEnvs:
      secretKeyRef:
        name: internal-user-metricgetter
        key: password
+ - name: OPENSEARCH_NODE_DN
+   valueFrom:
+     secretKeyRef:
+       name: opensearch-cert-subjects
+       key: node_dn
+ - name: OPENSEARCH_ADMIN_DN
+   valueFrom:
+     secretKeyRef:
+       name: opensearch-cert-subjects
+       key: admin_dn
+
 
 extraVolumes:
 - name: v4m-security-script

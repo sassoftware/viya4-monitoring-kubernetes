@@ -92,6 +92,10 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
        fi
     fi
 
+    # set TLS Cert Generator (cert-manager|openssl)
+    export CERT_GENERATOR="${CERT_GENERATOR:-openssl}"
+
+
     # Set default timeout for kubectl namespace delete command
     export KUBE_NAMESPACE_DELETE_TIMEOUT=${KUBE_NAMESPACE_DELETE_TIMEOUT:-5m}
 
