@@ -78,18 +78,21 @@ do
         ;;
      GRAFANA|GRAF|GR)
         namespace=${MON_NS:-"monitoring"}
+        service="Grafana"
         servicename="v4m-grafana"
         ingressname="v4m-grafana"
         tls_flag="$TLS_ENABLE"
         ;;
      PROMETHEUS|PROM|PR)
         namespace=${MON_NS:-"monitoring"}
+        service="Prometheus"
         servicename="v4m-prometheus"
         ingressname="v4m-prometheus"
         tls_flag="$TLS_ENABLE"
         ;;
      ALERTMANAGER|AM)
         namespace=${MON_NS:-"monitoring"}
+        service="AlertManager"
         servicename="v4m-alertmanager"
         ingressname="v4m-alertmanager"
         tls_flag="$TLS_ENABLE"
