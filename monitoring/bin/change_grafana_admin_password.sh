@@ -17,8 +17,8 @@ function show_usage {
   log_message  "arguments.  To change the Grafana admin user at the tenant level, you need"
   log_message  "to provide the following arguments:"
   log_message  "     -ns, --namespace NAMESPACE   - The namespace where the Viya tenant resides."
-  log_message  "     -t,  --tenant TENANT         - The tenant whose logging data source you want to set up."
-  log_message  "     -p,  --password PASSWORD         - The tenant whose logging data source you want to set up."
+  log_message  "     -t,  --tenant TENANT         - The tenant whose Grafana admin password you want to change."
+  log_message  "     -p,  --password PASSWORD     - The new password you want to use."
   log_message  ""
 }
 
@@ -82,11 +82,11 @@ tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
 if [ -z "$tenantNS" ] && [ -z "$tenant" ]; then
   cluster="true"
   namespace=$MON_NS
-  v4mSecret="v4m-grafana"
+  grafanaInstance="v4m-grafana"
 elif [ -n "$tenantNS" ] && [ -n "$tenant" ]; then
   cluster="false"
   namespace=$tenantNS
-  v4mSecret="v4m-grafana-${tenant}"
+  grafanaInstance="v4m-grafana-${tenant}"
 else
   log_error "Both a [NAMESPACE] and a [TENANT] are required in order to change the Grafana admin password.";
   exit 1
@@ -99,9 +99,9 @@ if [ -z $password ]; then
 fi 
 
 if [ "$cluster" == "true" ]; then
-  grafanaPod="$(kubectl get pods -n $MON_NS -l app.kubernetes.io/name=grafana --template='{{range .items}}{{.metadata.name}}{{end}}')"
+  grafanaPod="$(kubectl get pods -n $namespace -l app.kubernetes.io/name=grafana --template='{{range .items}}{{.metadata.name}}{{end}}')"
 else
-  grafanaPod="$(kubectl get pods -n $tenantNS -l app.kubernetes.io/name=grafana -l app.kubernetes.io/instance=v4m-grafana-${tenant} --template='{{range .items}}{{.metadata.name}}{{end}}')"
+  grafanaPod="$(kubectl get pods -n $namespace -l app.kubernetes.io/name=grafana -l app.kubernetes.io/instance=$grafanaInstance --template='{{range .items}}{{.metadata.name}}{{end}}')"
 fi
 
 # Error out if a Grafana pod has not been found
@@ -116,7 +116,7 @@ log_info "Updating the admin password using Grafana CLI"
 kubectl exec -n $namespace $grafanaPod -c grafana -- bin/grafana-cli admin reset-admin-password $password
 
 # Exit out of the script if the Grafana CLI call fails
-if (( $? == 1 )); then
+if (( $? != 0 )); then
   log_error "An error occurred when updating the password"
   exit 1
 fi
@@ -124,10 +124,16 @@ fi
 # Patch new password in Kubernetes
 encryptedPassword="$(echo -n "$password" | base64)"
 log_info "Updating Grafana secret with the new password"
-kubectl -n $namespace patch secret $v4mSecret --type='json' -p="[{'op' : 'replace' ,'path' : '/data/admin-password' ,'value' : '$encryptedPassword'}]"
+kubectl -n $namespace patch secret $grafanaInstance --type='json' -p="[{'op' : 'replace' ,'path' : '/data/admin-password' ,'value' : '$encryptedPassword'}]"
 
 # Restart Grafana pods and wait for them to restart
-log_info "Restarting the Grafana pods"
-kubectl delete pods -n $namespace -l "app.kubernetes.io/instance=v4m-prometheus-operator" -l "app.kubernetes.io/name=grafana"
-kubectl -n $namespace wait pods --selector "app.kubernetes.io/instance=v4m-prometheus-operator","app.kubernetes.io/name=grafana" --for condition=Ready --timeout=2m
-log_info "Grafana admin password has been updated"
+log_info "Grafana admin password has been updated.  Restarting Grafana pods to apply the change"
+if [ "$cluster" == "true" ]; then
+    kubectl delete pods -n $MON_NS -l "app.kubernetes.io/instance=v4m-prometheus-operator" -l "app.kubernetes.io/name=grafana"
+    kubectl -n $MON_NS wait pods --selector "app.kubernetes.io/instance=v4m-prometheus-operator","app.kubernetes.io/name=grafana" --for condition=Ready --timeout=2m
+    log_info "Grafana password has been successfully changed."
+else
+    kubectl delete pods -n $tenantNS -l "app.kubernetes.io/instance=$grafanaInstance"
+    kubectl -n $tenantNS wait pods --selector app.kubernetes.io/instance=$grafanaInstance --for condition=Ready --timeout=2m
+    log_info "Grafana admin password has been successfully changed for [$tenantNS/$tenant]."
+fi
