@@ -129,11 +129,11 @@ kubectl -n $namespace patch secret $grafanaInstance --type='json' -p="[{'op' : '
 # Restart Grafana pods and wait for them to restart
 log_info "Grafana admin password has been updated.  Restarting Grafana pods to apply the change"
 if [ "$cluster" == "true" ]; then
-    kubectl delete pods -n $MON_NS -l "app.kubernetes.io/instance=v4m-prometheus-operator" -l "app.kubernetes.io/name=grafana"
-    kubectl -n $MON_NS wait pods --selector "app.kubernetes.io/instance=v4m-prometheus-operator","app.kubernetes.io/name=grafana" --for condition=Ready --timeout=2m
+    kubectl delete pods -n $namespace -l "app.kubernetes.io/instance=v4m-prometheus-operator" -l "app.kubernetes.io/name=grafana"
+    kubectl -n $namespace wait pods --selector "app.kubernetes.io/instance=v4m-prometheus-operator","app.kubernetes.io/name=grafana" --for condition=Ready --timeout=2m
     log_info "Grafana password has been successfully changed."
 else
-    kubectl delete pods -n $tenantNS -l "app.kubernetes.io/instance=$grafanaInstance"
-    kubectl -n $tenantNS wait pods --selector app.kubernetes.io/instance=$grafanaInstance --for condition=Ready --timeout=2m
+    kubectl delete pods -n $namespace -l "app.kubernetes.io/instance=$grafanaInstance"
+    kubectl -n $namespace wait pods --selector app.kubernetes.io/instance=$grafanaInstance --for condition=Ready --timeout=2m
     log_info "Grafana admin password has been successfully changed for [$tenantNS/$tenant]."
 fi
