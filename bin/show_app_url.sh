@@ -127,8 +127,8 @@ do
 done
 
 
-add_notice " Note: These URLs may be incorrect if your ingress and/or other network"
-add_notice "       configuration includes options this script does not handle."
+add_notice " Note: The URL might be incorrect if your Ingress configuration, another network"
+add_notice "       configuration, or both include options that this script does not process."
 add_notice ""
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}
