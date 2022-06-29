@@ -53,6 +53,10 @@ When this option is set, OpenSearch Dashboards is accessible on the same port (3
 
 **Note:** NodePorts are not suitable for production deployments.
 
+**Note:** As of release 1.2.1, if you do not set the environment variable `KB_KNOWN_NODEPORT_ENABLE` to `true` before running the `logging/bin/deploy_logging.sh` script, you can now use the `configure_nodeport.sh` 
+script after deployment.
+See [Configure Access Via NodePorts](http://documentation.sas.com/doc/en/sasadmincdc/default/callogging/n0l4k3bz39cw2dn131zcbat7m4r1.htm).
+
 ### Migrate an Existing Deployment
 
 To migrate an existing deployment of the log monitoring project, run the `./logging/bin/deploy_logging.sh` script.
