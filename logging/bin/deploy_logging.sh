@@ -42,16 +42,17 @@ set -e
 logging/bin/deploy_eventrouter.sh
 
 ##################################
+# OpenSearch Dashboards (Kibana) #
+##################################
+# OSD take a while to spin up...deploying it first
+
+logging/bin/deploy_osd.sh
+
+##################################
 # OpenSearch                     #
 ##################################
 
 logging/bin/deploy_opensearch.sh
-
-##################################
-# Open Distro Content            #
-##################################
-
-logging/bin/deploy_opensearch_content.sh
 
 ##################################
 # Elasticsearch Metric Exporter  #
@@ -60,22 +61,22 @@ logging/bin/deploy_opensearch_content.sh
 logging/bin/deploy_esexporter.sh
 
 ##################################
-# Fluent Bit                     #
+# Open Distro Content            #
 ##################################
 
-logging/bin/deploy_fluentbit_opensearch.sh
-
-##################################
-# OpenSearch Dashboards (Kibana) #
-##################################
-
-logging/bin/deploy_osd.sh
+logging/bin/deploy_opensearch_content.sh
 
 ##################################
 # OSD Content                    #
 ##################################
 
 logging/bin/deploy_osd_content.sh
+
+##################################
+# Fluent Bit                     #
+##################################
+
+logging/bin/deploy_fluentbit_opensearch.sh
 
 ##################################
 # Display Kibana URL             #
