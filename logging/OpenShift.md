@@ -129,7 +129,7 @@ To remove access to the API endpoint, use the oc command to delete the route:
 oc -n $LOG_NS delete route v4m-es
 ```
 
-***Note:*** Do not use the `es_nodeport_enable_open.sh` and `es_nodeport_disable_open.sh` scripts
+***Important:*** Do not use the `configure_nodeport.sh` script
 in an OpenShift environment.
 
 #### Customizing Routes
