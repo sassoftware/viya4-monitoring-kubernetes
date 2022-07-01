@@ -16,7 +16,7 @@ function show_usage {
    log_info  "Usage: $this_script USERNAME [PASSWORD] "
    log_info  ""
    log_info  "Changes the password for one of the special internal user accounts used by other components of the monitoring system to communicate "
-   log_info  "with Elasticsearch.  In addition, the script upates the internal cache (i.e. corresponding Kubernetes secret) with the new value."
+   log_info  "with OpenSearch.  In addition, the script upates the internal cache (i.e. corresponding Kubernetes secret) with the new value."
    log_info  ""
    log_info  "     USERNAME - REQUIRED; the internal username for which the password is be changed; "
    log_info  "                MUST be one of: admin, kibanaserver, logadm, logcollector or metricgetter"
@@ -138,7 +138,7 @@ if [[ $response == 4* ]]; then
             echo ""
             success="false"
          elif [[ $response == 2* ]]; then
-            log_debug "Password for [$USER_NAME] has been changed in Elasticsearch. [$response]"
+            log_debug "Password for [$USER_NAME] has been changed in OpenSearch. [$response]"
             success="true"
          else
             log_warn "Unable to change password for [$USER_NAME] using [admin] credentials. [$response]"
@@ -178,7 +178,7 @@ if [[ $response == 4* ]]; then
             # Attempt to change password using admin certs
             response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/internalusers/$ES_USER"   -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "hash", "value" : "'"$hashed_passwd"'"}]'  --cert $TMP_DIR/admin_tls.crt --key $TMP_DIR/admin_tls.key  --insecure)
             if [[ $response == 2* ]]; then
-               log_debug "Password for [$USER_NAME] has been changed in Elasticsearch. [$response]"
+               log_debug "Password for [$USER_NAME] has been changed in OpenSearch. [$response]"
                success="true"
             else
                log_warn "Unable to change password for [$USER_NAME] using [admin] certificates. [$response]"
@@ -196,7 +196,7 @@ else
 fi
 
 if [ "$success" == "true" ]; then
-  log_info "Successfully changed the password for [$USER_NAME] in Elasticsearch internal database."
+  log_info "Successfully changed the password for [$USER_NAME] in OpenSearch internal database."
 
   if [ "$USER_NAME" != "logadm" ]; then
      log_debug "Trying to store the updated credentials in the corresponding Kubernetes secret [internal-user-$USER_NAME]."
@@ -212,7 +212,7 @@ if [ "$success" == "true" ]; then
      rc=$?
      if [ "$rc" != "0" ]; then
        log_error "IMPORTANT! A Kubernetes secret holding the password for $USER_NAME no longer exists."
-       log_error "This WILL cause problems when the Elasticsearch pods restart."
+       log_error "This WILL cause problems when the OpenSearch pods restart."
        log_error "Try re-running this script again OR manually creating the secret using the command: "
        log_error "kubectl -n $LOG_NS create secret generic --from-literal=username=$USER_NAME --from-literal=password=$NEW_PASSWD"
      else
@@ -223,7 +223,7 @@ if [ "$success" == "true" ]; then
              echo ""
              log_notice "                    *********** IMPORTANT NOTE ***********                  "
              log_notice ""
-             log_notice " The password for the Elasticsearch 'admin' user was changed as requested.  "
+             log_notice " The password for the OpenSearch 'admin' user was changed as requested.  "
              log_notice "                                                                            "
              log_notice " Since a new password for the 'admin' user was NOT provided, one was        "
              log_notice " auto-generated for the account. The generated password is shown below.     "
@@ -234,7 +234,7 @@ if [ "$success" == "true" ]; then
              log_notice " re-running this script.                                                    "
              log_notice "                                                                            "
              log_notice " NOTE: *NEVER* change the password for the 'admin' account from within the  "
-             log_notice " Kibana web-interface.  The 'admin' password should *ONLY* be changed via   "
+             log_notice " OpenSearch Dashboards web-interface.  The 'admin' password should *ONLY* be changed via   "
              log_notice " this script (logging/bin/change_internal_password.sh)                      "
              echo ""
           fi
@@ -273,7 +273,7 @@ if [ "$success" == "true" ]; then
           log_notice "                        *********** IMPORTANT NOTE ***********                        "
           log_notice "                                                                                      "
           log_notice " After changing the password for the [metricgetter] user, you should restart the      "
-          log_notice " Elasticsearch Exporter pod to ensure Elasticsearch metrics continue to be collected. "
+          log_notice " Elasticsearch Exporter pod to ensure OpenSearch metrics continue to be collected. "
           log_notice "                                                                                      "
           log_notice " This can be done by submitting the following command:                                "
           log_notice "           kubectl -n $LOG_NS delete pod -l 'app=elasticsearch-exporter' "
@@ -286,6 +286,6 @@ if [ "$success" == "true" ]; then
      fi
   fi
 elif [ "$success" == "false" ]; then
-  log_error "Unable to update the password for user [$USER_NAME] on the Elasticsearch pod; original password remains in place."
+  log_error "Unable to update the password for user [$USER_NAME] on the OpenSearch pod; original password remains in place."
   exit 99
 fi
