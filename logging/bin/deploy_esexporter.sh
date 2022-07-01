@@ -20,6 +20,9 @@ fi
 
 set -e
 
+#Fail if not using OpenSearch back-end
+require_opensearch
+
 log_info "Deploying Elasticsearch metric exporter ..."
 
 # check for pre-reqs

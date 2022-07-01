@@ -8,6 +8,9 @@ source logging/bin/common.sh
 
 this_script=`basename "$0"`
 
+#Fail if not using OpenSearch back-end
+require_opensearch
+
 log_debug "Script [$this_script] has started [$(date)]"
 
 # Deploy OpenShift-specific pre-reqs?

@@ -26,6 +26,10 @@ set -e
 # check for pre-reqs
 #
 
+#Fail if not using OpenSearch back-end
+require_opensearch
+
+
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   log_error "Namespace [$LOG_NS] does NOT exist."

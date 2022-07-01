@@ -1,10 +1,13 @@
 #! /bin/bash
 
-# Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2022, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
+
+#Fail if not using OpenSearch back-end
+require_opensearch
 
 # Confirm NOT on OpenShift
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then

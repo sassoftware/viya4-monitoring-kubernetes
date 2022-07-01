@@ -21,6 +21,9 @@ if [ "$KIBANA_CONTENT_DEPLOY" != "true" ]; then
   exit 0
 fi
 
+#Fail if not using OpenSearch back-end
+require_opensearch
+
 # temp file used to capture command output
 tmpfile=$TMP_DIR/output.txt
 
