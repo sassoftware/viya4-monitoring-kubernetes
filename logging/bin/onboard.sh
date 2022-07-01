@@ -175,23 +175,23 @@ fi
 get_kb_api_url
 
 # Import appropriate content into OpenSearch Dashboards tenant space
-./logging/bin/import_osd_content.sh logging/kibana/common $ktenant
+./logging/bin/import_osd_content.sh logging/osd/common $ktenant
 
 if [ -z "$tenant" ]; then
-   ./logging/bin/import_osd_content.sh logging/kibana/namespace $ktenant
+   ./logging/bin/import_osd_content.sh logging/osd/namespace $ktenant
 else
-   ./logging/bin/import_osd_content.sh logging/kibana/tenant    $ktenant
+   ./logging/bin/import_osd_content.sh logging/osd/tenant    $ktenant
 fi
 
-if [ -d "$USER_DIR/logging/kibana" ] && [ "$USER_DIR" != "$(pwd)" ]; then
+if [ -d "$USER_DIR/logging/osd" ] && [ "$USER_DIR" != "$(pwd)" ]; then
 
    export IGNORE_NOT_FOUND="true"
-   ./logging/bin/import_osd_content.sh $USER_DIR/logging/kibana/common $ktenant
+   ./logging/bin/import_osd_content.sh $USER_DIR/logging/osd/common $ktenant
 
    if [ -z "$tenant" ]; then
-      ./logging/bin/import_osd_content.sh $USER_DIR/logging/kibana/namespace $ktenant
+      ./logging/bin/import_osd_content.sh $USER_DIR/logging/osd/namespace $ktenant
    else
-      ./logging/bin/import_osd_content.sh $USER_DIR/logging/kibana/tenant    $ktenant
+      ./logging/bin/import_osd_content.sh $USER_DIR/logging/osd/tenant    $ktenant
    fi
    unset IGNORE_NOT_FOUND
 fi
