@@ -53,34 +53,9 @@ set -e
 log_info "Configuring OpenSearch Dashboards...this may take a few minutes"
 
 
-if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ]; then            ####   ODFE SUPPORT-start
-
-   pod_selector="app=v4m-es,role=kibana"
-
-   KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-true}
-
-   if [ "$KB_KNOWN_NODEPORT_ENABLE" == "true" ]; then
-      SVC=v4m-es-kibana-svc
-      SVC_TYPE=$(kubectl get svc -n $LOG_NS $SVC -o jsonpath='{.spec.type}')
-
-      if [ "$SVC_TYPE" == "NodePort" ]; then
-        KIBANA_PORT=31033
-        kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
-        log_verbose "Setting Kibana service NodePort to 31033"
-       fi
-   else
-     log_debug "Kibana service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
-   fi
-else
-   # OPENSEARCH DASHBOARDS
-   pod_selector="app=opensearch-dashboards"
-
-fi                                                            ####   ODFE SUPPORT-end
-
-
 # wait for pod to show as "running" and "ready"
 log_info "Waiting for OpenSearch Dashboards pods to be ready ($(date) - timeout 10m)"
-kubectl -n $LOG_NS wait pods --selector $pod_selector  --for condition=Ready --timeout=10m
+kubectl -n $LOG_NS wait pods --selector "app=opensearch-dashboards"  --for condition=Ready --timeout=10m
 
 set +e  # disable exit on error
 
@@ -133,7 +108,7 @@ else
    log_debug "The OpenSearch Dashboards tenant space [cluster_admins] exists."
 fi
 
-#Migrating from ODFE 1.7.0 to ODFE 1.13.x (file should only exist during migration)
+#Migrating from ODFE 1.7.0 (file should only exist during migration)
 if [ -f "$KB_GLOBAL_EXPORT_FILE" ]; then
 
    # delete 'demo' Kibana tenant space created (but not used) prior to V4m version 1.1.0
