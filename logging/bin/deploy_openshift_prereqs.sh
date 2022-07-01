@@ -18,14 +18,9 @@ if [ "$OPENSHIFT_PREREQS_ENABLE" != "true" ]; then
   exit
 fi
 
-if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
-  searchServiceAccount="v4m-os"
-else
-  searchServiceAccount="v4m-es-es"
-fi
 
 # link Elasticsearch serviceAccounts to 'privileged' scc
-oc adm policy add-scc-to-user privileged -z $searchServiceAccount -n $LOG_NS
+oc adm policy add-scc-to-user privileged -z v4m-os -n $LOG_NS
 
 # create the 'v4mlogging' SCC, if it does not already exist
 if oc get scc v4mlogging 2>/dev/null 1>&2; then
