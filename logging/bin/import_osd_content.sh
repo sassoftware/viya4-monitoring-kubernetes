@@ -196,6 +196,6 @@ fi
 if [ "$import_problems" == "0" ]; then
  log_info "Imported content into tenant space [$tenant]."
 else
- log_warn "There were one or more issues deploying the requested content to OpenSearch Dasboards.  Review the messages above."
+ log_warn "There were one or more issues deploying the requested content to OpenSearch Dashboards.  Review the messages above."
 fi
 
