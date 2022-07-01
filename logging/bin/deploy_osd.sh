@@ -79,12 +79,12 @@ helm repo update
 KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-false}
 
 if [ "$KB_KNOWN_NODEPORT_ENABLE" == "true" ]; then
-   KIBANA_PORT=31034
-   log_verbose "Setting Kibana service NodePort to $KIBANA_PORT"
+   KIBANA_PORT=31033
+   log_verbose "Setting OpenSearch Dashboards service NodePort to $KIBANA_PORT"
    nodeport_yaml=logging/opensearch/osd_helm_values_nodeport.yaml
 else
    nodeport_yaml=$TMP_DIR/empty.yaml
-   log_debug "Kibana service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
+   log_debug "OpenSearch Dashboards service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
 fi
 
 
@@ -98,15 +98,15 @@ fi
 # Require TLS into OpenSearch Dashboards (nee Kibana)?
 LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-false}
 
-# Enable TLS for East/West Kibana traffic (inc. requiring HTTPS from browser if using NodePorts)
+# Enable TLS for East/West OSD traffic (inc. requiring HTTPS from browser if using NodePorts)
 if [ "$LOG_KB_TLS_ENABLE" == "true" ]; then
    # w/TLS: use HTTPS in curl commands
    KB_CURL_PROTOCOL=https
-   log_debug "TLS enabled for Kibana"
+   log_debug "TLS enabled for OpenSearch Dashboards"
 else
    # w/o TLS: use HTTP in curl commands
    KB_CURL_PROTOCOL=http
-   log_debug "TLS not enabled for Kibana"
+   log_debug "TLS not enabled for OpenSearch Dashboards"
 fi
 #(Re)Create secret containing OSD TLS Setting
 kubectl -n $LOG_NS delete secret          v4m-osd-tls-enabled  --ignore-not-found

@@ -149,9 +149,9 @@ rc=$?
 if [ "$rc" != "0" ] ;then log_info "RC=$rc"; exit $rc;fi
 
 if kibana_tenant_exists $tenant; then
-   log_debug "Confirmed Kibana tenant space [$tenant] exists"
+   log_debug "Confirmed OpenSearch Dashboards tenant space [$tenant] exists"
 elif [ "$tenant" == "global" ];then
-   log_debug "Kibana tenant space [global] specified."
+   log_debug "OpenSearch Dashboards tenant space [global] specified."
 else
    log_error "Specified tenant space [$tenant] does not exist. Target OpenSearch Dashboards tenant space must exist."
    exit 1
@@ -173,7 +173,7 @@ if [ -f "$1" ]; then
    fi
 elif [ -d "$1" ]; then
 
-    # Deploy specified directory of Kibana content
+    # Deploy specified directory of OSD content
     log_info "Importing content in [$1] to tenant space [$tenant]..."
     if [ "$batch_kibana_content" != "true" ]; then
        log_debug "'BATCH_KIBANA_CONTENT' flag set to 'false'; loading files individually from directory"

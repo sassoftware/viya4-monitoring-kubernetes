@@ -17,7 +17,7 @@ function show_usage {
   log_message  "Usage: $this_script --namespace NAMESPACE [--tenant TENANT] [OPTIONS]"
   log_message  ""
   log_message  "'Offboards' either the specified Viya deployment (namespace) or the specified tenant within that deployment.  This removes the ability to limit admins to the Viya deployment (or a single tenant within a given deployment)."
-  log_message  "The offboarding process deletes the security access controls and the associated Kibana tenant space (including any saved Kibana content (e.g. visualizations, dashboards, etc.)."
+  log_message  "The offboarding process deletes the security access controls and the associated OpenSearch Dashboards tenant space (including any saved OpenSearch Dashboards content (e.g. visualizations, dashboards, etc.)."
   log_message  ""
   log_message  "    Arguments:"
   log_message  "     -ns, --namespace   NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace to which access should be removed."
@@ -108,14 +108,14 @@ else
    index_nst="${namespace}"
 fi
 
-# Kibana tenant space
+# OpenSearch Dashboards tenant space
 ktenant=$nst
 
 if [ -n "$tenant" ]; then
-   tenant_description="A Kibana tenant space for tenant [$tenant] within Viya deployment (namespace) [$namespace]."
+   tenant_description="An OpenSearch Dashboards tenant space for tenant [$tenant] within Viya deployment (namespace) [$namespace]."
    log_notice "Offboarding tenant [$tenant] within namespace [$namespace] [$(date)]"
 else
-   tenant_description="A Kibana tenant space for Viya deployment (namespace) [$namespace]."
+   tenant_description="An OpenSearch Dashboards tenant space for Viya deployment (namespace) [$namespace]."
    log_notice "Offboarding namespace [$namespace] [$(date)]"
 fi
 
@@ -132,20 +132,20 @@ get_es_api_url
 # get Security API URL
 get_sec_api_url
 
-# Delete Kibana tenant space (if it exists)
+# Delete OpenSearch Dashboards tenant space (if it exists)
 if kibana_tenant_exists "$ktenant"; then
    delete_kibana_tenant "$ktenant"
    rc=$?
    if [ "$rc" == "0" ]; then
       add_notice "                                                      "
-      add_notice "   The Kibana tenant space [$ktenant] has been deleted.   "
+      add_notice "   The OpenSearch Dashboards tenant space [$ktenant] has been deleted.   "
       add_notice "                                                      "
    else
       log_error "Problems were encountered while attempting to delete tenant space [$ktenant]."
       exit 1
    fi
 else
-   log_warn "The Kibana tenant space [$ktenant] does not exist and, therefore, could not be deleted."
+   log_warn "The OpenSearch Dashboards tenant space [$ktenant] does not exist and, therefore, could not be deleted."
 fi
 
 # Delete ES index containing tenant content
@@ -154,14 +154,14 @@ response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "${es_api_url}/$kiban
 if [[ $response == 2* ]]; then
    log_info "Deleted index [$kibana_index_name]. [$response]"
 else
-   log_warn "There was an issue deleting the index [$kibana_index_name] holding content related to Kibana tenant space [$ktenant]. You may need to manually delete this index. [$response]"
+   log_warn "There was an issue deleting the index [$kibana_index_name] holding content related to OpenSearch Dashboards tenant space [$ktenant]. You may need to manually delete this index. [$response]"
 fi
 
 response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "${es_api_url}/${kibana_index_name}_*"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 if [[ $response == 2* ]]; then
    log_info "Deleted index [${kibana_index_name}_*]. [$response]"
 else
-   log_warn "There was an issue deleting the index [${kibana_index_name}_*] holding content related to Kibana tenant space [$ktenant]. You may need to manually delete this index. [$response]"
+   log_warn "There was an issue deleting the index [${kibana_index_name}_*] holding content related to OpenSearch Dashboards tenant space [$ktenant]. You may need to manually delete this index. [$response]"
 fi
 
 
@@ -184,7 +184,7 @@ if [ -n "$tenant" ]; then
 fi
 add_notice "   Viya deployment/namespace of [$namespace]                     "
 add_notice "   you must delete those users manually, either through the      "
-add_notice "   Kibana web application or via the logging/bin/user.sh script. "
+add_notice "   OpenSearch Dashboards web application or via the logging/bin/user.sh script. "
 add_notice "                                                                 "
 
 # Write any "notices" to console

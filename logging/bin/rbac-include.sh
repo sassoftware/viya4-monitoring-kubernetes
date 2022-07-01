@@ -293,10 +293,10 @@ function create_kibana_tenant {
    response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/tenants/$tenant"  -H 'Content-Type: application/json' -d '{"description":"'"$description"'"}'  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 
    if [[ $response == 2* ]]; then
-      log_info "Kibana tenant space [$tenant] created. [$response]"
+      log_info "OpenSearch Dashboards tenant space [$tenant] created. [$response]"
       return  0
    else
-      log_error "There was an issue creating the Kibana tenant space [$tenant]. [$response]"
+      log_error "There was an issue creating the OpenSearch Dashboards tenant space [$tenant]. [$response]"
       return 1
    fi
 }
@@ -314,10 +314,10 @@ function delete_kibana_tenant {
    response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "$sec_api_url/tenants/$tenant"   --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
 
    if [[ $response == 2* ]]; then
-      log_info "Kibana tenant space [$tenant] deleted. [$response]"
+      log_info "OpenSearch Dashboards tenant space [$tenant] deleted. [$response]"
       return  0
    else
-      log_error "There was an issue deleting the Kibana tenant space [$tenant]. [$response]"
+      log_error "There was an issue deleting the OpenSearch Dashboards tenant space [$tenant]. [$response]"
       return 1
    fi
 }
@@ -334,10 +334,10 @@ function kibana_tenant_exists {
    response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "${sec_api_url}/tenants/$tenant" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 
    if [[ $response == 2* ]]; then
-      log_debug "Confirmed Kibana tenant [$tenant] exists. [$response]"
+      log_debug "Confirmed OpenSearch Dashboards tenant [$tenant] exists. [$response]"
       return 0
    else
-      log_debug "Kibana tenant [$tenant] does not exist. [$response]"
+      log_debug "OpenSearch Dashboards tenant [$tenant] does not exist. [$response]"
       return 1
    fi
 }
@@ -358,10 +358,10 @@ function user_exists {
    response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "${sec_api_url}/internalusers/$username" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure )
 
    if [[ $response == 2* ]]; then
-      log_debug "Confirmed Kibana user [$username] exists. [$response]"
+      log_debug "Confirmed OpenSearch user [$username] exists. [$response]"
       return 0
    else
-      log_debug "Kibana user [$username] does not exist. [$response]"
+      log_debug "OpenSearch user [$username] does not exist. [$response]"
       return 1
    fi
 }

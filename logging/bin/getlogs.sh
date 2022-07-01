@@ -113,10 +113,10 @@ function show_usage {
    log_info  "                Date values without a time value are interpreted as referring to midnight on that date."
    log_info  ""
    log_info  "     ** Connection Options **"
-   log_info  '     -us, --user              USERNAME  - Username for connecting to Elasticsearch/Kibana (default: $ESUSER)'
-   log_info  '     -pw, --password          PASSWORD  - Password for connecting to Elasticsearh/Kibana  (default: $ESPASSWD)'
-   log_info  '     -ho, --host              hostname  - Hostname for connection to Elasticsearch/Kibana (default: $ESHOST)'
-   log_info  '     -po, --port              port_num  - Port number for connection to Elasticsearch/Kibana (default: $ESPORT)'
+   log_info  '     -us, --user              USERNAME  - Username for connecting to OpenSearch/OpenSearch Dashboards (default: $ESUSER)'
+   log_info  '     -pw, --password          PASSWORD  - Password for connecting to OpenSearch/OpenSearch Dashboards (default: $ESPASSWD)'
+   log_info  '     -ho, --host              hostname  - Hostname for connection to OpenSearch/OpenSearch Dashboards (default: $ESHOST)'
+   log_info  '     -po, --port              port_num  - Port number for connection to OpenSearch/OpenSearch Dashboards (default: $ESPORT)'
    log_info  "     -pr, --protocol          https     - Protocol (https|http) for connection to Elasticsearch (default: https)"
    log_info  "          NOTE: Connection information can also be passed via environment vars (ESHOST, ESPORT, ESPROTOCOL, ESUSER and ESPASSWD)."
    log_info  ""

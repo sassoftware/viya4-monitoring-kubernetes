@@ -136,7 +136,7 @@ function add_ism_template {
       response=$(curl -s -o /dev/null   -w "%{http_code}" -XDELETE "$ism_api_url/policies/$policy_name" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
       if [[ $response != 2* ]]; then
          log_warn "Error encountered deleting index management policy [$policy_name] before patching to add ISM template stanza [$response]."
-         log_warn "Review the index managment policy [$policy_name] within Kibana to ensure it is properly configured and linked to appropriate indexes [$pattern]."
+         log_warn "Review the index managment policy [$policy_name] within OpenSearch Dashboards to ensure it is properly configured and linked to appropriate indexes [$pattern]."
          return
       else
          log_debug "Index policy [$policy_name] deleted [$response]."
@@ -153,7 +153,7 @@ function add_ism_template {
       response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$ism_api_url/policies/$policy_name"  -H 'Content-Type: application/json' -d "@$TMP_DIR/ism_policy_patch.json" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
       if [[ $response != 2* ]]; then
          log_warn "Unable to update index management policy [$policy_name] to add a ISM_TEMPLATE stanza [$response]"
-         log_warn "Review/create the index managment policy [$policy_name] within Kibana to ensure it is properly configured and linked to appropriate indexes [$pattern]."
+         log_warn "Review/create the index managment policy [$policy_name] within OpenSearch Dashboards to ensure it is properly configured and linked to appropriate indexes [$pattern]."
          return
       else
          log_info "Index management policy [$policy_name] loaded into OpenSearch [$response]"
