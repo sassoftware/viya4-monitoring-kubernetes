@@ -152,44 +152,6 @@ fi
 ./logging/bin/import_osd_content.sh logging/osd/namespace       cluster_admins
 ./logging/bin/import_osd_content.sh logging/osd/tenant          cluster_admins
 
-
-
-# create the all logs RBACs
-add_notice "**OpenSearch/OSD Access Controls**"
-LOGGING_DRIVER=true ./logging/bin/security_create_rbac.sh _all_ _all_
-
-# Create the 'logadm' OS/OSD user who can access all logs
-LOG_CREATE_LOGADM_USER=${LOG_CREATE_LOGADM_USER:-true}
-if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
-
-   if user_exists logadm; then
-      log_warn "A user 'logadm' already exists; leaving that user as-is.  Review its definition in OpenSearch Dashboards and update it, or create another user, as needed."
-   else
-      log_debug "Creating the 'logadm' user"
-
-      LOG_LOGADM_PASSWD=${LOG_LOGADM_PASSWD:-$ES_ADMIN_PASSWD}
-      if [ -z "$LOG_LOGADM_PASSWD" ]; then
-         log_debug "Creating a random password for the 'logadm' user"
-         LOG_LOGADM_PASSWD="$(randomPassword)"
-         add_notice ""
-         add_notice "**The OpenSearch 'logadm' Account**"
-         add_notice "Generated 'logadm' password:  $LOG_LOGADM_PASSWD"
-      fi
-
-      #create the user
-      LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logadm -p $LOG_LOGADM_PASSWD
-   fi
-else
-   log_debug "Skipping creation of 'logadm' user because LOG_CREATE_LOGADM_USER not 'true' [$LOG_CREATE_LOGADM_USER]"
-fi
-
-LOGGING_DRIVER=${LOGGING_DRIVER:-false}
-if [ "$LOGGING_DRIVER" != "true" ]; then
-   echo ""
-   display_notices
-   echo ""
-fi
-
 log_info "Configuring OpenSearch Dashboards has been completed"
 
 log_debug "Script [$this_script] has completed [$(date)]"

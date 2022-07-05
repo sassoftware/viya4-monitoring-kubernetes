@@ -7,6 +7,7 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 source logging/bin/apiaccess-include.sh
+source logging/bin/rbac-include.sh
 
 this_script=`basename "$0"`
 
@@ -45,7 +46,7 @@ if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 get_ism_api_url
 
-# Confirm Open Distro for OpenSearch is ready
+# Confirm OpenSearch is ready
 for pause in 30 30 30 30 30 30 60
 do
    response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "$es_api_url"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD  --insecure)
@@ -226,6 +227,42 @@ else
    log_debug "Monitoring index template template settings loaded into OpenSearch [$response]"
 fi
 echo ""
+
+# create the all logs RBACs
+add_notice "**OpenSearch/OSD Access Controls**"
+LOGGING_DRIVER=true ./logging/bin/security_create_rbac.sh _all_ _all_
+
+# Create the 'logadm' OS/OSD user who can access all logs
+LOG_CREATE_LOGADM_USER=${LOG_CREATE_LOGADM_USER:-true}
+if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
+
+   if user_exists logadm; then
+      log_warn "A user 'logadm' already exists; leaving that user as-is.  Review its definition in OpenSearch Dashboards and update it, or create another user, as needed."
+   else
+      log_debug "Creating the 'logadm' user"
+
+      LOG_LOGADM_PASSWD=${LOG_LOGADM_PASSWD:-$ES_ADMIN_PASSWD}
+      if [ -z "$LOG_LOGADM_PASSWD" ]; then
+         log_debug "Creating a random password for the 'logadm' user"
+         LOG_LOGADM_PASSWD="$(randomPassword)"
+         add_notice ""
+         add_notice "**The OpenSearch 'logadm' Account**"
+         add_notice "Generated 'logadm' password:  $LOG_LOGADM_PASSWD"
+      fi
+
+      #create the user
+      LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logadm -p $LOG_LOGADM_PASSWD
+   fi
+else
+   log_debug "Skipping creation of 'logadm' user because LOG_CREATE_LOGADM_USER not 'true' [$LOG_CREATE_LOGADM_USER]"
+fi
+
+LOGGING_DRIVER=${LOGGING_DRIVER:-false}
+if [ "$LOGGING_DRIVER" != "true" ]; then
+   echo ""
+   display_notices
+   echo ""
+fi
 
 
 log_info "Content has been loaded into OpenSearch"
