@@ -31,7 +31,7 @@ log_debug "Application URLs requested for [$servicelist]"
 for service in $servicelist
 do
    case  "$service" in
-     OPENSEARCHDASHBOARD|OSD)
+     OPENSEARCHDASHBOARDS|OPENSEARCHDASHBOARD|OSD)
         if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ];then
            reset_search_backend="true"
            LOG_SEARCH_BACKEND="OPENSEARCH"
