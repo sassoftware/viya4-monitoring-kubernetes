@@ -17,14 +17,14 @@ function show_usage {
   log_message  "Usage: $this_script --namespace NAMESPACE [--tenant TENANT] [OPTIONS]"
   log_message  ""
   log_message  "'Onboards' a Viya deployment (namespace) or a specific tenant within that deployment.  This process allows admins responsible for a Viya deployment (or a single tenant within a given deployment) to work with log messages collected from the deployment (or tenant within the deployment)."
-  log_message  "The onboarding process creates the security access controls and, optionally, an initial user granted access.  In addition, a Kibana tenant space is created and populated with an initial set of Kibana content (e.g. visualizations, dashboards, etc.)."
+  log_message  "The onboarding process creates the security access controls and, optionally, an initial user granted access.  In addition, an OpenSearch Dashboards tenant space is created and populated with an initial set of OpenSearch Dashboards content (e.g. visualizations, dashboards, etc.)."
   log_message  ""
   log_message  "    Arguments:"
   log_message  "     -ns, --namespace   NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace to 'on-board' or the namespace in which the tenant to 'on-board' resides."
   log_message  "     -t,  --tenant      TENANT    - (Optional) The tenant within the specified Viya deployment/Kubernetes Namespace to 'on-board'."
   log_message  ""
   log_message  "    Options:"
-  log_message  "        -u, --user [USER]           - Create an initial user with access to this Kibana tenant space. User name is optional, by default its name will combine the Kibana tenant space name with '_admin'."
+  log_message  "        -u, --user [USER]           - Create an initial user with access to this OpenSearch Dashboards tenant space. User name is optional, by default its name will combine the OpenSearch Dashboards tenant space name with '_admin'."
   log_message  "        -p, --password PASSWORD     - Password for the initial user."
   log_message  ""
 }
@@ -133,14 +133,14 @@ else
    index_nst="${namespace}"
 fi
 
-#FUTURE: Allow user to specify Kibana tenant space name?
+#FUTURE: Allow user to specify OpenSearch Dashboards tenant space name?
 ktenant=$nst
 
 if [ -n "$tenant" ]; then
-   tenant_description="A Kibana tenant space for tenant [$tenant] within Viya deployment (namespace) [$namespace]."
+   tenant_description="An OpenSearch Dashboards tenant space for tenant [$tenant] within Viya deployment (namespace) [$namespace]."
    log_notice "Onboarding tenant [$tenant] within namespace [$namespace] [$(date)]"
 else
-   tenant_description="A Kibana tenant space for Viya deployment (namespace) [$namespace]."
+   tenant_description="An OpenSearch Dashboards tenant space for Viya deployment (namespace) [$namespace]."
    log_notice "Onboarding namespace [$namespace] [$(date)]"
 fi
 
@@ -154,44 +154,44 @@ get_credentials_from_secret admin
 # get Security API URL
 get_sec_api_url
 
-# Create Kibana tenant space (if it doesn't exist)
+# Create OpenSearch Dashboards tenant space (if it doesn't exist)
 if ! kibana_tenant_exists "$ktenant"; then
    create_kibana_tenant "$ktenant" "$tenant_description"
    rc=$?
    if [ "$rc" == "0" ]; then
       add_notice "                                                      "
-      add_notice "   The Kibana tenant space [$ktenant] was created.   "
+      add_notice "   The OpenSearch Dashboards tenant space [$ktenant] was created.   "
       add_notice "                                                      "
    else
       log_error "Problems were encountered while attempting to create tenant space [$ktenant]."
       exit 1
    fi
 else
-   log_error "A Kibana tenant space [$ktenant] already exists."
+   log_error "A OpenSearch Dashboards tenant space [$ktenant] already exists."
    exit 1
 fi
 
 # get KIBANA API URL
 get_kb_api_url
 
-# Import appropriate content into Kibana tenant space
-./logging/bin/import_osd_content.sh logging/kibana/common $ktenant
+# Import appropriate content into OpenSearch Dashboards tenant space
+./logging/bin/import_osd_content.sh logging/osd/common $ktenant
 
 if [ -z "$tenant" ]; then
-   ./logging/bin/import_osd_content.sh logging/kibana/namespace $ktenant
+   ./logging/bin/import_osd_content.sh logging/osd/namespace $ktenant
 else
-   ./logging/bin/import_osd_content.sh logging/kibana/tenant    $ktenant
+   ./logging/bin/import_osd_content.sh logging/osd/tenant    $ktenant
 fi
 
-if [ -d "$USER_DIR/logging/kibana" ] && [ "$USER_DIR" != "$(pwd)" ]; then
+if [ -d "$USER_DIR/logging/osd" ] && [ "$USER_DIR" != "$(pwd)" ]; then
 
    export IGNORE_NOT_FOUND="true"
-   ./logging/bin/import_osd_content.sh $USER_DIR/logging/kibana/common $ktenant
+   ./logging/bin/import_osd_content.sh $USER_DIR/logging/osd/common $ktenant
 
    if [ -z "$tenant" ]; then
-      ./logging/bin/import_osd_content.sh $USER_DIR/logging/kibana/namespace $ktenant
+      ./logging/bin/import_osd_content.sh $USER_DIR/logging/osd/namespace $ktenant
    else
-      ./logging/bin/import_osd_content.sh $USER_DIR/logging/kibana/tenant    $ktenant
+      ./logging/bin/import_osd_content.sh $USER_DIR/logging/osd/tenant    $ktenant
    fi
    unset IGNORE_NOT_FOUND
 fi

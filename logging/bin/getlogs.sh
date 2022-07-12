@@ -70,7 +70,7 @@ function show_usage {
    log_info  ""
    log_info  "Usage: $this_script [QUERY OPTIONS] [TIME PERIOD] [OUTPUT OPTIONS] [CONNECTION OPTIONS]"
    log_info  ""
-   log_info  "Submits a query to Elasticsearch for log messages meeting the specified criteria and directs results to stdout or specified file."
+   log_info  "Submits a query to OpenSearch for log messages meeting the specified criteria and directs results to stdout or specified file."
    log_info  "Results are returned in CSV (comma-separated value) format.  In most case, option values are expected to be a single value (exceptions noted below)."
    log_info  "NOTE: Connection information is required but may be provided via environment variables."
    log_info  ""
@@ -113,11 +113,11 @@ function show_usage {
    log_info  "                Date values without a time value are interpreted as referring to midnight on that date."
    log_info  ""
    log_info  "     ** Connection Options **"
-   log_info  '     -us, --user              USERNAME  - Username for connecting to Elasticsearch/Kibana (default: $ESUSER)'
-   log_info  '     -pw, --password          PASSWORD  - Password for connecting to Elasticsearh/Kibana  (default: $ESPASSWD)'
-   log_info  '     -ho, --host              hostname  - Hostname for connection to Elasticsearch/Kibana (default: $ESHOST)'
-   log_info  '     -po, --port              port_num  - Port number for connection to Elasticsearch/Kibana (default: $ESPORT)'
-   log_info  "     -pr, --protocol          https     - Protocol (https|http) for connection to Elasticsearch (default: https)"
+   log_info  '     -us, --user              USERNAME  - Username for connecting to OpenSearch/OpenSearch Dashboards (default: $ESUSER)'
+   log_info  '     -pw, --password          PASSWORD  - Password for connecting to OpenSearch/OpenSearch Dashboards (default: $ESPASSWD)'
+   log_info  '     -ho, --host              hostname  - Hostname for connection to OpenSearch/OpenSearch Dashboards (default: $ESHOST)'
+   log_info  '     -po, --port              port_num  - Port number for connection to OpenSearch/OpenSearch Dashboards (default: $ESPORT)'
+   log_info  "     -pr, --protocol          https     - Protocol (https|http) for connection to OpenSearch (default: https)"
    log_info  "          NOTE: Connection information can also be passed via environment vars (ESHOST, ESPORT, ESPROTOCOL, ESUSER and ESPASSWD)."
    log_info  ""
    log_info  "     ** Other Options **"
@@ -473,7 +473,7 @@ rc=$?
 if [[ $response != 2* ]]; then
 
    if [[ "$rc" == "28" ]]; then
-      log_error "Unable to validate connection to Elasticsearch within [60] seconds."
+      log_error "Unable to validate connection to OpenSearch within [60] seconds."
       exit 1
    elif [ "$response" == "401" ]; then
       log_error "Unable to validate connection credentials. [$response] rc:[$rc]"
@@ -481,7 +481,7 @@ if [[ $response != 2* ]]; then
    elif [ "$response" == "403" ]; then
       log_debug "Validation of connection information not completely successful; specified user may have limited permissions. [$response] rc:[$rc]"
    else
-      log_error "Unable to validate connection to Elasticsearch. [$response] rc:[$rc]"
+      log_error "Unable to validate connection to OpenSearch. [$response] rc:[$rc]"
       exit 1
    fi
 else

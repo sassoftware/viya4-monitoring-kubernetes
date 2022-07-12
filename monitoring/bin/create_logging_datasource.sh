@@ -183,7 +183,7 @@ else
     fi
 fi
 
-# Adds the Elasticsearch data source to Grafana
+# Adds the logging data source to Grafana
 log_info "Provisioning logging data source in Grafana"
 if [ "$cluster" == "true" ]; then
     kubectl create secret generic -n $MON_NS grafana-datasource-es --from-file $monDir/grafana-datasource-es.yaml
@@ -193,7 +193,7 @@ else
     kubectl label secret -n $tenantNS v4m-grafana-datasource-es-$tenant grafana_datasource-$tenant=true sas.com/monitoring-base=kube-viya-monitoring
 fi
 
-# Create the logging dashboard
+# Deploy the log-enabled Viya dashboards
 WELCOME_DASH="false" KUBE_DASH="false" VIYA_DASH="false" VIYA_LOGS_DASH="true" PGMONITOR_DASH="false" RABBITMQ_DASH="false" NGINX_DASH="false" LOGGING_DASH="false" USER_DASH="false" monitoring/bin/deploy_dashboards.sh
 
 # Delete pods so that they can be restarted with the change.

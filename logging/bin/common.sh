@@ -15,6 +15,16 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
         fi
     fi
 
+
+    function require_opensearch {
+       if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ]; then
+          log_error "This script is only appropriate for use with OpenSearch as the search back-end."
+          log_error "The LOG_SEARCH_BACKEND environment variable is currently set to [$LOG_SEARCH_BACKEND]"
+          exit 1
+       fi
+    }
+    export -f require_opensearch
+
     export LOG_NS="${LOG_NS:-logging}"
 
     #if TLS (w/in cluster; for all monitoring components) is requested, require TLS into Kibana pod, too

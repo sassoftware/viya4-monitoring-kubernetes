@@ -21,6 +21,9 @@ if [ "$KIBANA_CONTENT_DEPLOY" != "true" ]; then
   exit 0
 fi
 
+#Fail if not using OpenSearch back-end
+require_opensearch
+
 # temp file used to capture command output
 tmpfile=$TMP_DIR/output.txt
 
@@ -53,34 +56,9 @@ set -e
 log_info "Configuring OpenSearch Dashboards...this may take a few minutes"
 
 
-if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ]; then            ####   ODFE SUPPORT-start
-
-   pod_selector="app=v4m-es,role=kibana"
-
-   KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-true}
-
-   if [ "$KB_KNOWN_NODEPORT_ENABLE" == "true" ]; then
-      SVC=v4m-es-kibana-svc
-      SVC_TYPE=$(kubectl get svc -n $LOG_NS $SVC -o jsonpath='{.spec.type}')
-
-      if [ "$SVC_TYPE" == "NodePort" ]; then
-        KIBANA_PORT=31033
-        kubectl -n "$LOG_NS" patch svc "$SVC" --type='json' -p '[{"op":"replace","path":"/spec/ports/0/nodePort","value":31033}]'
-        log_verbose "Setting Kibana service NodePort to 31033"
-       fi
-   else
-     log_debug "Kibana service NodePort NOT changed to 'known' port because KB_KNOWN_NODEPORT_ENABLE set to [$KB_KNOWN_NODEPORT_ENABLE]."
-   fi
-else
-   # OPENSEARCH DASHBOARDS
-   pod_selector="app=opensearch-dashboards"
-
-fi                                                            ####   ODFE SUPPORT-end
-
-
 # wait for pod to show as "running" and "ready"
 log_info "Waiting for OpenSearch Dashboards pods to be ready ($(date) - timeout 10m)"
-kubectl -n $LOG_NS wait pods --selector $pod_selector  --for condition=Ready --timeout=10m
+kubectl -n $LOG_NS wait pods --selector "app=opensearch-dashboards"  --for condition=Ready --timeout=10m
 
 set +e  # disable exit on error
 
@@ -133,7 +111,7 @@ else
    log_debug "The OpenSearch Dashboards tenant space [cluster_admins] exists."
 fi
 
-#Migrating from ODFE 1.7.0 to ODFE 1.13.x (file should only exist during migration)
+#Migrating from ODFE 1.7.0 (file should only exist during migration)
 if [ -f "$KB_GLOBAL_EXPORT_FILE" ]; then
 
    # delete 'demo' Kibana tenant space created (but not used) prior to V4m version 1.1.0
@@ -169,48 +147,10 @@ else
 fi
 
 # Import OSD Searches, Visualizations and Dashboard Objects using curl
-./logging/bin/import_osd_content.sh logging/kibana/common          cluster_admins
-./logging/bin/import_osd_content.sh logging/kibana/cluster_admins  cluster_admins
-./logging/bin/import_osd_content.sh logging/kibana/namespace       cluster_admins
-./logging/bin/import_osd_content.sh logging/kibana/tenant          cluster_admins
-
-
-
-# create the all logs RBACs
-add_notice "**OpenSearch/OSD Access Controls**"
-LOGGING_DRIVER=true ./logging/bin/security_create_rbac.sh _all_ _all_
-
-# Create the 'logadm' OS/OSD user who can access all logs
-LOG_CREATE_LOGADM_USER=${LOG_CREATE_LOGADM_USER:-true}
-if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
-
-   if user_exists logadm; then
-      log_warn "A user 'logadm' already exists; leaving that user as-is.  Review its definition in OpenSearch Dashboards and update it, or create another user, as needed."
-   else
-      log_debug "Creating the 'logadm' user"
-
-      LOG_LOGADM_PASSWD=${LOG_LOGADM_PASSWD:-$ES_ADMIN_PASSWD}
-      if [ -z "$LOG_LOGADM_PASSWD" ]; then
-         log_debug "Creating a random password for the 'logadm' user"
-         LOG_LOGADM_PASSWD="$(randomPassword)"
-         add_notice ""
-         add_notice "**The OpenSearch 'logadm' Account**"
-         add_notice "Generated 'logadm' password:  $LOG_LOGADM_PASSWD"
-      fi
-
-      #create the user
-      LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logadm -p $LOG_LOGADM_PASSWD
-   fi
-else
-   log_debug "Skipping creation of 'logadm' user because LOG_CREATE_LOGADM_USER not 'true' [$LOG_CREATE_LOGADM_USER]"
-fi
-
-LOGGING_DRIVER=${LOGGING_DRIVER:-false}
-if [ "$LOGGING_DRIVER" != "true" ]; then
-   echo ""
-   display_notices
-   echo ""
-fi
+./logging/bin/import_osd_content.sh logging/osd/common          cluster_admins
+./logging/bin/import_osd_content.sh logging/osd/cluster_admins  cluster_admins
+./logging/bin/import_osd_content.sh logging/osd/namespace       cluster_admins
+./logging/bin/import_osd_content.sh logging/osd/tenant          cluster_admins
 
 log_info "Configuring OpenSearch Dashboards has been completed"
 

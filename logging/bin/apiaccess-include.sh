@@ -202,7 +202,7 @@ function get_kb_api_url {
       trap_add stop_kb_portforwarding EXIT
       return 0
    else
-      log_error "Unable to obtain the URL for the Kibana API Endpoint"
+      log_error "Unable to obtain the URL for the OpenSearch Dashboards API Endpoint"
       return 1
    fi
 }

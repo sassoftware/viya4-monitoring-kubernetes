@@ -22,8 +22,10 @@ if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
 fi
 
 app=${1}
+app=$(echo "$app"| tr '[:lower:]' '[:upper:]')
+
 case "$app" in
-   "KIBANA"|"kibana"|"kb"|"KB")
+   "KIBANA"|"KB")
       namespace="$LOG_NS"
       service_name="v4m-es-kibana-svc"
       port="kibana-svc"
@@ -39,7 +41,7 @@ case "$app" in
         route_path="/"
       fi
       ;;
-   "ELASTICSEARCH"|"elasticsearch"|"ES"|"es")
+   "ELASTICSEARCH"|"ES")
       namespace="$LOG_NS"
       service_name="v4m-es-client-service"
       port="http"
@@ -55,7 +57,7 @@ case "$app" in
         route_path="/"
       fi
       ;;
-   "OPENSEARCH"|"opensearch"|"OS"|"os")
+   "OPENSEARCH"|"OS")
       namespace="$LOG_NS"
       service_name="v4m-search"
       port="http"
@@ -71,7 +73,7 @@ case "$app" in
         route_path="/"
       fi
       ;;
-   "OSD"|"osd")
+   "OSD"|"OPENSEARCHDASHBOARD"|"OPENSEARCHDASHBOARDS")
       namespace="$LOG_NS"
       service_name="v4m-osd"
       port="http"
@@ -89,7 +91,7 @@ case "$app" in
       ;;
   ""|*)
       log_error "Application name is invalid or missing."
-      log_error "The APPLICATION NAME is required; valid values are: ELASTICSEARCH or KIBANA"
+      log_error "The APPLICATION NAME is required; valid values are: OpenSearch or OpenSearchDashboards"
       exit 1
       ;;
 esac

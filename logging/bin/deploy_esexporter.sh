@@ -20,6 +20,9 @@ fi
 
 set -e
 
+#Fail if not using OpenSearch back-end
+require_opensearch
+
 log_info "Deploying Elasticsearch metric exporter ..."
 
 # check for pre-reqs
@@ -36,16 +39,14 @@ rc=$?
 if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 
-if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
-   if helm3ReleaseExists es-exporter $LOG_NS; then
-      #remove an existing instance if it targets ODFE
-      if [ -z $(kubectl -n $LOG_NS get pods -l "app=prometheus-elasticsearch-exporter,searchbackend=opensearch" -o name 2>/dev/null) ]; then
-         log_debug "Removing an outdated version of Helm release [es-exporter]"
-         helm -n $LOG_NS delete es-exporter
-      fi
-   else
-      log_debug "No existing Helm release [es-exporter] found."
+if helm3ReleaseExists es-exporter $LOG_NS; then
+   #remove an existing instance if it does NOT target OPENSEARCH (i.e. targets ODFE)
+   if [ -z $(kubectl -n $LOG_NS get pods -l "app=prometheus-elasticsearch-exporter,searchbackend=opensearch" -o name 2>/dev/null) ]; then
+      log_debug "Removing an outdated version of Helm release [es-exporter]"
+      helm -n $LOG_NS delete es-exporter
    fi
+else
+   log_debug "No existing Helm release [es-exporter] found."
 fi
 
 # enable debug on Helm via env var
@@ -60,13 +61,8 @@ helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-cha
 log_verbose "Updating Helm repositories"
 helm repo update
 
-if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
-   primaryValuesFile="logging/esexporter/values-es-exporter.yaml"
-   log_debug "Deploying Elasticsearch Exporter for [$LOG_SEARCH_BACKEND]"
-else
-   primaryValuesFile="logging/esexporter/values-es-exporter_open.yaml"
-   log_debug "Deploying Elasticsearch Exporter for [$LOG_SEARCH_BACKEND]"
-fi
+primaryValuesFile="logging/esexporter/values-es-exporter.yaml"
+log_debug "Deploying Elasticsearch Exporter"
 
 # Load any user customizations/overrides
 ES_OPEN_EXPORTER_USER_YAML="${ES_OPEN_EXPORTER_USER_YAML:-$USER_DIR/logging/user-values-es-exporter.yaml}"
