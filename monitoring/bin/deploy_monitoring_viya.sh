@@ -90,9 +90,9 @@ else
 fi
 
 # If a deployment with the old name exists, remove it first
-if helm3ReleaseExists "v4m-viya" $MON_NS; then
+if helm3ReleaseExists "v4m-viya" $VIYA_NS; then
   log_verbose "Removing outdated SAS Viya Monitoring Helm chart release from [$VIYA_NS] namespace"
-  helm uninstall -n "$MON_NS" "v4m-viya"
+  helm uninstall -n "$VIYA_NS" "v4m-viya"
 fi
 
 deployV4MInfo "$VIYA_NS" "v4m-metrics-viya"
