@@ -17,8 +17,10 @@ A query is cancelled if it does not complete within three minutes.
 
 For options than accept multiple values, the values must be in quotes and must be separated by commas. 
 
-If you are using nodeports, an administrator must run the `logging/bin/es_nodeport_enable.sh` 
-script to enable HTTPS access to OpenSearch and to obtain the host and port values to use when specifying the connection options. After this script is run, HTTPS access to OpenSearch remains enabled until either the `logging/bin/es_nodeport_disable.sh` script is run or the logging components are redeployed.
+If you are using nodeports, an administrator must run the `configure_nodeport.sh` 
+script to enable HTTPS access to OpenSearch and to obtain the host and port values to use when specifying the connection options. See [Configure Access Via NodePorts](http://documentation.sas.com/doc/en/sasadmincdc/default/callogging/n0l4k3bz39cw2dn131zcbat7m4r1.htm). After this script is run, HTTPS access to OpenSearch remains enabled until one of the following occurs: 
+- the `configure_nodeport.sh` script with the `disable` option is run.
+- the logging components are redeployed. 
 
 ## Query Options
 

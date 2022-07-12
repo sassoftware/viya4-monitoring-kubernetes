@@ -22,6 +22,8 @@ add_notice ""
 
 #start looping through services
 servicelist=${@:-"ALL"}
+servicelist=$(echo "$servicelist"| tr '[:lower:]' '[:upper:]')
+
 if [ "$servicelist" == "ALL" ]; then
    servicelist="GRAFANA OS OSD"
 fi
@@ -36,7 +38,7 @@ do
            reset_search_backend="true"
            LOG_SEARCH_BACKEND="OPENSEARCH"
         fi
-
+        
         service="OpenSearch Dashboards"
         namespace=${LOG_NS:-"logging"}
         servicename="v4m-osd"
@@ -55,6 +57,11 @@ do
         tls_flag="true"
         ;;
      KIBANA|KB)
+        if [ "$LOG_SEARCH_BACKEND" != "ODFE" ];then
+           reset_search_backend="true"
+           LOG_SEARCH_BACKEND="ODFE"
+        fi
+
         namespace=${LOG_NS:-"logging"}
         service="Kibana"
         servicename="v4m-es-kibana-svc"
@@ -63,33 +70,42 @@ do
         log_debug "TLS required to connect to Kibana? [$tls_flag]"
         ;;
      ELASTICSEARCH|ES)
+        if [ "$LOG_SEARCH_BACKEND" != "ODFE" ];then
+           reset_search_backend="true"
+           LOG_SEARCH_BACKEND="ODFE"
+        fi
+
         namespace=${LOG_NS:-"logging"}
         service="Elasticsearch"
         servicename="v4m-es-client-service"
         ingressname=""
         tls_flag="true"
         ;;
-     GRAFANA)
+     GRAFANA|GRAF|GR)
         namespace=${MON_NS:-"monitoring"}
+        service="Grafana"
         servicename="v4m-grafana"
         ingressname="v4m-grafana"
         tls_flag="$TLS_ENABLE"
         ;;
-     PROMETHEUS)
+     PROMETHEUS|PROM|PR)
         namespace=${MON_NS:-"monitoring"}
+        service="Prometheus"
         servicename="v4m-prometheus"
         ingressname="v4m-prometheus"
         tls_flag="$TLS_ENABLE"
         ;;
-     ALERTMANAGER)
+     ALERTMANAGER|AM)
         namespace=${MON_NS:-"monitoring"}
+        service="AlertManager"
         servicename="v4m-alertmanager"
         ingressname="v4m-alertmanager"
         tls_flag="$TLS_ENABLE"
         ;;
 
      *)
-        log_error "Invalid service [$service] specified; valid values are [GRAFANA, OPENSEARCH, OPENSEARCHDASHBOARDS, KIBANA, ELASTICSEARCH or ALL(does not inc. KIBANA or ELASTICSEARCH)]"
+        log_error "Invalid application [$service] specified".
+        log_error "Valid values are [GRAFANA, OPENSEARCH, OPENSEARCHDASHBOARDS, KIBANA, ELASTICSEARCH or ALL(does not inc. KIBANA or ELASTICSEARCH)]"
         exit 1
         ;;
    esac
@@ -100,7 +116,7 @@ do
    service_url=$(get_service_url "$namespace" "$servicename"  "$tls_flag" "$ingressname")
 
    if [ "$reset_search_backend" == "true" ]; then
-      LOG_SEARCH_BACKEND="ODFE"
+      LOG_SEARCH_BACKEND="OPENSEARCH"
    fi
 
    # Print URLs
@@ -116,8 +132,8 @@ do
 done
 
 
-add_notice " Note: These URLs may be incorrect if your ingress and/or other network"
-add_notice "       configuration includes options this script does not handle."
+add_notice " Note: The URL might be incorrect if your Ingress configuration, another network"
+add_notice "       configuration, or both include options that this script does not process."
 add_notice ""
 
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}

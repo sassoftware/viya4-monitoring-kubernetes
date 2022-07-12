@@ -335,30 +335,8 @@ deployment process.
 this page to review the collected log messages. You can use the query box or
 __Add filter__ to filter the messages that are displayed.
 
-## Enable Users to Access OpenSearch (optional)
+## Configure Access Via NodePorts (optional)
 
-You can choose to enable users to access OpenSearch so that they can issue queries using API calls or scripts. Run this command to enable nodeport connections to OpenSearch:
-
-```bash
-./logging/bin/es_nodeport_enable.sh
-``` 
-
-When the script completes, a message such as this appears in the console window:
-
-```text
-=============================================
-== Access OpenSearch using this URL: https://myK8snode:<portnumber>/ ==
-=============================================
-```
-
-The message provides the URL address for the OpenSearch application. The `<portnumber>` value is specific to your deployment.
-
-User connections to OpenSearch always use TLS.
-
-To disable nodeport connections to OpenSearch, run this command:
-
-```bash
-./logging/bin/es_nodeport_disable.sh
-```  
-
-You can use these scripts to temporarily enable user access to OpenSearch.
+You can enable access via NodePorts to enable users to access an application, 
+such as OpenSearch, so that they can issue queries using API calls or scripts. 
+See [Configure Access Via NodePorts](http://documentation.sas.com/doc/en/sasadmincdc/default/callogging/n0l4k3bz39cw2dn131zcbat7m4r1.htm).
