@@ -228,6 +228,9 @@ else
 fi
 echo ""
 
+# get Security API URL
+get_sec_api_url
+
 # create the all logs RBACs
 add_notice "**OpenSearch/OSD Access Controls**"
 LOGGING_DRIVER=true ./logging/bin/security_create_rbac.sh _all_ _all_
