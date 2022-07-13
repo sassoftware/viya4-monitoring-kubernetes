@@ -60,45 +60,53 @@ logging/bin/deploy_eventrouter.sh
 
 
 ##################################
+# OpenSearch Dashboards (Kibana) #
+##################################
+log_info "STEP 2: OpenSearch Dashboards"
+logging/bin/deploy_osd.sh
+
+
+##################################
 # OpenSearch                     #
 ##################################
-log_info "STEP 2: OpenSearch"
+log_info "STEP 3: OpenSearch"
 logging/bin/deploy_opensearch.sh
-
-
-##################################
-# OpenSearch Content (OpenShift) #
-##################################
-log_info "STEP 2a: Loading Content into OpenSearch"
-logging/bin/deploy_opensearch_content.sh
 
 
 ##################################
 # Elasticsearch Metric Exporter  #
 ##################################
-log_info "STEP 3: Elasticsearch metric exporter"
+log_info "STEP 4: Elasticsearch metric exporter"
 logging/bin/deploy_esexporter.sh
+
+
+##################################
+# OpenSearch Content (OpenShift) #
+##################################
+log_info "STEP 5: Loading Content into OpenSearch"
+logging/bin/deploy_opensearch_content.sh
+
+
+##################################
+# OSD Content                    #
+##################################
+log_info "STEP 6: Configuring OpenSearch Dashboards"
+
+KB_KNOWN_NODEPORT_ENABLE=false logging/bin/deploy_osd_content.sh
 
 
 ##################################
 # Fluent Bit                     #
 ##################################
-log_info "STEP 4: Deploying Fluent Bit"
+log_info "STEP 7: Deploying Fluent Bit"
 logging/bin/deploy_fluentbit_opensearch.sh
-
-
-##################################
-# OpenSearch Dashboards (Kibana) #
-##################################
-log_info "STEP 5: OpenSearch Dashboards"
-logging/bin/deploy_osd.sh
 
 
 ##################################
 # Create OpenShift Route(s)      #
 # and display app URL(s)         #
 ##################################
-log_info "STEP 5a: Create OpenShift Route(s) & Application URL(s)"
+log_info "STEP 8: Create OpenShift Route(s) & Application URL(s)"
 
 OPENSHIFT_ROUTES_ENABLE=${OPENSHIFT_ROUTES_ENABLE:-true}
 
@@ -122,18 +130,9 @@ fi
 
 
 ##################################
-# OSD Content                    #
-##################################
-log_info "STEP 5b: Configuring OpenSearch Dashboards"
-
-KB_KNOWN_NODEPORT_ENABLE=false logging/bin/deploy_osd_content.sh
-
-
-
-##################################
 # Service Monitors               #
 ##################################
-log_info "STEP 6: Deploying Service Monitors"
+log_info "STEP 9: Deploying Service Monitors"
 export DEPLOY_SERVICEMONITORS=${DEPLOY_SERVICEMONITORS:-true}
 logging/bin/deploy_servicemonitors_openshift.sh
 
@@ -141,7 +140,7 @@ logging/bin/deploy_servicemonitors_openshift.sh
 ##################################
 # Version Info                   #
 ##################################
-log_info "STEP 7: Updating version info"
+log_info "STEP 10: Updating version info"
 
 # If a deployment with the old name exists, remove it first
 if helm3ReleaseExists v4m $LOG_NS; then

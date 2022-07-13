@@ -64,7 +64,7 @@ logging/bin/deploy_opensearch.sh
 logging/bin/deploy_esexporter.sh
 
 ##################################
-# Open Distro Content            #
+# OpenSearch Content             #
 ##################################
 
 logging/bin/deploy_opensearch_content.sh
