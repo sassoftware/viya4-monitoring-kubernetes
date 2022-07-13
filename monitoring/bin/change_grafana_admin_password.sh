@@ -9,12 +9,15 @@ source monitoring/bin/common.sh
 this_script=`basename "$0"`
 
 function show_usage {
-  log_message  "Usage: $this_script [--namespace NAMESPACE --tenant TENANT]"
+  log_message  "Usage: $this_script [--password PASSWORD --namespace NAMESPACE --tenant TENANT]"
   log_message  ""
   log_message  "Changes the password of the Grafana admin user."
   log_message  ""
-  log_message  "To change the Grafana admin user at the cluster level, do not pass any "
-  log_message  "arguments.  To change the Grafana admin user at the tenant level, you need"
+  log_message  "To change the Grafana admin user at the cluster level, you need to provide"
+  log_message  "the following argument:"
+  log_message  "     -p,  --password PASSWORD     - The new password you want to use."
+  log_message  ""
+  log_message  "To change the Grafana admin user at the tenant level, you need"
   log_message  "to provide the following arguments:"
   log_message  "     -ns, --namespace NAMESPACE   - The namespace where the Viya tenant resides."
   log_message  "     -t,  --tenant TENANT         - The tenant whose Grafana admin password you want to change."
