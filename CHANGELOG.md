@@ -1,5 +1,16 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.2.1 (19JUL22)
+
+* **Monitoring**
+  * [FEATURE] - change_grafana_admin_password script has been created to change the Grafana admin password.
+  * [FIX] - Fixed issue where the logging data source would not be successfully created if you changed the Grafana admin password using the kubectl exec command provided at the end of the monitoring deployment tasks.
+  * [FIX] - Fixed a bug where the Viya monitoring deployment script would not remove older, v4m-viya Helm chart.
+
+* **Logging**
+  * [CHANGE] The es_nodeport_enable.sh and es_nodeport_disable.sh scripts used to enable and disable access to OpenSearch via NodePort, respectively, have been replaced with bin/configure_nodeport.sh which includes additional functionality.  See [Configure Access Via NodePorts](http://documentation.sas.com/doc/en/sasadmincdc/default/callogging/n0l4k3bz39cw2dn131zcbat7m4r1.htm).
+  * [CHANGE] Completed various clean-up tasks and tweaks related to the move to OpenSearch.  The order in which the log monitoring components are deployed has been modified to reduce start-up time and increase reliability.  Logic related to creating access controls has been moved to deploy_opensearch_content.sh (rather than deploy_osd_content.sh).  Message text has been revised to eliminate references to Elasticsearch and Kibana, replacing them (as appropriate) with references to OpenSearch and OpenSearch Dashboards (respectively).
+
 ## Version 1.2.0 (14JUN22)
 
 * **Overall**
