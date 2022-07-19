@@ -3,7 +3,7 @@
 ## Version 1.2.1 (19JUL22)
 
 * **Monitoring**
-  * [CHANGE] - change_grafana_admin_password script has been created to change the Grafana admin password.
+  * [FEATURE] - change_grafana_admin_password script has been created to change the Grafana admin password.
   * [FIX] - Fixed issue where the logging data source would not be successfully created if you changed the Grafana admin password using the kubectl exec command provided at the end of the monitoring deployment tasks.
   * [FIX] - Fixed a bug where the Viya monitoring deployment script would not remove older, v4m-viya Helm chart.
 
