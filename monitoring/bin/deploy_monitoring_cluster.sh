@@ -295,11 +295,10 @@ fi
 
 if [ "$showPass" == "true" ]; then
   # Find the grafana pod
-  grafanaPod="$(kubectl get po -n $MON_NS -l app.kubernetes.io/name=grafana --template='{{range .items}}{{.metadata.name}}{{end}}')"
-
+ 
   log_notice " Generated Grafana admin password is: $grafanaPwd"
-  log_notice " To change the password, run the following command (replace myNewPassword with an updated password):"
-  log_notice " kubectl exec -n $MON_NS $grafanaPod -c grafana -- bin/grafana-cli admin reset-admin-password myNewPassword"
+  log_notice " To change the password, run the following script (replace myNewPassword with an updated password):"
+  log_notice " monitoring/bin/change_grafana_admin_password.sh -p myNewPassword"
 fi
 
 log_message ""
