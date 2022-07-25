@@ -29,6 +29,10 @@ if [ "$VIYA_TENANT" == "" ]; then
   exit 1
 fi
 
+# EXPERIMENTAL Notice
+log_notice  "***Experimental - This script may be removed or undergo significant changes in the future***"
+log_message " " #blank line to improve readability
+
 # Validate tenant name
 validateTenantID $VIYA_TENANT
 

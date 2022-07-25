@@ -1,4 +1,8 @@
 # Deploying Monitoring for Tenants
+>**Important:** The features documented here should be considered _**EXPERIMENTAL**_.
+They might be significantly changed, replaced, or removed in later releases. 
+Feedback is welcomed about this functionality including requirements, usage
+scenarios, and required options.
 
 ## Overview
 
