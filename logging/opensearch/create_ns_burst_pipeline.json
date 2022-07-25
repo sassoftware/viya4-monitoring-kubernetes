@@ -16,15 +16,15 @@
     },
     {
       "set": {
-        "if": "'ctx.kube.labels.sas_com/tenant' != null",
         "field": "__tenant",
-        "value": "{{kube.labels.sas_com/tenant}}"
+        "value": "{{kube.labels.sas_com/tenant}}",
+        "ignore_empty_value": true
       }
     },
       {
         "lowercase": {
-          "if": "ctx.__tenant != null",
           "field": "__tenant",
+          "ignore_missing": true,
           "on_failure": [
             {
               "set": {
@@ -44,8 +44,9 @@
     {
       "script": {
         "if": "ctx.__tenant != null && !ctx.__tenant.startsWith('sas')",
+        "ignore_failure": true,
         "lang": "painless",
-        "source": " List primaryContainerNames = [\"cas\", \"sas-programming-environment\"];
+        "source": " List primaryContainerNames = [\"cas\", \"sas-cas-server\", \"sas-programming-environment\"];
                     List internalTenantNames = [\"default\", \"provider\", \"shared\", \"sharedservices\", \"spre\", \"uaa\", \"viya\"];
                     if (primaryContainerNames.contains(ctx.kube.container) && !internalTenantNames.contains(ctx.__tenant)) {ctx.__index_fragment=ctx.kube.namespace+\"-__\"+ctx.__tenant+\"__\"}
                   "
@@ -71,7 +72,8 @@
     },
     {
       "remove": {
-        "field": ["__index_fragment","__tenant"]
+        "field": ["__index_fragment","__tenant"],
+        "ignore_missing": true
       }
     }
   ]
