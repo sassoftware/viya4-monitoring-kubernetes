@@ -29,6 +29,11 @@ if [ "$VIYA_TENANT" == "" ]; then
   exit 1
 fi
 
+# EXPERIMENTAL Notice
+log_notice  "***Experimental - This script may be removed or undergo significant changes in the future***"
+log_message " " #blank line to improve readability
+
+
 log_notice "Deploying OpenShift tenant monitoring for [$VIYA_TENANT] to the [$VIYA_NS] namespace..."
 
 # Copy template files to temp
