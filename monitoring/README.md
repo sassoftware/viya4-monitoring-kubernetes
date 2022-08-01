@@ -64,7 +64,7 @@ repository is created in a directory named `viya4-monitoring-kubernetes-<release
 #### Clone the Repository
 
 1. From the main page for the repository, select the **stable** branch, which
-is the most recent officially released version. The **master** branch is the
+is the most recent officially released version. The **main** branch is the
 branch under active development.
 2. From the main page for the repository, click **Code**.
 3. Copy the HTTPS URL for the repository.
@@ -410,8 +410,8 @@ different depending on whether you use nodeports or ingress to access Grafana.
 NodePorts are used by default. If you deployed using NodePorts, Prometheus and
 AlertManager are available at these locations by default:
 
-* Prometheus - Port 31090 `http://master-node.yourcluster.example.com:31090`
-* AlertManager - Port 31091 `http://master-node.yourcluster.example.com:31091`
+* Prometheus - Port 31090 `http://control-plane-node.yourcluster.example.com:31090`
+* AlertManager - Port 31091 `http://control-plane-node.yourcluster.example.com:31091`
 
 The default Grafana admin user is `admin`. Unless you set the
 `GRAFANA_ADMIN_PASSWORD` environment variable (either in the `user.env` file or
