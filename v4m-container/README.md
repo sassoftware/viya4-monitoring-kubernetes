@@ -35,7 +35,7 @@ in a directory named `viya4-monitoring-kubernetes-<release_number>`.
 
 #### Clone the Repository
 
-1. From the main page for the repository, select the **stable** branch, which is the most recent officially released version. The **master** branch is the branch under active development.
+1. From the main page for the repository, select the **stable** branch, which is the most recent officially released version. The **main** branch is the branch under active development.
 2. From the main page for the repository, click **Code**.
 3. Copy the HTTPS URL for the repository.
 4. From a directory where you want to create the local copy, enter the command `git clone --branch stable <https_url>`. You can replace `stable` with the tag associated with a specific release if you need a version other than the current stable version. For example, if you are developing a repeatable process and need to ensure the same release of the repo is used every time, specify the tag associated with that specific release rather than stable. Note that the tag and release names are typically the same, but you should check the Releases page to verify the tag name.
