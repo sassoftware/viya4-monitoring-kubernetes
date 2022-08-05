@@ -1,4 +1,1 @@
-# Security Considerations for Logging
-
-The content in this file has been replaced by 
-[Limiting Access to Logs](Limiting_Access_to_Logs.md).
+See [Controlling User Access](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p1nee94eh0x1ymn1blz03g48jz2y.htm) in the SAS Viya Administration Help Center.

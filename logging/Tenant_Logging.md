@@ -18,6 +18,7 @@ Use the `/logging/bin/user.sh` script to create or delete OpenSearch accounts
 that have access to only the log messages and OpenSearch Dashboards-tenant space 
 associated with a specified SAS Viya tenant.
 
-See [Limiting Access to Logs](Limiting_Access_to_Logs.md) for information 
-about using these scripts.
+For information about using these scripts, see 
+[Controlling User Access](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p1nee94eh0x1ymn1blz03g48jz2y.htm) 
+in the SAS Viya Administration Help Center.
 
