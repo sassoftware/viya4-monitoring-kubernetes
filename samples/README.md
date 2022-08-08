@@ -18,10 +18,10 @@ each deployment file.
 
 You customize your logging deployment by specifying values in `user.env` and
 `*.yaml` files. These files are stored in a local directory outside of your
-repository that is identified by the `USER_DIR` environment variable. See the
-[monitoring README](../monitoring/README.md#mon_custom) or the
-[logging README](../logging/README.md#log_custom) for information about the
-customization process.
+repository that is identified by the `USER_DIR` environment variable. 
+For information about the customization process, see the
+[monitoring README](../monitoring/README.md#mon_custom) or 
+[Pre-deployment for Logging](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p1j31coiuoun6mn1om73shkcq4ut.htm) in the SAS Viya Administration Help Center.
 
 The customization files in each sample provide a starting point for the
 customization files for a deployment that supports a specific situation.

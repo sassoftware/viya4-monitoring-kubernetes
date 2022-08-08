@@ -44,31 +44,11 @@ for more information about using the monitoring components.
 
 ## Logging - Aggregation, Searching, & Filtering
 
-The logging solution includes these components and your right to use each such component is governed by its applicable open source license:
-
-- [Fluent Bit](https://fluentbit.io/)
-  - Custom Fluent Bit parsers
-- [OpenSearch](https://opensearch.org/docs/latest/opensearch/index/)
-  - Custom index pattern for logs
-  - Namespace separation
-  - [Elasticsearch Exporter](https://github.com/helm/charts/tree/master/stable/elasticsearch-exporter)
-- [OpenSearch Dashboards](https://opensearch.org/docs/latest/dashboards/index/)
-  - Custom dashboards for OpenSearch Dashboards
-
   This is an example of OpenSearch Dashboards displaying log message volumes.
 
   ![OpenSearch Dashboards - Log Message Volume Dashboard](img/screenshot-logs-dashboard.png)
 
-See the documentation at [SAS Viya: Logging](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=titlepage.htm)
-for more information about using the logging components.
-
-## Prerequisites
-
-- A Kubernetes cluster that meets the prerequisites for SAS Viya 4
-- [Helm](https://helm.sh) version 3.x
-- `kubectl` version 1.21+ with cluster-admin access
-- [Git](https://git-scm.com/) version 1.8 or later
-- [Bash](https://www.gnu.org/software/bash/)
+For information about the application components deployed by the log-monitoring solution, the prerequisites, and more, see [Getting Started](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p069v6xx0f500zn12n18vel967w3.htm) in the SAS Viya Administration Help Center.
 
 ## Installation
 
@@ -80,8 +60,8 @@ metric exporters, service monitors, and custom dashboards.
 
 ### Logging
 
-See the [logging README](logging/README.md) to deploy the logging components,
-including Fluent Bit, OpenSearch, and OpenSearch Dashboards.
+See the documentation at [SAS Viya: Logging](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=titlepage.htm)
+for information about deployment.
 
 ## Customization
 
@@ -101,7 +81,7 @@ Samples are provided for several common deployment scenarios. Each sample
 includes detailed information about the customization process and values for
 the scenario.
 
-See the [monitoring README](monitoring/README.md) and [logging README](logging/README.md)
+See the [monitoring README](monitoring/README.md) and [SAS Viya: Logging](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=titlepage.htm)
 for detailed information about the customization process and about determining
 valid customization values. See the README file for each [sample](samples/README.md)
 for detailed information about customization for each deployment scenario.

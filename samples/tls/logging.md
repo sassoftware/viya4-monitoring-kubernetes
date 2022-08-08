@@ -1,49 +1,17 @@
 # Sample - TLS Enablement for Logging
 
+**Note:** Before using this sample, be sure to read 
+[Understanding How Transport Layer Security (TLS) Is Used by SAS Viya Monitoring for Kubernetes](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p1lpu39g0ynczrn1jmcz4p49x1w6.htm) 
+in the SAS Viya Administration Help Center. 
+
 ## Overview
 
-You can enable Transport Layer Security (TLS) to secure two types of 
-communications traffic used by the log monitoring components:
-
-- TLS for in-cluster communications
-- TLS for communications into the cluster
-
-**TLS for in-cluster communications** is communication between log-monitoring 
-components within the cluster. The communication can be between the 
-Elasticsearch nodes or between Elasticsearch and other logging components. 
-TLS must be enabled on these connections.
-
-In-cluster communications must always take place through TLS-enabled
-connections. TLS for in-cluster communications is configured by using either 
-of the following processes:
-
-- automatic configuration by using cert-manager to generate certificates
-- manual configuration by generating certificates
-
-See [Notes_on_using_TLS](../../../logging/Notes_on_using_TLS.md)
-for information about configuring TLS for in-cluster communications.
-
-**TLS for communications into the cluster** is communication between Ingress 
-or a user's browser (if NodePorts are used) and Kibana. TLS is optional on 
-these connections, although enabling TLS is a best practice.
-
 This sample demonstrates how to enable TLS for communication into the
-cluster by deploying logging with TLS enabled for connections between the
-user and Kibana. The `TLS_ENABLE` environment variable controls whether
-connections to Kibana use TLS.
+cluster. It does so by deploying log-monitoring with TLS enabled for connections between the
+user and OpenSearch Dashboards. The `TLS_ENABLE` environment variable controls whether
+connections to OpenSearch Dashboards use TLS.
 
-## Using This Sample
-
-Customize your logging deployment by specifying values in the `user.env` and
-`*.yaml` files. These files are stored in a local directory outside of your
-repository. The local directory is identified by the `USER_DIR` environment 
-variable. See the
-[logging README](../../../logging/README.md#log_custom) for information about 
-the customization process.
-
-The customization files in this sample provide a starting point for the
-customization files required for a deployment that supports logging with TLS 
-enabled.
+## About This Sample
 
 There are two versions of this sample:
 
@@ -60,6 +28,15 @@ application name is part of the host name itself (for example,
 - appended as a path on the URL
 (for example, `https://host.cluster.example.com/kibana`).
 
+## Using This Sample
+
+For information about the customization process, see 
+[Pre-deployment](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p1j31coiuoun6mn1om73shkcq4ut.htm) in the SAS Viya Administration Help Center.
+
+The customization files in this sample provide a starting point for the
+customization files required for a deployment that supports logging with TLS 
+enabled.
+
 In order to use the values in this sample in the customization files for your 
 deployment, complete the following steps:
 
@@ -70,73 +47,27 @@ or `path-based-ingress` subdirectories to your local customization directory
 with the host name that is used in your environment.
 3. (Optional) Modify the files further as needed.
 
-After you finish modifying the customization files, deploy monitoring by using the 
-standard deployment script:
+After you finish modifying the customization files, deploy log monitoring. See 
+[Deploy](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p0288u3wuftagyn1x1965tatn4zu.htm) in the SAS Viya Administration Help Center.
 
-<pre>
-<i>repository_path</i>/logging/bin/deploy_logging_open.sh
-</pre>
-where *repository_path* is the path that is used for your repository.
+## Specifying TLS for Connections to OpenSearch Dashboards
 
-## Specifying TLS for Connections to Kibana
-
-Specify `TLS_ENABLE=true` in the `user.env` file to require TLS for connections
-to Kibana. When connections to Elasticsearch are enabled, TLS is always used 
-regardless of the value of `TLS_ENABLE`.
+See [Enable HTTPS Connections to OpenSearch Dashboards](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p1lpu39g0ynczrn1jmcz4p49x1w6.htm#p1u9i94g6fcmusn1n8284qegjtow) 
+in the SAS Viya Administration Help Center.
 
 If you specify `TLS_ENABLE=true`, the `kibana-tls-secret` Kubernetes secret
-must be present. By default, the `deploy_logging_open.sh` deployment script
-automatically obtains the certificates from cert-manager and creates the
+must be present. By default, the deployment script
+automatically obtains the certificates from OpenSSL and creates the
 `kibana-tls-secret` secret.
+For more information, see
+[Configure TLS Using Deployment-Generated Certificates](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p1lpu39g0ynczrn1jmcz4p49x1w6.htm#n0dung19iw8t9un17qsxhqkwclzp) 
+in the SAS Viya Administration Help Center.
 
-See [Notes_on_using_TLS](../../../logging/Notes_on_using_TLS.md) for
-information about creating this secret manually.
+For information about creating this secret manually, see
+[Create Kubernetes Secrets Using Your Own Certificates](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p1lpu39g0ynczrn1jmcz4p49x1w6.htm#p1dvch59jjskz8n0zvfpw4q81tq7) 
+in the SAS Viya Administration Help Center.
 
 ## Specifying TLS for Ingress
 
-If you are using ingress and want to enable TLS on communications into the 
-cluster, you must manually create the following two Kubernetes secrets:
-
-- `elasticsearch-ingress-tls-secret`
-- `kibana-ingress-tls-secret`
-
-**Note:** The process of generating the TLS certificates for these secrets is 
-outside the scope for this example.
-
-1. After you have obtained the TLS certificates for each secret, use the 
-following command to generate the secrets. You must run the command for each 
-secret name.
-
-<pre>
-kubectl create secret tls <i>secret_name</i> --namespace <i>namespace</i> --key=<i>cert_key_file</i> --cert=<i>cert_file</i>
-</pre>
-
-  where:
-
-- *secret_name* is the one of the following values:
-  - The first time use `elasticsearch-ingress-tls-secret`.
-  - The second time use `kibana-ingress-tls-secret`.
-- *namespace* is the value `logging` by default. If you deployed the logging 
-  components into a namespace with a different name, use that value instead.
-- *cert_key_file* is the TLS certificate key file associated with the secret name. 
-  Be sure to use the correct .key file in each instance of this command.
-- *cert_file* is the TLS certificate file associated with the secret name. 
-  Be sure to use the correct .crt file in each instance of this command.
-
-2. In your local copy of the file
-`$USER_DIR\logging\user-values-elasticsearch-open.yaml`, update the 
-values `kibana.logging.host.cluster.example.com` and `
-elasticsearch.logging.host.cluster.example.com` in the following ways:
-
-   - change the namespace to the namespace into which you have deployed the log-monitoring components
-   - change the host to the correct ingress host information
-
-    For example, if you deploy the log-monitoring components into the namespace 
-    `mymonitoring` and the ingress host is `myhost.example.com`, use the values of 
-    `kibana.mymonitoring.myhost.example.com` and 
-    `elasticsearch.mymonitoring.myhost.example.com`.
-
-3. If you are using an ingress controller other than NGINX, modify the
-annotation `nginx.ingress.kubernetes.io/backend-protocol: HTTPS` as needed in
-the `user-values-elasticsearch-open.yaml` file. Refer to the documentation for
-your ingress controller.
+See [Enable TLS for Ingress](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p1lpu39g0ynczrn1jmcz4p49x1w6.htm#n05lzm6u60rczwn14kzduswmcggl) 
+in the SAS Viya Administration Help Center.
