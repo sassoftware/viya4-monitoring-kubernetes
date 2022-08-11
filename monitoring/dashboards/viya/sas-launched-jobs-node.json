@@ -3,10 +3,7 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": {
-          "type": "datasource",
-          "uid": "grafana"
-        },
+        "datasource": "-- Grafana --",
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -23,17 +20,16 @@
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
+  "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1660157399432,
+  "id": 94,
+  "iteration": 1637607145730,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "collapsed": false,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -42,22 +38,12 @@
       },
       "id": 20,
       "panels": [],
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A"
-        }
-      ],
       "title": "Current Active Totals",
       "type": "row"
     },
     {
-      "datasource": {
-        "uid": "$datasource"
-      },
+      "cacheTimeout": null,
+      "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
           "decimals": 2,
@@ -99,12 +85,9 @@
         "text": {},
         "textMode": "value_and_name"
       },
-      "pluginVersion": "9.0.3",
+      "pluginVersion": "8.2.1",
       "targets": [
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
           "exemplar": true,
           "expr": "sum(:sas_launcher_pod_cpu_core_usage:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}) or vector(0)",
           "instant": false,
@@ -114,13 +97,14 @@
           "refId": "B"
         }
       ],
+      "timeFrom": null,
+      "timeShift": null,
       "transparent": true,
       "type": "stat"
     },
     {
-      "datasource": {
-        "uid": "$datasource"
-      },
+      "cacheTimeout": null,
+      "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
           "decimals": 2,
@@ -172,12 +156,9 @@
         "text": {},
         "textMode": "value_and_name"
       },
-      "pluginVersion": "9.0.3",
+      "pluginVersion": "8.2.1",
       "targets": [
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
           "exemplar": true,
           "expr": "sum(:sas_launcher_pod_mem_working_set_bytes:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}) or vector(0)",
           "instant": false,
@@ -187,13 +168,14 @@
           "refId": "A"
         }
       ],
+      "timeFrom": null,
+      "timeShift": null,
       "transparent": true,
       "type": "stat"
     },
     {
-      "datasource": {
-        "uid": "$datasource"
-      },
+      "cacheTimeout": null,
+      "datasource": "$datasource",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -261,12 +243,9 @@
         "text": {},
         "textMode": "value_and_name"
       },
-      "pluginVersion": "9.0.3",
+      "pluginVersion": "8.2.1",
       "targets": [
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
           "exemplar": true,
           "expr": "sum(:sas_launcher_pod_status:{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\",phase=~\"Pending\"}) or vector(0)",
           "instant": false,
@@ -276,13 +255,14 @@
           "refId": "A"
         }
       ],
+      "timeFrom": null,
+      "timeShift": null,
       "transparent": true,
       "type": "stat"
     },
     {
-      "datasource": {
-        "uid": "$datasource"
-      },
+      "cacheTimeout": null,
+      "datasource": "$datasource",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -350,12 +330,9 @@
         "text": {},
         "textMode": "value_and_name"
       },
-      "pluginVersion": "9.0.3",
+      "pluginVersion": "8.2.1",
       "targets": [
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
           "expr": "sum(:sas_launcher_pod_status:{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\", phase=~\"Running\"}) or vector(0)",
           "instant": false,
           "interval": "",
@@ -363,13 +340,14 @@
           "refId": "A"
         }
       ],
+      "timeFrom": null,
+      "timeShift": null,
       "transparent": true,
       "type": "stat"
     },
     {
-      "datasource": {
-        "uid": "$datasource"
-      },
+      "cacheTimeout": null,
+      "datasource": "$datasource",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -422,12 +400,9 @@
         "text": {},
         "textMode": "value_and_name"
       },
-      "pluginVersion": "9.0.3",
+      "pluginVersion": "8.2.1",
       "targets": [
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
           "exemplar": true,
           "expr": "sum(rate(:sas_launcher_pod_net_transmit_bytes_total:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}[1m])) + sum(rate(:sas_launcher_pod_net_receive_bytes_total:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}[1m])) or vector(0)",
           "instant": false,
@@ -437,13 +412,14 @@
           "refId": "A"
         }
       ],
+      "timeFrom": null,
+      "timeShift": null,
       "transparent": true,
       "type": "stat"
     },
     {
-      "datasource": {
-        "uid": "$datasource"
-      },
+      "cacheTimeout": null,
+      "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
           "decimals": 2,
@@ -495,12 +471,9 @@
         "text": {},
         "textMode": "value_and_name"
       },
-      "pluginVersion": "9.0.3",
+      "pluginVersion": "8.2.1",
       "targets": [
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
           "exemplar": true,
           "expr": "sum(rate(:sas_launcher_pod_fs_read_bytes_total:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}[1m])) + sum(rate(:sas_launcher_pod_fs_write_bytes_total:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}[1m])) or vector(0)",
           "instant": false,
@@ -510,13 +483,14 @@
           "refId": "A"
         }
       ],
+      "timeFrom": null,
+      "timeShift": null,
       "transparent": true,
       "type": "stat"
     },
     {
-      "datasource": {
-        "uid": "$datasource"
-      },
+      "cacheTimeout": null,
+      "datasource": "$datasource",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -548,8 +522,6 @@
       "links": [],
       "options": {
         "displayMode": "basic",
-        "minVizHeight": 10,
-        "minVizWidth": 0,
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -561,12 +533,9 @@
         "showUnfilled": true,
         "text": {}
       },
-      "pluginVersion": "9.0.3",
+      "pluginVersion": "8.2.1",
       "targets": [
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
           "expr": "sort_desc(count(:sas_launcher_pod_status:{namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\",phase=~\"Pending|Running\"}) by (node))",
           "hide": false,
           "instant": true,
@@ -575,6 +544,8 @@
           "refId": "A"
         }
       ],
+      "timeFrom": null,
+      "timeShift": null,
       "title": "Workload Distribution by Node",
       "transformations": [],
       "transparent": true,
@@ -582,10 +553,7 @@
     },
     {
       "collapsed": false,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -594,15 +562,6 @@
       },
       "id": 27,
       "panels": [],
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A"
-        }
-      ],
       "title": "Activity by Node",
       "type": "row"
     },
@@ -611,9 +570,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-        "uid": "$datasource"
-      },
+      "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
           "links": []
@@ -650,7 +607,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.0.3",
+      "pluginVersion": "8.2.1",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -660,9 +617,6 @@
       "steppedLine": false,
       "targets": [
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
           "exemplar": true,
           "expr": "sum(:sas_launcher_pod_cpu_core_usage:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}) by (node)",
           "interval": "",
@@ -672,7 +626,9 @@
         }
       ],
       "thresholds": [],
+      "timeFrom": null,
       "timeRegions": [],
+      "timeShift": null,
       "title": "CPU Usage by Node",
       "tooltip": {
         "shared": true,
@@ -682,25 +638,34 @@
       "transparent": true,
       "type": "graph",
       "xaxis": {
+        "buckets": null,
         "mode": "time",
+        "name": null,
         "show": true,
         "values": []
       },
       "yaxes": [
         {
+          "decimals": null,
           "format": "short",
           "label": "Cores",
           "logBase": 1,
+          "max": null,
+          "min": null,
           "show": true
         },
         {
           "format": "short",
+          "label": null,
           "logBase": 1,
+          "max": null,
+          "min": null,
           "show": false
         }
       ],
       "yaxis": {
-        "align": false
+        "align": false,
+        "alignLevel": null
       }
     },
     {
@@ -708,9 +673,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-        "uid": "$datasource"
-      },
+      "datasource": "$datasource",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -746,7 +709,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.0.3",
+      "pluginVersion": "8.2.1",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -756,9 +719,6 @@
       "steppedLine": false,
       "targets": [
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
           "exemplar": true,
           "expr": "sum(:sas_launcher_pod_mem_working_set_bytes:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}) by (node)",
           "interval": "",
@@ -768,7 +728,9 @@
         }
       ],
       "thresholds": [],
+      "timeFrom": null,
       "timeRegions": [],
+      "timeShift": null,
       "title": "Memory Usage by Node",
       "tooltip": {
         "shared": true,
@@ -778,24 +740,33 @@
       "transparent": true,
       "type": "graph",
       "xaxis": {
+        "buckets": null,
         "mode": "time",
+        "name": null,
         "show": true,
         "values": []
       },
       "yaxes": [
         {
           "format": "bytes",
+          "label": null,
           "logBase": 1,
+          "max": null,
+          "min": null,
           "show": true
         },
         {
           "format": "bytes",
+          "label": null,
           "logBase": 1,
+          "max": null,
+          "min": null,
           "show": false
         }
       ],
       "yaxis": {
-        "align": false
+        "align": false,
+        "alignLevel": null
       }
     },
     {
@@ -803,9 +774,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-        "uid": "$datasource"
-      },
+      "datasource": "$datasource",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -853,9 +822,6 @@
       "steppedLine": false,
       "targets": [
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
           "exemplar": true,
           "expr": "sum(rate(:sas_launcher_pod_fs_read_bytes_total:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}[1m])) by (node)",
           "hide": false,
@@ -865,9 +831,6 @@
           "refId": "C"
         },
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
           "exemplar": true,
           "expr": "-sum(rate(:sas_launcher_pod_fs_write_bytes_total:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}[1m])) by (node)",
           "hide": false,
@@ -878,7 +841,9 @@
         }
       ],
       "thresholds": [],
+      "timeFrom": null,
       "timeRegions": [],
+      "timeShift": null,
       "title": "Filesystem I/O by Node",
       "tooltip": {
         "shared": true,
@@ -888,25 +853,34 @@
       "transparent": true,
       "type": "graph",
       "xaxis": {
+        "buckets": null,
         "mode": "time",
+        "name": null,
         "show": true,
         "values": []
       },
       "yaxes": [
         {
+          "decimals": null,
           "format": "Bps",
           "label": "",
           "logBase": 1,
+          "max": null,
+          "min": null,
           "show": true
         },
         {
           "format": "short",
+          "label": null,
           "logBase": 1,
+          "max": null,
+          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false
+        "align": false,
+        "alignLevel": null
       }
     },
     {
@@ -914,9 +888,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-        "uid": "$datasource"
-      },
+      "datasource": "$datasource",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -964,9 +936,6 @@
       "steppedLine": false,
       "targets": [
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
           "exemplar": true,
           "expr": "sum(rate(:sas_launcher_pod_net_receive_bytes_total:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}[1m])) by (node)",
           "interval": "",
@@ -975,9 +944,6 @@
           "refId": "C"
         },
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
           "exemplar": true,
           "expr": "-sum(rate(:sas_launcher_pod_net_transmit_bytes_total:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}[1m])) by (node)",
           "interval": "",
@@ -987,7 +953,9 @@
         }
       ],
       "thresholds": [],
+      "timeFrom": null,
       "timeRegions": [],
+      "timeShift": null,
       "title": "Network I/O by Node",
       "tooltip": {
         "shared": true,
@@ -997,7 +965,9 @@
       "transparent": true,
       "type": "graph",
       "xaxis": {
+        "buckets": null,
         "mode": "time",
+        "name": null,
         "show": true,
         "values": []
       },
@@ -1007,24 +977,27 @@
           "format": "Bps",
           "label": "",
           "logBase": 1,
+          "max": null,
+          "min": null,
           "show": true
         },
         {
           "format": "short",
+          "label": null,
           "logBase": 1,
+          "max": null,
+          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false
+        "align": false,
+        "alignLevel": null
       }
     },
     {
       "collapsed": true,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1034,19 +1007,20 @@
       "id": 29,
       "panels": [
         {
-          "datasource": {
-            "uid": "$datasource"
-          },
+          "datasource": "$datasource",
           "fieldConfig": {
             "defaults": {
-              "custom": {},
+              "custom": {
+                "align": null
+              },
               "decimals": 2,
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   }
                 ]
               }
@@ -1136,7 +1110,8 @@
                       "mode": "absolute",
                       "steps": [
                         {
-                          "color": "green"
+                          "color": "green",
+                          "value": null
                         },
                         {
                           "color": "yellow",
@@ -1171,7 +1146,8 @@
                       "mode": "absolute",
                       "steps": [
                         {
-                          "color": "green"
+                          "color": "green",
+                          "value": null
                         },
                         {
                           "color": "yellow",
@@ -1344,9 +1320,6 @@
           "pluginVersion": "7.1.5",
           "targets": [
             {
-              "datasource": {
-                "uid": "$datasource"
-              },
               "expr": ":sas_launcher_pod_cpu_core_usage:{phase=~\"Pending|Running\",namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}",
               "format": "table",
               "hide": false,
@@ -1356,9 +1329,6 @@
               "refId": "A"
             },
             {
-              "datasource": {
-                "uid": "$datasource"
-              },
               "expr": ":sas_launcher_pod_mem_working_set_bytes:{phase=~\"Pending|Running\",namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}",
               "format": "table",
               "hide": false,
@@ -1368,9 +1338,6 @@
               "refId": "B"
             },
             {
-              "datasource": {
-                "uid": "$datasource"
-              },
               "expr": "sum(:sas_launcher_pod_cpu_core_usage:{phase=~\"Pending|Running\",namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}) by (pod,namespace) / sum(kube_pod_container_resource_limits{resource=\"cpu\",namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}) by (pod,namespace)",
               "format": "table",
               "hide": false,
@@ -1380,9 +1347,6 @@
               "refId": "C"
             },
             {
-              "datasource": {
-                "uid": "$datasource"
-              },
               "expr": "sum(:sas_launcher_pod_mem_working_set_bytes:{phase=~\"Pending|Running\",namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}) by (pod,namespace) / sum(kube_pod_container_resource_limits{resource=\"memory\",namespace=~\"$namespace\",label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\",queue_name=~\"$queue\"}) by (pod,namespace)",
               "format": "table",
               "hide": false,
@@ -1392,6 +1356,8 @@
               "refId": "D"
             }
           ],
+          "timeFrom": null,
+          "timeShift": null,
           "title": "Active Jobs",
           "transformations": [
             {
@@ -1439,21 +1405,12 @@
           "type": "table"
         }
       ],
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "A"
-        }
-      ],
       "title": "Active Job Details",
       "type": "row"
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 36,
+  "schemaVersion": 31,
   "style": "dark",
   "tags": [
     "sas-viya"
@@ -1466,6 +1423,8 @@
           "text": "Prometheus",
           "value": "Prometheus"
         },
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": "Datasource",
@@ -1480,6 +1439,7 @@
         "type": "datasource"
       },
       {
+        "allValue": null,
         "current": {
           "selected": true,
           "text": [
@@ -1489,11 +1449,10 @@
             "$__all"
           ]
         },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "$datasource"
-        },
+        "datasource": "$datasource",
         "definition": "label_values(:sas_launcher_pod_info:,namespace)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Namespace",
@@ -1524,6 +1483,8 @@
             "$__all"
           ]
         },
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Job Type",
@@ -1557,6 +1518,7 @@
         "type": "custom"
       },
       {
+        "allValue": null,
         "current": {
           "selected": true,
           "text": [
@@ -1566,11 +1528,10 @@
             "$__all"
           ]
         },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "$datasource"
-        },
+        "datasource": "$datasource",
         "definition": "label_values(:sas_launcher_pod_info:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\"},node)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Node",
@@ -1601,11 +1562,10 @@
             "$__all"
           ]
         },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "$datasource"
-        },
+        "datasource": "$datasource",
         "definition": "label_values(:sas_launcher_pod_info:{node=~\"$node\",namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\"}, label_launcher_sas_com_username)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "User",
@@ -1626,6 +1586,7 @@
         "useTags": false
       },
       {
+        "allValue": null,
         "current": {
           "selected": true,
           "text": [
@@ -1635,11 +1596,10 @@
             "$__all"
           ]
         },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+        "datasource": null,
         "definition": "label_values(:sas_launcher_pod_info:{node=~\"$node\",namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\"}, job_name)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Job",
@@ -1670,11 +1630,10 @@
             "$__all"
           ]
         },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+        "datasource": null,
         "definition": "label_values(:sas_launcher_pod_info:{node=~\"$node\",namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\"}, queue_name)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": "Queue",
@@ -1716,6 +1675,6 @@
   "timezone": "",
   "title": "SAS Launched Jobs - Node Activity",
   "uid": "aBDyaKNGk",
-  "version": 1,
-  "weekStart": ""
+  "version": 7
 }
+
