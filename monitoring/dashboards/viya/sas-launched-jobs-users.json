@@ -1420,7 +1420,8 @@
   "schemaVersion": 31,
   "style": "dark",
   "tags": [
-    "sas-viya"
+    "sas-viya",
+    "sas-workload-orchestrator"
   ],
   "templating": {
     "list": [
