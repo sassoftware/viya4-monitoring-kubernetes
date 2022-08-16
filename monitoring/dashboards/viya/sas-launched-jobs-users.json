@@ -1419,7 +1419,10 @@
   "refresh": "10s",
   "schemaVersion": 31,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "sas-viya",
+    "sas-workload-orchestrator"
+  ],
   "templating": {
     "list": [
       {
