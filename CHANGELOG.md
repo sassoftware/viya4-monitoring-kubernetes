@@ -1,5 +1,19 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.2.2 (16AUG22)
+
+* **Overall**
+  * [CHANGE] - The 'master' branch of the project repository was renamed to "main".
+
+* **Metrics**
+  * [CHANGE] - Added 'sas-viya' and 'sas-workload-orchestrator' tags to the two SAS Launched Jobs dashboards in Grafana.
+  * [CHANGE] - Support for tenant-level metric monitoring (specifically, deploying tenant-level instances of Prometheus and Grafana) has been moved to "experimental" status. This reflects concerns about its architecture, scalability and supportability.
+
+* **Logging**
+  * [CHANGE] - The documentation about log monitoring has been extensively revised and relocated to the [SAS Viya Administration Help Center](http://documentation.sas.com/doc/en/sasadmincdc/default/callogging/titlepage.htm). The affected markdown-based documentation files stored in this repository have been updated to point to the new documentation location.
+  * [FIX] - OpenSearch tenant-level indexes with apparently missing tenant information (i.e. index names fitting the pattern "viya_logs-myviya-____-2022-07-23") were being created rather than storing some log messages in namespace-level indexes.
+  * [FIX] - A change in the container name used by SAS CAS Server resulted in some log messages not being stored in the right OpenSearch index.
+
 ## Version 1.2.1 (19JUL22)
 
 * **Monitoring**
@@ -8,8 +22,8 @@
   * [FIX] - Fixed a bug where the Viya monitoring deployment script would not remove older, v4m-viya Helm chart.
 
 * **Logging**
-  * [CHANGE] The es_nodeport_enable.sh and es_nodeport_disable.sh scripts used to enable and disable access to OpenSearch via NodePort, respectively, have been replaced with bin/configure_nodeport.sh which includes additional functionality.  See [Configure Access Via NodePorts](http://documentation.sas.com/doc/en/sasadmincdc/default/callogging/n0l4k3bz39cw2dn131zcbat7m4r1.htm).
-  * [CHANGE] Completed various clean-up tasks and tweaks related to the move to OpenSearch.  The order in which the log monitoring components are deployed has been modified to reduce start-up time and increase reliability.  Logic related to creating access controls has been moved to deploy_opensearch_content.sh (rather than deploy_osd_content.sh).  Message text has been revised to eliminate references to Elasticsearch and Kibana, replacing them (as appropriate) with references to OpenSearch and OpenSearch Dashboards (respectively).
+  * [CHANGE] - The es_nodeport_enable.sh and es_nodeport_disable.sh scripts used to enable and disable access to OpenSearch via NodePort, respectively, have been replaced with bin/configure_nodeport.sh which includes additional functionality.  See [Configure Access Via NodePorts](http://documentation.sas.com/doc/en/sasadmincdc/default/callogging/n0l4k3bz39cw2dn131zcbat7m4r1.htm).
+  * [CHANGE] - Completed various clean-up tasks and tweaks related to the move to OpenSearch.  The order in which the log monitoring components are deployed has been modified to reduce start-up time and increase reliability.  Logic related to creating access controls has been moved to deploy_opensearch_content.sh (rather than deploy_osd_content.sh).  Message text has been revised to eliminate references to Elasticsearch and Kibana, replacing them (as appropriate) with references to OpenSearch and OpenSearch Dashboards (respectively).
 
 ## Version 1.2.0 (14JUN22)
 
