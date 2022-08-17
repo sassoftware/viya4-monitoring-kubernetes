@@ -53,7 +53,7 @@ spec:
     - --key=/cert/tls.key
     - --cert=/cert/tls.crt
     - --disable-authentication
-    # image: squareup/ghostunnel:v1.5.2
+    image: squareup/ghostunnel:v1.5.2
     imagePullPolicy: IfNotPresent
     ports:
     - name: https
