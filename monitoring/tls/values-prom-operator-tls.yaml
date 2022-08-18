@@ -11,7 +11,7 @@ prometheus:
         - --key=/cert/tls.key
         - --cert=/cert/tls.crt
         - --disable-authentication
-        image: squareup/ghostunnel:v1.6.1
+        image: ghostunnel/ghostunnel:v1.6.1
         imagePullPolicy: IfNotPresent
         ports:
         - name: https
@@ -58,7 +58,7 @@ prometheus:
 #         - --key=cert/tls.key
 #         - --cert=cert/tls.crt
 #         - --disable-authentication
-#         image: squareup/ghostunnel:v1.6.1
+#         image: ghostunnel/ghostunnel:v1.6.1
 #         imagePullPolicy: IfNotPresent
 #         ports:
 #         - containerPort: 443 
@@ -115,7 +115,7 @@ grafana:
       - --key=/cert/tls.key
       - --cert=/cert/tls.crt
       - --disable-authentication
-      image: squareup/ghostunnel:v1.6.1
+      image: ghostunnel/ghostunnel:v1.6.1
       imagePullPolicy: IfNotPresent
       ports:
       - name: https
