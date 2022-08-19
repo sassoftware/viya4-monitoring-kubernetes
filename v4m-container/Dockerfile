@@ -29,6 +29,7 @@ WORKDIR $V4M_PATH
 COPY kubeconfig/* /opt/v4m/.kube/
 COPY user_dir/* /opt/v4m/user_dir/
 
+RUN chmod 600 ${KUBECONFIG}
 ENV USER_DIR=/opt/v4m/user_dir
 ENV TERM=xterm-256color
 
@@ -69,6 +70,11 @@ RUN mkdir oc; \
 	mv oc $V4M_PATH/bin/; \
 	cd ..; \
 	rm -rf oc/
+
+# OpenSSL
+RUN apk upgrade --update-cache --available && \
+    apk add openssl && \
+    rm -rf /var/cache/apk/*
 
 # viya4-monitoring-kubernetes
 RUN git clone https://github.com/sassoftware/viya4-monitoring-kubernetes; \
