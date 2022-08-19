@@ -46,6 +46,7 @@ RUN set -eux; \
 		yq \
 		openssh \
 		procps \
+		openssl \
 	;
 
 # kubectl
@@ -70,11 +71,6 @@ RUN mkdir oc; \
 	mv oc $V4M_PATH/bin/; \
 	cd ..; \
 	rm -rf oc/
-
-# OpenSSL
-RUN apk upgrade --update-cache --available && \
-    apk add openssl && \
-    rm -rf /var/cache/apk/*
 
 # viya4-monitoring-kubernetes
 RUN git clone https://github.com/sassoftware/viya4-monitoring-kubernetes; \
