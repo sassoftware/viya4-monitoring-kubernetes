@@ -45,8 +45,6 @@ export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD}
 # Create secrets containing internal user credentials
 create_user_secret internal-user-kibanaserver kibanaserver "$ES_KIBANASERVER_PASSWD"  managed-by=v4m-es-script
 
-#cert_generator="${CERT_GENERATOR:-openssl}"
-
 # Verify cert generator is available (if necessary)
 if verify_cert_generator $LOG_NS kibana; then
   log_debug "cert generator check OK [$cert_generator_ok]"
@@ -57,11 +55,6 @@ fi
 
 # Create/Get necessary TLS certs
 create_tls_certs $LOG_NS logging kibana
-
-
-# Need to retrieve these from secrets in case secrets pre-existed
-export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
-export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
 
 
 # enable debug on Helm via env var
@@ -127,7 +120,6 @@ else
   wnpValuesFile="$TMP_DIR/empty.yaml"
 fi
 
-#11FEB22 TODO: OpenShift
 OSD_PATH_INGRESS_YAML=$TMP_DIR/empty.yaml
 if [ "$OPENSHIFT_CLUSTER:$OPENSHIFT_PATH_ROUTES" == "true:true" ]; then
     OSD_PATH_INGRESS_YAML=logging/openshift/values-osd-path-route-openshift.yaml
