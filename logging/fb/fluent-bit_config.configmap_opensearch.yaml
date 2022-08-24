@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.18
+       Set  fb_configMap_version 0.2.19_test
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -944,8 +944,8 @@ data:
        DB.locking       On
        storage.type     filesystem
     [OUTPUT]
-       Name  es
-       Alias eslogs
+       Name  opensearch
+       Alias opensearch_logs
        Match kube.*
        Host  ${SEARCH_SERVICENAME}
        Port  9200
@@ -953,7 +953,7 @@ data:
        Logstash_Format On
        Retry_Limit 5
        Suppress_Type_Name On
-       Workers 1
+       Workers 2
        Time_Key @timestamp
        Generate_ID  On
        Replace_Dots On
@@ -965,11 +965,11 @@ data:
        tls.verify  off
     [OUTPUT]
        #
-       # NOTE: This ES OUTPUT filter _only_ applies to the **METALOGGING** messages
+       # NOTE: This OPENSEARCH OUTPUT filter _only_ applies to the **METALOGGING** messages
        #       A separate instance of this filter exists for the **LOGGING** messages
        #
-       Name  es
-       Alias esmeta
+       Name  opensearch
+       Alias opensearch_meta
        Match opsK.*
        Host  ${SEARCH_SERVICENAME}
        Port  9200
@@ -978,7 +978,7 @@ data:
        Retry_Limit 5
        Suppress_Type_Name On
        Time_Key @timestamp
-       Workers 1
+       Workers 2
        Replace_Dots On
        Logstash_Prefix viya_ops
        HTTP_User ${ES_LOGCOLLECTOR_USER}
