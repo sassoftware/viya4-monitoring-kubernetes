@@ -29,6 +29,7 @@ WORKDIR $V4M_PATH
 COPY kubeconfig/* /opt/v4m/.kube/
 COPY user_dir/* /opt/v4m/user_dir/
 
+RUN chmod 600 ${KUBECONFIG}
 ENV USER_DIR=/opt/v4m/user_dir
 ENV TERM=xterm-256color
 
@@ -45,6 +46,7 @@ RUN set -eux; \
 		yq \
 		openssh \
 		procps \
+		openssl \
 	;
 
 # kubectl
