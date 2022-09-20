@@ -4,8 +4,8 @@
 
 * **Overall**
   * [FEATURE] - The V4M container now includes OpenSSL so that you can run the deployment with TLS.
-  * [BUG] - Adjusted OpenSSL command that created an unnecssary file that caused issues if multiple users tried running the deployment scripts on the same machine.
   * [FEATURE] - [IMAGE_INVENTORY.md](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/IMAGE_INVENTORY.md) file now includes init containers that are used in the project.
+  * [FIX] - A temporary file created when using OpenSSL for TLS certificate generation is no longer left behind after certs are generated
 
 * **Metrics**
   * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 32.0.0 to 36.6.1
@@ -19,7 +19,6 @@
 * **Logging**
   * [UPGRADE] - Fluent Bit has been upgraded from version 1.8.7 to 1.9.6
   * [FIX] - Removed unnecessary retrieval of the OpenSearch 'admin' credentials from logging/bin/deploy_osd.sh
-  * [FIX] - A temporary file created when using OpenSSL for TLS certificate generation is no longer left behind after certs are generated
 
 ## Version 1.2.2 (16AUG22)
 
