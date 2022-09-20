@@ -1,5 +1,26 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.2.3 (20SEP22)
+
+* **Overall**
+  * [FEATURE] - The V4M container now includes OpenSSL so that you can run the deployment with TLS.
+  * [BUG] - Adjusted OpenSSL command that created an unnecssary file that caused issues if multiple users tried running the deployment scripts on the same machine.
+  * [FEATURE] - [IMAGE_INVENTORY.md](https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/master/IMAGE_INVENTORY.md) file now includes init containers that are used in the project.
+
+* **Metrics**
+  * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 32.0.0 to 36.6.1
+  * [UPGRADE] - Prometheus has been upgraded from version 2.33.1 to 2.36.2
+  * [UPGRADE] - Prometheus Operator has been upgraded from version 0.54.0 to 0.57.0
+  * [UPGRADE] - Grafana has been upgraded from version 8.4.1 to 9.0.3
+  * [UPGRADE] - AlertManager  has been upgraded from version to 0.24.0
+  * [UPGRADE] - Kube State Metrics has been upgraded from version 2.3.0 to 2.5.0
+  * [UPGRADE] - PushGateway has been upgraded from version 1.4.2 to 1.4.3
+
+* **Logging**
+  * [UPGRADE] - Fluent Bit has been upgraded from version 1.8.7 to 1.9.6
+  * [FIX] - Removed unnecessary retrieval of the OpenSearch 'admin' credentials from logging/bin/deploy_osd.sh
+  * [FIX] - A temporary file created when using OpenSSL for TLS certificate generation is no longer left behind after certs are generated
+
 ## Version 1.2.2 (16AUG22)
 
 * **Overall**
