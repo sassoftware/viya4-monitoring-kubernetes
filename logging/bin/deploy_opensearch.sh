@@ -38,7 +38,7 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
 fi
 
 # Get/Set Helm Chart Version
-OPENSEARCH_HELM_CHART_VERSION=${OPENSEARCH_HELM_CHART_VERSION:-"1.11.1"}
+OPENSEARCH_HELM_CHART_VERSION=${OPENSEARCH_HELM_CHART_VERSION:-"1.14.1"}
 
 # get credentials
 export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD}
