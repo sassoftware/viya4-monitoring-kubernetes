@@ -53,7 +53,7 @@
 
 # alertmanager:
 #   enabled:true
-#   alertManagerSpec:
+#   alertmanagerSpec:
 #     externalUrl: http://host.mycluster.example.com:31091
 #     storage:
 #       volumeClaimTemplate:
