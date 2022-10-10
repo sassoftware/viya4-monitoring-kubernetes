@@ -26,8 +26,8 @@ RUN mkdir -p $V4M_PATH/bin $V4M_PATH/.kube $V4M_PATH/user_dir
 WORKDIR $V4M_PATH
 
 # Copy contents from kubeconfig and user_dir to the container
-COPY kubeconfig/* /opt/v4m/.kube/
-COPY user_dir/* /opt/v4m/user_dir/
+COPY kubeconfig/ /opt/v4m/.kube/
+COPY user_dir/ /opt/v4m/user_dir/
 
 RUN chmod 600 ${KUBECONFIG}
 ENV USER_DIR=/opt/v4m/user_dir
