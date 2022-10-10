@@ -37,7 +37,7 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
 fi
 
 # Get/Set Helm Chart Version
-OSD_HELM_CHART_VERSION=${OSD_HELM_CHART_VERSION:-"1.5.1"}
+OSD_HELM_CHART_VERSION=${OSD_HELM_CHART_VERSION:-"1.8.3"}
 
 # get credentials
 export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD}
