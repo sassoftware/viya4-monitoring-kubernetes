@@ -73,13 +73,13 @@ if [ ! -f  $TMP_DIR/es-transport.pem ]; then
    log_debug "Extracting es-transport cert from secret"
    kubectl -n $LOG_NS get secret es-transport-tls-secret -o=jsonpath="{.data.tls\.crt}" |base64 --decode > $TMP_DIR/es-transport.pem
 fi
-node_dn=$(openssl x509 -subject -nameopt RFC2253 -noout -in $TMP_DIR/es-transport.pem | sed  "s/subject=\s*\(\S*\)/\1/" | sed -e 's/^[ \t]*//')
+node_dn=$(openssl x509 -subject -nameopt RFC2253 -noout -in $TMP_DIR/es-transport.pem | sed -e "s/subject=\s*\(\S*\)/\1/" -e 's/^[ \t]*//')
 
 if [ ! -f  $TMP_DIR/es-admin.pem ]; then
    log_debug "Extracting es-admin cert from secret"
    kubectl -n $LOG_NS get secret es-admin-tls-secret -o=jsonpath="{.data.tls\.crt}" |base64 --decode > $TMP_DIR/es-admin.pem
 fi
-admin_dn=$(openssl x509 -subject -nameopt RFC2253 -noout -in $TMP_DIR/es-admin.pem | sed  "s/subject=\s*\(\S*\)/\1/" | sed -e 's/^[ \t]*//')
+admin_dn=$(openssl x509 -subject -nameopt RFC2253 -noout -in $TMP_DIR/es-admin.pem | sed -e "s/subject=\s*\(\S*\)/\1/" -e 's/^[ \t]*//')
 
 log_debug "Subjects node_dn:[$node_dn] admin_dn:[$admin_dn]"
 
