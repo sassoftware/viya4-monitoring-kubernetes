@@ -7,7 +7,6 @@ FROM frolvlad/alpine-glibc:$ALPINE_TAG
 # Version of the Viya Monitoring for Kubernetes deployment to download to the container
 ARG V4M_TAG="stable"
 
-
 ARG OS=linux
 ARG ARCH=amd64
 
