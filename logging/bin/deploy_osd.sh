@@ -37,6 +37,10 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
 fi
 
 # Get/Set Helm Chart Version
+#12OCT22: Reverting back to OSD Helm Chart version 1.5.1 
+#         due to problem with Helm chart ver 1.8.3 which
+#         'matches' OSD version 1.3.5.  Problem involves
+#         ingress.path.backend.serverName resolution.
 OSD_HELM_CHART_VERSION=${OSD_HELM_CHART_VERSION:-"1.5.1"}
 
 # get credentials
