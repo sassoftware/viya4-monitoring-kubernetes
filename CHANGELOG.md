@@ -1,5 +1,19 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.2.4 (18OCT22)
+
+* **Overall**
+  * [CHANGE] Support for Kubernetes 1.21 has been dropped.
+  * [FIX] Updated the Dockerfile so that the subdirectories are preserved in the Docker container.
+
+* **Metrics**
+  * [FIX] Added Service Monitor definition to permit metric collection from OpenSearch instance within individual SAS Viya deployments.
+  * [FIX] Customizations in the user-values-prom-operator.yaml file under the alertmanagerSpec will now be applied correctly.
+
+* **Logging**
+  *  [UPGRADE] Opensearch and Opensearch Dashboards has been upgraded from 1.32 to 1.35
+  *  [UPGRADE] Elasticsearch Exporter has been upgraded from 1.2.1 to 1.5.0
+
 ## Version 1.2.3 (20SEP22)
 
 * **Overall**
