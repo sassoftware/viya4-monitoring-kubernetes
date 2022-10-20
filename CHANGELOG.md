@@ -1,5 +1,14 @@
 # SAS Viya Monitoring for Kubernetes
 
+## UNRELEASED
+
+* **Overall**
+
+* **Metrics**
+  * [DEPRECATION] NodePorts is now disabled by default for Prometheus and AlertManager for security reasons. Set the environment variable PROM_NODEPORT_ENABLE=true to replicate previous behavior. 
+
+* **Logging**
+
 ## Version 1.2.4 (18OCT22)
 
 * **Overall**
@@ -11,8 +20,8 @@
   * [FIX] Customizations in the user-values-prom-operator.yaml file under the alertmanagerSpec will now be applied correctly.
 
 * **Logging**
-  *  [UPGRADE] Opensearch and Opensearch Dashboards has been upgraded from 1.32 to 1.35
-  *  [UPGRADE] Elasticsearch Exporter has been upgraded from 1.2.1 to 1.5.0
+  * [UPGRADE] Opensearch and Opensearch Dashboards has been upgraded from 1.32 to 1.35
+  * [UPGRADE] Elasticsearch Exporter has been upgraded from 1.2.1 to 1.5.0
 
 ## Version 1.2.3 (20SEP22)
 
