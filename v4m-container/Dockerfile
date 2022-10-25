@@ -34,42 +34,42 @@ ENV TERM=xterm-256color
 
 # Download necessary executables
 RUN set -eux; \
-  apk add --no-cache \
-  bash \
-  coreutils \
-  ncurses \
-  curl \
-  git \
-  jq \
-  wget \
-  yq \
-  openssh \
-  procps \
-  openssl \
-  ;
+	apk add --no-cache \
+		bash \
+		coreutils \
+		ncurses \
+		curl \
+		git \
+		jq \
+		wget \
+		yq \
+		openssh \
+		procps \
+		openssl \
+	;
 
 # kubectl
 RUN wget https://storage.googleapis.com/kubernetes-release/release/$KUBECTL_VER/bin/$OS/$ARCH/kubectl; \
-  chmod +x ./kubectl; \
-  mv ./kubectl $V4M_PATH/bin/; \
-  mkdir -p $V4M_PATH/.kube;  \
-  touch /opt/v4m/.kube/config
+    chmod +x ./kubectl; \
+    mv ./kubectl $V4M_PATH/bin/; \
+	mkdir -p $V4M_PATH/.kube;  \
+	touch /opt/v4m/.kube/config
 
 # helm
 RUN	wget https://get.helm.sh/helm-$HELM_VER-$OS-$ARCH.tar.gz; \
-  tar -xvf helm-$HELM_VER-$OS-$ARCH.tar.gz; \
-  mv $OS-$ARCH/helm $V4M_PATH/bin/; \
-  rm -rf $OS-$ARCH; \
-  rm helm-$HELM_VER-$OS-$ARCH.tar.gz
+	tar -xvf helm-$HELM_VER-$OS-$ARCH.tar.gz; \
+	mv $OS-$ARCH/helm $V4M_PATH/bin/; \
+	rm -rf $OS-$ARCH; \
+	rm helm-$HELM_VER-$OS-$ARCH.tar.gz
 
 # oc
 RUN mkdir oc; \
-  cd oc; \
-  wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-${OC_VER}/openshift-client-${OS}.tar.gz; \
-  tar -xvf openshift-client-${OS}.tar.gz; \
-  mv oc $V4M_PATH/bin/; \
-  cd ..; \
-  rm -rf oc/
+    cd oc; \
+    wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-${OC_VER}/openshift-client-${OS}.tar.gz; \
+	tar -xvf openshift-client-${OS}.tar.gz; \
+	mv oc $V4M_PATH/bin/; \
+	cd ..; \
+	rm -rf oc/
 
 # viya4-monitoring-kubernetes
 RUN V4M_BRANCH="$V4M_TAG"; \
