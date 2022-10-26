@@ -5,7 +5,7 @@
 * **Overall**
 
 * **Metrics**
-  * [DEPRECATION] NodePorts is now disabled by default for Prometheus and AlertManager for security reasons. Set the environment variable PROM_NODEPORT_ENABLE=true to replicate previous behavior. 
+  * [DEPRECATION] For security reasons, access to Prometheus and AlertManager via NodePort is no longer enabled by default. Set the environment variable PROM_NODEPORT_ENABLE=true to replicate previous behavior.
 
 * **Logging**
 
