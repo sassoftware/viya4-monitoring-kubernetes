@@ -1,5 +1,14 @@
 # SAS Viya Monitoring for Kubernetes
 
+## UNRELEASED
+
+* **Overall**
+
+* **Metrics**
+
+* **Logging**
+  * [FIX] Updated Fluent Bit processing to handle log messages from Crunchy Data version 5
+
 ## Version 1.2.4 (18OCT22)
 
 * **Overall**
