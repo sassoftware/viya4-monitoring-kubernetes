@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.19
+       Set  fb_configMap_version 0.2.20-crunchy3G
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -108,6 +108,19 @@ data:
        Copy           labels_app.kubernetes.io/part_of    temp_k8sapp_partof
        Copy           labels_app.kubernetes.io/managed_by temp_k8sapp_managedby
        Copy           labels_app.kubernetes.io/created_by temp_k8sapp_createdby
+
+    [FILTER]
+       #
+       ### Crunchy 5
+       #
+       Alias          tag_crunchy5
+       Name           modify
+       Match          *
+       Condition      Key_exists labels_postgres-operator.crunchydata.com/cluster
+       Set            temp_vendor          crunchydata
+       Set            temp_pgo-pg-database true
+       Set            DB__crunchy_tag true
+
     [FILTER]
        #
        # Use kubernetes.labels.k8s-app for appname
@@ -347,6 +360,7 @@ data:
        Name            parser
        Match           kube.*
        Key_name        collectapi_message
+       Parser          crunchy_poo
        Parser          collectapi
        Parser          collectapiT
        Parser          crunchy_green
