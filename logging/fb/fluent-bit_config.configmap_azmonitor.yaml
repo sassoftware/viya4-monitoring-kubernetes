@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.19
+       Set  fb_configMap_version 0.2.20-crunchy5
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -108,6 +108,17 @@ data:
        Copy           labels_app.kubernetes.io/part_of    temp_k8sapp_partof
        Copy           labels_app.kubernetes.io/managed_by temp_k8sapp_managedby
        Copy           labels_app.kubernetes.io/created_by temp_k8sapp_createdby
+    [FILTER]
+       #
+       # Crunchy 5 - make it look like Crunchy 4
+       #
+       Alias          tag_crunchy5
+       Name           modify
+       Match          *
+       Condition      Key_exists labels_postgres-operator.crunchydata.com/cluster
+       Set            temp_vendor          crunchydata
+       Set            temp_pgo-pg-database true
+       Set            DB__crunchy5         true
     [FILTER]
        #
        # Use kubernetes.labels.k8s-app for appname
@@ -347,6 +358,7 @@ data:
        Name            parser
        Match           kube.*
        Key_name        collectapi_message
+       Parser          crunchy_poo
        Parser          collectapi
        Parser          collectapiT
        Parser          crunchy_green
@@ -791,11 +803,11 @@ data:
        Nest_under      properties
        Remove_prefix   PROPS__
     [FILTER]
-       # "Standardize" Level: DEBUG (includes 'HINT', 'FINE','DBG')
+       # "Standardize" Level: DEBUG (includes 'HINT', 'FINE','DBG','DETAIL')
        Alias          fix_level_debug
        Name           modify
        Match          *
-       Condition      Key_value_matches level (?i:DEBUG)|(?:\AD\z)|(?i:hint)|(?i:fine)|(?i:DBG)
+       Condition      Key_value_matches level (?i:DEBUG)|(?:\AD\z)|(?i:hint)|(?i:fine)|(?i:DBG)|(?i:DETAIL)
        Set            level DEBUG
        Set            __temp_level_fixed   Y
     [FILTER]
@@ -900,20 +912,20 @@ data:
        Remove_regex   __temp_.+
     [FILTER]
        #
-       # WHITELIST Vars to output
+       # ALLOWLIST Vars to output
        #
        Alias          whitelist
        Name           record_modifier
        Match          *
-       Whitelist_key  @timestamp
-       Whitelist_key  debug
-       Whitelist_key  level
-       Whitelist_key  kube
-       Whitelist_key  logsource
-       Whitelist_key  message
-       Whitelist_key  messageKey
-       Whitelist_key  messageParameters
-       Whitelist_key  properties
+       Allowlist_key  @timestamp
+       Allowlist_key  debug
+       Allowlist_key  level
+       Allowlist_key  kube
+       Allowlist_key  logsource
+       Allowlist_key  message
+       Allowlist_key  messageKey
+       Allowlist_key  messageParameters
+       Allowlist_key  properties
     [INPUT]
        Name             tail
        Path             /var/log/containers/*.log

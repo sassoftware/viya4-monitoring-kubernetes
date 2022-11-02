@@ -108,7 +108,6 @@ data:
        Copy           labels_app.kubernetes.io/part_of    temp_k8sapp_partof
        Copy           labels_app.kubernetes.io/managed_by temp_k8sapp_managedby
        Copy           labels_app.kubernetes.io/created_by temp_k8sapp_createdby
-
     [FILTER]
        #
        # Crunchy 5 - make it look like Crunchy 4
@@ -120,7 +119,6 @@ data:
        Set            temp_vendor          crunchydata
        Set            temp_pgo-pg-database true
        Set            DB__crunchy5         true
-
     [FILTER]
        #
        # Use kubernetes.labels.k8s-app for appname
@@ -914,20 +912,20 @@ data:
        Remove_regex   __temp_.+
     [FILTER]
        #
-       # WHITELIST Vars to output
+       # ALLOWLIST Vars to output
        #
        Alias          whitelist
        Name           record_modifier
        Match          *
-       Allowlist_key     @timestamp
-       Allowlist_key     debug
-       Allowlist_key     level
-       Allowlist_key     kube
-       Allowlist_key     logsource
-       Allowlist_key     message
-       Allowlist_key     messageKey
-       Allowlist_key     messageParameters
-       Allowlist_key     properties
+       Allowlist_key  @timestamp
+       Allowlist_key  debug
+       Allowlist_key  level
+       Allowlist_key  kube
+       Allowlist_key  logsource
+       Allowlist_key  message
+       Allowlist_key  messageKey
+       Allowlist_key  messageParameters
+       Allowlist_key  properties
     [INPUT]
        Name             tail
        Path             /var/log/containers/*.log
