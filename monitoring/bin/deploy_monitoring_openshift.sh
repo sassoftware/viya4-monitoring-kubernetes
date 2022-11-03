@@ -145,7 +145,6 @@ helm upgrade --install $helmDebug \
   -f "$wnpValuesFile" \
   -f "$grafanaYAML" \
   -f "$grafanaAuthYAML" \
-  -f "$grafanaAdditionalYAML" \
   -f "$userGrafanaYAML" \
   --set 'grafana\.ini'.server.domain=$OPENSHIFT_ROUTE_DOMAIN \
   --set 'grafana\.ini'.server.root_url=https://v4m-grafana-$MON_NS.$OPENSHIFT_ROUTE_DOMAIN$OPENSHIFT_ROUTE_PATH_GRAFANA \

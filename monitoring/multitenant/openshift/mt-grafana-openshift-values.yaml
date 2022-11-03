@@ -13,9 +13,9 @@ sidecar:
   datasources:
     enabled: true
     label: grafana_datasource-__TENANT__
-  # image:
-  #    tag: 1.19.5
-  #  repository: quay.io/kiwigrid/k8s-sidecar:1.19.5
+  image:
+    repository: quay.io/kiwigrid/k8s-sidecar
+    tag: 1.19.5
 deploymentStrategy:
   type: Recreate
 persistence:
