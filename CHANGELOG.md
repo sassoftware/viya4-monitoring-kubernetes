@@ -11,6 +11,7 @@
   * [UPGRADE] - Prometheus Operator has been upgraded from version 0.57.0 to 0.60.0
   * [UPGRADE] - Grafana has been upgraded from version 9.0.3 to 9.2.3
 
+
 * **Logging**
 
 ## Version 1.2.4 (18OCT22)
