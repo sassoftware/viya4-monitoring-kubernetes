@@ -1,12 +1,11 @@
-
-# Version of the Viya Monitoring for Kubernetes deployment to download to the container
-ARG V4M_TAG="stable"
-
 ARG ALPINE_TAG=latest
 
 # Need glibc to support the OpenShift 'oc' CLI
 # https://hub.docker.com/r/frolvlad/alpine-glibc/
 FROM frolvlad/alpine-glibc:$ALPINE_TAG
+
+# Version of the Viya Monitoring for Kubernetes deployment to download to the container
+ARG V4M_TAG="stable"
 
 ARG OS=linux
 ARG ARCH=amd64
@@ -73,10 +72,8 @@ RUN mkdir oc; \
 	rm -rf oc/
 
 # viya4-monitoring-kubernetes
-RUN git clone https://github.com/sassoftware/viya4-monitoring-kubernetes; \
-	cd viya4-monitoring-kubernetes; \
-	V4M_BRANCH="$V4M_TAG"; \
-	if [ "$V4M_BRANCH" == "latest" ]; then V4M_BRANCH="stable"; fi; \
-	git checkout ${V4M_BRANCH}
+RUN V4M_BRANCH="$V4M_TAG"; \
+  if [ "$V4M_BRANCH" == "latest" ]; then V4M_BRANCH="stable"; fi; \
+  git clone --depth 1 -b ${V4M_BRANCH} https://github.com/sassoftware/viya4-monitoring-kubernetes
 
 WORKDIR $V4M_PATH/viya4-monitoring-kubernetes

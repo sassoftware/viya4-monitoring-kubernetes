@@ -4,3 +4,4 @@ tmp/
 *-tmp.yaml
 user-dir/
 user-dir-*/
+v4m-container/kubeconfig/

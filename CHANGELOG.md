@@ -12,6 +12,7 @@
   * [UPGRADE] - Grafana has been upgraded from version 9.0.3 to 9.2.3
   * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from 1.19.2 to 1.19.5
 
+
 * **Logging**
 
 ## Version 1.2.4 (18OCT22)
