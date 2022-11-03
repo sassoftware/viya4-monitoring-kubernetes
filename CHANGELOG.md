@@ -1,5 +1,18 @@
 # SAS Viya Monitoring for Kubernetes
 
+## UNRELEASED
+
+* **Overall**
+
+* **Metrics**
+  * [DEPRECATION] For security reasons, access to Prometheus and AlertManager via NodePort is no longer enabled by default. Set the environment variable PROM_NODEPORT_ENABLE=true to replicate previous behavior.
+  * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 36.6.1 to 41.7.3
+  * [UPGRADE] - Prometheus has been upgraded from version 2.36.2 to 2.39.0
+  * [UPGRADE] - Prometheus Operator has been upgraded from version 0.57.0 to 0.60.0
+  * [UPGRADE] - Grafana has been upgraded from version 9.0.3 to 9.2.3
+
+* **Logging**
+
 ## Version 1.2.4 (18OCT22)
 
 * **Overall**
@@ -11,8 +24,8 @@
   * [FIX] Customizations in the user-values-prom-operator.yaml file under the alertmanagerSpec will now be applied correctly.
 
 * **Logging**
-  *  [UPGRADE] Opensearch and Opensearch Dashboards has been upgraded from 1.32 to 1.35
-  *  [UPGRADE] Elasticsearch Exporter has been upgraded from 1.2.1 to 1.5.0
+  * [UPGRADE] Opensearch and Opensearch Dashboards has been upgraded from 1.32 to 1.35
+  * [UPGRADE] Elasticsearch Exporter has been upgraded from 1.2.1 to 1.5.0
 
 ## Version 1.2.3 (20SEP22)
 
@@ -26,7 +39,7 @@
   * [UPGRADE] - Prometheus has been upgraded from version 2.33.1 to 2.36.2
   * [UPGRADE] - Prometheus Operator has been upgraded from version 0.54.0 to 0.57.0
   * [UPGRADE] - Grafana has been upgraded from version 8.4.1 to 9.0.3
-  * [UPGRADE] - AlertManager  has been upgraded from version to 0.24.0
+  * [UPGRADE] - AlertManager has been upgraded from version 0.23.0 to 0.24.0
   * [UPGRADE] - Kube State Metrics has been upgraded from version 2.3.0 to 2.5.0
   * [UPGRADE] - PushGateway has been upgraded from version 1.4.2 to 1.4.3
 
