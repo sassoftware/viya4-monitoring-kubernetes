@@ -10,6 +10,7 @@
   * [UPGRADE] - Prometheus has been upgraded from version 2.36.2 to 2.39.0
   * [UPGRADE] - Prometheus Operator has been upgraded from version 0.57.0 to 0.60.0
   * [UPGRADE] - Grafana has been upgraded from version 9.0.3 to 9.2.3
+  * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from 1.19.2 to 1.19.5
 
 * **Logging**
 

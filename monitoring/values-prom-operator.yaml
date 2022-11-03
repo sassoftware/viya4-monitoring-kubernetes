@@ -117,7 +117,7 @@ prometheus:
 alertmanager:
   service:
     type: ClusterIP
-    nodePort: null  
+    nodePort: null
   alertmanagerSpec:
     image:
       tag: v0.24.0
@@ -175,7 +175,7 @@ prometheus-node-exporter:
 # https://github.com/grafana/helm-charts/tree/main/charts/grafana
 grafana:
   image:
-    tag: "9.0.3"
+    tag: "9.2.3"
   "grafana.ini":
     analytics:
       check_for_updates: false

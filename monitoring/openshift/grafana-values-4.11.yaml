@@ -1,0 +1,14 @@
+spec:
+  securityContext:
+      # Do not use SeccompProfile if your project must work on
+      # old k8s versions < 1.19 and Openshift < 4.11
+      seccompProfile:
+        type: RuntimeDefault
+      runAsNonRoot: true
+
+  # image-renderer deployment container securityContext
+  containerSecurityContext:
+    capabilities:
+      drop: ['ALL']
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
