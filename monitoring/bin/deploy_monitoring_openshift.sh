@@ -73,6 +73,14 @@ if [ -z "$(kubectl get serviceAccount -n $MON_NS grafana-serviceaccount -o name 
   log_info "Creating Grafana serviceAccount..."
   kubectl create serviceaccount -n $MON_NS grafana-serviceaccount
 fi
+
+ # OCP 4.11: We need to patch service account to add API Token
+if [ "$OSHIFT_MAJOR_VERSION" -eq "4" ] && [ "$OSHIFT_MINOR_VERSION" -gt "10" ]; then
+     token=$(kubectl describe -n $MON_NS serviceaccount grafana-serviceaccount |grep "Tokens:"|awk '{print $2}')
+     log_debug "Patching serviceAccount to link to token...[$token]"
+     kubectl -n $MON_NS patch serviceaccount grafana-serviceaccount --type=json -p='[{"op":"add","path":"/secrets/1","value":{"name":"'$token'"}}]'
+  fi
+
 log_debug "Adding cluster role..."
 oc adm policy add-cluster-role-to-user cluster-monitoring-view -z grafana-serviceaccount -n $MON_NS
 log_debug "Obtaining token..."
@@ -138,12 +146,13 @@ else
 fi
 
 log_info "Deploying Grafana..."
-OPENSHIFT_GRAFANA_CHART_VERSION=${OPENSHIFT_GRAFANA_CHART_VERSION:-6.32.6}
+OPENSHIFT_GRAFANA_CHART_VERSION=${OPENSHIFT_GRAFANA_CHART_VERSION:-6.43.3}
 helm upgrade --install $helmDebug \
   -n "$MON_NS" \
   -f "$wnpValuesFile" \
   -f "$grafanaYAML" \
   -f "$grafanaAuthYAML" \
+  -f "$grafanaAdditionalYAML" \
   -f "$userGrafanaYAML" \
   --set 'grafana\.ini'.server.domain=$OPENSHIFT_ROUTE_DOMAIN \
   --set 'grafana\.ini'.server.root_url=https://v4m-grafana-$MON_NS.$OPENSHIFT_ROUTE_DOMAIN$OPENSHIFT_ROUTE_PATH_GRAFANA \

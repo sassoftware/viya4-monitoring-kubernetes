@@ -18,7 +18,7 @@ commonLabels:
 # https://github.com/coreos/prometheus-operator
 prometheusOperator:
   image:
-    tag: v0.57.0
+    tag: v0.60.0
   logFormat: json
   logLevel: info
   createCustomResource: false
@@ -37,7 +37,7 @@ prometheusOperator:
   prometheusConfigReloader:
     image:
       repository: quay.io/prometheus-operator/prometheus-config-reloader
-      tag: v0.57.0
+      tag: v0.60.0
 
 # ======================
 # kubelet ServiceMonitor
@@ -62,7 +62,7 @@ kubeStateMetrics:
 # https://github.com/helm/charts/tree/master/stable/kube-state-metrics
 kube-state-metrics:
   image:
-    tag: v2.5.0
+    tag: v2.6.0
   resources:
     requests:
       cpu: "25m"
@@ -83,7 +83,7 @@ prometheus:
     nodePort: null  
   prometheusSpec:
     image:
-      tag: v2.36.2
+      tag: v2.39.0
     logLevel: info
     logFormat: json
     podAntiAffinity: soft
@@ -207,6 +207,9 @@ grafana:
       requests:
         cpu: "50m"
         memory: "100Mi"
+    image:
+      repository: quay.io/kiwigrid/k8s-sidecar
+      tag: 1.19.5
   deploymentStrategy:
     type: Recreate
   persistence:
