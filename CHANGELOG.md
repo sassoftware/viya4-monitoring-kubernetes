@@ -21,6 +21,9 @@
   * [UPGRADE] - Kube State Metrics has been upgraded from version 2.5.0 to 2.6.0
   * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from 1.19.2 to 1.19.5
 
+* **Metrics**
+  * [DEPRECATION] For security reasons, access to Prometheus and AlertManager via NodePort is no longer enabled by default. Set the environment variable PROM_NODEPORT_ENABLE=true to replicate previous behavior.
+
 * **Logging**
 
 ## Version 1.2.4 (18OCT22)
