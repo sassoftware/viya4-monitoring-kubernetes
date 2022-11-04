@@ -3,6 +3,7 @@
 ## Version 1.2.5 (04NOV22)
 
 * **Metrics**
+  * [SECURITY] Upgraded metrics monitoring components to address CVE-2022-37434
   * [DEPRECATION] For security reasons, access to Prometheus and AlertManager via NodePort is no longer enabled by default. Set the environment variable PROM_NODEPORT_ENABLE=true to replicate previous behavior.
   * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 36.6.1 to 41.7.3
   * [UPGRADE] - Prometheus has been upgraded from version 2.36.2 to 2.39.0
