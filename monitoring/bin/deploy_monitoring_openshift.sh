@@ -73,6 +73,14 @@ if [ -z "$(kubectl get serviceAccount -n $MON_NS grafana-serviceaccount -o name 
   log_info "Creating Grafana serviceAccount..."
   kubectl create serviceaccount -n $MON_NS grafana-serviceaccount
 fi
+
+ # OCP 4.11: Add additional parameters to work in Openshift 4.11+
+grafanaAdditionalYAML=$TMP_DIR/empty.yaml
+if [ "$OSHIFT_MAJOR_VERSION" -eq "4" ] && [ "$OSHIFT_MINOR_VERSION" -gt "10" ]; then
+    grafanaAdditionalYAML="monitoring/openshift/grafana-values-4.11.yaml"
+    log_debug "Openshift 4.11+ values added."
+fi 
+
 log_debug "Adding cluster role..."
 oc adm policy add-cluster-role-to-user cluster-monitoring-view -z grafana-serviceaccount -n $MON_NS
 log_debug "Obtaining token..."
