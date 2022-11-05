@@ -1,11 +1,17 @@
 # SAS Viya Monitoring for Kubernetes
 
-## UNRELEASED
-
-* **Overall**
+## Version 1.2.5 (04NOV22)
 
 * **Metrics**
+  * [SECURITY] Upgraded metrics monitoring components to address CVE-2022-37434
   * [DEPRECATION] For security reasons, access to Prometheus and AlertManager via NodePort is no longer enabled by default. Set the environment variable PROM_NODEPORT_ENABLE=true to replicate previous behavior.
+  * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 36.6.1 to 41.7.3
+  * [UPGRADE] - Prometheus has been upgraded from version 2.36.2 to 2.39.0
+  * [UPGRADE] - Prometheus Operator has been upgraded from version 0.57.0 to 0.60.0
+  * [UPGRADE] - Grafana has been upgraded from version 9.0.3 to 9.2.3
+  * [UPGRADE] - Kube State Metrics has been upgraded from version 2.5.0 to 2.6.0
+  * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from 1.19.2 to 1.19.5
+  * [UPGRADE] - TLS Proxy sidecar (ghostunnel) for monitoring components has been upgraded from 1.6.1 to 1.7.0
 
 * **Logging**
 
@@ -35,7 +41,7 @@
   * [UPGRADE] - Prometheus has been upgraded from version 2.33.1 to 2.36.2
   * [UPGRADE] - Prometheus Operator has been upgraded from version 0.54.0 to 0.57.0
   * [UPGRADE] - Grafana has been upgraded from version 8.4.1 to 9.0.3
-  * [UPGRADE] - AlertManager  has been upgraded from version to 0.24.0
+  * [UPGRADE] - AlertManager has been upgraded from version 0.23.0 to 0.24.0
   * [UPGRADE] - Kube State Metrics has been upgraded from version 2.3.0 to 2.5.0
   * [UPGRADE] - PushGateway has been upgraded from version 1.4.2 to 1.4.3
 
