@@ -1,5 +1,15 @@
 # SAS Viya Monitoring for Kubernetes
 
+## UNRELEASE
+
+* **Overall**
+
+* **Metrics**
+  * [FIX] - Deploy_monitoring_cluster script now correctly removes the v4m-kubelet service that is deployed by deploy_monitoring_cluster.
+  * [FIX] - Added patch for API Token that caused the deploy_monitoring_openshift script to fail during deployment.
+
+* **Logging**
+
 ## Version 1.2.5 (04NOV22)
 
 * **Metrics**
@@ -12,8 +22,6 @@
   * [UPGRADE] - Kube State Metrics has been upgraded from version 2.5.0 to 2.6.0
   * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from 1.19.2 to 1.19.5
   * [UPGRADE] - TLS Proxy sidecar (ghostunnel) for monitoring components has been upgraded from 1.6.1 to 1.7.0
-
-* **Logging**
 
 ## Version 1.2.4 (18OCT22)
 

@@ -64,6 +64,9 @@ log_verbose "Removing configmaps and secrets"
 kubectl delete cm --ignore-not-found -n $MON_NS -l sas.com/monitoring-base=kube-viya-monitoring
 kubectl delete secret --ignore-not-found -n $MON_NS -l sas.com/monitoring-base=kube-viya-monitoring
 
+log_verbose "Removing Kubelet"
+kubectl delete service --ignore-not-found -n kube-system v4m-kubelet
+
 if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
   log_verbose "Removing known monitoring PVCs"
   kubectl delete pvc --ignore-not-found -n $MON_NS -l app=alertmanager
