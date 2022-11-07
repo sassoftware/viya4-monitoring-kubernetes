@@ -64,7 +64,7 @@ fi
 
 # Check if Prometheus Operator CRDs are already installed
 PROM_OPERATOR_CRD_UPDATE=${PROM_OPERATOR_CRD_UPDATE:-true}
-PROM_OPERATOR_CRD_VERSION=${PROM_OPERATOR_CRD_VERSION:-v0.57.0}
+PROM_OPERATOR_CRD_VERSION=${PROM_OPERATOR_CRD_VERSION:-v0.60.0}
 if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
   log_verbose "Updating Prometheus Operator custom resource definitions"
   crds=( alertmanagerconfigs alertmanagers prometheuses prometheusrules podmonitors servicemonitors thanosrulers probes )
@@ -79,6 +79,9 @@ if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
 else
   log_debug "Prometheus Operator CRD update disabled"
 fi
+
+# Remove existing DaemonSets in case of an upgrade-in-place
+kubectl delete daemonset -n $MON_NS -l app=prometheus-node-exporter --ignore-not-found
 
 # Optional workload node placement support
 MON_NODE_PLACEMENT_ENABLE=${MON_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
@@ -117,7 +120,7 @@ if [ "$TLS_ENABLE" == "true" ]; then
 fi
 
 nodePortValuesFile=$TMP_DIR/empty.yaml
-PROM_NODEPORT_ENABLE=${PROM_NODEPORT_ENABLE:-true}
+PROM_NODEPORT_ENABLE=${PROM_NODEPORT_ENABLE:-false}
 if [ "$PROM_NODEPORT_ENABLE" == "true" ]; then
   log_debug "Enabling NodePort access for Prometheus and Alertmanager"
   nodePortValuesFile=monitoring/values-prom-nodeport.yaml
@@ -151,7 +154,7 @@ if [ "$V4M_CURRENT_VERSION_MAJOR" == "1" ] && [[ "$V4M_CURRENT_VERSION_MINOR" =~
     -l app.kubernetes.io/instance=v4m-prometheus-operator,app.kubernetes.io/name=kube-state-metrics
 fi
 
-KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-36.6.1}
+KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-41.7.3}
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
   -f monitoring/values-prom-operator.yaml \
