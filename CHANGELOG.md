@@ -5,7 +5,7 @@
 * **Overall**
 
 * **Metrics**
-  * [FIX] - Deploy_monitoring_cluster script now correctly removes the v4m-kubelet service that is deployed by deploy_monitoring_cluster.
+  * [FIX] - Remove v4m-kubelet service when removing cluster-level metric monitoring components
   * [FIX] - Added patch for API Token that caused the deploy_monitoring_openshift script to fail during deployment.
 
 * **Logging**
