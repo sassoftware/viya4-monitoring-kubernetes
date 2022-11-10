@@ -1,5 +1,14 @@
 # SAS Viya Monitoring for Kubernetes
 
+## UNRELEASED
+
+* **Overall**
+
+* **Metrics**
+
+* **Logging**
+  * [FIX] Updated Fluent Bit configuration to use `Allowlist_key` instead of `Whitelist_key` modifier as it has been deprecated and is ignored.
+
 ## Version 1.2.5 (04NOV22)
 
 * **Metrics**
@@ -12,8 +21,6 @@
   * [UPGRADE] - Kube State Metrics has been upgraded from version 2.5.0 to 2.6.0
   * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from 1.19.2 to 1.19.5
   * [UPGRADE] - TLS Proxy sidecar (ghostunnel) for monitoring components has been upgraded from 1.6.1 to 1.7.0
-
-* **Logging**
 
 ## Version 1.2.4 (18OCT22)
 
