@@ -7,6 +7,7 @@
 * **Metrics**
 
 * **Logging**
+  * [FIX] Updated Fluent Bit processing to handle log messages from Crunchy Data version 5
   * [FIX] Updated Fluent Bit configuration to use `Allowlist_key` instead of `Whitelist_key` modifier as it has been deprecated and is ignored.
 
 ## Version 1.2.5 (04NOV22)
