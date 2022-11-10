@@ -914,7 +914,7 @@ data:
        #
        # ALLOWLIST Vars to output
        #
-       Alias          whitelist
+       Alias          allowlist
        Name           record_modifier
        Match          *
        Allowlist_key  @timestamp
