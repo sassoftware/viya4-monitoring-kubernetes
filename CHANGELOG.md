@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## UNRELEASE
+## UNRELEASED
 
 * **Overall**
 
@@ -9,6 +9,7 @@
   * [FIX] - Added patch for API Token that caused the deploy_monitoring_openshift script to fail during deployment.
 
 * **Logging**
+  * [FIX] Updated Fluent Bit configuration to use `Allowlist_key` instead of `Whitelist_key` modifier as it has been deprecated and is ignored.
 
 ## Version 1.2.5 (04NOV22)
 
