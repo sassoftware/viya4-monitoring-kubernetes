@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.19
+       Set  fb_configMap_version 0.2.20-test
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -900,20 +900,20 @@ data:
        Remove_regex   __temp_.+
     [FILTER]
        #
-       # WHITELIST Vars to output
+       # ALLOWLIST Vars to output
        #
-       Alias          whitelist
+       Alias          allowlist
        Name           record_modifier
        Match          *
-       Whitelist_key  @timestamp
-       Whitelist_key  debug
-       Whitelist_key  level
-       Whitelist_key  kube
-       Whitelist_key  logsource
-       Whitelist_key  message
-       Whitelist_key  messageKey
-       Whitelist_key  messageParameters
-       Whitelist_key  properties
+       Allowlist_key  @timestamp
+       Allowlist_key  debug
+       Allowlist_key  level
+       Allowlist_key  kube
+       Allowlist_key  logsource
+       Allowlist_key  message
+       Allowlist_key  messageKey
+       Allowlist_key  messageParameters
+       Allowlist_key  properties
     [INPUT]
        Name             tail
        Path             /var/log/containers/*.log
