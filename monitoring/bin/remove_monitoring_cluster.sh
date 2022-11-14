@@ -40,6 +40,9 @@ if [ $? != 0 ]; then
   log_warn "Uninstall of [$promRelease] was not successful. Check output above for details."
 fi
 
+log_verbose "Removing v4m-kubelet service"
+kubectl delete service --ignore-not-found -n kube-system v4m-kubelet
+
 if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
   log_info "Deleting the [$MON_NS] namespace..."
   if kubectl delete namespace $MON_NS --timeout $KUBE_NAMESPACE_DELETE_TIMEOUT; then
