@@ -403,29 +403,37 @@ By default, the components are deployed into the namespace `monitoring`.
 
 ## Access Monitoring Applications
 
+### Grafana
+
 If the deployment process completes without errors, a message appears in the
 console window containing the URL address for Grafana. The URL for Grafana is
 different depending on whether you use nodeports or ingress to access Grafana.
-
-NodePorts are used by default. If you deployed using NodePorts, Prometheus and
-AlertManager are available at these locations by default:
-
-* Prometheus - Port 31090 `http://control-plane-node.yourcluster.example.com:31090`
-* AlertManager - Port 31091 `http://control-plane-node.yourcluster.example.com:31091`
+NodePorts are used by default. 
 
 The default Grafana admin user is `admin`. Unless you set the
 `GRAFANA_ADMIN_PASSWORD` environment variable (either in the `user.env` file or
 on the command line) to specify a default password during deployment, the
 default password is randomly generated and displayed during deployment.
+The randomly-generated password is displayed only during the initial deployment
+of the monitoring components.  It is not displayed if you redeploy the components.
 
 If you want to change the password, issue this command:
 
 ```bash
-kubectl exec -n <monitoring_namespace> <grafana_pod> -c grafana -- bin/grafana-cli admin reset-admin-password myNewPassword
+monitoring/bin/change_grafana_admin_password.sh --password new_password
 ```
 
-The randomly-generated password is displayed only during the initial deployment
-of the monitoring components.  It is not displayed if you redeploy the components.
+Where *new_password* is the new password that you want to set.
+
+### Prometheus and Alertmanager 
+
+If you deployed using NodePorts, Prometheus and
+Alertmanager are available at these locations by default:
+
+* Prometheus - Port 31090 `http://control-plane-node.yourcluster.example.com:31090`
+* AlertManager - Port 31091 `http://control-plane-node.yourcluster.example.com:31091`
+
+**Note: As of release 1.2.6, NodePorts for these web applications are disabled by default.**
 
 ## Deploy Monitoring for Tenants
 
