@@ -1,8 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## UNRELEASED
-
-* **Overall**
+## Version 1.2.6 (15NOV2022)
 
 * **Metrics**
   * [FIX] - Remove v4m-kubelet service when removing cluster-level metric monitoring components
