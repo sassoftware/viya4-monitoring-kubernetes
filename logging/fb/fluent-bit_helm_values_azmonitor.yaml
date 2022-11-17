@@ -2,7 +2,7 @@
 # Default values: https://github.com/fluent/helm-charts/blob/main/charts/fluent-bit/values.yaml
 
 image:
-  tag: 1.9.6
+  tag: 1.9.9
 podAnnotations: 
   fluentbit.io/parser: fluentbit
 podLabels:
