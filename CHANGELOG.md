@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+## UNRELEASED
+
+* **Logging**
+  * [UPGRADE] - Fluent Bit has been upgraded from version 1.9.6 to 1.9.9
+
 ## Version 1.2.6 (15NOV2022)
 
 * **Metrics**
