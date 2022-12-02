@@ -3,6 +3,7 @@
 ## UNRELEASED
 
 * **Logging**
+  * [FIX] - Pin to specific Helm chart version (4.15.1) in logging/bin/deploy_esexporter.sh
   * [UPGRADE] - Fluent Bit has been upgraded from version 1.9.6 to 1.9.9
 
 ## Version 1.2.6 (15NOV2022)
