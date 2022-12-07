@@ -11,7 +11,7 @@ datasources:
   jsonData:
     tlsSkipVerify: true
     timeField: "@timestamp"
-    esVersion: 70
+    esVersion: '7.10.0'
     logMessageField: message
     logLevelField: level.keyword
   secureJsonData:
