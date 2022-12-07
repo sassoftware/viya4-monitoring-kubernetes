@@ -2,6 +2,9 @@
 
 ## UNRELEASED
 
+* **Metrics**
+  * [FIX] - Restored various container-related metrics that were being filtered out after an update.
+
 * **Logging**
   * [UPGRADE] - Fluent Bit has been upgraded from version 1.9.6 to 1.9.9
 
