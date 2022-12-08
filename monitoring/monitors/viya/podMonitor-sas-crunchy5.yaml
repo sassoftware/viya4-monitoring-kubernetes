@@ -11,15 +11,17 @@ spec:
   podMetricsEndpoints:
   - port: exporter
     relabelings:
-    - sourceLabels: [__meta_kubernetes_service_label_name]
+    - sourceLabels: [__meta_kubernetes_pod_container_name]
       regex: .+
       targetLabel: exp_type
       replacement: pg
+    - sourceLabels: [job]
+      targetLabel: service
     - sourceLabels: [__meta_kubernetes_pod_label_sas_com_deployment]
       targetLabel: sas_deployment
     - sourceLabels: [__meta_kubernetes_pod_annotation_sas_com_tls_enabled_ports]
       action: replace
-      regex: .*postgres-exporter.*
+      regex: .*exporter.*
       targetLabel: __scheme__
       replacement: https
     - sourceLabels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
