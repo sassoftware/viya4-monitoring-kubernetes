@@ -1,5 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Logging**
+  * [FIX] Restore metrics after move to Crunchy Data v.5
+
 ## Version 1.2.6 (15NOV2022)
 
 * **Metrics**
