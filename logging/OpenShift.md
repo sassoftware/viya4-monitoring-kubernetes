@@ -1,1 +1,3 @@
-See [Log-Message Monitoring on Red Hat OpenShift](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p1jazb9s8qunacn1gwqwdzt8yed8.htm) in the SAS Viya Administration Help Center.
+# SAS Viya Log-monitoring on Red Hat OpenShift
+
+See [Monitoring on Red Hat OpenShift](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1o8xyp2vatupan1nhgknbzhp7tm.htm) in the SAS Viya Monitoring for Kubernetes Help Center.

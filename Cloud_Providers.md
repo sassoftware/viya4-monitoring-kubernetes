@@ -1,1 +1,3 @@
-See [Monitoring and Logging on Cloud-Provider Platforms](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p15n5xnufinhxpn0z6hmk4w55shv.htm) in the SAS Viya Administration Help Center.
+# Cloud Providers
+
+See [Monitoring and Logging on Cloud-Provider Platforms](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n0lzjee544jib9n1dj4wc0fhuc36.htm) in the SAS Viya Monitoring for Kubernetes Help Center.

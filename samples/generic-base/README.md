@@ -9,10 +9,7 @@ reference links and variable listings.
 You customize your deployment by specifying values in `user.env` and `*.yaml`
 files. These files are stored in a local directory outside of your
 repository that is identified by the `USER_DIR` environment variable. 
-For information about the customization process, see the
-[monitoring README](../../monitoring/README.md#mon_custom) or 
-[Pre-deployment for Logging](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p1j31coiuoun6mn1om73shkcq4ut.htm) 
-in the SAS Viya Administration Help Center.
+For information about the customization process, see [Pre-deployment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1ajbblsxpcgl5n11t13wgtd4d7c.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
 
 The customization files in this sample provide a starting point for
 customization if your environment does not match any of the specialized
@@ -26,20 +23,9 @@ If you need to use values from another sample, manually copy the values to
 your customization files after you add the values in this sample.
 
 After you finish modifying the customization files, deploy the metric-monitoring and
-log-monitoring components.
-
-For the metric-monitoring components, issue the following command:
-
-```bash
-my_repository_path/monitoring/bin/deploy_monitoring_cluster.sh
-```
-
-For the log-monitoring components, see 
-[Deploy](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p0288u3wuftagyn1x1965tatn4zu.htm) in the SAS Viya Administration Help Center.
+log-monitoring components. See [Deploy](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1rhzwx0mcnnnun17q11v85bspyk.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
 
 ## Grafana Dashboards
 
 In addition to customizing the deployment, you can also use this sample to add
-your own Grafana dashboards. See the [dashboard README](monitoring/dashboards/README.md)
-for details about supplying additional Grafana dashboards that will be deployed
-(and removed) with the monitoring components.
+your own Grafana dashboards. See [Adding More Grafana Dashboards](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1sg9bc44ow616n1sw7l3dlsbmgz.htm) for details.
