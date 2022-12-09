@@ -1,7 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## UNRELEASED
-
+* **Metrics**
+  * [FIX] Restore metrics after move to Crunchy Data v.5
+  
 * **Logging**
   * [FIX] Limited Access User Can NOT Generate CSV via OpenSearch Dashboards Reporting
 
