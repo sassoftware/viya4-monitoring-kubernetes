@@ -260,6 +260,17 @@ else
    log_debug "Skipping creation of 'logadm' user because LOG_CREATE_LOGADM_USER not 'true' [$LOG_CREATE_LOGADM_USER]"
 fi
 
+#Initialize OSD Reporting Plugin indices
+INIT_OSD_RPT_IDX=${INIT_OSD_RPT_IDX:-true}
+if [ "$INIT_OSD_RPT_IDX" == "true" ]; then
+   log_debug "Initializing OpenSearch Dashboards Reporting plugin indices"
+   response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "$es_api_url/_plugins/_reports/instances"   --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+   log_debug "OSD_RPT_IDX (instances) Response [$response]"
+   response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "$es_api_url/_plugins/_reports/definitions" --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+   log_debug "OSD_RPT_IDX (definitions) Response [$response]"
+fi
+
+
 LOGGING_DRIVER=${LOGGING_DRIVER:-false}
 if [ "$LOGGING_DRIVER" != "true" ]; then
    echo ""

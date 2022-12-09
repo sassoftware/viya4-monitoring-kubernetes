@@ -1,4 +1,5 @@
-# Deploying Monitoring for Tenants
+# Deploying Monitoring for Tenants 
+
 >**Important:** The features documented here should be considered _**EXPERIMENTAL**_.
 They might be significantly changed, replaced, or removed in later releases. 
 Feedback is welcomed about this functionality including requirements, usage
@@ -22,7 +23,11 @@ information only for the tenant and the tenant-specific Grafana
 instance contains its own user definitions and includes only 
 three dashboards. 
 
-### Secrets for In-Cluster TLS
+## Secrets for In-Cluster TLS
+
+For information about TLS for in-cluster communications, see 
+[Understanding How Transport Layer Security (TLS) Is Used by SAS Viya Monitoring for Kubernetes](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=p0ssqw32dy9a44n1rokwojskla19.htm) in the Help
+Center. 
 
 The [TLS Monitoring sample](/samples/tls/monitoring) contains information about
 specifying the `TLS_ENABLE` environment variable to use TLS for in-cluster
@@ -48,11 +53,17 @@ if TLS is disabled or if all of the TLS secrets exist prior to deployment.
 
 Before deploying monitoring for a tenant, you must deploy both the cluster 
 monitoring components and the SAS Viya monitoring components. See the 
-[monitoring README](README.md) for information.
+following sections in the Help Center for information:
+
+* [Pre-deployment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1ajbblsxpcgl5n11t13wgtd4d7c.htm)
+* [Deploy](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1rhzwx0mcnnnun17q11v85bspyk.htm)
+* [Modify the Deployment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n08465wdbmux9cn1iz6dk2bzdcw4.htm) 
 
 You can customize each tenant's deployment by specifying values 
-in a `*.yaml` file for each tenant. These files are stored in a local directory outside of your repository that is identified by the `USER_DIR` environment variable. See the 
-[monitoring README](README.md#mon_custom) for information about the customization process.
+in a `*.yaml` file for each tenant. These files are stored in a local 
+directory outside of your repository that is identified by the `USER_DIR` 
+environment variable. See [Pre-deployment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1ajbblsxpcgl5n11t13wgtd4d7c.htm)
+for information about the customization process.
 
 After you create the location for your customization files, you can customize
 each tenant's monitoring deployment by specifying Helm chart parameters in 
@@ -62,7 +73,9 @@ a tenant's customization file:
 
 Each tenant has a separate customization file.
 
-The tenant deployment process uses the [public Grafana Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana). Overrides for these 
+The tenant deployment process uses the 
+[public Grafana Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana). 
+Overrides for these 
 values are specified in `monitoring/multitenant/mt-grafana-values.yaml` and 
 `monitoring/multitenant/tls/mt-grafana-tls-values.yaml` (if TLS is enabled).
 
@@ -74,6 +87,7 @@ To deploy the monitoring components for a tenant, issue this command:
 ```bash
 VIYA_NS=<your_viya_namespace> VIYA_TENANT=<tenant_name> monitoring/bin/deploy_monitoring_tenant.sh
 ```
+
 The value of `your_viya_namespace` is the namespace into which you deployed 
 SAS Viya monitoring components. The value of `tenant_name` is the name of 
 the tenant for which you are deploying the monitoring components. You can 
@@ -86,6 +100,7 @@ To remove the monitoring components for a tenant, issue this command:
 ```bash
 VIYA_NS=<your_viya_namespace> VIYA_TENANT=<tenant_name> monitoring/bin/remove_monitoring_tenant.sh
 ```
+
 The value of `your_viya_namespace` is the namespace into which you deployed 
 SAS Viya monitoring components. The value of `tenant_name` is the name of 
 the tenant that contains the monitoring components. You can 

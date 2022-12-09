@@ -19,9 +19,7 @@ each deployment file.
 You customize your logging deployment by specifying values in `user.env` and
 `*.yaml` files. These files are stored in a local directory outside of your
 repository that is identified by the `USER_DIR` environment variable. 
-For information about the customization process, see the
-[monitoring README](../monitoring/README.md#mon_custom) or 
-[Pre-deployment for Logging](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p1j31coiuoun6mn1om73shkcq4ut.htm) in the SAS Viya Administration Help Center.
+For information about the customization process, see [Pre-deployment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1ajbblsxpcgl5n11t13wgtd4d7c.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
 
 The customization files in each sample provide a starting point for the
 customization files for a deployment that supports a specific situation.
@@ -49,30 +47,26 @@ logging using the standard deployment scripts.
 These samples are provided:
 
 * [azure-deployment](azure-deployment) - Deploys on Microsoft Azure Kubernetes
-  Service (AKS)
+  Service (AKS).
 * [azure-monitor](azure-monitor) - Enables Azure Monitor to collect metrics
-from SAS Viya components
+from SAS Viya components.
 * [cloudwatch](cloudwatch) - Enables Amazon CloudWatch to collect metrics from
-  SAS Viya services
-* [esmulti](esmulti) - Provides an alternate cluster layout of Elasticsearch
-  that uses multiple roles for each node vs. the default of single-role nodes
+  SAS Viya services.
 * [external-alertmanager](external-alertmanager) - Configures a central
-  external Alertmanager instance
+  external Alertmanager instance.
 * [generic-base](generic-base) - Provides a template `USER_DIR` containing a
-  full set of customization files with comments
+  full set of customization files with comments.
 * [gke-monitoring](gke-monitoring) - Enables Google Cloud Operations to collect
-  metrics from SAS Viya services
-* [ingress](ingress) - Deploys using host-based or path-based ingress
-* [min-logging](min-logging) - Provides a minimal logging configuration for dev
-  or test environments
+  metrics from SAS Viya services.
+* [ingress](ingress) - Deploys using host-based or path-based ingress.
 * [namespace-monitoring](namespace-monitoring) - Separates cluster monitoring
-from SAS Viya monitoring
+from SAS Viya monitoring.
 * [tls](tls) - Enables TLS encryption for both in-cluster and ingress. Options
   for either host-based and path-based ingress are included.
 
 ## Other Samples
 
 * [Cloudwatch](cloudwatch) - Configures Amazon Cloudwatch to collect SAS Viya
-  metrics
+  metrics.
 * [Google Cloud Operations](gke-monitoring) - Enables Google Cloud Operations
-  to view SAS Viya metric data from Prometheus
+  to view SAS Viya metric data from Prometheus.

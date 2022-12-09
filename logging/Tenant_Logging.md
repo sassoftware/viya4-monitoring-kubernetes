@@ -19,6 +19,4 @@ that have access to only the log messages and OpenSearch Dashboards-tenant space
 associated with a specified SAS Viya tenant.
 
 For information about using these scripts, see 
-[Controlling User Access](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=p1nee94eh0x1ymn1blz03g48jz2y.htm) 
-in the SAS Viya Administration Help Center.
-
+[Controlling User Access to Log Monitoring](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=p1nee94eh0x1ymn1blz03g48jz2y.htm) in the SAS Viya Monitoring for Kubernetes Help Center.

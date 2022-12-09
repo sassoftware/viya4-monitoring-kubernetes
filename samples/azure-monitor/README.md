@@ -26,10 +26,10 @@ auto-discover pods to monitor, based on the standard Prometheus annotations.
 SAS Viya components that expose metrics endpoints should include these
 annotations:
 
-- `promethues.io/scrape` - `true` or `false`
-- `promethues.io/path` - path to metrics endpoint
-- `promethues.io/port`- metrics port
-- `promethues.io/scheme`- `http` or `https`
+- `prometheus.io/scrape` - `true` or `false`
+- `prometheus.io/path` - path to metrics endpoint
+- `prometheus.io/port`- metrics port
+- `prometheus.io/scheme`- `http` or `https`
 
 3. After customizing the template, apply it to the cluster by using this command:
 
