@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+<<<<<<< HEAD
+## Unreleased
+* **Metrics**
+  * [FIX] Restore metrics after move to Crunchy Data v.5
+
 ## Version 1.2.7 (02DEC2022)
 * **Logging**
   * [FIX] - Pin to specific Helm chart version (4.15.1) in logging/bin/deploy_esexporter.sh
