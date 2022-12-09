@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+## UNRELEASED - Version 1.2.8 (13DEC2022)
+
+* **Metrics**
+  * [FIX] - Data source created by the create_logging_datasource script no longer shows a depreciation notice.
+
 ## Version 1.2.7 (02DEC2022)
 
 * **Metrics**
