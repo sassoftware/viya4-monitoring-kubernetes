@@ -1,6 +1,12 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## UNRELEASED
+* **Overall**
+  * [ANNOUNCEMENT] The documentation for this project has been redesigned and is now located 
+    in the [SAS Viya Monitoring for Kubernetes Help Center](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvwlcm&docsetTarget=titlepage.htm).  
+    A limited amount of documentation, primarily related to experimental features, remains available 
+    as markdown files in the project repo.
+
 * **Metrics**
   * [FIX] Restore metrics after move to Crunchy Data v.5
   
