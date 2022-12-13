@@ -1,1 +1,3 @@
-See [Troubleshooting](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=callogging&docsetTarget=n1ih2j7rs04pran130y237wn14vo.htm) in the SAS Viya Administration Help Center.
+# Troubleshooting
+
+See [Troubleshooting](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=p1f3c5so49c0fyn1hrdplosqc6l1.htm) in the SAS Viya Monitoring for Kubernetes Help Center.

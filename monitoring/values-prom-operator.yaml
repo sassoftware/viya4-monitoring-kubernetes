@@ -48,6 +48,7 @@ kubelet:
     # Depending on your environment, this may require configuration
     # changes to the kubelet.
     # See issue: https://github.com/coreos/prometheus-operator/issues/926
+    cAdvisorMetricRelabelings: null
     https: true
     interval: 20s
 
