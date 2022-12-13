@@ -10,6 +10,7 @@
 * **Metrics**
   * [FIX] - Restored various container-related metrics that were being filtered out after an update.
   * [FIX] Restore metrics after move to Crunchy Data v.5
+  * [FIX] - Data source created by the create_logging_datasource script no longer shows a depreciation notice.
   
 * **Logging**
   * [FIX] Limited Access User Can NOT Generate CSV via OpenSearch Dashboards Reporting
