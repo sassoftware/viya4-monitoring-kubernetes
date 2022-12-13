@@ -8,6 +8,7 @@
     as markdown files in the project repo.
 
 * **Metrics**
+  * [FIX] - Restored various container-related metrics that were being filtered out after an update.
   * [FIX] Restore metrics after move to Crunchy Data v.5
   
 * **Logging**
