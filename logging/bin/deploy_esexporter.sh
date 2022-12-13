@@ -97,8 +97,13 @@ fi
 # Elasticsearch metric exporter
 helm2ReleaseCheck es-exporter-$LOG_NS
 
+# Get/Set Helm Chart Version
+ESEXPORTER_HELM_CHART_VERSION=${ESEXPORTER_HELM_CHART_VERSION:-"4.15.1"}
+log_debug "Elasticsearch Exporter Helm Chart version: $ESEXPORTER_HELM_CHART_VERSION"
+
 helm $helmDebug upgrade --install es-exporter \
  --namespace $LOG_NS \
+ --version $ESEXPORTER_HELM_CHART_VERSION \
  -f $primaryValuesFile \
  -f $wnpValuesFile \
  -f $openshiftValuesFile \

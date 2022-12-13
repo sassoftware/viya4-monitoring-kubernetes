@@ -33,7 +33,7 @@ prom/pushgateway:v1.4.3
 ## Cluster-Level Logging Images
 
 ```plaintext
-cr.fluentbit.io/fluent/fluent-bit:1.9.6
+cr.fluentbit.io/fluent/fluent-bit:1.9.9
 gcr.io/heptio-images/eventrouter:v0.3
 opensearchproject/opensearch-dashboards:1.3.5
 opensearchproject/opensearch:1.3.5
@@ -48,7 +48,7 @@ busybox:latest
 ```plaintext
 busybox:1.31.1
 busybox:latest
-cr.fluentbit.io/fluent/fluent-bit:1.9.6
+cr.fluentbit.io/fluent/fluent-bit:1.9.9
 gcr.io/heptio-images/eventrouter:v0.3
 ghostunnel/ghostunnel:v1.7.0
 grafana/grafana:9.2.3

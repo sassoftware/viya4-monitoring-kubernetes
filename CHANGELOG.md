@@ -1,9 +1,18 @@
 # SAS Viya Monitoring for Kubernetes
 
-## UNRELEASED - Version 1.2.8 (13DEC2022)
+## UNRELEASED
+* **Overall**
+  * [ANNOUNCEMENT] The documentation for this project has been redesigned and is now located 
+    in the [SAS Viya Monitoring for Kubernetes Help Center](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvwlcm&docsetTarget=titlepage.htm).  
+    A limited amount of documentation, primarily related to experimental features, remains available 
+    as markdown files in the project repo.
 
 * **Metrics**
   * [FIX] - Restored various container-related metrics that were being filtered out after an update.
+  * [FIX] Restore metrics after move to Crunchy Data v.5
+  
+* **Logging**
+  * [FIX] Limited Access User Can NOT Generate CSV via OpenSearch Dashboards Reporting
 
 ## Version 1.2.7 (02DEC2022)
 
