@@ -112,7 +112,7 @@ if [[ $response == 4* ]]; then
       # make sure hash utility is executable
       kubectl -n $LOG_NS exec $targetpod --  chmod +x $toolsrootdir/tools/hash.sh
       # get hash of new password
-      hashed_passwd=$(kubectl -n $LOG_NS exec $targetpod --  $toolsrootdir/tools/hash.sh -p $NEW_PASSWD)
+      hashed_passwd=$(kubectl -n $LOG_NS exec $targetpod --  $toolsrootdir/tools/hash.sh -p $NEW_PASSWD|grep -v '*')
       rc=$?
       if [ "$rc" == "0" ]; then
 
