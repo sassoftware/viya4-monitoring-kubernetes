@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+
+* **Metrics**
+  * [FIX] Eliminated 'Templating'/'Datasource not found' error in Grafana PostgreSQL Database dashboard
+
 ## Version 1.2.8 (13DEC2022)
 
 * **Overall**

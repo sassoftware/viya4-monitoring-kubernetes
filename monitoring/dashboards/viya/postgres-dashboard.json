@@ -2736,7 +2736,7 @@
           "text": "d48534",
           "value": "d48534"
         },
-        "datasource": "prometheus",
+        "datasource": "Prometheus",
         "definition": "",
         "hide": 0,
         "includeAll": true,
@@ -2763,7 +2763,7 @@
           "text": "10.254.12.225:9187",
           "value": "10.254.12.225:9187"
         },
-        "datasource": "prometheus",
+        "datasource": "Prometheus",
         "definition": "query_result(pg_up{namespace=~\"$namespace\"})",
         "hide": 0,
         "includeAll": false,
@@ -2790,7 +2790,7 @@
           "text": "All",
           "value": "$__all"
         },
-        "datasource": "prometheus",
+        "datasource": "Prometheus",
         "definition": "",
         "hide": 0,
         "includeAll": true,
@@ -2817,7 +2817,7 @@
           "text": "All",
           "value": "$__all"
         },
-        "datasource": "prometheus",
+        "datasource": "Prometheus",
         "definition": "",
         "hide": 0,
         "includeAll": true,
