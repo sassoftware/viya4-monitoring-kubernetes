@@ -76,6 +76,8 @@ spec:
           volumeMounts:
           - name: config-volume
             mountPath: /etc/eventrouter
+          securityContext:
+            readOnlyRootFilesystem: true
       serviceAccount: eventrouter
       volumes:
         - name: config-volume
