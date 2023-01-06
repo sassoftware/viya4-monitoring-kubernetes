@@ -72,6 +72,8 @@ kube-state-metrics:
   # collected for each resource type 
   extraArgs:
   - --metric-labels-allowlist=nodes=[*],namespaces=[*],pods=[*],deployments=[*],statefulsets=[*],daemonsets=[*],jobs=[*]
+  containerSecurityContext:
+    readOnlyRootFilesystem: true
 
 # ==========
 # Prometheus
