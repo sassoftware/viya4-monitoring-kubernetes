@@ -229,3 +229,5 @@ grafana:
       - kubernetes.io/pvc-protection
     # subPath: ""
     # existingClaim:
+  containerSecurityContext:
+    readOnlyRootFilesystem: true
