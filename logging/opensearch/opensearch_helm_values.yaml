@@ -1,5 +1,6 @@
 image:
-  tag: 1.3.5
+  #Support for DISABLE_PERFORMANCE_ANALYZER_AGENT_CLI added w/1.3.6+
+  tag: 1.3.7
 
 config: 
   opensearch.yml: |
