@@ -171,6 +171,8 @@ prometheus-node-exporter:
         targetLabel: nodename
         replacement: $1
         action: replace
+  containerSecurityContext:
+    readOnlyRootFilesystem: true
 
 # =======
 # Grafana
