@@ -42,6 +42,8 @@ securityConfig:
   tenantsSecret: security-tenants
 
 extraEnvs:
+ - name: DISABLE_PERFORMANCE_ANALYZER_AGENT_CLI
+   value: "true"
  - name: DISABLE_INSTALL_DEMO_CONFIG
    value: "true"
  - name: ES_ADMIN_PASSWD
@@ -175,3 +177,6 @@ extraInitContainers:
   securityContext:
     privileged: true
     runAsUser: 0
+
+securityContext:
+  readOnlyRootFilesystem: true
