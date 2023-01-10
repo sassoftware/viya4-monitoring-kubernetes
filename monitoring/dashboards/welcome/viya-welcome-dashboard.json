@@ -353,7 +353,7 @@
       },
       "id": 26,
       "options": {
-        "content": "### Get More Help\n\n* [SAS Viya Monitoring on GitHub](https://github.com/sassoftware/viya4-monitoring-kubernetes)\n* [View Open Issues](https://github.com/sassoftware/viya4-monitoring-kubernetes/issues)\n* [Report a New Issue](https://github.com/sassoftware/viya4-monitoring-kubernetes/issues/new)",
+        "content": "### Get More Help\n\n * [SAS Viya Monitoring for Kubernetes Help Center](http://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default)\n* [SAS Viya Monitoring on GitHub](https://github.com/sassoftware/viya4-monitoring-kubernetes)\n* [View Open Issues](https://github.com/sassoftware/viya4-monitoring-kubernetes/issues)\n* [Report a New Issue](https://github.com/sassoftware/viya4-monitoring-kubernetes/issues/new)",
         "mode": "markdown"
       },
       "pluginVersion": "8.2.1",

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* **Overall**
+  * [FEATURE] Added link to the SAS Viya Monitoring for Kubernetes Help Center page on the Welcome screen in Grafana
+
 * **Metrics**
   * [FIX] Eliminated 'Templating'/'Datasource not found' error in Grafana PostgreSQL Database dashboard
 
