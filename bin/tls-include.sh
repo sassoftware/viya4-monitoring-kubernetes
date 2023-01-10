@@ -11,6 +11,8 @@ else
   certManagerAvailable="false"
 fi
 
+DAY_IN_SECONDS=86400
+
 function verify_cert_manager {
   if [ "$cert_manager_ok" == "true" ]; then
     return 0
@@ -106,7 +108,7 @@ function create_tls_certs_cm {
     # Only create the secrets if they do not exist
     TLS_SECRET_NAME=$app-tls-secret
     if [ -n "$(kubectl get secret -n $namespace $TLS_SECRET_NAME -o name 2>/dev/null)" ]; then
-      if kubectl get secret -n $namespace $TLS_SECRET_NAME -o "jsonpath={.data['tls\.crt']}" | base64 -d | openssl x509 -checkend 86400 -noout 2>/dev/null
+      if kubectl get secret -n $namespace $TLS_SECRET_NAME -o "jsonpath={.data['tls\.crt']}" | base64 -d | openssl x509 -checkend $DAY_IN_SECONDS -noout 2>/dev/null
       then
         log_debug "TLS Secret for [$app] already exists and cert is not expired; skipping TLS certificate generation."
         continue
@@ -263,7 +265,7 @@ function create_tls_certs_openssl {
       secretName="${app}-tls-secret"
 
       if [ -n "$(kubectl get secret -n $namespace $secretName -o name 2>/dev/null)" ]; then
-        if kubectl get secret -n $namespace $secretName -o "jsonpath={.data['tls\.crt']}" | base64 -d | openssl x509 -checkend 86400 -noout 2>/dev/null
+        if kubectl get secret -n $namespace $secretName -o "jsonpath={.data['tls\.crt']}" | base64 -d | openssl x509 -checkend $DAY_IN_SECONDS -noout 2>/dev/null
         then
           log_debug "TLS Secret for [$app] already exists and cert is not expired; skipping TLS certificate generation."
           continue
