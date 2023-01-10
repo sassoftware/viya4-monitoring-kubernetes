@@ -1,6 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+
+* **Metrics**
+  * [FIX] Eliminated 'Templating'/'Datasource not found' error in Grafana PostgreSQL Database dashboard
+
 * **Logging**
   * [FIX]  - Improved handling of log messages from RabbitMQ and Consul
 
