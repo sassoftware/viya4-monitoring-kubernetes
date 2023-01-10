@@ -105,15 +105,22 @@ function create_tls_certs_cm {
   for app in "${apps[@]}"; do
     # Only create the secrets if they do not exist
     TLS_SECRET_NAME=$app-tls-secret
-    if [ -z "$(kubectl get secret -n $namespace $TLS_SECRET_NAME -o name 2>/dev/null)" ]; then
-        if [ "$deployedIssuers" == "false" ]; then
-          deploy_issuers $namespace $context
-          deployedIssuers="true"
-        fi
-        deploy_app_cert "$namespace" "$context" "$app"
-    else
-      log_debug "Using existing $TLS_SECRET_NAME for [$app]"
+    if [ -n "$(kubectl get secret -n $namespace $TLS_SECRET_NAME -o name 2>/dev/null)" ]; then
+       if kubectl get secret -n $namespace $TLS_SECRET_NAME -o "jsonpath={.data['tls\.crt']}" | base64 -d | openssl x509 -enddate -noout -checkend 86400
+       then
+         log_debug "TLS Secret for [$app] already exists and cert is not expired; skipping TLS certificate generation."
+         continue
+       else
+         log_debug "TLS Secret for [$app] exists but cert has expired or will do so within 24 hours; Replacing with new cert"
+         kubectl delete secret -n $namespace $TLS_SECRET_NAME
+       fi
     fi
+
+    if [ "$deployedIssuers" == "false" ]; then
+      deploy_issuers $namespace $context
+      deployedIssuers="true"
+    fi
+    deploy_app_cert "$namespace" "$context" "$app"
   done
 }
 
@@ -256,8 +263,14 @@ function create_tls_certs_openssl {
       secretName="${app}-tls-secret"
 
       if [ -n "$(kubectl get secret -n $namespace $secretName -o name 2>/dev/null)" ]; then
-         log_debug "TLS Secret for [$app] already exists; skipping TLS certificate generation."
-         continue
+         if kubectl get secret -n $namespace $secretName -o "jsonpath={.data['tls\.crt']}" | base64 -d | openssl x509 -enddate -noout -checkend 86400
+         then
+           log_debug "TLS Secret for [$app] already exists and cert is not expired; skipping TLS certificate generation."
+           continue
+         else
+           log_debug "TLS Secret for [$app] exists but cert has expired or will do so within 24 hours; Replacing with new cert"
+           kubectl delete secret -n $namespace $secretName
+         fi
       fi
 
       if [ ! -f  $TMP_DIR/root-ca-key.pem ]; then
