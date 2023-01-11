@@ -11,7 +11,7 @@ else
   certManagerAvailable="false"
 fi
 
-DAY_IN_SECONDS=86400
+CERT_CHECK_EXPIRATION_SECONDS=604800
 
 function verify_cert_manager {
   if [ "$cert_manager_ok" == "true" ]; then
@@ -105,10 +105,10 @@ function create_tls_certs_cm {
   deployedIssuers="false"
     # Certs honor USER_DIR for overrides/customizations
   for app in "${apps[@]}"; do
-    # Only create the secrets if they do not exist
+    # Only create the secrets if they do not exist or if the certs have expired
     TLS_SECRET_NAME=$app-tls-secret
     if [ -n "$(kubectl get secret -n $namespace $TLS_SECRET_NAME -o name 2>/dev/null)" ]; then
-      if kubectl get secret -n $namespace $TLS_SECRET_NAME -o "jsonpath={.data['tls\.crt']}" | base64 -d | openssl x509 -checkend $DAY_IN_SECONDS -noout 2>/dev/null
+      if kubectl get secret -n $namespace $TLS_SECRET_NAME -o "jsonpath={.data['tls\.crt']}" | base64 -d | openssl x509 -checkend $CERT_CHECK_EXPIRATION_SECONDS -noout 2>/dev/null
       then
         log_debug "TLS Secret for [$app] already exists and cert is not expired; skipping TLS certificate generation."
         continue
@@ -265,13 +265,19 @@ function create_tls_certs_openssl {
       secretName="${app}-tls-secret"
 
       if [ -n "$(kubectl get secret -n $namespace $secretName -o name 2>/dev/null)" ]; then
-        if kubectl get secret -n $namespace $secretName -o "jsonpath={.data['tls\.crt']}" | base64 -d | openssl x509 -checkend $DAY_IN_SECONDS -noout 2>/dev/null
-        then
-          log_debug "TLS Secret for [$app] already exists and cert is not expired; skipping TLS certificate generation."
-          continue
+        # If the secret exists, make sure it is managed by v4m before rotating the cert
+        if [[ "$(kubectl get secret -n monitoring grafana-tls-secret --show-labels)" == *"managed-by=v4m"* ]]; then
+          if kubectl get secret -n $namespace $secretName -o "jsonpath={.data['tls\.crt']}" | base64 -d | openssl x509 -checkend $CERT_CHECK_EXPIRATION_SECONDS -noout 2>/dev/null
+          then
+            log_debug "TLS Secret for [$app] already exists and cert is not expired; skipping TLS certificate generation."
+            continue
+          else
+            log_debug "TLS Secret for [$app] exists but cert has expired or will do so within 24 hours; Replacing with new cert"
+            kubectl delete secret -n $namespace $secretName
+          fi
         else
-          log_debug "TLS Secret for [$app] exists but cert has expired or will do so within 24 hours; Replacing with new cert"
-          kubectl delete secret -n $namespace $secretName
+            log_debug "TLS Secret for [$app] already exists but is not managed by v4m; skipping cert expiration check"
+            continue
         fi
       fi
 
