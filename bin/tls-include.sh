@@ -270,8 +270,10 @@ function tls_certs_managed_by_v4m () {
   secretName="$3"
 
   if [[ "$(kubectl get secret -n $namespace $secretName --show-labels)" == *"managed-by=v4m"* ]]; then
+    log_debug "TLS Certs are managed by V4M"
     return 0
   else
+    log_debug "TLS Certs are not managed by V4M"
     return 1
   fi
 }
