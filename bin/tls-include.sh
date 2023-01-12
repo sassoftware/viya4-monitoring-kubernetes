@@ -11,9 +11,6 @@ else
   certManagerAvailable="false"
 fi
 
-CERT_CHECK_EXPIRATION_SECONDS=604800
-# CERT_CHECK_EXPIRATION_SECONDS=10
-
 function verify_cert_manager {
   if [ "$cert_manager_ok" == "true" ]; then
     return 0
@@ -285,8 +282,7 @@ function create_tls_certs_openssl {
     shift
     apps=("$@")
 
-    # cert_life=${OPENSSL_CERT_LIFE:-550}
-    cert_life=1
+    cert_life=${OPENSSL_CERT_LIFE:-550}
 
     for app in "${apps[@]}"; do
       secretName="${app}-tls-secret"
