@@ -115,9 +115,11 @@ function renew-certs {
         log_info "Generating new certs for [Alertmanager, Prometheus, Grafana]"
         log_info "Deleting existing secrets for [Alertmanager, Prometheus, Grafana]"
 
-        kubectl delete secret -n "$MON_NS" "prometheus-tls-secret"
-        kubectl delete secret -n "$MON_NS" "alertmanager-tls-secret"
-        kubectl delete secret -n "$MON_NS" "grafana-tls-secret"
+        for secretName in prometheus-tls-secret alertmanager-tls-secret grafana-tls-secret; do
+          if [ -n "$(kubectl get secret -n $MON_NS $secretName -o name 2>/dev/null)" ]; then
+            kubectl delete secret -n "$MON_NS" $secretName
+          fi
+        done
 
         log_info "Generating new certs for [Alertmanager, Prometheus, Grafana]"
         create_tls_certs_openssl "$MON_NS" prometheus alertmanager grafana
@@ -128,10 +130,11 @@ function renew-certs {
         log_info "Generating new certs for [Alertmanager, Prometheus, Grafana]"
         log_info "Deleting existing secrets for [Alertmanager, Prometheus, Grafana]"
 
-        kubectl delete secret -n "$LOG_NS" 'kibana-tls-secret'
-        kubectl delete secret -n "$LOG_NS" 'es-transport-tls-secret'
-        kubectl delete secret -n "$LOG_NS" 'es-rest-tls-secret'
-        kubectl delete secret -n "$LOG_NS" 'es-admin-tls-secret'
+        for secretName in kibana-tls-secret es-transport-tls-secret es-rest-tls-secret es-admin-tls-secret; do
+          if [ -n "$(kubectl get secret -n $LOG_NS $secretName -o name 2>/dev/null)" ]; then
+            kubectl delete secret -n "$LOG_NS" $secretName
+          fi
+        done
 
         log_info "Generating new certs for [Opensearch and Opensearch Dashboard]"
         create_tls_certs_openssl "$LOG_NS" kibana es-transport es-rest es-admin
