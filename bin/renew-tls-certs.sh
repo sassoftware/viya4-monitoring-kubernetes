@@ -66,7 +66,7 @@ function restart-resources {
         kubectl rollout restart statefulset "$prometheusResourceName" -n "$namespace"
         kubectl rollout restart deployment "$grafanaResourceName" -n "$namespace"
 
-        log_info "[Altermanager, Prometheus, Grafana] have been restarted"
+        log_info "[Alertmanager, Prometheus, Grafana] have been restarted"
         ;;
      "ALL-LOG")
         namespace=$LOG_NS
@@ -97,7 +97,7 @@ function restart-resources {
         kubectl rollout restart statefulset "$prometheusResourceName" -n "$monNamespace"
         kubectl rollout restart deployment "$grafanaResourceName" -n "$monNamespace"
 
-        log_info "[OpenSearch, OpenSearch Dashboard, Altermanager, Prometheus, Grafana] have been restarted"
+        log_info "[OpenSearch, OpenSearch Dashboard, Alertmanager, Prometheus, Grafana] have been restarted"
         ;;
     ""|*)
         log_error "Must Specify which resources to restart"
@@ -112,21 +112,21 @@ function renew-certs {
   app=$1
   case "$app" in
      "ALL-MON")
-        log_info "Generating new certs for [Altermanager, Prometheus, Grafana]"
-        log_info "Deleting existing secrets for [Altermanager, Prometheus, Grafana]"
+        log_info "Generating new certs for [Alertmanager, Prometheus, Grafana]"
+        log_info "Deleting existing secrets for [Alertmanager, Prometheus, Grafana]"
 
         kubectl delete secret -n "$MON_NS" "prometheus-tls-secret"
         kubectl delete secret -n "$MON_NS" "alertmanager-tls-secret"
         kubectl delete secret -n "$MON_NS" "grafana-tls-secret"
 
-        log_info "Generating new certs for [Altermanager, Prometheus, Grafana]"
+        log_info "Generating new certs for [Alertmanager, Prometheus, Grafana]"
         create_tls_certs_openssl "$MON_NS" prometheus alertmanager grafana
 
         restart-resources "$app"
         ;;
      "ALL-LOG")
-        log_info "Generating new certs for [Altermanager, Prometheus, Grafana]"
-        log_info "Deleting existing secrets for [Altermanager, Prometheus, Grafana]"
+        log_info "Generating new certs for [Alertmanager, Prometheus, Grafana]"
+        log_info "Deleting existing secrets for [Alertmanager, Prometheus, Grafana]"
 
         kubectl delete secret -n "$LOG_NS" 'kibana-tls-secret'
         kubectl delete secret -n "$LOG_NS" 'es-transport-tls-secret'
