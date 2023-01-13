@@ -148,7 +148,7 @@ function renew-certs {
 
 restartOnly=false
 
-while getopts 't:frh' OPTION; do
+while getopts 't:rh' OPTION; do
   case "$OPTION" in
     t)
       targetOpt=$OPTARG
@@ -160,7 +160,7 @@ while getopts 't:frh' OPTION; do
       log_info "Restarting the target resources without renewing certs"
       ;;
     h)
-      log_info "script usage: ./bin/renew-tls-certs.sh [-t [REQUIRED](target resource)] [-f] [-r]"
+      log_info "script usage: ./bin/renew-tls-certs.sh [-t [REQUIRED](target resource)] [-r]"
       log_info "-t REQUIRED Options: [OPENSEARCH, OPENSEARCHDASHBOARDS, GRAFANA, PROMETHEUS, ALERTMANAGER, ALL-MON, ALL-LOG, or ALL]"
       log_info "-r Only restarts the target resources and does not generate new certs. Useful for those managing their own certs"
       ;;
