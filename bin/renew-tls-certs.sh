@@ -124,7 +124,7 @@ function renew-certs {
         log_info "Generating new certs for [Alertmanager, Prometheus, Grafana]"
         create_tls_certs_openssl "$MON_NS" prometheus alertmanager grafana
 
-        restart-resources "$app"
+        restart-resources "ALL-MON" # WIP: Move restarts to create_tls_certs_openssl function?
         ;;
      "ALL-LOG")
         log_info "Generating new certs for [Alertmanager, Prometheus, Grafana]"
@@ -139,7 +139,7 @@ function renew-certs {
         log_info "Generating new certs for [Opensearch and Opensearch Dashboard]"
         create_tls_certs_openssl "$LOG_NS" kibana es-transport es-rest es-admin
 
-        restart-resources "$app"
+        restart-resources "ALL-LOG" # WIP: Move restarts to create_tls_certs_openssl function?
         ;;
     ""|*)
         log_error "Valid target values for certificate renewal:"
