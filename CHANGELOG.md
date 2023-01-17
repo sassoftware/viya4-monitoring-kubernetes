@@ -7,6 +7,7 @@
 
 * **Metrics**
   * [FIX] Eliminated 'Templating'/'Datasource not found' error in Grafana PostgreSQL Database dashboard
+  * [FEATURE] Add new 'SAS Micro Analytic Serivce' dashboard to Grafana
 
 * **Logging**
   * [FIX]  - Improved handling of log messages from RabbitMQ and Consul
