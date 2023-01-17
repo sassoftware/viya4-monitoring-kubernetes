@@ -110,6 +110,9 @@ function renew-certs {
           if [ -n "$(kubectl get secret -n $MON_NS $secretName -o name 2>/dev/null)" ]; then
             if (tls_cert_managed_by_v4m "$MON_NS" "$secretName") then
               kubectl delete secret -n "$MON_NS" $secretName
+            else
+              log_error "[$secretName] is not managed by Viya Monitoring. Delete certs not managed by Viya Monitoring or update certs and restart applications by re-running this script using the [-r] flag"
+              exit 1
             fi
           fi
         done
@@ -120,13 +123,16 @@ function renew-certs {
         restart-resources "ALL-MON" # WIP: Move restarts to create_tls_certs_openssl function?
         ;;
      "ALL-LOG")
-        log_info "Generating new certs for [Alertmanager, Prometheus, Grafana]"
-        log_info "Deleting existing secrets for [Alertmanager, Prometheus, Grafana]"
+       log_info "Generating new certs for [OpenSearch, OpenSearch Dashboards]"
+       log_info "Deleting existing secrets for [OpenSearch, OpenSearch Dashboards]"
 
         for secretName in kibana-tls-secret es-transport-tls-secret es-rest-tls-secret es-admin-tls-secret; do
           if [ -n "$(kubectl get secret -n $LOG_NS $secretName -o name 2>/dev/null)" ]; then
             if (tls_cert_managed_by_v4m "$LOG_NS" "$secretName") then
               kubectl delete secret -n "$LOG_NS" $secretName
+            else
+              log_error "[$secretName] is not managed by Viya Monitoring. Delete certs not managed by Viya Monitoring or update certs and restart applications by re-running this script using the [-r] flag"
+              exit 1
             fi
           fi
         done
