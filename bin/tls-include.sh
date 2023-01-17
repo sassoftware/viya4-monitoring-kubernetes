@@ -247,7 +247,7 @@ function create_cert_secret {
 # Checks if tls certs is or will expire within TLS_CERT_RENEW_WINDOW timeframe
 # Return 0: Cert is still valid and will not expire with the given timeframe
 # Return 1: Cert is expired or will expire within the given timeframe
-function check_tls_cert_expiration () {
+function tls_cert_expired () {
   namespace="$1"
   app="$2"
   secretName="$3"
@@ -291,11 +291,11 @@ function create_tls_certs_openssl {
 
       if [ -n "$(kubectl get secret -n $namespace $secretName -o name 2>/dev/null)" ]; then
         if (tls_certs_managed_by_v4m $namespace $secretName) then
-          if (check_tls_cert_expiration $namespace $app $secretName) then
+          if (tls_cert_expired $namespace $app $secretName) then
             log_debug "TLS Secret for [$app] already exists and cert is not expired; skipping TLS certificate generation."
             continue
           else
-            log_debug "TLS Secret for [$app] exists but cert has expired or will do so within a week"
+            log_debug "TLS Secret for [$app] exists but cert has expired or will do so within ${TLS_CERT_RENEW_WINDOW:-7} days"
             log_debug "Renew certs using: renew-tls-certs.sh"
             # TODO: When certs are expired:
             # Delete secret and allow cert generation
