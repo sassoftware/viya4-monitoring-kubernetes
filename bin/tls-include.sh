@@ -270,10 +270,10 @@ function tls_certs_managed_by_v4m () {
   secretName="$3"
 
   if [[ "$(kubectl get secret -n $namespace $secretName --show-labels)" == *"managed-by=v4m"* ]]; then
-    log_debug "TLS Certs are managed by V4M"
+    log_debug "TLS Certs are managed by Viya Monitoring"
     return 0
   else
-    log_debug "TLS Certs are not managed by V4M"
+    log_debug "TLS Certs are not managed by Viya Monitoring"
     return 1
   fi
 }
@@ -290,12 +290,22 @@ function create_tls_certs_openssl {
       secretName="${app}-tls-secret"
 
       if [ -n "$(kubectl get secret -n $namespace $secretName -o name 2>/dev/null)" ]; then
-        if (tls_certs_managed_by_v4m $namespace $secretName) && (check_tls_cert_expiration $namespace $app $secretName) then
-          log_debug "TLS Secret for [$app] already exists and cert is not expired; skipping TLS certificate generation."
-          continue
+        if (tls_certs_managed_by_v4m $namespace $secretName) then
+          if (check_tls_cert_expiration $namespace $app $secretName) then
+            log_debug "TLS Secret for [$app] already exists and cert is not expired; skipping TLS certificate generation."
+            continue
+          else
+            log_debug "TLS Secret for [$app] exists but cert has expired or will do so within a week"
+            log_debug "Renew certs using: renew-tls-certs.sh"
+            # TODO: When certs are expired:
+            # Delete secret and allow cert generation
+            # Get the resource restarted by calling func in renew-tls-certs.sh
+            # kubectl delete secret -n $namespace $secretName
+            continue
+          fi
         else
-          log_debug "TLS Secret for [$app] exists but cert has expired or will do so within a week; Replacing with new cert"
-          kubectl delete secret -n $namespace $secretName
+          # Certs not managed by Viya Monitoring
+          continue
         fi
       fi
 
