@@ -108,7 +108,9 @@ function renew-certs {
 
         for secretName in prometheus-tls-secret alertmanager-tls-secret grafana-tls-secret; do
           if [ -n "$(kubectl get secret -n $MON_NS $secretName -o name 2>/dev/null)" ]; then
-            kubectl delete secret -n "$MON_NS" $secretName
+            if (tls_cert_managed_by_v4m "$MON_NS" "$secretName") then
+              kubectl delete secret -n "$MON_NS" $secretName
+            fi
           fi
         done
 
@@ -123,7 +125,9 @@ function renew-certs {
 
         for secretName in kibana-tls-secret es-transport-tls-secret es-rest-tls-secret es-admin-tls-secret; do
           if [ -n "$(kubectl get secret -n $LOG_NS $secretName -o name 2>/dev/null)" ]; then
-            kubectl delete secret -n "$LOG_NS" $secretName
+            if (tls_cert_managed_by_v4m "$LOG_NS" "$secretName") then
+              kubectl delete secret -n "$LOG_NS" $secretName
+            fi
           fi
         done
 
