@@ -85,7 +85,7 @@ function restart-resources {
         prometheusResourceName=${PROM_RESOURCENAME:-"prometheus-v4m-prometheus"}
         grafanaResourceName=${GR_RESOURCENAME:-"v4m-grafana"}
 
-        log_info "Restarting [OpenSearch, OpenSearch Dashboards, Alertmanager, Prometheus, Grafana]"
+        log_info "Restarting [Alertmanager, Prometheus, Grafana]"
         kubectl rollout restart statefulset "$alertmanagerResourceName" -n "$monNamespace"
         kubectl rollout restart statefulset "$prometheusResourceName" -n "$monNamespace"
         kubectl rollout restart deployment "$grafanaResourceName" -n "$monNamespace"
