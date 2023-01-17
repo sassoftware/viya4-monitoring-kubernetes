@@ -20,14 +20,14 @@ function restart-resources {
         namespace=$LOG_NS
         resourceName=${OS_RESOURCENAME:-"v4m-search"}
 
-        log_info "Restarting [Opensearch]"
+        log_info "Restarting [OpenSearch]"
         kubectl rollout restart statefulset "$resourceName" -n "$namespace"
         ;;
      "OPENSEARCHDASHBOARDS"|"DASHBOARDS"|"OSD")
         namespace=$LOG_NS
         resourceName=${OSD_RESOURCENAME:-"v4m-osd"}
 
-        log_info "Restarting [Opensearch Dashboards]"
+        log_info "Restarting [OpenSearch Dashboards]"
         kubectl rollout restart deployment "$resourceName" -n "$namespace"
         ;;
      "ALERTMANAGER"|"AM")
@@ -127,7 +127,7 @@ function renew-certs {
           fi
         done
 
-        log_info "Generating new certs for [Opensearch and Opensearch Dashboards]"
+        log_info "Generating new certs for [OpenSearch and OpenSearch Dashboards]"
         create_tls_certs_openssl "$LOG_NS" kibana es-transport es-rest es-admin
 
         restart-resources "ALL-LOG" # WIP: Move restarts to create_tls_certs_openssl function?
@@ -155,8 +155,9 @@ while getopts 't:rh' OPTION; do
       ;;
     h)
       log_message "script usage: ./bin/renew-tls-certs.sh [-t [REQUIRED](target resource)] [-r]"
-      log_message "-t REQUIRED Options: [OPENSEARCH, OPENSEARCHDASHBOARDS, GRAFANA, PROMETHEUS, ALERTMANAGER, ALL-MON, ALL-LOG, or ALL]"
+      log_message "-t (REQUIRED) Options: [ALL-MON, ALL-LOG]"
       log_message "-r Only restarts the target resources and does not generate new certs. Useful for those managing their own certs"
+      log_message "Running with [-r] allows the following targets [-t]: [OPENSEARCH, OPENSEARCHDASHBOARDS, GRAFANA, PROMETHEUS, ALERTMANAGER, ALL-MON, ALL-LOG, or ALL]"
       ;;
     ?)
       log_error "script usage: ./bin/renew-tls-certs.sh [-t [REQUIRED](target resource)] [-r]" >&2
