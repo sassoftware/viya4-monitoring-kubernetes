@@ -27,7 +27,7 @@ function restart-resources {
         namespace=$LOG_NS
         resourceName=${OSD_RESOURCENAME:-"v4m-osd"}
 
-        log_info "Restarting [Opensearch Dashboard]"
+        log_info "Restarting [Opensearch Dashboards]"
         kubectl rollout restart deployment "$resourceName" -n "$namespace"
         ;;
      "ALERTMANAGER"|"AM")
@@ -67,7 +67,7 @@ function restart-resources {
         osdResourceName=${OSD_RESOURCENAME:-"v4m-osd"}
         osResourceName=${OS_RESOURCENAME:-"v4m-search"}
 
-        log_info "Restarting [OpenSearch, OpenSearch Dashboard]"
+        log_info "Restarting [OpenSearch, OpenSearch Dashboards]"
         kubectl rollout restart deployment "$osdResourceName" -n "$namespace"
         kubectl rollout restart statefulset "$osResourceName" -n "$namespace"
         ;;
@@ -76,7 +76,7 @@ function restart-resources {
         osdResourceName=${OSD_RESOURCENAME:-"v4m-osd"}
         osResourceName=${OS_RESOURCENAME:-"v4m-search"}
 
-        log_info "Restarting [OpenSearch, OpenSearch Dashboard]"
+        log_info "Restarting [OpenSearch, OpenSearch Dashboards]"
         kubectl rollout restart deployment "$osdResourceName" -n "$logNamespace"
         kubectl rollout restart statefulset "$osResourceName" -n "$logNamespace"
 
@@ -85,7 +85,7 @@ function restart-resources {
         prometheusResourceName=${PROM_RESOURCENAME:-"prometheus-v4m-prometheus"}
         grafanaResourceName=${GR_RESOURCENAME:-"v4m-grafana"}
 
-        log_info "Restarting [OpenSearch, OpenSearch Dashboard, Alertmanager, Prometheus, Grafana]"
+        log_info "Restarting [OpenSearch, OpenSearch Dashboards, Alertmanager, Prometheus, Grafana]"
         kubectl rollout restart statefulset "$alertmanagerResourceName" -n "$monNamespace"
         kubectl rollout restart statefulset "$prometheusResourceName" -n "$monNamespace"
         kubectl rollout restart deployment "$grafanaResourceName" -n "$monNamespace"
@@ -127,7 +127,7 @@ function renew-certs {
           fi
         done
 
-        log_info "Generating new certs for [Opensearch and Opensearch Dashboard]"
+        log_info "Generating new certs for [Opensearch and Opensearch Dashboards]"
         create_tls_certs_openssl "$LOG_NS" kibana es-transport es-rest es-admin
 
         restart-resources "ALL-LOG" # WIP: Move restarts to create_tls_certs_openssl function?
