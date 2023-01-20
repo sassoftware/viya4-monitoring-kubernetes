@@ -10,7 +10,6 @@ export ES_CONF_DIR=/usr/share/opensearch/config
 logfile=$ES_CONF_DIR/run_securityadmin.log
 echo "run_securityadmin.sh script starting [$(date)]" > $logfile
 
-#if [[ ! -x $ES_PLUGINS_DIR/opensearch-security/tools/securityadmin.sh ]]; then
 if [ ! -x $ES_PLUGINS_DIR/opensearch-security/tools/securityadmin.sh ]; then
    echo "Setting eXecutable bit"
   chmod +x $ES_PLUGINS_DIR/opensearch-security/tools/securityadmin.sh
