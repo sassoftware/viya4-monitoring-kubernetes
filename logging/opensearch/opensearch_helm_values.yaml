@@ -3,14 +3,7 @@ image:
 
 config: 
   opensearch.yml: |
-    ######## ODFE ==> OpenSearch Security Configuration - START ########
-    # Based on V4M existing es_helm_values_open.yaml security config
-    #
-    # Changes: global change opendistro_security.==>plugins.security.
-    #          added opensearch.yaml line and indented previous content
-    # Changes (19JAN23): removed node.max_local_storage_nodes (deprecated in OpenSearch)
-
-
+    ######## OpenSearch Security Configuration - START ########
     plugins.security.ssl.transport.pemcert_filepath: elk-transport-crt.pem
     plugins.security.ssl.transport.pemkey_filepath: elk-transport-key.pem
     plugins.security.ssl.transport.pemtrustedcas_filepath: elk-transport-root-ca.pem
@@ -30,20 +23,13 @@ config:
     plugins.security.check_snapshot_restore_write_privileges: true
     plugins.security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
     cluster.routing.allocation.disk.threshold_enabled: false
-    ######## ODFE ==> OpenSearch Security Configuration - END ########
+    ######## OpenSearch Security Configuration - END ########
 
 securityConfig:
   enabled: true
   path: "/usr/share/opensearch/plugins/opensearch-security/securityconfig"
   config:
      securityConfigSecret: opensearch-securityconfig
-
-#  actionGroupsSecret: security-action-groups
-#  configSecret: security-config
-#  internalUsersSecret: security-internal-users
-#  rolesSecret: security-roles
-#  rolesMappingSecret: security-roles-mapping
-#  tenantsSecret: security-tenants
 
 extraEnvs:
  - name: DISABLE_INSTALL_DEMO_CONFIG
