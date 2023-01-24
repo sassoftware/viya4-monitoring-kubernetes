@@ -178,13 +178,3 @@ sysctlInit:
 
 #sysctlVmMaxMapCount:
 #  262144
-
-#plugins:
-#  enabled: true
-#  installList:
-#  - opensearch-alerting
-#  - opensearch-index-management
-#  - opensearch-job-scheduler
-#  - opensearch-reports-scheduler
-#  - opensearch-security
-#  - opensearch-sql
