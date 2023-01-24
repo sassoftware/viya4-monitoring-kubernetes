@@ -255,7 +255,8 @@ if [ -z "$(kubectl -n $LOG_NS get secret opensearch-securityconfig -o name 2>/de
    #Overlay OpenSearch security configuration files from USER_DIR (if exists)
    if [ -d "$USER_DIR/logging/opensearch/securityconfig" ]; then
       log_debug "OpenSearch Security Configuration directory found w/in USER_DIR [$USER_DIR]"
-      if [ "$ls $USER_DIR/logging/opensearch/securityconfig/*.yml" ]; then
+
+      if [ "$(ls $USER_DIR/logging/opensearch/securityconfig/*.yml 2>/dev/null)" ]; then
         log_info "Copying OpenSearch Security Configuration files from [$USER_DIR/logging/opensearch/securityconfig]"
         cp $USER_DIR/logging/opensearch/securityconfig/*.yml $TMP_DIR/opensearch/securityconfig
       else
