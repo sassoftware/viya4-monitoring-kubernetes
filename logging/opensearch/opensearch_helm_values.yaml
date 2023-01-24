@@ -166,6 +166,7 @@ persistence:
   enabled: true
   #storageClass: alt-storage
   size: 30Gi
+  enableInitChown: false
 
 # Use securityContext to set sysctl
 sysctl:
