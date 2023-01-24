@@ -1,12 +1,11 @@
-# Chart: https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch-dashboards
-# Default values: https://github.com/opensearch-project/helm-charts/blob/main/charts/opensearch-dashboards/values.yaml
+# Chart: https://github.com/opensearch-project/helm-charts/tree/opensearch-dashboards-2.7.0/charts/opensearch-dashboards
+# Default values: https://github.com/opensearch-project/helm-charts/blob/opensearch-dashboards-2.7.0/charts/opensearch-dashboards/values.yaml
 
 #image:
-#  tag: 1.3.2
+#  tag: 2.4.1
 #  repository: "opensearchproject/opensearch-dashboards"
 #  pullPolicy: "IfNotPresent"
 
-## See samples/ingress and/or samples/tls for examples
-## of how to configure ingress (host or path based) and
-## TLS
+## See samples/tls for examples of how to
+## configure TLS+ingress (host or path based)
 

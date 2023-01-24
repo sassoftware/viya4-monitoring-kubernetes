@@ -1,8 +1,8 @@
-# Chart: https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch
-# Default values: https://github.com/opensearch-project/helm-charts/blob/main/charts/opensearch/values.yaml
+# Chart: https://github.com/opensearch-project/helm-charts/tree/opensearch-2.9.1/charts/opensearch
+# Default values: https://github.com/opensearch-project/helm-charts/blob/opensearch-2.9.1/charts/opensearch/values.yaml
 
 #image:
-#  tag: 1.3.2
+#  tag: 2.4.1
 #  repository: "opensearchproject/opensearch"
 #  pullPolicy: "IfNotPresent"
 
@@ -17,47 +17,24 @@
 #   enabled: true
 #   #storageClass: alt-storage
 #   size: 30Gi
+#   enableInitChown: false
 
 
-# The following properties should ONLY be
-# modified if you are using your own TLS
-# certificates rather than having the
-# deployment process obtain TLS certificates
-# from cert-manager.  Refer to the section
-# "Configure TLS without Using cert-manager" in
-# the document logging/tls.md for more information
-#
-#  *** DO NOT MODIFY ***
-#
-#   config:
-#     opensearch.yml: |
-#       plugins.security.authcz.admin_dn:
-#       - "CN=es-admin,O=cert-manager"
-#       plugins.security.nodes_dn:
-#      - "CN=es-transport,O=cert-manager"
+## The following stanzas 'sysctl' and 'sysctlInit'
+## configure the Kubernetes cluster nodes to run
+## OpenSearch in the same way but using different
+## mechanisms (via securityContext or via a
+## privileged initContainer). By default, we use
+## the latter approach but include both stanzas
+## to allow you to choose an approach that suits
+## your organization's preferences.
 
-
-
-## The following stanzas 'sysctl' and 'extraInitContainers'
-## are needed to configure the Kubernetes cluster nodes
-## to run OpenSearch. It is not expected that you will
-## need to modify these setttings.
-##
-## If you define any extra initContainers, you
-## MUST uncomment the lines defining the init-sysctl
-## initContainer and add your extra initContainers
-## definitions after the init-sysctl initContainer.
-
+## Use securityContext to set sysctl
 #sysctl:
 #  enabled: false
 
-#extraInitContainers:
-#- name: init-sysctl
-#  image: busybox
-#  command:
-#  - sysctl
-#  - '-w'
-#  - vm.max_map_count=262144
-#  securityContext:
-#    privileged: true
-#    runAsUser: 0
+## Use privileged initContainer to set sysctl
+#sysctlInit:
+#  enabled: true
+
+#sysctlVmMaxMapCount: 262144
