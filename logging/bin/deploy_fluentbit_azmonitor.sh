@@ -136,6 +136,10 @@ kubectl -n $LOG_NS delete pods -l "app.kubernetes.io/name=fluent-bit, fbout=azur
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install v4m-fbaz         --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_azmonitor.yaml --values $FB_AZMONITOR_USER_YAML  --set fullnameOverride=v4m-fbaz fluent/fluent-bit
 
+#Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
+disable_sa_token_automount $LOG_NS v4m-fb
+patch_pod_token_automount  $LOG_NS daemonset v4m-fb
+
 
 log_info "Fluent Bit deployment (Azure Monitor) completed"
 
