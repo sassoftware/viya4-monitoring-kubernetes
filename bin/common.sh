@@ -193,9 +193,9 @@ function disable_sa_token_automount {
   sa_name=$2
   should_disable=${SEC_DISABLE_SA_TOKEN_AUTOMOUNT:-true}
 
-  if [ "$should_disable" == "true" ];then
-    log_debug "Disabling automount of API tokens for serviceAccount [$ns/$sa_name]"
-    kubectl -n $ns patch serviceAccount $sa_name -p '{"automountServiceAccountToken":false}'
+  if [ "$should_disable" == "true" ]; then
+     log_debug "Disabling automount of API tokens for serviceAccount [$ns/$sa_name]"
+     kubectl -n $ns patch serviceAccount $sa_name -p '{"automountServiceAccountToken":false}'
   fi
 }
 
@@ -206,15 +206,15 @@ function patch_pod_token_automount {
   resource_name=$3
   should_disable=${SEC_DISABLE_SA_TOKEN_AUTOMOUNT:-true}
 
-  if [ "$should_disable" == "true" ];then
-    log_debug "Enabling automount of API tokens for pods deployed via [$resource_type/$resource_name]"
+  if [ "$should_disable" == "true" ]; then
+     log_debug "Enabling automount of API tokens for pods deployed via [$resource_type/$resource_name]"
 
-    if [ "$resource_type" == "daemonset" ] || [ "$resource_type" == "deployment" ];then
-       kubectl -n $ns patch $resource_type  $resource_name -p '{"spec": {"template": {"spec": {"automountServiceAccountToken":true}}}}'
-    else
-       log_error "Invalid request to function [${FUNCNAME[0]}]; unsupported resource_type [$resource_type]"
-       return 1
-    fi
+     if [ "$resource_type" == "daemonset" ] || [ "$resource_type" == "deployment" ]; then
+        kubectl -n $ns patch $resource_type  $resource_name -p '{"spec": {"template": {"spec": {"automountServiceAccountToken":true}}}}'
+     else
+        log_error "Invalid request to function [${FUNCNAME[0]}]; unsupported resource_type [$resource_type]"
+        return 1
+     fi
   fi
 }
 
