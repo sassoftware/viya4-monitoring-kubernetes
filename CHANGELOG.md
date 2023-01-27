@@ -5,10 +5,10 @@
   * [SECURITY] Disabled the automounting of API credentials for all serviceAccount resources associated with deployed
     components. Automounting of credentials was enabled at the _Pod_ level in a small number of cases (Event Router, 
     Fluent Bit, Kube State Metrics and Prometheus Operator) where needed to support required functionality.  If necessary,
-    this change can be disabled by setting the SEC_DISABLE_SA_TOKEN_AUTOMOUNT environment variable to 'false'.
+    these changes can be disabled by setting the SEC_DISABLE_SA_TOKEN_AUTOMOUNT environment variable to 'false'.
 
 * **Logging**
-  * [FIX]  - On OpenShift, the deployment order of OpenSearch and OpenSearch Dashboards was reversed to resolve a timing
+  * [FIX] On OpenShift, the deployment order of OpenSearch and OpenSearch Dashboards was reversed to resolve a timing
     issue related to the shared serviceAccount.
 
 
