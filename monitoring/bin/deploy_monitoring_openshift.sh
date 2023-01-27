@@ -23,6 +23,12 @@ fi
 
 if [ -z "$(kubectl get ns $MON_NS -o name 2>/dev/null)" ]; then
   kubectl create ns $MON_NS
+
+  #Container Security: Disable serviceAccount Token Automounting
+  disable_sa_token_automount $MON_NS default
+  disable_sa_token_automount $MON_NS builder
+  disable_sa_token_automount $MON_NS deployer
+
 fi
 
 set -e
@@ -80,6 +86,9 @@ fi
      log_debug "Patching serviceAccount to link to token...[$token]"
      kubectl -n $MON_NS patch serviceaccount grafana-serviceaccount --type=json -p='[{"op":"add","path":"/secrets/1","value":{"name":"'$token'"}}]'
   fi
+
+#Container Security: Disable serviceAccount Token Automounting
+disable_sa_token_automount $MON_NS grafana-serviceaccount
 
 log_debug "Adding cluster role..."
 oc adm policy add-cluster-role-to-user cluster-monitoring-view -z grafana-serviceaccount -n $MON_NS
