@@ -3,7 +3,7 @@
 ## Unreleased
 * **Overall**
   * [SECURITY] Disabled the automounting of API credentials for all serviceAccount resources associated with deployed
-    components. Automounting of credentials was enabled at the _Pod_ level in a small number of cases (Event Router, 
+    components. Automounting of credentials is now enabled at the _pod_ level in a small number of cases (Event Router, 
     Fluent Bit, Kube State Metrics and Prometheus Operator) where needed to support required functionality.  If necessary,
     these changes can be disabled by setting the SEC_DISABLE_SA_TOKEN_AUTOMOUNT environment variable to 'false'.
 
