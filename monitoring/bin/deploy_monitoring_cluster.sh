@@ -194,9 +194,9 @@ disable_sa_token_automount $MON_NS v4m-alertmanager
 
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
 disable_sa_token_automount $MON_NS v4m-kube-state-metrics
-patch_pod_token_automount  $MON_NS deployment v4m-kube-state-metrics
+enable_pod_token_automount $MON_NS deployment v4m-kube-state-metrics
 disable_sa_token_automount $MON_NS v4m-operator
-patch_pod_token_automount  $MON_NS deployment v4m-operator
+enable_pod_token_automount $MON_NS deployment v4m-operator
 
 log_info "Deploying ServiceMonitors and Prometheus rules"
 log_verbose "Deploying cluster ServiceMonitors"

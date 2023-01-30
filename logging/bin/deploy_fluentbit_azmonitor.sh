@@ -138,7 +138,7 @@ helm $helmDebug upgrade --install v4m-fbaz         --namespace $LOG_NS --values 
 
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
 disable_sa_token_automount $LOG_NS v4m-fbaz
-patch_pod_token_automount  $LOG_NS daemonset v4m-fbaz
+enable_pod_token_automount $LOG_NS daemonset v4m-fbaz
 
 
 log_info "Fluent Bit deployment (Azure Monitor) completed"
