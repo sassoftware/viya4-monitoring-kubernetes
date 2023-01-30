@@ -1,5 +1,17 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+
+* **Metrics**
+  * [UPGRADE] Kube-prometheus-stack has been upgraded from version 41.7.3 to 43.3.1
+  * [UPGRADE] Prometheus has been upgraded from version 2.39.0 to 2.40.7
+  * [UPGRADE] Prometheus Operator has been upgraded from version 0.60.0 to 0.62.0
+  * [UPGRADE] Grafana has been upgraded from version 9.2.3 to 9.3.1
+  * [UPGRADE] Alertmanager has been upgraded from version 0.24.0 to 0.25.0
+  * [UPGRADE] Node Exporter has been upgraded from version 1.3.1 to 1.5.0
+  * [UPGRADE] Kube State Metrics has been upgraded from version 2.6.0 to 2.7.0
+  * [UPGRADE] Pushgateway has been upgraded from version 1.4.3 to 1.5.1
+  * [UPGRADE] K8s-sidecar used with Grafana has been upgraded from 1.19.5 to 1.22.0
 
 ## Version 1.2.9 (17JAN2023)
 * **Overall**

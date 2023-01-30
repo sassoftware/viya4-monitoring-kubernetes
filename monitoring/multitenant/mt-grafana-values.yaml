@@ -1,5 +1,5 @@
 image:
-  tag: "9.2.3"
+  tag: "9.3.1"
 extraLabels:
   v4m.sas.com/tenant: __TENANT__
 readinessProbe: null
@@ -12,8 +12,9 @@ sidecar:
     enabled: true
     label: grafana_datasource-__TENANT__
   image:
-    repository: quay.io/kiwigrid/k8s-sidecar
-    tag: 1.19.5
+    registry: quay.io
+    repository: kiwigrid/k8s-sidecar
+    tag: 1.22.0
 deploymentStrategy:
   type: Recreate
 persistence:

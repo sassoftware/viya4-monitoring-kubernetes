@@ -146,7 +146,7 @@ else
 fi
 
 log_info "Deploying Grafana..."
-OPENSHIFT_GRAFANA_CHART_VERSION=${OPENSHIFT_GRAFANA_CHART_VERSION:-6.43.3}
+OPENSHIFT_GRAFANA_CHART_VERSION=${OPENSHIFT_GRAFANA_CHART_VERSION:-6.50.0}
 helm upgrade --install $helmDebug \
   -n "$MON_NS" \
   -f "$wnpValuesFile" \
