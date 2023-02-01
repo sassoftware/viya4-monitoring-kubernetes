@@ -143,11 +143,15 @@ kubectl -n $LOG_NS create configmap fb-env-vars \
 kubectl -n $LOG_NS label configmap fb-env-vars   managed-by=v4m-es-script
 
 
+## TODO: (31JAN23) Move this to AFTER the HELM command and change to kubectl restarts 
 # Delete any existing Fluent Bit pods in the $LOG_NS namepace (otherwise Helm chart may assume an upgrade w/o reloading updated config
 kubectl -n $LOG_NS delete pods -l "app.kubernetes.io/name=fluent-bit, fbout=es"
 
+FLUENTBIT_HELM_CHART_VERSION=${FLUENTBIT_HELM_CHART_VERSION:-"0.22.0"}
+
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
+  --version $FLUENTBIT_HELM_CHART_VERSION \
   --values logging/fb/fluent-bit_helm_values_opensearch.yaml  \
   --values $openshiftValuesFile \
   --values $FB_OPENSEARCH_USER_YAML   \
