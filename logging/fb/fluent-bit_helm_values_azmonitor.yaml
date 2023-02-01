@@ -1,8 +1,8 @@
-# Chart:  https://github.com/fluent/helm-charts/blob/main/charts/fluent-bit/Chart.yaml
-# Default values: https://github.com/fluent/helm-charts/blob/main/charts/fluent-bit/values.yaml
+# Chart:  https://github.com/fluent/helm-charts/blob/fluent-bit-0.22.0/charts/fluent-bit
+# Default values: https://github.com/fluent/helm-charts/blob/fluent-bit-0.22.0/charts/fluent-bit/values.yaml
 
 image:
-  tag: 1.9.9
+  tag: 2.0.8
 podAnnotations: 
   fluentbit.io/parser: fluentbit
 podLabels:
@@ -43,7 +43,7 @@ env:
          key: shared_key
 envFrom:
    - configMapRef:
-        name: fb-env-vars
+        name: fbaz-env-vars
 
 # Be very tolerant
 tolerations:
