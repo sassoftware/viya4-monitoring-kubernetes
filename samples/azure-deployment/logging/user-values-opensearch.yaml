@@ -7,8 +7,8 @@ persistence:
 #  ingressClassName: nginx
 #  annotations:
 #    nginx.ingress.kubernetes.io/configuration-snippet: |
-#      rewrite (?i)/elasticsearch/(.*) /$1 break;
-#      rewrite (?i)/elasticsearch$ / break;
+#      rewrite (?i)/opensearch/(.*) /$1 break;
+#      rewrite (?i)/opensearch$ / break;
 #    nginx.ingress.kubernetes.io/rewrite-target: /opensearch
 #    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
 #  enabled: true

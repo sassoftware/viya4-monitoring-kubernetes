@@ -153,6 +153,10 @@ helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
   --values $FB_OPENSEARCH_USER_YAML   \
   --set fullnameOverride=v4m-fb fluent/fluent-bit
 
+#Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
+disable_sa_token_automount $LOG_NS v4m-fb
+enable_pod_token_automount $LOG_NS daemonset v4m-fb
+
 # Force restart of daemonset to ensure we pick up latest config changes
 # since Helm won't notice if the only changes are in the configMap
 kubectl -n "$LOG_NS" rollout restart daemonset v4m-fb

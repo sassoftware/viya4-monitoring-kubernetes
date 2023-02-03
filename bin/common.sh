@@ -187,9 +187,46 @@ function randomPassword {
   date +%s | sha256sum | base64 | head -c 32 ; echo
 }
 
+function disable_sa_token_automount {
+  local ns sa_name should_disable
+  ns=$1
+  sa_name=$2
+  should_disable=${SEC_DISABLE_SA_TOKEN_AUTOMOUNT:-true}
+
+  if [ "$should_disable" == "true" ]; then
+     log_debug "Disabling automount of API tokens for serviceAccount [$ns/$sa_name]"
+     kubectl -n $ns patch serviceAccount $sa_name -p '{"automountServiceAccountToken":false}'
+  else
+     log_debug "NOT disabling token automount serviceAccount [$ns/$sa_name]; SEC_DISABLE_SA_TOKEN_AUTOMOUNT set to [$SEC_DISABLE_SA_TOKEN_AUTOMOUNT]"
+  fi
+}
+
+function enable_pod_token_automount {
+  local ns resource_type resource_name should_disable
+  ns=$1
+  resource_type=$2
+  resource_name=$3
+  should_disable=${SEC_DISABLE_SA_TOKEN_AUTOMOUNT:-true}
+
+  if [ "$should_disable" == "true" ]; then
+     log_debug "Enabling automount of API tokens for pods deployed via [$resource_type/$resource_name]"
+
+     if [ "$resource_type" == "daemonset" ] || [ "$resource_type" == "deployment" ]; then
+        kubectl -n $ns patch $resource_type  $resource_name -p '{"spec": {"template": {"spec": {"automountServiceAccountToken":true}}}}'
+     else
+        log_error "Invalid request to function [${FUNCNAME[0]}]; unsupported resource_type [$resource_type]"
+        return 1
+     fi
+  else
+     log_debug "NOT enabling token automount on pods for [$ns/$resource_type/$resource_name]; SEC_DISABLE_SA_TOKEN_AUTOMOUNT set to [$SEC_DISABLE_SA_TOKEN_AUTOMOUNT]"
+  fi
+}
+
 export -f checkDefaultStorageClass
 export -f validateTenantID
 export -f validateNamespace
 export -f randomPassword
 export -f trap_add
 export -f errexit_msg
+export -f disable_sa_token_automount
+export -f enable_pod_token_automount

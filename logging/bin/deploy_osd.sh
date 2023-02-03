@@ -41,7 +41,7 @@ fi
 #         due to problem with Helm chart ver 1.8.3 which
 #         'matches' OSD version 1.3.5.  Problem involves
 #         ingress.path.backend.serverName resolution.
-OSD_HELM_CHART_VERSION=${OSD_HELM_CHART_VERSION:-"1.5.1"}
+OSD_HELM_CHART_VERSION=${OSD_HELM_CHART_VERSION:-"2.7.0"}
 
 # get credentials
 export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD}
@@ -149,6 +149,14 @@ helm $helmDebug upgrade --install v4m-osd \
     --set fullnameOverride=v4m-osd opensearch/opensearch-dashboards
 
 log_info "OpenSearch Dashboards has been deployed"
+
+
+#Container Security: Disable serviceAccount Token Automounting
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+   disable_sa_token_automount $LOG_NS v4m-os
+else
+   disable_sa_token_automount $LOG_NS v4m-osd-dashboards
+fi
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""

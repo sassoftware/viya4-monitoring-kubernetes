@@ -1,11 +1,8 @@
-# This sample configures path-based ingress (w/o TLS)
-
 extraEnvs:
-# SERVER_BASEPATH needed for path-based ingress only
+# SERVER_BASEPATH needed for path-based ingress
 - name: SERVER_BASEPATH
   value: /dashboards
-# NOTE: OSD_ENABLE_TLS, OPENSEARCH_USERNAME & OPENSEARCH_PASSWORD
-# need to be set here since Helm *replaces* array values
+# OSD_ENABLE_TLS, Username & password need to be set here since helm *replaces* array values
 - name: OSD_ENABLE_TLS
   valueFrom:
     secretKeyRef:
@@ -21,11 +18,9 @@ extraEnvs:
     secretKeyRef:
       name: internal-user-kibanaserver
       key: password
-
 service:
   type: ClusterIP
   nodePort: null
-
 ingress:
   ingressClassName: nginx
   annotations:
@@ -40,5 +35,7 @@ ingress:
     - host: host.cluster.example.com
       paths:
         - path: /dashboards
-
+          backend:
+            serviceName: v4m-osd
+            servicePort: 5601
 

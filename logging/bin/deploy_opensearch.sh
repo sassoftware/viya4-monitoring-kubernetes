@@ -38,7 +38,7 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
 fi
 
 # Get/Set Helm Chart Version
-OPENSEARCH_HELM_CHART_VERSION=${OPENSEARCH_HELM_CHART_VERSION:-"1.14.1"}
+OPENSEARCH_HELM_CHART_VERSION=${OPENSEARCH_HELM_CHART_VERSION:-"2.9.1"}
 
 # get credentials
 export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD}
@@ -86,6 +86,7 @@ log_debug "Subjects node_dn:[$node_dn] admin_dn:[$admin_dn]"
 #write cert subjects to secret to be mounted as env var
 kubectl -n $LOG_NS delete secret opensearch-cert-subjects --ignore-not-found
 kubectl -n $LOG_NS create secret generic opensearch-cert-subjects  --from-literal=node_dn="$node_dn" --from-literal=admin_dn="$admin_dn"
+kubectl -n $LOG_NS label  secret opensearch-cert-subjects  managed-by=v4m-es-script
 
 # Create ConfigMap for securityadmin script
 kubectl -n $LOG_NS delete configmap run-securityadmin.sh --ignore-not-found
@@ -244,15 +245,44 @@ if [ ! -f "$ES_OPEN_USER_YAML" ]; then
   ES_OPEN_USER_YAML=$TMP_DIR/empty.yaml
 fi
 
+if [ -z "$(kubectl -n $LOG_NS get secret opensearch-securityconfig -o name 2>/dev/null)" ]; then
 
-# Create secrets containing SecurityConfig files
-create_secret_from_file securityconfig/action_groups.yml   security-action-groups   managed-by=v4m-es-script
-create_secret_from_file securityconfig/config.yml          security-config          managed-by=v4m-es-script
-create_secret_from_file securityconfig/internal_users.yml  security-internal-users  managed-by=v4m-es-script
-create_secret_from_file securityconfig/roles.yml           security-roles           managed-by=v4m-es-script
-create_secret_from_file securityconfig/roles_mapping.yml   security-roles-mapping   managed-by=v4m-es-script
-create_secret_from_file securityconfig/tenants.yml         security-tenants         managed-by=v4m-es-script
+   kubectl -n $LOG_NS delete secret opensearch-securityconfig --ignore-not-found
 
+   #Copy OpenSearch Security Configuration files
+   mkdir $TMP_DIR/opensearch/securityconfig -p
+   cp logging/opensearch/securityconfig/*.yml $TMP_DIR/opensearch/securityconfig
+   #Overlay OpenSearch security configuration files from USER_DIR (if exists)
+   if [ -d "$USER_DIR/logging/opensearch/securityconfig" ]; then
+      log_debug "OpenSearch Security Configuration directory found w/in USER_DIR [$USER_DIR]"
+
+      if [ "$(ls $USER_DIR/logging/opensearch/securityconfig/*.yml 2>/dev/null)" ]; then
+        log_info "Copying OpenSearch Security Configuration files from [$USER_DIR/logging/opensearch/securityconfig]"
+        cp $USER_DIR/logging/opensearch/securityconfig/*.yml $TMP_DIR/opensearch/securityconfig
+      else
+         log_debug "No YAML (*.yml) files found in USER_DIR/opensearch/securityconfig directory"
+      fi
+   fi
+
+   #create secret containing OpenSearch security configuration yaml files
+   #NOTE: whitelist.yml file is only created due to apparent bug in OpenSearch
+   #      which causes an ERROR when securityAdmin.sh is run without it 
+   kubectl -n $LOG_NS create secret generic opensearch-securityconfig    \
+       --from-file $TMP_DIR/opensearch/securityconfig/action_groups.yml  \
+       --from-file $TMP_DIR/opensearch/securityconfig/allowlist.yml      \
+       --from-file whitelist.yml=$TMP_DIR/opensearch/securityconfig/allowlist.yml      \
+       --from-file $TMP_DIR/opensearch/securityconfig/config.yml         \
+       --from-file $TMP_DIR/opensearch/securityconfig/internal_users.yml \
+       --from-file $TMP_DIR/opensearch/securityconfig/nodes_dn.yml       \
+       --from-file $TMP_DIR/opensearch/securityconfig/roles.yml          \
+       --from-file $TMP_DIR/opensearch/securityconfig/roles_mapping.yml  \
+       --from-file $TMP_DIR/opensearch/securityconfig/tenants.yml
+
+   kubectl -n $LOG_NS label secret opensearch-securityconfig  managed-by=v4m-es-script
+
+else
+   log_verbose "Using existing secret [opensearch-securityconfig] for OpenSearch Security Configuration"
+fi
 
 # OpenSearch
 log_info "Deploying OpenSearch"
@@ -337,7 +367,7 @@ kubectl -n $LOG_NS wait pods v4m-search-0 --for=condition=Ready --timeout=10m
 
 # TO DO: Convert to curl command to detect ES is up?
 # hitting https:/host:port -u adminuser:adminpwd --insecure 
-# returns "OpenDisro Security not initialized." and 503 when up
+# returns "OpenDistro Security not initialized." and 503 when up
 log_verbose "Waiting [2] minutes to allow OpenSearch to initialize [$(date)]"
 sleep 120
 
@@ -398,7 +428,7 @@ set +e
 if [ "$existingSearch" == "false" ] && [ "$existingODFE" != "true" ]; then
   kubectl -n $LOG_NS exec v4m-search-0 -c opensearch -- config/run_securityadmin.sh
   # Retrieve log file from security admin script
-  kubectl -n $LOG_NS cp v4m-search-0:config/run_securityadmin.log $TMP_DIR/run_securityadmin.log
+  kubectl -n $LOG_NS cp v4m-search-0:config/run_securityadmin.log $TMP_DIR/run_securityadmin.log -c opensearch
   if [ "$(tail -n1  $TMP_DIR/run_securityadmin.log)" == "Done with success" ]; then
     log_verbose "The run_securityadmin.log script appears to have run successfully; you can review its output below:"
   else
@@ -411,6 +441,12 @@ else
 fi
 
 set -e
+
+#Container Security: Disable serviceAccount Token Automounting
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+   disable_sa_token_automount $LOG_NS v4m-os
+   #NOTE: On other providers, OpenSearch pods linked to the 'default' serviceAccount
+fi
 
 log_info "OpenSearch has been deployed"
 
