@@ -8,6 +8,12 @@
     these changes can be disabled by setting the SEC_DISABLE_SA_TOKEN_AUTOMOUNT environment variable to 'false'.
 
 * **Logging**
+  * [UPGRADE] Moved to OpenSearch and OpenSearch Dashboards version 2.4.1.  As part of this change, 
+    an initContainer (fsgoup-volume - used to run a chown command) and the Performance Analyzer agent 
+    (which ran alongside OpenSearch) were disabled.  Both can be re-enabled, if necessary, by setting
+    keys in your $USER_DIR/ user-values-opensearch.yaml file.
+  * [CHANGE] The TLS samples, both with host-based and path-based ingress, were modified to work with
+    OpenSearch Dashboards 2.4.1.
   * [FIX] On OpenShift, the deployment order of OpenSearch and OpenSearch Dashboards was reversed to resolve a timing
     issue related to the shared serviceAccount.
 
