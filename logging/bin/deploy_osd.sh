@@ -150,5 +150,13 @@ helm $helmDebug upgrade --install v4m-osd \
 
 log_info "OpenSearch Dashboards has been deployed"
 
+
+#Container Security: Disable serviceAccount Token Automounting
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+   disable_sa_token_automount $LOG_NS v4m-os
+else
+   disable_sa_token_automount $LOG_NS v4m-osd-dashboards
+fi
+
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""

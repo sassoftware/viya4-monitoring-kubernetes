@@ -1,6 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+* **Overall**
+  * [SECURITY] Disabled the automounting of API credentials for all serviceAccount resources associated with deployed
+    components. Automounting of credentials is now enabled at the _pod_ level in a small number of cases (Event Router, 
+    Fluent Bit, Kube State Metrics and Prometheus Operator) where needed to support required functionality.  If necessary,
+    these changes can be disabled by setting the SEC_DISABLE_SA_TOKEN_AUTOMOUNT environment variable to 'false'.
 
 * **Logging**
   * [UPGRADE] Moved to OpenSearch and OpenSearch Dashboards version 2.4.1.  As part of this change, 
@@ -9,6 +14,9 @@
     keys in your $USER_DIR/ user-values-opensearch.yaml file.
   * [CHANGE] The TLS samples, both with host-based and path-based ingress, were modified to work with
     OpenSearch Dashboards 2.4.1.
+  * [FIX] On OpenShift, the deployment order of OpenSearch and OpenSearch Dashboards was reversed to resolve a timing
+    issue related to the shared serviceAccount.
+
 
 ## Version 1.2.9 (17JAN2023)
 * **Overall**

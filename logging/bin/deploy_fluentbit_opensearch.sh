@@ -153,6 +153,10 @@ helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
   --values $FB_OPENSEARCH_USER_YAML   \
   --set fullnameOverride=v4m-fb fluent/fluent-bit
 
+#Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
+disable_sa_token_automount $LOG_NS v4m-fb
+enable_pod_token_automount $LOG_NS daemonset v4m-fb
+
 log_info "Fluent Bit deployment completed"
 
 

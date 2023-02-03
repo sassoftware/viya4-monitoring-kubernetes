@@ -442,6 +442,12 @@ fi
 
 set -e
 
+#Container Security: Disable serviceAccount Token Automounting
+if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+   disable_sa_token_automount $LOG_NS v4m-os
+   #NOTE: On other providers, OpenSearch pods linked to the 'default' serviceAccount
+fi
+
 log_info "OpenSearch has been deployed"
 
 log_debug "Script [$this_script] has completed [$(date)]"
