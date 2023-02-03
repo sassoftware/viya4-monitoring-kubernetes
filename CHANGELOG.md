@@ -1,5 +1,14 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+
+* **Logging**
+  * [UPGRADE] Moved to OpenSearch and OpenSearch Dashboards version 2.4.1.  As part of this change, 
+    an initContainer (fsgoup-volume - used to run a chown command) and the Performance Analyzer agent 
+    (which ran alongside OpenSearch) were disabled.  Both can be re-enabled, if necessary, by setting
+    keys in your $USER_DIR/ user-values-opensearch.yaml file.
+  * [CHANGE] The TLS samples, both with host-based and path-based ingress, were modified to work with
+    OpenSearch Dashboards 2.4.1.
 
 ## Version 1.2.9 (17JAN2023)
 * **Overall**
