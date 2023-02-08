@@ -1,7 +1,9 @@
 prometheus:
   prometheusSpec:
+    # listenLocal: true
     web:
       tlsConfig:
+        clientAuthType: NoClientCert
         keySecret:
           key: tls.key
           name: prometheus-tls-secret
@@ -9,11 +11,29 @@ prometheus:
           secret:
             key: tls.crt
             name: prometheus-tls-secret
+    # service:
+    #   # port: 443
+    #   # targetPort: 443
+    #   port: 9090
+    #   targetPort: 9090
+    # serviceMonitor:
+    #   scheme: https
+    #   tlsConfig:
+    #     insecureSkipVerify: true
+    alertingEndpoints:
+    - name: v4m-alertmanager 
+      namespace: monitoring
+      port: http-web
+      scheme: https
+      tlsConfig:
+        insecureSkipVerify: true
 
 alertmanager:
   alertmanagerSpec:
+    # listenLocal: true
     web:
       tlsConfig:
+        clientAuthType: NoClientCert
         keySecret:
           key: tls.key
           name: alertmanager-tls-secret
@@ -21,6 +41,13 @@ alertmanager:
           secret:
             key: tls.crt
             name: alertmanager-tls-secret
+    # service:
+    #   port: 9093
+    #   targetPort: 9093
+    # serviceMonitor:
+    #   scheme: https
+    #   tlsConfig:
+    #     insecureSkipVerify: true
 
 prometheus-node-exporter:
   extraArgs:
@@ -63,3 +90,15 @@ grafana:
       http_port: 3001
       cert_file: /cert/tls.crt
       cert_key: /cert/tls.key
+
+  sidecar:
+    datasources:
+      defaultDatasourceEnabled: false
+      # - name: Prometheus
+      #   type: prometheus
+      #   access: proxy
+      #   isDefault: true
+      # jsonData:
+      #   tlsSkipVerify: true
+      # editable: true
+      # url: https://v4m-prometheus.monitoring:9090

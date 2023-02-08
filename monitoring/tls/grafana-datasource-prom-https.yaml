@@ -7,4 +7,4 @@
       jsonData:
         tlsSkipVerify: true
       editable: true
-      url: https://v4m-prometheus
+      url: https://v4m-prometheus.monitoring:9090
