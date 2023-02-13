@@ -134,6 +134,12 @@ Required Depenencies:
 * Python 3
 * Opensearch library (`pip install opensearch-py`)
 
+Usage from within Docker Container:
+1. Build Docker Image:
+* Copy the file into the container during the build by adding the following to the Dockerfile:
+`COPY auth-file /opt/v4m/`
+2. Run with `--auth-file=/opt/v4m/auth-file`:
+* `docker run v4m python logging/bin/getlogs.py --auth-file=/opt/v4m/auth-file`
 
 This program generates OpenSearch DSL Queries from user specified parameters, and submits them to a database to retrieve logs. The flags below provide specifications for your Query, and can be placed in any order. 
     -Connection settings are required in order to run the program. You can create config files to autofill this using -cf, and call them using -af
