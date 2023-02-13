@@ -1,6 +1,6 @@
 #! /usr/bin/python3 
 
-# Copyright © 2022, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright Â© 2023, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 import time, calendar
@@ -9,15 +9,12 @@ from opensearchpy import OpenSearch
 import os, sys
 import json, csv
 
-## CSV format fixup
-## Set default format
-
-## If Previous Temp File Was Not Removed due to Error, Remove It.
+## Cleanup temp file if not previously deleted
 if os.path.isfile("temp_SAS_OSQ.TXT"):
     os.remove("temp_SAS_OSQ.TXT")
 
-def input_validate(dict):
-
+def validate_input(dict):
+    """Validate the arguments passed by the user to ensure script will function properly"""
     if args['create-auth']:
         if (type(dict['create-auth'] == list)):
             dict['create-auth'] = " ".join(dict['create-auth'])
@@ -37,6 +34,7 @@ def input_validate(dict):
             args['port'] = authDict['port']
         except Exception as e:
             print("There was a problem with the authentication file. Please ensure that the values are in dictionary format with keys: 'username', 'password', 'host', 'port'")
+            print(e)
             exit()
 
     
@@ -96,7 +94,8 @@ def input_validate(dict):
         print("One or more date(s) have been formatted incorrectly. Correct format is Y-M-D H:M:S. Ex: 1999-02-07 10:00:00")  
         exit()
 
-def query_build(dict): ##Generates Query using Opensearch DSL
+def build_query(dict): ##Generates Query using Opensearch DSL
+    """Takes query arguments from user and builds a query to pass to opensearch client"""
     first = True 
     argcounter=0    ##Counts unique options entered by user, sets min_match to this number
     if (not dict['query-filename']):     ##If User has not specified query file, create temp file for one.                                                                                                                                                                                                                                                                                                                                                                                   first = True
@@ -149,6 +148,7 @@ def query_build(dict): ##Generates Query using Opensearch DSL
 
 ##List of VALID arguments that are read from user as soon as program is run, nargs=+ indicates that argument takes multiple whitespace separated values. 
 def get_arguments():
+    """Defines the arguments a user can pass and parses them"""
     parser = argparse.ArgumentParser(prog='getLogs.py', usage='\n%(prog)s [options]', description="This program generates OpenSearch DSL Queries from user specified parameters, and submits them to a database to retrieve logs. The flags below provide specifications for your Query, and can be placed in any order. \n    -Connection settings are required in order to run the program. You can create config files to autofill this using -cf, and call them using -af\n    -The NAMESPACE*, POD*, CONTAINER*, LOGSOURCE* and LEVEL* options accept multiple, space-separated, values (e.g. --level INFO NONE). \n    -All Generated Program files are placed in the directory where the program is run.\n    -Use -sq to save generated queries, -q to run saved queries, and -o to output results to a supported file-format.\n    -Correct time format is Y-M-D H:M:S. Ex: 1999-02-07 10:00:00", formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-n', '--namespace', required=False, dest="kube.namespace", nargs='*', metavar="NAMESPACE", help="\nOne or more Viya deployments/Kubernetes Namespace for which logs are sought\n\n")
     parser.add_argument('-nx', '--namespace-exclude', required=False, dest="kube.namespace-ex", nargs='*', metavar="NAMESPACE", help='\nOne or more namespaces for which logs should be excluded from the output\n\n')
@@ -182,10 +182,9 @@ def get_arguments():
     return parser.parse_args().__dict__
 
 args = get_arguments() ##Creates "args" dictionary that contains all user submitted options. Print "args" to debug values. Note that the 'dest' value for each argument in argparser object is its key.
-input_validate(args)
-##print(args)
+validate_input(args)
 
-##Establish Client Using User Authorization and Connection Settings
+# Establish Client Using User Authorization and Connection Settings
 auth = (args['userName'], args['password'])
 client = OpenSearch(
     hosts = [{'host': args['host'], 'port': args['port']}],
@@ -201,7 +200,7 @@ client = OpenSearch(
 )
 
 ##Build Query Using Arguments
-x = query_build(args)
+x = build_query(args)
 index_name = args['index']
 if (args['showquery'] == True): ##Print Query if user asks. 
     print("The following query will be submitted:\n\n", json.dumps(eval(x), indent=2))
@@ -213,7 +212,7 @@ if(args['savequery']): ##Save Query if user asks.
     
 print('\nSearching index: ')
 try:
-    response = client.search(body=x, index = index_name)
+    response = client.search(body=x, index=index_name)
 except Exception as e: 
     print(e)
     print("\n")
