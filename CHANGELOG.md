@@ -12,6 +12,7 @@
   * [UPGRADE] Kube State Metrics has been upgraded from version 2.6.0 to 2.7.0
   * [UPGRADE] Pushgateway has been upgraded from version 1.4.3 to 1.5.1
   * [UPGRADE] K8s-sidecar used with Grafana has been upgraded from 1.19.5 to 1.22.0
+  * [CHANGE] The kube-prometheus-stack and Grafana Helm charts now use separate keys to identify the image registry and image repository within their user values yaml files. If you point to your own image repository during deployment, you will need to adjust your user value (e.g. USER_DIR/monitoring/user-values-prom-operator.yaml, USER_DIR/monitoring/user-values-openshift-grafana.yaml, etc.) files.
 
 ## Version 1.2.9 (17JAN2023)
 * **Overall**
