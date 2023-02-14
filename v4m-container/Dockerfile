@@ -35,6 +35,10 @@ RUN chmod 600 ${KUBECONFIG}
 ENV USER_DIR=/opt/v4m/user_dir
 ENV TERM=xterm-256color
 
+# Dependencies needed for python script
+RUN apk add --no-cache python3 py3-pip
+RUN pip3 install opensearch-py
+
 # Download necessary executables
 RUN set -eux; \
 	apk add --no-cache \
