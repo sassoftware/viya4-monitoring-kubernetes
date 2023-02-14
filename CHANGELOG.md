@@ -16,6 +16,7 @@
     OpenSearch Dashboards 2.4.1.
   * [FIX] On OpenShift, the deployment order of OpenSearch and OpenSearch Dashboards was reversed to resolve a timing
     issue related to the shared serviceAccount.
+  * [UPGRADE] Introduced new **experimental** getlogs script written in python, to retrieve Opensearch logs with filters and save to a file.
 
 
 ## Unreleased
