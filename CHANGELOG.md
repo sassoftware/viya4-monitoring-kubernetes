@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.10 (14FEB2023)
 * **Overall**
   * [SECURITY] Disabled the automounting of API credentials for all serviceAccount resources associated with deployed
     components. Automounting of credentials is now enabled at the _pod_ level in a small number of cases (Event Router, 
@@ -17,10 +17,6 @@
   * [FIX] On OpenShift, the deployment order of OpenSearch and OpenSearch Dashboards was reversed to resolve a timing
     issue related to the shared serviceAccount.
   * [UPGRADE] Introduced new **experimental** getlogs script written in python, to retrieve Opensearch logs with filters and save to a file.
-
-
-## Unreleased
-* **Logging**
   * [UPGRADE] Fluent Bit has been upgraded from version 1.9.9 to 2.0.8
 
 
