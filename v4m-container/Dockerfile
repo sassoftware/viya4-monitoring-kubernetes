@@ -83,7 +83,4 @@ RUN V4M_BRANCH="$V4M_TAG"; \
   if [ "$V4M_BRANCH" == "latest" ]; then V4M_BRANCH="stable"; fi; \
   git clone --depth 1 -b ${V4M_BRANCH} https://github.com/sassoftware/viya4-monitoring-kubernetes
 
-# Auth file needed to run python getlogs script
-# COPY auth-file /opt/v4m/
-
 WORKDIR $V4M_PATH/viya4-monitoring-kubernetes
