@@ -46,7 +46,7 @@ function display_notices {
 
 function log_notice {
   width=$noticeColWidth
-  n=$(expr $width - $(echo "$1" | wc -c))
+  n=$(($width - $(echo "$1" | wc -c)))
   if [ $n -lt 0 ]; then
      n=0
   fi
