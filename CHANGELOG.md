@@ -2,17 +2,36 @@
 
 ## Unreleased
 
-* **Metrics**
-  * [UPGRADE] Kube-prometheus-stack has been upgraded from version 41.7.3 to 43.3.1
-  * [UPGRADE] Prometheus has been upgraded from version 2.39.0 to 2.40.7
-  * [UPGRADE] Prometheus Operator has been upgraded from version 0.60.0 to 0.62.0
-  * [UPGRADE] Grafana has been upgraded from version 9.2.3 to 9.3.1
-  * [UPGRADE] Alertmanager has been upgraded from version 0.24.0 to 0.25.0
-  * [UPGRADE] Node Exporter has been upgraded from version 1.3.1 to 1.5.0
-  * [UPGRADE] Kube State Metrics has been upgraded from version 2.6.0 to 2.7.0
-  * [UPGRADE] Pushgateway has been upgraded from version 1.4.3 to 1.5.1
-  * [UPGRADE] K8s-sidecar used with Grafana has been upgraded from 1.19.5 to 1.22.0
-  * [CHANGE] The kube-prometheus-stack and Grafana Helm charts now use separate keys to identify the image registry and image repository within their user values yaml files. If you point to your own image repository during deployment, you will need to adjust your user value (e.g. USER_DIR/monitoring/user-values-prom-operator.yaml, USER_DIR/monitoring/user-values-openshift-grafana.yaml, etc.) files.
+* **Montoring**
+  * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 41.7.3 to 43.3.1
+  * [UPGRADE] - Prometheus has been upgraded from version 2.39.0 to 2.40.7
+  * [UPGRADE] - Prometheus Operator has been upgraded from version 0.60.0 to 0.62.0
+  * [UPGRADE] - Grafana has been upgraded from version 9.2.3 to 9.3.1
+  * [UPGRADE] - Alertmanager has been upgraded from version 0.24.0 to 0.25.0
+  * [UPGRADE] - Node Exporter has been upgraded from version 1.3.1 to 1.5.0
+  * [UPGRADE] - Kube State Metrics has been upgraded from version 2.5.0 to 2.6.0
+  * [UPGRADE] - Pushgateway has been upgraded from version 1.4.3 to 1.5.1
+  * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from 1.19.5 to 1.22.0
+
+## Version 1.2.10 (14FEB2023)
+* **Overall**
+  * [SECURITY] Disabled the automounting of API credentials for all serviceAccount resources associated with deployed
+    components. Automounting of credentials is now enabled at the _pod_ level in a small number of cases (Event Router, 
+    Fluent Bit, Kube State Metrics and Prometheus Operator) where needed to support required functionality.  If necessary,
+    these changes can be disabled by setting the SEC_DISABLE_SA_TOKEN_AUTOMOUNT environment variable to 'false'.
+
+* **Logging**
+  * [UPGRADE] Moved to OpenSearch and OpenSearch Dashboards version 2.4.1.  As part of this change, 
+    an initContainer (fsgoup-volume - used to run a chown command) and the Performance Analyzer agent 
+    (which ran alongside OpenSearch) were disabled.  Both can be re-enabled, if necessary, by setting
+    keys in your $USER_DIR/ user-values-opensearch.yaml file.
+  * [CHANGE] The TLS samples, both with host-based and path-based ingress, were modified to work with
+    OpenSearch Dashboards 2.4.1.
+  * [FIX] On OpenShift, the deployment order of OpenSearch and OpenSearch Dashboards was reversed to resolve a timing
+    issue related to the shared serviceAccount.
+  * [UPGRADE] Introduced new **experimental** getlogs script written in python, to retrieve Opensearch logs with filters and save to a file.
+  * [UPGRADE] Fluent Bit has been upgraded from version 1.9.9 to 2.0.8
+
 
 ## Version 1.2.9 (17JAN2023)
 * **Overall**
