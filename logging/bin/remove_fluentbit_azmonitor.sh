@@ -28,6 +28,7 @@ helm delete -n $LOG_NS $fbRelease
 log_info "Removing ConfigMaps"
 kubectl -n $LOG_NS delete configmap fbaz-fluent-bit-config   --ignore-not-found
 kubectl -n $LOG_NS delete configmap fbaz-viya-parsers        --ignore-not-found
+kubectl -n $LOG_NS delete configmap fbaz-env-vars            --ignore-not-found
 
 
 # Should we leave secret in place?

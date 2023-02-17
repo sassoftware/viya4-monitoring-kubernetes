@@ -42,7 +42,11 @@ fi
 
 if [ -z "$(kubectl get ns $MON_NS -o name 2>/dev/null)" ]; then
   kubectl create ns $MON_NS
+
+  #Container Security: Disable serviceAccount Token Automounting
+  disable_sa_token_automount $MON_NS default
 fi
+
 
 set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
@@ -181,6 +185,18 @@ if [ "$TLS_ENABLE" == "true" ]; then
   kubectl patch servicemonitor -n $MON_NS $promName-grafana --type=json \
     -p='[{"op": "replace", "path": "/spec/endpoints/0/scheme", "value":"https"},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig", "value":{}},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig/insecureSkipVerify", "value":true}]'
 fi
+
+#Container Security: Disable serviceAccount Token Automounting
+disable_sa_token_automount $MON_NS v4m-grafana
+disable_sa_token_automount $MON_NS sas-ops-acct      #Used w/Prometheus
+disable_sa_token_automount $MON_NS v4m-node-exporter
+disable_sa_token_automount $MON_NS v4m-alertmanager
+
+#Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
+disable_sa_token_automount $MON_NS v4m-kube-state-metrics
+enable_pod_token_automount $MON_NS deployment v4m-kube-state-metrics
+disable_sa_token_automount $MON_NS v4m-operator
+enable_pod_token_automount $MON_NS deployment v4m-operator
 
 log_info "Deploying ServiceMonitors and Prometheus rules"
 log_verbose "Deploying cluster ServiceMonitors"

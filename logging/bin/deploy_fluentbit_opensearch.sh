@@ -142,16 +142,24 @@ kubectl -n $LOG_NS create configmap fb-env-vars \
 
 kubectl -n $LOG_NS label configmap fb-env-vars   managed-by=v4m-es-script
 
-
-# Delete any existing Fluent Bit pods in the $LOG_NS namepace (otherwise Helm chart may assume an upgrade w/o reloading updated config
-kubectl -n $LOG_NS delete pods -l "app.kubernetes.io/name=fluent-bit, fbout=es"
+#Pin to a specific Helm chart version
+FLUENTBIT_HELM_CHART_VERSION=${FLUENTBIT_HELM_CHART_VERSION:-"0.22.0"}
 
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
+  --version $FLUENTBIT_HELM_CHART_VERSION \
   --values logging/fb/fluent-bit_helm_values_opensearch.yaml  \
   --values $openshiftValuesFile \
   --values $FB_OPENSEARCH_USER_YAML   \
   --set fullnameOverride=v4m-fb fluent/fluent-bit
+
+#Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
+disable_sa_token_automount $LOG_NS v4m-fb
+enable_pod_token_automount $LOG_NS daemonset v4m-fb
+
+# Force restart of daemonset to ensure we pick up latest config changes
+# since Helm won't notice if the only changes are in the configMap
+kubectl -n "$LOG_NS" rollout restart daemonset v4m-fb
 
 log_info "Fluent Bit deployment completed"
 

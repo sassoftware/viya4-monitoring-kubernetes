@@ -91,7 +91,7 @@ else
 fi
 
 # Multiline parser setup
-LOG_MULTILINE_ENABLED=${LOG_MULTILINE_ENABLED}
+LOG_MULTILINE_ENABLED="${LOG_MULTILINE_ENABLED}"
 if [ "$LOG_MULTILINE_ENABLED" == "true" ]; then
   LOG_MULTILINE_PARSER="docker, cri"
 else
@@ -106,7 +106,7 @@ kubectl -n $LOG_NS delete configmap fbaz-viya-parsers --ignore-not-found
 kubectl -n $LOG_NS create configmap fbaz-viya-parsers  --from-file=logging/fb/viya-parsers.conf
 
 # Check for Kubernetes container runtime log format info
-KUBERNETES_RUNTIME_LOGFMT=${KUBERNETES_RUNTIME_LOGFMT}
+KUBERNETES_RUNTIME_LOGFMT="${KUBERNETES_RUNTIME_LOGFMT}"
 if [ -z "$KUBERNETES_RUNTIME_LOGFMT" ]; then
    somenode=$(kubectl get nodes | awk 'NR==2 { print $1 }')
    runtime=$(kubectl get node $somenode -o jsonpath={.status.nodeInfo.containerRuntimeVersion} | awk -F: '{print $1}')
@@ -126,16 +126,30 @@ if [ -z "$KUBERNETES_RUNTIME_LOGFMT" ]; then
 fi
 
 # Create ConfigMap containing Kubernetes container runtime log format
-kubectl -n $LOG_NS delete configmap fb-env-vars --ignore-not-found
-kubectl -n $LOG_NS create configmap fb-env-vars --from-literal=KUBERNETES_RUNTIME_LOGFMT=$KUBERNETES_RUNTIME_LOGFMT
+kubectl -n $LOG_NS delete configmap fbaz-env-vars --ignore-not-found
+kubectl -n $LOG_NS create configmap fbaz-env-vars \
+                   --from-literal=KUBERNETES_RUNTIME_LOGFMT=$KUBERNETES_RUNTIME_LOGFMT \
+                   --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}"
 
+kubectl -n $LOG_NS label configmap fbaz-env-vars   managed-by=v4m-es-script
 
-# Delete any existing Fluent Bit pods in the $LOG_NS namepace (otherwise Helm chart may assume an upgrade w/o reloading updated config
-kubectl -n $LOG_NS delete pods -l "app.kubernetes.io/name=fluent-bit, fbout=azuremonitor"
+#Pin to a specific Helm chart version
+FLUENTBIT_HELM_CHART_VERSION=${FLUENTBIT_HELM_CHART_VERSION:-"0.22.0"}
 
 # Deploy Fluent Bit via Helm chart
-helm $helmDebug upgrade --install v4m-fbaz         --namespace $LOG_NS --values logging/fb/fluent-bit_helm_values_azmonitor.yaml --values $FB_AZMONITOR_USER_YAML  --set fullnameOverride=v4m-fbaz fluent/fluent-bit
+helm $helmDebug upgrade --install v4m-fbaz  --namespace $LOG_NS  \
+  --version $FLUENTBIT_HELM_CHART_VERSION \
+  --values logging/fb/fluent-bit_helm_values_azmonitor.yaml \
+  --values $FB_AZMONITOR_USER_YAML \
+  --set fullnameOverride=v4m-fbaz fluent/fluent-bit
 
+#Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
+disable_sa_token_automount $LOG_NS v4m-fbaz
+enable_pod_token_automount $LOG_NS daemonset v4m-fbaz
+
+# Force restart of daemonset to ensure we pick up latest config changes
+# since Helm won't notice if the only changes are in the configMap
+kubectl -n "$LOG_NS" rollout restart daemonset v4m-fbaz
 
 log_info "Fluent Bit deployment (Azure Monitor) completed"
 

@@ -36,6 +36,11 @@ checkDefaultStorageClass
 # Create namespace if it doesn't exist
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   kubectl create ns $LOG_NS
+
+  #Container Security: Disable serviceAccount Token Automounting
+  disable_sa_token_automount $LOG_NS default
+  disable_sa_token_automount $LOG_NS builder
+  disable_sa_token_automount $LOG_NS deployer
 fi
 
 set -e
@@ -60,17 +65,17 @@ logging/bin/deploy_eventrouter.sh
 
 
 ##################################
-# OpenSearch Dashboards (Kibana) #
-##################################
-log_info "STEP 2: OpenSearch Dashboards"
-logging/bin/deploy_osd.sh
-
-
-##################################
 # OpenSearch                     #
 ##################################
-log_info "STEP 3: OpenSearch"
+log_info "STEP 2: OpenSearch"
 logging/bin/deploy_opensearch.sh
+
+
+##################################
+# OpenSearch Dashboards (Kibana) #
+##################################
+log_info "STEP 3: OpenSearch Dashboards"
+logging/bin/deploy_osd.sh
 
 
 ##################################

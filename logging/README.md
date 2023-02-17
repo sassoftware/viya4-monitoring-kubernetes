@@ -9,7 +9,7 @@ See the following topics in the SAS Viya Monitoring for Kubernetes Help Center:
 
 ## Important Information about OpenSearch and OpenSearch Dashboards
 
->As of release 1.2.0, this project uses OpenSearch and OpenSearch Dashboards version 1.3.
+>As of release 1.2.0, this project uses OpenSearch and OpenSearch Dashboards.
 
 **Notes:**
 
