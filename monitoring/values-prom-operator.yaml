@@ -18,7 +18,9 @@ commonLabels:
 # https://github.com/coreos/prometheus-operator
 prometheusOperator:
   image:
-    tag: v0.60.0
+    registry: quay.io
+    repository: prometheus-operator/prometheus-operator
+    tag: v0.62.0
   logFormat: json
   logLevel: info
   createCustomResource: false
@@ -36,8 +38,9 @@ prometheusOperator:
         memory: "25Mi"
   prometheusConfigReloader:
     image:
-      repository: quay.io/prometheus-operator/prometheus-config-reloader
-      tag: v0.60.0
+      registry: quay.io
+      repository: prometheus-operator/prometheus-config-reloader
+      tag: v0.62.0
 
 # ======================
 # kubelet ServiceMonitor
@@ -63,7 +66,7 @@ kubeStateMetrics:
 # https://github.com/helm/charts/tree/master/stable/kube-state-metrics
 kube-state-metrics:
   image:
-    tag: v2.6.0
+    tag: v2.7.0
   resources:
     requests:
       cpu: "25m"
@@ -84,7 +87,7 @@ prometheus:
     nodePort: null  
   prometheusSpec:
     image:
-      tag: v2.39.0
+      tag: v2.40.7
     logLevel: info
     logFormat: json
     podAntiAffinity: soft
@@ -121,7 +124,7 @@ alertmanager:
     nodePort: null
   alertmanagerSpec:
     image:
-      tag: v0.24.0
+      tag: v0.25.0
     logFormat: json
     podAntiAffinity: soft
     retention: 240h
@@ -145,7 +148,9 @@ alertmanager:
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
 prometheus-node-exporter:
   image:
-    tag: v1.3.1
+    # registry: quay.io
+    repository: quay.io/prometheus/node-exporter
+    tag: v1.5.0
   service:
     # Override the default port of 9100 to avoid potential conflicts
     port: 9110
@@ -176,7 +181,7 @@ prometheus-node-exporter:
 # https://github.com/grafana/helm-charts/tree/main/charts/grafana
 grafana:
   image:
-    tag: "9.2.3"
+    tag: "9.3.1"
   "grafana.ini":
     analytics:
       check_for_updates: false
@@ -209,8 +214,9 @@ grafana:
         cpu: "50m"
         memory: "100Mi"
     image:
-      repository: quay.io/kiwigrid/k8s-sidecar
-      tag: 1.19.5
+      registry: quay.io
+      repository: kiwigrid/k8s-sidecar
+      tag: 1.22.0
   deploymentStrategy:
     type: Recreate
   persistence:
