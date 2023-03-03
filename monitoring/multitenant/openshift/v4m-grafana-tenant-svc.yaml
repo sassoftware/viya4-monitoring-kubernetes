@@ -7,7 +7,7 @@ metadata:
     service.beta.openshift.io/serving-cert-secret-name: v4m-grafana-__TENANT__-tls-secret
   labels:
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 9.2.3
+    app.kubernetes.io/version: 9.3.1
     v4m.sas.com/tenant: __TENANT__
 spec:
   ports:

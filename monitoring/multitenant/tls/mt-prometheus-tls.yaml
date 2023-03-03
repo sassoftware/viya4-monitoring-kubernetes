@@ -74,7 +74,7 @@ spec:
   additionalScrapeConfigs:
     name: prometheus-federate-__TENANT__
     key: cluster-federate-job
-  image: quay.io/prometheus/prometheus:v2.39.0
+  image: quay.io/prometheus/prometheus:v2.40.7
   # alerting:
   #   alertmanagers:
   #   - apiVersion: v2
@@ -108,4 +108,4 @@ spec:
   ruleSelector:
     matchLabels:
       v4m.sas.com/tenant: __TENANT__
-  version: v2.39.0
+  version: v2.40.7

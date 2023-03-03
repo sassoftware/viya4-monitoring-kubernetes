@@ -154,7 +154,7 @@ else
 fi
 
 # Deploy Grafana using Helm
-GRAFANA_CHART_VERSION_TENANT=${GRAFANA_CHART_VERSION_TENANT:-6.43.3}
+GRAFANA_CHART_VERSION_TENANT=${GRAFANA_CHART_VERSION_TENANT:-6.50.0}
 helm upgrade --install $helmDebug \
   -n "$VIYA_NS" \
   -f "$wnpGrafanaValuesFile" \

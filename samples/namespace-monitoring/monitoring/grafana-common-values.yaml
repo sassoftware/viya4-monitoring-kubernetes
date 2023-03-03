@@ -1,5 +1,5 @@
 image:
-  tag: "9.2.3"
+  tag: "9.3.1"
 service:
   type: ClusterIP
 sidecar:
