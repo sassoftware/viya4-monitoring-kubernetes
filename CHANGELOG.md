@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+
+* **Overall**
+  * [FIX] Updated deployment logic to address an issue that was discovered when deploying with external tools such as Ansible.
+
 ## Version 1.2.10 (14FEB2023)
 * **Overall**
   * [SECURITY] Disabled the automounting of API credentials for all serviceAccount resources associated with deployed
@@ -19,6 +24,8 @@
   * [UPGRADE] Introduced new **experimental** getlogs script written in python, to retrieve Opensearch logs with filters and save to a file.
   * [UPGRADE] Fluent Bit has been upgraded from version 1.9.9 to 2.0.8
 
+* **Metrics**
+  * [FIX] Updated recording rule logic to restore functionality to the SAS Launched Jobs dashboards.
 
 ## Version 1.2.9 (17JAN2023)
 * **Overall**
