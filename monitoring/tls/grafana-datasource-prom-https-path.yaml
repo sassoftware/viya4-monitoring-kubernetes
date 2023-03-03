@@ -7,4 +7,4 @@
       jsonData:
         tlsSkipVerify: true
       editable: true
-      url: https://v4m-prometheus/prometheus:9090
+      url: https://v4m-prometheus:9090/prometheus
