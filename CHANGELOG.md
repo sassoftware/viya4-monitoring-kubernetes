@@ -13,6 +13,9 @@
   * [UPGRADE] - Pushgateway has been upgraded from version 1.4.3 to 1.5.1
   * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from 1.19.5 to 1.22.0
 
+* **Logging**
+  * [FIX] Adjust priority of ISM Policy for OpenShift infrastructure indices to ensure proper policy assignment
+
 ## Version 1.2.10 (14FEB2023)
 * **Overall**
   * [SECURITY] Disabled the automounting of API credentials for all serviceAccount resources associated with deployed
