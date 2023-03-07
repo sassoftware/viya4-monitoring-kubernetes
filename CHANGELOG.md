@@ -14,7 +14,7 @@
   * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from 1.19.5 to 1.22.0
 
 * **Logging**
-  * [FIX] Corrected kubectl commands provided in the logging/bin/change_internal_password.sh to reset Fluent Bit and Elastic Exporter pods.
+  * [FIX] Corrected messages in logging/bin/change_internal_password.sh showing commands to restart Fluent Bit and Elastic Exporter pods.
 
 ## Version 1.2.10 (14FEB2023)
 * **Overall**
