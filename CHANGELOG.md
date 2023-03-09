@@ -12,6 +12,7 @@
   * [UPGRADE] - Kube State Metrics has been upgraded from version 2.5.0 to 2.6.0
   * [UPGRADE] - Pushgateway has been upgraded from version 1.4.3 to 1.5.1
   * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from 1.19.5 to 1.22.0
+  * [CHANGE]  - Replaced ghostunnel for Prometheus and Alertmanager when `TLS_ENABLE=true` with their respective native TLS capability. Relevant documentation can be seen [here](./logging/Export_Logs.md#Export-Logs-Python-Script-Experimental)
 
 ## Version 1.2.10 (14FEB2023)
 * **Overall**
@@ -29,7 +30,7 @@
     OpenSearch Dashboards 2.4.1.
   * [FIX] On OpenShift, the deployment order of OpenSearch and OpenSearch Dashboards was reversed to resolve a timing
     issue related to the shared serviceAccount.
-  * [UPGRADE] Introduced new **experimental** getlogs script written in python, to retrieve Opensearch logs with filters and save to a file.
+  * [UPGRADE] Introduced new **experimental** getlogs script written in python, to retrieve OpenSearch logs with filters and save to a file.
   * [UPGRADE] Fluent Bit has been upgraded from version 1.9.9 to 2.0.8
 
 
