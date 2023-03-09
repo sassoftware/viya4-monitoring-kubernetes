@@ -50,14 +50,6 @@ grafana:
 #   prometheusSpec:
 #     routePrefix: /prometheus
 #     externalUrl: https://host.cluster.example.com/prometheus
-#     alertingEndpoints:
-#       - name: v4m-alertmanager 
-#         namespace: monitoring
-#         port: http-web
-#         pathPrefix: "/alertmanager"
-#         scheme: https
-#         tlsConfig:
-#           insecureSkipVerify: true
 
 # alertmanager:
 #   # Disable default configuration of NodePort
