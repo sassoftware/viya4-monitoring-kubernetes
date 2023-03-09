@@ -45,6 +45,20 @@ alertmanager:
       tlsConfig:
         insecureSkipVerify: true
 
+prometheus-node-exporter:
+  extraArgs:
+  - '--web.config.file=/opt/node-exporter/node-exporter-web.yaml'
+  configmaps:
+  - name: node-exporter-tls-web-config
+    mountPath: /opt/node-exporter
+
+# node-exporter helm chart does not yet support HTTPS
+# node-exporter:
+#   sidecarVolumeMount:
+#   - name: tls-secret
+#     mountPath: /cert
+#     readOnly: true
+
 grafana:
   readinessProbe:
     httpGet:
