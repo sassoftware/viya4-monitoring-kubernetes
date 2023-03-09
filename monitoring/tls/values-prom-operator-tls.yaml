@@ -49,25 +49,81 @@ grafana:
   readinessProbe:
     httpGet:
       scheme: HTTPS
-      port: 3000
+      port: 443
   livenessProbe:
     httpGet:
       scheme: HTTPS
-      port: 3000
-  extraSecretMounts:
-  - name: grafana-tls
-    mountPath: /cert
-    secretName: grafana-tls-secret
-    readOnly: true
-    subPath: ""
+      port: 443
+  extraContainers: |
+    # Add square/ghosttunnel TLS proxy
+    - name: tls-proxy
+      args:
+      - server
+      - --listen=:443
+      - --target=127.0.0.1:3000
+      - --key=/cert/tls.key
+      - --cert=/cert/tls.crt
+      - --disable-authentication
+      image: ghostunnel/ghostunnel:v1.7.0
+      imagePullPolicy: IfNotPresent
+      ports:
+      - name: https
+        containerPort: 443 
+        protocol: TCP
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: true
+        privileged: true
+        readOnlyRootFilesystem: true
+        runAsUser: 0
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /cert
+        name: tls-proxy-secret
+        readOnly: true
+  extraContainerVolumes:
+  - name: tls-proxy-secret
+    secret:
+      defaultMode: 420
+      secretName: grafana-tls-secret
   service:
-    port: 3000
-    targetPort: 3000
+    port: 443
+    targetPort: 443
   sidecar:
     datasources:
       defaultDatasourceEnabled: false
   "grafana.ini":
     server:
-      protocol: https
-      cert_file: /cert/tls.crt
-      cert_key: /cert/tls.key
+      # Bind to localhost so https (tls-proxy) is the only way in
+      http_addr: 127.0.0.1
+
+# Commenting out for future reference with issue encountered when attempting to replace
+# ghostunnel with Grafanas native TLS.
+# Related GH Issue: https://github.com/prometheus-community/helm-charts/issues/3100
+# grafana:
+#   readinessProbe:
+#     httpGet:
+#       scheme: HTTPS
+#       port: 3000
+#   livenessProbe:
+#     httpGet:
+#       scheme: HTTPS
+#       port: 3000
+#   extraSecretMounts:
+#   - name: grafana-tls
+#     mountPath: /cert
+#     secretName: grafana-tls-secret
+#     readOnly: true
+#     subPath: ""
+#   service:
+#     port: 3000
+#     targetPort: 3000
+#   sidecar:
+#     datasources:
+#       defaultDatasourceEnabled: false
+#   "grafana.ini":
+#     server:
+#       protocol: https
+#       cert_file: /cert/tls.crt
+#       cert_key: /cert/tls.key
