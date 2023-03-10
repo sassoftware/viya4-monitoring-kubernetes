@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-* **Montoring**
+* **Metrics**
   * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 41.7.3 to 43.3.1
   * [UPGRADE] - Prometheus has been upgraded from version 2.39.0 to 2.40.7
   * [UPGRADE] - Prometheus Operator has been upgraded from version 0.60.0 to 0.62.0
@@ -12,6 +12,9 @@
   * [UPGRADE] - Kube State Metrics has been upgraded from version 2.5.0 to 2.6.0
   * [UPGRADE] - Pushgateway has been upgraded from version 1.4.3 to 1.5.1
   * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from 1.19.5 to 1.22.0
+
+* **Logging**
+  * [FIX] Corrected messages in logging/bin/change_internal_password.sh showing commands to restart Fluent Bit and Elastic Exporter pods.
 
 ## Version 1.2.10 (14FEB2023)
 * **Overall**
