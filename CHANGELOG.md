@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+
+* **Overall**
+  * [FIX] Updated deployment logic to address an issue that was discovered when deploying with external tools such as Ansible.
+
 * **Metrics**
   * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 41.7.3 to 43.3.1
   * [UPGRADE] - Prometheus has been upgraded from version 2.39.0 to 2.40.7
@@ -37,6 +41,8 @@
   * [UPGRADE] Introduced new **experimental** getlogs script written in python, to retrieve Opensearch logs with filters and save to a file.
   * [UPGRADE] Fluent Bit has been upgraded from version 1.9.9 to 2.0.8
 
+* **Metrics**
+  * [FIX] Updated recording rule logic to restore functionality to the SAS Launched Jobs dashboards.
 
 ## Version 1.2.9 (17JAN2023)
 * **Overall**
