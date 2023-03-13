@@ -179,6 +179,7 @@ helm $helmDebug upgrade --install $promRelease \
   --set kube-state-metrics.fullnameOverride=$promName-kube-state-metrics \
   --set grafana.fullnameOverride=$promName-grafana \
   --set grafana.adminPassword="$grafanaPwd" \
+  --set prometheus.prometheusSpec.alertingEndpoints[0].namespace="$MON_NS" \
   --version $KUBE_PROM_STACK_CHART_VERSION \
   prometheus-community/kube-prometheus-stack
 

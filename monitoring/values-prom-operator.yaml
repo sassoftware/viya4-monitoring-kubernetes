@@ -114,6 +114,9 @@ prometheus:
             requests:
               storage: 25Gi    
           volumeMode: Filesystem
+    alertingEndpoints:
+      - name: v4m-alertmanager 
+        port: http-web
 
 # =======================
 # Prometheus AlertManager

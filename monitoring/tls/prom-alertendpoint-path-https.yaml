@@ -1,10 +1,9 @@
 prometheus:
   prometheusSpec:
     alertingEndpoints:
-    - name: v4m-alertmanager 
-      namespace: monitoring
-      port: http-web
-      pathPrefix: "/alertmanager"
-      scheme: https
-      tlsConfig:
-        insecureSkipVerify: true
+      - name: v4m-alertmanager 
+        port: http-web
+        pathPrefix: "/alertmanager"
+        scheme: https
+        tlsConfig:
+          insecureSkipVerify: true
