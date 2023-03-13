@@ -249,7 +249,7 @@ if [ "$success" == "true" ]; then
           log_notice " the Fluent Bit pods to ensure log collection is not interrupted.            "
           log_notice "                                                                             "
           log_notice " This can be done by submitting the following command:                       "
-          log_notice "         kubectl -n $LOG_NS delete pods -l 'app=fluent-bit, fbout=es'        "
+          log_notice "       kubectl -n $LOG_NS rollout restart daemonset v4m-fb                   "
           echo ""
           ;;
         kibanaserver)
@@ -278,7 +278,7 @@ if [ "$success" == "true" ]; then
           log_notice " Elasticsearch Exporter pod to ensure OpenSearch metrics continue to be collected. "
           log_notice "                                                                                      "
           log_notice " This can be done by submitting the following command:                                "
-          log_notice "           kubectl -n $LOG_NS delete pod -l 'app=elasticsearch-exporter' "
+          log_notice "       kubectl -n $LOG_NS rollout restart deployment v4m-es-exporter                  "
           echo ""
           ;;
         *)
