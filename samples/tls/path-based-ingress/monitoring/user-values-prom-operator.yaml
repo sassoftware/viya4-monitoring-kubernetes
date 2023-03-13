@@ -28,11 +28,15 @@ grafana:
 # an unauthenticated applicaton without other restrictions in place
 # is insecure.
 
-# prometheus:
+# If you do not plan on defining an Ingress configuration with
+# Prometheus, keep the service.type, service.nodePort, and
+# prometheusSpec.routePrefix uncommented.
+
+prometheus:
 #   # Disable default configuration of NodePort
-#   service:
-#     type: ClusterIP
-#     nodePort: null
+  service:
+    type: ClusterIP
+    nodePort: null
 #   # Define host-based ingress
 #   ingress:
 #     ingressClassName: nginx
@@ -47,8 +51,8 @@ grafana:
 #     - host.cluster.example.com
 #     path: /prometheus
 #     pathType: Prefix
-#   prometheusSpec:
-#     routePrefix: /prometheus
+  prometheusSpec:
+    routePrefix: /prometheus
 #     externalUrl: https://host.cluster.example.com/prometheus
 
 # alertmanager:
