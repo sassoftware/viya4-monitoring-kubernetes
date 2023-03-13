@@ -34,9 +34,9 @@ grafana:
 
 prometheus:
 #   # Disable default configuration of NodePort
-  service:
-    type: ClusterIP
-    nodePort: null
+#  service:
+#    type: ClusterIP
+#    nodePort: null
 #   # Define host-based ingress
 #   ingress:
 #     ingressClassName: nginx
