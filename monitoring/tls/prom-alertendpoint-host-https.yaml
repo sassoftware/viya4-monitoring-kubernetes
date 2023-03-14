@@ -1,0 +1,8 @@
+prometheus:
+  prometheusSpec:
+    alertingEndpoints:
+      - name: v4m-alertmanager 
+        port: http-web
+        scheme: https
+        tlsConfig:
+          insecureSkipVerify: true

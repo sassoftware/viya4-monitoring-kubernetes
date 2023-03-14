@@ -99,17 +99,20 @@ fi
 
 # Optional TLS Support
 tlsValuesFile=$TMP_DIR/empty.yaml
+tlsPromAlertingEndpointFile=$TMP_DIR/empty.yaml
 if [ "$TLS_ENABLE" == "true" ]; then
   apps=( prometheus alertmanager grafana )
   create_tls_certs $MON_NS monitoring ${apps[@]}
 
   tlsValuesFile=monitoring/tls/values-prom-operator-tls.yaml
+  tlsPromAlertingEndpointFile=monitoring/tls/prom-alertendpoint-host-https.yaml
   log_debug "Including TLS response file $tlsValuesFile"
 
   log_verbose "Provisioning TLS-enabled Prometheus datasource for Grafana"
   grafanaDS=grafana-datasource-prom-https.yaml
   if [ "$MON_TLS_PATH_INGRESS" == "true" ]; then
     grafanaDS=grafana-datasource-prom-https-path.yaml
+    tlsPromAlertingEndpointFile=monitoring/tls/prom-alertendpoint-path-https.yaml
   fi
   kubectl delete cm -n $MON_NS --ignore-not-found grafana-datasource-prom-https
   kubectl create cm -n $MON_NS grafana-datasource-prom-https --from-file monitoring/tls/$grafanaDS
@@ -164,6 +167,7 @@ helm $helmDebug upgrade --install $promRelease \
   -f monitoring/values-prom-operator.yaml \
   -f $istioValuesFile \
   -f $tlsValuesFile \
+  -f $tlsPromAlertingEndpointFile \
   -f $nodePortValuesFile \
   -f $wnpValuesFile \
   -f $PROM_OPER_USER_YAML \
@@ -175,6 +179,7 @@ helm $helmDebug upgrade --install $promRelease \
   --set kube-state-metrics.fullnameOverride=$promName-kube-state-metrics \
   --set grafana.fullnameOverride=$promName-grafana \
   --set grafana.adminPassword="$grafanaPwd" \
+  --set prometheus.prometheusSpec.alertingEndpoints[0].namespace="$MON_NS" \
   --version $KUBE_PROM_STACK_CHART_VERSION \
   prometheus-community/kube-prometheus-stack
 
