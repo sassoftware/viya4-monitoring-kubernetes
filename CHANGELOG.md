@@ -1,8 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
-
-
+## Version 1.2.11 (14MAR2023)
 * **Overall**
   * [FIX] Updated deployment logic to address an issue that was discovered when deploying with external tools such as Ansible.
 
