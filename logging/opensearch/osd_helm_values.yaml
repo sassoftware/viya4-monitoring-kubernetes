@@ -1,5 +1,5 @@
 image:
-  tag: 2.4.1
+  tag: 2.6.0
 
 opensearchHosts: "https://v4m-search:9200"
 
