@@ -59,6 +59,8 @@ grafana:
 #   # Define host-based ingress
 #   ingress:
 #     ingressClassName: nginx
+#     annotations:
+#       nginx.ingress.kubernetes.io/backend-protocol: HTTPS
 #     enabled: true
 #     tls:
 #     - hosts:
