@@ -1,5 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Metrics**
+  * [FIX] Updated invalid defintion for Promtheus and Alertmanager service monitor that prevented the service monitor metrics to be collected.
+
 ## Version 1.2.11 (14MAR2023)
 * **Overall**
   * [FIX] Updated deployment logic to address an issue that was discovered when deploying with external tools such as Ansible.
