@@ -143,7 +143,7 @@ kubectl -n $LOG_NS create configmap fb-env-vars \
 kubectl -n $LOG_NS label configmap fb-env-vars   managed-by=v4m-es-script
 
 #Pin to a specific Helm chart version
-FLUENTBIT_HELM_CHART_VERSION=${FLUENTBIT_HELM_CHART_VERSION:-"0.22.0"}
+FLUENTBIT_HELM_CHART_VERSION=${FLUENTBIT_HELM_CHART_VERSION:-"0.24.0"}
 
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
