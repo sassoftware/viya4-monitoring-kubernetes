@@ -2,7 +2,7 @@
 
 ## Unreleased
 * **Metrics**
-  * [FIX] Updated invalid defintion for Promtheus and Alertmanager service monitor that prevented the service monitor metrics to be collected.
+  * [FIX] Updated invalid defintion for Prometheus and Alertmanager service monitor that prevented the service monitor metrics to be collected.
 
 ## Version 1.2.11 (14MAR2023)
 * **Overall**
