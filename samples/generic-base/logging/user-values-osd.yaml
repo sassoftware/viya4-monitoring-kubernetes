@@ -1,8 +1,8 @@
-# Chart: https://github.com/opensearch-project/helm-charts/tree/opensearch-dashboards-2.7.0/charts/opensearch-dashboards
-# Default values: https://github.com/opensearch-project/helm-charts/blob/opensearch-dashboards-2.7.0/charts/opensearch-dashboards/values.yaml
+# Chart: https://github.com/opensearch-project/helm-charts/tree/opensearch-dashboards-2.9.0/charts/opensearch-dashboards
+# Default values: https://github.com/opensearch-project/helm-charts/blob/opensearch-dashboards-2.9.0/charts/opensearch-dashboards/values.yaml
 
 #image:
-#  tag: 2.4.1
+#  tag: 2.6.0
 #  repository: "opensearchproject/opensearch-dashboards"
 #  pullPolicy: "IfNotPresent"
 
