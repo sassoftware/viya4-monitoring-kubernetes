@@ -5,6 +5,9 @@
   * [CHANGE] The ingress samples, both with host-based and path-based ingress, were modified to work with
     OpenSearch Dashboards 2.4.1.
 
+* **Metrics**
+  * [FIX] Added annotation to Alertmanager ingress resource to enable HTTPS access via nginx
+
 ## Version 1.2.11 (14MAR2023)
 * **Overall**
   * [FIX] Updated deployment logic to address an issue that was discovered when deploying with external tools such as Ansible.
