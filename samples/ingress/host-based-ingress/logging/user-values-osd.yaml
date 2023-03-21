@@ -9,3 +9,4 @@ ingress:
         - path: /
           backend:
             serviceName: v4m-osd
+            servicePort: 5601
