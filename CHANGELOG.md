@@ -2,8 +2,9 @@
 
 ## Unreleased
 * **Logging**
-  * [UPGRADE] - OpenSearch and OpenSearch Dashboards upgraded from version 2.4.1. to 2.6.0
-  * [UPGRADE] - Fluent Bit has been upgraded from version 2.0.8 to 2.0.9
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from version 2.4.1. to 2.6.0
+  * [UPGRADE] Fluent Bit upgraded from version 2.0.8 to 2.0.9
+  * [CHANGE]  Extended validation loop when deploying content into OpenSearch Dashboards and added message to user
 
 ## Version 1.2.11 (14MAR2023)
 * **Overall**
