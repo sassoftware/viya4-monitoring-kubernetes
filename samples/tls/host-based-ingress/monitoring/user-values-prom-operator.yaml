@@ -55,6 +55,8 @@ grafana:
 #     nodePort: null
 #   # Define host-based ingress
 #   ingress:
+#     annotations:
+#       nginx.ingress.kubernetes.io/backend-protocol: HTTPS
 #     enabled: true
 #     ingressClassName: nginx
 #     tls:

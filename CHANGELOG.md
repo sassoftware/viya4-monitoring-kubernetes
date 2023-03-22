@@ -3,6 +3,7 @@
 ## Unreleased
 * **Metrics**
   * [FIX] Updated invalid defintion for Prometheus and Alertmanager service monitor that prevented the service monitor metrics to be collected.
+  * [FIX] Added annotation to Alertmanager ingress resource to enable HTTPS access via nginx
 
 ## Version 1.2.11 (14MAR2023)
 * **Overall**
