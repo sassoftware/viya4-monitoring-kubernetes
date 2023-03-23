@@ -23,8 +23,16 @@ else
   exit 1
 fi
 
-# Minimuim version: 1.22  effective: 18OCT22
-if [[ $KUBE_SERVER_VER =~ v1.2[2-9] ]]; then
+# 23MAR23
+# Supported versions of SAS Viya 4
+# 2022.1  LTS 1.20 1.22
+# 2022.09 LTS 1.21 1.24
+# 2022.12     1.22 1.24
+# 2023.01     1.22 1.24
+# 2023.02     1.22 1.24
+# 2023.03     1.23 1.25
+
+if [[ $KUBE_SERVER_VER =~ v1.2[0-9] ]]; then
   :
 else 
   log_warn "WARNING: The detected version of Kubernetes [$KUBE_SERVER_VER] is not supported by any of the currently supported releases of SAS Viya 4."
