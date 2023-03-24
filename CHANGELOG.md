@@ -1,5 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Overall**
+  * [CHANGE] Revised Kubernetes and OpenShift version-checking logic (inc. changing ERROR message to a WARNING)
+
 ## Version 1.2.11 (14MAR2023)
 * **Overall**
   * [FIX] Updated deployment logic to address an issue that was discovered when deploying with external tools such as Ansible.
