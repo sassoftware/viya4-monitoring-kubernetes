@@ -56,6 +56,8 @@ metric_collector:
       - "*"
       allowed_actions:
         - indices_monitor
+        - indices:admin/aliases/get
+        - indices:admin/mappings/get
   cluster_permissions:
     - cluster_monitor
     - manage_snapshots
