@@ -1,6 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+* **Overall**
+  * [CHANGE] Revised Kubernetes and OpenShift version-checking logic (inc. changing ERROR message to a WARNING)
+
 * **Metrics**
   * [FIX] Updated invalid defintion for Prometheus and Alertmanager service monitor that prevented the service monitor metrics to be collected.
   * [FIX] Added annotation to Alertmanager ingress resource to enable HTTPS access via nginx
