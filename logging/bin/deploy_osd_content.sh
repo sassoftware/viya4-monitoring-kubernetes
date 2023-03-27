@@ -65,7 +65,8 @@ set +e  # disable exit on error
 # Need to wait 2-3 minutes for OSD to come up and
 # and be ready to accept the curl commands below
 # Confirm OSD is ready
-for pause in 30 30 60 30 30 30 30 30 30
+log_info "Waiting (up to more 8 minutes) for OpenSearch Dashboards API endpoint to be ready"
+for pause in 30 30 60 30 30 30 30 30 30 60 60 60 
 do
 
    get_kb_api_url

@@ -1,8 +1,8 @@
-# Chart: https://github.com/opensearch-project/helm-charts/tree/opensearch-2.9.1/charts/opensearch
-# Default values: https://github.com/opensearch-project/helm-charts/blob/opensearch-2.9.1/charts/opensearch/values.yaml
+# Chart: https://github.com/opensearch-project/helm-charts/tree/opensearch-2.11.0/charts/opensearch
+# Default values: https://github.com/opensearch-project/helm-charts/blob/opensearch-2.11.0/charts/opensearch/values.yaml
 
 #image:
-#  tag: 2.4.1
+#  tag: 2.6.0
 #  repository: "opensearchproject/opensearch"
 #  pullPolicy: "IfNotPresent"
 

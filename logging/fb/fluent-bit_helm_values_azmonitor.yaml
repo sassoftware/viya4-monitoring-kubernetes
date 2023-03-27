@@ -1,8 +1,8 @@
-# Chart:  https://github.com/fluent/helm-charts/blob/fluent-bit-0.22.0/charts/fluent-bit
-# Default values: https://github.com/fluent/helm-charts/blob/fluent-bit-0.22.0/charts/fluent-bit/values.yaml
+# Chart:  https://github.com/fluent/helm-charts/blob/fluent-bit-0.24.0/charts/fluent-bit
+# Default values: https://github.com/fluent/helm-charts/blob/fluent-bit-0.24.0/charts/fluent-bit/values.yaml
 
 image:
-  tag: 2.0.8
+  tag: 2.0.9
 podAnnotations: 
   fluentbit.io/parser: fluentbit
 podLabels:
