@@ -10,13 +10,13 @@ prometheus:
           secret:
             key: tls.crt
             name: prometheus-tls-secret
-    service:
-      port: 9090
-      targetPort: 9090
-    serviceMonitor:
-      scheme: https
-      tlsConfig:
-        insecureSkipVerify: true
+  service:
+    port: 9090
+    targetPort: 9090
+  serviceMonitor:
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
 
 alertmanager:
   alertmanagerSpec:
@@ -30,13 +30,13 @@ alertmanager:
           secret:
             key: tls.crt
             name: alertmanager-tls-secret
-    service:
-      port: 9093
-      targetPort: 9093
-    serviceMonitor:
-      scheme: https
-      tlsConfig:
-        insecureSkipVerify: true
+  service:
+    port: 9093
+    targetPort: 9093
+  serviceMonitor:
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
 
 prometheus-node-exporter:
   extraArgs:

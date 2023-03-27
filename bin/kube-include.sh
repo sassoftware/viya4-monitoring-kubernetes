@@ -14,21 +14,28 @@ fi
 KUBE_CLIENT_VER=$(kubectl version --short | grep 'Client Version' | awk '{print $3}' 2>/dev/null)
 KUBE_SERVER_VER=$(kubectl version --short | grep 'Server Version' | awk '{print $3}' 2>/dev/null)
 
-# Minimuim Client version: 1.21  effective: 18OCT22
 # Client version allowed to be one minor version earlier than minimum server version
-if [[ $KUBE_CLIENT_VER =~ v1.2[1-9] ]]; then
+# 23MAR23: In spite of above, limiting kubectl to 1.2.x for now
+if [[ $KUBE_CLIENT_VER =~ v1.2[0-9] ]]; then
   :
 else 
-  log_error "Unsupported kubectl version: [$KUBE_CLIENT_VER]"
-  exit 1
+  log_warn "Unsupported kubectl version: [$KUBE_CLIENT_VER]."
+  log_warn "This script might not work as expected. Support might not be available until kubectl is upgraded to a supported version."
 fi
 
-# Minimuim version: 1.22  effective: 18OCT22
-if [[ $KUBE_SERVER_VER =~ v1.2[2-9] ]]; then
+# Supported versions of SAS Viya 4
+# Updated: 23MAR23
+# 2022.1  LTS 1.20 1.22
+# 2022.09 LTS 1.21 1.24
+# 2022.12     1.22 1.24
+# 2023.01     1.22 1.24
+# 2023.02     1.22 1.24
+# 2023.03     1.23 1.25
+if [[ $KUBE_SERVER_VER =~ v1.2[0-9] ]]; then
   :
 else 
-  log_error "Unsupported Kubernetes server version: [$KUBE_SERVER_VER]"
-  exit 1
+  log_warn "The detected version of Kubernetes [$KUBE_SERVER_VER] is not supported by any of the currently supported releases of SAS Viya 4."
+  log_warn "This script might not work as expected. Support might not be available until Kubernetes is upgraded to a supported version."
 fi
 
 export KUBE_CLIENT_VER="$KUBE_CLIENT_VER"
