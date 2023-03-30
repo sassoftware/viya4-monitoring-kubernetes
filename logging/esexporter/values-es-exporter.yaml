@@ -85,6 +85,26 @@ es:
   ##
   indices: true
 
+  ## If true, query settings stats for all indices in the cluster.
+  ##
+  indices_settings: true
+
+  ## If true, query mapping stats for all indices in the cluster.
+  ##
+  indices_mappings: true
+
+  ## If true, query stats for shards in the cluster.
+  ##
+  shards: true
+
+  ## If true, query stats for snapshots in the cluster.
+  ##
+  snapshots: true
+
+  ## If true, query stats for cluster settings.
+  ##
+  cluster_settings: false
+
   ## Timeout for trying to get stats from Elasticsearch. (ex: 20s)
   ##
   timeout: 30s
