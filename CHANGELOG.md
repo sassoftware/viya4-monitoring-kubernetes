@@ -1,11 +1,17 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+* **Overall**
+  * [CHANGE] Revised Kubernetes and OpenShift version-checking logic (inc. changing ERROR message to a WARNING)
+
 * **Metrics**
   * [FIX] Updated invalid defintion for Prometheus and Alertmanager service monitor that prevented the service monitor metrics to be collected.
   * [FIX] Added annotation to Alertmanager ingress resource to enable HTTPS access via nginx
 
 * **Logging**
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from version 2.4.1. to 2.6.0
+  * [UPGRADE] Fluent Bit upgraded from version 2.0.8 to 2.0.9
+  * [CHANGE]  Extended validation loop when deploying content into OpenSearch Dashboards and added message to user
   * [FIX] Added additional permissions to OpenSearch 'metricgetter' role to permit more metrics to be collected from OpenSearch
 
 ## Version 1.2.11 (14MAR2023)
