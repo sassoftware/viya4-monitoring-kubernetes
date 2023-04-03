@@ -22,18 +22,8 @@ if [ "$OPENSHIFT_PREREQS_ENABLE" != "true" ]; then
 fi
 
 
-# link Elasticsearch serviceAccounts to 'privileged' scc
+# link OpenSearch serviceAccounts to 'privileged' scc
 oc adm policy add-scc-to-user privileged -z v4m-os -n $LOG_NS
-
-# create the 'v4mlogging' SCC, if it does not already exist
-if oc get scc v4mlogging 2>/dev/null 1>&2; then
-   log_info "Skipping scc creation; using existing scc [v4mlogging]"
-else
-   oc create -f logging/openshift/fb_v4mlogging_scc.yaml
-fi
-
-# link Fluent Bit serviceAccount to 'v4mlogging' scc
-oc adm policy add-scc-to-user v4mlogging -z v4m-fb    -n $LOG_NS
 
 log_info "OpenShift Prerequisites have been deployed."
 

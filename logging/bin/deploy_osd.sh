@@ -41,7 +41,7 @@ fi
 #         due to problem with Helm chart ver 1.8.3 which
 #         'matches' OSD version 1.3.5.  Problem involves
 #         ingress.path.backend.serverName resolution.
-OSD_HELM_CHART_VERSION=${OSD_HELM_CHART_VERSION:-"2.7.0"}
+OSD_HELM_CHART_VERSION=${OSD_HELM_CHART_VERSION:-"2.9.0"}
 
 # get credentials
 export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD}
