@@ -36,3 +36,6 @@ ingress:
     - host: host.cluster.example.com
       paths:
         - path: /dashboards
+          backend:
+            serviceName: v4m-osd
+            servicePort: 5601

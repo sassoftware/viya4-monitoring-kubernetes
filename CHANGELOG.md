@@ -1,6 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+* **Logging**
+  * [CHANGE] The ingress samples, both with host-based and path-based ingress, were modified to work with
+    OpenSearch Dashboards 2.4.1.
 * **Overall**
   * [CHANGE] Revised Kubernetes and OpenShift version-checking logic (inc. changing ERROR message to a WARNING)
 
