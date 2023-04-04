@@ -15,10 +15,10 @@ if os.path.isfile("temp_SAS_OSQ.TXT"):
 
 def validate_input(dict):
     """Validate the arguments passed by the user to ensure script will function properly"""
-    if args['create-auth']:
+    if dict['create-auth']:
         if (type(dict['create-auth'] == list)):
             dict['create-auth'] = " ".join(dict['create-auth'])
-        x = open(args['create-auth'], "w")
+        x = open(dict['create-auth'], "w")
         x.write('{"username": " " , "password": " " , "host": " ", "port": " "}')
         print("\nAuth File created.\n")
 
@@ -26,18 +26,23 @@ def validate_input(dict):
         if (type(dict['auth-file'] == list)):
             dict['auth-file'] = " ".join(dict['auth-file'])
         try: 
-            a = open(args['auth-file'], 'r')
+            a = open(dict['auth-file'], 'r')
             authDict = json.loads(a.read())
-            args['userName'] = authDict['username']
-            args['password'] = authDict['password']
-            args['host'] = authDict['host']
-            args['port'] = authDict['port']
+            dict['userName'] = authDict['username']
+            dict['password'] = authDict['password']
+            dict['host'] = authDict['host']
+            dict['port'] = authDict['port']
         except Exception as e:
             print("There was a problem with the authentication file. Please ensure that the values are in dictionary format with keys: 'username', 'password', 'host', 'port'")
             print(e)
             exit()
 
-    
+    """Ensure maxrows is less than 10000"""
+
+    if dict['maxInt'] > 10000:
+        print("Maxrows limit of 10000 exceeded, setting maximum rows to 10000")
+        dict['maxInt'] = 10000
+
     ##Check for existence of Connection Settings in input dictionary, if not, exit
     if(not dict['userName'] or not dict['password'] or not dict['host'] or not dict['port']):
         print('\nError: Missing required connection settings. Please specify username, password, host, or port.')
@@ -65,21 +70,21 @@ def validate_input(dict):
                     print('Setting default filetype: CSV')
                     dict['out-filename'] = dict['out-filename'] + ".csv"
         if os.path.isfile(dict['out-filename']):
-            if (args['force'] == False):
+            if (dict['force'] == False):
                 print("\nUser specified output file already exists. Use -f to overwrite the file.\n")
                 exit()
 
     if dict['savequery']:      
         if(type(dict['savequery']) == list):
             dict['savequery']= " ".join(dict['savequery'])
-        if ("." in dict['savequery']):
-            print('Please remove filetype from the savequery option.')
-            exit()  
+        if ((not ".json" in dict['savequery']) and (not ".txt" in dict['savequery'])):
+            print('Error: Not a supported filetype for the saved query file.')
+            exit()
 
     ##Time Validator - Verifies input, and converts it to UTC   
     if (type(dict['dateTimeStart']) ==list):
         dict['dateTimeStart'] = " ".join(dict['dateTimeStart'])
-    if (type(dict['dateTimeEnd']) ==list):
+    if (type(dict['dateTimeEnd']) == list):
         dict['dateTimeEnd'] = " ".join(dict['dateTimeEnd'])
     try:
         dict['dateTimeStart'] = (time.strptime(dict.get('dateTimeStart'), "%Y-%m-%d %H:%M:%S"))
@@ -168,7 +173,7 @@ def get_arguments():
     parser.add_argument('-o', '--out-file', required=False, dest="out-filename", nargs='*', metavar="FILENAME.*", help = "\nName of file to write results to (default: [stdout]). Filetype can be included at the end, or specified using -format. Supported filetypes: .csv, .json, .txt\n\n")
     parser.add_argument('-fo','--format',  required=False, dest="format", choices = ["csv","json","txt"], help = "\n Specify the output format for the results file. Filename is taken from out-filename. Overwrites the filetype for out-filename. \n\n")
     parser.add_argument('-f','--force',  required=False, dest="force", action= "store_true", help = "\n If this option is provided, the output results file will be overwritten if it already exists.\n\n")
-    parser.add_argument('-fi','--fields',  required=False, dest="fields", nargs="*", metavar= "FIELDS", default=['@timestamp', 'level', 'logsource', 'namespace','pod', 'container', 'message'], help = "\n Specify output columns (CSV file only) \n\n")
+    parser.add_argument('-fi','--fields',  required=False, dest="fields", nargs="*", metavar= "FIELDS", default=['@timestamp', 'level', 'logsource', 'namespace','pod', 'container', 'message'], help = "\n Specify output columns (CSV file only) Please provide a space separated list of fields. \n Default fields: @timestamp level logsource namespace pod container message \n Additional arguments: host index properties debug \n\n")
     parser.add_argument('-st', '--start', required=False, dest="dateTimeStart", nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime(time.localtime()) - 3600)), help = "\nDatetime for start of period for which logs are sought (default: 1 hour ago).\n\n")
     parser.add_argument('-en', '--end', required=False, dest="dateTimeEnd",nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), help = "\nDatetime for end of period for which logs are sought (default: now). \n\n")
     parser.add_argument('-i', '--index', required=False, dest="index", metavar="INDEX", default="viya_logs-*", help = "\nDetermine which index to perform the search in. Default: viya-logs-*\n\n")
@@ -205,10 +210,15 @@ index_name = args['index']
 if (args['showquery'] == True): ##Print Query if user asks. 
     print("The following query will be submitted:\n\n", json.dumps(eval(x), indent=2))
 if(args['savequery']): ##Save Query if user asks.
-    y = open(args['savequery'] + ".json", 'w')  
-    with y as outfile:
-        json.dump(eval(x), outfile, indent=2)
-    print("\nQuery saved to " + args['savequery'] + ".json")
+    y = open(args['savequery'], 'w')  
+    if (".json" in args['savequery']):
+        with y as outfile:
+            json.dump(eval(x), outfile, indent=2)   
+    
+    elif (".txt" in args['savequery']):
+        y.write(str(x))
+
+    print("\nQuery saved to " + args['savequery'])
     
 print('\nSearching index: ')
 try:
@@ -235,6 +245,12 @@ if (args['out-filename']): ##Check if user specified file exists, and if it shou
         print("Search complete. Results printed to " + args['out-filename'])
 
     elif(".csv" in args['out-filename']):
+
+        i =0
+        for field in args['fields']:
+            args['fields'][i] = field.replace(',','')
+            i+=1
+        
         valueStore = []
         dictArray=[]
         for log in response['hits']['hits']:
@@ -255,7 +271,7 @@ if (args['out-filename']): ##Check if user specified file exists, and if it shou
             newDict= dict(zip(args['fields'], valueStore))
             dictArray.append(newDict)
             valueStore.clear()
-
+        
         with x as csvfile:
             header = args['fields']
             writer = csv.DictWriter(csvfile, fieldnames = header)
