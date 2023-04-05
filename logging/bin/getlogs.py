@@ -166,10 +166,10 @@ def get_arguments():
     parser.add_argument('-l', '--level', required=False, dest='level', nargs='*', metavar="LEVEL",  help = "\nOne or more message levels for which logs are sought\n\n")
     parser.add_argument('-lx', '--level-exclude', required=False, dest = 'level-exclude', nargs='*', metavar="LEVEL", help = "\nOne or more message levels for which logs should be excluded from the output.\n\n")
     parser.add_argument('-se', '--search', required=False, dest= "message", nargs='*', metavar="MESSAGE",  help = "\nWord or phrase contained in log message.\n\n")
-    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=250,  help = "\nThe maximum number of log messsages to return.\n\n")
+    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=250,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
     parser.add_argument('-q', '--query-file ', required=False, dest="query-filename", metavar="FILENAME.*", help = "\nName of file containing search query (Including filetype) at end. Program will submit query from file, ALL other query parmeters ignored. Supported filetypes: .txt, .json\n\n")
     parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Display example of actual query that will be submitted during execution.\n\n")
-    parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (WITHOUT filetype) in which to save the generated query. If no file is specified, the query will not be saved. Query is saved in JSON format. \n\n")
+    parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (including filetype) in which to save the generated query. Supported fileypes are .json, .lst, and .txt\n\n")
     parser.add_argument('-o', '--out-file', required=False, dest="out-filename", nargs='*', metavar="FILENAME.*", help = "\nName of file to write results to (default: [stdout]). Filetype can be included at the end, or specified using -format. Supported filetypes: .csv, .json, .txt\n\n")
     parser.add_argument('-fo','--format',  required=False, dest="format", choices = ["csv","json","txt"], help = "\n Specify the output format for the results file. Filename is taken from out-filename. Overwrites the filetype for out-filename. \n\n")
     parser.add_argument('-f','--force',  required=False, dest="force", action= "store_true", help = "\n If this option is provided, the output results file will be overwritten if it already exists.\n\n")
@@ -215,8 +215,12 @@ if(args['savequery']): ##Save Query if user asks.
         with y as outfile:
             json.dump(eval(x), outfile, indent=2)   
     
-    elif (".txt" in args['savequery']):
+    elif (".txt" in args['savequery'] or ".lst" in args['savequery']):
         y.write(str(x))
+
+    else:
+        print("Please provide a file type for the saved query")
+        exit()
 
     print("\nQuery saved to " + args['savequery'])
     
