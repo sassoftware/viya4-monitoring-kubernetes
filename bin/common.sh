@@ -192,12 +192,16 @@ function disable_sa_token_automount {
   ns=$1
   sa_name=$2
   should_disable=${SEC_DISABLE_SA_TOKEN_AUTOMOUNT:-true}
-
+  
   if [ "$should_disable" == "true" ]; then
-     log_debug "Disabling automount of API tokens for serviceAccount [$ns/$sa_name]"
-     kubectl -n $ns patch serviceAccount $sa_name -p '{"automountServiceAccountToken":false}'
+    if [ -n "$(kubectl -n "$ns" get serviceAccount "$sa_name" -o name 2>/dev/null)" ]; then
+      log_debug "Disabling automount of API tokens for serviceAccount [$ns/$sa_name]"
+      kubectl -n $ns patch serviceAccount $sa_name -p '{"automountServiceAccountToken":false}'
+    else
+      log_debug "ServiceAccount [$ns/$sa_name] not found. Skipping patch"
+    fi
   else
-     log_debug "NOT disabling token automount serviceAccount [$ns/$sa_name]; SEC_DISABLE_SA_TOKEN_AUTOMOUNT set to [$SEC_DISABLE_SA_TOKEN_AUTOMOUNT]"
+    log_debug "NOT disabling token automount serviceAccount [$ns/$sa_name]; SEC_DISABLE_SA_TOKEN_AUTOMOUNT set to [$SEC_DISABLE_SA_TOKEN_AUTOMOUNT]"
   fi
 }
 
