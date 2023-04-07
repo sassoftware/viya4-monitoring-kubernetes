@@ -3,7 +3,7 @@
 ## Unreleased
 * **Overall**
   * [CHANGE] Revised Kubernetes and OpenShift version-checking logic (inc. changing ERROR message to a WARNING)
-  * [UPGRADE] Update driver persistent volume to `disk.csi.azure.com` in Azure deployment sample as that is the supported driver by AKS for K8s v1.26+
+  * [CHANGE] Updated Azure deployment sample to replace storage provisioner deprecated in AKS for K8s v1.26+
 
 * **Metrics**
   * [FIX] Updated invalid defintion for Prometheus and Alertmanager service monitor that prevented the service monitor metrics to be collected.
