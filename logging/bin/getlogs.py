@@ -54,15 +54,18 @@ def validate_input(dict):
         exit()
 
     if dict['out-filename']: ##Check for supported file-types
-        if(type(dict['out-filename']) == list):
-            dict['out-filename']= " ".join(dict['out-filename'])
-        if(dict['format']):
+
+        """if(dict['format']):
             if ("." in dict['out-filename']):
                 dict['out-filename'] = dict['out-filename'][0:dict['out-filename'].find(".")] + "." + dict['format']
             else:
                 dict['out-filename'] = dict['out-filename'] + "." + dict['format']
+                """
+        
+        if(type(dict['out-filename']) == list):
+            dict['out-filename']= " ".join(dict['out-filename'])
         else:
-            if ((not ".csv" in dict['out-filename']) and (not ".json" in dict['out-filename']) and (not ".txt" in dict['out-filename'])):
+            if ((not ".csv" in dict['out-filename']) and (not ".json" in dict['out-filename']) and (not ".txt" in dict['out-filename']) and (not ".lst" in dict['out-filename'])):
                 if ("." in dict['out-filename']):
                     print('Error: Not a supported filetype for the output file.')
                     exit()
@@ -171,7 +174,7 @@ def get_arguments():
     parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Display example of actual query that will be submitted during execution.\n\n")
     parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (including filetype) in which to save the generated query. Supported fileypes are .json, .lst, and .txt\n\n")
     parser.add_argument('-o', '--out-file', required=False, dest="out-filename", nargs='*', metavar="FILENAME.*", help = "\nName of file to write results to (default: [stdout]). Filetype can be included at the end, or specified using -format. Supported filetypes: .csv, .json, .txt\n\n")
-    parser.add_argument('-fo','--format',  required=False, dest="format", choices = ["csv","json","txt"], help = "\n Specify the output format for the results file. Filename is taken from out-filename. Overwrites the filetype for out-filename. \n\n")
+    parser.add_argument('-fo','--format',  required=False, dest="format", choices = ["lst","json","txt"], help = "\n If results not passed to a file, allows user to specify the format for the console output. Supported formats for console output are json, txt, and lst\n\n")
     parser.add_argument('-f','--force',  required=False, dest="force", action= "store_true", help = "\n If this option is provided, the output results file will be overwritten if it already exists.\n\n")
     parser.add_argument('-fi','--fields',  required=False, dest="fields", nargs="*", metavar= "FIELDS", default=['@timestamp', 'level', 'logsource', 'namespace','pod', 'container', 'message'], help = "\n Specify output columns (CSV file only) Please provide a space separated list of fields. \n Default fields: @timestamp level logsource namespace pod container message \n Additional arguments: host index properties debug \n\n")
     parser.add_argument('-st', '--start', required=False, dest="dateTimeStart", nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime(time.localtime()) - 3600)), help = "\nDatetime for start of period for which logs are sought (default: 1 hour ago).\n\n")
@@ -245,7 +248,7 @@ if (args['out-filename']): ##Check if user specified file exists, and if it shou
     ##Output as proper filetype
     if(".json" in args['out-filename']): 
         with x as outfile:
-            json.dump(response, outfile, sort_keys=True, indent=2)
+            json.dump(response['hits']['hits'], outfile, sort_keys=True, indent=2)
         print("Search complete. Results printed to " + args['out-filename'])
 
     elif(".csv" in args['out-filename']):
@@ -285,8 +288,11 @@ if (args['out-filename']): ##Check if user specified file exists, and if it shou
 
         print("Search complete. Results printed to " + args['out-filename'])
     elif(".txt" in args['out-filename']):
-        x.write(str(response))
+        x.write(str(response['hits']['hits']))
         print("Search complete. Results printed to " + args['out-filename'])    
 else:
     print("Search complete.")
-    print(json.dumps(response, sort_keys=True, indent=2))
+    if (args['format'].equals("json")):
+        print(json.dumps(response['hits']['hits'], sort_keys=True, indent=2))
+    else:
+        print(str(response['hits']['hits']))
