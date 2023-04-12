@@ -9,7 +9,7 @@ source bin/openshift-include.sh
 
 # If openshift deployment, ensure user-workload monitoring is enabled
 if [ -n "$(kubectl get ns openshift-monitoring -o name 2>/dev/null)" ]; then
-  if [ -n "$(kubectl get ns openshift-user-workload-monitoring -o name 2>/dev/null)" ]; then
+  if [ -n "$(kubectl get po -n openshift-user-workload-monitoring -o name 2>/dev/null)" ]; then
     log_debug "User workload monitoring is enabled"
   else
     log_error "Ensure that user workload monitoring is enabled"
