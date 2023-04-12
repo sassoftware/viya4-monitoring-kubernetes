@@ -292,7 +292,7 @@ if (args['out-filename']): ##Check if user specified file exists, and if it shou
         print("Search complete. Results printed to " + args['out-filename'])    
 else:
     print("Search complete.")
-    if (args['format'].equals("json")):
+    if args['format'] == "json":
         print(json.dumps(response['hits']['hits'], sort_keys=True, indent=2))
     else:
         print(str(response['hits']['hits']))
