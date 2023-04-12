@@ -41,7 +41,6 @@ if [ "$VIYA_NS" == "" ]; then
   exit 1
 fi
 
-
 # Optional workload node placement support
 MON_NODE_PLACEMENT_ENABLE=${MON_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
 if [ "$MON_NODE_PLACEMENT_ENABLE" == "true" ]; then

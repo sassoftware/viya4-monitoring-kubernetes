@@ -9,6 +9,7 @@
 * **Metrics**
   * [FIX] Updated invalid defintion for Prometheus and Alertmanager service monitor that prevented the service monitor metrics to be collected.
   * [FIX] Added annotation to Alertmanager ingress resource to enable HTTPS access via nginx
+  * [FIX] Added check in `deploy_monitoring_viya.sh` to ensure user workload monitoring is enabled for openshift clusters
 
 * **Logging**
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from version 2.4.1. to 2.6.0
