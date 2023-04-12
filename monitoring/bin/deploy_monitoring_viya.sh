@@ -7,6 +7,17 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 source bin/openshift-include.sh
 
+# If openshift deployment, ensure user-workload monitoring is enabled
+if [ -n "$(kubectl get ns openshift-monitoring -o name 2>/dev/null)" ]; then
+  if [ -n "$(kubectl get ns openshift-user-workload-monitoring -o name 2>/dev/null)" ]; then
+    log_debug "User workload monitoring is enabled"
+  else
+    log_error "Ensure that user workload monitoring is enabled"
+    log_error "openshift-user-workload-monitoring namespace was not found"
+    exit 1
+  fi
+fi
+
 checkDefaultStorageClass
 
 HELM_DEBUG="${HELM_DEBUG:-false}"
@@ -29,6 +40,7 @@ if [ "$VIYA_NS" == "" ]; then
   log_error "VIYA_NS must be set to the namespace of an existing Viya deployment"
   exit 1
 fi
+
 
 # Optional workload node placement support
 MON_NODE_PLACEMENT_ENABLE=${MON_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
