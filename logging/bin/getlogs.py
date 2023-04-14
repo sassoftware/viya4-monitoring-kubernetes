@@ -52,10 +52,10 @@ def validate_input(dict):
     if(len(sys.argv) == 1): ##Check if any args have been provided
         print("No arguments have been provided")
         exit()
-
-    if ("'" in args['message']): ##Check for invalid single quotes
-        print("Please remove single quotes ('') from search argument.")
-        exit()
+    if (args['message']):
+        if ("'" in args['message']): ##Check for invalid single quotes
+            print("Please remove single quotes ('') from search argument.")
+            exit()
 
     if dict['out-filename']: ##Check for supported file-types
 
