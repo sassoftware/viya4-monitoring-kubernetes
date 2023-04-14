@@ -53,6 +53,10 @@ def validate_input(dict):
         print("No arguments have been provided")
         exit()
 
+    if ("'" in args['message']): ##Check for invalid single quotes
+        print("Please remove single quotes ('') from search argument.")
+        exit()
+
     if dict['out-filename']: ##Check for supported file-types
 
         if(type(dict['out-filename']) == list):
@@ -157,7 +161,7 @@ def build_query(dict): ##Generates Query using Opensearch DSL
 ##List of VALID arguments that are read from user as soon as program is run, nargs=+ indicates that argument takes multiple whitespace separated values. 
 def get_arguments():
     """Defines the arguments a user can pass and parses them"""
-    parser = argparse.ArgumentParser(prog='getLogs.py', usage='\n%(prog)s [options]', description="This program generates OpenSearch DSL Queries from user specified parameters, and submits them to a database to retrieve logs. The flags below provide specifications for your Query, and can be placed in any order. \n    -Connection settings are required in order to run the program. You can create config files to autofill this using -cf, and call them using -af\n    -The NAMESPACE*, POD*, CONTAINER*, LOGSOURCE* and LEVEL* options accept multiple, space-separated, values (e.g. --level INFO NONE). \n    -All Generated Program files are placed in the directory where the program is run.\n    -Use -sq to save generated queries, -q to run saved queries, and -o to output results to a supported file-format.\n    -Correct time format is Y-M-D H:M:S. Ex: 1999-02-07 10:00:00 \n     -All default values for username, password, host, and port are derived from the ENV variables ESUSER, USPASSWD, ESHOST, ESPORT", formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(prog='getLogs.py', usage='\n%(prog)s [options]', description="This program generates OpenSearch DSL Queries from user specified parameters, and submits them to a database to retrieve logs. The flags below provide specifications for your Query, and can be placed in any order. \n     IMPORTANT NOTES: \n -Connection settings are required in order to run the program. You can create config files to autofill this using -cf, and call them using -af\n    -The NAMESPACE*, POD*, CONTAINER*, LOGSOURCE* and LEVEL* options accept multiple, space-separated, values (e.g. --level INFO NONE) Please refrain from passing single quotes ('') into arguments. \n    -All Generated Program files are placed in the directory where the program is run.\n    -Correct time format is Y-M-D H:M:S. Ex: 1999-02-07 10:00:00 \n     -All default values for username, password, host, and port are derived from the ENV variables ESUSER, USPASSWD, ESHOST, ESPORT", formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-n', '--namespace', required=False, dest="kube.namespace", nargs='*', metavar="NAMESPACE", help="\nOne or more Viya deployments/Kubernetes Namespace for which logs are sought\n\n")
     parser.add_argument('-nx', '--namespace-exclude', required=False, dest="kube.namespace-ex", nargs='*', metavar="NAMESPACE", help='\nOne or more namespaces for which logs should be excluded from the output\n\n')
     parser.add_argument('-p', '--pod', required=False, dest="kube.pod", nargs='*', metavar="POD", help='\nOne or more pods for which logs are sought\n\n')
@@ -168,7 +172,7 @@ def get_arguments():
     parser.add_argument('-sx', '--logsource-exclude', required=False, dest="logsource-ex",nargs='*', metavar="LOGSOURCE",  help = "\nOne or more logsource for which logs should be excluded from the output\n\n")
     parser.add_argument('-l', '--level', required=False, dest='level', nargs='*', metavar="LEVEL",  help = "\nOne or more message levels for which logs are sought\n\n")
     parser.add_argument('-lx', '--level-exclude', required=False, dest = 'level-exclude', nargs='*', metavar="LEVEL", help = "\nOne or more message levels for which logs should be excluded from the output.\n\n")
-    parser.add_argument('-se', '--search', required=False, dest= "message", nargs='*', metavar="MESSAGE",  help = "\nWord or phrase contained in log message.\n\n")
+    parser.add_argument('-se', '--search', required=False, dest= "message", nargs='*', metavar="MESSAGE",  help = "\nWord or phrase contained in log message. Do not include single quotes ('')\n\n")
     parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=250,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
     parser.add_argument('-q', '--query-file ', required=False, dest="query-filename", metavar="FILENAME.*", help = "\nName of file containing search query (Including filetype) at end. Program will submit query from file, ALL other query parmeters ignored. Supported filetypes: .txt, .json\n\n")
     parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Display example of actual query that will be submitted during execution.\n\n")
@@ -307,12 +311,3 @@ elif("csv" in args['format']):
             for log in dictArray:
                 writer.writerow(log)
                 print("\n")
-
-
- 
-"""else:
-    print("Search complete.")
-    if args['format'] == "json":
-        print(json.dumps(response['hits']['hits'], sort_keys=True, indent=2))
-    else:
-        print(str(response['hits']['hits']))"""
