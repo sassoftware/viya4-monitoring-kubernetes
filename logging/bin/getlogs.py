@@ -52,8 +52,11 @@ def validate_input(dict):
     if(len(sys.argv) == 1): ##Check if any args have been provided
         print("No arguments have been provided")
         exit()
-    if (args['message']):
-        if ("'" in args['message']): ##Check for invalid single quotes
+        
+    if (dict['message']):
+        if(type(dict['message']) == list):
+            dict['message']= " ".join(dict['message'])
+        if (dict['message'].find("'") > -1): ##Check for invalid single quotes
             print("Please remove single quotes ('') from search argument.")
             exit()
 
@@ -247,6 +250,7 @@ except Exception as e:
         print("Connection error. Please verify connection values. ") 
     exit()
 
+stdout = False
 if (args['out-filename']): ##Check if user specified file exists, and if it should be overwritten.
     try:
         x = open(args['out-filename'], 'w')    
