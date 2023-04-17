@@ -12,8 +12,8 @@ if [ -n "$(kubectl get ns openshift-monitoring -o name 2>/dev/null)" ]; then
   if [ -n "$(kubectl get po -n openshift-user-workload-monitoring -o name 2>/dev/null)" ]; then
     log_debug "User workload monitoring is enabled"
   else
+    log_error "User workload monitoring pods not detected in the openshift-user-workload-monitoring namespace"
     log_error "Ensure that user workload monitoring is enabled"
-    log_error "openshift-user-workload-monitoring namespace was not found"
     exit 1
   fi
 fi
