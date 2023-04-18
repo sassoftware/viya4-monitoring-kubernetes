@@ -1,7 +1,8 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.12 (18APR2023)
 * **Overall**
+  * [FEATURE] Information about resource requests and limits added to documentation under [Minimum Resource Requirements](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n039q38k9nedd2n16rbbafwsw0ae.htm).
   * [CHANGE] Revised Kubernetes and OpenShift version-checking logic (inc. changing ERROR message to a WARNING)
   * [CHANGE] Updated Azure deployment sample to replace storage provisioner deprecated in AKS for K8s v1.26+
   * [FIX] Added logic to determine if service account exists before attempting to patch it
