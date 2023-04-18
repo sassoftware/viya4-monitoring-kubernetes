@@ -87,7 +87,9 @@ def validate_input(dict):
     if dict['savequery']:      
         if(type(dict['savequery']) == list):
             dict['savequery']= " ".join(dict['savequery'])
-        if ((not ".json" in dict['savequery']) and (not ".txt" in dict['savequery'])):
+        if (dict['savequery'].find('.') == -1):
+            dict['savequery'] = dict['savequery'] + ".json"
+        if ((not ".json" in dict['savequery'])):
             print('Error: Not a supported filetype for the saved query file.')
             exit()
 
@@ -179,7 +181,7 @@ def get_arguments():
     parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=250,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
     parser.add_argument('-q', '--query-file ', required=False, dest="query-filename", metavar="FILENAME.*", help = "\nName of file containing search query (Including filetype) at end. Program will submit query from file, ALL other query parmeters ignored. Supported filetypes: .txt, .json\n\n")
     parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Display example of actual query that will be submitted during execution.\n\n")
-    parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (including filetype) in which to save the generated query. Supported fileypes are .json, .lst, and .txt\n\n")
+    parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (WITHOUT filetype) in which to save the generated query. Query is saved as JSON file in current directory.\n\n")
     parser.add_argument('-o', '--out-file', required=False, dest="out-filename",  nargs='*', metavar="FILENAME", help = "\nName of file to write results to. Filetype is specified using -format. Supported filetypes: .csv, .json\n\n")
     parser.add_argument('-fo','--format',  required=True, dest="format", choices = ["json","csv"], help = "\n Formats results into the specified file (from --out-file). If no output file is provided, results will be outputted to STDOUT. Supported formats for console output are json and csv \n\n")
     parser.add_argument('-f','--force',  required=False, dest="force", action= "store_true", help = "\n If this option is provided, the output results file will be overwritten if it already exists.\n\n")
