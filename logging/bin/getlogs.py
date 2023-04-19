@@ -33,13 +33,13 @@ def validate_input(dict):
             dict['host'] = authDict['host']
             dict['port'] = authDict['port']
         except Exception as e:
-            print("There was a problem with the authentication file. Please ensure that the values are in dictionary format with keys: 'username', 'password', 'host', 'port'")
+            print("Error: There was a problem with the authentication file. Please ensure that the values are in dictionary format with keys: 'username', 'password', 'host', 'port'")
             print(e)
             exit()
 
     """Ensure maxrows is less than 10000"""
-
-    if dict['maxInt'] > 10000:
+    MAX_ROWS = 10000
+    if dict['maxInt'] > MAX_ROWS:
         print("Error: Maxrows limit of 10000 exceeded.")
         exit()
 
