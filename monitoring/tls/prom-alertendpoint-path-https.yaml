@@ -1,9 +1,10 @@
 prometheus:
   prometheusSpec:
     alertingEndpoints:
-      - name: v4m-alertmanager 
+      - name: v4m-alertmanager
         port: http-web
         pathPrefix: "/alertmanager"
         scheme: https
         tlsConfig:
           insecureSkipVerify: true
+    routePrefix: /prometheus
