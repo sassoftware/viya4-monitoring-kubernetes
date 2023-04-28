@@ -676,7 +676,7 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 12,
+        "w": 9,
         "x": 0,
         "y": 12
       },
@@ -783,133 +783,34 @@
       }
     },
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "$Datasource",
-      "editable": true,
-      "error": false,
-      "fieldConfig": {
-        "defaults": {
-          "links": []
+        "datasource": "$Datasource",
+        "fieldConfig": {
+            "defaults": {
+              "links": []
+            },
+            "overrides": []
+          },
+        "gridPos": {
+          "h": 7,
+          "w": 9,
+          "x": 9,
+          "y": 12
         },
-        "overrides": []
+        "id": 146,
+        "options": {
+            "alertThreshold": true
+          },
+        "targets": [
+          {
+            "expr": "go_goroutines{namespace=~\"$namespace\", job=~\"$application\", pod=~\"$instance\"}",
+            "legendFormat": "{{level}}",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "Go Routines",
+        "type": "timeseries"
       },
-      "fill": 1,
-      "fillGradient": 0,
-      "grid": {
-        "leftLogBase": 1,
-        "leftMax": null,
-        "leftMin": null,
-        "rightLogBase": 1,
-        "rightMax": null,
-        "rightMin": null
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 12,
-        "y": 12
-      },
-      "hiddenSeries": false,
-      "id": 61,
-      "legend": {
-        "avg": false,
-        "current": true,
-        "max": true,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.2.1",
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "process_open_fds{job=~\"$application\", pod=~\"$instance\"}",
-          "format": "time_series",
-          "hide": false,
-          "intervalFactor": 2,
-          "legendFormat": "open",
-          "metric": "",
-          "refId": "A",
-          "step": 2400
-        },
-        {
-          "expr": "process_max_fds{job=~\"$application\", pod=~\"$instance\"}",
-          "format": "time_series",
-          "hide": false,
-          "intervalFactor": 2,
-          "legendFormat": "max",
-          "metric": "",
-          "refId": "B",
-          "step": 2400
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "File Descriptors",
-      "tooltip": {
-        "msResolution": false,
-        "shared": true,
-        "sort": 0,
-        "value_type": "cumulative"
-      },
-      "type": "graph",
-      "x-axis": true,
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "y-axis": true,
-      "y_formats": [
-        "short",
-        "short"
-      ],
-      "yaxes": [
-        {
-          "decimals": 0,
-          "format": "short",
-          "label": null,
-          "logBase": 10,
-          "max": null,
-          "min": 0,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
     {
       "collapsed": false,
       "datasource": "$Datasource",
@@ -1131,6 +1032,134 @@
         "align": false,
         "alignLevel": null
       }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "$Datasource",
+      "editable": true,
+      "error": false,
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "grid": {
+        "leftLogBase": 1,
+        "leftMax": null,
+        "leftMin": null,
+        "rightLogBase": 1,
+        "rightMax": null,
+        "rightMin": null
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 12,
+        "y": 20
+      },
+      "hiddenSeries": false,
+      "id": 61,
+      "legend": {
+        "avg": false,
+        "current": true,
+        "max": true,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.2.1",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "process_open_fds{job=~\"$application\", pod=~\"$instance\"}",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "open",
+          "metric": "",
+          "refId": "A",
+          "step": 2400
+        },
+        {
+          "expr": "process_max_fds{job=~\"$application\", pod=~\"$instance\"}",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "max",
+          "metric": "",
+          "refId": "B",
+          "step": 2400
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "File Descriptors",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "x-axis": true,
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "y-axis": true,
+      "y_formats": [
+        "short",
+        "short"
+      ],
+      "yaxes": [
+        {
+          "decimals": 0,
+          "format": "short",
+          "label": null,
+          "logBase": 10,
+          "max": null,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     }
   ],
   "refresh": "",
@@ -1143,11 +1172,6 @@
   "templating": {
     "list": [
       {
-        "current": {
-          "selected": false,
-          "text": "Prometheus",
-          "value": "Prometheus"
-        },
         "description": null,
         "error": null,
         "hide": 0,
@@ -1164,11 +1188,6 @@
       },
       {
         "allValue": ".+",
-        "current": {
-          "selected": false,
-          "text": "All",
-          "value": "$__all"
-        },
         "datasource": "$Datasource",
         "definition": "label_values(sas_build_info{sas_service_base=\"golang\"},namespace)",
         "description": null,
@@ -1194,11 +1213,6 @@
       },
       {
         "allValue": null,
-        "current": {
-          "selected": true,
-          "text": "sas-activities",
-          "value": "sas-activities"
-        },
         "datasource": "$Datasource",
         "definition": "label_values(go_info{sas_service_base=\"golang\",namespace=~\"$namespace\"}, service)",
         "description": null,
@@ -1225,11 +1239,6 @@
       {
         "allFormat": "glob",
         "allValue": null,
-        "current": {
-          "selected": false,
-          "text": "sas-activities-764bd84cbd-skl4f",
-          "value": "sas-activities-764bd84cbd-skl4f"
-        },
         "datasource": "$Datasource",
         "definition": "label_values(go_info{job=\"$application\",namespace=~\"$namespace\"}, pod)",
         "description": null,
