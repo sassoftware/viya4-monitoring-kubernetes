@@ -9,15 +9,25 @@ from opensearchpy import OpenSearch
 import os, sys
 import json, csv
 
-## Cleanup temp file if not previously deleted
-if os.path.isfile("temp_SAS_OSQ.TXT"):
-    os.remove("temp_SAS_OSQ.TXT")
+## Cleanup temp file if not previously deleted, Create target directory
+if not os.path.isdir("GetLogs_Files"):
+    os.mkdir("GetLogs_Files")
+
+if os.path.isfile("GetLogs_Files/temp_SAS_OSQ.TXT"):
+    os.remove("GetLogs_Files/temp_SAS_OSQ.TXT")
 
 def validate_input(dict):
     """Validate the arguments passed by the user to ensure script will function properly"""
+    
+    if(len(sys.argv) == 1): ##Check if any args have been provided
+        print("No arguments have been provided")
+        exit()
+
     if dict['create-auth']:
         if (type(dict['create-auth'] == list)):
             dict['create-auth'] = " ".join(dict['create-auth'])
+        if (not "GetLogs_Files/" in  dict['create-auth']):
+            dict['create-auth'] = os.path.join("GetLogs_Files", dict['create-auth'])
         x = open(dict['create-auth'], "w")
         x.write('{"username": " " , "password": " " , "host": " ", "port": " "}')
         print("\nAuth File created.\n")
@@ -25,6 +35,8 @@ def validate_input(dict):
     if dict['auth-file']:
         if (type(dict['auth-file'] == list)):
             dict['auth-file'] = " ".join(dict['auth-file'])
+        if (not "GetLogs_Files/" in  dict['auth-file']):
+            dict['auth-file'] = os.path.join("GetLogs_Files",  dict['auth-file'])
         try: 
             a = open(dict['auth-file'], 'r')
             authDict = json.loads(a.read())
@@ -47,10 +59,6 @@ def validate_input(dict):
     if(not dict['userName'] or not dict['password'] or not dict['host'] or not dict['port']):
         print('\nError: Missing required connection settings. Please specify username, password, host, or port.')
         print("Username:", dict['userName'], " Password:", dict['password'], " Host:", dict['host'], " Port:", dict['port'])
-        exit()
-
-    if(len(sys.argv) == 1): ##Check if any args have been provided
-        print("No arguments have been provided")
         exit()
         
     if (dict['message']):
@@ -79,6 +87,10 @@ def validate_input(dict):
                 else:
                     print('Setting default filetype: CSV')
                     dict['out-filename'] = dict['out-filename'] + ".csv"
+
+        if (not "GetLogs_Files/" in dict['out-filename']):
+            dict['out-filename'] = os.path.join("GetLogs_Files", dict['out-filename'])
+        
         if os.path.isfile(dict['out-filename']):
             if (dict['force'] == False):
                 print("\nUser specified output file already exists. Use -f to overwrite the file.\n")
@@ -92,7 +104,18 @@ def validate_input(dict):
         if ((not ".json" in dict['savequery'])):
             print('Error: Not a supported filetype for the saved query file.')
             exit()
+        if (not "GetLogs_Files/" in dict['savequery']):
+            dict['savequery']= os.path.join("GetLogs_Files", dict['savequery'])
 
+    if dict['query-filename']:
+        if (not "GetLogs_Files/" in dict['query-filename']):
+            dict['query-filename'] = os.path.join("GetLogs_Files", dict['query-filename'])
+        
+        if (not os.path.isfile(dict['query-filename'])):
+            print("Error: Invalid query file path.")
+            exit()
+
+    
     ##Time Validator - Verifies input, and converts it to UTC   
     if (type(dict['dateTimeStart']) ==list):
         dict['dateTimeStart'] = " ".join(dict['dateTimeStart'])
@@ -116,8 +139,8 @@ def build_query(dict): ##Generates Query using Opensearch DSL
     first = True 
     argcounter=0    ##Counts unique options entered by user, sets min_match to this number
     if (not dict['query-filename']):     ##If User has not specified query file, create temp file for one.                                                                                                                                                                                                                                                                                                                                                                                   first = True
-        x = open("temp_SAS_OSQ.TXT", 'x')
-        x = open("temp_SAS_OSQ.TXT", 'wt')  ## Create txt file to write query, make it writable
+        x = open("GetLogs_Files/temp_SAS_OSQ.TXT", 'x')
+        x = open("GetLogs_Files/temp_SAS_OSQ.TXT", 'wt')  ## Create txt file to write query, make it writable
         x.write('{"size": ' + str(dict['maxInt']) + ',"sort": [{"@timestamp": {"order": "desc","unmapped_type": "boolean"} }]')     ## Establish size of query, remove scoring
         x.write(', "query": {"bool": {"must":[ {"range": {"@timestamp": {"gte": "' + dict['dateTimeStart'] + '","lt": "' + dict['dateTimeEnd'] + '"} } }], ')   ##Establish Query with Range Requirements, 3 open brackets
         x.write('"should": [ ')     ## Should Clause, search results must inlcude at least one of each specified option
@@ -152,10 +175,10 @@ def build_query(dict): ##Generates Query using Opensearch DSL
         if (first==False):
             x.write(']')
         x.write('} } }') ##Close 3 open brackets, end query
-        x = open("temp_SAS_OSQ.TXT", 'rt')
+        x = open("GetLogs_Files/temp_SAS_OSQ.TXT", 'rt')
         query =  " ".join([line.strip() for line in x])
         x.close()
-        os.remove("temp_SAS_OSQ.TXT") ##Remove Temp File Created for Query Generation
+        os.remove("GetLogs_Files/temp_SAS_OSQ.TXT") ##Remove Temp File Created for Query Generation
     else:
         x = open(dict['query-filename'], 'rt')
         query =  " ".join([line.strip() for line in x]) ## Turn file into string, return.
@@ -166,7 +189,7 @@ def build_query(dict): ##Generates Query using Opensearch DSL
 ##List of VALID arguments that are read from user as soon as program is run, nargs=+ indicates that argument takes multiple whitespace separated values. 
 def get_arguments():
     """Defines the arguments a user can pass and parses them"""
-    parser = argparse.ArgumentParser(prog='getLogs.py', usage='\n%(prog)s [options]', description="This program generates OpenSearch DSL Queries from user specified parameters, and submits them to a database to retrieve logs. The flags below provide specifications for your Query, and can be placed in any order. \n     IMPORTANT NOTES: \n -Connection settings are required in order to run the program. You can create config files to autofill this using -cf, and call them using -af\n    -The NAMESPACE*, POD*, CONTAINER*, LOGSOURCE* and LEVEL* options accept multiple, space-separated, values (e.g. --level INFO NONE) Please refrain from passing single quotes ('') into arguments. \n    -All Generated Program files are placed in the directory where the program is run.\n    -Correct time format is Y-M-D H:M:S. Ex: 1999-02-07 10:00:00 \n     -All default values for username, password, host, and port are derived from the ENV variables ESUSER, USPASSWD, ESHOST, ESPORT", formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(prog='getLogs.py', usage='\n%(prog)s [options]', description="This program generates OpenSearch DSL Queries from user specified parameters, and submits them to a database to retrieve logs. The flags below provide specifications for your Query, and can be placed in any order. \n     IMPORTANT NOTES: \n -Connection settings are required in order to run the program. You can create config files to autofill this using -cf, and call them using -af\n    -The NAMESPACE*, POD*, CONTAINER*, LOGSOURCE* and LEVEL* options accept multiple, space-separated, values (e.g. --level INFO NONE) Please refrain from passing single quotes ('') into arguments. \n    -All Generated Program files are placed in GetLogs_Files where the program is run. It is not required to include this directory when passing created files in as arguments\n    -Correct time format is Y-M-D H:M:S. Ex: 1999-02-07 10:00:00 \n     -All default values for username, password, host, and port are derived from the ENV variables ESUSER, USPASSWD, ESHOST, ESPORT", formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-n', '--namespace', required=False, dest="kube.namespace", nargs='*', metavar="NAMESPACE", help="\nOne or more Viya deployments/Kubernetes Namespace for which logs are sought\n\n")
     parser.add_argument('-nx', '--namespace-exclude', required=False, dest="kube.namespace-ex", nargs='*', metavar="NAMESPACE", help='\nOne or more namespaces for which logs should be excluded from the output\n\n')
     parser.add_argument('-p', '--pod', required=False, dest="kube.pod", nargs='*', metavar="POD", help='\nOne or more pods for which logs are sought\n\n')
