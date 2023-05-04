@@ -4,6 +4,7 @@
 
 * **Metrics**
   * [FIX] Fixed an issue that caused the Prometheus data source to fail in path-based Ingress deployments if Prometheus was not externalized
+  * [FEATURE] Added "Go Routines" graph to the SAS Go Service Details dashboard in Grafana
 
 ## Version 1.2.12 (18APR2023)
 * **Overall**
