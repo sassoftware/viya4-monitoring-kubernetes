@@ -1,11 +1,11 @@
 # Amazon CloudWatch Integration
 
 This sample describes how to configure Amazon CloudWatch to collect metrics
-from the services and components in SAS Viya. Complete the deployment
+from the services and components in SAS Viya platform platform. Complete the deployment
 and configuration steps in this document to enable Amazon CloudWatch to collect
-and visualize metric information from both SAS Viya as well as the monitoring
+and visualize metric information from both SAS Viya platform as well as the monitoring
 components deployed from this repository. This sample currently does not
-provide information for using Amazon applications to view SAS Viya log
+provide information for using Amazon applications to view SAS Viya platform log
 messages.
 
 ## CloudWatch Agent
@@ -15,20 +15,20 @@ There are two types of
 CloudWatch agents that you might want to use in your environment:
 
 - The CloudWatch agent with Prometheus monitoring scrapes metrics from
-Prometheus sources, such as SAS Viya. The metrics can then be converted and
+Prometheus sources, such as SAS Viya platform. The metrics can then be converted and
 mapped for display in CloudWatch.
 
 - The default CloudWatch agent collects metrics from AWS nodes. Although
-these metrics are not specific to SAS Viya, you might want to use both agents
+these metrics are not specific to SAS Viya platform, you might want to use both agents
 so that you can obtain a complete view of your environment's performance. For
 information about using the default agent, see the
 [CloudWatch documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html).
 If you do use the default agent, you must add tolerations to the agent's
 DaemonSet definition so that the agent can run on nodes that are tainted to
-support SAS Viya workload node placement. See
+support SAS Viya platform workload node placement. See
 [CloudWatch Agent DaemonSet and Workload Node Placement](#wnp_tolerations).
 
-Because SAS Viya monitoring uses Prometheus, this sample focuses on deploying
+Because SAS Viya platform monitoring uses Prometheus, this sample focuses on deploying
 and configuring the CloudWatch agent for use with Prometheus.
 
 These instructions are based on deploying the EKS cluster using the
@@ -62,12 +62,12 @@ project and set the `HttpPutResponseHopLimit` values to 2 at cluster creation ti
 ## Deployment
 
 Follow these steps to deploy CloudWatch and enable it to collect metrics from
-SAS Viya:
+SAS Viya platform:
 
 1. Attach CloudWatchAgentServerPolicy to the EC2 IAM role.
 2. Identify the cluster and region.
 3. Deploy the CloudWatch Prometheus agent.
-4. Apply SAS Viya customizations:
+4. Apply SAS Viya platform customizations:
     - Customize the Prometheus scrape configuration.
     - Customize the mapping of performance log events to CloudWatch metrics.
 
@@ -95,7 +95,7 @@ bottom pane.
 
 ### Identify Cluster and Region
 
-You must identify the Amazon EKS cluster on which SAS Viya is deployed and the
+You must identify the Amazon EKS cluster on which SAS Viya platform is deployed and the
 region for the cluster. These values are needed to construct the correct
 endpoint for CloudWatch.
 
@@ -121,9 +121,9 @@ sed "s/{{cluster_name}}/${ClusterName}/;s/{{region_name}}/${RegionName}/" |
 kubectl apply -f -
 ```
 
-### Apply SAS Viya Customizations
+### Apply SAS Viya Platform Customizations
 
-This sample includes configuration files that transform the scraped SAS Viya
+This sample includes configuration files that transform the scraped SAS Viya platform
 Prometheus metrics into performance log events and then map the performance
 log events to CloudWatch metrics.
 
@@ -179,10 +179,10 @@ All of the metrics that use a common set of dimensions are grouped under a tile
 that is labeled with the list of dimensions. In order to find the specific
 metric, you must find the tile with the corresponding set of dimensions.
 
-Because each metric has many dimensions and because many SAS Viya metrics are
+Because each metric has many dimensions and because many SAS Viya platform metrics are
 collected for CloudWatch, it can be difficult to find a specific metric or
-metrics. You can use the reference tables in [CloudWatch SAS Viya Metrics](reference.md)
-to locate SAS Viya metrics and identify the tile with which they are
+metrics. You can use the reference tables in [CloudWatch SAS Viya Platform Metrics](reference.md)
+to locate SAS Viya platform metrics and identify the tile with which they are
 associated. The tables provide these cross-reference listings:
 
 - the metrics associated with each set of dimensions
@@ -192,10 +192,10 @@ associated. The tables provide these cross-reference listings:
 
 After you find the metric you are interested in, you can create a graph from
 the metric data. The following example contains the steps to create a graph of
-`go_memstats_alloc_bytes` (memory usage) of SAS Viya services that are
+`go_memstats_alloc_bytes` (memory usage) of SAS Viya platform services that are
 written in Go:
 
-1. Go to [CloudWatch SAS Viya Metrics](reference.md) and expand the
+1. Go to [CloudWatch SAS Viya Platform Metrics](reference.md) and expand the
 **By Metric** table.
 2. Locate the `go_memstats_alloc_bytes` metric. The table indicates that it is
 associated with the `'ClusterName,job,namespace,node,pod,sas_service_base,service`
@@ -207,16 +207,16 @@ dimensions.
 dimension. A table appears that lists all of the metrics associated with that dimension.
 7. Locate the `go_memstats_alloc_bytes` metric.
 8. Click the arrow next to the metric and select `Search for this only`.
-9. Select the check box for the SAS Viya services that you want to include in the
+9. Select the check box for the SAS Viya platform services that you want to include in the
 graph.
 
 ## CloudWatch Agent DaemonSet and Workload Node Placement<a name=wnp_tolerations></a>
 
-The SAS Viya workload node placement configuration uses annotations and node taints
+The SAS Viya platform workload node placement configuration uses annotations and node taints
 to schedule pods on appropriate nodes. The default CloudWatch agent is deployed
 as a DaemonSet and runs on every node. If you use the default CloudWatch agent,
 you must add tolerations to the agent's DaemonSet definition to enable the agent
-to run on nodes that are tainted for SAS Viya workload node placement.
+to run on nodes that are tainted for SAS Viya platform workload node placement.
 
 Here is a sample `tolerations` code snippet that you can add to the DaemonSet to
 allow it to properly schedule a pod on every node in the cluster:

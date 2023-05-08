@@ -1,4 +1,4 @@
-# CloudWatch SAS Viya Metrics
+# CloudWatch SAS Viya Platform Metrics
 
 ## By Dimensions
 This table lists the metrics associated with each set of dimensions.

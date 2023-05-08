@@ -2,7 +2,7 @@
 
 ## Scrape Prometheus Metrics Endpoints
 
-SAS Viya components are natively instrumented to expose a Prometheus-compatible
+SAS Viya platform components are natively instrumented to expose a Prometheus-compatible
 HTTP or HTTPS metrics endpoint. This sample shows how to configure Azure
 Monitor to automatically discover and scrape these endpoints.
 
@@ -23,7 +23,7 @@ guide. Recommended changes include:
 - `monitor_kubernetes_pods` - Set to `true`.
 - `monitor_kubernetes_pods` - Set to `true` to enable Azure Monitor to
 auto-discover pods to monitor, based on the standard Prometheus annotations.
-SAS Viya components that expose metrics endpoints should include these
+SAS Viya platform components that expose metrics endpoints should include these
 annotations:
 
 - `prometheus.io/scrape` - `true` or `false`

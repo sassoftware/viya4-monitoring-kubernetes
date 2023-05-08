@@ -1,4 +1,4 @@
-# SAS Viya Metric Monitoring on OpenShift
+# SAS Viya Platform Metric Monitoring on OpenShift
 
 ## Red Hat OpenShift
 

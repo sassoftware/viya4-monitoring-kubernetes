@@ -89,7 +89,7 @@ VIYA_NS=<your_viya_namespace> VIYA_TENANT=<tenant_name> monitoring/bin/deploy_mo
 ```
 
 The value of `your_viya_namespace` is the namespace into which you deployed 
-SAS Viya monitoring components. The value of `tenant_name` is the name of 
+SAS Viya platform monitoring components. The value of `tenant_name` is the name of 
 the tenant for which you are deploying the monitoring components. You can 
 specify these values on the command line or in a `user.env` file.  
 
@@ -102,8 +102,6 @@ VIYA_NS=<your_viya_namespace> VIYA_TENANT=<tenant_name> monitoring/bin/remove_mo
 ```
 
 The value of `your_viya_namespace` is the namespace into which you deployed 
-SAS Viya monitoring components. The value of `tenant_name` is the name of 
+SAS Viya platform monitoring components. The value of `tenant_name` is the name of 
 the tenant that contains the monitoring components. You can 
 specify these values on the command line or in a `user.env` file.
-
-

@@ -1,16 +1,16 @@
-# Viewing SAS Viya Metrics Using Google Cloud Operations
+# Viewing SAS Viya Platform Metrics Using Google Cloud Operations
 
 Google GKE uses [Google Cloud Operations](https://cloud.google.com/products/operations)
 to view metric data. In order for Google Cloud Operations to view metric data
-collected in Prometheus, such as from SAS Viya services, that data must be
+collected in Prometheus, such as from SAS Viya platform services, that data must be
 collected from Prometheus, converted, and exported Google Cloud Operations.
 
 Use this sample to deploy the components needed to enable Google Cloud
-Operations to view SAS Viya metric data.
+Operations to view SAS Viya platform metric data.
 
 ## Components
 
-These components are required to view SAS Viya metric data in Google Cloud
+These components are required to view SAS Viya platform metric data in Google Cloud
 Operations:
 
 - Prometheus server
@@ -18,15 +18,15 @@ Operations:
 
 ### Prometheus Server
 
-SAS Viya metrics are provided as HTTP-HTTPS metric endpoints that are read by
-a Prometheus server, such as the one deployed with the SAS Viya monitoring
+SAS Viya platform metrics are provided as HTTP-HTTPS metric endpoints that are read by
+a Prometheus server, such as the one deployed with the SAS Viya platform monitoring
 components.
 
 Google [supports Prometheus metrics](https://cloud.google.com/stackdriver/docs/solutions/gke/prometheus)
 by watching data as it is collected by the Prometheus server. Google then converts
 and exports that data to Google Cloud Operations.
 
-Before using this sample, you must [deploy the SAS Viya monitoring components](../README.md),
+Before using this sample, you must [deploy the SAS Viya platform monitoring components](../README.md),
 including the Prometheus server.
 
 ### Stackdriver Prometheus Sidecar
@@ -39,7 +39,7 @@ volume mount so that the sidecar can directly read the Prometheus server data.
 Although there are several ways to deploy the sidecar to a Prometheus pod,
 this sample directly supports only
 [Prometheus custom resources](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#prometheus)
-such as those deployed by the SAS Viya monitoring components in
+such as those deployed by the SAS Viya platform monitoring components in
 this repository.
 
 ## Using This Sample
@@ -99,7 +99,7 @@ All metrics collected from Prometheus begin with
 `external.googleapis.com/prometheus`. You can also search for the base metric
 name (such as `go_memstats_alloc_bytes`).
 
-You can create charts and dashboards for viewing the SAS Viya metric data. See
+You can create charts and dashboards for viewing the SAS Viya platform metric data. See
 the [Metric Explorer documentation](https://cloud.google.com/monitoring/charts/dashboards)
 for information about building charts and dashboards.
 

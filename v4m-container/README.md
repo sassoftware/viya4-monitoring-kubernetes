@@ -1,9 +1,9 @@
-# Viya Monitoring for Kubernetes Docker Container
+# SAS Viya Monitoring for Kubernetes Docker Container
 
 **EXPERIMENTAL**:  Container of the [viya4-monitoring-kubernetes](https://github.com/sassoftware/viya4-monitoring-kubernetes)
 project
 
-_The Viya Monitoring for Kubernetes Docker Container allows you to work with the Viya 4 Monitoring for Kubernetes project in a containerized environment. By using the container, you don't have to worry about:_
+_The SAS Viya Monitoring for Kubernetes Docker Container allows you to work with the SAS Viya Monitoring for Kubernetes project in a containerized environment. By using the container, you don't have to worry about:_
 
 * _Configuring your own shell environment with all of the prerequisite modules and routines needed by the monitoring solution_
 * _Which version of a given module you have installed_

@@ -1,18 +1,18 @@
 # Namespace Monitoring
 
 This sample demonstrates how to customize a monitoring
-deployment to separate cluster monitoring from SAS Viya (namespace)
+deployment to separate cluster monitoring from SAS Viya platform (namespace)
 monitoring.
 
 The basic steps are the following:
 
 * Create the monitoring namespace and label other namespaces for
-cluster or SAS Viya monitoring.
+cluster or SAS Viya platform monitoring.
 * Deploy cluster monitoring and restrict it to use only cluster dashboards.
-* Deploy standard SAS Viya monitoring to each SAS Viya namespace.
+* Deploy standard SAS Viya platform monitoring to each SAS Viya platform namespace.
 * Create Prometheus custom resources (CRs) that are configured to monitor only
-their respective SAS Viya namespaces.
-* Deploy Grafana to each SAS Viya namespace to provide visualization.
+their respective SAS Viya platform namespaces.
+* Deploy Grafana to each SAS Viya platform namespace to provide visualization.
 
 **Note:** All resources in this sample are configured for host-based ingress.
 
@@ -21,7 +21,7 @@ Alertmanager, in order to demonstrate how you can centralize alerts. You
 can use Alertmanager CRs to deploy a separate Alertmanager for each instance
 of Prometheus.
 
-This sample assumes that you are deploying two SAS Viya namespaces, but you can
+This sample assumes that you are deploying two SAS Viya platform namespaces, but you can
 customize the files to deploy to any number of namespaces.
 
 ## Using This Sample
@@ -57,9 +57,9 @@ Prometheus Operator and make the following modifications:
 3. Set environment variables to the namespaces:
 
 ```bash
-# First SAS Viya namespace
+# First SAS Viya platform namespace
 export VIYA_ONE_NS=viya-one
-# Second SAS Viya namespace
+# Second SAS Viya platform namespace
 export VIYA_TWO_NS=viya-two
 ```
 
@@ -78,27 +78,27 @@ kubectl label ns $VIYA_TWO_NS sas.com/viya-namespace=$VIYA_TWO_NS
 ```
 
 5. Deploy cluster monitoring (including the Prometheus Operator) with a
-custom user directory and no SAS Viya dashboards.
+custom user directory and no SAS Viya platform dashboards.
 
 ```bash
 VIYA_DASH=false monitoring/bin/deploy_monitoring_cluster.sh
 ```
 
-6. Deploy standard SAS Viya monitoring components for each SAS Viya namespace.
+6. Deploy standard SAS Viya platform monitoring components for each SAS Viya platform namespace.
 
 ```bash
 VIYA_NS=$VIYA_ONE_NS monitoring/bin/deploy_monitoring_viya.sh
 VIYA_NS=$VIYA_TWO_NS monitoring/bin/deploy_monitoring_viya.sh
 ```
 
-7. Deploy Prometheus to each SAS Viya namespace.
+7. Deploy Prometheus to each SAS Viya platform namespace.
 
 ```bash
 kubectl apply -n viya-one -f $USER_DIR/monitoring/prometheus-viya-one.yaml
 kubectl apply -n viya-two -f $USER_DIR/monitoring/prometheus-viya-two.yaml
 ```
 
-8. Deploy Grafana to each SAS Viya namespace.
+8. Deploy Grafana to each SAS Viya platform namespace.
 
 ```bash
 helm upgrade --install --namespace viya-one grafana-viya-one \
@@ -109,7 +109,7 @@ helm upgrade --install --namespace viya-two grafana-viya-two \
   -f $USER_DIR/monitoring/grafana-viya-two-values.yaml stable/grafana
 ```
 
-9. Deploy SAS Viya dashboards to each SAS Viya namespace.
+9. Deploy SAS Viya platform dashboards to each SAS Viya platform namespace.
 
 ```bash
 DASH_NS=$VIYA_ONE_NS KUBE_DASH=false LOGGING_DASH=false monitoring/bin/deploy_dashboards.sh
@@ -129,8 +129,8 @@ deployment depend on the values that you substitute for the namespace names
 and the host names.
 
 * [Cluster Grafana - http://grafana.host.cluster.example.com](http://grafana.host.cluster.example.com)
-* [Viya-one Grafana - http://grafana.viya-one.host.cluster.example.com](http://grafana.viya-one.host.cluster.example.com)
-* [Viya-two Grafana - http://grafana.viya-two.host.cluster.example.com](http://grafana.viya-two.host.cluster.example.com/)
+* [SAS Viya one Grafana - http://grafana.viya-one.host.cluster.example.com](http://grafana.viya-one.host.cluster.example.com)
+* [SAS Viya two Grafana - http://grafana.viya-two.host.cluster.example.com](http://grafana.viya-two.host.cluster.example.com/)
 
 ## References
 

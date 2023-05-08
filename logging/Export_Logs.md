@@ -151,7 +151,7 @@ optional arguments:
   -h, --help            show this help message and exit
   -n [NAMESPACE ...], --namespace [NAMESPACE ...]
                         
-                        One or more Viya deployments/Kubernetes Namespace for which logs are sought
+                        One or more SAS Viya platform deployments/Kubernetes Namespace for which logs are sought
                         
   -nx [NAMESPACE ...], --namespace-exclude [NAMESPACE ...]
                         

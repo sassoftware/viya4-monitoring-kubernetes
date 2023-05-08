@@ -49,24 +49,24 @@ These samples are provided:
 * [azure-deployment](azure-deployment) - Deploys on Microsoft Azure Kubernetes
   Service (AKS).
 * [azure-monitor](azure-monitor) - Enables Azure Monitor to collect metrics
-from SAS Viya components.
+from SAS Viya platform components.
 * [cloudwatch](cloudwatch) - Enables Amazon CloudWatch to collect metrics from
-  SAS Viya services.
+  SAS Viya platform services.
 * [external-alertmanager](external-alertmanager) - Configures a central
   external Alertmanager instance.
 * [generic-base](generic-base) - Provides a template `USER_DIR` containing a
   full set of customization files with comments.
 * [gke-monitoring](gke-monitoring) - Enables Google Cloud Operations to collect
-  metrics from SAS Viya services.
+  metrics from SAS Viya platform services.
 * [ingress](ingress) - Deploys using host-based or path-based ingress.
 * [namespace-monitoring](namespace-monitoring) - Separates cluster monitoring
-from SAS Viya monitoring.
+from SAS Viya platform monitoring.
 * [tls](tls) - Enables TLS encryption for both in-cluster and ingress. Options
   for either host-based and path-based ingress are included.
 
 ## Other Samples
 
-* [Cloudwatch](cloudwatch) - Configures Amazon Cloudwatch to collect SAS Viya
+* [Cloudwatch](cloudwatch) - Configures Amazon Cloudwatch to collect SAS Viya platform
   metrics.
 * [Google Cloud Operations](gke-monitoring) - Enables Google Cloud Operations
-  to view SAS Viya metric data from Prometheus.
+  to view SAS Viya platform metric data from Prometheus.
