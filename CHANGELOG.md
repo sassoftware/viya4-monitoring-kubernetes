@@ -131,7 +131,7 @@
   * [FIX] Updated the Dockerfile so that the subdirectories are preserved in the Docker container.
 
 * **Metrics**
-  * [FIX] Added Service Monitor definition to permit metric collection from OpenSearch instance within individual SAS Viya deployments.
+  * [FIX] Added Service Monitor definition to permit metric collection from OpenSearch instance within individual SAS Viya platform deployments.
   * [FIX] Customizations in the user-values-prom-operator.yaml file under the alertmanagerSpec will now be applied correctly.
 
 * **Logging**
@@ -168,7 +168,7 @@
   * [CHANGE] - Support for tenant-level metric monitoring (specifically, deploying tenant-level instances of Prometheus and Grafana) has been moved to "experimental" status. This reflects concerns about its architecture, scalability and supportability.
 
 * **Logging**
-  * [CHANGE] - The documentation about log monitoring has been extensively revised and relocated to the [SAS Viya Administration Help Center](http://documentation.sas.com/doc/en/sasadmincdc/default/callogging/titlepage.htm). The affected markdown-based documentation files stored in this repository have been updated to point to the new documentation location.
+  * [CHANGE] - The documentation about log monitoring has been extensively revised and relocated to the [SAS Viya Platform Administration Help Center](http://documentation.sas.com/doc/en/sasadmincdc/default/callogging/titlepage.htm). The affected markdown-based documentation files stored in this repository have been updated to point to the new documentation location.
   * [FIX] - OpenSearch tenant-level indexes with apparently missing tenant information (i.e. index names fitting the pattern "viya_logs-myviya-____-2022-07-23") were being created rather than storing some log messages in namespace-level indexes.
   * [FIX] - A change in the container name used by SAS CAS Server resulted in some log messages not being stored in the right OpenSearch index.
 
@@ -177,7 +177,7 @@
 * **Monitoring**
   * [FEATURE] - change_grafana_admin_password script has been created to change the Grafana admin password.
   * [FIX] - Fixed issue where the logging data source would not be successfully created if you changed the Grafana admin password using the kubectl exec command provided at the end of the monitoring deployment tasks.
-  * [FIX] - Fixed a bug where the Viya monitoring deployment script would not remove older, v4m-viya Helm chart.
+  * [FIX] - Fixed a bug where the SAS Viya Monitoring deployment script would not remove older, v4m-viya Helm chart.
 
 * **Logging**
   * [CHANGE] - The es_nodeport_enable.sh and es_nodeport_disable.sh scripts used to enable and disable access to OpenSearch via NodePort, respectively, have been replaced with bin/configure_nodeport.sh which includes additional functionality.  See [Configure Access Via NodePorts](http://documentation.sas.com/doc/en/sasadmincdc/default/callogging/n0l4k3bz39cw2dn131zcbat7m4r1.htm).
@@ -203,7 +203,7 @@
   * [CHANGE] - Running scripts on OpenShift 4.9 no longer generates a WARNING message.
 
 * **Monitoring**
-  * [FIX] - Updated SAS Viya logo on the Grafana Welcome screen so that it is easier to see on darker background.
+  * [FIX] - Updated SAS Viya platform logo on the Grafana Welcome screen so that it is easier to see on darker background.
   * [FIX] - Fixed an issue that pod names were concatenated when multiple instances of tenant monitoring have been deployed.
   * [CHANGE] - Combined the functionality of the create_elasticsearch_datasource_cluster.sh and create_elasticsearch_datasource_tenant.sh scripts into one script (create_elasticsearch_datasource.sh).
   
@@ -277,7 +277,7 @@
 ## Version 1.1.5 (15FEB22)
 
 * **Monitoring**
-  * [CHANGE] - The SAS Viya Welcome dashboard has been updated with a
+  * [CHANGE] - The SAS Viya platform Welcome dashboard has been updated with a
     cleaner design and an improved layout
   * [EXPERIMENTAL] - Setting `ELASTICSEARCH_DATASOURCE=true` when running
     `monitoring/bin/deploy_monitoring_cluster.sh`  will configure an
@@ -417,8 +417,8 @@
     for details.
 
   * [FEATURE] A significant number of changes to support application
-    multi-tenancy in SAS Viya; including the ability to limit users to log
-    messages from a specific Viya deployment and tenant. See
+    multi-tenancy in SAS Viya platform; including the ability to limit users to log
+    messages from a specific SAS Viya platform deployment and tenant. See
     [Tenant Logging](logging/Tenant_Logging.md) for details.
 
 * **Known Issues**
@@ -450,13 +450,13 @@
 * **Monitoring**
   * [FIX] Metrics will be properly collected from the SAS Deployment Operator
   * [CHANGE] Internal improvements, refactoring and preparations for future support
-    of application multi-tenancy in SAS Viya
+    of application multi-tenancy in SAS Viya platform
   * [FIX] The two SAS Jobs dashboards have been updated and slightly optimized
 
 * **Logging**
   * [CHANGE] Fluent Bit has been upgraded to version 1.8.7
   * [CHANGE] Internal improvements, refactoring and preparations for future support
-    of application multi-tenancy in SAS Viya
+    of application multi-tenancy in SAS Viya platform
 
 ## Version 1.0.11 (13SEP21)
 
@@ -472,7 +472,7 @@
 
 * **Logging**
   * Internal improvements, refactoring and preparations for application multi-
-  tenancy in SAS Viya
+  tenancy in SAS Viya platform
 
 ## Version 1.0.10 (16AUG21)
 
@@ -495,7 +495,7 @@
     * Version 4.6.x is supported
     * Version 4.5 or lower generates an error
     * Version 4.7 or higher generates a warning
-  * [FEATURE] Integration with the SAS Viya workload node placement strategy
+  * [FEATURE] Integration with the SAS Viya platform workload node placement strategy
     can be enabled with `NODE_PLACEMENT_ENABLE=true`
   * [FEATURE] OpenShift: Path-based ingress can be enabled
     with `OPENSHIFT_PATH_ROUTES=true`
@@ -588,10 +588,10 @@
 * **Monitoring**
   * [FEATURE] There is a [new sample](samples/gke-monitoring) that demonstrates
   how to enable Google Cloud's Operation Suite to collect metrics a Prometheus
-  instance that is scraping metrics from SAS Viya components
+  instance that is scraping metrics from SAS Viya platform components
   * [CHANGE] The [Amazon CloudWatch sample](samples/cloudwatch) has been
   updated to include many more metrics and mappings. Almost all metrics exposed
-  by SAS Viya and third party components are now mapped properly to sets of
+  by SAS Viya platform and third party components are now mapped properly to sets of
   dimensions. A new [reference](samples/cloudwatch/reference.md) documents
   the metrics by dimention, by source, and by metric name.
 
@@ -613,7 +613,7 @@
   supported to supply user-provided dashboards at deployment time
   * [FEATURE] The new [CloudWatch sample](samples/cloudwatch) provides
   instructions on configuring the CloudWatch agent to scrape metrics
-  from SAS Viya components
+  from SAS Viya platform components
   * [FEATURE] The browser-accessible URL for Grafana is now included in
   the output of `monitoring/bin/deploy_monitoring_cluster.sh` (including
   if ingress is configured)
@@ -633,7 +633,7 @@
     * flant-statusmap-panel
     * btplc-status-dot-panel
   * [CHANGE] [cert-manager](https://cert-manager.io/docs/usage/certificate/) resources
-  now use 'v1' to align with their use in SAS Viya 4.x
+  now use 'v1' to align with their use in SAS Viya platform 4.
 
 * **Logging**
   * [FEATURE] The browser-accessible URL for Kibana included in the output
@@ -727,7 +727,7 @@ This is the first public release.
 * **Overall**
   * [Helm 2.x has reached end-of-life](https://github.com/helm/helm/releases/tag/v2.17.0)
   and is no longer supported. Helm 3.x is now required.
-  * Support added for the [SAS Viya Workload Node Placement](https://go.documentation.sas.com/?cdcId=itopscdc&cdcVersion=default&docsetId=dplyml0phy0dkr&docsetTarget=p0om33z572ycnan1c1ecfwqntf24.htm&locale=en)
+  * Support added for the [SAS Viya Platform Workload Node Placement](https://go.documentation.sas.com/?cdcId=itopscdc&cdcVersion=default&docsetId=dplyml0phy0dkr&docsetTarget=p0om33z572ycnan1c1ecfwqntf24.htm&locale=en)
     * By default, monitoring and logging pods are deployed to untainted nodes
     * A new flag, `NODE_PLACEMENT_ENABLE` supports deploying pods to appropriate
     workload node placement nodes
@@ -742,7 +742,7 @@ This is the first public release.
   support merged services
 
 * **Logging**
-  * Support for SAS Viya move to Crunchy Data 4.5
+  * Support for SAS Viya platform move to Crunchy Data 4.5
   * Support for [changing retention period](logging/Log_Retention.md) of log messages
   * Node anti-affinity for Elasticsearch replicas
   * Support for multi-role Elasticsearch nodes (including [sample](samples/esmulti/README.md)

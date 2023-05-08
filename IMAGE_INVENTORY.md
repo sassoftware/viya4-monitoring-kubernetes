@@ -1,6 +1,6 @@
-# List of Images Deployed By Viya 4 Monitoring for Kubernetes Project
+# List of Images Deployed By SAS Viya Monitoring for Kubernetes Project
 
-The following images are deployed by the Viya 4 Monitoring for Kubernetes project:
+The following images are deployed by the SAS Viya Monitoring for Kubernetes project.
 
 ## Cluster-Level Monitoring Images
 
@@ -18,7 +18,7 @@ busybox:1.31.1
 quay.io/prometheus-operator/prometheus-config-reloader:v0.62.0
 ```
 
-## Viya- and Tenant-Level Monitoring Images
+## SAS Viya Platform- and Tenant-Level Monitoring Images
 
 ```plaintext
 ghostunnel/ghostunnel:v1.7.0
@@ -41,9 +41,9 @@ quay.io/prometheuscommunity/elasticsearch-exporter:v1.5.0
 busybox:latest
 ```
 
-## All Viya 4 Monitoring for Kubernetes Images
+## All SAS Viya Monitoring for Kubernetes Images
 
-**NOTE:**  This is a consolidated list of all images deployed by the Viya 4 Monitoring for Kubernetes project.
+**NOTE:**  This is a consolidated list of all images deployed by the SAS Viya Monitoring for Kubernetes project.
 
 ```plaintext
 busybox:1.31.1
