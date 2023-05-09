@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* **Overall**
+  * [CHANGE] v4m-metrics and v4m-logs Helm chart will now encrypt passwords that are stored in Helm values.
+
 * **Metrics**
   * [FIX] Fixed an issue that caused the Prometheus data source to fail in path-based Ingress deployments if Prometheus was not externalized
   * [FEATURE] Added "Go Routines" graph to the SAS Go Service Details dashboard in Grafana
