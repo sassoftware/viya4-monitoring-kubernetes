@@ -51,12 +51,12 @@ function populateValuesYAML() {
   # Encrypt passwords stored in V4M Helm Chart
   if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
     sed -i '' "s/GRAFANA_ADMIN_PASSWORD=.*/GRAFANA_ADMIN_PASSWORD=***/g" "$v4mValuesYAML"
-    sed -i '' "s/ES_ADMIN_PASSWD.*/ES_ADMIN_PASSWD=***/g" "$v4mValuesYAML"
-    sed -i '' "s/LOG_LOGADM_PASSWD.*/LOG_LOGADM_PASSWD=***/g" "$v4mValuesYAML"
+    sed -i '' "s/ES_ADMIN_PASSWD=.*/ES_ADMIN_PASSWD=***/g" "$v4mValuesYAML"
+    sed -i '' "s/LOG_LOGADM_PASSWD=.*/LOG_LOGADM_PASSWD=***/g" "$v4mValuesYAML"
   else
     sed -i "s/GRAFANA_ADMIN_PASSWORD=.*/GRAFANA_ADMIN_PASSWORD=***/g" "$v4mValuesYAML"
-    sed -i "s/ES_ADMIN_PASSWD.*/ES_ADMIN_PASSWD=***/g" "$v4mValuesYAML"
-    sed -i "s/LOG_LOGADM_PASSWD.*/LOG_LOGADM_PASSWD=***/g" "$v4mValuesYAML"
+    sed -i "s/ES_ADMIN_PASSWD=.*/ES_ADMIN_PASSWD=***/g" "$v4mValuesYAML"
+    sed -i "s/LOG_LOGADM_PASSWD=.*/LOG_LOGADM_PASSWD=***/g" "$v4mValuesYAML"
   fi
 }
 
