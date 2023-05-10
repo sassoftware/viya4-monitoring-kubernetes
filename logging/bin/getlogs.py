@@ -70,6 +70,9 @@ def validate_input(dict):
 
     if dict['out-filename']: ##Check for supported file-types
 
+        if (dict['maxInt'] == 0):
+            dict['maxInt'] = 250
+
         if(type(dict['out-filename']) == list):
             dict['out-filename']= " ".join(dict['out-filename'])
 
@@ -114,6 +117,9 @@ def validate_input(dict):
         if (not os.path.isfile(dict['query-filename'])):
             print("Error: Invalid query file path.")
             exit()
+    else: ## If no output file, set default maxrows to 25
+        if (dict['maxInt'] == 0):
+            dict['maxInt'] = 25
 
     
     ##Time Validator - Verifies input, and converts it to UTC   
@@ -201,7 +207,7 @@ def get_arguments():
     parser.add_argument('-l', '--level', required=False, dest='level', nargs='*', metavar="LEVEL",  help = "\nOne or more message levels for which logs are sought\n\n")
     parser.add_argument('-lx', '--level-exclude', required=False, dest = 'level-exclude', nargs='*', metavar="LEVEL", help = "\nOne or more message levels for which logs should be excluded from the output.\n\n")
     parser.add_argument('-se', '--search', required=False, dest= "message", nargs='*', metavar="MESSAGE",  help = "\nWord or phrase contained in log message. Do not include single quotes ('')\n\n")
-    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=250,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
+    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=0,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
     parser.add_argument('-q', '--query-file ', required=False, dest="query-filename", metavar="FILENAME.*", help = "\nName of file containing search query (Including filetype) at end. Program will submit query from file, ALL other query parmeters ignored. Supported filetypes: .txt, .json\n\n")
     parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Display example of actual query that will be submitted during execution.\n\n")
     parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (WITHOUT filetype) in which to save the generated query. Query is saved as JSON file in current directory.\n\n")
@@ -273,6 +279,10 @@ except Exception as e:
         print("User Authentication failed. Verify username and password values. ")
     else:
         print("Connection error. Please verify connection values. ") 
+    exit()
+
+if response['hits']['total']['value'] == 0:
+    print("No results found for submitted query.")
     exit()
 
 stdout = False
