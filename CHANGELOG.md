@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* **Overall**
+  * [CHANGE] Actual passwords are replaced with asterisks in deployed instances of the v4m Helm chart (e.g. v4m-logs, v4m-metrics, etc.).
+
 * **Metrics**
   * [FIX] Fixed an issue that caused the Prometheus data source to fail in path-based Ingress deployments if Prometheus was not externalized
   * [FEATURE] Added "Go Routines" graph to the SAS Go Service Details dashboard in Grafana
