@@ -19,14 +19,14 @@ Operations:
 ### Prometheus Server
 
 SAS Viya metrics are provided as HTTP-HTTPS metric endpoints that are read by
-a Prometheus server, such as the one deployed with the SAS Viya monitoring
+a Prometheus server, such as the one deployed with the SAS Viya Monitoring
 components.
 
 Google [supports Prometheus metrics](https://cloud.google.com/stackdriver/docs/solutions/gke/prometheus)
 by watching data as it is collected by the Prometheus server. Google then converts
 and exports that data to Google Cloud Operations.
 
-Before using this sample, you must [deploy the SAS Viya monitoring components](../README.md),
+Before using this sample, you must [deploy the SAS Viya Monitoring components](../README.md),
 including the Prometheus server.
 
 ### Stackdriver Prometheus Sidecar
@@ -39,7 +39,7 @@ volume mount so that the sidecar can directly read the Prometheus server data.
 Although there are several ways to deploy the sidecar to a Prometheus pod,
 this sample directly supports only
 [Prometheus custom resources](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#prometheus)
-such as those deployed by the SAS Viya monitoring components in
+such as those deployed by the SAS Viya Monitoring components in
 this repository.
 
 ## Using This Sample

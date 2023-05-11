@@ -1,7 +1,7 @@
 # Amazon CloudWatch Integration
 
 This sample describes how to configure Amazon CloudWatch to collect metrics
-from the services and components in SAS Viya. Complete the deployment
+from the services and components in SAS Viya applications and SAS Viya platform. Complete the deployment
 and configuration steps in this document to enable Amazon CloudWatch to collect
 and visualize metric information from both SAS Viya as well as the monitoring
 components deployed from this repository. This sample currently does not
@@ -28,7 +28,7 @@ DaemonSet definition so that the agent can run on nodes that are tainted to
 support SAS Viya workload node placement. See
 [CloudWatch Agent DaemonSet and Workload Node Placement](#wnp_tolerations).
 
-Because SAS Viya monitoring uses Prometheus, this sample focuses on deploying
+Because SAS Viya Monitoring for Kubernetes uses Prometheus, this sample focuses on deploying
 and configuring the CloudWatch agent for use with Prometheus.
 
 These instructions are based on deploying the EKS cluster using the

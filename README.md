@@ -1,7 +1,13 @@
 # SAS® Viya® Monitoring for Kubernetes
 
 SAS® Viya® Monitoring for Kubernetes provides scripts and customization
-options to deploy metric monitoring, alerts, and log-message aggregation for SAS Viya 4.
+options to deploy metric monitoring, alerts, and log-message aggregation for SAS® Viya®.
+
+**Note:** The documentation included in this GitHub project uses "SAS Viya" to refer to the SAS Viya platform and compatible SAS Viya applications, including these products:
+- SAS® Viya® (previously called SAS Visual Machine Learning)
+- SAS® Viya® Advanced (previously called SAS Visual Data Science)
+- SAS® Viya® Programming (previously called SAS Visual Data Science Programming)
+- SAS® Viya® Enterprise (previously called SAS Visual Data Science Decisioning)
 
 Log monitoring and metric monitoring can be deployed independently or together. There are no hard dependencies between the two.
 
