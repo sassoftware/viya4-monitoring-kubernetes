@@ -19,12 +19,11 @@ image:
 log:
   format: json
 
-## Set enabled to false if you don't want securityContext
+## Set enabled to false if you don't want podSecurityContext
 ## in your Deployment.
 ## The below values are the default for kubernetes.
 ## Openshift won't deploy with runAsUser: 1000 without additional permissions.
-securityContext:
-  enabled: true  # Should be set to false when running on OpenShift
+podSecurityContext:
   runAsUser: 1000
 
 resources:

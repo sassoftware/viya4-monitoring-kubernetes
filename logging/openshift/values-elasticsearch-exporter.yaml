@@ -1,2 +1,1 @@
-securityContext:
-    enabled: false
+podSecurityContext: null
