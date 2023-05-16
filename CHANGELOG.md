@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.13 (16MAY2023)
 
 * **Overall**
   * [CHANGE] The use of the ["SAS Viya"](https://github.com/sassoftware/viya4-monitoring-kubernetes#sas-viya-monitoring-for-kubernetes) name has been updated to reflect product name changes.
@@ -9,6 +9,9 @@
 * **Metrics**
   * [FIX] Fixed an issue that caused the Prometheus data source to fail in path-based Ingress deployments if Prometheus was not externalized
   * [FEATURE] Added "Go Routines" graph to the SAS Go Service Details dashboard in Grafana
+
+* **Logging**
+  * none 
 
 ## Version 1.2.12 (18APR2023)
 * **Overall**
