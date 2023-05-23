@@ -1,5 +1,19 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+
+* **Overall**
+
+* **Metrics**
+  * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 43.3.1 to 45.28.0
+  * [UPGRADE] - Prometheus has been upgraded from version 2.40.7 to 2.44.0
+  * [UPGRADE] - Prometheus Operator has been upgraded from version 0.62.0 to 0.65.1
+  * [UPGRADE] - Grafana has been upgraded from version 9.3.1 to 9.5.2
+  * [UPGRADE] - Kube State Metrics has been upgraded from version 2.7.0 to 2.8.2
+  * [UPGRADE] - Pushgateway has been upgraded from version 1.4.3 to 1.5.1
+  * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from 1.22.0 to 1.24.0
+  * [UPGRADE] - Ghostunnel has been upgraded from version 1.7.0 to 1.7.1
+
 ## Version 1.2.13 (16MAY2023)
 
 * **Overall**

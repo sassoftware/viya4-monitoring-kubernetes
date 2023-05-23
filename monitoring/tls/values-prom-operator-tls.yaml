@@ -61,6 +61,8 @@ grafana:
     httpGet:
       scheme: HTTPS
       port: 443
+  securityContext:
+      runAsNonRoot: false
   extraContainers: |
     # Add square/ghosttunnel TLS proxy
     - name: tls-proxy
@@ -71,7 +73,7 @@ grafana:
       - --key=/cert/tls.key
       - --cert=/cert/tls.crt
       - --disable-authentication
-      image: ghostunnel/ghostunnel:v1.7.0
+      image: ghostunnel/ghostunnel:v1.7.1
       imagePullPolicy: IfNotPresent
       ports:
       - name: https

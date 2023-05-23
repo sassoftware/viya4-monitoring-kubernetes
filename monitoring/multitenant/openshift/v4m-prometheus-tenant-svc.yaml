@@ -6,7 +6,7 @@ metadata:
     service.beta.openshift.io/serving-cert-secret-name: v4m-prometheus-__TENANT__-tls-secret
   labels:
     app.kubernetes.io/name: prometheus
-    app.kubernetes.io/version: 2.40.7
+    app.kubernetes.io/version: 2.44.0
     v4m.sas.com/tenant: __TENANT__
 spec:
   ports:

@@ -53,7 +53,7 @@ spec:
     - --key=/cert/tls.key
     - --cert=/cert/tls.crt
     - --disable-authentication
-    image: ghostunnel/ghostunnel:v1.7.0
+    image: ghostunnel/ghostunnel:v1.7.1
     imagePullPolicy: IfNotPresent
     ports:
     - name: https
@@ -74,7 +74,7 @@ spec:
   additionalScrapeConfigs:
     name: prometheus-federate-__TENANT__
     key: cluster-federate-job
-  image: quay.io/prometheus/prometheus:v2.40.7
+  image: quay.io/prometheus/prometheus:v2.44.0
   # alerting:
   #   alertmanagers:
   #   - apiVersion: v2
@@ -108,4 +108,4 @@ spec:
   ruleSelector:
     matchLabels:
       v4m.sas.com/tenant: __TENANT__
-  version: v2.40.7
+  version: v2.44.0
