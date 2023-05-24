@@ -61,8 +61,6 @@ grafana:
     httpGet:
       scheme: HTTPS
       port: 443
-  # securityContext:
-      # runAsNonRoot: false
   extraContainers: |
     # Add square/ghosttunnel TLS proxy
     - name: tls-proxy
