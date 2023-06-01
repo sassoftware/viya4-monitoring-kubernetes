@@ -222,7 +222,7 @@ def get_arguments():
     parser.add_argument('-st', '--start', required=False, dest="dateTimeStart", nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime(time.localtime()) - 3600)), help = "\nDatetime for start of period for which logs are sought (default: 1 hour ago).\n\n")
     parser.add_argument('-en', '--end', required=False, dest="dateTimeEnd",nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), help = "\nDatetime for end of period for which logs are sought (default: now). \n\n\n \t\t\t CONNECTION SETTINGS: \n\n")
     
-    ##parser.add_argument('-i', '--index', required=False, dest="index", metavar="INDEX", default="viya_logs-*", help = "\nDetermine which index to perform the search in. Default: viya-logs-*\n\n")
+    parser.add_argument('-i', '--index', required=False, dest="index", metavar="INDEX", default="viya_logs-*") ## help = "\nDetermine which index to perform the search in. Default: viya-logs-*\n\n
     ##Connection settings
     parser.add_argument('-us','--user',  required=False, dest="userName", default=os.environ.get("ESUSER"), help = "\nUsername for connecting to OpenSearch/Kibana (default: $ESUSER)\n\n")
     parser.add_argument('-pw', '--password', required=False,  dest="password", default=os.environ.get("ESPASSWD"), help = "\nPassword for connecting to OpenSearch/Kibana  (default: $ESPASSWD)\n\n")
