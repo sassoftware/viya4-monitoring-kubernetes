@@ -84,7 +84,7 @@ function removeV4MInfo() {
   NS=$1
   releaseName=${2:-'v4m'}
   if [ -z "$NS" ]; then
-    log_error "No namespace specified for removing Viya Monitoring for Kubernetes version information"
+    log_error "No namespace specified for removing SAS Viya Monitoring for Kubernetes version information"
     return 1
   fi
  
