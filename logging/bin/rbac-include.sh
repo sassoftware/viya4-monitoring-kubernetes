@@ -36,7 +36,7 @@ function create_role {
 
 
 function delete_role {
-   # Delete Viya deployment-restricted role
+   # Delete SAS Viya deployment-restricted role
    #
    # Returns: 0 - Role deleted
    #          1 - Role was/could not be deleted

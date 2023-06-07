@@ -16,12 +16,12 @@ this_script=`basename "$0"`
 function show_usage {
   log_message  "Usage: $this_script --namespace NAMESPACE [--tenant TENANT] [OPTIONS]"
   log_message  ""
-  log_message  "'Offboards' either the specified Viya deployment (namespace) or the specified tenant within that deployment.  This removes the ability to limit admins to the Viya deployment (or a single tenant within a given deployment)."
+  log_message  "'Offboards' either the specified SAS Viya deployment (namespace) or the specified tenant within that deployment.  This removes the ability to limit admins to the SAS Viya deployment (or a single tenant within a given deployment)."
   log_message  "The offboarding process deletes the security access controls and the associated OpenSearch Dashboards tenant space (including any saved OpenSearch Dashboards content (e.g. visualizations, dashboards, etc.)."
   log_message  ""
   log_message  "    Arguments:"
-  log_message  "     -ns, --namespace   NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace to which access should be removed."
-  log_message  "     -t,  --tenant      TENANT    - (Optional) The tenant within the specific Viya deployment/Kubernetes Namespace to which access should be removed."
+  log_message  "     -ns, --namespace   NAMESPACE - (Required) The SAS Viya deployment/Kubernetes Namespace to which access should be removed."
+  log_message  "     -t,  --tenant      TENANT    - (Optional) The tenant within the specific SAS Viya deployment/Kubernetes Namespace to which access should be removed."
   log_message  ""
   #log_message  "    Options:"
   #log_message  ""
@@ -112,10 +112,10 @@ fi
 ktenant=$nst
 
 if [ -n "$tenant" ]; then
-   tenant_description="An OpenSearch Dashboards tenant space for tenant [$tenant] within Viya deployment (namespace) [$namespace]."
+   tenant_description="An OpenSearch Dashboards tenant space for tenant [$tenant] within SAS Viya deployment (namespace) [$namespace]."
    log_notice "Offboarding tenant [$tenant] within namespace [$namespace] [$(date)]"
 else
-   tenant_description="An OpenSearch Dashboards tenant space for Viya deployment (namespace) [$namespace]."
+   tenant_description="An OpenSearch Dashboards tenant space for SAS Viya deployment (namespace) [$namespace]."
    log_notice "Offboarding namespace [$namespace] [$(date)]"
 fi
 
@@ -182,7 +182,7 @@ add_notice "   are users which are no longer needed after off-boarding the   "
 if [ -n "$tenant" ]; then
    add_notice "   tenant [$tenant] within the                                   "
 fi
-add_notice "   Viya deployment/namespace of [$namespace]                     "
+add_notice "   SAS Viya deployment/namespace of [$namespace]                     "
 add_notice "   you must delete those users manually, either through the      "
 add_notice "   OpenSearch Dashboards web application or via the logging/bin/user.sh script. "
 add_notice "                                                                 "

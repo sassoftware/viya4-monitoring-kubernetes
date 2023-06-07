@@ -85,10 +85,10 @@ if [ "$odfe_master_pvc_count" -gt 0 ] && [ "$odfe_data_pvc_count" -eq 0 ]; then
 elif [ "$odfe_master_pvc_count" -eq 1 ] && [ "$odfe_data_pvc_count" -eq 1 ]; then
    # min-logging sample configuration
    log_error "The current ODFE configuration (likely based on the min-logging sample) can NOT be migrated to OpenSearch"
-   log_info "You may be able to redeploy using an earlier release of Viya 4 Monitoring for Kubernetes to restore the current ODFE."
+   log_info "You may be able to redeploy using an earlier release of SAS Viya Monitoring for Kubernetes to restore the current ODFE."
    log_info "However, the underlying Open Distro for Elasticsearch technology is no longer actively maintained and doing so will make you vulnerable."
    log_info ""
-   log_info "Or, you can re-run the deployment script and deploy an entirely new OpenSearch-based deployment of Viya 4 Monitoring for Kubernetes"
+   log_info "Or, you can re-run the deployment script and deploy an entirely new OpenSearch-based deployment of SAS Viya Monitoring for Kubernetes"
    log_info "You can delete the existing PVCs that cannot be migrated and free up storage space by submitting a command:"
    log_info "      kubectl -n $LOG_NS delete pvc -l 'app=v4m-es, release=odfe'  " 
    log_info "Note: any previously captured log messages will no longer be available."
