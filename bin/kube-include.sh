@@ -34,7 +34,7 @@ fi
 if [[ $KUBE_SERVER_VER =~ v1.2[1-9] ]]; then
   :
 else 
-  log_warn "The detected version of Kubernetes [$KUBE_SERVER_VER] is not supported by any of the currently supported releases of SAS Viya Monitoring."
+  log_warn "The detected version of Kubernetes [$KUBE_SERVER_VER] is not supported by any of the currently supported releases of SAS Viya."
   log_warn "This script might not work as expected. Support might not be available until Kubernetes is upgraded to a supported version."
 fi
 
