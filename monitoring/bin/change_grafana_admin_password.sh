@@ -19,7 +19,7 @@ function show_usage {
   log_message  ""
   log_message  "To change the Grafana admin user at the tenant level, you need"
   log_message  "to provide the following arguments:"
-  log_message  "     -ns, --namespace NAMESPACE   - The namespace where the Viya tenant resides."
+  log_message  "     -ns, --namespace NAMESPACE   - The namespace where the SAS Viya tenant resides."
   log_message  "     -t,  --tenant TENANT         - The tenant whose Grafana admin password you want to change."
   log_message  "     -p,  --password PASSWORD     - The new password you want to use."
   log_message  ""
