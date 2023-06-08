@@ -39,8 +39,8 @@ if [ -z "$namespace" ]; then
   log_message  ""
   log_message  "Deletes access control artifacts (e.g. roles, role-mappings, etc.) previously created to limit access to the specified namespace."
   log_message  ""
-  log_message  "        NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace for which access controls should be deleted"
-  log_message  "        TENANT    - (Optional) The tenant with the Viya deployment/Kubernetes Namespace for which access controls should be created"
+  log_message  "        NAMESPACE - (Required) The SAS Viya deployment/Kubernetes Namespace for which access controls should be deleted"
+  log_message  "        TENANT    - (Optional) The tenant with the SAS Viya deployment/Kubernetes Namespace for which access controls should be created"
   log_message  ""
 
   exit 1

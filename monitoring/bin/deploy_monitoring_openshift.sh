@@ -265,4 +265,4 @@ bin/show_app_url.sh GRAFANA
 # log_notice "Grafana URL: $scheme://$(kubectl get route -n $MON_NS v4m-grafana -o jsonpath='{.spec.host}{.spec.path}')"
 
 log_message ""
-log_notice "Successfully deployed SAS Viya monitoring for OpenShift"
+log_notice "Successfully deployed SAS Viya Monitoring for OpenShift"

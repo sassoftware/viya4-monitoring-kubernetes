@@ -9,7 +9,7 @@ source monitoring/bin/common.sh
 MON_DELETE_PVCS_ON_REMOVE=${MON_DELETE_PVCS_ON_REMOVE:-false}
 
 if [ "$VIYA_NS" == "" ]; then
-  log_error "VIYA_NS must be set to the Viya deployment namespace"
+  log_error "VIYA_NS must be set to the SAS Viya deployment namespace"
   exit 1
 fi
 

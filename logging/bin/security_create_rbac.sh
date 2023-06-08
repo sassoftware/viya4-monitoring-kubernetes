@@ -36,9 +36,9 @@ function show_usage {
   log_message  ""
   log_message  "Creates access controls (e.g. roles, role-mappings, etc.) to limit access to the specified namespace and, optionally, the specified tenant within that namespace."
   log_message  ""
-  log_message  "        NAMESPACE - (Required) The Viya deployment/Kubernetes Namespace for which access controls should be created"
+  log_message  "        NAMESPACE - (Required) The SAS Viya deployment/Kubernetes Namespace for which access controls should be created"
   log_message  ""
-  log_message  "        TENANT    - (Optional) The tenant with the Viya deployment/Kubernetes Namespace for which access controls should be created"
+  log_message  "        TENANT    - (Optional) The tenant with the SAS Viya deployment/Kubernetes Namespace for which access controls should be created"
   log_message  ""
 }
 
