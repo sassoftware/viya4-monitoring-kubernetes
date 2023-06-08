@@ -46,13 +46,13 @@ def validate_input(dict):
             dict['host'] = authDict['host']
             dict['port'] = authDict['port']
         except Exception as e:
-            print("There was a problem with the authentication file. Please ensure that the values are in dictionary format with keys: 'username', 'password', 'host', 'port'")
+            print("Error: There was a problem with the authentication file. Please ensure that the values are in dictionary format with keys: 'username', 'password', 'host', 'port'")
             print(e)
             exit()
 
     """Ensure maxrows is less than 10000"""
-
-    if dict['maxInt'] > 10000:
+    MAX_ROWS = 10000
+    if dict['maxInt'] > MAX_ROWS:
         print("Error: Maxrows limit of 10000 exceeded.")
         exit()
 
@@ -197,6 +197,7 @@ def build_query(dict): ##Generates Query using Opensearch DSL
 def get_arguments():
     """Defines the arguments a user can pass and parses them"""
     parser = argparse.ArgumentParser(prog='getLogs.py', usage='\n%(prog)s [options]', description="This program generates OpenSearch DSL Queries from user specified parameters, and submits them to a database to retrieve logs. The flags below provide specifications for your Query, and can be placed in any order. \n   IMPORTANT NOTES: \n    *Connection settings are required in order to run the program. You can create config files to autofill this using --create-auth, and call them using --auth-file \n    *The NAMESPACE*, POD*, CONTAINER*, LOGSOURCE* and LEVEL* options accept multiple, space-separated, values (e.g. --level INFO NONE) Please refrain from passing single quotes ('') into arguments. \n    *All Generated Program files are placed in a folder titled GetLogssFiles in the directory where the program is run. It is not required to include this directory when passing created files in as arguments.\n    *Correct time format is Y-M-D H:M:S. Ex: 1999-02-07 10:00:00 \n    *All default values for username, password, host, and port are derived from the ENV variables ESUSER, USPASSWD, ESHOST, ESPORT\n\n\n \t\t\t\t QUERY SEARCH PARAMETERS: \n\n", formatter_class=argparse.RawTextHelpFormatter)
+    
     ##Search Params
     parser.add_argument('-n', '--namespace', required=False, dest="kube.namespace", nargs='*', metavar="NAMESPACE", help="\nOne or more Viya deployments/Kubernetes Namespace for which logs are sought\n\n")
     parser.add_argument('-nx', '--namespace-exclude', required=False, dest="kube.namespace-ex", nargs='*', metavar="NAMESPACE", help='\nOne or more namespaces for which logs should be excluded from the output\n\n')

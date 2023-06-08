@@ -38,7 +38,7 @@ if [ ! -f "$PUSHGATEWAY_USER_YAML" ]; then
 fi
 
 if [ "$VIYA_NS" == "" ]; then
-  log_error "VIYA_NS must be set to the namespace of an existing Viya deployment"
+  log_error "VIYA_NS must be set to the namespace of an existing SAS Viya deployment"
   exit 1
 fi
 
@@ -52,7 +52,7 @@ else
   wnpValuesFile="$TMP_DIR/empty.yaml"
 fi
 
-log_notice "Enabling the [$VIYA_NS] namespace for SAS Viya monitoring"
+log_notice "Enabling the [$VIYA_NS] namespace for SAS Viya Monitoring"
 
 # Exit on failure
 set -e

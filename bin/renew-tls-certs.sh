@@ -111,7 +111,7 @@ function renew-certs {
             if (tls_cert_managed_by_v4m "$MON_NS" "$secretName") then
               kubectl delete secret -n "$MON_NS" $secretName
             else
-              log_error "[$secretName] is not managed by Viya Monitoring. Delete certs not managed by Viya Monitoring or update certs and restart applications by re-running this script using the [-r] flag"
+              log_error "[$secretName] is not managed by SAS Viya Monitoring. Delete certs not managed by SAS Viya Monitoring or update certs and restart applications by re-running this script using the [-r] flag"
               exit 1
             fi
           fi
@@ -131,7 +131,7 @@ function renew-certs {
             if (tls_cert_managed_by_v4m "$LOG_NS" "$secretName") then
               kubectl delete secret -n "$LOG_NS" $secretName
             else
-              log_error "[$secretName] is not managed by Viya Monitoring. Delete certs not managed by Viya Monitoring or update certs and restart applications by re-running this script using the [-r] flag"
+              log_error "[$secretName] is not managed by SAS Viya Monitoring. Delete certs not managed by SAS Viya Monitoring or update certs and restart applications by re-running this script using the [-r] flag"
               exit 1
             fi
           fi

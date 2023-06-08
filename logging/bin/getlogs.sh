@@ -75,7 +75,7 @@ function show_usage {
    log_info  "NOTE: Connection information is required but may be provided via environment variables."
    log_info  ""
    log_info  "     ** Query Options **"
-   log_info  "     -n,  --namespace         NAMESPACE - Oneor more Viya deployments/Kubernetes Namespace for which logs are sought"
+   log_info  "     -n,  --namespace         NAMESPACE - One or more SAS Viya deployments/Kubernetes Namespace for which logs are sought"
    log_info  "     -nx, --namespace-exclude NAMESPACE - One or more namespaces for which logs should be excluded from the output"
    log_info  "     -p,  --pod               POD       - One or more pods for which logs are sought"
    log_info  "     -px, --pod-exclude       POD       - One or more pods for which logs should be excluded from the output"

@@ -7,9 +7,9 @@ monitoring.
 The basic steps are the following:
 
 * Create the monitoring namespace and label other namespaces for
-cluster or SAS Viya monitoring.
+cluster or SAS Viya Monitoring.
 * Deploy cluster monitoring and restrict it to use only cluster dashboards.
-* Deploy standard SAS Viya monitoring to each SAS Viya namespace.
+* Deploy standard SAS Viya Monitoring to each SAS Viya namespace.
 * Create Prometheus custom resources (CRs) that are configured to monitor only
 their respective SAS Viya namespaces.
 * Deploy Grafana to each SAS Viya namespace to provide visualization.
@@ -84,7 +84,7 @@ custom user directory and no SAS Viya dashboards.
 VIYA_DASH=false monitoring/bin/deploy_monitoring_cluster.sh
 ```
 
-6. Deploy standard SAS Viya monitoring components for each SAS Viya namespace.
+6. Deploy standard SAS Viya Monitoring components for each SAS Viya namespace.
 
 ```bash
 VIYA_NS=$VIYA_ONE_NS monitoring/bin/deploy_monitoring_viya.sh

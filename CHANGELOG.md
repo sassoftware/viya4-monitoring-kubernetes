@@ -1,5 +1,20 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+
+* **Overall**
+  * [CHANGE] Kubernetes versions prior to 1.21 produce WARNING message; OpenShift versions prior to 4.10 not supported
+
+## Version 1.2.13 (16MAY2023)
+
+* **Overall**
+  * [CHANGE] The use of the ["SAS Viya"](https://github.com/sassoftware/viya4-monitoring-kubernetes#sas-viya-monitoring-for-kubernetes) name has been updated to reflect product name changes.
+  * [CHANGE] Actual passwords are replaced with asterisks in deployed instances of the v4m Helm chart (e.g. v4m-logs, v4m-metrics, etc.).
+
+* **Metrics**
+  * [FIX] Fixed an issue that caused the Prometheus data source to fail in path-based Ingress deployments if Prometheus was not externalized
+  * [FEATURE] Added "Go Routines" graph to the SAS Go Service Details dashboard in Grafana
+
 ## Version 1.2.12 (18APR2023)
 * **Overall**
   * [FEATURE] Information about resource requests and limits added to documentation under [Minimum Resource Requirements](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n039q38k9nedd2n16rbbafwsw0ae.htm).
