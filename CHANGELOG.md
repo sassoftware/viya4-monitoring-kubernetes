@@ -5,6 +5,16 @@
 * **Overall**
   * [CHANGE] Kubernetes versions prior to 1.21 produce WARNING message; OpenShift versions prior to 4.10 not supported
 
+* **Metrics**
+  * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 43.3.1 to 45.28.0
+  * [UPGRADE] - Prometheus has been upgraded from version 2.40.7 to 2.44.0
+  * [UPGRADE] - Prometheus Operator has been upgraded from version 0.62.0 to 0.65.1
+  * [UPGRADE] - Grafana has been upgraded from version 9.3.1 to 9.5.2
+  * [UPGRADE] - Kube State Metrics has been upgraded from version 2.7.0 to 2.8.2
+  * [UPGRADE] - Pushgateway Helm chart has been upgraded from version 2.0.3 to 2.1.6
+  * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from 1.22.0 to 1.24.0
+  * [UPGRADE] - Ghostunnel has been upgraded from version 1.7.0 to 1.7.1
+
 ## Version 1.2.13 (16MAY2023)
 
 * **Overall**
