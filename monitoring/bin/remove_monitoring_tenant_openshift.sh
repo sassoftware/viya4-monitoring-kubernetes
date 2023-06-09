@@ -26,12 +26,12 @@ if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
 fi
 
 if [ "$VIYA_NS" == "" ]; then
-  log_error "VIYA_NS must be set to the namespace of an existing Viya deployment"
+  log_error "VIYA_NS must be set to the namespace of an existing SAS Viya deployment"
   exit 1
 fi
 
 if [ "$VIYA_TENANT" == "" ]; then
-  log_error "VIYA_TENANT must be set to the name of an existing Viya tenant"
+  log_error "VIYA_TENANT must be set to the name of an existing SAS Viya tenant"
   exit 1
 fi
 

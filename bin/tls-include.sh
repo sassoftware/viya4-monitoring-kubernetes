@@ -270,10 +270,10 @@ function tls_cert_managed_by_v4m () {
   secretName="$3"
 
   if [[ "$(kubectl get secret -n $namespace $secretName --show-labels)" == *"managed-by=v4m"* ]]; then
-    log_debug "TLS Certs are managed by Viya Monitoring"
+    log_debug "TLS Certs are managed by SAS Viya Monitoring"
     return 0
   else
-    log_debug "TLS Certs are not managed by Viya Monitoring"
+    log_debug "TLS Certs are not managed by SAS Viya Monitoring"
     return 1
   fi
 }
@@ -304,7 +304,7 @@ function create_tls_certs_openssl {
             continue
           fi
         else
-          # Cert not managed by Viya Monitoring
+          # Cert not managed by SAS Viya Monitoring
           continue
         fi
       fi

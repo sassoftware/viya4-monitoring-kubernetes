@@ -3,6 +3,7 @@
 ## Unreleased
 
 * **Overall**
+  * [CHANGE] Kubernetes versions prior to 1.21 produce WARNING message; OpenShift versions prior to 4.10 not supported
 
 * **Metrics**
   * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 43.3.1 to 45.28.0
