@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.14 (13JUN2023)
 
 * **Overall**
   * [CHANGE] Kubernetes versions prior to 1.21 produce WARNING message; OpenShift versions prior to 4.10 not supported
