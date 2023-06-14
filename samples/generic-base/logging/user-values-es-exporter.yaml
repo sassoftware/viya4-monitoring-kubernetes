@@ -1,5 +1,5 @@
-## Helm Chart:     https://github.com/prometheus-community/helm-charts/prometheus-elasticsearch-exporter-4.15.1/main/charts/prometheus-elasticsearch-exporter
-## Default values: https://github.com/prometheus-community/helm-charts/blob/prometheus-elasticsearch-exporter-4.15.1/charts/prometheus-elasticsearch-exporter/values.yaml
+## Helm Chart:     https://github.com/prometheus-community/helm-charts/prometheus-elasticsearch-exporter-5.2.0/main/charts/prometheus-elasticsearch-exporter
+## Default values: https://github.com/prometheus-community/helm-charts/blob/prometheus-elasticsearch-exporter-5.2.0/charts/prometheus-elasticsearch-exporter/values.yaml
 
 # image:
 #  repository: quay.io/prometheuscommunity/elasticsearch-exporter
