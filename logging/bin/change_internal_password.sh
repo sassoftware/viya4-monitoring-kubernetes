@@ -155,7 +155,8 @@ if [[ $response == 4* ]]; then
       # make sure hash utility is executable
       kubectl -n $LOG_NS exec $targetpod  -c $targetcontainer --  chmod +x $toolsrootdir/tools/hash.sh
       # get hash of new password
-      hashed_passwd=$(kubectl -n $LOG_NS exec $targetpod  -c $targetcontainer --  $toolsrootdir/tools/hash.sh -p $NEW_PASSWD)
+      hashed_passwd=$(kubectl -n $LOG_NS exec $targetpod  -c $targetcontainer --  $toolsrootdir/tools/hash.sh -p $NEW_PASSWD|grep -v '*')
+
 
       #obtain admin cert
       rm -f $TMP_DIR/tls.crt
