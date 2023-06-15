@@ -37,6 +37,11 @@ In order to use the values in this sample in the customization files for your
 deployment, copy the customization files from this sample to your local
 customization directory and modify the files further as needed.
 
+- If you are using host-based routing, copy the files and sub-directories from the 
+`samples/ingress/host-based-ingress` sub-directory to the `$USER_DIR` directory.
+- If you are using path-based routing, copy the files and sub-directories from the 
+`samples/ingress/path-based-ingress` sub-directory to the `$USER_DIR` directory.
+
 If you also need to use values from another sample, manually copy the values to
 your customization files after you add the values in this sample.
 
@@ -56,11 +61,6 @@ my_repository_path/logging/bin/deploy_logging.sh
 The monitoring deployment process requires that the user response file be
 named `$USER_DIR/monitoring/user-values-prom-operator.yaml`.
 
-- If you are using host-based routing, copy the files from the host-based-ingress sub-directory
-to the `$USER_DIR/logging` directory.
-- If you are using path-based routing, copy the files from the path-based-ingress sub-directory
-to the `$USER_DIR/logging` directory.
-
 Edit `$USER_DIR/monitoring/user-values-prom-operator.yaml` and replace
 all instances of `host.cluster.example.com` with host names that match your cluster.
 
@@ -68,12 +68,6 @@ all instances of `host.cluster.example.com` with host names that match your clus
 
 The logging deployment process requires that the user response files be
 named `$USER_DIR/logging/user-values-opensearch.yaml` and `$USER_DIR/logging/user-values-osd.yaml`.
-
-- If you are using host-based routing, copy the files from the host-based-ingress sub-directory 
-to the `$USER_DIR/logging` directory.
-
-- If you are using path-based routing, copy the files from the path-based-ingress sub-directory 
-to the `$USER_DIR/logging` directory.
 
 Edit `$USER_DIR/logging/user-values-opensearch.yaml` and  `$USER_DIR/logging/user-values-osd.yaml` files
 and replace all instances of `host.cluster.example.com` with host names that match your cluster
