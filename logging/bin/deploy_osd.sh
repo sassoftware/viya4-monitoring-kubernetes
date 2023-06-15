@@ -89,21 +89,15 @@ if [ ! -f "$OSD_USER_YAML" ]; then
 fi
 
 # Require TLS into OpenSearch Dashboards (nee Kibana)?
-LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-false}
-
-# Enable TLS for East/West OSD traffic (inc. requiring HTTPS from browser if using NodePorts)
-if [ "$LOG_KB_TLS_ENABLE" == "true" ]; then
-   # w/TLS: use HTTPS in curl commands
-   KB_CURL_PROTOCOL=https
-   log_debug "TLS enabled for OpenSearch Dashboards"
-else
-   # w/o TLS: use HTTP in curl commands
-   KB_CURL_PROTOCOL=http
-   log_debug "TLS not enabled for OpenSearch Dashboards"
+OSD_TLS_ENABLE=${OSD_TLS_ENABLE:-$TLS_ENABLE}
+if [ -z "$OSD_TLS_ENABLE" ]; then
+   #set to 'true' if still not set
+   OSD_TLS_ENABLE="true"
 fi
+
 #(Re)Create secret containing OSD TLS Setting
 kubectl -n $LOG_NS delete secret          v4m-osd-tls-enabled  --ignore-not-found
-kubectl -n $LOG_NS create secret generic  v4m-osd-tls-enabled  --from-literal enable_tls="$LOG_KB_TLS_ENABLE"
+kubectl -n $LOG_NS create secret generic  v4m-osd-tls-enabled  --from-literal enable_tls="$OSD_TLS_ENABLE"
 
 # OpenSearch Dashboards
 log_info "Deploying OpenSearch Dashboards"
