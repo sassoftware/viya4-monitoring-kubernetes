@@ -194,7 +194,7 @@ case "$action" in
       if [ "$cluster" == "true" ]; then
          if [ "$grafanads_user" == "true" ]; then
             berole="V4MCLUSTER_ADMIN_grafana_dsusers"
-            pwdchangetxt="Do NOT use Kibana or API, MUST re-run Grafana datasource creation script"
+            pwdchangetxt="Do NOT use OpenSearch Dashboards or API, MUST re-run Grafana datasource creation script"
          else
             berole="V4MCLUSTER_ADMIN_kibana_users"
          fi
@@ -220,7 +220,7 @@ case "$action" in
 
          if [ "$grafanads_user" == "true" ]; then
             berole="${nst}_grafana_dsusers"
-            pwdchangetxt="Do NOT use Kibana or API, MUST re-run Grafana datasource creation script"
+            pwdchangetxt="Do NOT use OpenSearch Dashboards or API, MUST re-run Grafana datasource creation script"
          else
             berole="${nst}_kibana_users"
 
@@ -261,7 +261,7 @@ case "$action" in
       fi
 
       if [ -z "$pwdchangetxt" ]; then
-         pwdchangetxt="Use Kibana or API"
+         pwdchangetxt="Use OpenSearch Dashboards or API"
       fi
 
       cp logging/opensearch/rbac/user.json $TMP_DIR/user.json
@@ -271,7 +271,7 @@ case "$action" in
       sed -i'.bak' "s/xxTCONSTRAINTxx/$tconstraint/g"   $TMP_DIR/user.json      # TENANT|'-none-'
       sed -i'.bak' "s/xxPASSWORDxx/$password/g"         $TMP_DIR/user.json      # PASSWORD
       sed -i'.bak' "s/xxCREATEDBYxx/$this_script/g"     $TMP_DIR/user.json      # CREATEDBY
-      sed -i'.bak' "s/xxPWDCHANGEXX/$pwdchangetxt/g"    $TMP_DIR/user.json      # PASSWORD CHANGE MECHANISM (Kibana|change_internal_password.sh script)
+      sed -i'.bak' "s/xxPWDCHANGEXX/$pwdchangetxt/g"    $TMP_DIR/user.json      # PASSWORD CHANGE MECHANISM (OSD|change_internal_password.sh script)
       sed -i'.bak' "s/xxDATETIMExx/$(date)/g"           $TMP_DIR/user.json      # DATE
 
       log_debug "Contents of user.json template file after substitutions: \n $(cat $TMP_DIR/user.json)"
