@@ -1,0 +1,3 @@
+global:
+  imageRegistry: __AIRGAP_REGISTRY__
+  imagePullSecrets: __AIRGAP_IMAGE_PULL_SECRET_NAME__
