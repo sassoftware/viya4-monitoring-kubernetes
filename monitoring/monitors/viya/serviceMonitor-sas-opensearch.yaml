@@ -39,4 +39,4 @@ spec:
       insecureSkipVerify: true
   selector:
     matchLabels:
-      app.kubernetes.io/name: sas-opendistro
+      opendistro.sas.com/service-name: sas-opendistro
