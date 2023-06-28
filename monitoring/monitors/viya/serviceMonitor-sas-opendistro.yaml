@@ -4,39 +4,13 @@ metadata:
   name: sas-opendistro
 spec:
   endpoints:
-  - basicAuth:
-      password:
-        key: password
-        name: sas-opendistro-sasadmin-secret
-      username:
-        key: username
-        name: sas-opendistro-sasadmin-secret
-    metricRelabelings:
+  - metricRelabelings:
     - action: replace
       sourceLabels:
       - node
       targetLabel: es_node
-    relabelings:
-    - sourceLabels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
-      action: replace
-      targetLabel: __metrics_path__
-      regex: (.+)
-    - sourceLabels: [__address__, __meta_kubernetes_service_annotation_io_port]
-      action: replace
-      targetLabel: __address__
-      regex: ([^:]+)(?::\d+)?;(\d+)
-      replacement: $1:$2
-    - sourceLabels: [__meta_kubernetes_pod_annotation_sas_com_tls_enabled_ports]
-      action: replace
-      regex: all|.*http.*
-      targetLabel: __scheme__
-      replacement: https
-    - sourceLabels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
-      action: replace
-      targetLabel: __scheme__
-      regex: (https?)
-    tlsConfig:
-      insecureSkipVerify: true
+    path: /metrics
+    port: http
   selector:
     matchLabels:
-      app.kubernetes.io/name: sas-opendistro
+      app.kubernetes.io/name: sas-opendistro-exporter
