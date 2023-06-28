@@ -324,13 +324,8 @@ case "$action" in
          add_notice '+------------------------------------------------------------------------------+'
          add_notice '|.............IMPORTANT NOTICE: REQUESTED PASSWORD REJECTED....................|'
          add_notice '+------------------------------------------------------------------------------+'
-<<<<<<< HEAD
          add_notice "The specified password failed the complexity requirements of OpenSearch."
          add_notice "The password [$password] was generated randomly for [$username]."
-=======
-         add_notice "The specified password was considered 'weak' and unacceptable."
-         add_notice "A randomly generated password [$password] was used for [$username] instead."
->>>>>>> 97c7eeb7b709751a781f0fd2bc020e2a4aae8b62
          add_notice "$pwdchangetxt to change the password later."
       fi
       add_notice " "
