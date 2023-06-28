@@ -11,6 +11,7 @@ spec:
       username:
         key: username
         name: sas-opendistro-sasadmin-secret
+    port: https
     metricRelabelings:
     - action: replace
       sourceLabels:
