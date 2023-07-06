@@ -1,6 +1,6 @@
 ingress:
   annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
   enabled: true
   ingressClassName: nginx
   hosts:
@@ -10,7 +10,3 @@ ingress:
           backend:
             serviceName: v4m-osd
             servicePort: 5601
-  tls:
-    - secretName: kibana-ingress-tls-secret
-      hosts:
-        - dashboards.logging.host.cluster.example.com

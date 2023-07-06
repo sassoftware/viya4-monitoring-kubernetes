@@ -3,17 +3,22 @@ grafana:
   service:
     type: ClusterIP
     nodePort: null
-  # Define host-based ingress
   ingress:
-    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     enabled: true
+    ingressClassName: nginx
+    tls:
+    - hosts:
+      - grafana.monitoring.host.cluster.example.com
+      secretName: grafana-ingress-tls-secret
     hosts:
     - grafana.monitoring.host.cluster.example.com
     path: /
   "grafana.ini":
     server:
       domain: monitoring.host.cluster.example.com
-      root_url: http://grafana.monitoring.host.cluster.example.com
+      root_url: https://grafana.monitoring.host.cluster.example.com
       serve_from_sub_path: false
 
 # Uncomment the following sections to expose Prometheus and/or
@@ -29,13 +34,19 @@ grafana:
 #     nodePort: null
 #   # Define host-based ingress
 #   ingress:
-#     ingressClassName: nginx
+#     annotations:
+#       nginx.ingress.kubernetes.io/backend-protocol: HTTPS
 #     enabled: true
+#     ingressClassName: nginx
+#     tls:
+#     - hosts:
+#       - prometheus.monitoring.host.cluster.example.com
+#       secretName: prometheus-ingress-tls-secret
 #     hosts:
 #     - prometheus.monitoring.host.cluster.example.com
 #   prometheusSpec:
 #     # routePrefix: /prometheus
-#     externalUrl: http://prometheus.monitoring.host.cluster.example.com
+#     externalUrl: https://prometheus.monitoring.host.cluster.example.com
 
 # alertmanager:
 #   # Disable default configuration of NodePort
@@ -44,10 +55,16 @@ grafana:
 #     nodePort: null
 #   # Define host-based ingress
 #   ingress:
-#     ingressClassName: nginx
+#     annotations:
+#       nginx.ingress.kubernetes.io/backend-protocol: HTTPS
 #     enabled: true
+#     ingressClassName: nginx
+#     tls:
+#     - hosts:
+#       - alertmanager.monitoring.host.cluster.example.com
+#       secretName: alertmanager-ingress-tls-secret
 #     hosts:
 #     - alertmanager.monitoring.host.cluster.example.com
 #   alertmanagerSpec:
 #     # routePrefix: /alertmanager
-#     externalUrl: http://alertmanager.monitoring.host.cluster.example.com
+#     externalUrl: https://alertmanager.monitoring.host.cluster.example.com

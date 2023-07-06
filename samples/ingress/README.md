@@ -1,93 +1,65 @@
 # Ingress
 
-## IMPORTANT NOTE: This Sample Is Deprecated
+This sample demonstrates how to configure Kubernetes ingress for accessing the monitoring
+web applications deployed as part of the SAS Viya Monitoring for Kubernetes solution.
 
-This sample should be used only for internal development and testing. It is
-highly recommended to use the [tls sample](/samples/tls), which provides a more
-secure HTTPS-based ingress configuration.
+This sample provides information for two different scenarios:
+* host-based ingress
+* path-based ingress
 
-**This sample will be removed at some point in the future.**
-**With our 1.2.15 release, TLS (for both in-cluster and for ingress) is enabled by default.**
-**However, this sample disables TLS.**
-## Overview
 
-This sample demonstrates how to deploy monitoring and logging components
-**WITH TLS DISABLED** and configured with ingress instead of node ports. You 
-can choose to use host-based or path-based routing. Host-based routing makes
-the monitoring applications (Grafana, OpenSearch Dashboards, etc.) available 
-by using different host names.  Path-based routing allows the use of a common
- host name with a different path per application.
+The difference between the two is in the URL that is used to access the applications:
 
-If you are using a cloud provider, you must configure ingress as node ports are
-usually disabled by default.
+* For host-based ingress, the application name is part of the host name itself (for example, https://grafana.host.cluster.example.com/).
+* For path-based ingress, the host name is fixed and the application name is appended as a path on the URL (for example, https://host.cluster.example.com/grafana).
+
 
 ## Using This Sample
 
-You customize your deployment by specifying values in `user.env` and `*.yaml`
-files. These files are stored in a local directory outside of your repository
-that is identified by the `USER_DIR` environment variable. See the
-[monitoring README](../../monitoring/README.md#mon_custom) or the
-[logging README](../../logging/README.md#log_custom) for information about the
-customization process.
+For information about the customization process, see 
+[Pre-deployment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1ajbblsxpcgl5n11t13wgtd4d7c.htm).
 
 The customization files in this sample provide a starting point for the
-customization files for a deployment that supports ingress instead of node ports.
+customization files required for a deployment that uses Kubernetes ingress
+for accessing the web applications.
 
-In order to use the values in this sample in the customization files for your
-deployment, copy the customization files from this sample to your local
-customization directory and modify the files further as needed.
+In order to use the values in this sample in the customization files for your 
+deployment, complete the following steps:
 
-- If you are using host-based routing, copy the files and sub-directories from the 
-`samples/ingress/host-based-ingress` sub-directory to the `$USER_DIR` directory.
-- If you are using path-based routing, copy the files and sub-directories from the 
-`samples/ingress/path-based-ingress` sub-directory to the `$USER_DIR` directory.
+1. Copy the customization files from either the `host-based-ingress`
+or `path-based-ingress` subdirectories to your local customization directory 
+(that is, your `USER_DIR`).
+2. In the configuration files, replace all instances of 
+   `host.cluster.example.com` with the appropriate host name for your 
+   environment.
+3. (Optional) Modify the files further as needed.
 
-If you also need to use values from another sample, manually copy the values to
-your customization files after you add the values in this sample.
+After you finish modifying the customization files, you may deploy
+SAS Viya Monitoring for Kubernetes.  See
+[Deploy](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1rhzwx0mcnnnun17q11v85bspyk.htm)
 
-After you finish modifying the configuration files, deploy monitoring and
-logging using the standard deployment scripts:
 
-```bash
-my_repository_path/monitoring/bin/deploy_monitoring_cluster.sh
-```
+## Notes on Customization Values
 
-```bash
-my_repository_path/logging/bin/deploy_logging.sh
-```
+- Edit the .yaml files within your `$USER_DIR/monitoring` and `$USER_DIR/monitoring`
+sub-directories and replace any sample host names with the appropriate host name 
+for your deployment. Specifically, you must replace `host.cluster.example.com` with 
+the ingress controller's endpoint.
 
-### Monitoring
+## Specifying TLS Certificates for use with Ingress
 
-The monitoring deployment process requires that the user response file be
-named `$USER_DIR/monitoring/user-values-prom-operator.yaml`.
+Starting with the 1.2.15 (19JUL23) release, SAS Viya Monitoring for Kubernetes is deployed with TLS enabled for
+intra-cluster communications.  As discussed in  [Understanding How Transport Layer Security (TLS) Is Used by SAS Viya Monitoring for Kubernetes](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=p0ssqw32dy9a44n1rokwojskla19.htm) 
+in the SAS Viya Monitoring for Kubernetes Help Center, the deployment scripts will automatically generate a set of
+self-signed TLS certificates for this purpose if you do not specify your own.
 
-Edit `$USER_DIR/monitoring/user-values-prom-operator.yaml` and replace
-all instances of `host.cluster.example.com` with host names that match your cluster.
+This sample assumes that access to the web applications should also be secured using
+TLS (i.e. the web-applications should be accessed via HTTPS rather than HTTP). This requires a second set of TLS 
+certificates (different than those used for intra-cluster communication).  However, these certificates are **not** 
+created automatically for you.  You will need to obtain these certificates and create Kubernetes secrets with specific
+names to make them available to SAS Viya Monitoring for Kubernetes.
+See [Enable TLS for Ingress](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=p0ssqw32dy9a44n1rokwojskla19.htm#p1itsqky7ypohbn1txujf7jmqajb).
 
-### Logging
+If you do not wish to require end-users to use HTTPS when accessing the web-applications, refer to 
+the [HTTP not HTTPS scenario](no-https/README.md) within this sample.
 
-The logging deployment process requires that the user response files be
-named `$USER_DIR/logging/user-values-opensearch.yaml` and `$USER_DIR/logging/user-values-osd.yaml`.
-
-Edit `$USER_DIR/logging/user-values-opensearch.yaml` and  `$USER_DIR/logging/user-values-osd.yaml` files
-and replace all instances of `host.cluster.example.com` with host names that match your cluster
-
-## Access the Applications
-
-If you deploy using host-based ingress, the applications are available at the
-following locations. Be sure to replace the host names with the host names in the 
-actual environment that you specified.
-
-- Grafana - `http://grafana.host.mycluster.example.com`
-- Prometheus - `http://prometheus.host.mycluster.example.com`
-- Alertmanager - `http://alertmanager.host.mycluster.example.com`
-- OpenSearch Dashboards - `http://dashboards.host.mycluster.example.com`
-
-If you deploy using path-based ingress, the applications are available at the
-following locations. Be sure to replace the host names with the host names in the 
-actual environment that you specified.
-
-- Grafana - `http://host.mycluster.example.com/grafana`
-- Prometheus - `http://host.mycluster.example.com/prometheus`
-- Alertmanager - `http://host.mycluster.example.com/alertmanager`
-- OpenSearch Dashboards - `http://host.mycluster.example.com/dashboards`
