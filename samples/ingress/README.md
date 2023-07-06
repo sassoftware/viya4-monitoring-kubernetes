@@ -60,3 +60,31 @@ created automatically for you.  You will need to obtain these certificates and c
 names to make them available to SAS Viya Monitoring for Kubernetes.
 See [Enable TLS for Ingress](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=p0ssqw32dy9a44n1rokwojskla19.htm#p1itsqky7ypohbn1txujf7jmqajb).
 
+## Access the Applications
+
+If you deploy using host-based ingress, the applications are available at the
+following locations. Be sure to replace the host names with the host names in the 
+actual environment that you specified.
+
+- Grafana - `https://grafana.host.mycluster.example.com`
+- OpenSearch Dashboards - `https://dashboards.host.mycluster.example.com`
+
+If you have chosen to make these applications available and configured host-based
+ingress, the applications are available at the following locations:
+- Prometheus - `https://prometheus.host.mycluster.example.com`
+- Alertmanager - `https://alertmanager.host.mycluster.example.com`
+- OpenSearch - `https://search.host.mycluster.example.com`
+
+
+If you deploy using path-based ingress, the applications are available at the
+following locations. Be sure to replace the host names with the host names in the 
+actual environment that you specified.
+
+- Grafana - `http://host.mycluster.example.com/grafana`
+- OpenSearch Dasbhoards - `http://host.mycluster.example.com/dashboards`
+
+If you have chosen to make these applications available and configured path-based
+ingress, the applications are available at the following locations:
+- Prometheus - `http://host.mycluster.example.com/prometheus`
+- Alertmanager - `http://host.mycluster.example.com/alertmanager`
+- OpenSearch - `http://host.mycluster.example.com/opensearch`
