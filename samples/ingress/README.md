@@ -60,6 +60,3 @@ created automatically for you.  You will need to obtain these certificates and c
 names to make them available to SAS Viya Monitoring for Kubernetes.
 See [Enable TLS for Ingress](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=p0ssqw32dy9a44n1rokwojskla19.htm#p1itsqky7ypohbn1txujf7jmqajb).
 
-If you do not wish to require end-users to use HTTPS when accessing the web-applications, refer to 
-the [HTTP not HTTPS scenario](no-https/README.md) within this sample.
-
