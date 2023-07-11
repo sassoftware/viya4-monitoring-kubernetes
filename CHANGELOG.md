@@ -1,5 +1,22 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+
+* **Overall**
+  * [SECURITY] TLS for intra-cluster communications is now enabled by default.
+  * [SECURITY] Use of HTTPS when accessing web applications now required by default.
+  * [CHANGE] The Ingress (samples/ingress) and TLS (samples/tls) samples have been revised
+to reflect new default behavior of enabling TLS for intra-cluster communications.
+
+* **Logging**
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from version 2.6.0 to 2.8.0
+  * [CHANGE]  OpenSearch 2.8.0 introduces enhanced password complexity requirements for user
+accounts.  Deployment and user creation scripts have been revised to generate a random password
+if a requested password fails to meet the new password complexity requirement and emit a WARNING
+message to the console output if this occurs.
+  * [UPGRADE] Fluent Bit upgraded from version 2.0.9 to 2.1.4
+  * [CHANGE]  Removed support for deprecated environment variable LOG_KB_TLS_ENABLE
+
 ## Version 1.2.14 (13JUN2023)
 
 * **Overall**
