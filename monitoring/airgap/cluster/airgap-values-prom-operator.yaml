@@ -1,0 +1,47 @@
+global:
+  imageRegistry: __AIRGAP_REGISTRY__
+  imagePullSecrets:
+    - __AIRGAP_IMAGE_PULL_SECRET_NAME__
+
+## Individually update image registries
+# prometheusOperator:
+#  image:
+#    registry: __AIRGAP_REGISTRY__
+#  prometheusConfigReloader:
+#    image:
+#      registry: __AIRGAP_REGISTRY__
+
+# kube-state-metrics:
+#  image:
+#    registry: __AIRGAP_REGISTRY__
+
+# =======================
+# Prometheus AlertManager
+# =======================
+# alertmanager:
+#  alertmanagerSpec:
+#    image:
+#      registry: __AIRGAP_REGISTRY__
+
+# Prometheus Node Exporter
+# https://github.com/prometheus/node_exporter
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
+# prometheus-node-exporter:
+#  image:
+#    registry: __AIRGAP_REGISTRY__
+
+# =======
+# Grafana
+# =======
+# https://github.com/grafana/helm-charts/tree/main/charts/grafana
+grafana:
+  image:
+    repository: __AIRGAP_REGISTRY__/grafana/grafana
+    pullSecrets:
+      - __AIRGAP_IMAGE_PULL_SECRET_NAME__
+  sidecar:
+    image:
+      repository: __AIRGAP_REGISTRY__/kiwigrid/k8s-sidecar
+  initChownData:
+    image:
+      repository: __AIRGAP_REGISTRY__/busybox

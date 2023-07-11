@@ -94,35 +94,32 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
 
     ## Check for air gap deployment
     AIRGAP_DEPLOYMENT=${AIRGAP_DEPLOYMENT:-false}
-    if [ $AIRGAP_DEPLOYMENT == true ] 
+    if [ $AIRGAP_DEPLOYMENT == true ]; then
       ## Check for AIRGAP_REGISTRY, if null/empty, error out.  Otherwise set and create HELM_URL_BASE.
       if [ -z $AIRGAP_REGISTRY ]; then
         log_error "AIRGAP_REGISTRY has not been set"
         log_error "Please provide the URL for the private image registry and try again"
         exit 1
       else
+        AIRGAP_IMAGE_PULL_SECRET_NAME=${AIRGAP_IMAGE_PULL_SECRET_NAME:-"v4m-image-pull-secret"}
         if [ -z "$AIRGAP_HELM_REPO"]; then
           log_debug "Separate AIRGAP_HELM_REPO value not provided"
           log_debug "Setting AIRGAP_HELM_REPO to oci://${AIRGAP_REGISTRY}/"
           AIRGAP_HELM_REPO="oci://${AIRGAP_REGISTRY}/"
-        fi
+        fi  
       fi
-
-      ## Check for an air gap secret name - if none, default to v4m-image-pull-secret
-      if [ -z $AIRGAP_IMAGE_PULL_SECRET ]; then
     fi
 
     ## The user will need to create the namespace and secret before running the deployment scripts.
     ## This function will produce an error if the secret is not found in the environment.
     function checkForAirgapSecretToNamespace {
       secretName="$1"
-      namespace="$2"
+      namespace="$2" 
       if [ -z "$(kubectl get secret -n $namespace | grep $secretName)" ]; then
         log_error "The secret, $secretName, was not detected"
         log_error "Please add the Image Pull secret to the $namespace namespace and run the deployment script again"
         exit 1
       fi
-
     }
 
     # set TLS Cert Generator (cert-manager|openssl)

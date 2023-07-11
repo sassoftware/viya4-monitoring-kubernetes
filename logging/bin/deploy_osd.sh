@@ -29,6 +29,33 @@ set -e
 #Fail if not using OpenSearch back-end
 require_opensearch
 
+## Check for air gap deployment
+if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+  
+  # Check for the image pull secret for the air gap environment
+  checkForAirgapSecretToNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+
+  # Copy template files to temp
+  airgapDir="$TMP_DIR/airgap"
+  mkdir -p $airgapDir
+  cp -R logging/airgap/airgap-opensearch-dashboards.yaml $airgapDir/
+
+  # Replace placeholders
+  log_debug "Replacing airgap variables for files in [$airgapDir]"
+  for f in $(find $airgapDir -name '*.yaml'); do
+    if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
+      sed -i '' "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
+      sed -i '' "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
+    else
+      sed -i "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
+      sed -i "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
+    fi
+  done
+  
+  airgapValuesFile=$airgapDir/airgap-opensearch-dashboards.yaml
+else
+  airgapValuesFile=$TMP_DIR/empty.yaml
+fi
 
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
@@ -143,6 +170,7 @@ helm $helmDebug upgrade --install v4m-osd \
     --values logging/opensearch/osd_helm_values.yaml \
     --values "$wnpValuesFile" \
     --values "$nodeport_yaml" \
+    --values "$airgapValuesFile" \
     --values "$OSD_USER_YAML" \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
     --values "$OSD_PATH_INGRESS_YAML" \

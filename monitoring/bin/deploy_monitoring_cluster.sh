@@ -48,15 +48,15 @@ if [ -z "$(kubectl get ns $MON_NS -o name 2>/dev/null)" ]; then
 fi
 
 ## Check for air gap deployment
-if [ "$AIRGAP_DEPLOYMENT" == "true" ]
+if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
   
   # Check for the image pull secret for the air gap environment
-  checkForAirgapSecretToNamespace $AIRGAP_IMAGE_PULL_SECRET_NAME $MON_NS
+  checkForAirgapSecretToNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
 
   # Copy template files to temp
-  airgapDir="$TMP_DIR/airgap"
+  airgapDir="$TMP_DIR/airgap/cluster"
   mkdir -p $airgapDir
-  cp -R monitoring/airgap/* $airgapDir/
+  cp -R monitoring/airgap/cluster/* $airgapDir/
 
   # Replace placeholders
   log_debug "Replacing airgap variables for files in [$airgapDir]"
@@ -70,10 +70,17 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]
     fi
   done
   
-  airgapValuesFile=$airgapDir/airgap-config.yaml
+  airgapValuesFile=$airgapDir/airgap-values-prom-operator.yaml
+
+  if [ "$TLS_ENABLE" == "true" ]; then
+    airgapTLSValuesFile=$airgapDir/airgap-values-prom-operator-tls.yaml
+  else
+    airgapTLSValuesFile=$TMP_DIR/empty.yaml
+  fi
 
 else
   airgapValuesFile=$TMP_DIR/empty.yaml
+  airgapTLSValuesFile=$TMP_DIR/empty.yaml
 fi
 
 set -e
@@ -101,12 +108,26 @@ if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
   log_verbose "Updating Prometheus Operator custom resource definitions"
   crds=( alertmanagerconfigs alertmanagers prometheuses prometheusrules podmonitors servicemonitors thanosrulers probes )
   for crd in "${crds[@]}"; do
-    ## Add conditional logic to change URL base (if air gap, point to USER_DIR) - otherweise use raw.github...
-    crdURL="https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_$crd.yaml"
-    if kubectl get crd $crd.monitoring.coreos.com 1>/dev/null 2>&1; then
-      kubectl replace -f $crdURL --insecure-skip-tls-verify
+    
+    ## Determine CRD URL - if in an airgap environment, look for them in USER_DIR.
+    if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+      crdURL=$USER_DIR/monitoring/prometheus-operator-crd/$PROM_OPERATOR_CRD_VERSION/monitoring.coreos.com_$crd.yaml
+
+      ## Fail if the CRDs could not be located.
+      if [ ! -f "$crdURL" ]; then
+        log_error "Unable to locate file: monitoring.coreos.com_$crd.yaml in"
+        log_error "$USER_DIR/monitoring/prometheus-operator-crd/$PROM_OPERATOR_CRD_VERSION directory"
+        log_error "Please make sure to provide all Prometheus Operator CRDs before running the deployment"
+        exit 1
+      fi
     else
-      kubectl create -f $crdURL --insecure-skip-tls-verify
+      crdURL="https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_$crd.yaml"
+    fi 
+
+    if kubectl get crd $crd.monitoring.coreos.com 1>/dev/null 2>&1; then
+      kubectl replace -f $crdURL
+    else
+      kubectl create -f $crdURL
     fi
   done
 else
@@ -193,10 +214,11 @@ fi
 KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-45.28.0}
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
-  -f $airgapValuesFile \
   -f monitoring/values-prom-operator.yaml \
+  -f $airgapValuesFile \
   -f $istioValuesFile \
   -f $tlsValuesFile \
+  -f $airgapTLSValuesFile \
   -f $tlsPromAlertingEndpointFile \
   -f $nodePortValuesFile \
   -f $wnpValuesFile \
@@ -211,7 +233,7 @@ helm $helmDebug upgrade --install $promRelease \
   --set grafana.adminPassword="$grafanaPwd" \
   --set prometheus.prometheusSpec.alertingEndpoints[0].namespace="$MON_NS" \
   --version $KUBE_PROM_STACK_CHART_VERSION \
-  prometheus-community/kube-prometheus-stack
+  ${AIRGAP_HELM_REPO}prometheus-community/kube-prometheus-stack
 
 sleep 2
 

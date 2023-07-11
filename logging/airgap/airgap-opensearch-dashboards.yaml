@@ -1,0 +1,5 @@
+image:
+  repository: "__AIRGAP_REGISTRY__/opensearchproject/opensearch-dashboards"
+
+imagePullSecrets:
+  - name: __AIRGAP_IMAGE_PULL_SECRET_NAME__

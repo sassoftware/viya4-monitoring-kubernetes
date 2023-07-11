@@ -60,7 +60,35 @@ set -e
 # Prometheus Pushgateway
 PUSHGATEWAY_ENABLED=${PUSHGATEWAY_ENABLED:-true}
 if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
-  PUSHGATEWAY_CHART_VERSION=${PUSHGATEWAY_CHART_VERSION:-2.1.6}
+  PUSHGATEWAY_CHART_VERSION=${PUSHGATEWAY_CHART_VERSION:-1.11.0}
+
+  ## Check for air gap deployment
+  if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+  
+    # Check for the image pull secret for the air gap environment
+    checkForAirgapSecretToNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$VIYA_NS"
+
+    # Copy template files to temp
+    airgapDir="$TMP_DIR/airgap/viya"
+    mkdir -p $airgapDir
+    cp -R monitoring/airgap/viya/airgap-values-pushgateway.yaml $airgapDir/airgap-values-pushgateway.yaml
+
+    # Replace placeholders
+    log_debug "Replacing airgap variables for files in [$airgapDir]"
+    for f in $(find $airgapDir -name '*.yaml'); do
+      if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
+        sed -i '' "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
+        sed -i '' "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
+      else
+        sed -i "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
+        sed -i "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
+      fi
+    done
+    airgapValuesFile=$airgapDir/airgap-values-pushgateway.yaml
+  else
+    airgapValuesFile=$TMP_DIR/empty.yaml
+  fi
+
   if helm3ReleaseExists prometheus-pushgateway $VIYA_NS; then
     kubectl delete deployment -n $VIYA_NS prometheus-pushgateway
     svcClusterIP=$(kubectl get svc -n $VIYA_NS prometheus-pushgateway -o 'jsonpath={.spec.clusterIP}')
@@ -72,9 +100,10 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
   --version $PUSHGATEWAY_CHART_VERSION \
   --set service.clusterIP=$svcClusterIP \
   -f monitoring/values-pushgateway.yaml \
+  -f $airgapValuesFile \
   -f $wnpValuesFile \
   -f $PUSHGATEWAY_USER_YAML \
-  prometheus-community/prometheus-pushgateway
+  ${AIRGAP_HELM_REPO}prometheus-community/prometheus-pushgateway
 fi
 
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then

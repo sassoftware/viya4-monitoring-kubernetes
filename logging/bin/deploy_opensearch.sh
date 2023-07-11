@@ -40,6 +40,34 @@ fi
 # Get/Set Helm Chart Version
 OPENSEARCH_HELM_CHART_VERSION=${OPENSEARCH_HELM_CHART_VERSION:-"2.11.0"}
 
+## Check for air gap deployment
+if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+  
+  # Check for the image pull secret for the air gap environment
+  checkForAirgapSecretToNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+
+  # Copy template files to temp
+  airgapDir="$TMP_DIR/airgap"
+  mkdir -p $airgapDir
+  cp -R logging/airgap/airgap-opensearch.yaml $airgapDir/
+
+  # Replace placeholders
+  log_debug "Replacing airgap variables for files in [$airgapDir]"
+  for f in $(find $airgapDir -name '*.yaml'); do
+    if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
+      sed -i '' "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
+      sed -i '' "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
+    else
+      sed -i "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
+      sed -i "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
+    fi
+  done
+  
+  airgapValuesFile=$airgapDir/airgap-opensearch.yaml
+else
+  airgapValuesFile=$TMP_DIR/empty.yaml
+fi
+
 # get credentials
 export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD}
 export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD}
@@ -133,8 +161,10 @@ if [ "$HELM_DEBUG" == "true" ]; then
 fi
 
 helmRepoAdd opensearch  https://opensearch-project.github.io/helm-charts
-log_verbose "Updating Helm repositories"
-helm repo update
+
+## Commenting out as it might be redundant code
+# log_verbose "Updating Helm repositories"
+# helm repo update
 
 # Check for existing OpenSearch helm release
 if [ "$(helm -n $LOG_NS list --filter 'opensearch' -q)" == "opensearch" ]; then
@@ -328,6 +358,7 @@ if [ "$deploy_temp_masters" == "true" ]; then
        --namespace $LOG_NS \
        --values logging/opensearch/opensearch_helm_values.yaml \
        --values "$wnpValuesFile" \
+       --values "$airgapValuesFile" \
        --values "$ES_OPEN_USER_YAML" \
        --values "$OPENSHIFT_SPECIFIC_YAML" \
        --set nodeGroup=temp_masters  \

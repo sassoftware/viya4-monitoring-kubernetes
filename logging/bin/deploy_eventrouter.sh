@@ -10,6 +10,21 @@ this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
+eventrouterRegistry="gcr.io"
+eventrouterPullSecret="null"
+
+## Check for air gap deployment
+if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+  
+  # Check for the image pull secret for the air gap environment
+  checkForAirgapSecretToNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+
+  eventrouterRegistry=$AIRGAP_REGISTRY
+  eventrouterPullSecret=$AIRGAP_IMAGE_PULL_SECRET_NAME
+fi
+
+echo "Event Router Registry: $eventrouterRegistry"
+
 # Copy template files to temp
 logDir=$TMP_DIR/$LOG_NS
 mkdir -p $logDir
@@ -19,8 +34,13 @@ cp -R logging/node-placement/eventrouter-wnp.yaml $logDir/eventrouter-wnp.yaml
 # Replace placeholders
 log_debug "Replacing logging namespace for files in [$logDir]"
   if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
+    sed -i '' "s/__EVENTROUTER_REGISTRY__/$eventrouterRegistry/g" $logDir/eventrouter*.yaml
+    sed -i '' "s/__PULL_SECRET_NAME__/$eventrouterPullSecret/g" $logDir/eventrouter*.yaml
     sed -i '' "s/__LOG_NS__/$LOG_NS/g" $logDir/eventrouter*.yaml
+    
   else
+    sed -i "s/__EVENTROUTER_REGISTRY__/$eventrouterRegistry/g" $logDir/eventrouter*.yaml
+    sed -i "s/__PULL_SECRET_NAME__/$eventrouterPullSecret/g" $logDir/eventrouter*.yaml
     sed -i "s/__LOG_NS__/$LOG_NS/g" $logDir/eventrouter*.yaml
   fi
 

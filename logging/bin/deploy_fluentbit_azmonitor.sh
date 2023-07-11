@@ -38,6 +38,34 @@ fi
 
 log_info "Deploying Fluent Bit (Azure Monitor)"
 
+## Check for air gap deployment
+if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+  
+  # Check for the image pull secret for the air gap environment
+  checkForAirgapSecretToNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+
+  # Copy template files to temp
+  airgapDir="$TMP_DIR/airgap"
+  mkdir -p $airgapDir
+  cp -R logging/airgap/airgap-fluent-bit.yaml $airgapDir/
+
+  # Replace placeholders
+  log_debug "Replacing airgap variables for files in [$airgapDir]"
+  for f in $(find $airgapDir -name '*.yaml'); do
+    if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
+      sed -i '' "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
+      sed -i '' "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
+    else
+      sed -i "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
+      sed -i "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
+    fi
+  done
+  
+  airgapValuesFile=$airgapDir/airgap-fluent-bit.yaml
+else
+  airgapValuesFile=$TMP_DIR/empty.yaml
+fi
+
 # Fluent Bit user customizations
 FB_AZMONITOR_USER_YAML="${FB_AZMONITOR_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-azmonitor.yaml}"
 if [ ! -f "$FB_AZMONITOR_USER_YAML" ]; then
@@ -140,6 +168,7 @@ FLUENTBIT_HELM_CHART_VERSION=${FLUENTBIT_HELM_CHART_VERSION:-"0.24.0"}
 helm $helmDebug upgrade --install v4m-fbaz  --namespace $LOG_NS  \
   --version $FLUENTBIT_HELM_CHART_VERSION \
   --values logging/fb/fluent-bit_helm_values_azmonitor.yaml \
+  --values $airgapValuesFile \
   --values $FB_AZMONITOR_USER_YAML \
   --set fullnameOverride=v4m-fbaz fluent/fluent-bit
 
