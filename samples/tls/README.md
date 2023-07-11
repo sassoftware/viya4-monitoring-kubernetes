@@ -1,12 +1,11 @@
-# TLS-Enabling SAS Viya Monitoring for Kubernetes
+# Enabling TLS for SAS Viya Monitoring for Kubernetes
 
-With the 1.2.15 (18JUL23) release, the components of SAS Viya Monitoring for Kubernetes 
-are deployed with TLS *enabled by default*.  Therefore, there are no additional steps
-required and this sample is no longer necessary.
+As of release 1.2.15 (18JUL23), the components of SAS Viya Monitoring for Kubernetes 
+are deployed with TLS *enabled by default*.  Therefore, no additional steps are required and this sample is no longer necessary.
+ 
+For information about how to configure access via Kubernetes Ingress to the SAS Viya 
+Monitoring for Kubernetes web applications, see the [Ingress sample](../ingress/README.md).
 
-Refer to the Ingress sample (../ingress/README.md) for information about
-configuring access to the various monitoring web applications via Kubernetes ingress.
-
->***IMPORTANT NOTE: This Sample is Deprecated***
+>***IMPORTANT NOTE: This sample is deprecated.***
 
 This sample will be removed at some point in the future.
