@@ -4,7 +4,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.23
+       Set  fb_configMap_version 0.2.24k
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -100,6 +100,7 @@ data:
        Copy           labels_role    temp_role
        Copy           labels_pgo-pg-database temp_pgo-pg-database
        # following used for 'standard' k8s labels
+       Copy           labels_application  temp_application
        Copy           labels_name temp_labels_name
        Copy           labels_app.kubernetes.io/name       temp_k8sapp_name
        Copy           labels_app.kubernetes.io/instance   temp_k8sapp_instance
@@ -715,6 +716,30 @@ data:
        Condition       Key_value_matches  flagged4parsing s2operator
        Rename          source      PROPS__source
        Rename          component   PROPS__component
+
+    [FILTER]
+       #
+       # Zalando (Postgres)
+       #
+       Alias           flag_zpg
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_matches  temp_application spilo
+       Copy            message            zpg_message
+       Rename          message            unparsed_message
+       Add             flagged4parsing    zpg
+    [FILTER]
+       Alias           parse_zpg
+       Name            parser
+       Match           kube.*
+       Key_name        zpg_message
+       Parser          crunchy_database
+       Parser          crunchy_stderr2
+       Parser          zpg3
+       Parser          zpgboot
+       Reserve_Data    On
+
+
     [FILTER]
        #
        # Try some misc. parsers for unparsed messages (stderr)
