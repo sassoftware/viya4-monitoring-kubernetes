@@ -8,6 +8,7 @@
   * [CHANGE] The [Ingress ](samples/ingress) and [TLS ](samples/tls) samples have been revised
 to reflect new default behavior of enabling TLS for intra-cluster communications.
 
+
 * **Logging**
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from version 2.6.0 to 2.8.0
   * [CHANGE]  OpenSearch 2.8.0 introduces enhanced password complexity requirements for user
