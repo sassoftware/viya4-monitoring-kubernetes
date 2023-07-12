@@ -134,7 +134,7 @@ kubectl -n $LOG_NS create configmap fbaz-env-vars \
 kubectl -n $LOG_NS label configmap fbaz-env-vars   managed-by=v4m-es-script
 
 #Pin to a specific Helm chart version
-FLUENTBIT_HELM_CHART_VERSION=${FLUENTBIT_HELM_CHART_VERSION:-"0.24.0"}
+FLUENTBIT_HELM_CHART_VERSION=${FLUENTBIT_HELM_CHART_VERSION:-"0.30.4"}
 
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install v4m-fbaz  --namespace $LOG_NS  \

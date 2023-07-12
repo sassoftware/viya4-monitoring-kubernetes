@@ -270,9 +270,9 @@ set +e
 get_ingress_ports
 
 # get URLs for Grafana, Prometheus and AlertManager
-gf_url=$(get_service_url $MON_NS v4m-grafana  "false")
-# pr_url=$(get_url $MON_NS v4m-prometheus  "false")
-# am_url=$(get_url $MON_NS v4m-alertmanager  "false")
+gf_url=$(get_service_url $MON_NS v4m-grafana  "$TLS_ENABLE")
+# pr_url=$(get_url $MON_NS v4m-prometheus  "$TLS_ENABLE")
+# am_url=$(get_url $MON_NS v4m-alertmanager  "$TLS_ENABLE")
 set -e
 
 # If a deployment with the old name exists, remove it first

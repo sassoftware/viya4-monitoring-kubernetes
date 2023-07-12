@@ -1,2 +1,2 @@
-securityContext:
-    enabled: false
+podSecurityContext:
+  runAsUser: null

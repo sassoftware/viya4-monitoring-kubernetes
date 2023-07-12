@@ -27,12 +27,11 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
 
     export LOG_NS="${LOG_NS:-logging}"
 
-    #if TLS (w/in cluster; for all monitoring components) is requested, require TLS into Kibana pod, too
-    # DEPRECATION: use of the LOG_KB_TLS_ENABLE env var has been deprecated with release 1.1.14 (14FEB22)
-    #              with support removed completely in a subsequent release
-    export TLS_ENABLE="${TLS_ENABLE:-false}"
+    #if TLS (w/in cluster; for all monitoring components) is requested, require TLS into OSD pod, too
+    export TLS_ENABLE="${TLS_ENABLE:-true}"
     log_debug "logging/common.sh (incoming): TLS_ENABLE=$TLS_ENABLE"
-    export LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-$TLS_ENABLE}
+
+    export OSD_TLS_ENABLE=${TLS_ENABLE:-true}
     # TLS is required for logging components so hard-code to 'true'
     export TLS_ENABLE="true"
 

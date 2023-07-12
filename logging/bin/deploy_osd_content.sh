@@ -33,19 +33,6 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   exit 1
 fi
 
-# Require TLS into OSD?
-LOG_KB_TLS_ENABLE=${LOG_KB_TLS_ENABLE:-false}
-
-if [ "$LOG_KB_TLS_ENABLE" == "true" ]; then
-   # w/TLS: use HTTPS in curl commands
-   KB_CURL_PROTOCOL=https
-   log_debug "TLS enabled for OpenSearch Dashboards"
-else
-   # w/o TLS: use HTTP in curl commands
-   KB_CURL_PROTOCOL=http
-   log_debug "TLS not enabled for OpenSearch Dashboards"
-fi
-
 # get credentials
 get_credentials_from_secret admin
 rc=$?

@@ -16,7 +16,7 @@ if [ "$SAS_MONITORING_COMMON_SOURCED" = "" ]; then
   fi
 
   export MON_NS="${MON_NS:-monitoring}"
-  export TLS_ENABLE="${MON_TLS_ENABLE:-${TLS_ENABLE:-false}}"
+  export TLS_ENABLE="${MON_TLS_ENABLE:-${TLS_ENABLE:-true}}"
   export V4M_NS=$MON_NS
 
   source bin/version-include.sh

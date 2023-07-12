@@ -1,12 +1,12 @@
-# Chart: https://github.com/helm/charts/tree/master/stable/fluent-bit
-# Default values: https://github.com/helm/charts/blob/master/stable/fluent-bit/values.yaml
+# Chart:  https://github.com/fluent/helm-charts/blob/fluent-bit-0.30.4/charts/fluent-bit
+# Default values: https://github.com/fluent/helm-charts/blob/fluent-bit-0.30.4/charts/fluent-bit/values.yaml
 
 # NOTE: Customizations intended to alter the contents of the Fluent Bit Configuration Files
 #       MUST be made by altering contents of the fluent-bit_config.configmap_azmonitor.yaml file.
 #       Use this file to customize other Helm chart settings.
 
 #image:
-#   tag: 1.6.10
+#   tag: 2.1.4
 
 #env:
 # IMPORTANT: Do NOT set the values for the environment variables

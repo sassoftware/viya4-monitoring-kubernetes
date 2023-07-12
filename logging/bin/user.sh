@@ -194,7 +194,7 @@ case "$action" in
       if [ "$cluster" == "true" ]; then
          if [ "$grafanads_user" == "true" ]; then
             berole="V4MCLUSTER_ADMIN_grafana_dsusers"
-            pwdchangetxt="Do NOT use Kibana or API, MUST re-run Grafana datasource creation script"
+            pwdchangetxt="Do NOT use OpenSearch Dashboards or API, MUST re-run Grafana datasource creation script"
          else
             berole="V4MCLUSTER_ADMIN_kibana_users"
          fi
@@ -220,7 +220,7 @@ case "$action" in
 
          if [ "$grafanads_user" == "true" ]; then
             berole="${nst}_grafana_dsusers"
-            pwdchangetxt="Do NOT use Kibana or API, MUST re-run Grafana datasource creation script"
+            pwdchangetxt="Do NOT use OpenSearch Dashboards or API, MUST re-run Grafana datasource creation script"
          else
             berole="${nst}_kibana_users"
 
@@ -261,35 +261,75 @@ case "$action" in
       fi
 
       if [ -z "$pwdchangetxt" ]; then
-         pwdchangetxt="Use Kibana or API"
+         pwdchangetxt="Use OpenSearch Dashboards or API"
       fi
 
-      cp logging/opensearch/rbac/user.json $TMP_DIR/user.json
-      # Replace PLACEHOLDERS
-      sed -i'.bak' "s/xxBEROLExx/$berole/g"             $TMP_DIR/user.json      # (NAMESPACE|NAMESPACE_TENANT|'V4MCLUSTER_ADMIN') + '_kibana_users'
-      sed -i'.bak' "s/xxNSCONSTRAINTxx/$nsconstraint/g" $TMP_DIR/user.json      # NAMESPACE|'-none-'
-      sed -i'.bak' "s/xxTCONSTRAINTxx/$tconstraint/g"   $TMP_DIR/user.json      # TENANT|'-none-'
-      sed -i'.bak' "s/xxPASSWORDxx/$password/g"         $TMP_DIR/user.json      # PASSWORD
-      sed -i'.bak' "s/xxCREATEDBYxx/$this_script/g"     $TMP_DIR/user.json      # CREATEDBY
-      sed -i'.bak' "s/xxPWDCHANGEXX/$pwdchangetxt/g"    $TMP_DIR/user.json      # PASSWORD CHANGE MECHANISM (Kibana|change_internal_password.sh script)
-      sed -i'.bak' "s/xxDATETIMExx/$(date)/g"           $TMP_DIR/user.json      # DATE
+      exitnow="false"
+      weakpass="false"
+      loopcounter=1
+      until [ "$exitnow" == "true" ]
+      do
 
-      log_debug "Contents of user.json template file after substitutions: \n $(cat $TMP_DIR/user.json)"
+         cp logging/opensearch/rbac/user.json $TMP_DIR/user.json
+         # Replace PLACEHOLDERS
+         sed -i'.bak' "s/xxBEROLExx/$berole/g"             $TMP_DIR/user.json      # (NAMESPACE|NAMESPACE_TENANT|'V4MCLUSTER_ADMIN') + '_kibana_users'
+         sed -i'.bak' "s/xxNSCONSTRAINTxx/$nsconstraint/g" $TMP_DIR/user.json      # NAMESPACE|'-none-'
+         sed -i'.bak' "s/xxTCONSTRAINTxx/$tconstraint/g"   $TMP_DIR/user.json      # TENANT|'-none-'
+         sed -i'.bak' "s/xxPASSWORDxx/$password/g"         $TMP_DIR/user.json      # PASSWORD
+         sed -i'.bak' "s/xxCREATEDBYxx/$this_script/g"     $TMP_DIR/user.json      # CREATEDBY
+         sed -i'.bak' "s/xxPWDCHANGEXX/$pwdchangetxt/g"    $TMP_DIR/user.json      # PASSWORD CHANGE MECHANISM (OSD|change_internal_password.sh script)
+         sed -i'.bak' "s/xxDATETIMExx/$(date)/g"           $TMP_DIR/user.json      # DATE
+
+         log_debug "Contents of user.json template file after substitutions: \n $(cat $TMP_DIR/user.json)"
 
 
-      # Create user
-      response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/internalusers/$username"  -H 'Content-Type: application/json' -d @$TMP_DIR/user.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+         #remove any existing instance of this file
+         rm -f $TMP_DIR/user_create.txt
+
+         # Create user
+         response=$(curl -s -o $TMP_DIR/user_create.txt -w "%{http_code}" -XPUT "$sec_api_url/internalusers/$username"  -H 'Content-Type: application/json' -d @$TMP_DIR/user.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+
+         if grep -i 'weak password' $TMP_DIR/user_create.txt >/dev/null 2>&1; then
+            log_warn "The password specified for user [$username] did not meet complexity requirements of OpenSearch."
+            log_warn "A randomly generated password will be used instead."
+            log_warn "Check notices below for additional details."
+            weakpassword="true"
+            password="$(randomPassword)"
+            exitnow="false"
+         else
+            exitnow="true"
+         fi
+
+         ((loopcounter++))
+
+         if [[ $loopcounter -gt 3 ]]; then
+            exitnow='true'
+            log_debug "Weak password check looped too many times [$loopcounter]"
+         else
+            log_debug "Weak password check loop [$loopcounter]"
+         fi
+      done
 
       if [[ $response != 2* ]]; then
          log_error "There was an issue creating the user [$username]. [$response]"
          exit 1
       else
-      log_info "User [$username] created. [$response]"
+         log_info "User [$username] created. [$response]"
       fi
       log_notice "User [$username] added to internal user database [$(date)]"
       add_notice "                                                          "
-      add_notice "   User [$username] added to internal user database.      "
-      add_notice "                                                          "
+      add_notice "User [$username] added to internal user database. "
+
+      if [ "$weakpassword" == "true" ]; then
+         add_notice '+------------------------------------------------------------------------------+'
+         add_notice '|.............IMPORTANT NOTICE: REQUESTED PASSWORD REJECTED....................|'
+         add_notice '+------------------------------------------------------------------------------+'
+         add_notice "The specified password failed the complexity requirements of OpenSearch."
+         add_notice "The password [$password] was generated randomly for [$username]."
+         add_notice "$pwdchangetxt to change the password later."
+      fi
+      add_notice " "
+
       ;;
    DELETE)
       if [ -z "$username" ]; then

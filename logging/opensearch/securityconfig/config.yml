@@ -65,9 +65,11 @@ config:
     # Set filtered_alias_mode to 'nowarn' to allow more than 2 filtered aliases per index silently
     #filtered_alias_mode: warn
     do_not_fail_on_forbidden: true
-    #kibana:
-    # Kibana multitenancy
-    #multitenancy_enabled: true
+    kibana:
+    # Kibana multitenancy 
+      multitenancy_enabled: true
+      # disable private tenant
+      private_tenant_enabled: false
     #server_username: kibanaserver
     #index: '.kibana'
     http:

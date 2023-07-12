@@ -38,7 +38,7 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
 fi
 
 # Get/Set Helm Chart Version
-OPENSEARCH_HELM_CHART_VERSION=${OPENSEARCH_HELM_CHART_VERSION:-"2.11.0"}
+OPENSEARCH_HELM_CHART_VERSION=${OPENSEARCH_HELM_CHART_VERSION:-"2.13.0"}
 
 # get credentials
 export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD}
@@ -250,7 +250,7 @@ if [ -z "$(kubectl -n $LOG_NS get secret opensearch-securityconfig -o name 2>/de
    kubectl -n $LOG_NS delete secret opensearch-securityconfig --ignore-not-found
 
    #Copy OpenSearch Security Configuration files
-   mkdir $TMP_DIR/opensearch/securityconfig -p
+   mkdir -p $TMP_DIR/opensearch/securityconfig
    cp logging/opensearch/securityconfig/*.yml $TMP_DIR/opensearch/securityconfig
    #Overlay OpenSearch security configuration files from USER_DIR (if exists)
    if [ -d "$USER_DIR/logging/opensearch/securityconfig" ]; then

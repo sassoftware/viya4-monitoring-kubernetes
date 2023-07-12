@@ -11,6 +11,9 @@ this_script=`basename "$0"`
 
 log_debug "Script [$this_script] has started [$(date)]"
 
+#Set TLS_ENABLE to 'true' if not explictly set already
+TLS_ENABLE=${TLS_ENABLE:-true}
+
 set +e
 
 # call function to get HTTP/HTTPS ports from ingress controller
