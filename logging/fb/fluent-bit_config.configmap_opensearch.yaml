@@ -956,6 +956,31 @@ data:
        DB               /var/log/sas_viya_flb.db
        DB.locking       On
        storage.type     filesystem
+    [INPUT]
+       name             opentelemetry
+       listen           0.0.0.0
+       port             4318
+       tag              otel.otel
+    # [INPUT]
+    #    Name                 event_type
+    #    Type                 traces
+    #    Tag                  test_traces
+    [OUTPUT]
+       Name stdout
+       Match test_traces
+    [OUTPUT]
+       Name opentelemetry
+       Host  v4m-tempo.monitoring
+       Port  4318
+       Match test_traces
+       # Metrics_uri  /api/v2/otlp/v1/metrics
+       Traces_uri  /v1/traces
+       # Logs_uri   /api/v2/otlp/v1/logs
+       Log_response_payload True
+       Tls Off
+       Tls.verify Off
+       # header Authorization Api-Token DT_TOKEN_TO_REPLACE
+       # header Content-type application/x-protobuf
     [OUTPUT]
        Name  opensearch
        Alias opensearch_logs

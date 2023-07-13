@@ -51,3 +51,19 @@
 #  name: path2dockercontainers
 
 # ***** extraVolumeMounts/extraVolumes - END *****
+
+# add ports here
+#- containerPort: 4318
+  # name: otlphttp
+  # protocol: TCP
+service:
+  - name: otlphttp
+    protocol: TCP
+    port: 4318
+    targetPort: 4318
+
+extraPorts:
+  - port: 4318
+    containerPort: 4318
+    protocol: TCP
+    name: otlphttp

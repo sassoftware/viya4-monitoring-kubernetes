@@ -188,6 +188,8 @@ grafana:
   "grafana.ini":
     analytics:
       check_for_updates: false
+    feature_toggles:
+      enable: tempoSearch tempoBackendSearch
     # dashboards:
     #   default_home_dashboard_path: 
     log:
