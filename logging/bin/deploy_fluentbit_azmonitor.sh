@@ -40,28 +40,13 @@ log_info "Deploying Fluent Bit (Azure Monitor)"
 
 ## Check for air gap deployment
 if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  
+  source bin/airgap-include.sh
+
   # Check for the image pull secret for the air gap environment
-  checkForAirgapSecretToNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-
-  # Copy template files to temp
-  airgapDir="$TMP_DIR/airgap"
-  mkdir -p $airgapDir
-  cp -R logging/airgap/airgap-fluent-bit.yaml $airgapDir/
-
-  # Replace placeholders
-  log_debug "Replacing airgap variables for files in [$airgapDir]"
-  for f in $(find $airgapDir -name '*.yaml'); do
-    if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-      sed -i '' "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
-      sed -i '' "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
-    else
-      sed -i "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
-      sed -i "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
-    fi
-  done
+  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+  replaceAirgapValuesInFiles "logging/airgap/airgap-fluent-bit.yaml"
   
-  airgapValuesFile=$airgapDir/airgap-fluent-bit.yaml
+  airgapValuesFile=$updatedAirgapValuesFile 
 else
   airgapValuesFile=$TMP_DIR/empty.yaml
 fi
@@ -170,7 +155,8 @@ helm $helmDebug upgrade --install v4m-fbaz  --namespace $LOG_NS  \
   --values logging/fb/fluent-bit_helm_values_azmonitor.yaml \
   --values $airgapValuesFile \
   --values $FB_AZMONITOR_USER_YAML \
-  --set fullnameOverride=v4m-fbaz fluent/fluent-bit
+  --set fullnameOverride=v4m-fbaz \
+  ${AIRGAP_HELM_REPO}fluent/fluent-bit
 
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
 disable_sa_token_automount $LOG_NS v4m-fbaz

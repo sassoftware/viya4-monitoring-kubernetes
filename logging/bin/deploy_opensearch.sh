@@ -41,29 +41,15 @@ fi
 OPENSEARCH_HELM_CHART_VERSION=${OPENSEARCH_HELM_CHART_VERSION:-"2.11.0"}
 
 ## Check for air gap deployment
+## Check for air gap deployment
 if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  
-  # Check for the image pull secret for the air gap environment
-  checkForAirgapSecretToNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+  source bin/airgap-include.sh
 
-  # Copy template files to temp
-  airgapDir="$TMP_DIR/airgap"
-  mkdir -p $airgapDir
-  cp -R logging/airgap/airgap-opensearch.yaml $airgapDir/
+  # Check for the image pull secret for the air gap environment and replace placeholders
+  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+  replaceAirgapValuesInFiles "logging/airgap/airgap-opensearch.yaml"
 
-  # Replace placeholders
-  log_debug "Replacing airgap variables for files in [$airgapDir]"
-  for f in $(find $airgapDir -name '*.yaml'); do
-    if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-      sed -i '' "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
-      sed -i '' "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
-    else
-      sed -i "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
-      sed -i "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
-    fi
-  done
-  
-  airgapValuesFile=$airgapDir/airgap-opensearch.yaml
+  airgapValuesFile=$updatedAirgapValuesFile
 else
   airgapValuesFile=$TMP_DIR/empty.yaml
 fi
@@ -345,7 +331,8 @@ helm $helmDebug upgrade --install opensearch \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
     --set nodeGroup=primary  \
     --set masterService=v4m-search \
-    --set fullnameOverride=v4m-search opensearch/opensearch
+    --set fullnameOverride=v4m-search \
+    ${AIRGAP_HELM_REPO}opensearch/opensearch
 
 # ODFE => OpenSearch Migration
 if [ "$deploy_temp_masters" == "true" ]; then
@@ -367,7 +354,8 @@ if [ "$deploy_temp_masters" == "true" ]; then
        --set roles={master} \
        --set rbac.create=false \
        --set masterService=v4m-search \
-       --set fullnameOverride=v4m-master opensearch/opensearch
+       --set fullnameOverride=v4m-master \
+       ${AIRGAP_HELM_REPO}opensearch/opensearch
 fi
 
 

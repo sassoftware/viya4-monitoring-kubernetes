@@ -17,7 +17,7 @@ eventrouterPullSecret="null"
 if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
   
   # Check for the image pull secret for the air gap environment
-  checkForAirgapSecretToNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
 
   eventrouterRegistry=$AIRGAP_REGISTRY
   eventrouterPullSecret=$AIRGAP_IMAGE_PULL_SECRET_NAME

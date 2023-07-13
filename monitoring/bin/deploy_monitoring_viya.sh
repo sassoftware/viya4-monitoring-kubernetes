@@ -66,7 +66,7 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
   if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
   
     # Check for the image pull secret for the air gap environment
-    checkForAirgapSecretToNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$VIYA_NS"
+    checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$VIYA_NS"
 
     # Copy template files to temp
     airgapDir="$TMP_DIR/airgap/viya"

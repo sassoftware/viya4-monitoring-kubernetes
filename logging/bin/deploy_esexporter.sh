@@ -67,28 +67,13 @@ log_debug "Deploying Elasticsearch Exporter"
 
 ## Check for air gap deployment
 if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  
-  # Check for the image pull secret for the air gap environment
-  checkForAirgapSecretToNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+  source bin/airgap-include.sh
 
-  # Copy template files to temp
-  airgapDir="$TMP_DIR/airgap"
-  mkdir -p $airgapDir
-  cp -R logging/airgap/airgap-values-es-exporter.yaml $airgapDir/
+  # Check for the image pull secret for the air gap environment and replace placeholders
+  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+  replaceAirgapValuesInFiles "logging/airgap/airgap-values-es-exporter.yaml"
 
-  # Replace placeholders
-  log_debug "Replacing airgap variables for files in [$airgapDir]"
-  for f in $(find $airgapDir -name '*.yaml'); do
-    if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-      sed -i '' "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
-      sed -i '' "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
-    else
-      sed -i "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
-      sed -i "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
-    fi
-  done
-  
-  airgapValuesFile=$airgapDir/airgap-values-es-exporter.yaml
+  airgapValuesFile=$updatedAirgapValuesFile
 else
   airgapValuesFile=$TMP_DIR/empty.yaml
 fi
@@ -137,7 +122,7 @@ helm $helmDebug upgrade --install es-exporter \
  -f $openshiftValuesFile \
  -f $airgapValuesFile \
  -f $ES_OPEN_EXPORTER_USER_YAML \
- prometheus-community/prometheus-elasticsearch-exporter \
+ ${AIRGAP_HELM_REPO}prometheus-community/prometheus-elasticsearch-exporter \
  --set fullnameOverride=v4m-es-exporter
 
 log_info "Elasticsearch metric exporter has been deployed"

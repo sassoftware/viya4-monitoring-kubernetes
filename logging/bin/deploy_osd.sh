@@ -31,28 +31,17 @@ require_opensearch
 
 ## Check for air gap deployment
 if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  
+  source bin/airgap-include.sh
+
   # Check for the image pull secret for the air gap environment
-  checkForAirgapSecretToNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
 
-  # Copy template files to temp
-  airgapDir="$TMP_DIR/airgap"
-  mkdir -p $airgapDir
-  cp -R logging/airgap/airgap-opensearch-dashboards.yaml $airgapDir/
+  # Check for the image pull secret for the air gap environment and replace placeholders
+  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+  replaceAirgapValuesInFiles "logging/airgap/airgap-opensearch-dashboards.yaml"
 
-  # Replace placeholders
-  log_debug "Replacing airgap variables for files in [$airgapDir]"
-  for f in $(find $airgapDir -name '*.yaml'); do
-    if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-      sed -i '' "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
-      sed -i '' "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
-    else
-      sed -i "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
-      sed -i "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
-    fi
-  done
-  
-  airgapValuesFile=$airgapDir/airgap-opensearch-dashboards.yaml
+  airgapValuesFile=$updatedAirgapValuesFile
+
 else
   airgapValuesFile=$TMP_DIR/empty.yaml
 fi
@@ -96,9 +85,6 @@ if [ "$HELM_DEBUG" == "true" ]; then
 fi
 
 helmRepoAdd opensearch  https://opensearch-project.github.io/helm-charts
-log_verbose "Updating Helm repositories"
-helm repo update
-
 
 KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-false}
 
@@ -174,7 +160,8 @@ helm $helmDebug upgrade --install v4m-osd \
     --values "$OSD_USER_YAML" \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
     --values "$OSD_PATH_INGRESS_YAML" \
-    --set fullnameOverride=v4m-osd opensearch/opensearch-dashboards
+    --set fullnameOverride=v4m-osd \
+    ${AIRGAP_HELM_REPO}opensearch/opensearch-dashboards
 
 log_info "OpenSearch Dashboards has been deployed"
 
