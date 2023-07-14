@@ -23,7 +23,7 @@ grafana:
 
 # This sample does NOT expose Prometheus and Alertmanager via Ingress by default.
 # However, you can expose one or both of these web applications
-# by changing the ingress.enabled key to from 'false' to 'true'
+# by changing the 'ingress.enabled' key from 'false' to 'true'
 # in the 'prometheus' and/or 'alertmanager' stanza below
 
 # Note that Prometheus and Alertmanager
@@ -40,7 +40,7 @@ prometheus:
   ingress:
     # change the following value to 'true'
     # to make Prometheus accessible via ingress
-    enabled: true
+    enabled: false
     annotations:
       nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     ingressClassName: nginx
@@ -63,7 +63,7 @@ alertmanager:
   ingress:
     # change the following value to 'true'
     # to make Alertmanager accessible via ingress
-    enabled: true
+    enabled: false
     annotations:
       nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     ingressClassName: nginx
