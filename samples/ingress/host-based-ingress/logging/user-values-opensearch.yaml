@@ -13,8 +13,8 @@ ingress:
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
   path: /
   hosts:
-    - search.logging.host.cluster.example.com
+    - search.host.cluster.example.com
   tls:
     - secretName: elasticsearch-ingress-tls-secret
       hosts:
-        - search.logging.host.cluster.example.com
+        - search.host.cluster.example.com

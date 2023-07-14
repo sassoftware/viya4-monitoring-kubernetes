@@ -4,7 +4,7 @@ ingress:
   enabled: true
   ingressClassName: nginx
   hosts:
-    - host: dashboards.logging.host.cluster.example.com
+    - host: dashboards.host.cluster.example.com
       paths:
         - path: /
           backend:
@@ -13,4 +13,4 @@ ingress:
   tls:
     - secretName: kibana-ingress-tls-secret
       hosts:
-        - dashboards.logging.host.cluster.example.com
+        - dashboards.host.cluster.example.com

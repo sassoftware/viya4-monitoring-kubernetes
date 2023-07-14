@@ -10,15 +10,15 @@ grafana:
     ingressClassName: nginx
     tls:
     - hosts:
-      - grafana.monitoring.host.cluster.example.com
+      - grafana.host.cluster.example.com
       secretName: grafana-ingress-tls-secret
     hosts:
-    - grafana.monitoring.host.cluster.example.com
+    - grafana.host.cluster.example.com
     path: /
   "grafana.ini":
     server:
-      domain: monitoring.host.cluster.example.com
-      root_url: https://grafana.monitoring.host.cluster.example.com
+      domain: host.cluster.example.com
+      root_url: https://grafana.host.cluster.example.com
       serve_from_sub_path: false
 
 # This sample does NOT expose Prometheus and Alertmanager via Ingress by default.
@@ -46,13 +46,13 @@ prometheus:
     ingressClassName: nginx
     tls:
     - hosts:
-      - prometheus.monitoring.host.cluster.example.com
+      - prometheus.host.cluster.example.com
       secretName: prometheus-ingress-tls-secret
     hosts:
-    - prometheus.monitoring.host.cluster.example.com
+    - prometheus.host.cluster.example.com
   prometheusSpec:
     # routePrefix: /prometheus
-    externalUrl: https://prometheus.monitoring.host.cluster.example.com
+    externalUrl: https://prometheus.host.cluster.example.com
 
 alertmanager:
   # Disable default configuration of NodePort
@@ -69,10 +69,10 @@ alertmanager:
     ingressClassName: nginx
     tls:
     - hosts:
-      - alertmanager.monitoring.host.cluster.example.com
+      - alertmanager.host.cluster.example.com
       secretName: alertmanager-ingress-tls-secret
     hosts:
-    - alertmanager.monitoring.host.cluster.example.com
+    - alertmanager.host.cluster.example.com
   alertmanagerSpec:
     # routePrefix: /alertmanager
-    externalUrl: https://alertmanager.monitoring.host.cluster.example.com
+    externalUrl: https://alertmanager.host.cluster.example.com
