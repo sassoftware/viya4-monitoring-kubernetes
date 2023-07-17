@@ -115,8 +115,8 @@ if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
 
       ## Fail if the CRDs could not be located.
       if [ ! -f "$crdURL" ]; then
-        log_error "Unable to locate file: monitoring.coreos.com_$crd.yaml in"
-        log_error "$USER_DIR/monitoring/prometheus-operator-crd/$PROM_OPERATOR_CRD_VERSION directory"
+        log_error "Unable to locate file: [monitoring.coreos.com_$crd.yaml] in"
+        log_error "[$USER_DIR/monitoring/prometheus-operator-crd/$PROM_OPERATOR_CRD_VERSION] directory"
         log_error "Please make sure to provide all Prometheus Operator CRDs before running the deployment"
         exit 1
       fi
