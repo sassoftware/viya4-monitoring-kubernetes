@@ -1,9 +1,20 @@
 ## OpenSearch ingress is optional
-#ingress:
-#  ingressClassName: nginx
-#  annotations:
-#    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-#  enabled: true
-#  path: /
-#  hosts:
-#    - search.logging.host.cluster.example.com
+
+# This sample does NOT expose OpenSearch via Ingress by default.
+# However, you can expose OpenSearch via ingress by changing 
+# the "enabled" key from 'false' to 'true' in the 'ingress' stanza below
+
+ingress:
+  # change the following value to 'true'
+  # to make OpenSearch accessible via ingress
+  enabled: false
+  ingressClassName: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+  path: /
+  hosts:
+    - search.host.cluster.example.com
+  tls:
+    - secretName: elasticsearch-ingress-tls-secret
+      hosts:
+        - search.host.cluster.example.com

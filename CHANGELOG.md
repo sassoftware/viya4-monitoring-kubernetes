@@ -5,6 +5,8 @@
 * **Overall**
   * [SECURITY] TLS for intra-cluster communications is now enabled by default.
   * [SECURITY] Use of HTTPS when accessing web applications now required by default.
+  * [CHANGE] The [Ingress ](samples/ingress) and [TLS ](samples/tls) samples have been revised
+to reflect new default behavior of enabling TLS for intra-cluster communications.
 
 * **Logging**
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from version 2.6.0 to 2.8.0

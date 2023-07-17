@@ -3,51 +3,76 @@ grafana:
   service:
     type: ClusterIP
     nodePort: null
-  # Define host-based ingress
   ingress:
-    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     enabled: true
+    ingressClassName: nginx
+    tls:
+    - hosts:
+      - grafana.host.cluster.example.com
+      secretName: grafana-ingress-tls-secret
     hosts:
-    - grafana.monitoring.host.cluster.example.com
+    - grafana.host.cluster.example.com
     path: /
   "grafana.ini":
     server:
-      domain: monitoring.host.cluster.example.com
-      root_url: http://grafana.monitoring.host.cluster.example.com
+      domain: host.cluster.example.com
+      root_url: https://grafana.host.cluster.example.com
       serve_from_sub_path: false
 
-# Uncomment the following sections to expose Prometheus and/or
-# Alertmanager via Ingress. Note that Prometheus and Alertmanager
+# This sample does NOT expose Prometheus and Alertmanager via Ingress by default.
+# However, you can expose one or both of these web applications
+# by changing the 'ingress.enabled' key from 'false' to 'true'
+# in the 'prometheus' and/or 'alertmanager' stanza below
+
+# Note that Prometheus and Alertmanager
 # do not have any authentication configured by default, and exposing
 # an unauthenticated applicaton without other restrictions in place
 # is insecure.
 
-# prometheus:
-#   # Disable default configuration of NodePort
-#   service:
-#     type: ClusterIP
-#     nodePort: null
-#   # Define host-based ingress
-#   ingress:
-#     ingressClassName: nginx
-#     enabled: true
-#     hosts:
-#     - prometheus.monitoring.host.cluster.example.com
-#   prometheusSpec:
-#     # routePrefix: /prometheus
-#     externalUrl: http://prometheus.monitoring.host.cluster.example.com
+prometheus:
+  # Disable default configuration of NodePort
+  service:
+    type: ClusterIP
+    nodePort: null
+  # Define host-based ingress
+  ingress:
+    # change the following value to 'true'
+    # to make Prometheus accessible via ingress
+    enabled: false
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    ingressClassName: nginx
+    tls:
+    - hosts:
+      - prometheus.host.cluster.example.com
+      secretName: prometheus-ingress-tls-secret
+    hosts:
+    - prometheus.host.cluster.example.com
+  prometheusSpec:
+    # routePrefix: /prometheus
+    externalUrl: https://prometheus.host.cluster.example.com
 
-# alertmanager:
-#   # Disable default configuration of NodePort
-#   service:
-#     type: ClusterIP
-#     nodePort: null
-#   # Define host-based ingress
-#   ingress:
-#     ingressClassName: nginx
-#     enabled: true
-#     hosts:
-#     - alertmanager.monitoring.host.cluster.example.com
-#   alertmanagerSpec:
-#     # routePrefix: /alertmanager
-#     externalUrl: http://alertmanager.monitoring.host.cluster.example.com
+alertmanager:
+  # Disable default configuration of NodePort
+  service:
+    type: ClusterIP
+    nodePort: null
+  # Define host-based ingress
+  ingress:
+    # change the following value to 'true'
+    # to make Alertmanager accessible via ingress
+    enabled: false
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    ingressClassName: nginx
+    tls:
+    - hosts:
+      - alertmanager.host.cluster.example.com
+      secretName: alertmanager-ingress-tls-secret
+    hosts:
+    - alertmanager.host.cluster.example.com
+  alertmanagerSpec:
+    # routePrefix: /alertmanager
+    externalUrl: https://alertmanager.host.cluster.example.com
