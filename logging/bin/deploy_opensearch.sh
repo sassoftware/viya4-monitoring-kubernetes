@@ -41,7 +41,6 @@ fi
 OPENSEARCH_HELM_CHART_VERSION=${OPENSEARCH_HELM_CHART_VERSION:-"2.11.0"}
 
 ## Check for air gap deployment
-## Check for air gap deployment
 if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
   source bin/airgap-include.sh
 
@@ -327,6 +326,7 @@ helm $helmDebug upgrade --install opensearch \
     --namespace $LOG_NS \
     --values logging/opensearch/opensearch_helm_values.yaml \
     --values "$wnpValuesFile" \
+    --values "$airgapValuesFile" \
     --values "$ES_OPEN_USER_YAML" \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
     --set nodeGroup=primary  \

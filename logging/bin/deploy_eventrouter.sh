@@ -23,8 +23,6 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
   eventrouterPullSecret=$AIRGAP_IMAGE_PULL_SECRET_NAME
 fi
 
-echo "Event Router Registry: $eventrouterRegistry"
-
 # Copy template files to temp
 logDir=$TMP_DIR/$LOG_NS
 mkdir -p $logDir

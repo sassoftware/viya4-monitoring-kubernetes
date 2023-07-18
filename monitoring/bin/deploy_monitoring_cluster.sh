@@ -88,8 +88,6 @@ log_notice "Deploying monitoring to the [$MON_NS] namespace..."
 
 # Add the prometheus-community Helm repo
 helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
-#log_debug "Updating Helm repositories..."
-#helm repo update
 
 istioValuesFile=$TMP_DIR/empty.yaml
 # Istio - Federate data from Istio's Prometheus instance
