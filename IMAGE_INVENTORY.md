@@ -32,10 +32,10 @@ prom/pushgateway:v1.5.1
 ## Cluster-Level Logging Images
 
 ```plaintext
-cr.fluentbit.io/fluent/fluent-bit:2.0.9
+cr.fluentbit.io/fluent/fluent-bit:2.1.4
 gcr.io/heptio-images/eventrouter:v0.3
-opensearchproject/opensearch-dashboards:2.6.0
-opensearchproject/opensearch:2.6.0
+opensearchproject/opensearch-dashboards:2.8.0
+opensearchproject/opensearch:2.8.0
 quay.io/prometheuscommunity/elasticsearch-exporter:v1.5.0
 busybox:latest
 ```
@@ -47,13 +47,13 @@ busybox:latest
 ```plaintext
 busybox:1.31.1
 busybox:latest
-cr.fluentbit.io/fluent/fluent-bit:2.0.9
+cr.fluentbit.io/fluent/fluent-bit:2.1.4
 gcr.io/heptio-images/eventrouter:v0.3
 ghostunnel/ghostunnel:v1.7.1
 grafana/grafana:9.5.2
 kiwigrid/k8s-sidecar:1.24.0
-opensearchproject/opensearch-dashboards:2.6.0
-opensearchproject/opensearch:2.6.0
+opensearchproject/opensearch-dashboards:2.8.0
+opensearchproject/opensearch:2.8.0
 prom/pushgateway:v1.5.1
 quay.io/prometheus-operator/prometheus-config-reloader:v0.65.1
 quay.io/prometheus-operator/prometheus-operator:v0.65.1
