@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+## Version 1.2.15 (18JUL2023)
 * **Overall**
   * [SECURITY] TLS for intra-cluster communications is now enabled by default.
   * [SECURITY] Use of HTTPS when accessing web applications now required by default.
