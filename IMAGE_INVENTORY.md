@@ -51,6 +51,7 @@ cr.fluentbit.io/fluent/fluent-bit:2.1.4
 gcr.io/heptio-images/eventrouter:v0.3
 ghostunnel/ghostunnel:v1.7.1
 grafana/grafana:9.5.2
+ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6
 kiwigrid/k8s-sidecar:1.24.0
 opensearchproject/opensearch-dashboards:2.8.0
 opensearchproject/opensearch:2.8.0

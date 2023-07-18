@@ -58,11 +58,25 @@ fi
 
 helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
 
-log_verbose "Updating Helm repositories"
-helm repo update
+## Commenting out because it might be redundant code.
+# log_verbose "Updating Helm repositories"
+# helm repo update
 
 primaryValuesFile="logging/esexporter/values-es-exporter.yaml"
 log_debug "Deploying Elasticsearch Exporter"
+
+## Check for air gap deployment
+if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+  source bin/airgap-include.sh
+
+  # Check for the image pull secret for the air gap environment and replace placeholders
+  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+  replaceAirgapValuesInFiles "logging/airgap/airgap-values-es-exporter.yaml"
+
+  airgapValuesFile=$updatedAirgapValuesFile
+else
+  airgapValuesFile=$TMP_DIR/empty.yaml
+fi
 
 # Load any user customizations/overrides
 ES_OPEN_EXPORTER_USER_YAML="${ES_OPEN_EXPORTER_USER_YAML:-$USER_DIR/logging/user-values-es-exporter.yaml}"
@@ -70,7 +84,6 @@ if [ ! -f "$ES_OPEN_EXPORTER_USER_YAML" ]; then
   log_debug "[$ES_OPEN_EXPORTER_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
   ES_OPEN_EXPORTER_USER_YAML=$TMP_DIR/empty.yaml
 fi
-
 
 # Enable workload node placement?
 LOG_NODE_PLACEMENT_ENABLE=${LOG_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
@@ -107,8 +120,9 @@ helm $helmDebug upgrade --install es-exporter \
  -f $primaryValuesFile \
  -f $wnpValuesFile \
  -f $openshiftValuesFile \
+ -f $airgapValuesFile \
  -f $ES_OPEN_EXPORTER_USER_YAML \
- prometheus-community/prometheus-elasticsearch-exporter \
+ ${AIRGAP_HELM_REPO}prometheus-community/prometheus-elasticsearch-exporter \
  --set fullnameOverride=v4m-es-exporter
 
 log_info "Elasticsearch metric exporter has been deployed"

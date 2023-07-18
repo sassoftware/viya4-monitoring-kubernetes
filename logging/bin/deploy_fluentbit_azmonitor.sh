@@ -38,6 +38,19 @@ fi
 
 log_info "Deploying Fluent Bit (Azure Monitor)"
 
+## Check for air gap deployment
+if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+  source bin/airgap-include.sh
+
+  # Check for the image pull secret for the air gap environment
+  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+  replaceAirgapValuesInFiles "logging/airgap/airgap-fluent-bit.yaml"
+  
+  airgapValuesFile=$updatedAirgapValuesFile 
+else
+  airgapValuesFile=$TMP_DIR/empty.yaml
+fi
+
 # Fluent Bit user customizations
 FB_AZMONITOR_USER_YAML="${FB_AZMONITOR_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-azmonitor.yaml}"
 if [ ! -f "$FB_AZMONITOR_USER_YAML" ]; then
@@ -140,8 +153,10 @@ FLUENTBIT_HELM_CHART_VERSION=${FLUENTBIT_HELM_CHART_VERSION:-"0.30.4"}
 helm $helmDebug upgrade --install v4m-fbaz  --namespace $LOG_NS  \
   --version $FLUENTBIT_HELM_CHART_VERSION \
   --values logging/fb/fluent-bit_helm_values_azmonitor.yaml \
+  --values $airgapValuesFile \
   --values $FB_AZMONITOR_USER_YAML \
-  --set fullnameOverride=v4m-fbaz fluent/fluent-bit
+  --set fullnameOverride=v4m-fbaz \
+  ${AIRGAP_HELM_REPO}fluent/fluent-bit
 
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
 disable_sa_token_automount $LOG_NS v4m-fbaz

@@ -59,11 +59,13 @@ spec:
     spec:
       containers:
         - name: kube-eventrouter
-          image: gcr.io/heptio-images/eventrouter:v0.3
+          image: __EVENTROUTER_REGISTRY__/heptio-images/eventrouter:v0.3
           imagePullPolicy: IfNotPresent
           volumeMounts:
           - name: config-volume
             mountPath: /etc/eventrouter
+      imagePullSecrets:
+        - name: __PULL_SECRET_NAME__
       serviceAccount: eventrouter
       volumes:
         - name: config-volume

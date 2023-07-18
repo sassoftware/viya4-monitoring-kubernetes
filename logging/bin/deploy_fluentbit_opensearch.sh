@@ -67,6 +67,18 @@ else
   log_debug "No existing release of the deprecated stable/fluent-bit Helm chart was found"
 fi
 
+## Check for air gap deployment
+if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+  source bin/airgap-include.sh
+
+  # Check for the image pull secret for the air gap environment and replace placeholders
+  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+  replaceAirgapValuesInFiles "logging/airgap/airgap-fluent-bit.yaml"
+
+  airgapValuesFile=$updatedAirgapValuesFile
+else
+  airgapValuesFile=$TMP_DIR/empty.yaml
+fi
 
 # Fluent Bit user customizations
 FB_OPENSEARCH_USER_YAML="${FB_OPENSEARCH_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-opensearch.yaml}"
@@ -150,8 +162,10 @@ helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
   --version $FLUENTBIT_HELM_CHART_VERSION \
   --values logging/fb/fluent-bit_helm_values_opensearch.yaml  \
   --values $openshiftValuesFile \
+  --values $airgapValuesFile \
   --values $FB_OPENSEARCH_USER_YAML   \
-  --set fullnameOverride=v4m-fb fluent/fluent-bit
+  --set fullnameOverride=v4m-fb \
+  ${AIRGAP_HELM_REPO}fluent/fluent-bit
 
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
 disable_sa_token_automount $LOG_NS v4m-fb

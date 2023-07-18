@@ -40,6 +40,19 @@ fi
 # Get/Set Helm Chart Version
 OPENSEARCH_HELM_CHART_VERSION=${OPENSEARCH_HELM_CHART_VERSION:-"2.13.0"}
 
+## Check for air gap deployment
+if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+  source bin/airgap-include.sh
+
+  # Check for the image pull secret for the air gap environment and replace placeholders
+  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+  replaceAirgapValuesInFiles "logging/airgap/airgap-opensearch.yaml"
+
+  airgapValuesFile=$updatedAirgapValuesFile
+else
+  airgapValuesFile=$TMP_DIR/empty.yaml
+fi
+
 # get credentials
 export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD}
 export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD}
@@ -133,8 +146,10 @@ if [ "$HELM_DEBUG" == "true" ]; then
 fi
 
 helmRepoAdd opensearch  https://opensearch-project.github.io/helm-charts
-log_verbose "Updating Helm repositories"
-helm repo update
+
+## Commenting out as it might be redundant code
+# log_verbose "Updating Helm repositories"
+# helm repo update
 
 # Check for existing OpenSearch helm release
 if [ "$(helm -n $LOG_NS list --filter 'opensearch' -q)" == "opensearch" ]; then
@@ -311,11 +326,13 @@ helm $helmDebug upgrade --install opensearch \
     --namespace $LOG_NS \
     --values logging/opensearch/opensearch_helm_values.yaml \
     --values "$wnpValuesFile" \
+    --values "$airgapValuesFile" \
     --values "$ES_OPEN_USER_YAML" \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
     --set nodeGroup=primary  \
     --set masterService=v4m-search \
-    --set fullnameOverride=v4m-search opensearch/opensearch
+    --set fullnameOverride=v4m-search \
+    ${AIRGAP_HELM_REPO}opensearch/opensearch
 
 # ODFE => OpenSearch Migration
 if [ "$deploy_temp_masters" == "true" ]; then
@@ -328,6 +345,7 @@ if [ "$deploy_temp_masters" == "true" ]; then
        --namespace $LOG_NS \
        --values logging/opensearch/opensearch_helm_values.yaml \
        --values "$wnpValuesFile" \
+       --values "$airgapValuesFile" \
        --values "$ES_OPEN_USER_YAML" \
        --values "$OPENSHIFT_SPECIFIC_YAML" \
        --set nodeGroup=temp_masters  \
@@ -336,7 +354,8 @@ if [ "$deploy_temp_masters" == "true" ]; then
        --set roles={master} \
        --set rbac.create=false \
        --set masterService=v4m-search \
-       --set fullnameOverride=v4m-master opensearch/opensearch
+       --set fullnameOverride=v4m-master \
+       ${AIRGAP_HELM_REPO}opensearch/opensearch
 fi
 
 

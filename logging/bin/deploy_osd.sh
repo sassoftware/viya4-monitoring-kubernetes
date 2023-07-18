@@ -29,6 +29,22 @@ set -e
 #Fail if not using OpenSearch back-end
 require_opensearch
 
+## Check for air gap deployment
+if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+  source bin/airgap-include.sh
+
+  # Check for the image pull secret for the air gap environment
+  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+
+  # Check for the image pull secret for the air gap environment and replace placeholders
+  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
+  replaceAirgapValuesInFiles "logging/airgap/airgap-opensearch-dashboards.yaml"
+
+  airgapValuesFile=$updatedAirgapValuesFile
+
+else
+  airgapValuesFile=$TMP_DIR/empty.yaml
+fi
 
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
@@ -65,9 +81,6 @@ if [ "$HELM_DEBUG" == "true" ]; then
 fi
 
 helmRepoAdd opensearch  https://opensearch-project.github.io/helm-charts
-log_verbose "Updating Helm repositories"
-helm repo update
-
 
 KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-false}
 
@@ -133,10 +146,12 @@ helm $helmDebug upgrade --install v4m-osd \
     --values logging/opensearch/osd_helm_values.yaml \
     --values "$wnpValuesFile" \
     --values "$nodeport_yaml" \
+    --values "$airgapValuesFile" \
     --values "$OSD_USER_YAML" \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
     --values "$OSD_PATH_INGRESS_YAML" \
-    --set fullnameOverride=v4m-osd opensearch/opensearch-dashboards
+    --set fullnameOverride=v4m-osd \
+    ${AIRGAP_HELM_REPO}opensearch/opensearch-dashboards
 
 log_info "OpenSearch Dashboards has been deployed"
 

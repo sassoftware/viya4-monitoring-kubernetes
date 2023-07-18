@@ -63,6 +63,12 @@ function helm2ReleaseCheck {
 function helmRepoAdd {
   repo=$1
   repoURL=$2
+
+  ## If this is an air gap deployment, do nothing
+  if [ $AIRGAP_DEPLOYMENT == "true" ]; then
+    return 0
+  fi 
+
   HELM_FORCE_REPO_UPDATE=${HELM_FORCE_REPO_UPDATE:-true}
   if [[ ! $(helm repo list 2>/dev/null) =~ $repo[[:space:]] ]]; then
     log_info "Adding [$repo] helm repository"
