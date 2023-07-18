@@ -32,10 +32,10 @@ prom/pushgateway:v1.5.1
 ## Cluster-Level Logging Images
 
 ```plaintext
-cr.fluentbit.io/fluent/fluent-bit:2.0.9
+cr.fluentbit.io/fluent/fluent-bit:2.1.4
 gcr.io/heptio-images/eventrouter:v0.3
-opensearchproject/opensearch-dashboards:2.6.0
-opensearchproject/opensearch:2.6.0
+opensearchproject/opensearch-dashboards:2.8.0
+opensearchproject/opensearch:2.8.0
 quay.io/prometheuscommunity/elasticsearch-exporter:v1.5.0
 busybox:latest
 ```
