@@ -184,7 +184,7 @@ prometheus-node-exporter:
 # https://github.com/grafana/helm-charts/tree/main/charts/grafana
 grafana:
   image:
-    tag: "9.5.2"
+    tag: "9.5.5"
   "grafana.ini":
     analytics:
       check_for_updates: false
