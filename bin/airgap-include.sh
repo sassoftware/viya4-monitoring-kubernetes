@@ -5,7 +5,7 @@
 # Current directory must be the root directory of the repo
 
 
-if [ $AIRGAP_SOURCED = "" ]; then
+if [ "$AIRGAP_SOURCED" == "" ]; then
     ## Check for AIRGAP_REGISTRY, if null/empty, error out.  Otherwise set and create HELM_URL_BASE.
     if [ -z $AIRGAP_REGISTRY ]; then
         log_error "AIRGAP_REGISTRY has not been set"
