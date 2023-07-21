@@ -68,7 +68,7 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
   # Check for the image pull secret for the air gap environment and replace placeholders
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-  replaceAirgapValuesInFiles "monitoring/airgap/viya/airgap-values-pushgateway.yaml"
+  replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-pushgateway.yaml"
 
   airgapValuesFile=$updatedAirgapValuesFile
 else
