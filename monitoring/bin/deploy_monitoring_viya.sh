@@ -60,7 +60,7 @@ set -e
 # Prometheus Pushgateway
 PUSHGATEWAY_ENABLED=${PUSHGATEWAY_ENABLED:-true}
 if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
-  PUSHGATEWAY_CHART_VERSION=${PUSHGATEWAY_CHART_VERSION:-2.1.6}
+  PUSHGATEWAY_CHART_VERSION=${PUSHGATEWAY_CHART_VERSION:-1.11.0}
 
  ## Check for air gap deployment
 if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
