@@ -2698,7 +2698,9 @@
   "refresh": false,
   "schemaVersion": 38,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "sas-viya"
+  ],
   "templating": {
     "list": [
       {
@@ -2774,11 +2776,7 @@
         "type": "custom"
       },
       {
-        "current": {
-          "selected": false,
-          "text": "d68529",
-          "value": "d68529"
-        },
+        "current": false,
         "definition": "label_values(opensearch_cluster_status,namespace)",
         "hide": 0,
         "includeAll": false,
@@ -2930,7 +2928,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "OpenSearch (NEW2)",
+  "title": "OpenSearch",
   "version": 4,
   "weekStart": ""
 }
