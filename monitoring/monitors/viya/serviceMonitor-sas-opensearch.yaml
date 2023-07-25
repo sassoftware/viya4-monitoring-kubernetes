@@ -41,4 +41,3 @@ spec:
   selector:
     matchLabels:
       opendistro.sas.com/service-name: sas-opendistro
-
