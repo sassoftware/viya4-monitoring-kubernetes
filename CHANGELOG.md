@@ -1,6 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+* **Metrics**
+  * [CHANGE] - Moved to monitoring the OpenSearch instance w/in SAS Viya deployments with OpenSearch plugin;
+added new corresponding OpenSearch Grafana dashboard.
 
 ## Version 1.2.15 (18JUL2023)
 * **Overall**
