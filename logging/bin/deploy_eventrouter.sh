@@ -22,6 +22,9 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
   eventrouterRegistry=$AIRGAP_REGISTRY
   eventrouterPullSecret=$AIRGAP_IMAGE_PULL_SECRET_NAME
+else 
+  eventrouterPullSecret="'null'"
+
 fi
 
 # Copy template files to temp
