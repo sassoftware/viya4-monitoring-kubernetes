@@ -1,5 +1,5 @@
 image:
-  tag: "9.5.2"
+  tag: "9.5.5"
 extraLabels:
   v4m.sas.com/tenant: __TENANT__
 readinessProbe: null
