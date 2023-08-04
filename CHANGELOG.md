@@ -6,7 +6,8 @@
 added new corresponding OpenSearch Grafana dashboard.
 
 * **Metrics**
-  * [UPGRADE] - Grafana has been upgraded from version 9.5.2 to 9.5.5. This version contains a fix to address vulnerability [CVE-2023-3128](https://nvd.nist.gov/vuln/detail/CVE-2023-3128)
+  * [UPGRADE] Grafana has been upgraded from version 9.5.2 to 9.5.5. This version contains a fix to address vulnerability [CVE-2023-3128](https://nvd.nist.gov/vuln/detail/CVE-2023-3128)
+    [FIX] Removed hard-coded reference to 'monitoring' namespace in Prometheus URL w/in Grafana datasource
 
 ## Version 1.2.15 (18JUL2023)
 * **Overall**
