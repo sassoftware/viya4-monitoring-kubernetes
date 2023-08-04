@@ -1,6 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+* **Metrics**
+  * [CHANGE] - Moved to monitoring the OpenSearch instance w/in SAS Viya deployments with OpenSearch plugin;
+added new corresponding OpenSearch Grafana dashboard.
 
 * **Metrics**
   * [UPGRADE] - Grafana has been upgraded from version 9.5.2 to 9.5.5. This version contains a fix to address vulnerability [CVE-2023-3128](https://nvd.nist.gov/vuln/detail/CVE-2023-3128)
