@@ -240,6 +240,23 @@ enable_pod_token_automount $MON_NS deployment v4m-operator
 log_info "Deploying ServiceMonitors and Prometheus rules"
 log_verbose "Deploying cluster ServiceMonitors"
 
+ENABLE_TRACING="${ENABLE_TRACING:-true}"
+if [ "$ENABLE_TRACING" == "true" ]; then
+  log_info "Tracing enabled..."
+  # # Add the grafana helm chart repo
+  helmRepoAdd grafana https://grafana.github.io/helm-charts
+  log_info "Installing tempo"
+  # helm repo update
+  # helm install v4m-tempo --set serviceMonitor.enabled=true --set searchEnabled=true -n "$MON_NS" grafana/tempo
+  helm upgrade --install v4m-tempo --set serviceMonitor.enabled=true --set searchEnabled=true -n "$MON_NS" grafana/tempo
+
+  log_verbose "Provisioning Tempo Datasource"
+  grafanaTempoDS=grafana-datasource-tempo.yaml
+  kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-tempo
+  kubectl create cm -n "$MON_NS" grafana-datasource-tempo --from-file monitoring/$grafanaTempoDS
+  kubectl label cm -n "$MON_NS" grafana-datasource-tempo grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
+fi
+
 # NGINX
 set +e
 kubectl get ns $NGINX_NS 2>/dev/null

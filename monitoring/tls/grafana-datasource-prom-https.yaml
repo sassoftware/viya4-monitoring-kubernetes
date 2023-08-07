@@ -8,3 +8,9 @@
         tlsSkipVerify: true
       editable: true
       url: https://v4m-prometheus:9090
+    - name: Tempo
+      type: tempo
+      url: http://v4m-tempo:3100
+      isDefault: false
+      editable: true
+      apiVersion: 1
