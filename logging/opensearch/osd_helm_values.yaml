@@ -62,6 +62,5 @@ config:
 
     opensearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
 
-
 securityContext:
   readOnlyRootFilesystem: true
