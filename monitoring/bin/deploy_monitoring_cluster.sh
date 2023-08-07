@@ -47,37 +47,21 @@ if [ -z "$(kubectl get ns $MON_NS -o name 2>/dev/null)" ]; then
   disable_sa_token_automount $MON_NS default
 fi
 
-## Check for air gap deployment
 if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  
-  # Check for the image pull secret for the air gap environment
+  source bin/airgap-include.sh
+
+  # Check for the image pull secret for the air gap environment and replace placeholders
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
+  replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-prom-operator.yaml"
 
-  # Copy template files to temp
-  airgapDir="$TMP_DIR/airgap/cluster"
-  mkdir -p $airgapDir
-  cp -R monitoring/airgap/cluster/* $airgapDir/
-
-  # Replace placeholders
-  log_debug "Replacing airgap variables for files in [$airgapDir]"
-  for f in $(find $airgapDir -name '*.yaml'); do
-    if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-      sed -i '' "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
-      sed -i '' "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
-    else
-      sed -i "s/__AIRGAP_REGISTRY__/$AIRGAP_REGISTRY/g" $f
-      sed -i "s/__AIRGAP_IMAGE_PULL_SECRET_NAME__/$AIRGAP_IMAGE_PULL_SECRET_NAME/g" $f
-    fi
-  done
-  
-  airgapValuesFile=$airgapDir/airgap-values-prom-operator.yaml
+  airgapValuesFile=$updatedAirgapValuesFile
 
   if [ "$TLS_ENABLE" == "true" ]; then
-    airgapTLSValuesFile=$airgapDir/airgap-values-prom-operator-tls.yaml
+    replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-prom-operator-tls.yaml"
+    airgapTLSValuesFile=$updatedAirgapValuesFile
   else
     airgapTLSValuesFile=$TMP_DIR/empty.yaml
   fi
-
 else
   airgapValuesFile=$TMP_DIR/empty.yaml
   airgapTLSValuesFile=$TMP_DIR/empty.yaml

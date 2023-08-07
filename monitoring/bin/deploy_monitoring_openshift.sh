@@ -119,6 +119,19 @@ if ! helm3ReleaseExists v4m-grafana $MON_NS; then
   firstTimeGrafana=true
 fi
 
+ ## Check for air gap deployment
+if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+  source bin/airgap-include.sh
+
+  # Check for the image pull secret for the air gap environment and replace placeholders
+  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
+  replaceAirgapValuesInFiles "monitoring/airgap/airgap-grafana-values.yaml"
+
+  airgapValuesFile=$updatedAirgapValuesFile
+else
+  airgapValuesFile=$TMP_DIR/empty.yaml
+fi
+
 OPENSHIFT_AUTH_ENABLE=${OPENSHIFT_AUTH_ENABLE:-true}
 if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   grafanaAuthYAML="monitoring/openshift/grafana-proxy-values.yaml"
@@ -160,6 +173,7 @@ helm upgrade --install $helmDebug \
   -n "$MON_NS" \
   -f "$wnpValuesFile" \
   -f "$grafanaYAML" \
+  -f "$airgapValuesFile" \
   -f "$grafanaAuthYAML" \
   -f "$userGrafanaYAML" \
   --set 'grafana\.ini'.server.domain=$OPENSHIFT_ROUTE_DOMAIN \

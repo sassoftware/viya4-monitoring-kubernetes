@@ -15,12 +15,16 @@ eventrouterPullSecret="null"
 
 ## Check for air gap deployment
 if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  
+  source bin/airgap-include.sh
+
   # Check for the image pull secret for the air gap environment
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
 
   eventrouterRegistry=$AIRGAP_REGISTRY
   eventrouterPullSecret=$AIRGAP_IMAGE_PULL_SECRET_NAME
+else 
+  eventrouterPullSecret="'null'"
+
 fi
 
 # Copy template files to temp

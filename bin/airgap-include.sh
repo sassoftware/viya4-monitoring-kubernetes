@@ -5,7 +5,7 @@
 # Current directory must be the root directory of the repo
 
 
-if [ $AIRGAP_SOURCED = "" ]; then
+if [ "$AIRGAP_SOURCED" == "" ]; then
     ## Check for AIRGAP_REGISTRY, if null/empty, error out.  Otherwise set and create HELM_URL_BASE.
     if [ -z $AIRGAP_REGISTRY ]; then
         log_error "AIRGAP_REGISTRY has not been set"
@@ -13,7 +13,7 @@ if [ $AIRGAP_SOURCED = "" ]; then
         exit 1
     else
         AIRGAP_IMAGE_PULL_SECRET_NAME=${AIRGAP_IMAGE_PULL_SECRET_NAME:-"v4m-image-pull-secret"}
-        if [ -z "$AIRGAP_HELM_REPO"]; then
+        if [ -z "$AIRGAP_HELM_REPO" ]; then
             log_debug "Separate AIRGAP_HELM_REPO value not provided"
             log_debug "Setting AIRGAP_HELM_REPO to oci://${AIRGAP_REGISTRY}/"
             AIRGAP_HELM_REPO="oci://${AIRGAP_REGISTRY}/"
