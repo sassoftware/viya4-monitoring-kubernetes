@@ -214,11 +214,6 @@ grafana:
       enabled: true
       label: grafana_datasource
       resources:
-      datasources:
-        - name: Tempo
-          type: tempo
-          url: //v4m-tempos.monitoring:3100
-          isDefault: true
     resources:
       requests:
         cpu: "50m"
@@ -241,11 +236,3 @@ grafana:
       - kubernetes.io/pvc-protection
     # subPath: ""
     # existingClaim:
-
-# =======
-# Tempo
-# =======
-# https://github.com/grafana/helm-charts/tree/main/charts/tempo
-tempo:
-  image:
-    tag: "2.1.1"
