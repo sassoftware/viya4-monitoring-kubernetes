@@ -196,6 +196,12 @@ fi
 TRACING_ENABLE="${TRACING_ENABLE:-true}"
 if [ "$TRACING_ENABLE" == "false" ]; then
   tempoDSFile=$TMP_DIR/empty.yaml
+
+  TEMPO_USER_YAML="${TEMPO_USER_YAML:-$USER_DIR/monitoring/user-values-tempo.yaml}"
+  if [ ! -f "$TEMPO_USER_YAML" ]; then
+    log_debug "[$TEMPO_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
+    TEMPO_USER_YAML=$TMP_DIR/empty.yaml
+  fi
 else
   tempoDSFile="monitoring/grafana-datasource-tempo.yaml"
 fi 
@@ -249,11 +255,20 @@ log_info "Deploying ServiceMonitors and Prometheus rules"
 log_verbose "Deploying cluster ServiceMonitors"
 
 if [ "$TRACING_ENABLE" == "true" ]; then
+  TEMPO_CHART_VERSION=${TEMPO_CHART_VERSION:-1.5.0}
   log_info "Tracing enabled..."
   # # Add the grafana helm chart repo
   helmRepoAdd grafana https://grafana.github.io/helm-charts
+  helm repo update
+
   log_info "Installing tempo"
-  helm upgrade --install v4m-tempo --set serviceMonitor.enabled=true --set searchEnabled=true -n "$MON_NS" grafana/tempo
+  helm upgrade --install v4m-tempo \
+    -n "$MON_NS" \
+    -f "$TEMPO_USER_YAML" \
+    --set serviceMonitor.enabled=true \
+    --set searchEnabled=true \
+    --version "$TEMPO_CHART_VERSION" \
+    grafana/tempo
 fi
 
 # NGINX

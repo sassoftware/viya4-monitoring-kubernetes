@@ -1,4 +1,7 @@
 grafana:
+  "grafana.ini":
+    feature_toggles:
+      enable: tempoSearch tempoBackendSearch
   datasources:
     datasources.yaml:
      apiVersion: 1
