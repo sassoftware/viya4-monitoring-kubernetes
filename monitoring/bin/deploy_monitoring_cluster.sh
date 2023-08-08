@@ -193,6 +193,13 @@ if [ "$V4M_CURRENT_VERSION_MAJOR" == "1" ] && [[ "$V4M_CURRENT_VERSION_MINOR" =~
     -l app.kubernetes.io/instance=v4m-prometheus-operator,app.kubernetes.io/name=kube-state-metrics
 fi
 
+TRACING_ENABLE="${TRACING_ENABLE:-true}"
+if [ "$TRACING_ENABLE" == "false" ]; then
+  tempoDSFile=$TMP_DIR/empty.yaml
+else
+  tempoDSFile="monitoring/grafana-datasource-tempo.yaml"
+fi 
+
 KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-45.28.0}
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
@@ -205,6 +212,7 @@ helm $helmDebug upgrade --install $promRelease \
   -f $nodePortValuesFile \
   -f $wnpValuesFile \
   -f $PROM_OPER_USER_YAML \
+  -f $tempoDSFile \
   --atomic \
   --timeout 20m \
   --set nameOverride=$promName \
@@ -240,21 +248,12 @@ enable_pod_token_automount $MON_NS deployment v4m-operator
 log_info "Deploying ServiceMonitors and Prometheus rules"
 log_verbose "Deploying cluster ServiceMonitors"
 
-TRACING_ENABLE="${TRACING_ENABLE:-true}"
 if [ "$TRACING_ENABLE" == "true" ]; then
   log_info "Tracing enabled..."
   # # Add the grafana helm chart repo
   helmRepoAdd grafana https://grafana.github.io/helm-charts
   log_info "Installing tempo"
   helm upgrade --install v4m-tempo --set serviceMonitor.enabled=true --set searchEnabled=true -n "$MON_NS" grafana/tempo
-
-  log_verbose "Provisioning Tempo Datasource"
-  if [ "$TLS_ENABLE" == "false" ]; then
-    grafanaTempoDS=grafana-datasource-tempo.yaml
-    kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-tempo
-    kubectl create cm -n "$MON_NS" grafana-datasource-tempo --from-file monitoring/$grafanaTempoDS
-    kubectl label cm -n "$MON_NS" grafana-datasource-tempo grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
-  fi
 fi
 
 # NGINX

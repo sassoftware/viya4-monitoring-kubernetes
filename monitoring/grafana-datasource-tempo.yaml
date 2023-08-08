@@ -1,8 +1,12 @@
-    apiVersion: 1
-    datasources:
-    - name: Tempo
-      type: tempo
-      url: http://v4m-tempo:3100
-      isDefault: false
-      editable: true
-      apiVersion: 1
+grafana:
+  datasources:
+    datasources.yaml:
+     apiVersion: 1
+     datasources:
+      - name: Tempo
+        type: tempo
+        url: http://v4m-tempo:3100
+        isDefault: false
+        editable: true
+        apiVersion: 1
+
