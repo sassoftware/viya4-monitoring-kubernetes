@@ -249,11 +249,12 @@ if [ "$TRACING_ENABLE" == "true" ]; then
   helm upgrade --install v4m-tempo --set serviceMonitor.enabled=true --set searchEnabled=true -n "$MON_NS" grafana/tempo
 
   log_verbose "Provisioning Tempo Datasource"
-  # This will get overwritten if TLS is enabled and that datasource gets configured
-  grafanaTempoDS=grafana-datasource-tempo.yaml
-  kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-tempo
-  kubectl create cm -n "$MON_NS" grafana-datasource-tempo --from-file monitoring/$grafanaTempoDS
-  kubectl label cm -n "$MON_NS" grafana-datasource-tempo grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
+  if [ "$TLS_ENABLE" == "false" ]; then
+    grafanaTempoDS=grafana-datasource-tempo.yaml
+    kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-tempo
+    kubectl create cm -n "$MON_NS" grafana-datasource-tempo --from-file monitoring/$grafanaTempoDS
+    kubectl label cm -n "$MON_NS" grafana-datasource-tempo grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
+  fi
 fi
 
 # NGINX
