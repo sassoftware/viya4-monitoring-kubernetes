@@ -184,7 +184,7 @@ helm upgrade --install $helmDebug \
   $grafanaPwd \
   $extraArgs \
   v4m-grafana \
-  grafana/grafana
+  ${AIRGAP_HELM_REPO}grafana/grafana
 
 if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   log_info "Using OpenShift authentication for Grafana"
