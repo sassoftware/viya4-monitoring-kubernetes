@@ -4,7 +4,7 @@ image:
   - name: __AIRGAP_IMAGE_PULL_SECRET_NAME__
 sidecar:
   image:
-    registry: __AIRGAP_REGISTRY__
+    repository: __AIRGAP_REGISTRY__/kiwigrid/k8s-sidecar
 initChownData:
   image:
     repository: __AIRGAP_REGISTRY__/library/busybox
