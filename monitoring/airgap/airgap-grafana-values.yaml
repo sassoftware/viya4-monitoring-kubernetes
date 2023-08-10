@@ -4,3 +4,7 @@ image:
 sidecar:
   image:
     registry: __AIRGAP_REGISTRY__
+initChownData:
+  image:
+    repository: __AIRGAP_REGISTRY__/library/busybox
+
