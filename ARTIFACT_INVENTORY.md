@@ -5,7 +5,7 @@ The following tables provide information about the container images and Helm cha
 * pre-pull container images
 * deploy into an air-gapped Kubernetes cluster
 
-**Note:** These tables are used in  
+**Note:** For more information about deploying in an air-gapped environment, refer to  
 [Configure SAS Viya Monitoring for Kubernetes for an Air-Gapped Environment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n0grd8g2pkfglin12bzm3g1oik2p.htm).
 
 ## Table 1. Container Images
@@ -36,18 +36,18 @@ registry/repository/image_name:version
 | Metrics | Prometheus Pushgateway | docker.io/prom/pushgateway:v1.5.1|
 | Metrics | Sidecar | quay.io/kiwigrid/k8s-sidecar:1.24.0|
 
-## Table 2. Helm-Chart Repositories
+## Table 2. Helm Chart Repositories
 
-| Subsystem | Component | Helm Repository | Helm-Repository URL |
+| Subsystem | Component | Helm Repository | Helm Repository URL |
 |--|--|--|--|
-| Logging | Fluent Bit | fluent | `https://fluent.github.io/helm-charts` |
-| Logging | OpenSearch and OpenSearch Dashboards | opensearch | `https://opensearch-project.github.io/helm-charts` |
-| Metrics | Grafana | grafana | `https://grafana.github.io/helm-charts` |
-| Both | Several (including Prometheus, Kube Prometheus Stack, Prometheus Pushgateway and Elasticsearch Exporter) | prometheus-community | `https://prometheus-community.github.io/helm-charts` |
+| Logging | Fluent Bit | fluent | https://fluent.github.io/helm-charts |
+| Logging | OpenSearch and OpenSearch Dashboards | opensearch | https://opensearch-project.github.io/helm-charts |
+| Metrics | Grafana | grafana | https://grafana.github.io/helm-charts |
+| Both | Several (including Prometheus, Kube Prometheus Stack, Prometheus Pushgateway and Elasticsearch Exporter) | prometheus-community | https://prometheus-community.github.io/helm-charts |
 
-## Table 3. Helm-Chart Information
+## Table 3. Helm Chart Information
 
-| Subsystem | Component | Helm-Chart Repository | Helm-Chart Name |Helm-Chart Version | Helm-Archive File Name|
+| Subsystem | Component | Helm Chart Repository | Helm Chart Name |Helm Chart Version | Helm Archive File Name|
 |--|--|--|--|--|--|
 | Logging | Elasticsearch Exporter| prometheus-community| prometheus-elasticsearch-exporter| 5.2.0| prometheus-elasticsearch-exporter-5.2.0.tgz
 | Logging | Fluent Bit| fluent| fluent-bit| 0.30.4| fluent-bit-0.30.4.tgz
