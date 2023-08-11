@@ -10,9 +10,8 @@ The following tables provide information about the container images and Helm cha
 
 ## Table 1. Container Images
 
-This table provides the fully qualified container-image names required for the air-gapped configuration.
+This table provides the fully qualified container-image names for the components of SAS Viya Monitoring for Kubernetes.
 These names use the following format: 
-
 registry/repository/image_name:version
 
 | Subsystem| Component | Fully Qualified Container-Image Name (registry/repository/image_name:version)|
@@ -30,13 +29,15 @@ registry/repository/image_name:version
 | Metrics | Ingress-NGINX Controller | registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6|
 | Metrics | Kube State Exporter | k8s.gcr.io/kube-state-metrics/kube-state-metrics:v2.8.2|
 | Metrics | Node Exporter | quay.io/prometheus/node-exporter:v1.5.0|
-| Metrics | **Prometheus** | quay.io/prometheus/prometheus:v2.44.0|
+| Metrics | Prometheus | quay.io/prometheus/prometheus:v2.44.0|
 | Metrics | Prometheus Operator | quay.io/prometheus-operator/prometheus-operator:v0.65.1|
 | Metrics | Prometheus Operator (config reloader) | quay.io/prometheus-operator/prometheus-config-reloader:v0.65.1|
 | Metrics | Prometheus Pushgateway | docker.io/prom/pushgateway:v1.5.1|
 | Metrics | Sidecar | quay.io/kiwigrid/k8s-sidecar:1.24.0|
 
 ## Table 2. Helm Chart Repositories
+This table identifies the Helm repositories that contain the Helm charts used by SAS Viya Monitoring for Kubernetes.
+These repositories must be made available to Helm in your environment. Use the `helm repo add` command.
 
 | Subsystem | Component | Helm Repository | Helm Repository URL |
 |--|--|--|--|
@@ -46,6 +47,7 @@ registry/repository/image_name:version
 | Both | Several (including Prometheus, Kube Prometheus Stack, Prometheus Pushgateway and Elasticsearch Exporter) | prometheus-community | https://prometheus-community.github.io/helm-charts |
 
 ## Table 3. Helm Chart Information
+This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes.
 
 | Subsystem | Component | Helm Chart Repository | Helm Chart Name |Helm Chart Version | Helm Archive File Name|
 |--|--|--|--|--|--|
