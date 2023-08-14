@@ -30,17 +30,6 @@ extraVolumes:
 fullConfigMap: false
 existingConfigMap: fb-fluent-bit-config
 
-# config:
-#  extraFiles:
-#   tracing.conf: |
-#     [INPUT]
-#        Name                 event_type
-#        Type                 traces
-#        Tag                  test_traces
-#     [OUTPUT]
-#        Name stdout
-#        Match test_traces
-
 env:
    - name: ES_LOGCOLLECTOR_USER
      valueFrom:
