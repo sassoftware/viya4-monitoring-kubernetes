@@ -1041,15 +1041,6 @@ data:
 
     @INCLUDE viya-tracing.conf
 
-  # input-tracing.conf: |
-  #   [INPUT]
-  #      Name                 event_type
-  #      Type                 traces
-  #      Tag                  test_traces
-  #   [OUTPUT]
-  #      Name stdout
-  #      Match test_traces
-
   parsers.conf: ""
 
 
