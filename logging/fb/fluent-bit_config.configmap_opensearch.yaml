@@ -1,6 +1,8 @@
 apiVersion: v1
 data:
   fluent-bit.conf: |
+    @INCLUDE viya-tracing.conf
+
     [FILTER]
        Name modify
        Match *
@@ -1038,8 +1040,6 @@ data:
        storage.sync normal
        storage.backlog.mem_limit 5M
        storage.metrics On
-
-    @INCLUDE viya-tracing.conf
 
   parsers.conf: ""
 
