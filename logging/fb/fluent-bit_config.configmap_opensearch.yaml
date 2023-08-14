@@ -1038,7 +1038,21 @@ data:
        storage.sync normal
        storage.backlog.mem_limit 5M
        storage.metrics On
+
+    @INCLUDE viya-tracing.conf
+
+  # input-tracing.conf: |
+  #   [INPUT]
+  #      Name                 event_type
+  #      Type                 traces
+  #      Tag                  test_traces
+  #   [OUTPUT]
+  #      Name stdout
+  #      Match test_traces
+
   parsers.conf: ""
+
+
 kind: ConfigMap
 metadata:
   labels:

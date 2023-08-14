@@ -104,8 +104,6 @@ if [ -f "$USER_DIR/logging/fluent-bit_config.configmap_opensearch.yaml" ]; then
 else
    # use copy in repo
    FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_opensearch.yaml"
-
-
 fi
 log_debug "Using FB ConfigMap:" $FB_CONFIGMAP
 
@@ -123,6 +121,17 @@ kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 # Create ConfigMap containing Viya-customized parsers (delete it first)
 kubectl -n $LOG_NS delete configmap fb-viya-parsers --ignore-not-found
 kubectl -n $LOG_NS create configmap fb-viya-parsers  --from-file=logging/fb/viya-parsers.conf
+
+TRACING_ENABLE="${TRACING_ENABLE:-true}"
+if [ "$TRACING_ENABLE" == "true" ]; then
+  # Create ConfigMap containing tracing config
+  kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
+  kubectl -n "$LOG_NS" create configmap fb-viya-tracing  --from-file=logging/fb/viya-tracing.conf
+else 
+  # Create empty ConfigMap for tracing since it is expected to exist in main config
+  kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
+  kubectl -n "$LOG_NS" create configmap fb-viya-tracing  --from-file="$TMP_DIR"/empty.yaml
+fi
 
 # Check for Kubernetes container runtime log format info
 KUBERNETES_RUNTIME_LOGFMT="${KUBERNETES_RUNTIME_LOGFMT}"

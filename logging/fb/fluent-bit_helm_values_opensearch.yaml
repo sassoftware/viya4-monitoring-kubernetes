@@ -15,13 +15,31 @@ extraVolumeMounts:
 - mountPath: /fluent-bit/etc/viya-parsers.conf
   name: parsers-config
   subPath: viya-parsers.conf
+- mountPath: /fluent-bit/etc/viya-tracing.conf
+  name: tracing-config
+  subPath: viya-tracing.conf
 extraVolumes:
 - configMap:
     defaultMode: 420
     name: fb-viya-parsers
   name: parsers-config
+- configMap:
+    defaultMode: 420
+    name: fb-viya-tracing
+  name: tracing-config
 fullConfigMap: false
 existingConfigMap: fb-fluent-bit-config
+
+# config:
+#  extraFiles:
+#   tracing.conf: |
+#     [INPUT]
+#        Name                 event_type
+#        Type                 traces
+#        Tag                  test_traces
+#     [OUTPUT]
+#        Name stdout
+#        Match test_traces
 
 env:
    - name: ES_LOGCOLLECTOR_USER
