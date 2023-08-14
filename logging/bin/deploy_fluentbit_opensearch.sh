@@ -123,6 +123,7 @@ kubectl -n $LOG_NS delete configmap fb-viya-parsers --ignore-not-found
 kubectl -n $LOG_NS create configmap fb-viya-parsers  --from-file=logging/fb/viya-parsers.conf
 
 TRACING_ENABLE="${TRACING_ENABLE:-true}"
+export MON_NS="${MON_NS:-monitoring}"
 if [ "$TRACING_ENABLE" == "true" ]; then
   # Create ConfigMap containing tracing config
   kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
@@ -159,7 +160,9 @@ kubectl -n $LOG_NS delete configmap fb-env-vars --ignore-not-found
 kubectl -n $LOG_NS create configmap fb-env-vars \
                    --from-literal=KUBERNETES_RUNTIME_LOGFMT="$KUBERNETES_RUNTIME_LOGFMT" \
                    --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}"         \
-                   --from-literal=SEARCH_SERVICENAME="${ES_SERVICENAME}"
+                   --from-literal=SEARCH_SERVICENAME="${ES_SERVICENAME}"                 \
+                   --from-literal=MON_NS="${MON_NS}"
+# here
 
 kubectl -n $LOG_NS label configmap fb-env-vars   managed-by=v4m-es-script
 
