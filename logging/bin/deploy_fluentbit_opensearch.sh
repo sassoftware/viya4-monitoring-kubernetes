@@ -128,10 +128,14 @@ if [ "$TRACING_ENABLE" == "true" ]; then
   # Create ConfigMap containing tracing config
   kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
   kubectl -n "$LOG_NS" create configmap fb-viya-tracing  --from-file=logging/fb/viya-tracing.conf
+
+  tracingValuesFile="logging/fb/fluent-bit_helm_values_tracing.yaml"
 else 
   # Create empty ConfigMap for tracing since it is expected to exist in main config
   kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
   kubectl -n "$LOG_NS" create configmap fb-viya-tracing  --from-file="$TMP_DIR"/empty.yaml
+
+  tracingValuesFile=$TMP_DIR/empty.yaml
 fi
 
 # Check for Kubernetes container runtime log format info
@@ -162,7 +166,6 @@ kubectl -n $LOG_NS create configmap fb-env-vars \
                    --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}"         \
                    --from-literal=SEARCH_SERVICENAME="${ES_SERVICENAME}"                 \
                    --from-literal=MON_NS="${MON_NS}"
-# here
 
 kubectl -n $LOG_NS label configmap fb-env-vars   managed-by=v4m-es-script
 
@@ -175,6 +178,7 @@ helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
   --values logging/fb/fluent-bit_helm_values_opensearch.yaml  \
   --values $openshiftValuesFile \
   --values $airgapValuesFile \
+  --values $tracingValuesFile \
   --values $FB_OPENSEARCH_USER_YAML   \
   --set fullnameOverride=v4m-fb \
   ${AIRGAP_HELM_REPO}fluent/fluent-bit
