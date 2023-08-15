@@ -43,6 +43,11 @@ fi
 log_verbose "Removing v4m-kubelet service"
 kubectl delete service --ignore-not-found -n kube-system v4m-kubelet
 
+log_verbose "Removing tempo"
+if helm3ReleaseExists v4m-tempo $MON_NS; then
+  helm uninstall --namespace $MON_NS v4m-tempo
+fi
+
 if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
   log_info "Deleting the [$MON_NS] namespace..."
   if kubectl delete namespace $MON_NS --timeout $KUBE_NAMESPACE_DELETE_TIMEOUT; then

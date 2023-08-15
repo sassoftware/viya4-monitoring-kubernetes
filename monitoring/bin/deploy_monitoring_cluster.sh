@@ -193,6 +193,18 @@ if [ "$V4M_CURRENT_VERSION_MAJOR" == "1" ] && [[ "$V4M_CURRENT_VERSION_MINOR" =~
     -l app.kubernetes.io/instance=v4m-prometheus-operator,app.kubernetes.io/name=kube-state-metrics
 fi
 
+TRACING_ENABLE="${TRACING_ENABLE:-false}"
+if [ "$TRACING_ENABLE" == "false" ]; then
+  tempoDSFile=$TMP_DIR/empty.yaml
+else
+  TEMPO_USER_YAML="${TEMPO_USER_YAML:-$USER_DIR/monitoring/user-values-tempo.yaml}"
+  if [ ! -f "$TEMPO_USER_YAML" ]; then
+    log_debug "[$TEMPO_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
+    TEMPO_USER_YAML=$TMP_DIR/empty.yaml
+  fi
+  tempoDSFile="monitoring/grafana-datasource-tempo.yaml"
+fi 
+
 KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-45.28.0}
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
@@ -205,6 +217,7 @@ helm $helmDebug upgrade --install $promRelease \
   -f $nodePortValuesFile \
   -f $wnpValuesFile \
   -f $PROM_OPER_USER_YAML \
+  -f $tempoDSFile \
   --atomic \
   --timeout 20m \
   --set nameOverride=$promName \
@@ -239,6 +252,23 @@ enable_pod_token_automount $MON_NS deployment v4m-operator
 
 log_info "Deploying ServiceMonitors and Prometheus rules"
 log_verbose "Deploying cluster ServiceMonitors"
+
+if [ "$TRACING_ENABLE" == "true" ]; then
+  TEMPO_CHART_VERSION=${TEMPO_CHART_VERSION:-1.5.0}
+  log_info "Tracing enabled..."
+  # # Add the grafana helm chart repo
+  helmRepoAdd grafana https://grafana.github.io/helm-charts
+  helm repo update
+
+  log_info "Installing tempo"
+  helm upgrade --install v4m-tempo \
+    -n "$MON_NS" \
+    -f "$TEMPO_USER_YAML" \
+    --set serviceMonitor.enabled=true \
+    --set searchEnabled=true \
+    --version "$TEMPO_CHART_VERSION" \
+    grafana/tempo
+fi
 
 # NGINX
 set +e

@@ -104,8 +104,6 @@ if [ -f "$USER_DIR/logging/fluent-bit_config.configmap_opensearch.yaml" ]; then
 else
    # use copy in repo
    FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_opensearch.yaml"
-
-
 fi
 log_debug "Using FB ConfigMap:" $FB_CONFIGMAP
 
@@ -123,6 +121,21 @@ kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 # Create ConfigMap containing Viya-customized parsers (delete it first)
 kubectl -n $LOG_NS delete configmap fb-viya-parsers --ignore-not-found
 kubectl -n $LOG_NS create configmap fb-viya-parsers  --from-file=logging/fb/viya-parsers.conf
+
+TRACING_ENABLE="${TRACING_ENABLE:-false}"
+if [ "$TRACING_ENABLE" == "true" ]; then
+  # Create ConfigMap containing tracing config
+  kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
+  kubectl -n "$LOG_NS" create configmap fb-viya-tracing  --from-file=logging/fb/viya-tracing.conf
+
+  tracingValuesFile="logging/fb/fluent-bit_helm_values_tracing.yaml"
+else 
+  # Create empty ConfigMap for tracing since it is expected to exist in main config
+  kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
+  kubectl -n "$LOG_NS" create configmap fb-viya-tracing  --from-file="$TMP_DIR"/empty.yaml
+
+  tracingValuesFile=$TMP_DIR/empty.yaml
+fi
 
 # Check for Kubernetes container runtime log format info
 KUBERNETES_RUNTIME_LOGFMT="${KUBERNETES_RUNTIME_LOGFMT}"
@@ -144,13 +157,15 @@ if [ -z "$KUBERNETES_RUNTIME_LOGFMT" ]; then
    esac
 fi
 
+MON_NS="${MON_NS:-monitoring}"
 
 # Create ConfigMap containing Kubernetes container runtime log format
 kubectl -n $LOG_NS delete configmap fb-env-vars --ignore-not-found
 kubectl -n $LOG_NS create configmap fb-env-vars \
                    --from-literal=KUBERNETES_RUNTIME_LOGFMT="$KUBERNETES_RUNTIME_LOGFMT" \
                    --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}"         \
-                   --from-literal=SEARCH_SERVICENAME="${ES_SERVICENAME}"
+                   --from-literal=SEARCH_SERVICENAME="${ES_SERVICENAME}"                 \
+                   --from-literal=MON_NS="${MON_NS}"
 
 kubectl -n $LOG_NS label configmap fb-env-vars   managed-by=v4m-es-script
 
@@ -163,6 +178,7 @@ helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
   --values logging/fb/fluent-bit_helm_values_opensearch.yaml  \
   --values $openshiftValuesFile \
   --values $airgapValuesFile \
+  --values $tracingValuesFile \
   --values $FB_OPENSEARCH_USER_YAML   \
   --set fullnameOverride=v4m-fb \
   ${AIRGAP_HELM_REPO}fluent/fluent-bit
