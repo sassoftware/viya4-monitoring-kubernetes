@@ -68,6 +68,9 @@ fi
 
 log_info "Deploying Event Router ..."
 
+# 15AUG23 - Quick fix to handle issue w/ UIP from 1.2.15 to 1.2.16
+kubectl -n $LOG_NS delete deployment eventrouter --ignore-not-found 
+
 if [ "$LOG_NODE_PLACEMENT_ENABLE" == "true" ]; then
    log_info "Enabling eventrouter for workload node placement"
    kubectl apply -f $logDir/eventrouter-wnp.yaml
