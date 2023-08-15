@@ -25,7 +25,7 @@ registry/repository/image_name:version
 | Metrics | Alertmanager | quay.io/prometheus/alertmanager:v0.25.0|
 | Metrics | BusyBox | docker.io/library/busybox:1.31.1|
 | Metrics | Ghostunnel | docker.io/ghostunnel/ghostunnel:v1.7.1|
-| Metrics | Grafana | docker.io/grafana/grafana:9.5.2|
+| Metrics | Grafana | docker.io/grafana/grafana:9.5.5|
 | Metrics | Ingress-NGINX Controller | registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6|
 | Metrics | Kube State Exporter | k8s.gcr.io/kube-state-metrics/kube-state-metrics:v2.8.2|
 | Metrics | Node Exporter | quay.io/prometheus/node-exporter:v1.5.0|
