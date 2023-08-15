@@ -7,6 +7,9 @@ added new corresponding OpenSearch Grafana dashboard.
   * [UPGRADE] Grafana has been upgraded from version 9.5.2 to 9.5.5. This version contains a fix to address vulnerability [CVE-2023-3128](https://nvd.nist.gov/vuln/detail/CVE-2023-3128)
     [FIX] Removed hard-coded reference to 'monitoring' namespace in Prometheus URL w/in Grafana datasource
     [FIX] Unset MON_TLS_PATH_INGRESS in samples/generic-base/monitoring/user.env
+    [ANNOUNCEMENT] Support for tenant-level metric monitoring (specifically, deploying tenant-level instances 
+of Prometheus and Grafana), is moved from 'experiemental' to 'deprecated' status and will be removed in 
+an upcoming release.
 
 * **Logging**
   * [SECURITY] Deploy OpenSearch Dashboards pod with readOnlyRootFilesystem enabled
