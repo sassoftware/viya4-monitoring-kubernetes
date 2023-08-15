@@ -23,6 +23,9 @@ extraVolumes:
 - name: kibana-certs
   secret:
     secretName: kibana-tls-secret
+- name: uuid-file
+  emptyDir: {}
+
 extraVolumeMounts:
 - name: kibana-certs
   mountPath: "/usr/share/opensearchdashboards/certs/kibana-crt.pem"
@@ -33,6 +36,9 @@ extraVolumeMounts:
 - name: kibana-certs
   mountPath: "/usr/share/opensearchdashboards/certs/kibana-root-ca.pem"
   subPath: ca.crt
+- name: uuid-file
+  mountPath: "/usr/share/opensearch-dashboards/data/"
+  subPath: uuid
 
 config:
   opensearch_dashboards.yml: |
@@ -55,3 +61,6 @@ config:
     opensearch_security.readonly_mode.roles: ["kibana_read_only"]
 
     opensearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
+
+securityContext:
+  readOnlyRootFilesystem: true

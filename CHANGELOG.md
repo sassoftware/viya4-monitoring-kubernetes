@@ -8,6 +8,9 @@ added new corresponding OpenSearch Grafana dashboard.
     [FIX] Removed hard-coded reference to 'monitoring' namespace in Prometheus URL w/in Grafana datasource
     [FIX] Unset MON_TLS_PATH_INGRESS in samples/generic-base/monitoring/user.env
 
+* **Logging**
+  * [SECURITY] Deploy OpenSearch Dashboards pod with readOnlyRootFilesystem enabled
+
 ## Version 1.2.15 (18JUL2023)
 * **Overall**
   * [SECURITY] TLS for intra-cluster communications is now enabled by default.
