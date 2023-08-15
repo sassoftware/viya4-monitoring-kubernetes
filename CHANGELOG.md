@@ -4,7 +4,8 @@
 * **Overall**
   * [FEATURE] Deploying into an air-gapped environment from a private container registry is now supported.  See
 [Configure SAS Viya Monitoring for Kubernetes for an Air-Gapped Environment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n0grd8g2pkfglin12bzm3g1oik2p.htm).
-
+  * [CHANGE] The IMAGE_INVENTORY.md file has been superseded by a new file, [ARTIFACT_INVENTORY.md](ARTIFACT_INVENTORY.md),
+with more complete information about the project's deployment artifacts.
 * **Metrics**
   * [CHANGE] - Moved to monitoring the OpenSearch instance w/in SAS Viya deployments with OpenSearch plugin;
 added new corresponding OpenSearch Grafana dashboard.
