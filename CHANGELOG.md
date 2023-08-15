@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.16 (15AUG2023)
 * **Overall**
   * [FEATURE] Deploying into an air-gapped environment from a private container registry is now supported.  See
 [Configure SAS Viya Monitoring for Kubernetes for an Air-Gapped Environment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n0grd8g2pkfglin12bzm3g1oik2p.htm).
@@ -18,6 +18,9 @@ an upcoming release.
 
 * **Logging**
   * [SECURITY] Deploy OpenSearch Dashboards pod with readOnlyRootFilesystem enabled
+
+* **Tracing**
+  * [FEATURE] Introduced new **experimental** ability to deploy tracing pipeline which includes Tempo and configuring Fluent Bit to ingest traces and output them to Tempo. As it is experimental, there is work left to be done, including documentation to accompany this feature.
 
 ## Version 1.2.15 (18JUL2023)
 * **Overall**
