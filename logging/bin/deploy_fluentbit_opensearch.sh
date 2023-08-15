@@ -122,7 +122,7 @@ kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 kubectl -n $LOG_NS delete configmap fb-viya-parsers --ignore-not-found
 kubectl -n $LOG_NS create configmap fb-viya-parsers  --from-file=logging/fb/viya-parsers.conf
 
-TRACING_ENABLE="${TRACING_ENABLE:-true}"
+TRACING_ENABLE="${TRACING_ENABLE:-false}"
 if [ "$TRACING_ENABLE" == "true" ]; then
   # Create ConfigMap containing tracing config
   kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
@@ -157,7 +157,7 @@ if [ -z "$KUBERNETES_RUNTIME_LOGFMT" ]; then
    esac
 fi
 
-export MON_NS="${MON_NS:-monitoring}"
+MON_NS="${MON_NS:-monitoring}"
 
 # Create ConfigMap containing Kubernetes container runtime log format
 kubectl -n $LOG_NS delete configmap fb-env-vars --ignore-not-found

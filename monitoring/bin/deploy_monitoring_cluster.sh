@@ -193,16 +193,15 @@ if [ "$V4M_CURRENT_VERSION_MAJOR" == "1" ] && [[ "$V4M_CURRENT_VERSION_MINOR" =~
     -l app.kubernetes.io/instance=v4m-prometheus-operator,app.kubernetes.io/name=kube-state-metrics
 fi
 
-TRACING_ENABLE="${TRACING_ENABLE:-true}"
+TRACING_ENABLE="${TRACING_ENABLE:-false}"
 if [ "$TRACING_ENABLE" == "false" ]; then
   tempoDSFile=$TMP_DIR/empty.yaml
-
+else
   TEMPO_USER_YAML="${TEMPO_USER_YAML:-$USER_DIR/monitoring/user-values-tempo.yaml}"
   if [ ! -f "$TEMPO_USER_YAML" ]; then
     log_debug "[$TEMPO_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
     TEMPO_USER_YAML=$TMP_DIR/empty.yaml
   fi
-else
   tempoDSFile="monitoring/grafana-datasource-tempo.yaml"
 fi 
 
