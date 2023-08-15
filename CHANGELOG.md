@@ -20,7 +20,7 @@ an upcoming release.
   * [SECURITY] Deploy OpenSearch Dashboards pod with readOnlyRootFilesystem enabled
 
 * **Tracing**
-  * [FEATURE] Introduced new **experimental** ability to deploy tracing pipeline which includes Tempo and configuring Fluentbit to ingest traces and output them to Tempo. As it is experimental, there is work left to be done, including documentation to accompany this features.
+  * [FEATURE] Introduced new **experimental** ability to deploy tracing pipeline which includes Tempo and configuring Fluent Bit to ingest traces and output them to Tempo. As it is experimental, there is work left to be done, including documentation to accompany this feature.
 
 ## Version 1.2.15 (18JUL2023)
 * **Overall**
