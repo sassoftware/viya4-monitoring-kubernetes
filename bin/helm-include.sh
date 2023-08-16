@@ -65,7 +65,7 @@ function helmRepoAdd {
   repoURL=$2
 
   ## If this is an air gap deployment, do nothing
-  if [ $AIRGAP_DEPLOYMENT == "true" ]; then
+  if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
     return 0
   fi 
 
