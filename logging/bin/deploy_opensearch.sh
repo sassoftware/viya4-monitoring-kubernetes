@@ -37,9 +37,6 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   exit 1
 fi
 
-# Get/Set Helm Chart Version
-OPENSEARCH_HELM_CHART_VERSION=${OPENSEARCH_HELM_CHART_VERSION:-"2.13.0"}
-
 ## Check for air gap deployment
 if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
   source bin/airgap-include.sh
@@ -319,6 +316,13 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
     OPENSHIFT_SPECIFIC_YAML=logging/openshift/values-opensearch-openshift.yaml
 fi
 
+
+# Get Helm Chart Name
+log_debug "OpenSearch Helm Chart: repo [$OPENSEARCH_HELM_CHART_REPO] name [$OPENSEARCH_HELM_CHART_NAME] version [$OPENSEARCH_HELM_CHART_VERSION]"
+chart2install="$(get_helmchart_reference $OPENSEARCH_HELM_CHART_REPO $OPENSEARCH_HELM_CHART_NAME $OPENSEARCH_HELM_CHART_VERSION)"
+log_debug "Installing Helm chart from artifact [$chart2install]"
+
+
 # Deploy OpenSearch via Helm chart
 # NOTE: nodeGroup needed to get resource names we want
 helm $helmDebug upgrade --install opensearch \
@@ -332,7 +336,7 @@ helm $helmDebug upgrade --install opensearch \
     --set nodeGroup=primary  \
     --set masterService=v4m-search \
     --set fullnameOverride=v4m-search \
-    ${AIRGAP_HELM_REPO}opensearch/opensearch
+    $chart2install
 
 # ODFE => OpenSearch Migration
 if [ "$deploy_temp_masters" == "true" ]; then
@@ -355,7 +359,7 @@ if [ "$deploy_temp_masters" == "true" ]; then
        --set rbac.create=false \
        --set masterService=v4m-search \
        --set fullnameOverride=v4m-master \
-       ${AIRGAP_HELM_REPO}opensearch/opensearch
+       $chart2install
 fi
 
 
