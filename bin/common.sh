@@ -46,6 +46,23 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
       exit 1
     fi
 
+    # Load component Helm chart version infomation
+    # NOTE: This is loaded prior to the USER_DIR to allow
+    # overriding these defaults via USER_DIR user.env files
+    if [ -f "component_versions.env" ]; then
+        userEnv=$(grep -v '^[[:blank:]]*$' component_versions.env | grep -v '^#' | xargs)
+        if [ "$userEnv" != "" ]; then
+          log_debug "Loading global user environment file: component_versions.env"
+          if [ "$userEnv" != "" ]; then
+            export $userEnv
+          fi
+        fi
+    else
+        log_debug "No component_versions.env file found"
+    fi
+
+
+
     export USER_DIR=${USER_DIR:-$(pwd)}
     if [ -d "$USER_DIR" ]; then
       # Resolve full path

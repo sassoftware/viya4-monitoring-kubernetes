@@ -95,8 +95,37 @@ function helmRepoAdd {
   fi
 }
 
+function get_helmchart_reference {
+  local chart_repository chart_name chart_version
+
+  chart_repository=$1
+  chart_name=$2
+  chart_version=$3
+
+  if [ -z "$chart_repository" ]; then
+     echo "'ERROR: Helm chart repository not specified'"
+     return 1
+  elif [ -z "$chart_name" ]; then
+     echo "'ERROR: Helm chart name not specified'"
+     return 1
+  elif [ -z "$chart_version" ]; then
+     echo "'ERROR: Helm chart version not specified'"
+     return 1
+  else
+     #all parms have values
+     :
+  fi
+
+  if [ "$AIRGAP_HELM_FORMAT"  == "tgz" ]; then
+      echo "${AIRGAP_HELM_REPO}${chart_name}-${chart_version}.tgz"
+  else
+      echo "${AIRGAP_HELM_REPO}${chart_repository}/${chart_name}"
+  fi
+}
+
 export HELM_VER_FULL HELM_VER_MAJOR HELM_VER_MINOR HELM_VER_PATCH
 export -f helm2ReleaseExists
 export -f helm3ReleaseExists
 export -f helm2ReleaseCheck
 export -f helmRepoAdd
+export -f get_helmchart_reference
