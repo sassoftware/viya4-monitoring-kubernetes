@@ -75,7 +75,7 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
    fi
 
    if helm3ReleaseExists prometheus-pushgateway $VIYA_NS; then
-      kubectl delete deployment -n $VIYA_NS prometheus-pushgateway
+      kubectl delete deployment -n $VIYA_NS prometheus-pushgateway --ignore-not-found
       svcClusterIP=$(kubectl get svc -n $VIYA_NS prometheus-pushgateway -o 'jsonpath={.spec.clusterIP}')
    fi
 
