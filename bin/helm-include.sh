@@ -121,7 +121,7 @@ function get_helmchart_reference {
   elif [ "$AIRGAP_HELM_FORMAT"  == "oci" ]; then
       echo "oci://${AIRGAP_HELM_REPO}/${chart_repository}/${chart_name}"
   else
-      echo "${AIRGAP_HELM_REPO}/${chart_repository}/${chart_name}"
+      echo "${chart_repository}/${chart_name}"
   fi
 }
 
