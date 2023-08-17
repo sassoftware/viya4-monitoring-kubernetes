@@ -118,8 +118,10 @@ function get_helmchart_reference {
 
   if [ "$AIRGAP_HELM_FORMAT"  == "tgz" ]; then
       echo "${AIRGAP_HELM_REPO}${chart_name}-${chart_version}.tgz"
+  elif [ "$AIRGAP_HELM_FORMAT"  == "oci" ]; then
+      echo "oci://${AIRGAP_HELM_REPO}/${chart_repository}/${chart_name}"
   else
-      echo "${AIRGAP_HELM_REPO}${chart_repository}/${chart_name}"
+      echo "${AIRGAP_HELM_REPO}/${chart_repository}/${chart_name}"
   fi
 }
 

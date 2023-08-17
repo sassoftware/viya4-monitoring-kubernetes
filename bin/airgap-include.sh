@@ -13,11 +13,8 @@ if [ "$AIRGAP_SOURCED" == "" ]; then
         exit 1
     else
         AIRGAP_IMAGE_PULL_SECRET_NAME=${AIRGAP_IMAGE_PULL_SECRET_NAME:-"v4m-image-pull-secret"}
-        if [ -z "$AIRGAP_HELM_REPO" ]; then
-            log_debug "Separate AIRGAP_HELM_REPO value not provided"
-            log_debug "Setting AIRGAP_HELM_REPO to oci://${AIRGAP_REGISTRY}/"
-            AIRGAP_HELM_REPO="oci://${AIRGAP_REGISTRY}/"
-        fi
+        AIRGAP_HELM_REPO=${AIRGAP_HELM_REPO:-"$AIRGAP_REGISTRY"}
+        AIRGAP_HELM_FORMAT=${AIRGAP_HELM_FORMAT:-"oci"}
     fi
 
     log_info "Deploying into an 'air-gapped' cluster from private registry [$AIRGAP_REGISTRY]"
