@@ -258,9 +258,8 @@ log_info "Deploying ServiceMonitors and Prometheus rules"
 log_verbose "Deploying cluster ServiceMonitors"
 
 if [ "$TRACING_ENABLE" == "true" ]; then
-  TEMPO_CHART_VERSION=${TEMPO_CHART_VERSION:-1.5.0}
   log_info "Tracing enabled..."
-  # # Add the grafana helm chart repo
+  # Add the grafana helm chart repo
   helmRepoAdd grafana https://grafana.github.io/helm-charts
   helm repo update
 
