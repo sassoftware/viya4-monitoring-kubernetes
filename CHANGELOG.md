@@ -5,6 +5,9 @@
   * [FEATURE] Deploying into an air-gapped environment using local Helm archive (.tgz) files is now supported.  In this scenario,
 container images are still expected to be pulled from private container registry.  See
 [Configure SAS Viya Monitoring for Kubernetes for an Air-Gapped Environment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n0grd8g2pkfglin12bzm3g1oik2p.htm).
+  * [CHANGE] The environment variables over-riding the default Helm chart versions to deploy MUST now be set in the user.env files
+within your USER_DIR.  Setting these environment variables via the command line or in your environment before running deployment
+scripts is no longer supported.
 
 ## Version 1.2.16 (15AUG2023)
 * **Overall**
