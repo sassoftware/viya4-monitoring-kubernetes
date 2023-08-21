@@ -15,6 +15,16 @@ if [ "$AIRGAP_SOURCED" == "" ]; then
         AIRGAP_IMAGE_PULL_SECRET_NAME=${AIRGAP_IMAGE_PULL_SECRET_NAME:-"v4m-image-pull-secret"}
         AIRGAP_HELM_REPO=${AIRGAP_HELM_REPO:-"$AIRGAP_REGISTRY"}
         AIRGAP_HELM_FORMAT=${AIRGAP_HELM_FORMAT:-"oci"}
+
+        if [ "$AIRGAP_HELM_FORMAT" == "tgz" ]; then
+           if [ ! -d "$AIRGAP_HELM_REPO" ]; then
+              log_error "When AIRGAP_HELM_FORMAT is 'tgz', AIRGAP_HELM_REPO is expected to be a directory."
+              log_error "The specified AIRGAP_HELM_REPO directory [$AIRGAP_HELM_REPO] does NOT exist."
+              exit 1
+           else
+              log_debug "Confirmed AIRGAP_HELM_REPO [$AIRGAP_HELM_REPO] exists"
+           fi
+        fi
     fi
 
     log_info "Deploying into an 'air-gapped' cluster from private registry [$AIRGAP_REGISTRY]"
