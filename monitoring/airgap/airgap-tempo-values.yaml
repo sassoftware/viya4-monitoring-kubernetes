@@ -2,6 +2,3 @@ image:
   repository: __AIRGAP_REGISTRY__/tempo/tempo
   pullSecrets:
   - name: __AIRGAP_IMAGE_PULL_SECRET_NAME__
-initChownData:
-  image:
-    repository: __AIRGAP_REGISTRY__/library/busybox
