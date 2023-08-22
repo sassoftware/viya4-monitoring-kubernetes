@@ -205,7 +205,11 @@ else
   tempoDSFile="monitoring/grafana-datasource-tempo.yaml"
 fi 
 
-KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-45.28.0}
+# Get Helm Chart Name
+log_debug "Kube-Prometheus Stack Helm Chart: repo [$KUBE_PROM_STACK_CHART_REPO] name [$KUBE_PROM_STACK_CHART_NAME] version [$KUBE_PROM_STACK_CHART_VERSION]"
+chart2install="$(get_helmchart_reference $KUBE_PROM_STACK_CHART_REPO $KUBE_PROM_STACK_CHART_NAME $KUBE_PROM_STACK_CHART_VERSION)"
+log_debug "Installing Helm chart from artifact [$chart2install]"
+
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
   -f monitoring/values-prom-operator.yaml \
@@ -228,7 +232,7 @@ helm $helmDebug upgrade --install $promRelease \
   --set grafana.adminPassword="$grafanaPwd" \
   --set prometheus.prometheusSpec.alertingEndpoints[0].namespace="$MON_NS" \
   --version $KUBE_PROM_STACK_CHART_VERSION \
-  ${AIRGAP_HELM_REPO}prometheus-community/kube-prometheus-stack
+  $chart2install
 
 sleep 2
 
@@ -269,9 +273,14 @@ if [ "$TRACING_ENABLE" == "true" ]; then
 
   TEMPO_CHART_VERSION=${TEMPO_CHART_VERSION:-1.5.0}
   log_info "Tracing enabled..."
-  # # Add the grafana helm chart repo
+  # Add the grafana helm chart repo
   helmRepoAdd grafana https://grafana.github.io/helm-charts
   helm repo update
+
+  # Get Helm Chart Name
+  log_debug "Tempo Helm Chart: repo [$TEMPO_CHART_REPO] name [$TEMPO_CHART_NAME] version [$TEMPO_CHART_VERSION]"
+  chart2install="$(get_helmchart_reference $TEMPO_CHART_REPO $TEMPO_CHART_NAME $TEMPO_CHART_VERSION)"
+  log_debug "Installing Helm chart from artifact [$chart2install]"
 
   log_info "Installing tempo"
   helm upgrade --install v4m-tempo \
@@ -281,7 +290,7 @@ if [ "$TRACING_ENABLE" == "true" ]; then
     --set serviceMonitor.enabled=true \
     --set searchEnabled=true \
     --version "$TEMPO_CHART_VERSION" \
-    ${AIRGAP_HELM_REPO}grafana/tempo
+    $chart2install
 fi
 
 # NGINX
