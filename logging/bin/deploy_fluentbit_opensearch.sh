@@ -169,8 +169,10 @@ kubectl -n $LOG_NS create configmap fb-env-vars \
 
 kubectl -n $LOG_NS label configmap fb-env-vars   managed-by=v4m-es-script
 
-#Pin to a specific Helm chart version
-FLUENTBIT_HELM_CHART_VERSION=${FLUENTBIT_HELM_CHART_VERSION:-"0.30.4"}
+## Get Helm Chart Name
+log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"
+chart2install="$(get_helmchart_reference $FLUENTBIT_HELM_CHART_REPO $FLUENTBIT_HELM_CHART_NAME $FLUENTBIT_HELM_CHART_VERSION)"
+log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
@@ -181,7 +183,7 @@ helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
   --values $tracingValuesFile \
   --values $FB_OPENSEARCH_USER_YAML   \
   --set fullnameOverride=v4m-fb \
-  ${AIRGAP_HELM_REPO}fluent/fluent-bit
+  $chart2install
 
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
 disable_sa_token_automount $LOG_NS v4m-fb
