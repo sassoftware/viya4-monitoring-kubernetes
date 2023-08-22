@@ -253,20 +253,20 @@ enable_pod_token_automount $MON_NS deployment v4m-operator
 log_info "Deploying ServiceMonitors and Prometheus rules"
 log_verbose "Deploying cluster ServiceMonitors"
 
-## Check for air gap deployment
-if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  source bin/airgap-include.sh
-
-  # Check for the image pull secret for the air gap environment and replace placeholders
-  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-  replaceAirgapValuesInFiles "monitoring/airgap/airgap-tempo-values.yaml"
-
-  airgapValuesFile=$updatedAirgapValuesFile
-else
-  airgapValuesFile=$TMP_DIR/empty.yaml
-fi
-
 if [ "$TRACING_ENABLE" == "true" ]; then
+  ## Check for air gap deployment
+  if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+    source bin/airgap-include.sh
+
+    # Check for the image pull secret for the air gap environment and replace placeholders
+    checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
+    replaceAirgapValuesInFiles "monitoring/airgap/airgap-tempo-values.yaml"
+
+    airgapValuesFile=$updatedAirgapValuesFile
+  else
+    airgapValuesFile=$TMP_DIR/empty.yaml
+  fi
+
   TEMPO_CHART_VERSION=${TEMPO_CHART_VERSION:-1.5.0}
   log_info "Tracing enabled..."
   # # Add the grafana helm chart repo

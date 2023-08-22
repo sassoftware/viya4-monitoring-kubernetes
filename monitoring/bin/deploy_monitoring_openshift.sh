@@ -270,16 +270,30 @@ if ! kubectl get route -n $MON_NS v4m-grafana 1>/dev/null 2>&1; then
 fi
 
 if [ "$TRACING_ENABLE" == "true" ]; then
+  ## Check for air gap deployment
+  if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+    source bin/airgap-include.sh
+
+    # Check for the image pull secret for the air gap environment and replace placeholders
+    checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
+    replaceAirgapValuesInFiles "monitoring/airgap/airgap-tempo-values.yaml"
+
+    airgapValuesFile=$updatedAirgapValuesFile
+  else
+    airgapValuesFile=$TMP_DIR/empty.yaml
+  fi
+
   TEMPO_CHART_VERSION=${TEMPO_CHART_VERSION:-1.5.0}
   log_info "Tracing enabled..."
   log_info "Installing tempo"
   helm upgrade --install v4m-tempo \
     -n "$MON_NS" \
     -f "$TEMPO_USER_YAML" \
+    -f "$airgapValuesFile" \
     --set serviceMonitor.enabled=true \
     --set searchEnabled=true \
     --version "$TEMPO_CHART_VERSION" \
-    grafana/tempo
+    ${AIRGAP_HELM_REPO}grafana/tempo
 fi
 
 # If a deployment with the old name exists, remove it first
