@@ -275,6 +275,8 @@ if ! kubectl get route -n $MON_NS v4m-grafana 1>/dev/null 2>&1; then
 fi
 
 if [ "$TRACING_ENABLE" == "true" ]; then
+  log_info "Tracing enabled..."
+
   ## Check for air gap deployment
   if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
     source bin/airgap-include.sh
@@ -288,8 +290,11 @@ if [ "$TRACING_ENABLE" == "true" ]; then
     airgapValuesFile=$TMP_DIR/empty.yaml
   fi
 
-  TEMPO_CHART_VERSION=${TEMPO_CHART_VERSION:-1.5.0}
-  log_info "Tracing enabled..."
+  # Get Helm Chart Name
+  log_debug "Tempo Helm Chart: repo [$TEMPO_CHART_REPO] name [$TEMPO_CHART_NAME] version [$TEMPO_CHART_VERSION]"
+  chart2install="$(get_helmchart_reference $TEMPO_CHART_REPO $TEMPO_CHART_NAME $TEMPO_CHART_VERSION)"
+  log_debug "Installing Helm chart from artifact [$chart2install]"
+
   log_info "Installing tempo"
   helm upgrade --install v4m-tempo \
     -n "$MON_NS" \
@@ -298,7 +303,7 @@ if [ "$TRACING_ENABLE" == "true" ]; then
     --set serviceMonitor.enabled=true \
     --set searchEnabled=true \
     --version "$TEMPO_CHART_VERSION" \
-    ${AIRGAP_HELM_REPO}grafana/tempo
+    $chart2install
 fi
 
 # If a deployment with the old name exists, remove it first

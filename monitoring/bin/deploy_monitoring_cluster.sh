@@ -258,6 +258,8 @@ log_info "Deploying ServiceMonitors and Prometheus rules"
 log_verbose "Deploying cluster ServiceMonitors"
 
 if [ "$TRACING_ENABLE" == "true" ]; then
+  log_info "Tracing enabled..."
+
   ## Check for air gap deployment
   if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
     source bin/airgap-include.sh
@@ -271,8 +273,6 @@ if [ "$TRACING_ENABLE" == "true" ]; then
     airgapValuesFile=$TMP_DIR/empty.yaml
   fi
 
-  TEMPO_CHART_VERSION=${TEMPO_CHART_VERSION:-1.5.0}
-  log_info "Tracing enabled..."
   # Add the grafana helm chart repo
   helmRepoAdd grafana https://grafana.github.io/helm-charts
   helm repo update
@@ -285,8 +285,8 @@ if [ "$TRACING_ENABLE" == "true" ]; then
   log_info "Installing tempo"
   helm upgrade --install v4m-tempo \
     -n "$MON_NS" \
-    -f "$airgapValuesFile" \
     -f "$TEMPO_USER_YAML" \
+    -f "$airgapValuesFile" \
     --set serviceMonitor.enabled=true \
     --set searchEnabled=true \
     --version "$TEMPO_CHART_VERSION" \
