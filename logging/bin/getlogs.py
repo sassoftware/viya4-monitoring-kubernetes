@@ -50,6 +50,12 @@ def validate_input(dict):
             print(e)
             exit()
 
+    if dict['format']:
+        if (str['format'].lower() != 'csv') and (str['format'].lower()!= 'json'):
+            print("Error: Not a valid output type for --format. Supported filetypes are csv and json.")
+            exit()
+
+
     """Ensure maxrows is less than 10000"""
     MAX_ROWS = 10000
     if dict['maxInt'] > MAX_ROWS:
@@ -138,7 +144,7 @@ def validate_input(dict):
             dict['dateTimeStart'] = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.gmtime(time.mktime(dict['dateTimeStart'])))
             dict['dateTimeEnd'] = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.gmtime(time.mktime(dict['dateTimeEnd'])))
     except ValueError:
-        print("One or more date(s) have been formatted incorrectly. Correct format is Y-M-D H:M:S. Ex: 1999-02-07 10:00:00")  
+        print("One or more date(s) have been formatted incorrectly. Correct format is Y-M-D H:M:S. Ex: 1999-02-16 10:00:00")  
         exit()
 
 def build_query(dict): ##Generates Query using Opensearch DSL
@@ -164,7 +170,7 @@ def build_query(dict): ##Generates Query using Opensearch DSL
                         if(i != len(dict[arg])-1):
                             x.write(',')
                 else:
-                    x.write('{"match_phrase": { "message":"' + (" ".join(dict[arg])) + '"} }')
+                    x.write('{"match_phrase": { "message":"' + ("".join(dict[arg])) + '"} }')
         first = True
         x.write('], "minimum_should_match": ' + str(argcounter))
         for arg in dict.keys(): ##Must Not Clause, only added if specified by user
@@ -217,7 +223,7 @@ def get_arguments():
     parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Display example of actual query that will be submitted during execution.\n\n")
     parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (WITHOUT filetype) in which to save the generated query. Query is saved as JSON file in current directory.\n\n")
     parser.add_argument('-o', '--out-file', required=False, dest="out-filename",  nargs='*', metavar="FILENAME", help = "\nName of file to write results to. Filetype is specified using -format. Supported filetypes: .csv, .json\n\n")
-    parser.add_argument('-fo','--format',  required=True, dest="format", choices = ["json","csv"], help = "\n Formats results into the specified file (from --out-file). If no output file is provided, results will be outputted to STDOUT. Supported formats for console output are json and csv \n\n")
+    parser.add_argument('-fo','--format',  required=False, dest="format", default = "csv", help = "\n Formats results into the specified file (from --out-file). If no output file is provided, results will be outputted to STDOUT. Supported formats for console output are json and csv. \n\n")
     parser.add_argument('-f','--force',  required=False, dest="force", action= "store_true", help = "\n If this option is provided, the output results file will be overwritten if it already exists.\n\n")
     parser.add_argument('-fi','--fields',  required=False, dest="fields", nargs="*", metavar= "FIELDS", default=['@timestamp', 'level', 'logsource', 'namespace','pod', 'container', 'message'], help = "\n Specify output columns (CSV file only) Please provide a space separated list of fields. \n Default fields: @timestamp level logsource namespace pod container message \n Additional arguments: host index properties debug \n\n")
     parser.add_argument('-st', '--start', required=False, dest="dateTimeStart", nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime(time.localtime()) - 3600)), help = "\nDatetime for start of period for which logs are sought (default: 1 hour ago).\n\n")
