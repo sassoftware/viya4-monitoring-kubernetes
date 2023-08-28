@@ -1,5 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Overall**
+  * [FIX] Ensure forced updates of Helm repos actually occur
+
 ## Version 1.2.16 (15AUG2023)
 * **Overall**
   * [FEATURE] Deploying into an air-gapped environment from a private container registry is now supported.  See
