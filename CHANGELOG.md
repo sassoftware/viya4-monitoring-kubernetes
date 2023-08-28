@@ -2,6 +2,9 @@
 
 ## Unreleased
 * **Overall**
+  * [FEATURE] Deploying into an air-gapped environment using local Helm archive (.tgz) files is now supported.  In this scenario,
+container images are still expected to be pulled from private container registry.  See
+[Configure SAS Viya Monitoring for Kubernetes for an Air-Gapped Environment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n0grd8g2pkfglin12bzm3g1oik2p.htm).
   * [FIX] Ensure forced updates of Helm repos actually occur
 
 ## Version 1.2.16 (15AUG2023)
