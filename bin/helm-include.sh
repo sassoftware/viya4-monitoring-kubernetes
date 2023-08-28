@@ -77,20 +77,15 @@ function helmRepoAdd {
     log_debug "The helm repo [$repo] already exists"
     if [ "$HELM_FORCE_REPO_UPDATE" == "true" ]; then
       log_debug "Forcing update of [$repo] helm repo to [$repoURL]"
+
       # Helm 3.3.2 changed 'repo add' behavior and added the --force-update flag
       # https://github.com/helm/helm/releases/tag/v3.3.2
-      if [ $HELM_VER_MINOR -lt 3 ]; then
-        helm repo add $repo $repoURL
-      elif [ $HELM_VER_MINOR -eq 3 ]; then
-        if [ $HELM_VER_PATCH -lt 2 ]; then
-          helm repo add $repo $repoURL
-        else
-          helm repo add --force-update $repo $repoURL
-        fi
+      if [[  $HELM_VER_MINOR -lt 3 || ( $HELM_VER_MINOR -eq 3 &&  $HELM_VER_PATCH -lt 2) ]]; then
+         helm repo add $repo $repoURL
       else
-        # Helm 2.x behavior is to replace by default
-        helm repo add $repo $repoURL
+         helm repo add --force-update $repo $repoURL
       fi
+
     fi
   fi
 }
