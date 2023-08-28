@@ -87,7 +87,7 @@ prometheus:
     nodePort: null  
   prometheusSpec:
     image:
-    #  tag: v2.44.0
+      tag: v2.46.0
     logLevel: info
     logFormat: json
     podAntiAffinity: soft
