@@ -205,7 +205,7 @@ else
   tempoDSFile="monitoring/grafana-datasource-tempo.yaml"
 fi 
 
-KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-45.28.0}
+KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-48.3.2}
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
   -f monitoring/values-prom-operator.yaml \

@@ -60,6 +60,8 @@ set -e
 # Prometheus Pushgateway
 PUSHGATEWAY_ENABLED=${PUSHGATEWAY_ENABLED:-true}
 if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
+  
+  # TODO: Remove references to repository in values-pushgateway.yaml once Pushgateway Helm chart 2.0.0+ issues resolved
   PUSHGATEWAY_CHART_VERSION=${PUSHGATEWAY_CHART_VERSION:-1.11.0}
 
  ## Check for air gap deployment
