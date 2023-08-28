@@ -9,7 +9,7 @@ container images are still expected to be pulled from private container registry
   * [FIX] Ensure forced updates of Helm repos actually occur
 
 * **Metrics**
-  * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 45.28.0 to 48.2.3
+  * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 45.28.0 to 48.3.2
   * [UPGRADE] - Prometheus has been upgraded from version 2.44.0 to 2.45.0
   * [UPGRADE] - Prometheus Operator has been upgraded from version 0.65.1 to 0.66.0
   * [UPGRADE] - Grafana has been upgraded from version 9.5.5 to 10.0.3
