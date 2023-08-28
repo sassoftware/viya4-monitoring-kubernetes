@@ -168,7 +168,12 @@ else
 fi
 
 log_info "Deploying Grafana..."
-OPENSHIFT_GRAFANA_CHART_VERSION=${OPENSHIFT_GRAFANA_CHART_VERSION:-6.58.9}
+
+# Get Helm Chart Name
+log_debug "Grafana Helm Chart: repo [$OPENSHIFT_GRAFANA_CHART_REPO] name [$OPENSHIFT_GRAFANA_CHART_NAME] version [$OPENSHIFT_GRAFANA_CHART_VERSION]"
+chart2install="$(get_helmchart_reference $OPENSHIFT_GRAFANA_CHART_REPO $OPENSHIFT_GRAFANA_CHART_NAME $OPENSHIFT_GRAFANA_CHART_VERSION)"
+log_debug "Installing Helm chart from artifact [$chart2install]"
+
 helm upgrade --install $helmDebug \
   -n "$MON_NS" \
   -f "$wnpValuesFile" \
@@ -184,7 +189,7 @@ helm upgrade --install $helmDebug \
   $grafanaPwd \
   $extraArgs \
   v4m-grafana \
-  ${AIRGAP_HELM_REPO}grafana/grafana
+  $chart2install
 
 if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   log_info "Using OpenShift authentication for Grafana"

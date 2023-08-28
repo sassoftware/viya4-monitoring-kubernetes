@@ -60,38 +60,43 @@ set -e
 # Prometheus Pushgateway
 PUSHGATEWAY_ENABLED=${PUSHGATEWAY_ENABLED:-true}
 if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
-  
-  # TODO: Remove references to repository in values-pushgateway.yaml once Pushgateway Helm chart 2.0.0+ issues resolved
-  PUSHGATEWAY_CHART_VERSION=${PUSHGATEWAY_CHART_VERSION:-1.11.0}
 
- ## Check for air gap deployment
-if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  source bin/airgap-include.sh
+   ## Check for air gap deployment
+   if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+      source bin/airgap-include.sh
 
-  # Check for the image pull secret for the air gap environment and replace placeholders
-  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-  replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-pushgateway.yaml"
+      # Check for the image pull secret for the air gap environment and replace placeholders
+      checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
+      replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-pushgateway.yaml"
 
-  airgapValuesFile=$updatedAirgapValuesFile
-else
-  airgapValuesFile=$TMP_DIR/empty.yaml
-fi
+      airgapValuesFile=$updatedAirgapValuesFile
+   else
+      airgapValuesFile=$TMP_DIR/empty.yaml
+   fi
 
-  if helm3ReleaseExists prometheus-pushgateway $VIYA_NS; then
-    kubectl delete deployment -n $VIYA_NS prometheus-pushgateway
-    svcClusterIP=$(kubectl get svc -n $VIYA_NS prometheus-pushgateway -o 'jsonpath={.spec.clusterIP}')
-  fi
-  log_info "Installing the Prometheus Pushgateway to the [$VIYA_NS] namespace"
-  helm2ReleaseCheck pushgateway-$VIYA_NS
-  helm $helmDebug upgrade --install prometheus-pushgateway \
-  --namespace $VIYA_NS \
-  --version $PUSHGATEWAY_CHART_VERSION \
-  --set service.clusterIP=$svcClusterIP \
-  -f monitoring/values-pushgateway.yaml \
-  -f $airgapValuesFile \
-  -f $wnpValuesFile \
-  -f $PUSHGATEWAY_USER_YAML \
-  ${AIRGAP_HELM_REPO}prometheus-community/prometheus-pushgateway
+   if helm3ReleaseExists prometheus-pushgateway $VIYA_NS; then
+      kubectl delete deployment -n $VIYA_NS prometheus-pushgateway --ignore-not-found
+      svcClusterIP=$(kubectl get svc -n $VIYA_NS prometheus-pushgateway -o 'jsonpath={.spec.clusterIP}')
+   fi
+
+   log_info "Installing the Prometheus Pushgateway to the [$VIYA_NS] namespace"
+   helm2ReleaseCheck pushgateway-$VIYA_NS
+
+   ## Get Helm Chart Name
+   log_debug "Prometheus Pushgateway Helm Chart: repo [$PUSHGATEWAY_CHART_REPO] name [$PUSHGATEWAY_CHART_NAME] version [$PUSHGATEWAY_CHART_VERSION]"
+   chart2install="$(get_helmchart_reference $PUSHGATEWAY_CHART_REPO $PUSHGATEWAY_CHART_NAME $PUSHGATEWAY_CHART_VERSION)"
+   log_debug "Installing Helm chart from artifact [$chart2install]"
+
+   helm $helmDebug upgrade --install prometheus-pushgateway \
+        --namespace $VIYA_NS \
+        --version $PUSHGATEWAY_CHART_VERSION \
+        --set service.clusterIP=$svcClusterIP \
+        -f monitoring/values-pushgateway.yaml \
+        -f $airgapValuesFile \
+        -f $wnpValuesFile \
+        -f $PUSHGATEWAY_USER_YAML \
+         $chart2install
+
 fi
 
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
