@@ -298,10 +298,9 @@ if [ "$TRACING_ENABLE" == "true" ]; then
   log_info "Installing tempo"
   helm upgrade --install v4m-tempo \
     -n "$MON_NS" \
+    -f monitoring/openshift/tempo-values.yaml
     -f "$TEMPO_USER_YAML" \
     -f "$airgapValuesFile" \
-    --set serviceMonitor.enabled=true \
-    --set searchEnabled=true \
     --version "$TEMPO_CHART_VERSION" \
     $chart2install
 fi
