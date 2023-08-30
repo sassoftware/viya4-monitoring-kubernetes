@@ -16,24 +16,24 @@ registry/repository/image_name:version
 
 | Subsystem| Component | Fully Qualified Container-Image Name (registry/repository/image_name:version)|
 |----|----|----|
-| Logging | BusyBox | docker.io/library/busybox|
+| Logging | BusyBox (OpenSearch) | docker.io/library/busybox|
 | Logging | Fluent Bit | cr.fluentbit.io/fluent/fluent-bit:2.1.4|
 | Logging | Elasticsearch Exporter | quay.io/prometheuscommunity/elasticsearch-exporter:v1.5.0|
 | Logging | Eventrouter | gcr.io/heptio-images/eventrouter:v0.3|
 | Logging | OpenSearch | docker.io/opensearchproject/opensearch:2.8.0|
 | Logging | OpenSearch Dashboards| docker.io/opensearchproject/opensearch-dashboards:2.8.0|
 | Metrics | Alertmanager | quay.io/prometheus/alertmanager:v0.25.0|
-| Metrics | BusyBox | docker.io/library/busybox:1.31.1|
+| Metrics | BusyBox (Grafana) | docker.io/library/busybox:1.31.1|
 | Metrics | Ghostunnel | docker.io/ghostunnel/ghostunnel:v1.7.1|
 | Metrics | Grafana | docker.io/grafana/grafana:10.0.3|
-| Metrics | Ingress-NGINX Controller | registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6|
+| Metrics | Admission Webhook | registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6|
 | Metrics | Kube State Exporter | k8s.gcr.io/kube-state-metrics/kube-state-metrics:v2.9.2|
-| Metrics | Node Exporter | quay.io/prometheus/node-exporter:v1.6.0|
-| Metrics | Prometheus | quay.io/prometheus/prometheus:v2.45.0|
+| Metrics | Node Exporter | quay.io/prometheus/node-exporter:v1.6.1|
+| Metrics | Prometheus | quay.io/prometheus/prometheus:v2.46.0|
 | Metrics | Prometheus Operator | quay.io/prometheus-operator/prometheus-operator:v0.66.0|
-| Metrics | Prometheus Operator (config reloader) | quay.io/prometheus-operator/prometheus-config-reloader:v0.66.0|
+| Metrics | Configuration Reloader (Alertmanager, Grafana) | quay.io/prometheus-operator/prometheus-config-reloader:v0.66.0|
 | Metrics | Prometheus Pushgateway | docker.io/prom/pushgateway:v1.6.0|
-| Metrics | Sidecar | quay.io/kiwigrid/k8s-sidecar:1.24.6|
+| Metrics | Auto-load Sidecars (Grafana) | quay.io/kiwigrid/k8s-sidecar:1.25.0|
 
 ## Table 2. Helm Chart Repositories
 This table identifies the Helm repositories that contain the Helm charts used by SAS Viya Monitoring for Kubernetes.
