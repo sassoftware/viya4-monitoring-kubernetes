@@ -127,8 +127,8 @@ if [ "$TRACING_ENABLE" == "true" ]; then
   tracingValuesFile="logging/fb/fluent-bit_helm_values_tracing.yaml"
 else 
   # Create empty ConfigMap for tracing since it is expected to exist in main config
-  kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
-  kubectl -n "$LOG_NS" create configmap fb-viya-tracing  --from-file="$TMP_DIR"/empty.yaml
+  kubectl -n "$LOG_NS" delete configmap fbaz-viya-tracing --ignore-not-found
+  kubectl -n "$LOG_NS" create configmap fbaz-viya-tracing  --from-file="$TMP_DIR"/empty.yaml
 
   tracingValuesFile=$TMP_DIR/empty.yaml
 fi
