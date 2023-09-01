@@ -77,6 +77,17 @@ def validate_input(dict):
 
     if dict['out-filename']: ##Check for supported file-types
 
+        if os.path.isfile(dict['out-filename']):
+            if (dict['force'] == False):
+                print("\nUser specified output file already exists. Use -f to overwrite the file.\n")
+                exit()
+
+        try:
+            x = open(args['out-filename'], 'w')    
+        except FileNotFoundError as e:
+            print("Output file Directory not found. Please verify output file path.")
+            exit()
+
         if (dict['maxInt'] == 0):
             dict['maxInt'] = 250
 
@@ -100,11 +111,6 @@ def validate_input(dict):
 
         if (not (DEFAULT_DIR + "/") in dict['out-filename']):
             dict['out-filename'] = os.path.join(DEFAULT_DIR, dict['out-filename'])
-        
-        if os.path.isfile(dict['out-filename']):
-            if (dict['force'] == False):
-                print("\nUser specified output file already exists. Use -f to overwrite the file.\n")
-                exit()
 
     if dict['savequery']:      
         if(type(dict['savequery']) == list):
@@ -127,8 +133,7 @@ def validate_input(dict):
     else: ## If no output file, set default maxrows to 25
         if (dict['maxInt'] == 0):
             dict['maxInt'] = 25
-
-    
+ 
     ##Time Validator - Verifies input, and converts it to UTC   
     if (type(dict['dateTimeStart']) ==list):
         dict['dateTimeStart'] = " ".join(dict['dateTimeStart'])
@@ -299,13 +304,7 @@ if response['hits']['total']['value'] == 0:
     exit()
 
 stdout = False
-if (args['out-filename']): ##Check if user specified file exists, and if it should be overwritten.
-    try:
-        x = open(args['out-filename'], 'w')    
-    except FileNotFoundError as e:
-        print("Output file Directory not found. Please verify output file path.")
-        exit()
-else:
+if (not args['out-filename']): ##Check if user specified file exists, and if it should be overwritten.
     stdout = True
 
 ##Output as proper filetype
