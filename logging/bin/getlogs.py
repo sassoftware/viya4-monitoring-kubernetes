@@ -51,10 +51,11 @@ def validate_input(dict):
             exit()
 
     if dict['format']:
-        if (str['format'].lower() != 'csv') and (str['format'].lower()!= 'json'):
+        if (dict['format'].lower() != 'csv') and (dict['format'].lower() != 'json'):
             print("Error: Not a valid output type for --format. Supported filetypes are csv and json.")
             exit()
-
+        else:
+            dict['format'] = dict['format'].lower()
 
     """Ensure maxrows is less than 10000"""
     MAX_ROWS = 10000
@@ -146,8 +147,8 @@ def validate_input(dict):
             print("Given start date is after the end date.")
             exit()
         else:
-            dict['dateTimeStart'] = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.gmtime(time.mktime(dict['dateTimeStart'])))
-            dict['dateTimeEnd'] = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.gmtime(time.mktime(dict['dateTimeEnd'])))
+            dict['dateTimeStart'] = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.mktime(dict['dateTimeStart'])))
+            dict['dateTimeEnd'] = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.mktime(dict['dateTimeEnd'])))
     except ValueError:
         print("One or more date(s) have been formatted incorrectly. Correct format is Y-M-D H:M:S. Ex: 1999-02-16 10:00:00")  
         exit()
