@@ -78,6 +78,9 @@ def validate_input(dict):
 
     if dict['out-filename']: ##Check for supported file-types
 
+        if(type(dict['out-filename']) == list):
+            dict['out-filename']= " ".join(dict['out-filename'])
+
         if os.path.isfile(dict['out-filename']):
             if (dict['force'] == False):
                 print("\nUser specified output file already exists. Use -f to overwrite the file.\n")
@@ -91,9 +94,6 @@ def validate_input(dict):
 
         if (dict['maxInt'] == 0):
             dict['maxInt'] = 250
-
-        if(type(dict['out-filename']) == list):
-            dict['out-filename']= " ".join(dict['out-filename'])
 
         if(dict['format']):
             if ("." in dict['out-filename']):
@@ -305,9 +305,10 @@ if response['hits']['total']['value'] == 0:
     exit()
 
 stdout = False
-if (not args['out-filename']): ##Check if user specified file exists, and if it should be overwritten.
+if (not args['out-filename']):
     stdout = True
 
+x = open(args['out-filename'], 'w')
 ##Output as proper filetype
 if("json" in args['format']): 
     if (not stdout):
