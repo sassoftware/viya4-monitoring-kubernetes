@@ -224,7 +224,7 @@ def get_arguments():
     parser.add_argument('-se', '--search', required=False, dest= "message", nargs='*', metavar="MESSAGE",  help = "\nWord or phrase contained in log message. Do not include single quotes ('')\n\n\n \t\t\t QUERY OUTPUT SETTINGS: \n\n")
 
     ##Query and Output Params
-    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=0,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
+    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=10,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
     parser.add_argument('-q', '--query-file ', required=False, dest="query-filename", metavar="FILENAME.*", help = "\nName of file containing search query (Including filetype) at end. Program will submit query from file, ALL other query parmeters ignored. Supported filetypes: .txt, .json\n\n")
     parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Display example of actual query that will be submitted during execution.\n\n")
     parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (WITHOUT filetype) in which to save the generated query. Query is saved as JSON file in current directory.\n\n")
@@ -307,8 +307,9 @@ if response['hits']['total']['value'] == 0:
 stdout = False
 if (not args['out-filename']):
     stdout = True
-
-x = open(args['out-filename'], 'w')
+else:
+    x = open(args['out-filename'], 'w')
+    
 ##Output as proper filetype
 if("json" in args['format']): 
     if (not stdout):
