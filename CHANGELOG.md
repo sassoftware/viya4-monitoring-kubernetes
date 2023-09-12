@@ -7,6 +7,8 @@
 container images are still expected to be pulled from private container registry.  See
 [Configure SAS Viya Monitoring for Kubernetes for an Air-Gapped Environment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n0grd8g2pkfglin12bzm3g1oik2p.htm).
   * [FIX] Ensure forced updates of Helm repos actually occur
+* **Metrics**
+  * [REMOVAL] Remove previously deprecated (experimental) tenant-level metric monitoring components
 
 * **Metrics**
   * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 45.28.0 to 48.3.2
