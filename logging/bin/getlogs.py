@@ -89,7 +89,7 @@ def validate_input(dict):
         try:
             x = open(args['out-filename'], 'w')    
         except FileNotFoundError as e:
-            print("Output file Directory not found. Please verify output file path.")
+            print("Error: Output file Directory not found. Please verify output file path.")
             exit()
 
         if (dict['maxInt'] == 0):
