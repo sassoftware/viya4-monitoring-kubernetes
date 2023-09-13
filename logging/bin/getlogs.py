@@ -50,6 +50,13 @@ def validate_input(dict):
             print(e)
             exit()
 
+    if dict['format']:
+        if (dict['format'].lower() != 'csv') and (dict['format'].lower() != 'json'):
+            print("Error: Not a valid output type for --format. Supported filetypes are csv and json.")
+            exit()
+        else:
+            dict['format'] = dict['format'].lower()
+
     """Ensure maxrows is less than 10000"""
     MAX_ROWS = 10000
     if dict['maxInt'] > MAX_ROWS:
@@ -71,11 +78,22 @@ def validate_input(dict):
 
     if dict['out-filename']: ##Check for supported file-types
 
-        if (dict['maxInt'] == 0):
-            dict['maxInt'] = 250
-
         if(type(dict['out-filename']) == list):
             dict['out-filename']= " ".join(dict['out-filename'])
+
+        if os.path.isfile(dict['out-filename']):
+            if (dict['force'] == False):
+                print("\nUser specified output file already exists. Use -f to overwrite the file.\n")
+                exit()
+
+        try:
+            x = open(args['out-filename'], 'w')    
+        except FileNotFoundError as e:
+            print("Error: Output file Directory not found. Please verify output file path.")
+            exit()
+
+        if (dict['maxInt'] == 0):
+            dict['maxInt'] = 250
 
         if(dict['format']):
             if ("." in dict['out-filename']):
@@ -94,11 +112,6 @@ def validate_input(dict):
 
         if (not (DEFAULT_DIR + "/") in dict['out-filename']):
             dict['out-filename'] = os.path.join(DEFAULT_DIR, dict['out-filename'])
-        
-        if os.path.isfile(dict['out-filename']):
-            if (dict['force'] == False):
-                print("\nUser specified output file already exists. Use -f to overwrite the file.\n")
-                exit()
 
     if dict['savequery']:      
         if(type(dict['savequery']) == list):
@@ -121,8 +134,7 @@ def validate_input(dict):
     else: ## If no output file, set default maxrows to 25
         if (dict['maxInt'] == 0):
             dict['maxInt'] = 25
-
-    
+ 
     ##Time Validator - Verifies input, and converts it to UTC   
     if (type(dict['dateTimeStart']) ==list):
         dict['dateTimeStart'] = " ".join(dict['dateTimeStart'])
@@ -135,10 +147,10 @@ def validate_input(dict):
             print("Given start date is after the end date.")
             exit()
         else:
-            dict['dateTimeStart'] = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.gmtime(time.mktime(dict['dateTimeStart'])))
-            dict['dateTimeEnd'] = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.gmtime(time.mktime(dict['dateTimeEnd'])))
+            dict['dateTimeStart'] = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.mktime(dict['dateTimeStart'])))
+            dict['dateTimeEnd'] = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.mktime(dict['dateTimeEnd'])))
     except ValueError:
-        print("One or more date(s) have been formatted incorrectly. Correct format is Y-M-D H:M:S. Ex: 1999-02-07 10:00:00")  
+        print("One or more date(s) have been formatted incorrectly. Correct format is Y-M-D H:M:S. Ex: 1999-02-16 10:00:00")  
         exit()
 
 def build_query(dict): ##Generates Query using Opensearch DSL
@@ -164,7 +176,7 @@ def build_query(dict): ##Generates Query using Opensearch DSL
                         if(i != len(dict[arg])-1):
                             x.write(',')
                 else:
-                    x.write('{"match_phrase": { "message":"' + (" ".join(dict[arg])) + '"} }')
+                    x.write('{"match_phrase": { "message":"' + ("".join(dict[arg])) + '"} }')
         first = True
         x.write('], "minimum_should_match": ' + str(argcounter))
         for arg in dict.keys(): ##Must Not Clause, only added if specified by user
@@ -212,12 +224,12 @@ def get_arguments():
     parser.add_argument('-se', '--search', required=False, dest= "message", nargs='*', metavar="MESSAGE",  help = "\nWord or phrase contained in log message. Do not include single quotes ('')\n\n\n \t\t\t QUERY OUTPUT SETTINGS: \n\n")
 
     ##Query and Output Params
-    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=0,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
+    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=10,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
     parser.add_argument('-q', '--query-file ', required=False, dest="query-filename", metavar="FILENAME.*", help = "\nName of file containing search query (Including filetype) at end. Program will submit query from file, ALL other query parmeters ignored. Supported filetypes: .txt, .json\n\n")
     parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Display example of actual query that will be submitted during execution.\n\n")
     parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (WITHOUT filetype) in which to save the generated query. Query is saved as JSON file in current directory.\n\n")
     parser.add_argument('-o', '--out-file', required=False, dest="out-filename",  nargs='*', metavar="FILENAME", help = "\nName of file to write results to. Filetype is specified using -format. Supported filetypes: .csv, .json\n\n")
-    parser.add_argument('-fo','--format',  required=True, dest="format", choices = ["json","csv"], help = "\n Formats results into the specified file (from --out-file). If no output file is provided, results will be outputted to STDOUT. Supported formats for console output are json and csv \n\n")
+    parser.add_argument('-fo','--format',  required=False, dest="format", default = "csv", help = "\n Formats results into the specified file (from --out-file). If no output file is provided, results will be outputted to STDOUT. Supported formats for console output are json and csv. \n\n")
     parser.add_argument('-f','--force',  required=False, dest="force", action= "store_true", help = "\n If this option is provided, the output results file will be overwritten if it already exists.\n\n")
     parser.add_argument('-fi','--fields',  required=False, dest="fields", nargs="*", metavar= "FIELDS", default=['@timestamp', 'level', 'logsource', 'namespace','pod', 'container', 'message'], help = "\n Specify output columns (CSV file only) Please provide a space separated list of fields. \n Default fields: @timestamp level logsource namespace pod container message \n Additional arguments: host index properties debug \n\n")
     parser.add_argument('-st', '--start', required=False, dest="dateTimeStart", nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime(time.localtime()) - 3600)), help = "\nDatetime for start of period for which logs are sought (default: 1 hour ago).\n\n")
@@ -293,15 +305,11 @@ if response['hits']['total']['value'] == 0:
     exit()
 
 stdout = False
-if (args['out-filename']): ##Check if user specified file exists, and if it should be overwritten.
-    try:
-        x = open(args['out-filename'], 'w')    
-    except FileNotFoundError as e:
-        print("Output file Directory not found. Please verify output file path.")
-        exit()
-else:
+if (not args['out-filename']):
     stdout = True
-
+else:
+    x = open(args['out-filename'], 'w')
+    
 ##Output as proper filetype
 if("json" in args['format']): 
     if (not stdout):
