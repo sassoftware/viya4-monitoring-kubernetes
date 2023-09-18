@@ -119,6 +119,18 @@ if ! helm3ReleaseExists v4m-grafana $MON_NS; then
   firstTimeGrafana=true
 fi
 
+TRACING_ENABLE="${TRACING_ENABLE:-false}"
+if [ "$TRACING_ENABLE" == "false" ]; then
+  tempoDSFile=$TMP_DIR/empty.yaml
+else
+  TEMPO_USER_YAML="${TEMPO_USER_YAML:-$USER_DIR/monitoring/user-values-tempo.yaml}"
+  if [ ! -f "$TEMPO_USER_YAML" ]; then
+    log_debug "[$TEMPO_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
+    TEMPO_USER_YAML=$TMP_DIR/empty.yaml
+  fi
+  tempoDSFile="monitoring/grafana-datasource-tempo.yaml"
+fi 
+
  ## Check for air gap deployment
 if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
   source bin/airgap-include.sh
@@ -181,6 +193,7 @@ helm upgrade --install $helmDebug \
   -f "$airgapValuesFile" \
   -f "$grafanaAuthYAML" \
   -f "$userGrafanaYAML" \
+  -f $tempoDSFile \
   --set 'grafana\.ini'.server.domain=$OPENSHIFT_ROUTE_DOMAIN \
   --set 'grafana\.ini'.server.root_url=https://v4m-grafana-$MON_NS.$OPENSHIFT_ROUTE_DOMAIN$OPENSHIFT_ROUTE_PATH_GRAFANA \
   --set 'grafana\.ini'.server.serve_from_sub_path=$grafanaSubPath \
@@ -259,6 +272,37 @@ if ! kubectl get route -n $MON_NS v4m-grafana 1>/dev/null 2>&1; then
       --service v4m-grafana \
       --hostname "$routeHost"
   fi
+fi
+
+if [ "$TRACING_ENABLE" == "true" ]; then
+  log_info "Tracing enabled..."
+
+  ## Check for air gap deployment
+  if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+    source bin/airgap-include.sh
+
+    # Check for the image pull secret for the air gap environment and replace placeholders
+    checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
+    replaceAirgapValuesInFiles "monitoring/airgap/airgap-tempo-values.yaml"
+
+    airgapValuesFile=$updatedAirgapValuesFile
+  else
+    airgapValuesFile=$TMP_DIR/empty.yaml
+  fi
+
+  # Get Helm Chart Name
+  log_debug "Tempo Helm Chart: repo [$TEMPO_CHART_REPO] name [$TEMPO_CHART_NAME] version [$TEMPO_CHART_VERSION]"
+  chart2install="$(get_helmchart_reference $TEMPO_CHART_REPO $TEMPO_CHART_NAME $TEMPO_CHART_VERSION)"
+  log_debug "Installing Helm chart from artifact [$chart2install]"
+
+  log_info "Installing tempo"
+  helm upgrade --install v4m-tempo \
+    -n "$MON_NS" \
+    -f monitoring/openshift/tempo-values.yaml
+    -f "$TEMPO_USER_YAML" \
+    -f "$airgapValuesFile" \
+    --version "$TEMPO_CHART_VERSION" \
+    $chart2install
 fi
 
 # If a deployment with the old name exists, remove it first

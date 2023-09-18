@@ -34,6 +34,11 @@ log_info "Removing clusterrole and clusterrolebinding..."
 kubectl delete --ignore-not-found clusterrole v4m-grafana-clusterrole
 kubectl delete --ignore-not-found clusterrolebinding v4m-grafana-clusterrolebinding
 
+log_verbose "Removing tempo"
+if helm3ReleaseExists v4m-tempo $MON_NS; then
+  helm uninstall --namespace $MON_NS v4m-tempo
+fi
+
 # Removing traces of v4m (old naming convention) and v4m-metrics in namespace
 removeV4MInfo "$MON_NS" "v4m"
 
