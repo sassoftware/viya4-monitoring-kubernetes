@@ -27,7 +27,7 @@ registry/repository/image_name:version
 | Metrics | Ghostunnel | docker.io/ghostunnel/ghostunnel:v1.7.1|
 | Metrics | Grafana | docker.io/grafana/grafana:10.0.3|
 | Metrics | Admission Webhook | registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6|
-| Metrics | Kube State Metrics | registry.gcr.io/kube-state-metrics/kube-state-metrics:v2.9.2|
+| Metrics | Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.9.2|
 | Metrics | Node Exporter | quay.io/prometheus/node-exporter:v1.6.1|
 | Metrics | Prometheus | quay.io/prometheus/prometheus:v2.46.0|
 | Metrics | Prometheus Operator | quay.io/prometheus-operator/prometheus-operator:v0.67.1|
