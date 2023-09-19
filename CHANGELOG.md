@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.17 (19SEP2023)
 
 * **Overall**
   * [FEATURE] Deploying into an air-gapped environment using local Helm archive (.tgz) files is now supported.  In this scenario,
@@ -9,8 +9,6 @@ container images are still expected to be pulled from private container registry
   * [FIX] Ensure forced updates of Helm repos actually occur
 * **Metrics**
   * [REMOVAL] Remove previously deprecated (experimental) tenant-level metric monitoring components
-
-* **Metrics**
   * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 45.28.0 to 48.3.2
   * [UPGRADE] - Prometheus has been upgraded from version 2.44.0 to 2.46.0
   * [UPGRADE] - Prometheus Operator has been upgraded from version 0.65.1 to 0.67.1
