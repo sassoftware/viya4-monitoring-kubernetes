@@ -118,6 +118,21 @@ kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
 kubectl -n $LOG_NS delete configmap fbaz-viya-parsers --ignore-not-found
 kubectl -n $LOG_NS create configmap fbaz-viya-parsers  --from-file=logging/fb/viya-parsers.conf
 
+TRACING_ENABLE="${TRACING_ENABLE:-false}"
+if [ "$TRACING_ENABLE" == "true" ]; then
+  # Create ConfigMap containing tracing config
+  kubectl -n "$LOG_NS" delete configmap fbaz-viya-tracing --ignore-not-found
+  kubectl -n "$LOG_NS" create configmap fbaz-viya-tracing  --from-file=logging/fb/viya-tracing.conf
+
+  tracingValuesFile="logging/fb/fluent-bit_helm_values_tracing.yaml"
+else 
+  # Create empty ConfigMap for tracing since it is expected to exist in main config
+  kubectl -n "$LOG_NS" delete configmap fbaz-viya-tracing --ignore-not-found
+  kubectl -n "$LOG_NS" create configmap fbaz-viya-tracing  --from-file="$TMP_DIR"/empty.yaml
+
+  tracingValuesFile=$TMP_DIR/empty.yaml
+fi
+
 # Check for Kubernetes container runtime log format info
 KUBERNETES_RUNTIME_LOGFMT="${KUBERNETES_RUNTIME_LOGFMT}"
 if [ -z "$KUBERNETES_RUNTIME_LOGFMT" ]; then
@@ -138,11 +153,14 @@ if [ -z "$KUBERNETES_RUNTIME_LOGFMT" ]; then
    esac
 fi
 
+MON_NS="${MON_NS:-monitoring}"
+
 # Create ConfigMap containing Kubernetes container runtime log format
 kubectl -n $LOG_NS delete configmap fbaz-env-vars --ignore-not-found
 kubectl -n $LOG_NS create configmap fbaz-env-vars \
                    --from-literal=KUBERNETES_RUNTIME_LOGFMT=$KUBERNETES_RUNTIME_LOGFMT \
-                   --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}"
+                   --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}" \
+                   --from-literal=MON_NS="${MON_NS}"
 
 kubectl -n $LOG_NS label configmap fbaz-env-vars   managed-by=v4m-es-script
 
@@ -157,6 +175,7 @@ helm $helmDebug upgrade --install v4m-fbaz  --namespace $LOG_NS  \
   --values logging/fb/fluent-bit_helm_values_azmonitor.yaml \
   --values $airgapValuesFile \
   --values $FB_AZMONITOR_USER_YAML \
+  --values $tracingValuesFile \
   --set fullnameOverride=v4m-fbaz \
   $chart2install
 

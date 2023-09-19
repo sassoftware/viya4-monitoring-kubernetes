@@ -22,11 +22,18 @@ extraVolumeMounts:
 - mountPath: /fluent-bit/etc/viya-parsers.conf
   name: parsers-config
   subPath: viya-parsers.conf
+- mountPath: /fluent-bit/etc/viya-tracing.conf
+  name: tracing-config
+  subPath: viya-tracing.conf
 extraVolumes:
 - configMap:
     defaultMode: 420
     name: fbaz-viya-parsers
   name: parsers-config
+- configMap:
+    defaultMode: 420
+    name: fbaz-viya-tracing
+  name: tracing-config
 fullConfigMap: false
 existingConfigMap: fbaz-fluent-bit-config
 

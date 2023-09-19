@@ -258,6 +258,20 @@ log_verbose "Deploying cluster ServiceMonitors"
 
 if [ "$TRACING_ENABLE" == "true" ]; then
   log_info "Tracing enabled..."
+
+  ## Check for air gap deployment
+  if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+    source bin/airgap-include.sh
+
+    # Check for the image pull secret for the air gap environment and replace placeholders
+    checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
+    replaceAirgapValuesInFiles "monitoring/airgap/airgap-tempo-values.yaml"
+
+    airgapValuesFile=$updatedAirgapValuesFile
+  else
+    airgapValuesFile=$TMP_DIR/empty.yaml
+  fi
+
   # Add the grafana helm chart repo
   helmRepoAdd grafana https://grafana.github.io/helm-charts
   helm repo update
@@ -270,9 +284,9 @@ if [ "$TRACING_ENABLE" == "true" ]; then
   log_info "Installing tempo"
   helm upgrade --install v4m-tempo \
     -n "$MON_NS" \
+    -f monitoring/values-tempo.yaml \
     -f "$TEMPO_USER_YAML" \
-    --set serviceMonitor.enabled=true \
-    --set searchEnabled=true \
+    -f "$airgapValuesFile" \
     --version "$TEMPO_CHART_VERSION" \
     $chart2install
 fi
