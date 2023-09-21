@@ -12,10 +12,10 @@ import tempfile
 
 ##v 0.2.0
 
-def validate_input(dict):
-    ## Validate the arguments passed by the user to ensure script will function properly
+def validate_input(dict): 
+    """ Validate the arguments passed by the user to ensure script will function properly"""
 
-    ## Ensure maxrows is less than 10000
+    ##Set maximum log limit for output
     MAX_ROWS = 10000
     if dict['maxInt'] > MAX_ROWS:
         print("Error: Maxrows limit of 10000 exceeded.")
@@ -94,8 +94,9 @@ def validate_input(dict):
             print("Please remove single quotes ('') from search argument.")
             exit()
 
-def build_query(dict): ##Generates Query using Opensearch DSL
-    ##Takes arguments from user and builds a query to pass to opensearch client
+def build_query(dict): 
+    """Generates Query using Opensearch DSL"""
+    """Takes arguments from user and builds a query to pass to opensearch API"""
     tfile = tempfile.NamedTemporaryFile(delete = False)  ##If User has not specified query file, create temp file for one.
     temp = open(tfile.name, 'w')
     first = True 
@@ -155,7 +156,7 @@ def build_query(dict): ##Generates Query using Opensearch DSL
     
     return query
 
-##List of VALID arguments that are read from user as soon as program is run, nargs=+ indicates that argument takes multiple whitespace separated values. 
+"""List of valid arguments that are read from user as soon as program is run, nargs=+ indicates that argument takes multiple whitespace separated values. """
 def get_arguments():
     ###Defines the arguments a user can pass and parses them, includes help msgs
     parser = argparse.ArgumentParser(prog='getLogs.py', usage='\n%(prog)s [options]', description="""This program generates OpenSearch DSL Queries from user specified parameters, and submits them to a database to retrieve logs. The flags below provide specifications for your Query, and can be placed in any order. \n
