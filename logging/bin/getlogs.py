@@ -187,7 +187,7 @@ def get_arguments():
     parser.add_argument('-o', '--out-file', required=False, dest="out-filename",  nargs='*', metavar="FILENAME", help = "\nName of file to write results to. Filetype is specified using -format. Supported filetypes: .csv, .json\n\n")
     parser.add_argument('-fo','--format',  required=False, dest="format", default = "csv", help = "\n Formats results into the specified file (from --out-file). If no output file is provided, results will be outputted to STDOUT. Supported formats for console output are json and csv. \n\n")
     parser.add_argument('-f','--force',  required=False, dest="force", action= "store_true", help = "\n If this option is provided, the output results file from --out-file will be overwritten if it already exists.\n\n")
-    parser.add_argument('-fi','--fields',  required=False, dest="fields", nargs="*", metavar= "FIELDS", default=['@timestamp', 'level', 'kube.pod', 'message'], help = "\n Specify desired output columns from query. \n Default fields: @timestamp level kube.pod message \n Additional arguments: kube.host, properties.appname \n\n")
+    parser.add_argument('-fi','--fields',  required=False, dest="fields", nargs="*", metavar= "FIELDS", default=['@timestamp', 'level', 'kube.pod', 'message'], help = "\n Specify desired output columns from query. If a matching log is returned that does not have the specified field, a NULL value will be used as a placeholder. \n Default fields: @timestamp level kube.pod message \n Additional arguments: kube.host, properties.appname \n\n")
     parser.add_argument('-st', '--start', required=False, dest="dateTimeStart", nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime(time.localtime()) - 3600)), help = "\nDatetime for start of period for which logs are sought (default: 1 hour ago). Correct format is Y-M-D H:M:S. Ex: 2023-02-16 10:00:00\n\n")
     parser.add_argument('-en', '--end', required=False, dest="dateTimeEnd",nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), help = "\nDatetime for end of period for which logs are sought (default: now). \n\n\n \t\t\t CONNECTION SETTINGS: \n\n")
     
@@ -266,12 +266,19 @@ for hit in response['hits']['hits']:
     except KeyError as e:
         next
 
+for fieldDict in hitsList:
+    for field in args['fields']:
+        if not field in fieldDict.keys(): ##replaces empty fields with NULL values
+            fieldDict[field] = "NULL"
+        elif type(fieldDict[field]) == list: ##Converts lists into strings for proper output
+            fieldDict[field] = ''.join(fieldDict[field])
+
 if (len(hitsList) == 0):
     print("Error: No fields matched provided fieldnames. Please verify the field on opensearch-dashboards.\n")
     exit()
 
 ##Output as proper filetype
-if("json" in args['format']):
+if("json" in args['format']): ##JSON formatter, uses json.dump to print to stdout or file
     if (not stdout):
         with x as outfile:
             json.dump(hitsList, outfile, sort_keys=True, indent=2)
@@ -280,7 +287,7 @@ if("json" in args['format']):
         print("Search complete.")
         sys.stdout.write(json.dumps(hitsList, sort_keys=True, indent=2))
 
-elif("csv" in args['format']):
+elif("csv" in args['format']): ##CSV writer implemented using dictwriter
     args['fields'].append("id")
 
     if (not stdout):
