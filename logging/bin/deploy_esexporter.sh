@@ -110,9 +110,11 @@ fi
 # Elasticsearch metric exporter
 helm2ReleaseCheck es-exporter-$LOG_NS
 
-# Get/Set Helm Chart Version
-ESEXPORTER_HELM_CHART_VERSION=${ESEXPORTER_HELM_CHART_VERSION:-"5.2.0"}
-log_debug "Elasticsearch Exporter Helm Chart version: $ESEXPORTER_HELM_CHART_VERSION"
+
+## Get Helm Chart Name
+log_debug "Elasticsearch Exporter Helm Chart: repo [$ESEXPORTER_HELM_CHART_REPO] name [$ESEXPORTER_HELM_CHART_NAME] version [$ESEXPORTER_HELM_CHART_VERSION]"
+chart2install="$(get_helmchart_reference $ESEXPORTER_HELM_CHART_REPO $ESEXPORTER_HELM_CHART_NAME $ESEXPORTER_HELM_CHART_VERSION)"
+log_debug "Installing Helm chart from artifact [$chart2install]"
 
 helm $helmDebug upgrade --install es-exporter \
  --namespace $LOG_NS \
@@ -122,8 +124,8 @@ helm $helmDebug upgrade --install es-exporter \
  -f $openshiftValuesFile \
  -f $airgapValuesFile \
  -f $ES_OPEN_EXPORTER_USER_YAML \
- ${AIRGAP_HELM_REPO}prometheus-community/prometheus-elasticsearch-exporter \
- --set fullnameOverride=v4m-es-exporter
+ --set fullnameOverride=v4m-es-exporter  \
+ $chart2install
 
 log_info "Elasticsearch metric exporter has been deployed"
 

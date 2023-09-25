@@ -85,7 +85,6 @@ fi
 
 # Check if Prometheus Operator CRDs are already installed
 PROM_OPERATOR_CRD_UPDATE=${PROM_OPERATOR_CRD_UPDATE:-true}
-PROM_OPERATOR_CRD_VERSION=${PROM_OPERATOR_CRD_VERSION:-v0.65.1}
 if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
   log_verbose "Updating Prometheus Operator custom resource definitions"
   crds=( alertmanagerconfigs alertmanagers prometheuses prometheusrules podmonitors servicemonitors thanosrulers probes )
@@ -205,7 +204,11 @@ else
   tempoDSFile="monitoring/grafana-datasource-tempo.yaml"
 fi 
 
-KUBE_PROM_STACK_CHART_VERSION=${KUBE_PROM_STACK_CHART_VERSION:-45.28.0}
+# Get Helm Chart Name
+log_debug "Kube-Prometheus Stack Helm Chart: repo [$KUBE_PROM_STACK_CHART_REPO] name [$KUBE_PROM_STACK_CHART_NAME] version [$KUBE_PROM_STACK_CHART_VERSION]"
+chart2install="$(get_helmchart_reference $KUBE_PROM_STACK_CHART_REPO $KUBE_PROM_STACK_CHART_NAME $KUBE_PROM_STACK_CHART_VERSION)"
+log_debug "Installing Helm chart from artifact [$chart2install]"
+
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
   -f monitoring/values-prom-operator.yaml \
@@ -228,7 +231,7 @@ helm $helmDebug upgrade --install $promRelease \
   --set grafana.adminPassword="$grafanaPwd" \
   --set prometheus.prometheusSpec.alertingEndpoints[0].namespace="$MON_NS" \
   --version $KUBE_PROM_STACK_CHART_VERSION \
-  ${AIRGAP_HELM_REPO}prometheus-community/kube-prometheus-stack
+  $chart2install
 
 sleep 2
 
@@ -254,20 +257,38 @@ log_info "Deploying ServiceMonitors and Prometheus rules"
 log_verbose "Deploying cluster ServiceMonitors"
 
 if [ "$TRACING_ENABLE" == "true" ]; then
-  TEMPO_CHART_VERSION=${TEMPO_CHART_VERSION:-1.5.0}
   log_info "Tracing enabled..."
-  # # Add the grafana helm chart repo
+
+  ## Check for air gap deployment
+  if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+    source bin/airgap-include.sh
+
+    # Check for the image pull secret for the air gap environment and replace placeholders
+    checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
+    replaceAirgapValuesInFiles "monitoring/airgap/airgap-tempo-values.yaml"
+
+    airgapValuesFile=$updatedAirgapValuesFile
+  else
+    airgapValuesFile=$TMP_DIR/empty.yaml
+  fi
+
+  # Add the grafana helm chart repo
   helmRepoAdd grafana https://grafana.github.io/helm-charts
   helm repo update
+
+  # Get Helm Chart Name
+  log_debug "Tempo Helm Chart: repo [$TEMPO_CHART_REPO] name [$TEMPO_CHART_NAME] version [$TEMPO_CHART_VERSION]"
+  chart2install="$(get_helmchart_reference $TEMPO_CHART_REPO $TEMPO_CHART_NAME $TEMPO_CHART_VERSION)"
+  log_debug "Installing Helm chart from artifact [$chart2install]"
 
   log_info "Installing tempo"
   helm upgrade --install v4m-tempo \
     -n "$MON_NS" \
+    -f monitoring/values-tempo.yaml \
     -f "$TEMPO_USER_YAML" \
-    --set serviceMonitor.enabled=true \
-    --set searchEnabled=true \
+    -f "$airgapValuesFile" \
     --version "$TEMPO_CHART_VERSION" \
-    grafana/tempo
+    $chart2install
 fi
 
 # NGINX

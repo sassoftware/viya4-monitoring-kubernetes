@@ -8,121 +8,67 @@ import argparse
 from opensearchpy import OpenSearch
 import os, sys
 import json, csv
+import tempfile
 
-## Cleanup temp file if not previously deleted, Create target directory
-DEFAULT_DIR = "GetLogsFiles"
-if not os.path.isdir(DEFAULT_DIR):
-    os.mkdir(DEFAULT_DIR)
+##v 0.2.0
 
-if os.path.isfile(DEFAULT_DIR + "/temp_SAS_OSQ.TXT"):
-    os.remove(DEFAULT_DIR + "/temp_SAS_OSQ.TXT")
+def validate_input(dict): 
+    """ Validate the arguments passed by the user to ensure script will function properly"""
 
-def validate_input(dict):
-    """Validate the arguments passed by the user to ensure script will function properly"""
-    
-    if(len(sys.argv) == 1): ##Check if any args have been provided
-        print("No arguments have been provided")
-        exit()
-
-    if dict['create-auth']:
-        if (type(dict['create-auth'] == list)):
-            dict['create-auth'] = " ".join(dict['create-auth'])
-        if (not (DEFAULT_DIR + "/") in  dict['create-auth']):
-            dict['create-auth'] = os.path.join(DEFAULT_DIR, dict['create-auth'])
-        x = open(dict['create-auth'], "w")
-        x.write('{"username": " " , "password": " " , "host": " ", "port": " "}')
-        print("\nAuth File created.\n")
-
-    if dict['auth-file']:
-        if (type(dict['auth-file'] == list)):
-            dict['auth-file'] = " ".join(dict['auth-file'])
-        if (not (DEFAULT_DIR + "/") in  dict['auth-file']):
-            dict['auth-file'] = os.path.join(DEFAULT_DIR,  dict['auth-file'])
-        try: 
-            a = open(dict['auth-file'], 'r')
-            authDict = json.loads(a.read())
-            dict['userName'] = authDict['username']
-            dict['password'] = authDict['password']
-            dict['host'] = authDict['host']
-            dict['port'] = authDict['port']
-        except Exception as e:
-            print("Error: There was a problem with the authentication file. Please ensure that the values are in dictionary format with keys: 'username', 'password', 'host', 'port'")
-            print(e)
-            exit()
-
-    """Ensure maxrows is less than 10000"""
+    ##Set maximum log limit for output
     MAX_ROWS = 10000
     if dict['maxInt'] > MAX_ROWS:
         print("Error: Maxrows limit of 10000 exceeded.")
         exit()
 
-    ##Check for existence of Connection Settings in input dictionary, if not, exit
+    ##Check for existence of Connection Settings in input dictionary
     if(not dict['userName'] or not dict['password'] or not dict['host'] or not dict['port']):
-        print('\nError: Missing required connection settings. Please specify username, password, host, or port.')
+        print('\nError: Missing required connection settings. Please specify username, password, host, and port. \n Default values can be manually exported as environment variables ESHOST, ESPORT, ESUSER, ESPASSWD')
         print("Username:", dict['userName'], " Password:", dict['password'], " Host:", dict['host'], " Port:", dict['port'])
         exit()
-        
-    if (dict['message']):
-        if(type(dict['message']) == list):
-            dict['message']= " ".join(dict['message'])
-        if (dict['message'].find("'") > -1): ##Check for invalid single quotes
-            print("Please remove single quotes ('') from search argument.")
-            exit()
 
-    if dict['out-filename']: ##Check for supported file-types
-
-        if (dict['maxInt'] == 0):
-            dict['maxInt'] = 250
+    if dict['out-filename']: ##Check for supported file-types and existence of file
 
         if(type(dict['out-filename']) == list):
             dict['out-filename']= " ".join(dict['out-filename'])
 
-        if(dict['format']):
-            if ("." in dict['out-filename']):
-                dict['out-filename'] = dict['out-filename'][0:dict['out-filename'].find(".")] + "." + dict['format']
-            else:
-                dict['out-filename'] = dict['out-filename'] + "." + dict['format']
-        
-        else:
-            if ((not ".csv" in dict['out-filename']) and (not ".json" in dict['out-filename'])):
-                if ("." in dict['out-filename']):
-                    print('Error: Not a supported filetype for the output file.')
-                    exit()
-                else:
-                    print('Setting default filetype: CSV')
-                    dict['out-filename'] = dict['out-filename'] + ".csv"
+        dict['out-filename'] = dict['out-filename'] + "." + dict['format'] ## Add format to file
 
-        if (not (DEFAULT_DIR + "/") in dict['out-filename']):
-            dict['out-filename'] = os.path.join(DEFAULT_DIR, dict['out-filename'])
-        
-        if os.path.isfile(dict['out-filename']):
+        if os.path.isfile(dict['out-filename']): ##Check if file already exists
             if (dict['force'] == False):
                 print("\nUser specified output file already exists. Use -f to overwrite the file.\n")
                 exit()
+        
+        safe_dir = os.getcwd() ## Check for path traversal attack
+        if os.path.commonprefix((os.path.realpath(dict['out-filename']),safe_dir)) != safe_dir:
+            print("Error: Path traversal in out-filename not allowed.")
+            exit()
 
-    if dict['savequery']:      
+        try:
+            x = open(args['out-filename'], 'w')    
+        except FileNotFoundError as e:
+            print("Error: Output file path not found. Please verify output file path. ")
+            exit()
+
+    if dict['savequery']: ##Find saved query path location     
         if(type(dict['savequery']) == list):
             dict['savequery']= " ".join(dict['savequery'])
         if (dict['savequery'].find('.') == -1):
             dict['savequery'] = dict['savequery'] + ".json"
         if ((not ".json" in dict['savequery'])):
-            print('Error: Not a supported filetype for the saved query file.')
+            print('Error: Not a supported filetype for the saved query file. Supported type is .json')
             exit()
-        if (not (DEFAULT_DIR + "/") in dict['savequery']):
-            dict['savequery']= os.path.join(DEFAULT_DIR, dict['savequery'])
 
-    if dict['query-filename']:
-        if (not (DEFAULT_DIR + "/") in dict['query-filename']):
-            dict['query-filename'] = os.path.join(DEFAULT_DIR, dict['query-filename'])
-        
+    if dict['query-filename']: ##Use for plugging in queries
+        safe_dir = os.getcwd() ## Check for path traversal attack
+        if os.path.commonprefix((os.path.realpath(dict['query-filename']),safe_dir)) != safe_dir:
+            print("Error: Path traversal in query-filename not allowed.")
+            exit()
+
         if (not os.path.isfile(dict['query-filename'])):
             print("Error: Invalid query file path.")
             exit()
-    else: ## If no output file, set default maxrows to 25
-        if (dict['maxInt'] == 0):
-            dict['maxInt'] = 25
-
-    
+ 
     ##Time Validator - Verifies input, and converts it to UTC   
     if (type(dict['dateTimeStart']) ==list):
         dict['dateTimeStart'] = " ".join(dict['dateTimeStart'])
@@ -135,68 +81,91 @@ def validate_input(dict):
             print("Given start date is after the end date.")
             exit()
         else:
-            dict['dateTimeStart'] = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.gmtime(time.mktime(dict['dateTimeStart'])))
-            dict['dateTimeEnd'] = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.gmtime(time.mktime(dict['dateTimeEnd'])))
+            dict['dateTimeStart'] = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.mktime(dict['dateTimeStart'])))
+            dict['dateTimeEnd'] = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.mktime(dict['dateTimeEnd'])))
     except ValueError:
-        print("One or more date(s) have been formatted incorrectly. Correct format is Y-M-D H:M:S. Ex: 1999-02-07 10:00:00")  
+        print("One or more date(s) have been formatted incorrectly. Correct format is Y-M-D H:M:S. Ex: 1999-02-16 10:00:00")  
         exit()
 
-def build_query(dict): ##Generates Query using Opensearch DSL
-    """Takes query arguments from user and builds a query to pass to opensearch client"""
+    if (dict['message']): ## Argument formatting for query builder
+        if(type(dict['message']) == list):
+            dict['message']= " ".join(dict['message'])
+        if (dict['message'].find("'") > -1): ##Check for invalid single quotes
+            print("Please remove single quotes ('') from search argument.")
+            exit()
+
+def build_query(dict): 
+    """Generates Query using Opensearch DSL"""
+    """Takes arguments from user and builds a query to pass to opensearch API"""
+    tfile = tempfile.NamedTemporaryFile(delete = False)  ##If User has not specified query file, create temp file for one.
+    temp = open(tfile.name, 'w')
     first = True 
     argcounter=0    ##Counts unique options entered by user, sets min_match to this number
-    if (not dict['query-filename']):     ##If User has not specified query file, create temp file for one.                                                                                                                                                                                                                                                                                                                                                                                   first = True
-        x = open(DEFAULT_DIR + "/temp_SAS_OSQ.TXT", 'x')
-        x = open(DEFAULT_DIR + "/temp_SAS_OSQ.TXT", 'wt')  ## Create txt file to write query, make it writable
-        x.write('{"size": ' + str(dict['maxInt']) + ',"sort": [{"@timestamp": {"order": "desc","unmapped_type": "boolean"} }]')     ## Establish size of query, remove scoring
-        x.write(', "query": {"bool": {"must":[ {"range": {"@timestamp": {"gte": "' + dict['dateTimeStart'] + '","lt": "' + dict['dateTimeEnd'] + '"} } }], ')   ##Establish Query with Range Requirements, 3 open brackets
-        x.write('"should": [ ')     ## Should Clause, search results must inlcude at least one of each specified option
+    if (not dict['query-filename']):   
+        temp.write('{"size": ' + str(dict['maxInt']) + ',"sort": [{"@timestamp": {"order": "desc","unmapped_type": "boolean"} }]')     ## Establish size of query, remove scoring
+        temp.write(', "query": {"bool": {"must":[ {"range": {"@timestamp": {"gte": "' + dict['dateTimeStart'] + '","lt": "' + dict['dateTimeEnd'] + '"} } }], ')   ##Establish Query with Time Range Requirements
+        temp.write('"should": [ ')     ## Should Clause, search results must inlcude at least one of each specified option
         for arg in dict.keys():
             if (("kube" in arg or "level" in arg or "mes" in arg or "log" in arg) and (dict[arg]) and arg.find('-ex')==-1): ##Looking for non-exclusion options that are not NoneType in args dictionary
                 argcounter+=1
                 if (first == True):
                     first = False  
                 else:
-                    x.write(',')       
+                    temp.write(',')       
                 if arg!='message':
                     for i in range(len(dict[arg])):
-                        x.write('{"match_phrase": { "' + arg + '":"' + dict[arg][i] + '" } }')
+                        temp.write('{"match_phrase": { "' + arg + '":"' + dict[arg][i] + '" } }')
                         if(i != len(dict[arg])-1):
-                            x.write(',')
+                            temp.write(',')
                 else:
-                    x.write('{"match_phrase": { "message":"' + (" ".join(dict[arg])) + '"} }')
+                    temp.write('{"match_phrase": { "message":"' + ("".join(dict[arg])) + '"} }')
         first = True
-        x.write('], "minimum_should_match": ' + str(argcounter))
+        temp.write('], "minimum_should_match": ' + str(argcounter))
         for arg in dict.keys(): ##Must Not Clause, only added if specified by user
             if (("kube" in arg or "level" in arg or "log" in arg) and dict[arg] and arg.find('-ex')>-1):
                 name = arg[0:arg.find('-')]
                 if (first == True):
-                    x.write(', "must_not": [')
+                    temp.write(', "must_not": [')
                     first = False
                 else:
-                    x.write(',')
+                    temp.write(',')
                 for i in range(len(dict[arg])):
-                    x.write('{"match_phrase": {"' + name + '":"' + dict[arg][i] + '"} }')
+                    temp.write('{"match_phrase": {"' + name + '":"' + dict[arg][i] + '"} }')
                     if i != len(dict[arg])-1:
-                        x.write(',')
+                        temp.write(',')
         if (first==False):
-            x.write(']')
-        x.write('} } }') ##Close 3 open brackets, end query
-        x = open(DEFAULT_DIR + "/temp_SAS_OSQ.TXT", 'rt')
-        query =  " ".join([line.strip() for line in x])
-        x.close()
-        os.remove(DEFAULT_DIR + "/temp_SAS_OSQ.TXT") ##Remove Temp File Created for Query Generation
-    else:
+            temp.write(']')
+        temp.write('} },')
+        temp.write(' "fields": [') ## Add fields param
+        for i in range(len(dict['fields'])):
+            if i < len(dict['fields']) - 1:
+                temp.write('"' + dict['fields'][i] + '",' )
+            else:
+               temp.write('"' + dict['fields'][i] + '"],' )
+        temp.write('"_source": {"excludes": [] } }')
+        temp.close()
+       
+        temp = open(tfile.name, 'r')
+        query =  " ".join([line.strip() for line in temp])
+        temp.close()
+
+    else: ##Open existing query
         x = open(dict['query-filename'], 'rt')
         query =  " ".join([line.strip() for line in x]) ## Turn file into string, return.
         x.close()
     
     return query
 
-##List of VALID arguments that are read from user as soon as program is run, nargs=+ indicates that argument takes multiple whitespace separated values. 
+"""List of valid arguments that are read from user as soon as program is run, nargs=+ indicates that argument takes multiple whitespace separated values. """
 def get_arguments():
-    """Defines the arguments a user can pass and parses them"""
-    parser = argparse.ArgumentParser(prog='getLogs.py', usage='\n%(prog)s [options]', description="This program generates OpenSearch DSL Queries from user specified parameters, and submits them to a database to retrieve logs. The flags below provide specifications for your Query, and can be placed in any order. \n   IMPORTANT NOTES: \n    *Connection settings are required in order to run the program. You can create config files to autofill this using --create-auth, and call them using --auth-file \n    *The NAMESPACE*, POD*, CONTAINER*, LOGSOURCE* and LEVEL* options accept multiple, space-separated, values (e.g. --level INFO NONE) Please refrain from passing single quotes ('') into arguments. \n    *All Generated Program files are placed in a folder titled GetLogssFiles in the directory where the program is run. It is not required to include this directory when passing created files in as arguments.\n    *Correct time format is Y-M-D H:M:S. Ex: 1999-02-07 10:00:00 \n    *All default values for username, password, host, and port are derived from the ENV variables ESUSER, USPASSWD, ESHOST, ESPORT\n\n\n \t\t\t\t QUERY SEARCH PARAMETERS: \n\n", formatter_class=argparse.RawTextHelpFormatter)
+    ###Defines the arguments a user can pass and parses them, includes help msgs
+    parser = argparse.ArgumentParser(prog='getLogs.py', usage='\n%(prog)s [options]', description="""This program generates OpenSearch DSL Queries from user specified parameters, and submits them to a database to retrieve logs. The flags below provide specifications for your Query, and can be placed in any order. \n
+    \033[1m NOTES: *All default values for username, password, host, and port, are derived from the ENV variables ESUSER, USPASSWD, ESHOST, ESPORT in that respective order. '\033[0m' \n
+    \033[1m If you have default connections set in your environment variables, you can call this program without arguments and get the latest 10 logs from the target API in the default CSV format.  \033[0m \n
+    Getlogs has a default set of fields that runs with every query (seen below). You can replace the default fields with your own space-separated set of fields using --fields. Ex: --fields kube.labels.sas_com/deployment properties.appname \n
+    *The NAMESPACE*, POD*, CONTAINER*, LOGSOURCE* and LEVEL* options accept multiple, space-separated, values (e.g. --level INFO NONE). Please refrain from passing single quotes ('') into arguments. \n  
+    *All Generated files are placed in the current working directory. 
+    Don't include https:\\ in the HOST connection setting \n\n\n \t\t\t\t QUERY SEARCH PARAMETERS: \n\n""", formatter_class=argparse.RawTextHelpFormatter)
     
     ##Search Params
     parser.add_argument('-n', '--namespace', required=False, dest="kube.namespace", nargs='*', metavar="NAMESPACE", help="\nOne or more Viya deployments/Kubernetes Namespace for which logs are sought\n\n")
@@ -212,15 +181,15 @@ def get_arguments():
     parser.add_argument('-se', '--search', required=False, dest= "message", nargs='*', metavar="MESSAGE",  help = "\nWord or phrase contained in log message. Do not include single quotes ('')\n\n\n \t\t\t QUERY OUTPUT SETTINGS: \n\n")
 
     ##Query and Output Params
-    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=0,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
-    parser.add_argument('-q', '--query-file ', required=False, dest="query-filename", metavar="FILENAME.*", help = "\nName of file containing search query (Including filetype) at end. Program will submit query from file, ALL other query parmeters ignored. Supported filetypes: .txt, .json\n\n")
-    parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Display example of actual query that will be submitted during execution.\n\n")
-    parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (WITHOUT filetype) in which to save the generated query. Query is saved as JSON file in current directory.\n\n")
+    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=10,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
+    parser.add_argument('-q', '--query-file ', required=False, dest="query-filename", metavar="FILENAME.*", help = "\n Filepath of existing saved query in current working directory. Program will submit query from file, ALL other query parmeters ignored. Supported filetypes: .txt, .json\n\n")
+    parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Displays the actual query that will be submitted during execution.\n\n")
+    parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (without filetype) in which to save the generated query. Query is saved as JSON file in current working directory.\n\n")
     parser.add_argument('-o', '--out-file', required=False, dest="out-filename",  nargs='*', metavar="FILENAME", help = "\nName of file to write results to. Filetype is specified using -format. Supported filetypes: .csv, .json\n\n")
-    parser.add_argument('-fo','--format',  required=True, dest="format", choices = ["json","csv"], help = "\n Formats results into the specified file (from --out-file). If no output file is provided, results will be outputted to STDOUT. Supported formats for console output are json and csv \n\n")
-    parser.add_argument('-f','--force',  required=False, dest="force", action= "store_true", help = "\n If this option is provided, the output results file will be overwritten if it already exists.\n\n")
-    parser.add_argument('-fi','--fields',  required=False, dest="fields", nargs="*", metavar= "FIELDS", default=['@timestamp', 'level', 'logsource', 'namespace','pod', 'container', 'message'], help = "\n Specify output columns (CSV file only) Please provide a space separated list of fields. \n Default fields: @timestamp level logsource namespace pod container message \n Additional arguments: host index properties debug \n\n")
-    parser.add_argument('-st', '--start', required=False, dest="dateTimeStart", nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime(time.localtime()) - 3600)), help = "\nDatetime for start of period for which logs are sought (default: 1 hour ago).\n\n")
+    parser.add_argument('-fo','--format',  required=False, dest="format", default = "csv", help = "\n Formats results into the specified file (from --out-file). If no output file is provided, results will be outputted to STDOUT. Supported formats for console output are json and csv. \n\n")
+    parser.add_argument('-f','--force',  required=False, dest="force", action= "store_true", help = "\n If this option is provided, the output results file from --out-file will be overwritten if it already exists.\n\n")
+    parser.add_argument('-fi','--fields',  required=False, dest="fields", nargs="*", metavar= "FIELDS", default=['@timestamp', 'level', 'kube.pod', 'message'], help = "\n Specify desired output columns from query. If a matching log is returned that does not have the specified field, a NULL value will be used as a placeholder. \n Default fields: @timestamp level kube.pod message \n Additional arguments: kube.host, properties.appname \n\n")
+    parser.add_argument('-st', '--start', required=False, dest="dateTimeStart", nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime(time.localtime()) - 3600)), help = "\nDatetime for start of period for which logs are sought (default: 1 hour ago). Correct format is Y-M-D H:M:S. Ex: 2023-02-16 10:00:00\n\n")
     parser.add_argument('-en', '--end', required=False, dest="dateTimeEnd",nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), help = "\nDatetime for end of period for which logs are sought (default: now). \n\n\n \t\t\t CONNECTION SETTINGS: \n\n")
     
     parser.add_argument('-i', '--index', required=False, dest="index", metavar="INDEX", default="viya_logs-*") ## help = "\nDetermine which index to perform the search in. Default: viya-logs-*\n\n
@@ -230,8 +199,6 @@ def get_arguments():
     parser.add_argument('-ho', '--host', required=False,  dest="host", default=os.environ.get("ESHOST"), help = "\nHostname for connection to OpenSearch/Kibana (default: $ESHOST)\n\n")
     parser.add_argument('-po', '--port', required=False,  dest="port", default=os.environ.get("ESPORT"), help = "\nPort number for connection to OpenSearch/Kibana (default: $ESPORT)\n\n")
     parser.add_argument('-nossl', '--disable-ssl', required=False, dest = "ssl", action= "store_false", help = "\n If this option is provided, SSL will not be used to connect to the database.\n\n")
-    parser.add_argument('-af', '--auth-file', required=False, dest="auth-file", metavar="FILENAME.*", nargs='*', help = "\n The program will read the connection information from this file (include filetype).\n\n")
-    parser.add_argument('-cf', '--create-auth', required=False, dest="create-auth", metavar="FILENAME.*", nargs='*', help = "\n Creates a template authentication file (include filetype) under the specified file name. Connection information can be entered here.")
     return parser.parse_args().__dict__
 
 args = get_arguments() ##Creates "args" dictionary that contains all user submitted options. Print "args" to debug values. Note that the 'dest' value for each argument in argparser object is its key.
@@ -255,20 +222,14 @@ client = OpenSearch(
 ##Build Query Using Arguments
 x = build_query(args)
 index_name = args['index']
+
 if (args['showquery'] == True): ##Print Query if user asks. 
     print("The following query will be submitted:\n\n", json.dumps(eval(x), indent=2))
+
 if(args['savequery']): ##Save Query if user asks.
     y = open(args['savequery'], 'w')  
-    if (".json" in args['savequery']):
-        with y as outfile:
-            json.dump(eval(x), outfile, indent=2)   
-    
-    elif (".txt" in args['savequery'] or ".lst" in args['savequery']):
-        y.write(str(x))
-
-    else:
-        print("Please provide a file type for the saved query")
-        exit()
+    with y as outfile:
+        json.dump(eval(x), outfile, indent=2)   
 
     print("\nQuery saved to " + args['savequery'])
     
@@ -277,15 +238,15 @@ try:
     response = client.search(body=x, index=index_name)
 except Exception as e: 
     print(e)
-    print("\n")
-    if ("refused" in str(e)):
-        print("Connection Refused. Verify that user authentication and connection settings are set for the correct database.")
-    elif ("getaddrinfo" in str(e)):
-        print("Connection Failed. Verify the host and port values. ")
+    if ("getaddrinfo" in str(e)):
+        print("Connection Failed. Please verify the host and port values. ")
+        print("Username:", args['userName'], " Password:", args['password'], " Host:", args['host'], " Port:", args['port'])
     elif("Unauthorized" in str(e)):
-        print("User Authentication failed. Verify username and password values. ")
+        print("User Authentication failed. Please verify username and password values.")
+        print("Username:", args['userName'], " Password:", args['password'], " Host:", args['host'], " Port:", args['port'])
     else:
-        print("Connection error. Please verify connection values. ") 
+        print("Connection error. Please verify connection values. ")
+        print("Username:", args['userName'], " Password:", args['password'], " Host:", args['host'], " Port:", args['port']) 
     exit()
 
 if response['hits']['total']['value'] == 0:
@@ -293,60 +254,50 @@ if response['hits']['total']['value'] == 0:
     exit()
 
 stdout = False
-if (args['out-filename']): ##Check if user specified file exists, and if it should be overwritten.
-    try:
-        x = open(args['out-filename'], 'w')    
-    except FileNotFoundError as e:
-        print("Output file Directory not found. Please verify output file path.")
-        exit()
-else:
+if (not args['out-filename']):
     stdout = True
+else:
+    x = open(args['out-filename'], 'w')
+
+hitsList = [] ##Check to see if any fields matched user provided fields, collect matching fields
+for hit in response['hits']['hits']:
+    try:
+        hit['fields']['id'] = hit['_id']
+        hitsList.append(hit['fields'])
+    except KeyError as e:
+        next
+
+for fieldDict in hitsList:
+    for field in args['fields']:
+        if not field in fieldDict.keys(): ##replaces empty fields with NULL values
+            fieldDict[field] = "NULL"
+        elif type(fieldDict[field]) == list: ##Converts lists into strings for proper output
+            fieldDict[field] = ''.join(fieldDict[field])
+
+if (len(hitsList) == 0):
+    print("Error: No fields matched provided fieldnames. Please verify the field on opensearch-dashboards.\n")
+    exit()
 
 ##Output as proper filetype
-if("json" in args['format']): 
+if("json" in args['format']): ##JSON formatter, uses json.dump to print to stdout or file
     if (not stdout):
         with x as outfile:
-            json.dump(response['hits']['hits'], outfile, sort_keys=True, indent=2)
+            json.dump(hitsList, outfile, sort_keys=True, indent=2)
         print("Search complete. Results printed to " + args['out-filename'])
     else:
         print("Search complete.")
-        sys.stdout.write(json.dumps(response['hits']['hits'], sort_keys=True, indent=2))
+        sys.stdout.write(json.dumps(hitsList, sort_keys=True, indent=2))
 
-elif("csv" in args['format']):
+elif("csv" in args['format']): ##CSV writer implemented using dictwriter
+    args['fields'].append("id")
 
-    i =0
-    for field in args['fields']:
-        args['fields'][i] = field.replace(',','')
-        i+=1
-    
-    valueStore = []
-    dictArray=[]
-    for log in response['hits']['hits']:
-        for field in args['fields']: ##Compounds dictionaries inside of dictionaries into one dictionary so writerow works as intended.
-            for arg in log.keys(): ##Finds dictionaries inside of dictionaries, stores values
-                if (not field in arg):
-                    if type(log[arg]) == dict:
-                        for item in log[arg].keys():
-                            if not field in item:
-                                if type(log[arg][item]) == dict:
-                                    for subitem in log[arg][item].keys():
-                                        if subitem in field:
-                                            valueStore.append(log[arg][item][subitem])
-                            else:
-                                valueStore.append(log[arg][item])
-                else:
-                    valueStore.append(log[arg])
-        newDict= dict(zip(args['fields'], valueStore))
-        dictArray.append(newDict)
-        valueStore.clear()
-    
     if (not stdout):
         with x as csvfile:
             header = args['fields']
             writer = csv.DictWriter(csvfile, fieldnames = header)
             writer.writeheader()
-            for log in dictArray:
-                writer.writerow(log)
+            for fieldDict in hitsList:
+                writer.writerow(fieldDict)
             print("Search complete. Results printed to " + args['out-filename'])   
     else:
         print("Search complete")
@@ -354,6 +305,6 @@ elif("csv" in args['format']):
             header = args['fields']
             writer = csv.DictWriter(csvfile, fieldnames = header)
             writer.writeheader()
-            for log in dictArray:
-                writer.writerow(log)
+            for fieldDict in hitsList:
+                writer.writerow(fieldDict)
                 print("\n")

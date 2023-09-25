@@ -65,7 +65,7 @@ function helmRepoAdd {
   repoURL=$2
 
   ## If this is an air gap deployment, do nothing
-  if [ $AIRGAP_DEPLOYMENT == "true" ]; then
+  if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
     return 0
   fi 
 
@@ -77,21 +77,46 @@ function helmRepoAdd {
     log_debug "The helm repo [$repo] already exists"
     if [ "$HELM_FORCE_REPO_UPDATE" == "true" ]; then
       log_debug "Forcing update of [$repo] helm repo to [$repoURL]"
+
       # Helm 3.3.2 changed 'repo add' behavior and added the --force-update flag
       # https://github.com/helm/helm/releases/tag/v3.3.2
-      if [ $HELM_VER_MINOR -lt 3 ]; then
-        helm repo add $repo $repoURL
-      elif [ $HELM_VER_MINOR -eq 3 ]; then
-        if [ $HELM_VER_PATCH -lt 2 ]; then
-          helm repo add $repo $repoURL
-        else
-          helm repo add --force-update $repo $repoURL
-        fi
+      if [[  $HELM_VER_MINOR -lt 3 || ( $HELM_VER_MINOR -eq 3 &&  $HELM_VER_PATCH -lt 2) ]]; then
+         helm repo add $repo $repoURL
       else
-        # Helm 2.x behavior is to replace by default
-        helm repo add $repo $repoURL
+         helm repo add --force-update $repo $repoURL
       fi
+
     fi
+  fi
+}
+
+function get_helmchart_reference {
+  local chart_repository chart_name chart_version
+
+  chart_repository=$1
+  chart_name=$2
+  chart_version=$3
+
+  if [ -z "$chart_repository" ]; then
+     echo "'ERROR: Helm chart repository not specified'"
+     return 1
+  elif [ -z "$chart_name" ]; then
+     echo "'ERROR: Helm chart name not specified'"
+     return 1
+  elif [ -z "$chart_version" ]; then
+     echo "'ERROR: Helm chart version not specified'"
+     return 1
+  else
+     #all parms have values
+     :
+  fi
+
+  if [ "$AIRGAP_HELM_FORMAT"  == "tgz" ]; then
+      echo "${AIRGAP_HELM_REPO}/${chart_name}-${chart_version}.tgz"
+  elif [ "$AIRGAP_HELM_FORMAT"  == "oci" ]; then
+      echo "oci://${AIRGAP_HELM_REPO}/${chart_repository}/${chart_name}"
+  else
+      echo "${chart_repository}/${chart_name}"
   fi
 }
 
@@ -100,3 +125,4 @@ export -f helm2ReleaseExists
 export -f helm3ReleaseExists
 export -f helm2ReleaseCheck
 export -f helmRepoAdd
+export -f get_helmchart_reference

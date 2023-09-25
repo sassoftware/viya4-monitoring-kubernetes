@@ -1,10 +1,12 @@
 apiVersion: v1
 data:
   fluent-bit.conf: |
+    @INCLUDE viya-tracing.conf
+
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.24
+       Set  fb_configMap_version 0.2.25
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N

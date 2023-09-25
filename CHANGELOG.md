@@ -1,8 +1,31 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+
 * **Logging**
 * [CHANGE] The [Azure ](samples/azure-deployment/logging) samples have been revised to reflect new default behavior of enabling TLS for intra-cluster communications.
+
+## Version 1.2.17 (19SEP2023)
+
+* **Overall**
+  * [FEATURE] Deploying into an air-gapped environment using local Helm archive (.tgz) files is now supported.  In this scenario,
+container images are still expected to be pulled from private container registry.  See
+[Configure SAS Viya Monitoring for Kubernetes for an Air-Gapped Environment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n0grd8g2pkfglin12bzm3g1oik2p.htm).
+  * [FIX] Ensure forced updates of Helm repos actually occur
+* **Metrics**
+  * [REMOVAL] Remove previously deprecated (experimental) tenant-level metric monitoring components
+  * [UPGRADE] - Kube-prometheus-stack has been upgraded from version 45.28.0 to 48.3.2
+  * [UPGRADE] - Prometheus has been upgraded from version 2.44.0 to 2.46.0
+  * [UPGRADE] - Prometheus Operator has been upgraded from version 0.65.1 to 0.67.1
+  * [UPGRADE] - Grafana has been upgraded from version 9.5.5 to 10.0.3
+  * [UPGRADE] - Kube State Metrics has been upgraded from version 2.8.2 to 2.9.2
+  * [UPGRADE] - K8s-sidecar used with Grafana has been upgraded from version 1.24.0 to 1.25.0
+  * [UPGRADE] - Node Exporter has been upgraded from version 1.5.0 to 1.6.1
+  * [UPGRADE] - Prometheus Pushgateway has been upgraded from version 1.5.1 to 1.6.0
+
+* **Logging**
+
+* **Tracing**
 
 ## Version 1.2.16 (15AUG2023)
 * **Overall**

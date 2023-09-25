@@ -52,9 +52,6 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   exit 1
 fi
 
-# Get/Set Helm Chart Version
-OSD_HELM_CHART_VERSION=${OSD_HELM_CHART_VERSION:-"2.11.0"}
-
 # get credentials
 export ES_KIBANASERVER_PASSWD=${ES_KIBANASERVER_PASSWD}
 
@@ -138,6 +135,10 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
     OPENSHIFT_SPECIFIC_YAML=logging/openshift/values-osd-openshift.yaml
 fi
 
+# Get Helm Chart Name
+log_debug "OpenSearch Dashboards Helm Chart: repo [$OSD_HELM_CHART_REPO] name [$OSD_HELM_CHART_NAME] version [$OSD_HELM_CHART_VERSION]"
+chart2install="$(get_helmchart_reference $OSD_HELM_CHART_REPO $OSD_HELM_CHART_NAME $OSD_HELM_CHART_VERSION)"
+log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Deploy Elasticsearch via Helm chart
 helm $helmDebug upgrade --install v4m-osd \
@@ -151,7 +152,7 @@ helm $helmDebug upgrade --install v4m-osd \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
     --values "$OSD_PATH_INGRESS_YAML" \
     --set fullnameOverride=v4m-osd \
-    ${AIRGAP_HELM_REPO}opensearch/opensearch-dashboards
+   $chart2install
 
 log_info "OpenSearch Dashboards has been deployed"
 
