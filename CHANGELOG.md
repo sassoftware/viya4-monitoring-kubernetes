@@ -1,5 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Logging**
+* [CHANGE] The [Azure ](samples/azure-deployment/logging) samples have been revised to reflect new default behavior of enabling TLS for intra-cluster communications.
+
 ## Version 1.2.16 (15AUG2023)
 * **Overall**
   * [FEATURE] Deploying into an air-gapped environment from a private container registry is now supported.  See

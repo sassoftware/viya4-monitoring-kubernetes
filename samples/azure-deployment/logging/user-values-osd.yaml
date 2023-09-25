@@ -39,3 +39,7 @@ ingress:
             serviceName: v4m-osd
             servicePort: 5601
 
+  tls:
+    - secretName: kibana-ingress-tls-secret
+      hosts:
+        - host.cluster.example.com
