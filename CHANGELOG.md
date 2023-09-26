@@ -3,7 +3,7 @@
 ## Unreleased
 
 * **Logging**
-* [CHANGE] The [Azure ](samples/azure-deployment/logging) samples have been revised to reflect new default behavior of enabling TLS for intra-cluster communications.
+* [CHANGE] The [Azure](samples/azure-deployment/logging) samples have been revised to reflect new default behavior of enabling TLS for intra-cluster communications.
 
 ## Version 1.2.17 (19SEP2023)
 
