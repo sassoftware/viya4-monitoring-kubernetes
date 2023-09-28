@@ -1,5 +1,17 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+
+* **Overall**
+
+* **Metrics**
+  * [FIX] Updated Go pod monitors to not scan unnecessary ports or pods.
+
+* **Logging**
+
+* **Tracing**
+
+
 ## Version 1.2.17 (19SEP2023)
 
 * **Overall**

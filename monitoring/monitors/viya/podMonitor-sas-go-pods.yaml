@@ -22,11 +22,32 @@ spec:
     #   regex: golang
     #   action: keep
     - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
-      regex: "sas-arke|sas-launcher"
+      regex: "sas-arke|sas-launcher|sas-redis-operator"
       action: drop
     - sourceLabels: [__meta_kubernetes_pod_annotation_sas_com_kustomize_base]
       regex: "golang"
       action: keep
+    - action: replace
+      regex: true;(.+)
+      replacement: $1
+      sourceLabels:
+      - __meta_kubernetes_pod_annotationpresent_prometheus_io_port
+      - __meta_kubernetes_pod_annotation_prometheus_io_port
+      targetLabel: __port
+    - action: replace
+      regex: (.+);(.+)
+      replacement: $1:$2
+      sourceLabels:
+      - __meta_kubernetes_pod_ip
+      - __port
+      targetLabel: __address__
+    - action: replace
+      regex: true;(.+)
+      replacement: $1
+      sourceLabels:
+      - __meta_kubernetes_pod_annotationpresent_prometheus_io_path
+      - __meta_kubernetes_pod_annotation_prometheus_io_path
+      targetLabel: __metrics_path__
     - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
       targetLabel: sas_service_base
       replacement: golang
