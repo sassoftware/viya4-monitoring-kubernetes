@@ -38,9 +38,9 @@ The monitoring and logging applications in this sample are configured for
 path-based ingress and are available at the following URLs. Be sure to 
 replace the host names in the URLs with the host names for your deployment.
 
-* `http://host.mycluster.example.com/grafana`
-* `http://host.mycluster.example.com/prometheus`
-* `http://host.mycluster.example.com/alertmanager`
-* `http://host.mycluster.example.com/kibana`
+* `https://host.mycluster.example.com/grafana`
+* `https://host.mycluster.example.com/prometheus`
+* `https://host.mycluster.example.com/alertmanager`
+* `https://host.mycluster.example.com/kibana`
 
 For an example of using host-based ingress, see the [ingress sample](../ingress).
