@@ -5,7 +5,7 @@
 * **Overall**
 
 * **Metrics**
-  * [FIX] Updated Go pod monitors to not scan unnecessary ports or pods.
+  * [FIX] Updated Go podMonitors to eliminate scans of unnecessary ports or pods
 
 * **Logging**
 
