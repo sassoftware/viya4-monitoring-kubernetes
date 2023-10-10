@@ -27,7 +27,7 @@ spec:
       replacement: $1:$2
       targetLabel: __address__
     - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
-      regex: "sas-arke|sas-launcher|sas-redis-operator"
+      regex: "sas-arke|sas-launcher|sas-redis-operator|sas-opendistro-exporter"
       action: drop
     - sourceLabels: [__meta_kubernetes_pod_annotation_sas_com_kustomize_base]
       regex: "golang"
