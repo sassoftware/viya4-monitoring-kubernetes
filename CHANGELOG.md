@@ -3,7 +3,7 @@
 ## Unreleased
 
 * **Metrics**
-  * [FIX] Disable HTTP2 for sas-arke Service Monitor to allow metrics to be collected (Thank you @tynsh for PR#548)
+  * [FIX] Disable HTTP2 for sas-arke Service Monitor to allow metrics to be collected (Thank you @tynsh for PR #548)
 * **Logging**
   * [CHANGE] The [Azure](samples/azure-deployment/logging) samples have been revised to reflect new default behavior of enabling TLS for intra-cluster communications.
 
