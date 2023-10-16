@@ -19,13 +19,13 @@ def validate_input(dict):
     MAX_ROWS = 10000
     if dict['maxInt'] > MAX_ROWS:
         print("Error: Maxrows limit of 10000 exceeded.")
-        exit()
+        sys.exit()
 
     ##Check for existence of Connection Settings in input dictionary
     if(not dict['userName'] or not dict['password'] or not dict['host'] or not dict['port']):
         print('\nError: Missing required connection settings. Please specify username, password, host, and port. \n Default values can be manually exported as environment variables ESHOST, ESPORT, ESUSER, ESPASSWD')
         print("Username:", dict['userName'], " Password:", dict['password'], " Host:", dict['host'], " Port:", dict['port'])
-        exit()
+        sys.exit()
 
     if dict['out-filename']: ##Check for supported file-types and existence of file
 
@@ -37,18 +37,19 @@ def validate_input(dict):
         if os.path.isfile(dict['out-filename']): ##Check if file already exists
             if (dict['force'] == False):
                 print("\nUser specified output file already exists. Use -f to overwrite the file.\n")
-                exit()
+                sys.exit()
         
         safe_dir = os.getcwd() ## Check for path traversal attack
         if os.path.commonprefix((os.path.realpath(dict['out-filename']),safe_dir)) != safe_dir:
             print("Error: Path traversal in out-filename not allowed.")
-            exit()
+            sys.exit()
 
         try:
-            x = open(args['out-filename'], 'w')    
+            x = open(args['out-filename'], 'w')   
+            x.close() 
         except FileNotFoundError as e:
             print("Error: Output file path not found. Please verify output file path. ")
-            exit()
+            sys.exit()
 
     if dict['savequery']: ##Find saved query path location     
         if(type(dict['savequery']) == list):
@@ -57,17 +58,17 @@ def validate_input(dict):
             dict['savequery'] = dict['savequery'] + ".json"
         if ((not ".json" in dict['savequery'])):
             print('Error: Not a supported filetype for the saved query file. Supported type is .json')
-            exit()
+            sys.exit()
 
     if dict['query-filename']: ##Use for plugging in queries
         safe_dir = os.getcwd() ## Check for path traversal attack
         if os.path.commonprefix((os.path.realpath(dict['query-filename']),safe_dir)) != safe_dir:
             print("Error: Path traversal in query-filename not allowed.")
-            exit()
+            sys.exit()
 
         if (not os.path.isfile(dict['query-filename'])):
             print("Error: Invalid query file path.")
-            exit()
+            sys.exit()
  
     ##Time Validator - Verifies input, and converts it to UTC   
     if (type(dict['dateTimeStart']) ==list):
@@ -79,29 +80,30 @@ def validate_input(dict):
         dict['dateTimeEnd'] = (time.strptime(dict.get('dateTimeEnd'), "%Y-%m-%d %H:%M:%S"))
         if (calendar.timegm(dict['dateTimeStart']) > calendar.timegm(dict['dateTimeEnd'])):
             print("Given start date is after the end date.")
-            exit()
+            sys.exit()
         else:
             dict['dateTimeStart'] = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.mktime(dict['dateTimeStart'])))
             dict['dateTimeEnd'] = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.mktime(dict['dateTimeEnd'])))
     except ValueError:
         print("One or more date(s) have been formatted incorrectly. Correct format is Y-M-D H:M:S. Ex: 1999-02-16 10:00:00")  
-        exit()
+        sys.exit()
 
     if (dict['message']): ## Argument formatting for query builder
         if(type(dict['message']) == list):
             dict['message']= " ".join(dict['message'])
         if (dict['message'].find("'") > -1): ##Check for invalid single quotes
             print("Please remove single quotes ('') from search argument.")
-            exit()
+            sys.exit()
 
 def build_query(dict): 
     """Generates Query using Opensearch DSL"""
     """Takes arguments from user and builds a query to pass to opensearch API"""
-    tfile = tempfile.NamedTemporaryFile(delete = False)  ##If User has not specified query file, create temp file for one.
-    temp = open(tfile.name, 'w')
     first = True 
     argcounter=0    ##Counts unique options entered by user, sets min_match to this number
-    if (not dict['query-filename']):   
+    if (not dict['query-filename']):  
+        tfile = tempfile.NamedTemporaryFile(delete = False)  ##If User has not specified query file, create temp file for one.
+        temp = open(tfile.name, 'w') 
+
         temp.write('{"size": ' + str(dict['maxInt']) + ',"sort": [{"@timestamp": {"order": "desc","unmapped_type": "boolean"} }]')     ## Establish size of query, remove scoring
         temp.write(', "query": {"bool": {"must":[ {"range": {"@timestamp": {"gte": "' + dict['dateTimeStart'] + '","lt": "' + dict['dateTimeEnd'] + '"} } }], ')   ##Establish Query with Time Range Requirements
         temp.write('"should": [ ')     ## Should Clause, search results must inlcude at least one of each specified option
@@ -146,8 +148,9 @@ def build_query(dict):
         temp.close()
        
         temp = open(tfile.name, 'r')
-        query =  " ".join([line.strip() for line in temp])
+        query =  " ".join([line.strip() for line in temp]) ## Turns query into string 
         temp.close()
+        tfile.close()
 
     else: ##Open existing query
         x = open(dict['query-filename'], 'rt')
@@ -224,13 +227,18 @@ x = build_query(args)
 index_name = args['index']
 
 if (args['showquery'] == True): ##Print Query if user asks. 
-    print("The following query will be submitted:\n\n", json.dumps(eval(x), indent=2))
+    print("The following query will be submitted:\n\n", json.dumps(json.loads(x), indent=2))
 
 if(args['savequery']): ##Save Query if user asks.
-    y = open(args['savequery'], 'w')  
-    with y as outfile:
-        json.dump(eval(x), outfile, indent=2)   
-
+    safe_dir = os.getcwd()
+    if os.path.commonprefix((os.path.realpath(args['savequery']),safe_dir)) == safe_dir:
+        squery = os.path.realpath(args['savequery'])
+        # deepcode ignore PT: <Snyk bug: Path traversal checking implemented but not detected by snyk>
+        with open(squery, "w") as outfile:
+            outfile.write(x)
+    else:
+        print("Error: Path traversal in save-query not allowed.")
+        sys.exit()
     print("\nQuery saved to " + args['savequery'])
     
 print('\nSearching index: ')
@@ -247,16 +255,17 @@ except Exception as e:
     else:
         print("Connection error. Please verify connection values. ")
         print("Username:", args['userName'], " Password:", args['password'], " Host:", args['host'], " Port:", args['port']) 
-    exit()
+    sys.exit()
 
 if response['hits']['total']['value'] == 0:
     print("No results found for submitted query.")
-    exit()
+    sys.exit()
 
 stdout = False
 if (not args['out-filename']):
     stdout = True
 else:
+    # deepcode ignore PT: <Path traversal detection for out-filename already implemented on line 42>
     x = open(args['out-filename'], 'w')
 
 hitsList = [] ##Check to see if any fields matched user provided fields, collect matching fields
@@ -276,13 +285,14 @@ for fieldDict in hitsList:
 
 if (len(hitsList) == 0):
     print("Error: No fields matched provided fieldnames. Please verify the field on opensearch-dashboards.\n")
-    exit()
+    sys.exit()
 
 ##Output as proper filetype
 if("json" in args['format']): ##JSON formatter, uses json.dump to print to stdout or file
     if (not stdout):
         with x as outfile:
-            json.dump(hitsList, outfile, sort_keys=True, indent=2)
+            # deepcode ignore PT: <Same as before, Path traversal for outfile is checked on line 42>
+            json.dump(json.loads(hitsList), outfile, sort_keys=True, indent=2)
         print("Search complete. Results printed to " + args['out-filename'])
     else:
         print("Search complete.")
