@@ -57,4 +57,4 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 | Logging | OpenSearch Dashboard| opensearch| opensearch-dashboards| 2.11.0| opensearch-dashboards-2.11.0.tgz
 | Metrics | Grafana (on OpenShift)| grafana| grafana| 6.58.9| grafana-6.58.9.tgz
 | Metrics | Kube Prometheus Stack| prometheus-community| kube-prometheus-stack| 48.3.2| kube-prometheus-stack-48.3.2.tgz
-| Metrics | Prometheus Pushgateway| prometheus-community| prometheus-pushgateway| 1.11.0| prometheus-pushgateway-1.11.0.tgz
+| Metrics | Prometheus Pushgateway| prometheus-community| prometheus-pushgateway| 2.4.1| prometheus-pushgateway-2.4.1.tgz
