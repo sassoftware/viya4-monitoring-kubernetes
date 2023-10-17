@@ -12,9 +12,7 @@
 # Sample ingress configuration
 # NOTE: Edit hostnames and ingress port
 
-# HTTP path-based ingress is included here for convenience, but it is highly
-# recommended to incorporate the values from one of the
-# [tls samples](/samples/tls).
+# This example shows path-based ingress using HTTPS. Refer to the [ingress samples](/samples/ingress) for other options.
 # The relevant AKS-specific settings for this sample are just the 'storageClassName:'
 # sections below referencing the custom azuredisk-v4m storage class.
 
@@ -23,59 +21,78 @@ prometheus:
     type: ClusterIP
     nodePort: null
   ingress:
-    enabled: true
+    enabled: false
+    ingressClassName: nginx
     annotations:
-      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    tls:
+    - hosts:
+      - host.cluster.example.com
+      secretName: prometheus-ingress-tls-secret
     hosts:
-    - host.mycluster.example.com
-    paths:
-    - /prometheus
+    - host.cluster.example.com
+    path: /prometheus
+    pathType: Prefix
   prometheusSpec:
     routePrefix: /prometheus
-    externalUrl: http://host.mycluster.example.com/prometheus
+    externalUrl: https://host.cluster.example.com/prometheus
     storageSpec:
       volumeClaimTemplate:
         spec:
          storageClassName: azuredisk-v4m
 
 alertmanager:
+  # Disable default configuration of NodePort
   service:
     type: ClusterIP
     nodePort: null
+  # Define path-based ingress
   ingress:
-    enabled: true
+    # change the following value to 'true'
+    # to make Alertmanager accessible via ingress
+    enabled: false
+    ingressClassName: nginx
     annotations:
-      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    tls:
+    - hosts:
+      - host.cluster.example.com
+      secretName: alertmanager-ingress-tls-secret
     hosts:
-    - host.mycluster.example.com
-    paths:
-    - /alertmanager
+    - host.cluster.example.com
+    path: /alertmanager
+    pathType: Prefix
   alertmanagerSpec:
     routePrefix: /alertmanager
-    externalUrl: http://host.mycluster.example.com/alertmanager    
+    externalUrl: https://host.cluster.example.com/alertmanager
     storage:
       volumeClaimTemplate:
         spec:
           storageClassName: azuredisk-v4m
 
 grafana:
-  "grafana.ini":
-    server:
-      protocol: http
-      domain: host.mycluster.example.com
-      root_url: http://host.mycluster.example.com/grafana
-      serve_from_sub_path: true
+  # Disable default configuration of NodePort
   service:
     type: ClusterIP
     nodePort: null
   ingress:
-    enabled: true
     ingressClassName: nginx
     annotations:
-      nginx.ingress.kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    enabled: true
+    tls:
+    - hosts:
+      - host.cluster.example.com
+      secretName: grafana-ingress-tls-secret
     hosts:
-    - host.mycluster.example.com
+    - host.cluster.example.com
     path: /grafana
+    pathType: Prefix
+  "grafana.ini":
+    server:
+      domain: host.cluster.example.com
+      root_url: https://host.cluster.example.com/grafana
+      serve_from_sub_path: true
   testFramework:
     enabled: false
   persistence:

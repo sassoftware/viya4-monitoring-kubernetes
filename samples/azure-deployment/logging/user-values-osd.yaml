@@ -29,7 +29,7 @@ ingress:
       rewrite (?i)/dashboards/(.*) /$1 break;
       rewrite (?i)/dashboards$ / break;
     nginx.ingress.kubernetes.io/rewrite-target: /dashboards
-    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
   enabled: true
   hosts:
     - host: host.cluster.example.com
@@ -39,3 +39,7 @@ ingress:
             serviceName: v4m-osd
             servicePort: 5601
 
+  tls:
+    - secretName: kibana-ingress-tls-secret
+      hosts:
+        - host.cluster.example.com

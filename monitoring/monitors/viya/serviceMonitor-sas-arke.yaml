@@ -11,6 +11,7 @@ spec:
   endpoints:
   - port: tcp
     path: /metrics
+    enableHttp2: false
     relabelings:
     - sourceLabels: [__meta_kubernetes_pod_label_sas_com_deployment]
       targetLabel: sas_deployment

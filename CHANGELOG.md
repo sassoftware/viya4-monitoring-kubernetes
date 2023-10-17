@@ -5,12 +5,13 @@
 * **Overall**
 
 * **Metrics**
+  * [FIX] Disable HTTP2 for sas-arke Service Monitor to allow metrics to be collected (Thank you @tynsh for PR #548)
   * [FIX] Updated Go podMonitors to eliminate scans of unnecessary ports or pods
-
+ 
 * **Logging**
+  * [CHANGE] The [Azure](samples/azure-deployment/logging) samples have been revised to reflect new default behavior of enabling TLS for intra-cluster communications.
 
 * **Tracing**
-
 
 ## Version 1.2.17 (19SEP2023)
 
