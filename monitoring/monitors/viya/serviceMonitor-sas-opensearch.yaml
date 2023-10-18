@@ -40,4 +40,4 @@ spec:
       insecureSkipVerify: true
   selector:
     matchLabels:
-      opendistro.sas.com/service-name: sas-opendistro
+      opendistro.sas.com/metrics-plugin: true
