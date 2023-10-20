@@ -39,5 +39,10 @@ spec:
     tlsConfig:
       insecureSkipVerify: true
   selector:
-    matchLabels:
-      opendistro.sas.com/metrics-plugin: true
+    matchExpressions:
+      - key: opendistro.sas.com/metrics-plugin
+        operator: In
+        values: ["true"]
+      - key: opendistro.sas.com/service-name
+        operator:  In
+        values: ["sas-opendistro"]
