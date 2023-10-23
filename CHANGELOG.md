@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+
+* **Metrics**
+  * [FIX] Corrected typo preventing deploy_monitoring_openshift.sh from running successfully when TRACING_ENABLE='true'
+
 ## Version 1.2.18 (17OCT2023)
 
 * **Metrics**
