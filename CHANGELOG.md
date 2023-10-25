@@ -5,6 +5,10 @@
 * **Overall**
   * [CHANGE] OpenShift versions prior to 4.11 not supported
 
+* **Metrics**
+  * [FIX] Corrected typo preventing deploy_monitoring_openshift.sh from running successfully when TRACING_ENABLE='true'
+
+
 ## Version 1.2.18 (17OCT2023)
 
 * **Metrics**
