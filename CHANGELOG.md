@@ -42,6 +42,8 @@ container images are still expected to be pulled from private container registry
   * [UPGRADE] - Node Exporter has been upgraded from version 1.5.0 to 1.6.1
   * [UPGRADE] - Prometheus Pushgateway has been upgraded from version 1.5.1 to 1.6.0
 
+* **Logging**
+
 * **Tracing**
 
 ## Version 1.2.16 (15AUG2023)
