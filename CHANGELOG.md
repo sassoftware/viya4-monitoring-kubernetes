@@ -10,7 +10,10 @@
   * [FIX] ServiceMonitor definition for OpenSearch (w/in SAS Viya deployment) updated to align with new Kubernetes labels.
 
 * **Logging**
-* 
+  * [DEPRECATION] The script getlogs.sh is moved from 'experiemental' to 'deprecated' status and will be removed in an upcoming release.
+The getlogs.py script should be used instead.
+
+
 ## Version 1.2.18 (17OCT2023)
 
 * **Metrics**
@@ -39,9 +42,7 @@ container images are still expected to be pulled from private container registry
   * [UPGRADE] - Node Exporter has been upgraded from version 1.5.0 to 1.6.1
   * [UPGRADE] - Prometheus Pushgateway has been upgraded from version 1.5.1 to 1.6.0
 
-* **Logging**
-  * [DEPRECATION] The script getlogs.sh is moved from 'experiemental' to 'deprecated' status and will be removed in an upcoming release.
-The getlogs.py script should be used instead.
+* **Tracing**
 
 ## Version 1.2.16 (15AUG2023)
 * **Overall**
