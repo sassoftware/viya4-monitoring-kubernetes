@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+* **Overall**
+  * [CHANGE] OpenShift versions prior to 4.11 not supported
+
 * **Metrics**
+  * [FIX] Corrected typo preventing deploy_monitoring_openshift.sh from running successfully when TRACING_ENABLE='true'
   * [FIX] ServiceMonitor definition for OpenSearch (w/in SAS Viya deployment) updated to align with new Kubernetes labels.
 
+* **Logging**
+* 
 ## Version 1.2.18 (17OCT2023)
 
 * **Metrics**
@@ -34,8 +40,8 @@ container images are still expected to be pulled from private container registry
   * [UPGRADE] - Prometheus Pushgateway has been upgraded from version 1.5.1 to 1.6.0
 
 * **Logging**
-
-* **Tracing**
+  * [DEPRECATION] The script getlogs.sh is moved from 'experiemental' to 'deprecated' status and will be removed in an upcoming release.
+The getlogs.py script should be used instead.
 
 ## Version 1.2.16 (15AUG2023)
 * **Overall**
