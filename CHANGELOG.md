@@ -7,6 +7,11 @@
 
 * **Metrics**
   * [FIX] Corrected typo preventing deploy_monitoring_openshift.sh from running successfully when TRACING_ENABLE='true'
+  * [FIX] ServiceMonitor definition for OpenSearch (w/in SAS Viya deployment) updated to align with new Kubernetes labels.
+
+* **Logging**
+  * [DEPRECATION] The script getlogs.sh is moved from 'experiemental' to 'deprecated' status and will be removed in an upcoming release.
+The getlogs.py script should be used instead.
 
 
 ## Version 1.2.18 (17OCT2023)
