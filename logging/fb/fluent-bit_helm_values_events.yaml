@@ -1,0 +1,229 @@
+kind: Deployment
+image:
+  tag: 2.1.8
+replicaCount: 1
+
+rbac:
+  eventsAccess: true
+
+env:
+   - name: ES_LOGCOLLECTOR_USER
+     valueFrom:
+       secretKeyRef:
+         name: internal-user-logcollector
+         key: username
+   - name: ES_LOGCOLLECTOR_PASSWD
+     valueFrom:
+       secretKeyRef:
+         name: internal-user-logcollector
+         key: password
+
+extraVolumes:
+- name: fb-events-db
+  emptyDir: {}
+
+extraVolumeMounts:
+- name: fb-events-db
+  mountPath: /tmp/v4m
+  subPath: v4m_fb_events.db
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  readOnlyRootFilesystem: true
+
+config:
+  service: |
+    [SERVICE]
+        Flush        1
+        Daemon       Off
+        Log_Level    info
+        HTTP_Server  On
+        HTTP_Listen  0.0.0.0
+        HTTP_Port    2020
+        storage.path /tmp/v4m/fb_buffer/
+        storage.checksum off
+        storage.sync normal
+        storage.backlog.mem_limit 5M
+        storage.metrics On
+
+  inputs: |
+    [INPUT]
+        name kubernetes_events
+        tag  k8s_events
+        DB   /tmp/v4m/v4m_fb_events.db
+
+  outputs: |
+    [OUTPUT]
+        Name  opensearch
+        Alias opensearch_events
+        Match k8s_events
+        Host  v4m-search
+        Port  9200
+        Buffer_Size 512KB
+        Logstash_Format On
+        Retry_Limit 5
+        Suppress_Type_Name On
+        Workers 2
+        Time_Key @timestamp
+        ID_Key $properties['eventid']
+        Replace_Dots On
+        Logstash_Prefix viya_logs
+        HTTP_User ${ES_LOGCOLLECTOR_USER}
+        HTTP_Passwd ${ES_LOGCOLLECTOR_PASSWD}
+        tls         on
+        tls.debug   2
+        tls.verify  off
+
+  filters: |
+    [FILTER]
+        Name modify
+        Match k8s_events
+        Set  fb_configMap_version event47
+
+    [FILTER]
+        #NOTE: Fluent Bit RecordAccessor support is not currently supported(?)
+        # for RENAME/COPY operations with the MODIFY filter; therefore, we need
+        # to use NEST filters to handle nested fields for now.  When this is
+        # "fixed",we can remove these and use the simpler Record Accessor notation.
+        Alias events_lift_object
+        Name         nest
+        Match        k8s_events
+        Operation    lift
+        Nested_under involvedObject
+        Add_prefix   INVOBJ__
+    [FILTER]
+        Alias events_lift_metadata
+        Name         nest
+        Match        k8s_events
+        Operation    lift
+        Nested_under metadata
+        Add_prefix   META__
+    [FILTER]
+        Alias events_lift_source
+        Name         nest
+        Match        k8s_events
+        Operation    lift
+        Nested_under source
+        Add_prefix   SRC__
+    [FILTER]
+        Alias  k8s_modify1
+        Name   modify
+        Match  k8s_events
+        set    logsource                    KUBE_EVENT3
+        copy   lastTimestamp                timeStamp
+        copy   type                         level
+        ## Using source object Kubernetes metadata for "log message"
+        #rename $involvedObject['namespace'] k8s__namespace
+        rename INVOBJ__namespace            k8s__namespace
+        #rename $source['host']              k8s__host
+        rename SRC__host                    k8s__host
+        ## Storing other useful info in 'properties'
+        rename firstTimestamp               PROPS__firsttimestamp
+        rename lastTimestamp                PROPS__lastimestamp
+        rename count                        PROPS__count
+        rename type                         PROPS__type
+        rename reason                       PROPS__reason
+        rename clusterName                  PROPS__clustername
+        #rename $involvedObject['kind']      PROPS__object_type
+        #rename $involvedObject['name']      PROPS__object
+        rename INVOBJ__kind                 PROPS__object_type
+        rename INVOBJ__name                 PROPS__object
+        rename INVOBJ__fieldPath            PROPS__fieldPath
+        #copy   $metadata['name']            PROPS__eventName
+        #copy   $metadata['uid']             PROPS__eventid
+        rename META__name                   PROPS__eventName
+        rename META__uid                    PROPS__eventid
+
+        ## Not sure about these two
+        rename reportingComponent           PROPS__reportingComponent
+        rename reportingInstance            PROPS__reportingInstance
+
+    [FILTER]
+        Alias     events_set_kube_fields
+        Name      modify
+        Match     k8s_events
+        Condition Key_value_matches  PROPS__object_type  Pod|Job
+        Copy      PROPS__object      k8s__pod
+        Copy      INVOBJ__uid        k8s__pod_id
+    [FILTER]
+        # See NOTE above re: need to for NEST filters
+        # Re-construct EVENT structures (just in case)
+        Alias         events_nest_object
+        Name          nest
+        Match         k8s_events
+        Operation     nest
+        Wildcard      INVOBJ__*
+        Nest_under    involvedObject
+        Remove_prefix INVOBJ__
+    [FILTER]
+        Alias          events_nest_meta
+        Name           nest
+        Match          k8s_events
+        Operation      nest
+        Wildcard       META__*
+        Nest_under     metadata
+        Remove_prefix  META__
+    [FILTER]
+        Alias         events_nest_source
+        Name          nest
+        Match         k8s_events
+        Operation     nest
+        Wildcard      SRC__*
+        Nest_under    source
+        Remove_prefix SRC__
+    [FILTER]
+        # Create 'properties' map
+        # ..any PROPS_ objects are included
+        Alias           nest_PROPS_under_properties
+        Name            nest
+        Match           *
+        Operation       nest
+        Wildcard        PROPS__*
+        Nest_under      properties
+        Remove_prefix   PROPS__
+    [FILTER]
+        # Create 'kube' map
+        # ..any k8s_ objects are included
+        Alias           nest_K8s
+        Name            nest
+        Match           *
+        Operation       nest
+        Wildcard        k8s__*
+        Nest_under      kube
+        Remove_prefix   k8s__
+    [FILTER]
+        Alias  prep_junk
+        Name   modify
+        Match  k8s_events
+        rename metadata       JUNK__metadata
+        rename involvedObject JUNK__involvedObject
+        rename source         JUNK__source
+        rename eventTime      JUNK__eventTime
+    [FILTER]
+        Alias           nest_junk
+        Name            nest
+        Match           k8s_events
+        Operation       nest
+        Wildcard        JUNK__*
+        Nest_under      junk
+        Remove_prefix   JUNK__
+    [FILTER]
+        #
+        # ALLOWLIST Vars to output
+        #
+        Alias          allowlist
+        Name           record_modifier
+        Match          *
+        Allowlist_key  @timestamp
+        Allowlist_key  debug
+        Allowlist_key  level
+        Allowlist_key  kube
+        Allowlist_key  logsource
+        Allowlist_key  message
+        Allowlist_key  messageKey
+        Allowlist_key  messageParameters
+        Allowlist_key  properties
+
+
+
