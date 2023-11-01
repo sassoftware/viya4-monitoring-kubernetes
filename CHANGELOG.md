@@ -4,6 +4,7 @@
 
 * **Metrics**
   * [FIX] Corrected typo preventing deploy_monitoring_openshift.sh from running successfully when TRACING_ENABLE='true'
+  * [FEATURE] Updated SAS Launched Jobs dashboards to include jobs with customized job name prefixes
 
 ## Version 1.2.18 (17OCT2023)
 
