@@ -26,6 +26,8 @@ require_opensearch
 
 log_info "Deploying Fluent Bit for collecting Kubernetes Events..."
 
+#TO DO: Check that OpenSearch is actually deployed and running?
+
 # check for pre-reqs
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
@@ -34,10 +36,14 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
 fi
 
 # get credentials
-get_credentials_from_secret logcollector
-rc=$?
-if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
-
+if [ "$(kubectl -n $LOG_NS get secret internal-user-logcollector -o name 2>/dev/null)" == "" ]; then
+   export ES_LOGCOLLECTOR_PASSWD=${ES_LOGCOLLECTOR_PASSWD}
+   create_user_secret internal-user-logcollector logcollector "$ES_LOGCOLLECTOR_PASSWD"  managed-by=v4m-es-script
+else
+   get_credentials_from_secret logcollector
+   rc=$?
+   if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
+fi
 
 HELM_DEBUG="${HELM_DEBUG:-false}"
 if [ "$HELM_DEBUG" == "true" ]; then
