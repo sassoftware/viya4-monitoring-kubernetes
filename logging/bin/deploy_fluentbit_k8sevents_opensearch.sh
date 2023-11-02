@@ -28,6 +28,18 @@ log_info "Deploying Fluent Bit for collecting Kubernetes Events..."
 
 #TO DO: Check that OpenSearch is actually deployed and running?
 
+# Remove an existing Event Routher deployment?
+REMOVE_EVENTROUTER=${REMOVE_EVENTROUTER:-true}
+if [ "$REMOVE_EVENTROUTER" == "true" ]; then
+   if [ "$(kubectl get deployment -n $LOG_NS -o name -l app=eventrouter 2>/dev/null)" == "" ]; then
+      log_debug "No existing instance of Event Router found in namespace [$LOG_NS]."
+   else
+     log_debug "Removing an existing instance of Event Router found in namespace [$LOG_NS]."
+     kubectl -n $LOG_NS delete deployment -l app=eventrouter
+   fi
+fi
+
+
 # check for pre-reqs
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
@@ -101,8 +113,8 @@ helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb-events  \
 
 ##TO DO: Need this for Events?
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
-#disable_sa_token_automount $LOG_NS v4m-fb-events
-#enable_pod_token_automount $LOG_NS deployment v4m-fb-events
+##disable_sa_token_automount $LOG_NS v4m-fb-events
+##enable_pod_token_automount $LOG_NS deployment v4m-fb-events
 
 ##TO DO: This may not be needed since we are not using ConfigMaps here
 # Force restart of daemonset to ensure we pick up latest config changes
