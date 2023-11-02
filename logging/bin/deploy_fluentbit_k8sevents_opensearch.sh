@@ -113,13 +113,8 @@ helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb-events  \
 
 ##TO DO: Need this for Events?
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
-##disable_sa_token_automount $LOG_NS v4m-fb-events
-##enable_pod_token_automount $LOG_NS deployment v4m-fb-events
-
-##TO DO: This may not be needed since we are not using ConfigMaps here
-# Force restart of daemonset to ensure we pick up latest config changes
-# since Helm won't notice if the only changes are in the configMap
-#kubectl -n "$LOG_NS" rollout restart deployment v4m-fb-events
+disable_sa_token_automount $LOG_NS v4m-fb-events
+enable_pod_token_automount $LOG_NS deployment v4m-fb-events
 
 log_info "Fluent Bit deployment completed"
 
