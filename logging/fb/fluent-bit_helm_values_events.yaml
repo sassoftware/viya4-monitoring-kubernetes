@@ -1,6 +1,6 @@
 kind: Deployment
 image:
-  tag: 2.1.8
+  tag: 2.1.10
 replicaCount: 1
 
 rbac:
@@ -110,7 +110,7 @@ config:
         Alias  k8s_modify1
         Name   modify
         Match  k8s_events
-        set    logsource                    KUBE_EVENT3
+        set    logsource                    KUBE_EVENT
         copy   lastTimestamp                timeStamp
         copy   type                         level
         ## Using source object Kubernetes metadata for "log message"
