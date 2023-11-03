@@ -12,6 +12,9 @@
 * **Logging**
   * [DEPRECATION] The script getlogs.sh is moved from 'experiemental' to 'deprecated' status and will be removed in an upcoming release.
 The getlogs.py script should be used instead.
+  * [CHANGE] Replaced Event Router component with a Fluent Bit deployment for collecting Kubernetes events.  Note that this
+results in some changes: the properties.verb field is no longer available and only new events are captured.  The latter
+change reduces the number of events collected and eliminates clutter.
 
 
 ## Version 1.2.18 (17OCT2023)
