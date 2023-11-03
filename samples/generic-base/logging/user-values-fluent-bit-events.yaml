@@ -1,0 +1,6 @@
+# Chart:  https://github.com/fluent/helm-charts/blob/fluent-bit-0.39.0/charts/fluent-bit
+# Default values: https://github.com/fluent/helm-charts/blob/fluent-bit-0.39.0/charts/fluent-bit/values.yaml
+
+#image:
+#  tag: 2.1.10
+
