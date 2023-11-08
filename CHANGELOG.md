@@ -6,6 +6,7 @@
   * [CHANGE] OpenShift versions prior to 4.11 not supported
 
 * **Metrics**
+  * [CHANGE] Grafana dashboard 'Logging - Fluent Bit' renamed to 'Fluent Bit - Log Collection'
   * [FIX] Corrected typo preventing deploy_monitoring_openshift.sh from running successfully when TRACING_ENABLE='true'
   * [FIX] ServiceMonitor definition for OpenSearch (w/in SAS Viya deployment) updated to align with new Kubernetes labels.
 
@@ -15,7 +16,6 @@ The getlogs.py script should be used instead.
   * [CHANGE] Replaced Event Router component with a Fluent Bit deployment for collecting Kubernetes events.  Note that this
 results in some changes: the properties.verb field is no longer available and only new events are captured.  The latter
 change reduces the number of events collected and eliminates clutter.
-
 
 ## Version 1.2.18 (17OCT2023)
 
