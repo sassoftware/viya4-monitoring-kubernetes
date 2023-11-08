@@ -111,10 +111,11 @@ helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb-events  \
   --set fullnameOverride=v4m-fb-events \
   $chart2install
 
-##TO DO: Need this for Events?
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
 disable_sa_token_automount $LOG_NS v4m-fb-events
 enable_pod_token_automount $LOG_NS deployment v4m-fb-events
+
+kubectl -n $LOG_NS scale deployment v4m-fb-events --replicas 1
 
 log_info "Fluent Bit deployment completed"
 
