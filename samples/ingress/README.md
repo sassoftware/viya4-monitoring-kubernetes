@@ -83,11 +83,11 @@ Ingress, the applications are available at these locations:
 
 When you deploy using path-based Ingress, the following applications are available at these locations. 
 
-* Grafana - `http://host.mycluster.example.com/grafana`
-* OpenSearch Dashboards - `http://host.mycluster.example.com/dashboards`
+* Grafana - `https://host.mycluster.example.com/grafana`
+* OpenSearch Dashboards - `https://host.mycluster.example.com/dashboards`
 
 If you have chosen to make the following applications available and you have configured path-based Ingress, the applications are available at these locations:
 
-* Prometheus - `http://host.mycluster.example.com/prometheus`
-* Alertmanager - `http://host.mycluster.example.com/alertmanager`
-* OpenSearch - `http://host.mycluster.example.com/opensearch`
+* Prometheus - `https://host.mycluster.example.com/prometheus`
+* Alertmanager - `https://host.mycluster.example.com/alertmanager`
+* OpenSearch - `https://host.mycluster.example.com/opensearch`
