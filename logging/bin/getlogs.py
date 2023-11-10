@@ -9,6 +9,7 @@ from opensearchpy import OpenSearch
 import os, sys
 import json, csv
 import tempfile
+import subprocess, socket
 
 ##v 0.2.0
 
@@ -23,9 +24,16 @@ def validate_input(dict):
 
     ##Check for existence of Connection Settings in input dictionary
     if(not dict['userName'] or not dict['password'] or not dict['host'] or not dict['port']):
-        print('\nError: Missing required connection settings. Please specify username, password, host, and port. \n Default values can be manually exported as environment variables ESHOST, ESPORT, ESUSER, ESPASSWD')
-        print("Username:", dict['userName'], " Password:", dict['password'], " Host:", dict['host'], " Port:", dict['port'])
-        sys.exit()
+        if not dict['portforward']:
+            print('\nError: Missing required connection settings. Please specify username, password, host, and port. \n Default values can be manually exported as environment variables ESHOST, ESPORT, ESUSER, ESPASSWD \n To port-forward and skip ESHOST and ESPORT, use -pf')
+            print("Username:", dict['userName'], " Password:", dict['password'], " Host:", dict['host'], " Port:", dict['port'])
+            sys.exit()
+    
+    #Check whether user provided kubeconfig for port-forwarding
+    if dict['portforward']:
+        if os.environ.get('KUBECONFIG') is None:
+            print("Error: Port forwarding argument selected but no KUBECONFIG env variable set.")
+            sys.exit()
 
     if dict['out-filename']: ##Check for supported file-types and existence of file
 
@@ -94,6 +102,21 @@ def validate_input(dict):
         if (dict['message'].find("'") > -1): ##Check for invalid single quotes
             print("Please remove single quotes ('') from search argument.")
             sys.exit()
+
+def open_port(dict):
+    """Binds the v4m-search service on port 9200 to a locally available port"""
+    #Get open port
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("",0))
+    s.listen(1)
+    port = s.getsockname()[1]
+    s.close()
+
+    cmd = (["kubectl", "-n", "logging", "port-forward", "svc/v4m-search", str(port) + ':9200', '&'])
+    proc = subprocess.Popen(cmd, shell =True, stdout=subprocess.PIPE)
+    dict['host'] = 'localhost'
+    dict['port'] = port
+
 
 def build_query(dict): 
     """Generates Query using Opensearch DSL"""
@@ -197,6 +220,7 @@ def get_arguments():
     
     parser.add_argument('-i', '--index', required=False, dest="index", metavar="INDEX", default="viya_logs-*") ## help = "\nDetermine which index to perform the search in. Default: viya-logs-*\n\n
     ##Connection settings
+    parser.add_argument('-pf','--port-forward', required=False, dest="portforward", action="store_true", help = "\n If this option is provided, getlogs will use the value in your KUBECONFIG (case-sensitive) environment variable to port-forward and connect to the open-search API. This skips ESHOST and ESPORT, but ESUSER and ESPASSWD are stil required to authenticate and connect to the database. \n\n")
     parser.add_argument('-us','--user',  required=False, dest="userName", default=os.environ.get("ESUSER"), help = "\nUsername for connecting to OpenSearch/Kibana (default: $ESUSER)\n\n")
     parser.add_argument('-pw', '--password', required=False,  dest="password", default=os.environ.get("ESPASSWD"), help = "\nPassword for connecting to OpenSearch/Kibana  (default: $ESPASSWD)\n\n")
     parser.add_argument('-ho', '--host', required=False,  dest="host", default=os.environ.get("ESHOST"), help = "\nHostname for connection to OpenSearch/Kibana (default: $ESHOST)\n\n")
@@ -206,6 +230,8 @@ def get_arguments():
 
 args = get_arguments() ##Creates "args" dictionary that contains all user submitted options. Print "args" to debug values. Note that the 'dest' value for each argument in argparser object is its key.
 validate_input(args)
+if args['portforward']:
+    open_port(args)
 
 # Establish Client Using User Authorization and Connection Settings
 auth = (args['userName'], args['password'])
@@ -318,3 +344,4 @@ elif("csv" in args['format']): ##CSV writer implemented using dictwriter
             for fieldDict in hitsList:
                 writer.writerow(fieldDict)
                 print("\n")
+
