@@ -166,13 +166,13 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "- sum(rate(fluentbit_input_records_total{node=~\"$node\"}[5m]))",
+          "expr": "- sum(rate(fluentbit_input_records_total{pod!~\"v4m-fb-events.*\",node=~\"$node\"}[5m]))",
           "interval": "",
           "legendFormat": "In ",
           "refId": "B"
         },
         {
-          "expr": "sum(rate(fluentbit_output_proc_records_total{node=~\"$node\"}[5m]))",
+          "expr": "sum(rate(fluentbit_output_proc_records_total{pod!~\"v4m-fb-events.*\",node=~\"$node\"}[5m]))",
           "interval": "",
           "legendFormat": "Out",
           "refId": "A"
@@ -344,13 +344,13 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum (rate(fluentbit_output_retries_total{node=~\"$node\"}[2m]))",
+          "expr": "sum (rate(fluentbit_output_retries_total{pod!~\"v4m-fb-events.*\",node=~\"$node\"}[2m]))",
           "interval": "",
           "legendFormat": "Retries",
           "refId": "A"
         },
         {
-          "expr": "sum (rate(fluentbit_output_retries_failed_total{node=~\"$node\"}[2m]))",
+          "expr": "sum (rate(fluentbit_output_retries_failed_total{pod!~\"v4m-fb-events.*\",node=~\"$node\"}[2m]))",
           "interval": "",
           "legendFormat": "Failures",
           "refId": "B"
@@ -446,13 +446,13 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "- sum (rate(fluentbit_input_bytes_total{node=~\"$node\"}[2m]))",
+          "expr": "- sum (rate(fluentbit_input_bytes_total{pod!~\"v4m-fb-events.*\",node=~\"$node\"}[2m]))",
           "interval": "",
           "legendFormat": "Input Bytes",
           "refId": "B"
         },
         {
-          "expr": "sum (rate(fluentbit_output_proc_bytes_total{node=~\"$node\"}[2m]))",
+          "expr": "sum (rate(fluentbit_output_proc_bytes_total{pod!~\"v4m-fb-events.*\",node=~\"$node\"}[2m]))",
           "interval": "",
           "legendFormat": "Output Bytes",
           "refId": "A"
@@ -563,13 +563,13 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "- sum(rate(fluentbit_input_records_total{node=~\"$node\"}[5m])) by (node)",
+          "expr": "- sum(rate(fluentbit_input_records_total{pod!~\"v4m-fb-events.*\", node=~\"$node\"}[5m])) by (node)",
           "interval": "",
           "legendFormat": "In - {{ node }}",
           "refId": "B"
         },
         {
-          "expr": "sum(rate(fluentbit_output_proc_records_total{node=~\"$node\"}[5m])) by (node)",
+          "expr": "sum(rate(fluentbit_output_proc_records_total{pod!~\"v4m-fb-events.*\", node=~\"$node\"}[5m])) by (node)",
           "interval": "",
           "legendFormat": "Out - {{ node }}",
           "refId": "A"
@@ -664,7 +664,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "container_memory_working_set_bytes{container=\"fluent-bit\",node=~\"$node\"}",
+          "expr": "container_memory_working_set_bytes{pod!~\"v4m-fb-events.*\", container=\"fluent-bit\",node=~\"$node\"}",
           "interval": "",
           "legendFormat": "{{ node }}",
           "refId": "A"
@@ -760,13 +760,13 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "- sum (rate(fluentbit_input_bytes_total{node=~\"$node\"}[2m])) by (node)",
+          "expr": "- sum (rate(fluentbit_input_bytes_total{pod!~\"v4m-fb-events.*\",node=~\"$node\"}[2m])) by (node)",
           "interval": "",
           "legendFormat": "Input Bytes - {{ node }}",
           "refId": "B"
         },
         {
-          "expr": "sum (rate(fluentbit_output_proc_bytes_total{node=~\"$node\"}[2m])) by (node)",
+          "expr": "sum (rate(fluentbit_output_proc_bytes_total{pod!~\"v4m-fb-events.*\", node=~\"$node\"}[2m])) by (node)",
           "interval": "",
           "legendFormat": "Output Bytes - {{ node }}",
           "refId": "A"
@@ -863,13 +863,13 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum (rate(fluentbit_output_retries_total{node=~\"$node\"}[2m])) by (node)",
+          "expr": "sum (rate(fluentbit_output_retries_total{pod!~\"v4m-fb-events.*\",node=~\"$node\"}[2m])) by (node)",
           "interval": "",
           "legendFormat": "Retries - {{ node }}",
           "refId": "A"
         },
         {
-          "expr": "sum (rate(fluentbit_output_retries_failed_total{node=~\"$node\"}[2m])) by (node)",
+          "expr": "sum (rate(fluentbit_output_retries_failed_total{pod!~\"v4m-fb-events.*\",node=~\"$node\"}[2m])) by (node)",
           "interval": "",
           "legendFormat": "Failures - {{ node }}",
           "refId": "B"
@@ -997,7 +997,7 @@
     ]
   },
   "timezone": "",
-  "title": "Logging - Fluent Bit",
+  "title": "Fluent Bit - Log Message Collection",
   "uid": "e-WbwTjZk",
   "version": 2
 }

@@ -38,6 +38,8 @@ logging/bin/remove_opensearch.sh
 
 logging/bin/remove_eventrouter.sh
 
+logging/bin/remove_fluentbit_k8sevents_opensearch.sh
+
 if [ "$LOG_DELETE_PVCS_ON_REMOVE" == "true" ]; then
   log_verbose "Removing known logging PVCs..."
   kubectl delete pvc --ignore-not-found -n $LOG_NS -l app.kubernetes.io/name=opensearch
