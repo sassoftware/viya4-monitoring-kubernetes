@@ -15,7 +15,7 @@ log_debug "Script [$this_script] has started [$(date)]"
 FLUENT_BIT_EVENTS_ENABLED=${FLUENT_BIT_EVENTS_ENABLED:-true}
 
 if [ "$FLUENT_BIT_EVENTS_ENABLED" != "true" ]; then
-   log_info "Environment variable [FLUENT_BIT_EVENTS_ENABLED] is not set to 'true'; existing WITHOUT deploying Fluent Bit deployment"
+   log_info "Environment variable [FLUENT_BIT_EVENTS_ENABLED] is not set to 'true'; exiting WITHOUT deploying Fluent Bit deployment"
    exit
 fi
 
