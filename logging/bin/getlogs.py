@@ -10,6 +10,7 @@ import os, sys
 import json, csv
 import tempfile
 import subprocess, socket
+from subprocess import run
 
 ##v 0.2.0
 
@@ -111,12 +112,16 @@ def open_port(dict):
     s.listen(1)
     port = s.getsockname()[1]
     s.close()
-
-    cmd = (["kubectl", "-n", "logging", "port-forward", "svc/v4m-search", str(port) + ':9200', '&'])
-    proc = subprocess.Popen(cmd, shell =True, stdout=subprocess.PIPE)
+    cmd = (["kubectl", "-n", dict['portforward'], "port-forward", "svc/v4m-search", str(port) + ':9200', '&'])
+    proc = run(cmd, shell =True, capture_output =True)
     dict['host'] = 'localhost'
     dict['port'] = port
-
+    
+    if 'error' in str(proc.stderr).lower():
+        print("Error: Port-forwarding failed. Please verify KUBECONFIG and NAMESPACE values\n")
+        print("Error msg: ", str(proc.stderr).strip())
+        sys.exit()
+    
 
 def build_query(dict): 
     """Generates Query using Opensearch DSL"""
@@ -220,7 +225,7 @@ def get_arguments():
     
     parser.add_argument('-i', '--index', required=False, dest="index", metavar="INDEX", default="viya_logs-*") ## help = "\nDetermine which index to perform the search in. Default: viya-logs-*\n\n
     ##Connection settings
-    parser.add_argument('-pf','--port-forward', required=False, dest="portforward", action="store_true", help = "\n If this option is provided, getlogs will use the value in your KUBECONFIG (case-sensitive) environment variable to port-forward and connect to the open-search API. This skips ESHOST and ESPORT, but ESUSER and ESPASSWD are stil required to authenticate and connect to the database. \n\n")
+    parser.add_argument('-pf','--port-forward', required=False, dest="portforward", metavar="NAMESPACE", help = "\n If this option is provided, getlogs will use the value in your KUBECONFIG (case-sensitive) environment variable to port-forward and connect to the open-search API in the specified namespace. This skips ESHOST and ESPORT, but ESUSER and ESPASSWD are stil required to authenticate and connect to the database. \n\n")
     parser.add_argument('-us','--user',  required=False, dest="userName", default=os.environ.get("ESUSER"), help = "\nUsername for connecting to OpenSearch/Kibana (default: $ESUSER)\n\n")
     parser.add_argument('-pw', '--password', required=False,  dest="password", default=os.environ.get("ESPASSWD"), help = "\nPassword for connecting to OpenSearch/Kibana  (default: $ESPASSWD)\n\n")
     parser.add_argument('-ho', '--host', required=False,  dest="host", default=os.environ.get("ESHOST"), help = "\nHostname for connection to OpenSearch/Kibana (default: $ESHOST)\n\n")
