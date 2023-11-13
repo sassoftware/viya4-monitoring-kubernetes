@@ -35,7 +35,8 @@ if [ "$REMOVE_EVENTROUTER" == "true" ]; then
       log_debug "No existing instance of Event Router found in namespace [$LOG_NS]."
    else
      log_debug "Removing an existing instance of Event Router found in namespace [$LOG_NS]."
-     kubectl -n $LOG_NS delete deployment -l app=eventrouter
+     #kubectl -n $LOG_NS delete deployment -l app=eventrouter
+     logging/bin/remove_eventrouter.sh
    fi
 fi
 
