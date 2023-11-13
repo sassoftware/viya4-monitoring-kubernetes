@@ -67,44 +67,50 @@ logging/bin/deploy_eventrouter.sh
 ##################################
 # OpenSearch                     #
 ##################################
-log_info "STEP 2: OpenSearch"
+log_info "STEP 1: OpenSearch"
 logging/bin/deploy_opensearch.sh
 
 
 ##################################
 # OpenSearch Dashboards (Kibana) #
 ##################################
-log_info "STEP 3: OpenSearch Dashboards"
+log_info "STEP 2: OpenSearch Dashboards"
 logging/bin/deploy_osd.sh
 
 
 ##################################
 # Elasticsearch Metric Exporter  #
 ##################################
-log_info "STEP 4: Elasticsearch metric exporter"
+log_info "STEP 3: Elasticsearch metric exporter"
 logging/bin/deploy_esexporter.sh
 
 
 ##################################
 # OpenSearch Content (OpenShift) #
 ##################################
-log_info "STEP 5: Loading Content into OpenSearch"
+log_info "STEP 4: Loading Content into OpenSearch"
 logging/bin/deploy_opensearch_content.sh
 
 
 ##################################
 # OSD Content                    #
 ##################################
-log_info "STEP 6: Configuring OpenSearch Dashboards"
+log_info "STEP 5: Configuring OpenSearch Dashboards"
 
 KB_KNOWN_NODEPORT_ENABLE=false logging/bin/deploy_osd_content.sh
 
 
 ##################################
-# Fluent Bit                     #
+# Fluent Bit - Log Messages      #
 ##################################
-log_info "STEP 7: Deploying Fluent Bit"
+log_info "STEP 6: Deploying Fluent Bit - Log Message Collection"
 logging/bin/deploy_fluentbit_opensearch.sh
+
+##################################
+# Fluent Bit - Kubernetes Events #
+##################################
+log_info "STEP 7: Deploying Fluent Bit - K8s Event Collection"
+logging/bin/deploy_fluentbit_k8sevents_opensearch.sh
 
 
 ##################################
