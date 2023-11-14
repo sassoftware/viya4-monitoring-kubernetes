@@ -3,7 +3,7 @@
 ## Version 1.2.19 (14NOV2023)
 
 * **Overall**
-  * [DOCUMENTATION] Documentation on TLS revised and expanded to including information on renewing TLS certificates
+  * [DOCUMENTATION] Documentation on TLS revised and expanded to include information on renewing TLS certificates
   * [CHANGE] OpenShift versions prior to 4.11 not supported
 
 * **Metrics**
