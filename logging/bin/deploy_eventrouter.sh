@@ -47,7 +47,7 @@ log_debug "Replacing logging namespace for files in [$logDir]"
   fi
 
 # Output Kubernetes events as pseudo-log messages?
-EVENTROUTER_ENABLE=${EVENTROUTER_ENABLE:-true}
+EVENTROUTER_ENABLE=${EVENTROUTER_ENABLE:-false}
 
 if [ "$EVENTROUTER_ENABLE" != "true" ]; then
   log_info "Environment variable [EVENTROUTER_ENABLE] is not set to 'true'; exiting WITHOUT deploying Event Router"

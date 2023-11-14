@@ -78,10 +78,16 @@ logging/bin/deploy_opensearch_content.sh
 logging/bin/deploy_osd_content.sh
 
 ##################################
-# Fluent Bit                     #
+# Fluent Bit - Log Messages      #
 ##################################
 
 logging/bin/deploy_fluentbit_opensearch.sh
+
+##################################
+# Fluent Bit - Kubernetes Events #
+##################################
+
+logging/bin/deploy_fluentbit_k8sevents_opensearch.sh
 
 ##################################
 # Display Kibana URL             #
