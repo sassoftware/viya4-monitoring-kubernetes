@@ -8,6 +8,7 @@
 * **Metrics**
   * [CHANGE] Grafana dashboard 'Logging - Fluent Bit' renamed to 'Fluent Bit - Log Collection'
   * [FIX] Corrected typo preventing deploy_monitoring_openshift.sh from running successfully when TRACING_ENABLE='true'
+  * [FEATURE] Updated SAS Launched Jobs dashboards to include jobs with customized job name prefixes
   * [FIX] ServiceMonitor definition for OpenSearch (w/in SAS Viya deployment) updated to align with new Kubernetes labels.
 
 * **Logging**
