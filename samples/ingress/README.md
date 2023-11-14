@@ -57,7 +57,7 @@ TLS (that is, the web applications should be accessed via HTTPS instead of HTTP)
 certificates that differ from those used for intra-cluster communication.  However, these certificates are **not** 
 created automatically for you.  You must obtain these certificates, create Kubernetes secrets with specific
 names, and make them available to SAS Viya Monitoring for Kubernetes.
-For details, see [Enable TLS for Ingress](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=p0ssqw32dy9a44n1rokwojskla19.htm#p1itsqky7ypohbn1txujf7jmqajb).
+For details, see [Enable TLS for Ingress](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_002&docsetId=obsrvdply&docsetTarget=p0ssqw32dy9a44n1rokwojskla19.htm#n1osex1toskmixn19ccxb3lgkwb1).
 
 ## Access the Applications
 
