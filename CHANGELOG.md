@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+
+* **Logging**
+  * [REMOVAL] Removed the deprecated, experimental, script getlogs.sh from repo.  The Python-based getlogs.py script should be used instead.
+
 ## Version 1.2.19 (14NOV2023)
 
 * **Overall**
