@@ -196,6 +196,9 @@ grafana:
         format: json
     dashboards:
       default_home_dashboard_path: /tmp/dashboards/viya-welcome-dashboard.json
+    initChownData:
+      enabled: false
+    
   service:
     type: NodePort
     nodePort: 31100

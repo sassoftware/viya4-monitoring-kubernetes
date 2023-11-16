@@ -1,5 +1,14 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+
+* **Overall**
+
+* **Metrics**
+  * [CHANGE] Disabled init-chown-data initContainer that started with Grafana.
+
+* **Logging**
+
 ## Version 1.2.19 (14NOV2023)
 
 * **Overall**
