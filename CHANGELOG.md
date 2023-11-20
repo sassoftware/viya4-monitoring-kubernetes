@@ -5,6 +5,7 @@
 * **Logging**
   * [UPGRADE] Upgraded OpenSearch/OpenSearch Dashboards from 2.8.0 to 2.10.0
   * [UPGRADE] Upgraded Fluent Bit from 2.1.4(log collection)/2.1.10(K8s event collection) to 2.2.0
+  * [UPGRADE] Upgraded Elaticsearch Exporter from 1.5.0 to 1.6.0
 
 ## Version 1.2.19 (14NOV2023)
 
