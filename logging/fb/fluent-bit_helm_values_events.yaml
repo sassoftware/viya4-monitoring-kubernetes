@@ -1,6 +1,6 @@
 kind: Deployment
 image:
-  tag: 2.1.10
+  tag: 2.2.0
 replicaCount: 0
 
 rbac:
