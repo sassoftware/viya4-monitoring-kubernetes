@@ -28,13 +28,13 @@ registry/repository/image_name:version
 | Metrics | Ghostunnel | docker.io/ghostunnel/ghostunnel:v1.7.1|
 | Metrics | Grafana | docker.io/grafana/grafana:10.0.3|
 | Metrics | Admission Webhook | registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6|
-| Metrics | Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.9.2|
-| Metrics | Node Exporter | quay.io/prometheus/node-exporter:v1.6.1|
-| Metrics | Prometheus | quay.io/prometheus/prometheus:v2.46.0|
-| Metrics | Prometheus Operator | quay.io/prometheus-operator/prometheus-operator:v0.67.1|
-| Metrics | Configuration Reloader (Alertmanager, Prometheus) | quay.io/prometheus-operator/prometheus-config-reloader:v0.67.1|
-| Metrics | Prometheus Pushgateway | docker.io/prom/pushgateway:v1.6.0|
-| Metrics | Auto-load Sidecars (Grafana) | quay.io/kiwigrid/k8s-sidecar:1.25.0|
+| Metrics | Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.0|
+| Metrics | Node Exporter | quay.io/prometheus/node-exporter:v1.7.0|
+| Metrics | Prometheus | quay.io/prometheus/prometheus:v2.47.1|
+| Metrics | Prometheus Operator | quay.io/prometheus-operator/prometheus-operator:v0.69.1|
+| Metrics | Configuration Reloader (Alertmanager, Prometheus) | quay.io/prometheus-operator/prometheus-config-reloader:v0.69.1|
+| Metrics | Prometheus Pushgateway | docker.io/prom/pushgateway:v1.6.2|
+| Metrics | Auto-load Sidecars (Grafana) | quay.io/kiwigrid/k8s-sidecar:1.25.2|
 
 ## Table 2. Helm Chart Repositories
 This table identifies the Helm repositories that contain the Helm charts used by SAS Viya Monitoring for Kubernetes.
@@ -57,5 +57,5 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 | Logging | OpenSearch| opensearch| opensearch| 2.13.0| opensearch-2.13.0.tgz
 | Logging | OpenSearch Dashboard| opensearch| opensearch-dashboards| 2.11.0| opensearch-dashboards-2.11.0.tgz
 | Metrics | Grafana (on OpenShift)| grafana| grafana| 6.58.9| grafana-6.58.9.tgz
-| Metrics | Kube Prometheus Stack| prometheus-community| kube-prometheus-stack| 48.3.2| kube-prometheus-stack-48.3.2.tgz
-| Metrics | Prometheus Pushgateway| prometheus-community| prometheus-pushgateway| 2.4.1| prometheus-pushgateway-2.4.1.tgz
+| Metrics | Kube Prometheus Stack| prometheus-community| kube-prometheus-stack| 48.3.2| kube-prometheus-stack-54.0.1.tgz
+| Metrics | Prometheus Pushgateway| prometheus-community| prometheus-pushgateway| 2.4.2| prometheus-pushgateway-2.4.2.tgz

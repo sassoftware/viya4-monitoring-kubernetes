@@ -1,6 +1,6 @@
 image:
 #  repository: prom/pushgateway
-  tag: v1.6.0
+  tag: v1.6.2
 
 securityContext: null
 
