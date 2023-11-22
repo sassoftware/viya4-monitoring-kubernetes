@@ -3,7 +3,7 @@
 
 # image:
 #  repository: quay.io/prometheuscommunity/elasticsearch-exporter
-#  tag: v1.2.1
+#  tag: v1.6.0
 
 # es:
 ##  The env vars ES_USER and ES_PASSWORD are set, by default,
