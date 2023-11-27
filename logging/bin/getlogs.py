@@ -11,8 +11,6 @@ import json, csv
 import tempfile
 import subprocess, socket
 from subprocess import run
-from kubernetes import config
-
 ##v 0.2.0
 
 def validate_input(dict): 
@@ -244,7 +242,6 @@ if args['portforward']:
     args = open_port(args)
 
 # Establish Client Using User Authorization and Connection Settings
-
 auth = (args['userName'], args['password'])
 client = OpenSearch(
     hosts = [{'host': args['host'], 'port': args['port']}],
