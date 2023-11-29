@@ -1,5 +1,13 @@
 # SAS Viya Monitoring for Kubernetes
 
+## unreleased
+
+* **Metrics**
+  * [CHANGE]  Rather than patching the existing `KubeHpaMaxedOut` alert (within the `monitoring/v4m-kubernetes-apps` PrometheusRule 
+resource), a new equivalent alert `KubeHpaMaxedOutMultiPod` has been created (within a new PrometheusRule resource called 
+`monitoring/v4m-sas-modified-default-rules`).  Effectively, this means the existing `KubeHpaMaxedOut` alert has been renamed 
+to `KubeHpaMaxedOutMultiPod`.
+
 ## Version 1.2.19 (14NOV2023)
 
 * **Overall**
