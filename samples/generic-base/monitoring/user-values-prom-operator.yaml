@@ -52,20 +52,20 @@
 #               storage: 25Gi
 
 # alertmanager:
-#   enabled:true
+#   enabled: true
 #   alertmanagerSpec:
 #     externalUrl: http://host.mycluster.example.com:31091
-#     storage:
-#       volumeClaimTemplate:
-#         spec:
-#           storageClassName: myCustomStorageClass
+#   storage:
+#     volumeClaimTemplate:
+#       spec:
+#         storageClassName: myCustomStorageClass
 
 # grafana:
 #   enabled: true
 #   adminPassword: yourSecretPasswordHere
+#   initChownData:
+#     enabled: false
 #   "grafana.ini":
-#      initChownData:
-#       enabled: false
 #     # Specifying domain and root_url will create the correct links in alert notifications
 #     server:
 #       domain: host.mycluster.example.com
