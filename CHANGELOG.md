@@ -7,7 +7,7 @@
   * [UPGRADE] Upgraded Fluent Bit (for log collection) from 2.1.4 to 2.1.10
   * [UPGRADE] Upgraded Elaticsearch Exporter from 1.5.0 to 1.6.0
   * [REMOVAL] Removed the deprecated, experimental, script getlogs.sh from repo.  The Python-based getlogs.py script should be used instead.
-
+  * [FIX] Corrected bug in change_internal_password.sh that prevented it from working
 
 ## Version 1.2.19 (14NOV2023)
 
