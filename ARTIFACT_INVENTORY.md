@@ -23,17 +23,17 @@ registry/repository/image_name:version
 | Logging | Eventrouter | gcr.io/heptio-images/eventrouter:v0.3|
 | Logging | OpenSearch | docker.io/opensearchproject/opensearch:2.8.0|
 | Logging | OpenSearch Dashboards| docker.io/opensearchproject/opensearch-dashboards:2.8.0|
-| Metrics | Alertmanager | quay.io/prometheus/alertmanager:v0.25.0|
+| Metrics | Alertmanager | quay.io/prometheus/alertmanager:v0.26.0|
 | Metrics | BusyBox (Grafana) | docker.io/library/busybox:1.31.1|
 | Metrics | Ghostunnel | docker.io/ghostunnel/ghostunnel:v1.7.1|
-| Metrics | Grafana | docker.io/grafana/grafana:10.0.3|
+| Metrics | Grafana | docker.io/grafana/grafana:10.2.1|
 | Metrics | Admission Webhook | registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6|
 | Metrics | Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.0|
 | Metrics | Node Exporter | quay.io/prometheus/node-exporter:v1.7.0|
 | Metrics | Prometheus | quay.io/prometheus/prometheus:v2.47.1|
 | Metrics | Prometheus Operator | quay.io/prometheus-operator/prometheus-operator:v0.69.1|
 | Metrics | Configuration Reloader (Alertmanager, Prometheus) | quay.io/prometheus-operator/prometheus-config-reloader:v0.69.1|
-| Metrics | Prometheus Pushgateway | docker.io/prom/pushgateway:v1.6.2|
+| Metrics | Prometheus Pushgateway | quay.io/prom/pushgateway:v1.6.2|
 | Metrics | Auto-load Sidecars (Grafana) | quay.io/kiwigrid/k8s-sidecar:1.25.2|
 
 ## Table 2. Helm Chart Repositories

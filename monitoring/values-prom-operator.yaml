@@ -219,7 +219,7 @@ grafana:
     image:
     #  registry: quay.io
     #  repository: kiwigrid/k8s-sidecar
-       tag: 1.25.0
+       tag: 1.25.2
   deploymentStrategy:
     type: Recreate
   persistence:
