@@ -115,14 +115,13 @@ def open_port(dict):
     s.close()
 
     cmd = (["kubectl", "-n", " ".join(dict['portforward']), "port-forward", "svc/v4m-search", str(port) + ':9200', '&'])
-    proc = subprocess.Popen(cmd, shell =True, stdout = subprocess.PIPE)
+    full_command = " ".join(cmd)
+
+    proc = subprocess.Popen(full_command, shell=True)
     dict['host'] = 'localhost'
     dict['port'] = port
-    
-    if 'error' in str(proc.stderr).lower():
-       print("Error: Port-forwarding failed. Please verify KUBECONFIG and NAMESPACE values\n")
-       print("Error msg: ", str(proc.stderr).strip())
-       sys.exit()
+
+    time.sleep(5)
 
     return dict
     
