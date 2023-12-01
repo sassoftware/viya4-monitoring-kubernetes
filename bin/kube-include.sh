@@ -24,13 +24,14 @@ fi
 
 # SAS Viya 4 versions
 # supported by SAS Tech Support
-# Updated: 18OCT23
+# Updated: 22NOV23
 # 2022.09 LTS 1.21 1.24
 # 2023.03 LTS 1.23 1.25
-# 2023.07     1.24 1.26
+# 2023.10 LTS 1.25 1.27
 # 2023.08     1.24 1.26
 # 2023.09     1.25 1.27
 # 2023.10     1.25 1.27
+# 2023.11     1.25 1.27
 if [[ $KUBE_SERVER_VER =~ v1.2[1-9] ]]; then
   :
 else 

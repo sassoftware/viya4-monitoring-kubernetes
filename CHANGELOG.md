@@ -1,5 +1,14 @@
 # SAS Viya Monitoring for Kubernetes
 
+## unreleased
+
+* **Logging**
+  * [UPGRADE] Upgraded OpenSearch/OpenSearch Dashboards from 2.8.0 to 2.10.0
+  * [UPGRADE] Upgraded Fluent Bit (for log collection) from 2.1.4 to 2.1.10
+  * [UPGRADE] Upgraded Elaticsearch Exporter from 1.5.0 to 1.6.0
+  * [REMOVAL] Removed the deprecated, experimental, script getlogs.sh from repo.  The Python-based getlogs.py script should be used instead.
+
+
 ## Version 1.2.19 (14NOV2023)
 
 * **Overall**

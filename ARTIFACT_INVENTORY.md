@@ -17,12 +17,11 @@ registry/repository/image_name:version
 | Subsystem| Component | Fully Qualified Container-Image Name (registry/repository/image_name:version)|
 |----|----|----|
 | Logging | BusyBox (OpenSearch) | docker.io/library/busybox|
-| Logging | Fluent Bit (log collection) | cr.fluentbit.io/fluent/fluent-bit:2.1.4|
-| Logging | Fluent Bit (K8s event collection) | cr.fluentbit.io/fluent/fluent-bit:2.1.10|
-| Logging | Elasticsearch Exporter | quay.io/prometheuscommunity/elasticsearch-exporter:v1.5.0|
+| Logging | Fluent Bit | cr.fluentbit.io/fluent/fluent-bit:2.1.10|
+| Logging | Elasticsearch Exporter | quay.io/prometheuscommunity/elasticsearch-exporter:v1.6.0|
 | Logging | Eventrouter | gcr.io/heptio-images/eventrouter:v0.3|
-| Logging | OpenSearch | docker.io/opensearchproject/opensearch:2.8.0|
-| Logging | OpenSearch Dashboards| docker.io/opensearchproject/opensearch-dashboards:2.8.0|
+| Logging | OpenSearch | docker.io/opensearchproject/opensearch:2.10.0|
+| Logging | OpenSearch Dashboards| docker.io/opensearchproject/opensearch-dashboards:2.10.0|
 | Metrics | Alertmanager | quay.io/prometheus/alertmanager:v0.26.0|
 | Metrics | BusyBox (Grafana) | docker.io/library/busybox:1.31.1|
 | Metrics | Ghostunnel | docker.io/ghostunnel/ghostunnel:v1.7.1|
@@ -52,10 +51,10 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 
 | Subsystem | Component | Helm Chart Repository | Helm Chart Name |Helm Chart Version | Helm Archive File Name|
 |--|--|--|--|--|--|
-| Logging | Elasticsearch Exporter| prometheus-community| prometheus-elasticsearch-exporter| 5.2.0| prometheus-elasticsearch-exporter-5.2.0.tgz
-| Logging | Fluent Bit| fluent| fluent-bit| 0.39.0| fluent-bit-0.39.0.tgz
-| Logging | OpenSearch| opensearch| opensearch| 2.13.0| opensearch-2.13.0.tgz
-| Logging | OpenSearch Dashboard| opensearch| opensearch-dashboards| 2.11.0| opensearch-dashboards-2.11.0.tgz
+| Logging | Elasticsearch Exporter| prometheus-community| prometheus-elasticsearch-exporter| 5.3.1| prometheus-elasticsearch-exporter-5.3.1.tgz
+| Logging | Fluent Bit| fluent| fluent-bit| 0.40.0| fluent-bit-0.40.0.tgz
+| Logging | OpenSearch| opensearch| opensearch| 2.15.0| opensearch-2.15.0.tgz
+| Logging | OpenSearch Dashboard| opensearch| opensearch-dashboards| 2.13.0| opensearch-dashboards-2.13.0.tgz
 | Metrics | Grafana (on OpenShift)| grafana| grafana| 6.58.9| grafana-6.58.9.tgz
 | Metrics | Kube Prometheus Stack| prometheus-community| kube-prometheus-stack| 54.0.1| kube-prometheus-stack-54.0.1.tgz
 | Metrics | Prometheus Pushgateway| prometheus-community| prometheus-pushgateway| 2.4.2| prometheus-pushgateway-2.4.2.tgz
