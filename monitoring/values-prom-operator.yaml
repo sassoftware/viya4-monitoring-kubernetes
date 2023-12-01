@@ -12,29 +12,6 @@
 commonLabels:
   sas.com/monitoring-base: kube-viya-monitoring
 
-defaultRules:
-  disabled:
-    KubeHpaMaxedOut: true
-
-additionalPrometheusRulesMap:
-  sas-modified-default-rules:
-    groups:
-    - name: kubernetes-apps
-      rules:
-      - alert: KubeHpaMaxedOutMultiPod
-        annotations:
-          description: HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler  }}
-            has been running at max replicas for longer than 15 minutes.
-          runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubehpamaxedout
-          summary: HPA is running at max replicas
-        expr: (kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics",namespace=~".*"}
-          == kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics",namespace=~".*"})
-          and kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics",namespace=~".*"}
-          > 1
-        for: 15m
-        labels:
-          severity: warning
-
 # ===================
 # Prometheus Operator
 # ===================
