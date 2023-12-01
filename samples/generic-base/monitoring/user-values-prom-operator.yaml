@@ -55,10 +55,10 @@
 #   enabled: true
 #   alertmanagerSpec:
 #     externalUrl: http://host.mycluster.example.com:31091
-#   storage:
-#     volumeClaimTemplate:
-#       spec:
-#         storageClassName: myCustomStorageClass
+#     storage:
+#       volumeClaimTemplate:
+#         spec:
+#           storageClassName: myCustomStorageClass
 
 # grafana:
 #   enabled: true
