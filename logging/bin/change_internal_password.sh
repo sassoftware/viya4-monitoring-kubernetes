@@ -119,7 +119,7 @@ if [[ $response == 4* ]]; then
       if [ "$rc" == "0" ]; then
 
          #try changing password using admin password
-         response=$(curl -s -o /dev/null -w "%{http_code}"  -XPATCH "$sec_api_url/internalusers/$ES_USER"   -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "hash", "value" : "'"$hashed_passwd"'"}]'  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+         response=$(curl -s -o /dev/null -w "%{http_code}"  -XPATCH "$sec_api_url/internalusers/$ES_USER"   -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "/hash", "value" : "'"$hashed_passwd"'"}]'  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
          if [[ "$response" == "404" ]]; then
             log_error "Unable to change password for [$USER_NAME] because that user does not exist. [$response]"
             success="non-existent_user"
@@ -179,7 +179,7 @@ if [[ $response == 4* ]]; then
             echo "$admin_tls_key" |base64 --decode > $TMP_DIR/admin_tls.key
 
             # Attempt to change password using admin certs
-            response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/internalusers/$ES_USER"   -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "hash", "value" : "'"$hashed_passwd"'"}]'  --cert $TMP_DIR/admin_tls.crt --key $TMP_DIR/admin_tls.key  --insecure)
+            response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/internalusers/$ES_USER"   -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "/hash", "value" : "'"$hashed_passwd"'"}]'  --cert $TMP_DIR/admin_tls.crt --key $TMP_DIR/admin_tls.key  --insecure)
             if [[ $response == 2* ]]; then
                log_debug "Password for [$USER_NAME] has been changed in OpenSearch. [$response]"
                success="true"
