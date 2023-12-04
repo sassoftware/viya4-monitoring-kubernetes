@@ -5,7 +5,3 @@ image:
 sidecar:
   image:
     repository: __AIRGAP_REGISTRY__/kiwigrid/k8s-sidecar
-initChownData:
-  image:
-    repository: __AIRGAP_REGISTRY__/library/busybox
-
