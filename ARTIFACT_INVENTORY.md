@@ -16,14 +16,14 @@ registry/repository/image_name:version
 
 | Subsystem| Component | Fully Qualified Container-Image Name (registry/repository/image_name:version)|
 |----|----|----|
-| Logging | BusyBox (OpenSearch) | docker.io/library/busybox|
-| Logging | Fluent Bit | cr.fluentbit.io/fluent/fluent-bit:2.1.10|
-| Logging | Elasticsearch Exporter | quay.io/prometheuscommunity/elasticsearch-exporter:v1.6.0|
+| Logging | BusyBox (Opensearch) | docker.io/library/busybox|
+| Logging | Fluent Bit (log collection) | cr.fluentbit.io/fluent/fluent-bit:2.1.4|
+| Logging | Fluent Bit (K8s event collection) | cr.fluentbit.io/fluent/fluent-bit:2.1.10|
+| Logging | Elasticsearch Exporter | quay.io/prometheuscommunity/elasticsearch-exporter:v1.5.0|
 | Logging | Eventrouter | gcr.io/heptio-images/eventrouter:v0.3|
 | Logging | OpenSearch | docker.io/opensearchproject/opensearch:2.10.0|
 | Logging | OpenSearch Dashboards| docker.io/opensearchproject/opensearch-dashboards:2.10.0|
 | Metrics | Alertmanager | quay.io/prometheus/alertmanager:v0.25.0|
-| Metrics | BusyBox (Grafana) | docker.io/library/busybox:1.31.1|
 | Metrics | Ghostunnel | docker.io/ghostunnel/ghostunnel:v1.7.1|
 | Metrics | Grafana | docker.io/grafana/grafana:10.0.3|
 | Metrics | Admission Webhook | registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6|

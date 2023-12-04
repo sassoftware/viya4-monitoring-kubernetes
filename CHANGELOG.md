@@ -1,6 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 
-## unreleased
+## Unreleased
+
+* **Overall**
+
+* **Metrics**
+  * [CHANGE] Disabled init-chown-data initContainer that started with Grafana.
 
 * **Logging**
   * [UPGRADE] Upgraded OpenSearch/OpenSearch Dashboards from 2.8.0 to 2.10.0

@@ -63,6 +63,8 @@
 # grafana:
 #   enabled: true
 #   adminPassword: yourSecretPasswordHere
+#   initChownData:
+#     enabled: false
 #   "grafana.ini":
 #     # Specifying domain and root_url will create the correct links in alert notifications
 #     server:

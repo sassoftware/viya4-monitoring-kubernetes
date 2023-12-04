@@ -185,6 +185,8 @@ prometheus-node-exporter:
 grafana:
   image:
     tag: 10.0.3
+  initChownData:
+    enabled: false
   "grafana.ini":
     analytics:
       check_for_updates: false
@@ -196,6 +198,7 @@ grafana:
         format: json
     dashboards:
       default_home_dashboard_path: /tmp/dashboards/viya-welcome-dashboard.json
+
   service:
     type: NodePort
     nodePort: 31100
