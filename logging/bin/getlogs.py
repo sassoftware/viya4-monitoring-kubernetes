@@ -106,7 +106,7 @@ def validate_input(dict):
             sys.exit()
 
 def open_port(dict):
-    """Binds the v4m-search service on port 9200 to a locally available port"""
+    """Binds the v4m-search service on port 9200 to a locally available port by accessing the namespace of running Opensearch instance"""
     #Get open port
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(("",0))
@@ -114,10 +114,19 @@ def open_port(dict):
     port = s.getsockname()[1]
     s.close()
 
-    cmd = (["kubectl", "-n", " ".join(dict['portforward']), "port-forward", "svc/v4m-search", str(port) + ':9200', '&'])
+    find_namespace_cmd = "kubectl get service -l app.kubernetes.io/component=v4m-search -A -o jsonpath='{range.items[0]}{.metadata.namespace}'"
+    result = subprocess.run(find_namespace_cmd, capture_output=True, text=True)
+
+    port_namespace = result.stdout.replace("'", "")
+    print(port_namespace)
+    if (not port_namespace):
+        print("Error: The V4M opensearch service is not currently running on this cluster. Port forwarding failed.")
+        sys.exit()
+
+    cmd = (["kubectl", "-n", port_namespace, "port-forward", "svc/v4m-search", str(port) + ':9200', '&'])
     full_command = " ".join(cmd)
 
-    proc = subprocess.Popen(full_command, shell=True)
+    proc = subprocess.Popen(full_command, shell=True, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
     dict['host'] = 'localhost'
     dict['port'] = port
 
@@ -227,7 +236,7 @@ def get_arguments():
     
     parser.add_argument('-i', '--index', required=False, dest="index", metavar="INDEX", default="viya_logs-*") ## help = "\nDetermine which index to perform the search in. Default: viya-logs-*\n\n
     ##Connection settings
-    parser.add_argument('-pf','--port-forward', required=False, dest="portforward", nargs='*', metavar='NAMESPACE', help = "\n If this option is provided, getlogs will use the value in your KUBECONFIG (case-sensitive) environment variable to port-forward and connect to the open-search API in the specified NAMESPACE. This skips ESHOST and ESPORT, but ESUSER and ESPASSWD are stil required to authenticate and connect to the database. \n\n")
+    parser.add_argument('-pf','--port-forward', required=False, dest="portforward", action = 'store_true', help = "\n If this option is provided, getlogs will use the value in your KUBECONFIG (case-sensitive) environment variable to port-forward and connect to the open-search API in the specified NAMESPACE. This skips ESHOST and ESPORT, but ESUSER and ESPASSWD are stil required to authenticate and connect to the database. \n\n")
     parser.add_argument('-us','--user',  required=False, dest="userName", default=os.environ.get("ESUSER"), help = "\nUsername for connecting to OpenSearch/Kibana (default: $ESUSER)\n\n")
     parser.add_argument('-pw', '--password', required=False,  dest="password", default=os.environ.get("ESPASSWD"), help = "\nPassword for connecting to OpenSearch/Kibana  (default: $ESPASSWD)\n\n")
     parser.add_argument('-ho', '--host', required=False,  dest="host", default=os.environ.get("ESHOST"), help = "\nHostname for connection to OpenSearch/Kibana. Please ensure that host does not contain 'https://' (default: $ESHOST)\n\n")
