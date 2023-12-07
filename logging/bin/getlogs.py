@@ -114,11 +114,10 @@ def open_port(dict):
     port = s.getsockname()[1]
     s.close()
 
-    find_namespace_cmd = "kubectl get service -l app.kubernetes.io/component=v4m-search -A -o jsonpath='{range.items[0]}{.metadata.namespace}'"
+    find_namespace_cmd = ['kubectl', 'get', 'service', '-l' ,'app.kubernetes.io/component=v4m-search', '-A' ,'-o', 'jsonpath={range.items[0]}{.metadata.namespace}']
     result = subprocess.run(find_namespace_cmd, capture_output=True, text=True)
 
     port_namespace = result.stdout.replace("'", "")
-    print(port_namespace)
     if (not port_namespace):
         print("Error: The V4M opensearch service is not currently running on this cluster. Port forwarding failed.")
         sys.exit()
