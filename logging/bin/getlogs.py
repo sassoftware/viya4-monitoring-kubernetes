@@ -9,7 +9,8 @@ from opensearchpy import OpenSearch
 import os, sys
 import json, csv
 import tempfile
-
+import subprocess, socket
+from subprocess import run
 ##v 0.2.0
 
 def validate_input(dict): 
@@ -21,9 +22,18 @@ def validate_input(dict):
         print("Error: Maxrows limit of 10000 exceeded.")
         sys.exit()
 
+    #Check whether user provided kubeconfig for port-forwarding
+    if dict['portforward']:
+        if os.environ.get('KUBECONFIG') is None:
+            print("Error: Port forwarding argument selected but no KUBECONFIG env variable set.")
+            sys.exit()
+        else: ##Set default values
+            dict['host'] = 'port forwarded'
+            dict['port'] = 'port forwarded'
+
     ##Check for existence of Connection Settings in input dictionary
     if(not dict['userName'] or not dict['password'] or not dict['host'] or not dict['port']):
-        print('\nError: Missing required connection settings. Please specify username, password, host, and port. \n Default values can be manually exported as environment variables ESHOST, ESPORT, ESUSER, ESPASSWD')
+        print('\nError: Missing required connection settings. Please specify username, password, host, and port. \nDefault values can be manually exported as environment variables ESHOST, ESPORT, ESUSER, ESPASSWD \nTo port-forward and skip ESHOST and ESPORT, use -pf')
         print("Username:", dict['userName'], " Password:", dict['password'], " Host:", dict['host'], " Port:", dict['port'])
         sys.exit()
 
@@ -95,6 +105,34 @@ def validate_input(dict):
             print("Please remove single quotes ('') from search argument.")
             sys.exit()
 
+def open_port(dict):
+    """Binds the v4m-search service on port 9200 to a locally available port by accessing the namespace of running Opensearch instance"""
+    #Get open port
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("",0))
+    s.listen(1)
+    port = s.getsockname()[1]
+    s.close()
+
+    find_namespace_cmd = ['kubectl', 'get', 'service', '-l' ,'app.kubernetes.io/component=v4m-search', '-A' ,'-o', 'jsonpath={range.items[0]}{.metadata.namespace}']
+    result = subprocess.run(find_namespace_cmd, capture_output=True, text=True)
+
+    port_namespace = result.stdout.replace("'", "")
+    if (not port_namespace):
+        print("Error: The V4M opensearch service is not currently running on this cluster. Port forwarding failed.")
+        sys.exit()
+
+    cmd = (["kubectl", "-n", port_namespace, "port-forward", "svc/v4m-search", str(port) + ':9200', '&'])
+    full_command = " ".join(cmd)
+
+    proc = subprocess.Popen(full_command, shell=True, stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
+    dict['host'] = 'localhost'
+    dict['port'] = port
+
+    time.sleep(5)
+
+    return dict
+    
 def build_query(dict): 
     """Generates Query using Opensearch DSL"""
     """Takes arguments from user and builds a query to pass to opensearch API"""
@@ -197,15 +235,18 @@ def get_arguments():
     
     parser.add_argument('-i', '--index', required=False, dest="index", metavar="INDEX", default="viya_logs-*") ## help = "\nDetermine which index to perform the search in. Default: viya-logs-*\n\n
     ##Connection settings
+    parser.add_argument('-pf','--port-forward', required=False, dest="portforward", action = 'store_true', help = "\n If this option is provided, getlogs will use the value in your KUBECONFIG (case-sensitive) environment variable to port-forward and connect to the open-search API in the specified NAMESPACE. This skips ESHOST and ESPORT, but ESUSER and ESPASSWD are stil required to authenticate and connect to the database. \n\n")
     parser.add_argument('-us','--user',  required=False, dest="userName", default=os.environ.get("ESUSER"), help = "\nUsername for connecting to OpenSearch/Kibana (default: $ESUSER)\n\n")
     parser.add_argument('-pw', '--password', required=False,  dest="password", default=os.environ.get("ESPASSWD"), help = "\nPassword for connecting to OpenSearch/Kibana  (default: $ESPASSWD)\n\n")
-    parser.add_argument('-ho', '--host', required=False,  dest="host", default=os.environ.get("ESHOST"), help = "\nHostname for connection to OpenSearch/Kibana (default: $ESHOST)\n\n")
+    parser.add_argument('-ho', '--host', required=False,  dest="host", default=os.environ.get("ESHOST"), help = "\nHostname for connection to OpenSearch/Kibana. Please ensure that host does not contain 'https://' (default: $ESHOST)\n\n")
     parser.add_argument('-po', '--port', required=False,  dest="port", default=os.environ.get("ESPORT"), help = "\nPort number for connection to OpenSearch/Kibana (default: $ESPORT)\n\n")
     parser.add_argument('-nossl', '--disable-ssl', required=False, dest = "ssl", action= "store_false", help = "\n If this option is provided, SSL will not be used to connect to the database.\n\n")
     return parser.parse_args().__dict__
 
 args = get_arguments() ##Creates "args" dictionary that contains all user submitted options. Print "args" to debug values. Note that the 'dest' value for each argument in argparser object is its key.
 validate_input(args)
+if args['portforward']:
+    args = open_port(args)
 
 # Establish Client Using User Authorization and Connection Settings
 auth = (args['userName'], args['password'])
@@ -318,3 +359,4 @@ elif("csv" in args['format']): ##CSV writer implemented using dictwriter
             for fieldDict in hitsList:
                 writer.writerow(fieldDict)
                 print("\n")
+
