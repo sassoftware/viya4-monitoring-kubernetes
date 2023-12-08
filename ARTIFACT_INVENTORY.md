@@ -18,8 +18,7 @@ registry/repository/image_name:version
 |----|----|----|
 | Logging | BusyBox (OpenSearch) | docker.io/library/busybox|
 | Logging | Fluent Bit | cr.fluentbit.io/fluent/fluent-bit:2.1.10|
-| Logging | Elasticsearch Exporter | quay.io/prometheuscommunity/elasticsearch-exporter:v1.5.0|
-| Logging | Eventrouter | gcr.io/heptio-images/eventrouter:v0.3|
+| Logging | Elasticsearch Exporter | quay.io/prometheuscommunity/elasticsearch-exporter:v1.6.0|
 | Logging | OpenSearch | docker.io/opensearchproject/opensearch:2.10.0|
 | Logging | OpenSearch Dashboards| docker.io/opensearchproject/opensearch-dashboards:2.10.0|
 | Metrics | Alertmanager | quay.io/prometheus/alertmanager:v0.26.0|
