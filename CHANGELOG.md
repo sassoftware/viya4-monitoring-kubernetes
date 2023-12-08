@@ -6,6 +6,14 @@
 
 * **Metrics**
   * [CHANGE] Disabled init-chown-data initContainer that started with Grafana.
+  * [UPGRADE] Kube-prometheus-stack has been upgraded from version 48.3.2 to 54.0.1
+  * [UPGRADE] Prometheus has been upgraded from version 2.46.0 to 2.47.1
+  * [UPGRADE] Prometheus Operator has been upgraded from version v0.67.1 to v0.69.1
+  * [UPGRADE] Grafana has been upgraded from version 10.0.3 to 10.2.1
+  * [UPGRADE] Kube State Metrics has been upgraded from version 2.9.2 to 2.10.0
+  * [UPGRADE] K8s-sidecar used with Grafana has been upgraded from version 1.25.0 to 1.25.2
+  * [UPGRADE] Node Exporter has been upgraded from version 1.6.1 to 1.7.0
+  * [UPGRADE] Prometheus Pushgateway has been upgraded from version 2.4.1 to 2.4.2
 
 * **Logging**
   * [UPGRADE] Upgraded OpenSearch/OpenSearch Dashboards from 2.8.0 to 2.10.0
