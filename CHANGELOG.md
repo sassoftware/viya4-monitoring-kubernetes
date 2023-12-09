@@ -6,6 +6,7 @@
 
 * **Metrics**
   * [CHANGE] Disabled init-chown-data initContainer that started with Grafana.
+  * [FEATURE] Added a Grafana dashboard that monitors SAS Arke events.
 
 * **Logging**
   * [UPGRADE] Upgraded OpenSearch/OpenSearch Dashboards from 2.8.0 to 2.10.0
