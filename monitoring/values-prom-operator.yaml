@@ -238,10 +238,3 @@ grafana:
     # subPath: ""
     # existingClaim:
 
-tempo: 
-  metricsGenerator:
-    enabled: true
-
-  global_overrides:
-    metrics_generator_processors:
-      - service-graphs
