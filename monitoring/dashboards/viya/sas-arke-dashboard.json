@@ -25,7 +25,7 @@
     "panels": [
       {
         "datasource": {
-          "type": "prometheus",
+          "datasource": "$datasource",
           "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
@@ -100,11 +100,7 @@
           }
         },
         "targets": [
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "PBFA97CFB590B2093"
-            },
+            "datasource": "prometheus",
             "disableTextWrap": false,
             "editorMode": "code",
             "expr": "sum(rate(arke_client_consumed{namespace=\"$namespace\"}[$__rate_interval]))",
@@ -118,10 +114,7 @@
             "useBackend": false
           },
           {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "PBFA97CFB590B2093"
-            },
+            "datasource": "$datasource",
             "disableTextWrap": false,
             "editorMode": "code",
             "expr": "sum(rate(arke_client_produced{namespace=\"$namespace\"}[$__rate_interval]))",
@@ -139,10 +132,7 @@
         "type": "timeseries"
       },
       {
-        "datasource": {
-          "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
-        },
+        "datasource": "$datasource",
         "fieldConfig": {
           "defaults": {
             "color": {
@@ -216,10 +206,7 @@
         },
         "targets": [
           {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "PBFA97CFB590B2093"
-            },
+            "datasource": "$datasource",
             "disableTextWrap": false,
             "editorMode": "code",
             "exemplar": false,
@@ -238,10 +225,7 @@
         "type": "timeseries"
       },
       {
-        "datasource": {
-          "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
-        },
+        "datasource": "$datasource",
         "fieldConfig": {
           "defaults": {
             "color": {
@@ -315,10 +299,7 @@
         },
         "targets": [
           {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "PBFA97CFB590B2093"
-            },
+            "datasource": "$datasource",
             "editorMode": "code",
             "expr": "count(arke_client_consumed{namespace=\"$namespace\"} > 0)",
             "instant": false,
@@ -327,10 +308,7 @@
             "refId": "A"
           },
           {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "PBFA97CFB590B2093"
-            },
+            "datasource": "$datasource",
             "editorMode": "code",
             "expr": "count(arke_client_produced{namespace=\"$namespace\"} > 0)",
             "hide": false,
@@ -344,10 +322,7 @@
         "type": "timeseries"
       },
       {
-        "datasource": {
-          "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
-        },
+        "datasource": "$datasource",
         "fieldConfig": {
           "defaults": {
             "color": {
@@ -424,10 +399,7 @@
         },
         "targets": [
           {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "PBFA97CFB590B2093"
-            },
+            "datasource": "prometheus",
             "disableTextWrap": false,
             "editorMode": "code",
             "expr": "rate(arke_client_consumed{namespace=\"$namespace\"}[$__rate_interval]) > 0",
@@ -462,15 +434,7 @@
     "templating": {
       "list": [
         {
-          "current": {
-            "selected": false,
-            "text": "d69195",
-            "value": "d69195"
-          },
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
+          "datasource": "$datasource",
           "definition": "label_values( arke_request_total,namespace)",
           "hide": 0,
           "includeAll": false,
