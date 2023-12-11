@@ -16,6 +16,4 @@ grafana:
             datasourceUid: prometheus
           nodeGraph:
             enabled: true
-          # search:
-          #   hide: false
         apiVersion: 1

@@ -14,6 +14,9 @@
   * [REMOVAL] Removed the deprecated, experimental, script getlogs.sh from repo.  The Python-based getlogs.py script should be used instead.
   * [FIX] Corrected bug in change_internal_password.sh that prevented it from working
 
+* **Tracing**
+  * [FEATURE] Added node graph feature to Tempo data source in Grafana for more visualization options
+
 ## Version 1.2.19 (14NOV2023)
 
 * **Overall**
