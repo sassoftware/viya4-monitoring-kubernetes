@@ -237,3 +237,13 @@ grafana:
       - kubernetes.io/pvc-protection
     # subPath: ""
     # existingClaim:
+
+tempo: 
+  metricsGenerator:
+    enabled: true
+    config:
+      service_graphs_max_items: 15000
+
+  global_overrides:
+    metrics_generator_processors:
+      - service-graphs
