@@ -231,6 +231,7 @@ function enable_pod_token_automount {
   resource_name=$3
   should_disable=${SEC_DISABLE_SA_TOKEN_AUTOMOUNT:-true}
 
+
   if [ "$should_disable" == "true" ]; then
      log_debug "Enabling automount of API tokens for pods deployed via [$resource_type/$resource_name]"
 
