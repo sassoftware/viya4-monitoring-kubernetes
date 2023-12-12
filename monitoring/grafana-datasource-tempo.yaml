@@ -11,5 +11,9 @@ grafana:
         url: http://v4m-tempo:3100
         isDefault: false
         editable: true
+        jsonData:
+          serviceMap:
+            datasourceUid: prometheus
+          nodeGraph:
+            enabled: true
         apiVersion: 1
-
