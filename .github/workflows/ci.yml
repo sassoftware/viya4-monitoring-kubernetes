@@ -1,0 +1,16 @@
+name: shellcheck
+on:
+  - pull_request
+env:
+  GITHUB_BEFORE_SHA: ${{ github.event.before }}
+
+jobs:
+  check:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      # Run our action
+      - name: Checker and formatter 
+        uses: ashthespy/action-shell@v1
+        with:
+         only_changed: 'true'
