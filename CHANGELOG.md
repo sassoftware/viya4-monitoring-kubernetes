@@ -6,6 +6,7 @@
 
 * **Metrics**
   * [CHANGE] Disabled init-chown-data initContainer that started with Grafana.
+  * [FEATURE] Added a Grafana dashboard that monitors SAS Arke events.
   * [UPGRADE] Kube-prometheus-stack has been upgraded from version 48.3.2 to 54.0.1
   * [UPGRADE] Prometheus has been upgraded from version 2.46.0 to 2.47.1
   * [UPGRADE] Prometheus Operator has been upgraded from version v0.67.1 to v0.69.1
