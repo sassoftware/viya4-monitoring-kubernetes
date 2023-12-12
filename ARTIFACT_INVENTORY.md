@@ -53,6 +53,6 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 | Logging | Fluent Bit| fluent| fluent-bit| 0.40.0| fluent-bit-0.40.0.tgz
 | Logging | OpenSearch| opensearch| opensearch| 2.15.0| opensearch-2.15.0.tgz
 | Logging | OpenSearch Dashboard| opensearch| opensearch-dashboards| 2.13.0| opensearch-dashboards-2.13.0.tgz
-| Metrics | Grafana (on OpenShift)| grafana| grafana| 6.58.9| grafana-6.58.9.tgz
+| Metrics | Grafana (on OpenShift)| grafana| grafana| 7.0.4| grafana-7.0.4.tgz
 | Metrics | Kube Prometheus Stack| prometheus-community| kube-prometheus-stack| 54.0.1| kube-prometheus-stack-54.0.1.tgz
 | Metrics | Prometheus Pushgateway| prometheus-community| prometheus-pushgateway| 2.4.2| prometheus-pushgateway-2.4.2.tgz

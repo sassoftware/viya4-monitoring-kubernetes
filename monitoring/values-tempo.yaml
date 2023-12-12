@@ -13,8 +13,12 @@ tempo:
   reportingEnabled: false
   metricsGenerator:
     # -- If true, enables Tempo's metrics generator (https://grafana.com/docs/tempo/next/metrics-generator/)
-    enabled: false
-    remoteWriteUrl: "http://prometheus.monitoring:9090/api/v1/write"
+    enabled: true
+    remoteWriteUrl: "http://v4m-prometheus.monitoring:9090/api/v1/write"
+
+  # global_overrides:
+  #   metrics_generator_processors:
+  #     - service-graphs
 
   retention: 24h
 
