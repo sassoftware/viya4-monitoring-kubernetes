@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+
+* **Metrics**
+  * [CHANGE] The KubeHpaMaxedOut alert has (effectively) been renamed KubeHpaMaxedOutMultiPod
+
 ## Version 1.2.20 (12DEC2023)
 
 * **Metrics**
