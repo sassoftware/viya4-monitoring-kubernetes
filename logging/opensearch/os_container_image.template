@@ -1,0 +1,12 @@
+global:
+ dockerRegistry: __GLOBAL_REGISTRY__
+image:
+ repository: __IMAGE_REPO__
+ tag: __IMAGE_TAG__
+ pullPolicy: __IMAGE_PULL_POLICY__
+
+imagePullSecrets: __IMAGE_PULL_SECRETS__
+
+sysctlInit:
+  image:  __OS_SYSCTL_IMAGE__
+  imageTag: __OS_SYSCTL_TAG__
