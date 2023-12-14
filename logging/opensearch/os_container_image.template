@@ -9,4 +9,4 @@ imagePullSecrets: __IMAGE_PULL_SECRETS__
 
 sysctlInit:
   image:  __OS_SYSCTL_IMAGE__
-  imageTag: __OS_SYSCTL_TAG__
+  imageTag: __OS_SYSCTL_IMAGE_TAG__

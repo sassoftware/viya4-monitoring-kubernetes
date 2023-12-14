@@ -62,42 +62,56 @@ function doitall {
 
 }
 
+
+    if [ -f "component_versions.env" ]; then
+        userEnv=$(grep -v '^[[:blank:]]*$' component_versions.env | grep -v '^#' | xargs)
+        if [ "$userEnv" != "" ]; then
+           echo "DEBUG: Loading global user environment file: component_versions.env"
+          if [ "$userEnv" != "" ]; then
+            export $userEnv
+          fi
+        fi
+    else
+        echo "DEBUG No component_versions.env file found"
+    fi
+
+
 echo "*****************"
 TEMPFILE="/tmp/container_image.yaml"
 
-FB_FULL_IMAGE="cr.fluentbit.io/fluent/fluent-bit:2.1.10"
+###FB_FULL_IMAGE="cr.fluentbit.io/fluent/fluent-bit:2.1.10"
 doitall "$FB_FULL_IMAGE"          "logging/fb/container_image.template"
 cat $TEMPFILE
 
-OS_FULL_IMAGE="docker.io/opensearchproject/opensearch:2.10.0"
-OS_SYSCTL_FULL_IMAGE="docker.io/library/busybox:latest"
+###OS_FULL_IMAGE="docker.io/opensearchproject/opensearch:2.10.0"
+###OS_SYSCTL_FULL_IMAGE="docker.io/library/busybox:latest"
 doitall "$OS_FULL_IMAGE"          "logging/opensearch/os_container_image.template"
 doitall "$OS_SYSCTL_FULL_IMAGE"   "TEMPFILE"  "OS_SYSCTL_"
 cat $TEMPFILE
 
-OSD_FULL_IMAGE="docker.io/opensearchproject/opensearch-dashboards:2.10.0"
+###OSD_FULL_IMAGE="docker.io/opensearchproject/opensearch-dashboards:2.10.0"
 doitall "$OSD_FULL_IMAGE"         "logging/opensearch/osd_container_image.template"
 cat $TEMPFILE
 
-ES_EXPORTER_FULL_IMAGE="quay.io/prometheuscommunity/elasticsearch-exporter:v1.6.0"
+###ES_EXPORTER_FULL_IMAGE="quay.io/prometheuscommunity/elasticsearch-exporter:v1.6.0"
 doitall "$ES_EXPORTER_FULL_IMAGE" "logging/esexporter/es-exporter_container_image.template"
 cat $TEMPFILE
 
-GRAFANA_FULL_IMAGE="docker.io/grafana/grafana:10.2.1"
-GRAFANA_SIDECAR_FULL_IMAGE="quay.io/kiwigrid/k8s-sidecar:1.25.2"
+###GRAFANA_FULL_IMAGE="docker.io/grafana/grafana:10.2.1"
+###GRAFANA_SIDECAR_FULL_IMAGE="quay.io/kiwigrid/k8s-sidecar:1.25.2"
 doitall "$GRAFANA_FULL_IMAGE"     "monitoring/grafana_container_image.template"
 doitall "$GRAFANA_SIDECAR_FULL_IMAGE"   "TEMPFILE"  "SIDECAR_"
 cat $TEMPFILE
 
-ALERTMANAGER_FULL_IMAGE="quay.io/prometheus/alertmanager:v0.26.0"
-GRAFANA_FULL_IMAGE="docker.io/grafana/grafana:10.2.1"
-GRAFANA_SIDECAR_FULL_IMAGE="quay.io/kiwigrid/k8s-sidecar:1.25.2"
-ADMWEBHOOK_FULL_IMAGE="registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6"
-KSM_FULL_IMAGE="registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.0"
-NODEXPORT_FULL_IMAGE="quay.io/prometheus/node-exporter:v1.7.0"
-PROMETHEUS_FULL_IMAGE="quay.io/prometheus/prometheus:v2.47.1"
-PROMOP_FULL_IMAGE="quay.io/prometheus-operator/prometheus-operator:v0.69.1"
-CONFIGRELOAD_FULL_IMAGE="quay.io/prometheus-operator/prometheus-config-reloader:v0.69.1"
+###ALERTMANAGER_FULL_IMAGE="quay.io/prometheus/alertmanager:v0.26.0"
+###GRAFANA_FULL_IMAGE="docker.io/grafana/grafana:10.2.1"
+###GRAFANA_SIDECAR_FULL_IMAGE="quay.io/kiwigrid/k8s-sidecar:1.25.2"
+###ADMWEBHOOK_FULL_IMAGE="registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6"
+###KSM_FULL_IMAGE="registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.0"
+###NODEXPORT_FULL_IMAGE="quay.io/prometheus/node-exporter:v1.7.0"
+###PROMETHEUS_FULL_IMAGE="quay.io/prometheus/prometheus:v2.47.1"
+###PROMOP_FULL_IMAGE="quay.io/prometheus-operator/prometheus-operator:v0.69.1"
+###CONFIGRELOAD_FULL_IMAGE="quay.io/prometheus-operator/prometheus-config-reloader:v0.69.1"
 
 doitall "$PROMOP_FULL_IMAGE"          "monitoring/prom-operator_container_image.template"
 doitall "$ALERTMANAGER_FULL_IMAGE"    "TEMPFILE"  "ALERTMANAGER_"
@@ -108,6 +122,14 @@ doitall "$PROMETHEUS_FULL_IMAGE"      "TEMPFILE"  "PROMETHEUS_"
 doitall "$CONFIGRELOAD_FULL_IMAGE"    "TEMPFILE"  "CONFIGRELOAD_"
 doitall "$GRAFANA_FULL_IMAGE"         "TEMPFILE"  "GRAFANA_"
 doitall "$GRAFANA_SIDECAR_FULL_IMAGE" "TEMPFILE"  "SIDECAR_"
+cat $TEMPFILE
+
+#TEMPO_FULL_IMAGE="docker.io/grafana/tempo:2.2.0"
+doitall "$TEMPO_FULL_IMAGE" "monitoring/tempo_container_image.template"
+cat $TEMPFILE
+
+#PUSHGATEWAY_FULL_IMAGE="quay.io/prom/pushgateway:v1.6.2"
+doitall "$PUSHGATEWAY_FULL_IMAGE" "monitoring/pushgateway_container_image.template"
 cat $TEMPFILE
 
  

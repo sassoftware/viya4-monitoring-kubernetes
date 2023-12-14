@@ -1,0 +1,5 @@
+image:
+ repository: __IMAGE_REPO__
+ tag: __IMAGE_TAG__
+ pullPolicy: __IMAGE_PULL_POLICY__
+ pullSecrets: __IMAGE_PULL_SECRETS__
