@@ -253,3 +253,69 @@ export -f trap_add
 export -f errexit_msg
 export -f disable_sa_token_automount
 export -f enable_pod_token_automount
+
+
+function parseFullImage {
+   fullImage="$1"
+   unset REGISTRY REPOS IMAGE VERSION
+
+   if [[ "$1" =~ (.*)\/(.*)\/(.*)\:(.*) ]]; then
+      echo "DEBUG:  ${BASH_REMATCH[0]}"
+
+      REGISTRY="${BASH_REMATCH[1]}"
+      REPOS="${BASH_REMATCH[2]}"
+      IMAGE="${BASH_REMATCH[3]}"
+      VERSION="${BASH_REMATCH[4]}"
+   else
+      echo "no match"
+   fi
+}
+
+
+function v4m_replace {
+
+    if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
+      sed -i '' s/"$1"/"$2"/g  "$3"
+    else
+      sed -i  s/"$1"/"$2"/g  "$3"
+    fi
+}
+
+function doitall {
+
+   #arg1 Full container image
+   #arg2 name of template file
+   #arg3 prefix to insert in placeholders
+
+   parseFullImage "$1"
+   prefix=${3:-""}
+
+   tempfile="/tmp/container_image.yaml"
+   template_file=$2
+
+   if [ "$template_file" != "TEMPFILE" ]; then
+      rm -f  $tempfile
+      cp $template_file  $tempfile
+   else
+      echo "DEBUG: modifying existing file"
+   fi
+
+   if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+      REGISTRY="$AIRGAP_REGISTRY"
+   fi
+   v4m_replace "__${prefix}IMAGE_REGISTRY__"     "$REGISTRY"                 "$tempfile"
+   v4m_replace "__${prefix}GLOBAL_REGISTRY__"    "$REGISTRY"                 "$tempfile"
+   v4m_replace "__${prefix}IMAGE_REPO__"         "$REGISTRY\/$REPOS\/$IMAGE" "$tempfile"
+   v4m_replace "__${prefix}IMAGE__"              "$IMAGE"                    "$tempfile"
+   v4m_replace "__${prefix}IMAGE_TAG__"          "$VERSION"                  "$tempfile"
+   v4m_replace "__${prefix}IMAGE_PULL_POLICY__"  "Always"                    "$tempfile"
+   v4m_replace "__${prefix}IMAGE_PULL_SECRET__"  "null"                      "$tempfile"       #Handle Single Image Pull Secret
+   v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" "[]"                        "$tempfile"       #Handle Multiple Image Pull Secrets
+
+}
+
+
+
+export -f parseFullImage
+export -f v4m_replace
+export -f doitall

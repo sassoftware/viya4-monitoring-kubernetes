@@ -71,12 +71,21 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
   # Check for the image pull secret for the air gap environment and replace placeholders
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-  replaceAirgapValuesInFiles "logging/airgap/airgap-values-es-exporter.yaml"
+###   replaceAirgapValuesInFiles "logging/airgap/airgap-values-es-exporter.yaml"
 
-  airgapValuesFile=$updatedAirgapValuesFile
-else
-  airgapValuesFile=$TMP_DIR/empty.yaml
+###   airgapValuesFile=$updatedAirgapValuesFile
+###else
+###   airgapValuesFile=$TMP_DIR/empty.yaml
 fi
+
+########
+echo "DDDDDDD"
+doitall "$ES_EXPORTER_FULL_IMAGE" "logging/esexporter/es-exporter_container_image.template"
+imageKeysFile="/tmp/container_image.yaml"
+cat "$imageKeysFile"
+echo "DDDDDDD"
+
+
 
 # Load any user customizations/overrides
 ES_OPEN_EXPORTER_USER_YAML="${ES_OPEN_EXPORTER_USER_YAML:-$USER_DIR/logging/user-values-es-exporter.yaml}"
@@ -119,10 +128,10 @@ log_debug "Installing Helm chart from artifact [$chart2install]"
 helm $helmDebug upgrade --install es-exporter \
  --namespace $LOG_NS \
  --version $ESEXPORTER_HELM_CHART_VERSION \
+ -f $imageKeysFile \
  -f $primaryValuesFile \
  -f $wnpValuesFile \
  -f $openshiftValuesFile \
- -f $airgapValuesFile \
  -f $ES_OPEN_EXPORTER_USER_YAML \
  --set fullnameOverride=v4m-es-exporter  \
  $chart2install
