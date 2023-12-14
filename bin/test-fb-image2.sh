@@ -5,14 +5,16 @@ function parseFullImage {
    unset REGISTRY REPOS IMAGE VERSION
 
    if [[ "$1" =~ (.*)\/(.*)\/(.*)\:(.*) ]]; then
-      echo "DEBUG:  ${BASH_REMATCH[0]}"
+      ###echo "DEBUG:  ${BASH_REMATCH[0]}"
 
       REGISTRY="${BASH_REMATCH[1]}"
       REPOS="${BASH_REMATCH[2]}"
       IMAGE="${BASH_REMATCH[3]}"
       VERSION="${BASH_REMATCH[4]}"
+      return 0
    else
-      echo "no match"
+      ###echo "no match"
+      return 1
    fi
 }
 
@@ -35,7 +37,11 @@ function doitall {
    #arg2 name of template file
    #arg3 prefix to insert in placeholders
 
-   parseFullImage "$1"
+   if ! parseFullImage "$1";  then
+      echo "ERROR: unable to parse full image [$1]"
+      return 1
+   fi
+
    prefix=${3:-""}
 
    tempfile="/tmp/container_image.yaml"
@@ -51,6 +57,7 @@ function doitall {
    if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
       REGISTRY="$AIRGAP_REGISTRY"
    fi
+
    v4m_replace "__${prefix}IMAGE_REGISTRY__"     "$REGISTRY"                 "$tempfile"
    v4m_replace "__${prefix}GLOBAL_REGISTRY__"    "$REGISTRY"                 "$tempfile"
    v4m_replace "__${prefix}IMAGE_REPO__"         "$REGISTRY\/$REPOS\/$IMAGE" "$tempfile"
@@ -60,6 +67,7 @@ function doitall {
    v4m_replace "__${prefix}IMAGE_PULL_SECRET__"  "null"                      "$tempfile"       #Handle Single Image Pull Secret
    v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" "[]"                        "$tempfile"       #Handle Multiple Image Pull Secrets
 
+   return 0
 }
 
 
@@ -80,14 +88,23 @@ echo "*****************"
 TEMPFILE="/tmp/container_image.yaml"
 
 ###FB_FULL_IMAGE="cr.fluentbit.io/fluent/fluent-bit:2.1.10"
-doitall "$FB_FULL_IMAGE"          "logging/fb/container_image.template"
-cat $TEMPFILE
+if doitall "$FB_FULL_IMAGE"          "logging/fb/container_image.template"; then
+   cat $TEMPFILE
+else
+   echo "ERROR"
+fi
 
 ###OS_FULL_IMAGE="docker.io/opensearchproject/opensearch:2.10.0"
 ###OS_SYSCTL_FULL_IMAGE="docker.io/library/busybox:latest"
-doitall "$OS_FULL_IMAGE"          "logging/opensearch/os_container_image.template"
-doitall "$OS_SYSCTL_FULL_IMAGE"   "TEMPFILE"  "OS_SYSCTL_"
-cat $TEMPFILE
+if doitall "$OS_FULL_IMAGE"          "logging/opensearch/os_container_image.template"; then
+   if doitall "$OS_SYSCTL_FULL_IMAGE"   "TEMPFILE"  "OS_SYSCTL_"; then
+      cat $TEMPFILE
+   else echo "ERROR: Failed on [OS_SYSCT]"
+   fi
+else
+   echo "ERROR: Failed on [OS]"
+fi
+exit
 
 ###OSD_FULL_IMAGE="docker.io/opensearchproject/opensearch-dashboards:2.10.0"
 doitall "$OSD_FULL_IMAGE"         "logging/opensearch/osd_container_image.template"
