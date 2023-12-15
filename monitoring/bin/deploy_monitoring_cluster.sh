@@ -52,20 +52,35 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
   # Check for the image pull secret for the air gap environment and replace placeholders
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-  replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-prom-operator.yaml"
+###  replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-prom-operator.yaml"
 
-  airgapValuesFile=$updatedAirgapValuesFile
+###  airgapValuesFile=$updatedAirgapValuesFile
 
-  if [ "$TLS_ENABLE" == "true" ]; then
-    replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-prom-operator-tls.yaml"
-    airgapTLSValuesFile=$updatedAirgapValuesFile
-  else
-    airgapTLSValuesFile=$TMP_DIR/empty.yaml
-  fi
-else
-  airgapValuesFile=$TMP_DIR/empty.yaml
-  airgapTLSValuesFile=$TMP_DIR/empty.yaml
+###  if [ "$TLS_ENABLE" == "true" ]; then
+###    replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-prom-operator-tls.yaml"
+###    airgapTLSValuesFile=$updatedAirgapValuesFile
+###  else
+###    airgapTLSValuesFile=$TMP_DIR/empty.yaml
+###  fi
+###else
+###  airgapValuesFile=$TMP_DIR/empty.yaml
+###  airgapTLSValuesFile=$TMP_DIR/empty.yaml
 fi
+
+######
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
+doitall "$PROMOP_FULL_IMAGE"          "monitoring/prom-operator_container_image.template"
+doitall "$ALERTMANAGER_FULL_IMAGE"    "TEMPFILE"  "ALERTMANAGER_"
+doitall "$ADMWEBHOOK_FULL_IMAGE"      "TEMPFILE"  "ADMWEBHOOK_"
+doitall "$KSM_FULL_IMAGE"             "TEMPFILE"  "KSM_"
+doitall "$NODEXPORT_FULL_IMAGE"       "TEMPFILE"  "NODEXPORT_"
+doitall "$PROMETHEUS_FULL_IMAGE"      "TEMPFILE"  "PROMETHEUS_"
+doitall "$CONFIGRELOAD_FULL_IMAGE"    "TEMPFILE"  "CONFIGRELOAD_"
+doitall "$GRAFANA_FULL_IMAGE"         "TEMPFILE"  "GRAFANA_"
+doitall "$GRAFANA_SIDECAR_FULL_IMAGE" "TEMPFILE"  "SIDECAR_"
+cat "$imageKeysFile"  #DEBUGGING-REMOVE
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
+
 
 set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
@@ -211,11 +226,10 @@ log_debug "Installing Helm chart from artifact [$chart2install]"
 
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
+  -f $imageKeysFile \
   -f monitoring/values-prom-operator.yaml \
-  -f $airgapValuesFile \
   -f $istioValuesFile \
   -f $tlsValuesFile \
-  -f $airgapTLSValuesFile \
   -f $tlsPromAlertingEndpointFile \
   -f $nodePortValuesFile \
   -f $wnpValuesFile \
@@ -265,12 +279,18 @@ if [ "$TRACING_ENABLE" == "true" ]; then
 
     # Check for the image pull secret for the air gap environment and replace placeholders
     checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-    replaceAirgapValuesInFiles "monitoring/airgap/airgap-tempo-values.yaml"
-
-    airgapValuesFile=$updatedAirgapValuesFile
-  else
-    airgapValuesFile=$TMP_DIR/empty.yaml
+###    replaceAirgapValuesInFiles "monitoring/airgap/airgap-tempo-values.yaml"
+###
+###    airgapValuesFile=$updatedAirgapValuesFile
+###  else
+###    airgapValuesFile=$TMP_DIR/empty.yaml
   fi
+
+  ######
+  echo " DDDDDDDD"      #DEBUGGING-REMOVE
+  doitall "$TEMPO_FULL_IMAGE" "monitoring/tempo_container_image.template"
+  cat "$imageKeysFile"  #DEBUGGING-REMOVE
+  echo " DDDDDDDD"      #DEBUGGING-REMOVE
 
   # Add the grafana helm chart repo
   helmRepoAdd grafana https://grafana.github.io/helm-charts
@@ -284,9 +304,9 @@ if [ "$TRACING_ENABLE" == "true" ]; then
   log_info "Installing tempo"
   helm upgrade --install v4m-tempo \
     -n "$MON_NS" \
+    -f $imageKeysFile \
     -f monitoring/values-tempo.yaml \
     -f "$TEMPO_USER_YAML" \
-    -f "$airgapValuesFile" \
     --version "$TEMPO_CHART_VERSION" \
     $chart2install
 fi

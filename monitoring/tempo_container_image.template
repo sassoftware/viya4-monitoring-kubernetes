@@ -1,12 +1,12 @@
 tempo:
- repository: __IMAGE_REPO__
+ repository: __IMAGE_REPO_3LEVEL__
  tag: __IMAGE_TAG__
  pullPolicy: __IMAGE_PULL_POLICY__
  pullSecrets: __IMAGE_PULL_SECRETS__           
 
 #NOTE: Tempo Query is not used
 #tempoQuery:
-# repository: __TEMPOQ_IMAGE_REPO__
+# repository: __TEMPOQ_IMAGE_REPO_3LEVEL__
 # tag: __TEMPOQ_IMAGE_TAG__
 # pullPolicy: __TEMPOQ_IMAGE_PULL_POLICY__
 # pullSecrets: __TEMPOQ_IMAGE_PULL_SECRETS__          

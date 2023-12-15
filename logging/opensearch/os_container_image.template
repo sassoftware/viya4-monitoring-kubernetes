@@ -1,7 +1,7 @@
 global:
  dockerRegistry: __GLOBAL_REGISTRY__
 image:
- repository: __IMAGE_REPO__
+ repository: __IMAGE_REPO_2LEVEL__
  tag: __IMAGE_TAG__
  pullPolicy: __IMAGE_PULL_POLICY__
 

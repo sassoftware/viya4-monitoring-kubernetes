@@ -6,14 +6,14 @@ global:
 prometheusOperator:
   image:
     registry: __IMAGE_REGISTRY__
-    repository: __IMAGE_REPO__
+    repository: __IMAGE_REPO_2LEVEL__
     tag: __IMAGE_TAG__
     pullPolicy: __IMAGE_PULL_POLICY__
 
   prometheusConfigReloader:
     image: 
       registry: __CONFIGRELOAD_IMAGE_REGISTRY__
-      repository: __CONFIGRELOAD_IMAGE_REPO__
+      repository: __CONFIGRELOAD_IMAGE_REPO_2LEVEL__
       tag: __CONFIGRELOAD_IMAGE_TAG__
 
   admissionWebhooks:
@@ -21,13 +21,13 @@ prometheusOperator:
 #    deployment:
 #      image:
 #        registry: __ADMWEBHOOK_IMAGE_REGISTRY__
-#        repository: __ADMWEBHOOK_IMAGE_REPO__
+#        repository: __ADMWEBHOOK_IMAGE_REPO_2LEVEL__
 #        tag: __ADMWEBHOOK_IMAGE_TAG__
 #  	      pullPolicy: __ADMWEBHOOK_IMAGE_PULL_POLICY__
     patch:
       image:
         registry: __ADMWEBHOOK_IMAGE_REGISTRY__
-        repository: __ADMWEBHOOK_IMAGE_REPO__
+        repository: __ADMWEBHOOK_IMAGE_REPO_2LEVEL__
         tag: __ADMWEBHOOK_IMAGE_TAG__
         pullPolicy: __ADMWEBHOOK_IMAGE_PULL_POLICY__
 
@@ -50,7 +50,7 @@ prometheusOperator:
 ## NOTE: We do NOT use Thanos
 #  thanosImage:
 #    registry: __THANOS_IMAGE_REGISTRY__
-#    repository: __THANOS_IMAGE_REPO__
+#    repository: __THANOS_IMAGE_REPO_2LEVEL__
 #    tag: __THANOS_IMAGE_TAG__
 
 
@@ -59,16 +59,16 @@ alertmanager:
   alertmanagerSpec:
     image:
       registry: __ALERTMANAGER_IMAGE_REGISTRY__
-      repository: __ALERTMANAGER_IMAGE_REPO__
+      repository: __ALERTMANAGER_IMAGE_REPO_2LEVEL__
       tag: __ALERTMANAGER_IMAGE_TAG__
 
 ## Grafana
 grafana:
   image:
-    repository: __GRAFANA_IMAGE_REPO__
+    repository: __GRAFANA_IMAGE_REPO_2LEVEL__
   sidecar:
     image:
-      repository: __SIDECAR_IMAGE_REPO__
+      repository: __SIDECAR_IMAGE_REPO_2LEVEL__
 
 ## Kube-State-Metrics
 kube-state-metrics:
@@ -78,20 +78,20 @@ kube-state-metrics:
 ###  imagePullSecrets: __IMAGE_PULL_SECRETS__
   image:
     registry: __KSM_IMAGE_REGISTRY__
-    repository: __KSM_IMAGE_REPO__
+    repository: __KSM_IMAGE_REPO_2LEVEL__
     tag: __KSM_IMAGE_TAG__
-    pullPolicy: __KSM_PULL_POLICY__
-  imagePullSecrets: __KSM_PULL_SECRETS__
+    pullPolicy: __KSM_IMAGE_PULL_POLICY__
+  imagePullSecrets: __KSM_IMAGE_PULL_SECRETS__
 
 ##Node Exporter
-nodeExporter:
+prometheus-node-exporter:
 ### TO DO: Use these globals(node exporter)?
 ###global:
 ###  imageRegistry: __GLOBAL_REGISTRY__
 ###  imagePullSecrets: __IMAGE_PULL_SECRETS__
   image:
     registry: __NODEXPORT_IMAGE_REGISTRY__
-    repository: __NODEXPORT_IMAGE_REPO__
+    repository: __NODEXPORT_IMAGE_REPO_2LEVEL__
     tag: __NODEXPORT_IMAGE_TAG__
     pullPolicy: __NODEXPORT_IMAGE_PULL_POLICY__
   imagePullSecrets: __IMAGE_PULL_SECRETS__
@@ -101,7 +101,7 @@ prometheus:
   prometheusSpec:
     image:
       registry: __PROMETHEUS_IMAGE_REGISTRY__
-      repository: __PROMETHEUS_IMAGE_REPO__
+      repository: __PROMETHEUS_IMAGE_REPO_2LEVEL__
       tag: __PROMETHEUS_IMAGE_TAG__
 
 ##ThanosRuller
@@ -110,5 +110,5 @@ prometheus:
 #  thanosRulerSpec:
 #    image:
 #      registry: __THANOSRULER_IMAGE_REGISTRY__
-#      repository: __THANOSRULER_IMAGE_REPO__
+#      repository: __THANOSRULER_IMAGE_REPO_2LEVEL__
 #      tag: __THANOSRULER_IMAGE_TAG__

@@ -305,15 +305,18 @@ function doitall {
    fi
 
    if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-      REGISTRY="$AIRGAP_REGISTRY"
+      GLOBAL_REGISTRY="$AIRGAP_REGISTRY"
+   else
+      GLOBAL_REGISTRY="null"
    fi
 
+   v4m_replace "__${prefix}GLOBAL_REGISTRY__"    "$GLOBAL_REGISTRY"          "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE_REGISTRY__"     "$REGISTRY"                 "$imageKeysFile"
-   v4m_replace "__${prefix}GLOBAL_REGISTRY__"    "$REGISTRY"                 "$imageKeysFile"
-   v4m_replace "__${prefix}IMAGE_REPO__"         "$REGISTRY\/$REPOS\/$IMAGE" "$imageKeysFile"
+   v4m_replace "__${prefix}IMAGE_REPO_3LEVEL__"  "$REGISTRY\/$REPOS\/$IMAGE" "$imageKeysFile"
+   v4m_replace "__${prefix}IMAGE_REPO_2LEVEL__"  "$REPOS\/$IMAGE"            "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE__"              "$IMAGE"                    "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE_TAG__"          "$VERSION"                  "$imageKeysFile"
-   v4m_replace "__${prefix}IMAGE_PULL_POLICY__"  "Always"                    "$imageKeysFile"
+   v4m_replace "__${prefix}IMAGE_PULL_POLICY__"  "IfNotPresent"              "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE_PULL_SECRET__"  "null"                      "$imageKeysFile"       #Handle Single Image Pull Secret
    v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" "[]"                        "$imageKeysFile"       #Handle Multiple Image Pull Secrets
 

@@ -1,5 +1,5 @@
 image:
- repository: __IMAGE_REPO__
+ repository: __IMAGE_REPO_3LEVEL__
  tag: __IMAGE_TAG__
  pullPolicy: __IMAGE_PULL_POLICY__
 

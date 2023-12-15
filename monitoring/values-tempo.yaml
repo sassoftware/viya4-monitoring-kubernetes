@@ -5,8 +5,8 @@
 
 tempo:
   searchEnabled: true
-  repository: grafana/tempo
-  tag: null
+###  repository: grafana/tempo
+###  tag: null
 
   multitenancyEnabled: false
   # -- If true, Tempo will report anonymous usage data about the shape of a deployment to Grafana Labs

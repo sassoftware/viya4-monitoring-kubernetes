@@ -17,10 +17,10 @@ commonLabels:
 # ===================
 # https://github.com/coreos/prometheus-operator
 prometheusOperator:
-  image:
-  #  registry: quay.io
-  #  repository: prometheus-operator/prometheus-operator
-    tag: v0.69.1
+###  image:
+###  #  registry: quay.io
+###  #  repository: prometheus-operator/prometheus-operator
+###    tag: v0.69.1
   logFormat: json
   logLevel: info
   createCustomResource: false
@@ -36,11 +36,11 @@ prometheusOperator:
       requests:
         cpu: "50m"
         memory: "25Mi"
-  prometheusConfigReloader:
-    image:
-    #  registry: quay.io
-    #  repository: prometheus-operator/prometheus-config-reloader
-      tag: v0.69.1
+###  prometheusConfigReloader:
+###    image:
+###    #  registry: quay.io
+###    #  repository: prometheus-operator/prometheus-config-reloader
+###      tag: v0.69.1
 
 # ======================
 # kubelet ServiceMonitor
@@ -65,8 +65,8 @@ kubeStateMetrics:
 # https://github.com/kubernetes/kube-state-metrics
 # https://github.com/helm/charts/tree/master/stable/kube-state-metrics
 kube-state-metrics:
-  image:
-    tag: v2.10.0
+###  image:
+###    tag: v2.10.0
   resources:
     requests:
       cpu: "25m"
@@ -86,8 +86,8 @@ prometheus:
     type: ClusterIP
     nodePort: null  
   prometheusSpec:
-    image:
-      tag: v2.47.1
+###    image:
+###      tag: v2.47.1
     logLevel: info
     logFormat: json
     podAntiAffinity: soft
@@ -126,8 +126,8 @@ alertmanager:
     type: ClusterIP
     nodePort: null
   alertmanagerSpec:
-    image:
-      tag: v0.26.0
+###    image:
+###      tag: v0.26.0
     logFormat: json
     podAntiAffinity: soft
     retention: 240h
@@ -150,10 +150,10 @@ alertmanager:
 # https://github.com/prometheus/node_exporter
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
 prometheus-node-exporter:
-  image:
-  #  registry: quay.io
-  #  repository: prometheus/node-exporter
-    tag: v1.7.0
+###  image:
+###  #  registry: quay.io
+###  #  repository: prometheus/node-exporter
+###    tag: v1.7.0
   service:
     # Override the default port of 9100 to avoid potential conflicts
     port: 9110
@@ -183,8 +183,8 @@ prometheus-node-exporter:
 # =======
 # https://github.com/grafana/helm-charts/tree/main/charts/grafana
 grafana:
-  image:
-    tag: 10.2.1
+###  image:
+###    tag: 10.2.1
   initChownData:
     enabled: false
   "grafana.ini":
@@ -219,10 +219,10 @@ grafana:
       requests:
         cpu: "50m"
         memory: "100Mi"
-    image:
-    #  registry: quay.io
-    #  repository: kiwigrid/k8s-sidecar
-       tag: 1.25.2
+###    image:
+###    #  registry: quay.io
+###    #  repository: kiwigrid/k8s-sidecar
+###       tag: 1.25.2
   deploymentStrategy:
     type: Recreate
   persistence:
