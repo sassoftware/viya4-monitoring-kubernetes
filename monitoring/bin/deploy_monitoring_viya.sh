@@ -66,13 +66,21 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
       source bin/airgap-include.sh
 
       # Check for the image pull secret for the air gap environment and replace placeholders
-      checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-      replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-pushgateway.yaml"
+      checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$VIYA_NS"
+###      replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-pushgateway.yaml"
 
-      airgapValuesFile=$updatedAirgapValuesFile
-   else
-      airgapValuesFile=$TMP_DIR/empty.yaml
+###      airgapValuesFile=$updatedAirgapValuesFile
+###   else
+###      airgapValuesFile=$TMP_DIR/empty.yaml
    fi
+
+
+######
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
+doitall "$PUSHGATEWAY_FULL_IMAGE" "monitoring/pushgateway_container_image.template"
+cat "$imageKeysFile"  #DEBUGGING-REMOVE
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
+
 
    if helm3ReleaseExists prometheus-pushgateway $VIYA_NS; then
       kubectl delete deployment -n $VIYA_NS prometheus-pushgateway --ignore-not-found
@@ -91,8 +99,8 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
         --namespace $VIYA_NS \
         --version $PUSHGATEWAY_CHART_VERSION \
         --set service.clusterIP=$svcClusterIP \
+        -f $imageKeysFile \
         -f monitoring/values-pushgateway.yaml \
-        -f $airgapValuesFile \
         -f $wnpValuesFile \
         -f $PUSHGATEWAY_USER_YAML \
          $chart2install

@@ -1,5 +1,6 @@
 global:
- dockerRegistry: __GLOBAL_REGISTRY__
+ dockerRegistry: __GLOBAL_REGISTRY_OSBUG__
+
 image:
  repository: __IMAGE_REPO_2LEVEL__
  tag: __IMAGE_TAG__

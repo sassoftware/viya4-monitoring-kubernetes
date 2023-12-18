@@ -43,12 +43,19 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
   # Check for the image pull secret for the air gap environment and replace placeholders
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-  replaceAirgapValuesInFiles "logging/airgap/airgap-opensearch.yaml"
+###  replaceAirgapValuesInFiles "logging/airgap/airgap-opensearch.yaml"
 
-  airgapValuesFile=$updatedAirgapValuesFile
-else
-  airgapValuesFile=$TMP_DIR/empty.yaml
+###  airgapValuesFile=$updatedAirgapValuesFile
+###else
+###  airgapValuesFile=$TMP_DIR/empty.yaml
 fi
+
+######
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
+doitall "$OS_FULL_IMAGE"          "logging/opensearch/os_container_image.template"
+doitall "$OS_SYSCTL_FULL_IMAGE"   "TEMPFILE"  "OS_SYSCTL_"
+cat "$imageKeysFile"  #DEBUGGING-REMOVE
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
 
 # get credentials
 export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD}
@@ -328,9 +335,9 @@ log_debug "Installing Helm chart from artifact [$chart2install]"
 helm $helmDebug upgrade --install opensearch \
     --version $OPENSEARCH_HELM_CHART_VERSION \
     --namespace $LOG_NS \
+    --values "$imageKeysFile" \
     --values logging/opensearch/opensearch_helm_values.yaml \
     --values "$wnpValuesFile" \
-    --values "$airgapValuesFile" \
     --values "$ES_OPEN_USER_YAML" \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
     --set nodeGroup=primary  \
@@ -348,8 +355,8 @@ if [ "$deploy_temp_masters" == "true" ]; then
        --version $OPENSEARCH_HELM_CHART_VERSION \
        --namespace $LOG_NS \
        --values logging/opensearch/opensearch_helm_values.yaml \
+       --values "$imageKeysFile" \
        --values "$wnpValuesFile" \
-       --values "$airgapValuesFile" \
        --values "$ES_OPEN_USER_YAML" \
        --values "$OPENSHIFT_SPECIFIC_YAML" \
        --set nodeGroup=temp_masters  \

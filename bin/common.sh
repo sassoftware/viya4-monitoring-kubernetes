@@ -287,6 +287,8 @@ function doitall {
    #arg2 name of template file
    #arg3 prefix to insert in placeholders (optional)
 
+   local pullsecret_text
+
    if ! parseFullImage "$1";  then
       log_error "Unable to parse full image [$1]"
       return 1
@@ -305,11 +307,20 @@ function doitall {
    fi
 
    if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+      GLOBAL_REGISTRY_OSBUG="$AIRGAP_REGISTRY"
       GLOBAL_REGISTRY="$AIRGAP_REGISTRY"
+      REGISTRY="$AIRGAP_REGISTRY"
    else
       GLOBAL_REGISTRY="null"
+      GLOBAL_REGISTRY_OSBUG='""'
+   fi
+   if [ "$AIRGAP_IMAGE_PULL_SECRET_NAME" ]; then
+      pullsecret_text="[name: ""$AIRGAP_IMAGE_PULL_SECRET_NAME""]"
+   else
+      pullsecret_text="[]"
    fi
 
+   v4m_replace "__${prefix}GLOBAL_REGISTRY_OSBUG__"    "$GLOBAL_REGISTRY_OSBUG"          "$imageKeysFile"
    v4m_replace "__${prefix}GLOBAL_REGISTRY__"    "$GLOBAL_REGISTRY"          "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE_REGISTRY__"     "$REGISTRY"                 "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE_REPO_3LEVEL__"  "$REGISTRY\/$REPOS\/$IMAGE" "$imageKeysFile"
@@ -318,7 +329,9 @@ function doitall {
    v4m_replace "__${prefix}IMAGE_TAG__"          "$VERSION"                  "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE_PULL_POLICY__"  "IfNotPresent"              "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE_PULL_SECRET__"  "null"                      "$imageKeysFile"       #Handle Single Image Pull Secret
-   v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" "[]"                        "$imageKeysFile"       #Handle Multiple Image Pull Secrets
+   #v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" "[]"                        "$imageKeysFile"       #Handle Multiple Image Pull Secrets
+   #v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" '[name: "foo-bar-secret"]'              "$imageKeysFile"       #Handle Multiple Image Pull Secrets
+   v4m_replace "__${prefix}IMAGE_PULL_SECRETS__"  "$pullsecret_text"              "$imageKeysFile"       #Handle Multiple Image Pull Secrets
 
    return 0
 }
