@@ -310,15 +310,23 @@ function doitall {
       GLOBAL_REGISTRY_OSBUG="$AIRGAP_REGISTRY"
       GLOBAL_REGISTRY="$AIRGAP_REGISTRY"
       REGISTRY="$AIRGAP_REGISTRY"
+
+      if [ -n "$AIRGAP_IMAGE_PULL_SECRET_NAME" ]; then
+         pullsecrets_text="[name: ""$AIRGAP_IMAGE_PULL_SECRET_NAME""]"
+         pullsecret_text="$AIRGAP_IMAGE_PULL_SECRET_NAME"
+      else
+         pullsecrets_text="[]"
+         pullsecret_text="null"
+      fi
+
    else
       GLOBAL_REGISTRY="null"
       GLOBAL_REGISTRY_OSBUG='""'
-   fi
-   if [ "$AIRGAP_IMAGE_PULL_SECRET_NAME" ]; then
-      pullsecret_text="[name: ""$AIRGAP_IMAGE_PULL_SECRET_NAME""]"
-   else
       pullsecret_text="[]"
+      pullsecret_text="null"
    fi
+
+   v4m_pullPolicy=${V4M_PULL_POLICY:-"IfNotPresent"}
 
    v4m_replace "__${prefix}GLOBAL_REGISTRY_OSBUG__"    "$GLOBAL_REGISTRY_OSBUG"          "$imageKeysFile"
    v4m_replace "__${prefix}GLOBAL_REGISTRY__"    "$GLOBAL_REGISTRY"          "$imageKeysFile"
@@ -327,11 +335,9 @@ function doitall {
    v4m_replace "__${prefix}IMAGE_REPO_2LEVEL__"  "$REPOS\/$IMAGE"            "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE__"              "$IMAGE"                    "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE_TAG__"          "$VERSION"                  "$imageKeysFile"
-   v4m_replace "__${prefix}IMAGE_PULL_POLICY__"  "IfNotPresent"              "$imageKeysFile"
-   v4m_replace "__${prefix}IMAGE_PULL_SECRET__"  "null"                      "$imageKeysFile"       #Handle Single Image Pull Secret
-   #v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" "[]"                        "$imageKeysFile"       #Handle Multiple Image Pull Secrets
-   #v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" '[name: "foo-bar-secret"]'              "$imageKeysFile"       #Handle Multiple Image Pull Secrets
-   v4m_replace "__${prefix}IMAGE_PULL_SECRETS__"  "$pullsecret_text"              "$imageKeysFile"       #Handle Multiple Image Pull Secrets
+   v4m_replace "__${prefix}IMAGE_PULL_POLICY__"  "$v4m_pullpolicy"           "$imageKeysFile"
+   v4m_replace "__${prefix}IMAGE_PULL_SECRET__"  "pullsecret_text"           "$imageKeysFile"       #Handle Charts Accepting a Single Image Pull Secret
+   v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" "$pullsecrets_text"         "$imageKeysFile"       #Handle Charts Accepting Multiple Image Pull Secrets
 
    return 0
 }
