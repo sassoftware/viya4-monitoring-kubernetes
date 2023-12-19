@@ -306,6 +306,11 @@ function doitall {
       log_debug "Modifying an existing imageKeysFile"
    fi
 
+   if [ "$V4M_OMIT_IMAGE_KEYS" == "true" ]; then
+      cp $TMP_DIR/empty.yaml $imageKeysFile
+      return 0
+   fi
+
    if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
       GLOBAL_REGISTRY_OSBUG="$AIRGAP_REGISTRY"
       GLOBAL_REGISTRY="$AIRGAP_REGISTRY"
