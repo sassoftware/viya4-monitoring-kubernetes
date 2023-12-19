@@ -9,5 +9,6 @@ image:
 imagePullSecrets: __IMAGE_PULL_SECRETS__
 
 sysctlInit:
-  image:  __OS_SYSCTL_IMAGE__
+  #The image key below needs repo+image
+  image:  __OS_SYSCTL_IMAGE_REPO_2LEVEL__
   imageTag: __OS_SYSCTL_IMAGE_TAG__
