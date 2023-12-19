@@ -6,7 +6,7 @@
 # This script is not intended to be run directly
 # Assumes bin/common.sh has been sourced
 
-if [ ! $(which kubectl) ]; then
+if [ ! "$(which kubectl)" ]; then
   log_error "kubectl not found on the current PATH"
   exit 1
 fi
