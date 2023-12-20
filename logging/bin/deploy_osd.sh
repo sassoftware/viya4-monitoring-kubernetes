@@ -48,7 +48,7 @@ fi
 
 ######
 echo " DDDDDDDD"      #DEBUGGING-REMOVE
-doitall "$OSD_FULL_IMAGE"         "logging/opensearch/osd_container_image.template"
+generateImageKeysFile "$OSD_FULL_IMAGE"         "logging/opensearch/osd_container_image.template"
 cat "$imageKeysFile"  #DEBUGGING-REMOVE
 echo " DDDDDDDD"      #DEBUGGING-REMOVE
 

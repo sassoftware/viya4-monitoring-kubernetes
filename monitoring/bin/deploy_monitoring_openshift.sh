@@ -146,8 +146,8 @@ fi
 
 ######
 echo " DDDDDDDD"      #DEBUGGING-REMOVE
-doitall "$GRAFANA_FULL_IMAGE"     "monitoring/grafana_container_image.template"
-doitall "$GRAFANA_SIDECAR_FULL_IMAGE"   "TEMPFILE"  "SIDECAR_"
+generateImageKeysFile "$GRAFANA_FULL_IMAGE"     "monitoring/grafana_container_image.template"
+generateImageKeysFile "$GRAFANA_SIDECAR_FULL_IMAGE"   "$imageKeysFile"  "SIDECAR_"
 cat "$imageKeysFile"  #DEBUGGING-REMOVE
 echo " DDDDDDDD"      #DEBUGGING-REMOVE
 
@@ -301,7 +301,7 @@ if [ "$TRACING_ENABLE" == "true" ]; then
 
 ######
   echo " DDDDDDDD"      #DEBUGGING-REMOVE
-  doitall "$TEMPO_FULL_IMAGE" "monitoring/tempo_container_image.template"
+  generateImageKeysFile "$TEMPO_FULL_IMAGE" "monitoring/tempo_container_image.template"
   cat "$imageKeysFile"  #DEBUGGING-REMOVE
   echo " DDDDDDDD"      #DEBUGGING-REMOVE
 

@@ -53,7 +53,7 @@ fi
 
 ######
 echo " DDDDDDDD"      #DEBUGGING-REMOVE
-doitall "$FB_FULL_IMAGE"          "logging/fb/fb_container_image.template"
+generateImageKeysFile "$FB_FULL_IMAGE"          "logging/fb/fb_container_image.template"
 cat "$imageKeysFile"  #DEBUGGING-REMOVE
 echo " DDDDDDDD"      #DEBUGGING-REMOVE
 

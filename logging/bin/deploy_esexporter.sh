@@ -80,7 +80,7 @@ fi
 
 ########
 echo "DDDDDDD"           #DEBUGGING-REMOVE
-doitall "$ES_EXPORTER_FULL_IMAGE" "logging/esexporter/es-exporter_container_image.template"
+generateImageKeysFile "$ES_EXPORTER_FULL_IMAGE" "logging/esexporter/es-exporter_container_image.template"
 cat "$imageKeysFile"     #DEBUGGING-REMOVE
 echo "DDDDDDD"           #DEBUGGING-REMOVE
 

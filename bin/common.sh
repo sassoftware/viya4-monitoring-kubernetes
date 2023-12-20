@@ -281,7 +281,7 @@ function v4m_replace {
     fi
 }
 
-function doitall {
+function generateImageKeysFile {
 
    #arg1 Full container image
    #arg2 name of template file
@@ -299,7 +299,7 @@ function doitall {
    imageKeysFile="$TMP_DIR/imageKeysFile.yaml"
    template_file=$2
 
-   if [ "$template_file" != "TEMPFILE" ]; then
+   if [ "$template_file" != "$imageKeysFile" ]; then
       rm -f  $imageKeysFile
       cp $template_file  $imageKeysFile
    else
@@ -324,8 +324,8 @@ function doitall {
          pullsecret_text="null"
       fi
    else
-      GLOBAL_REGISTRY="null"
       GLOBAL_REGISTRY_OSBUG='""'
+      GLOBAL_REGISTRY="null"
       pullsecrets_text="[]"
       pullsecret_text="null"
    fi
@@ -349,4 +349,4 @@ function doitall {
 
 export -f parseFullImage
 export -f v4m_replace
-export -f doitall
+export -f generateImageKeysFile

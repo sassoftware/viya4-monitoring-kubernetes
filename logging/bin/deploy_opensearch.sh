@@ -52,8 +52,8 @@ fi
 
 ######
 echo " DDDDDDDD"      #DEBUGGING-REMOVE
-doitall "$OS_FULL_IMAGE"          "logging/opensearch/os_container_image.template"
-doitall "$OS_SYSCTL_FULL_IMAGE"   "TEMPFILE"  "OS_SYSCTL_"
+generateImageKeysFile "$OS_FULL_IMAGE"          "logging/opensearch/os_container_image.template"
+generateImageKeysFile "$OS_SYSCTL_FULL_IMAGE"   "$imageKeysFile"  "OS_SYSCTL_"
 cat "$imageKeysFile"  #DEBUGGING-REMOVE
 echo " DDDDDDDD"      #DEBUGGING-REMOVE
 

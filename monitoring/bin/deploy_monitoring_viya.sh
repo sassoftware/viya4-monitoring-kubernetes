@@ -77,7 +77,7 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
 
 ######
 echo " DDDDDDDD"      #DEBUGGING-REMOVE
-doitall "$PUSHGATEWAY_FULL_IMAGE" "monitoring/pushgateway_container_image.template"
+generateImageKeysFile "$PUSHGATEWAY_FULL_IMAGE" "monitoring/pushgateway_container_image.template"
 cat "$imageKeysFile"  #DEBUGGING-REMOVE
 echo " DDDDDDDD"      #DEBUGGING-REMOVE
 

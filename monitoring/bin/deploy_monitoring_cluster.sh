@@ -69,15 +69,15 @@ fi
 
 ######
 echo " DDDDDDDD"      #DEBUGGING-REMOVE
-doitall "$PROMOP_FULL_IMAGE"          "monitoring/prom-operator_container_image.template"
-doitall "$ALERTMANAGER_FULL_IMAGE"    "TEMPFILE"  "ALERTMANAGER_"
-doitall "$ADMWEBHOOK_FULL_IMAGE"      "TEMPFILE"  "ADMWEBHOOK_"
-doitall "$KSM_FULL_IMAGE"             "TEMPFILE"  "KSM_"
-doitall "$NODEXPORT_FULL_IMAGE"       "TEMPFILE"  "NODEXPORT_"
-doitall "$PROMETHEUS_FULL_IMAGE"      "TEMPFILE"  "PROMETHEUS_"
-doitall "$CONFIGRELOAD_FULL_IMAGE"    "TEMPFILE"  "CONFIGRELOAD_"
-doitall "$GRAFANA_FULL_IMAGE"         "TEMPFILE"  "GRAFANA_"
-doitall "$GRAFANA_SIDECAR_FULL_IMAGE" "TEMPFILE"  "SIDECAR_"
+generateImageKeysFile "$PROMOP_FULL_IMAGE"          "monitoring/prom-operator_container_image.template"
+generateImageKeysFile "$ALERTMANAGER_FULL_IMAGE"    "$imageKeysFile"  "ALERTMANAGER_"
+generateImageKeysFile "$ADMWEBHOOK_FULL_IMAGE"      "$imageKeysFile"  "ADMWEBHOOK_"
+generateImageKeysFile "$KSM_FULL_IMAGE"             "$imageKeysFile"  "KSM_"
+generateImageKeysFile "$NODEXPORT_FULL_IMAGE"       "$imageKeysFile"  "NODEXPORT_"
+generateImageKeysFile "$PROMETHEUS_FULL_IMAGE"      "$imageKeysFile"  "PROMETHEUS_"
+generateImageKeysFile "$CONFIGRELOAD_FULL_IMAGE"    "$imageKeysFile"  "CONFIGRELOAD_"
+generateImageKeysFile "$GRAFANA_FULL_IMAGE"         "$imageKeysFile"  "GRAFANA_"
+generateImageKeysFile "$GRAFANA_SIDECAR_FULL_IMAGE" "$imageKeysFile"  "SIDECAR_"
 cat "$imageKeysFile"  #DEBUGGING-REMOVE
 echo " DDDDDDDD"      #DEBUGGING-REMOVE
 
@@ -288,7 +288,7 @@ if [ "$TRACING_ENABLE" == "true" ]; then
 
   ######
   echo " DDDDDDDD"      #DEBUGGING-REMOVE
-  doitall "$TEMPO_FULL_IMAGE" "monitoring/tempo_container_image.template"
+  generateImageKeysFile "$TEMPO_FULL_IMAGE" "monitoring/tempo_container_image.template"
   cat "$imageKeysFile"  #DEBUGGING-REMOVE
   echo " DDDDDDDD"      #DEBUGGING-REMOVE
 
