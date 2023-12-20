@@ -6,7 +6,7 @@
 # This script is not intended to be run directly
 # Assumes bin/common.sh has been sourced
 
-if [ ! $(which kubectl) ]; then
+if [ ! "$(which kubectl)" ]; then
   log_error "kubectl not found on the current PATH"
   exit 1
 fi
@@ -24,14 +24,14 @@ fi
 
 # SAS Viya 4 versions
 # supported by SAS Tech Support
-# Updated: 22NOV23
+# Updated: 19DEC23
 # 2022.09 LTS 1.21 1.24
 # 2023.03 LTS 1.23 1.25
 # 2023.10 LTS 1.25 1.27
-# 2023.08     1.24 1.26
 # 2023.09     1.25 1.27
 # 2023.10     1.25 1.27
 # 2023.11     1.25 1.27
+# 2023.12     1.25 1.27
 if [[ $KUBE_SERVER_VER =~ v1.2[1-9] ]]; then
   :
 else 
