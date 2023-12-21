@@ -256,7 +256,7 @@ export -f enable_pod_token_automount
 
 function parseFullImage {
    fullImage="$1"
-   unset REGISTRY REPOS IMAGE VERSION
+   unset REGISTRY REPOS IMAGE VERSION FULL_IMAGE_ESCAPED
 
    if [[ "$1" =~ (.*)\/(.*)\/(.*)\:(.*) ]]; then
 
@@ -264,6 +264,7 @@ function parseFullImage {
       REPOS="${BASH_REMATCH[2]}"
       IMAGE="${BASH_REMATCH[3]}"
       VERSION="${BASH_REMATCH[4]}"
+      FULL_IMAGE_ESCAPED="$REGISTRY\/$REPOS\/$IMAGE\:$VERSION"
       return 0
    else
       log_warn "Invalid value for full container image; does not fit expected pattern [$1]."
