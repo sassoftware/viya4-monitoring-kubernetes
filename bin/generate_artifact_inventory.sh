@@ -8,28 +8,27 @@
 #       important file documenting the container images and Helm
 #       charts used by the project.
 
-
 source bin/common.sh
 
 file="ARTIFACT_INVENTORY.md"
 template="ARTIFACT_INVENTORY.template"
 
-cp "$template"  "$file"
+cp "$template" "$file"
 
 function buildHelmArchiveFilename {
 
-  local prefix repo name version format chart_archive_filename
+   local prefix repo name version format chart_archive_filename
 
-  prefix=$1
-  repo="${prefix}_CHART_REPO"
-  name="${prefix}_CHART_NAME"
-  version="${prefix}_CHART_VERSION"
-  format="tgz"
-  chart_archive_filename="${!repo}\/${!name}-${!version}.$format"
-  v4m_replace     "__${prefix}_CHART_REPO__"     "${!repo}"                 "$file"
-  v4m_replace     "__${prefix}_CHART_NAME__"     "${!name}"                 "$file"
-  v4m_replace     "__${prefix}_CHART_VERSION__"  "${!version}"              "$file"
-  v4m_replace     "__${prefix}_CHART_ARCHIVE__"  "$chart_archive_filename"  "$file"
+   prefix=$1
+   repo="${prefix}_CHART_REPO"
+   name="${prefix}_CHART_NAME"
+   version="${prefix}_CHART_VERSION"
+   format="tgz"
+   chart_archive_filename="${!repo}\/${!name}-${!version}.$format"
+   v4m_replace "__${prefix}_CHART_REPO__" "${!repo}" "$file"
+   v4m_replace "__${prefix}_CHART_NAME__" "${!name}" "$file"
+   v4m_replace "__${prefix}_CHART_VERSION__" "${!version}" "$file"
+   v4m_replace "__${prefix}_CHART_ARCHIVE__" "$chart_archive_filename" "$file"
 
 }
 
@@ -42,95 +41,52 @@ buildHelmArchiveFilename "KUBE_PROM_STACK"
 buildHelmArchiveFilename "PUSHGATEWAY"
 buildHelmArchiveFilename "TEMPO"
 
+parseFullImage "$ALERTMANAGER_FULL_IMAGE"
+v4m_replace "__ALERTMANAGER_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage  "$ALERTMANAGER_FULL_IMAGE"
-v4m_replace	"__ALERTMANAGER_FULL_IMAGE__"  "$FULL_IMAGE_ESCAPED"      "$file"
+parseFullImage "$GRAFANA_FULL_IMAGE"
+v4m_replace "__GRAFANA_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$GRAFANA_FULL_IMAGE"
-v4m_replace	"__GRAFANA_FULL_IMAGE__"         "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$GRAFANA_SIDECAR_FULL_IMAGE"
+v4m_replace "__GRAFANA_SIDECAR_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$GRAFANA_SIDECAR_FULL_IMAGE"
-v4m_replace	"__GRAFANA_SIDECAR_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$ADMWEBHOOK_FULL_IMAGE"
+v4m_replace "__ADMWEBHOOK_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$ADMWEBHOOK_FULL_IMAGE"
-v4m_replace	"__ADMWEBHOOK_FULL_IMAGE__"      "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$KSM_FULL_IMAGE"
+v4m_replace "__KSM_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$KSM_FULL_IMAGE"
-v4m_replace	"__KSM_FULL_IMAGE__"             "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$NODEXPORT_FULL_IMAGE"
+v4m_replace "__NODEXPORT_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$NODEXPORT_FULL_IMAGE"
-v4m_replace	"__NODEXPORT_FULL_IMAGE__"       "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$PROMETHEUS_FULL_IMAGE"
+v4m_replace "__PROMETHEUS_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$PROMETHEUS_FULL_IMAGE"
-v4m_replace	"__PROMETHEUS_FULL_IMAGE__"      "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$PROMOP_FULL_IMAGE"
+v4m_replace "__PROMOP_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$PROMOP_FULL_IMAGE"
-v4m_replace	"__PROMOP_FULL_IMAGE__"          "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$CONFIGRELOAD_FULL_IMAGE"
+v4m_replace "__CONFIGRELOAD_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$CONFIGRELOAD_FULL_IMAGE"
-v4m_replace	"__CONFIGRELOAD_FULL_IMAGE__"    "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$FB_FULL_IMAGE"
+v4m_replace "__FB_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$FB_FULL_IMAGE"
-v4m_replace	"__FB_FULL_IMAGE__"              "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$OS_FULL_IMAGE"
+v4m_replace "__OS_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$OS_FULL_IMAGE"
-v4m_replace	"__OS_FULL_IMAGE__"              "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$OS_SYSCTL_FULL_IMAGE"
+v4m_replace "__OS_SYSCTL_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$OS_SYSCTL_FULL_IMAGE"
-v4m_replace	"__OS_SYSCTL_FULL_IMAGE__"       "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$OSD_FULL_IMAGE"
+v4m_replace "__OSD_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$OSD_FULL_IMAGE"
-v4m_replace	"__OSD_FULL_IMAGE__"             "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$ES_EXPORTER_FULL_IMAGE"
+v4m_replace "__ES_EXPORTER_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$ES_EXPORTER_FULL_IMAGE"
-v4m_replace	"__ES_EXPORTER_FULL_IMAGE__"     "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$TEMPO_FULL_IMAGE"
+v4m_replace "__TEMPO_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$TEMPO_FULL_IMAGE"
-v4m_replace	"__TEMPO_FULL_IMAGE__"           "$FULL_IMAGE_ESCAPED"    "$file"
+parseFullImage "$PUSHGATEWAY_FULL_IMAGE"
+v4m_replace "__PUSHGATEWAY_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage	"$PUSHGATEWAY_FULL_IMAGE"
-v4m_replace	"__PUSHGATEWAY_FULL_IMAGE__"     "$FULL_IMAGE_ESCAPED"    "$file"
-
-exit
-
-function buildHelmArchiveFilename {
-
-   unset REPOS CHART VERSION FULL_CHART_ESCAPED
-
-   REPOS="$1"
-   CHART="$2"
-   VERSION="$3"
-   CHART_ARCHIVE_FILENAME="$REPOS\/$IMAGE-$VERSION.$FORMAT"
-}
-
-buildHelmArchiveFilename "ESEXPORTER_HELM_CHART_REPO" "ESEXPORTER_HELM_CHART_NAME" "ESEXPORTER_HELM_CHART_VERSION"
-v4m_replace "__ESEXPORTER_HELM_ARCHIVE__" "$CHART_ARCHIVE_FILENAME"
-
-##BETTER: Only pass the PREFIX...everything else is figured out
-## buildHelmArchiveFilename "ESEXPORTER"
-function buildHelmArchiveFilename {
-
-  local prefix repo name version format
-
-  prefix=$1
-  repo="${prefix}_HELM_CHART_REPO"
-  name="${prefix}_HELM_CHART_NAME"
-  version="${prefix}_HELM_CHART_VERSION"
-  format="tgz"
-  echo "repo: $repo"
-  REPOS=${!repo}
-  CHART=${!name}
-  VERSION=${!version}
-  CHART_ARCHIVE_FILENAME="$REPOS\/$IMAGE-$VERSION.$FORMAT"
-  CHART_ARCHIVE_FILENAME2="${!repo}\/${!name}-${!version}.$format"
-
-  echo "C: $CHART_ARCHIVE_FILENAME"
-  echo "C: $CHART_ARCHIVE_FILENAME2"
-}
-
-
-
-
-
-
-
+log_notice "Be sure to review the generated file [$file] prior to adding/committing it to the repo"
