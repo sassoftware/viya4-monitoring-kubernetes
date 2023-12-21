@@ -8,12 +8,40 @@
 #       important file documenting the container images and Helm
 #       charts used by the project.
 
+
 source bin/common.sh
 
 file="ARTIFACT_INVENTORY.md"
 template="ARTIFACT_INVENTORY.template"
 
 cp "$template"  "$file"
+
+function buildHelmArchiveFilename {
+
+  local prefix repo name version format chart_archive_filename
+
+  prefix=$1
+  repo="${prefix}_CHART_REPO"
+  name="${prefix}_CHART_NAME"
+  version="${prefix}_CHART_VERSION"
+  format="tgz"
+  chart_archive_filename="${!repo}\/${!name}-${!version}.$format"
+  v4m_replace     "__${prefix}_CHART_REPO__"     "${!repo}"                 "$file"
+  v4m_replace     "__${prefix}_CHART_NAME__"     "${!name}"                 "$file"
+  v4m_replace     "__${prefix}_CHART_VERSION__"  "${!version}"              "$file"
+  v4m_replace     "__${prefix}_CHART_ARCHIVE__"  "$chart_archive_filename"  "$file"
+
+}
+
+buildHelmArchiveFilename "ESEXPORTER_HELM"
+buildHelmArchiveFilename "FLUENTBIT_HELM"
+buildHelmArchiveFilename "OPENSEARCH_HELM"
+buildHelmArchiveFilename "OSD_HELM"
+buildHelmArchiveFilename "OPENSHIFT_GRAFANA"
+buildHelmArchiveFilename "KUBE_PROM_STACK"
+buildHelmArchiveFilename "PUSHGATEWAY"
+buildHelmArchiveFilename "TEMPO"
+
 
 parseFullImage  "$ALERTMANAGER_FULL_IMAGE"
 v4m_replace	"__ALERTMANAGER_FULL_IMAGE__"  "$FULL_IMAGE_ESCAPED"      "$file"
@@ -62,3 +90,47 @@ v4m_replace	"__TEMPO_FULL_IMAGE__"           "$FULL_IMAGE_ESCAPED"    "$file"
 
 parseFullImage	"$PUSHGATEWAY_FULL_IMAGE"
 v4m_replace	"__PUSHGATEWAY_FULL_IMAGE__"     "$FULL_IMAGE_ESCAPED"    "$file"
+
+exit
+
+function buildHelmArchiveFilename {
+
+   unset REPOS CHART VERSION FULL_CHART_ESCAPED
+
+   REPOS="$1"
+   CHART="$2"
+   VERSION="$3"
+   CHART_ARCHIVE_FILENAME="$REPOS\/$IMAGE-$VERSION.$FORMAT"
+}
+
+buildHelmArchiveFilename "ESEXPORTER_HELM_CHART_REPO" "ESEXPORTER_HELM_CHART_NAME" "ESEXPORTER_HELM_CHART_VERSION"
+v4m_replace "__ESEXPORTER_HELM_ARCHIVE__" "$CHART_ARCHIVE_FILENAME"
+
+##BETTER: Only pass the PREFIX...everything else is figured out
+## buildHelmArchiveFilename "ESEXPORTER"
+function buildHelmArchiveFilename {
+
+  local prefix repo name version format
+
+  prefix=$1
+  repo="${prefix}_HELM_CHART_REPO"
+  name="${prefix}_HELM_CHART_NAME"
+  version="${prefix}_HELM_CHART_VERSION"
+  format="tgz"
+  echo "repo: $repo"
+  REPOS=${!repo}
+  CHART=${!name}
+  VERSION=${!version}
+  CHART_ARCHIVE_FILENAME="$REPOS\/$IMAGE-$VERSION.$FORMAT"
+  CHART_ARCHIVE_FILENAME2="${!repo}\/${!name}-${!version}.$format"
+
+  echo "C: $CHART_ARCHIVE_FILENAME"
+  echo "C: $CHART_ARCHIVE_FILENAME2"
+}
+
+
+
+
+
+
+
