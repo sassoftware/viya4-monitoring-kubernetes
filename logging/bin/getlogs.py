@@ -51,11 +51,11 @@ def validate_input(checkInput):
         
         safe_dir = os.getcwd() ## Check for path traversal attack
         if os.path.commonprefix((os.path.realpath(checkInput['out-filename']),safe_dir)) != safe_dir:
-            print("Error: Path traversal in out-filename not allowed.")
+            print("Error: Out-file path must be in same working directory as getlogs.")
             sys.exit()
 
         try:
-            x = open(args['out-filename'], 'w')   
+            x = open(checkInput['out-filename'], 'w')   
             x.close() 
         except FileNotFoundError as e:
             print("Error: Output file path not found. Please verify output file path. ")
@@ -73,7 +73,7 @@ def validate_input(checkInput):
     if checkInput['query-filename']: ##Use for plugging in queries
         safe_dir = os.getcwd() ## Check for path traversal attack
         if os.path.commonprefix((os.path.realpath(checkInput['query-filename']),safe_dir)) != safe_dir:
-            print("Error: Path traversal in query-filename not allowed.")
+            print("Error: Query file must be from the same working directory as getlogs.")
             sys.exit()
 
         if (not os.path.isfile(checkInput['query-filename'])):
@@ -158,7 +158,7 @@ def build_query(args):
         temp.write('], "minimum_should_match": ' + str(argcounter))
         for argname in args.keys(): ##Must Not Clause, only added if specified by user
             if (("kube" in argname or "level" in argname or "log" in argname) and args[argname] and argname.find('-ex')>-1):
-                name = arg[0:argname.find('-')]
+                name = argname[0:argname.find('-')]
                 if (first == True):
                     temp.write(', "must_not": [')
                     first = False
@@ -222,7 +222,7 @@ def get_arguments():
     parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Displays the actual query that will be submitted during execution.\n\n")
     parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (without filetype) in which to save the generated query. Query is saved as JSON file in current working directory.\n\n")
     parser.add_argument('-o', '--out-file', required=False, dest="out-filename",  nargs='*', metavar="FILENAME", help = "\nName of file to write results to. Filetype is specified using -format. Supported filetypes: .csv, .json\n\n")
-    parser.add_argument('-fo','--format',  required=False, dest="format", default = "csv", help = "\n Formats results into the specified file (from --out-file). If no output file is provided, results will be outputted to STDOUT. Supported formats for console output are json and csv. \n\n")
+    parser.add_argument('-fo','--format',  required=False, dest="format", default = "csv", choices = ['json', 'csv'], help = "\n Formats results into the specified file (from --out-file). If no output file is provided, results will be outputted to STDOUT. Supported formats for console output are json and csv. \n\n")
     parser.add_argument('-f','--force',  required=False, dest="force", action= "store_true", help = "\n If this option is provided, the output results file from --out-file will be overwritten if it already exists.\n\n")
     parser.add_argument('-fi','--fields',  required=False, dest="fields", nargs="*", metavar= "FIELDS", default=['@timestamp', 'level', 'kube.pod', 'message'], help = "\n Specify desired output columns from query. If a matching log is returned that does not have the specified field, a NULL value will be used as a placeholder. \n Default fields: @timestamp level kube.pod message \n Additional arguments: kube.host, properties.appname \n\n")
     parser.add_argument('-st', '--start', required=False, dest="dateTimeStart", nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime(time.localtime()) - 3600)), help = "\nDatetime for start of period for which logs are sought (default: 1 hour ago). Correct format is Y-M-D H:M:S. Ex: 2023-02-16 10:00:00\n\n")
@@ -241,8 +241,9 @@ def get_arguments():
 def main():
 
     args = get_arguments() ##Creates "args" dictionary that contains all user submitted options. Print "args" to debug values. Note that the 'dest' value for each argument in argparser object is its key.
-    validate_input(args)
-    if args['portforward']:
+    validate_input(args) ##Pass args dictionary for input validation
+
+    if args['portforward']: ##Modify connection settings if port forward is selected
         args['host'] = 'localhost'
         args['port'] = open_port()
 
@@ -276,7 +277,7 @@ def main():
             with open(squery, "w") as outfile:
                 outfile.write(x)
         else:
-            print("Error: Path traversal in save-query not allowed.")
+            print("Error: Saved query must be written to current working directory.")
             sys.exit()
         print("\nQuery saved to " + args['savequery'])
         
@@ -307,7 +308,7 @@ def main():
         # deepcode ignore PT: <Path traversal detection for out-filename already implemented on line 42>
         x = open(args['out-filename'], 'w')
 
-    hitsList = [] ##Check to see if any fields matched user provided fields, collect matching fields
+    hitsList = [] ##Check to see if any fields in response matched user provided fields, collect matching fields
     for hit in response['hits']['hits']:
         try:
             hit['fields']['id'] = hit['_id']
@@ -326,7 +327,7 @@ def main():
         print("Error: No fields matched provided fieldnames. Please verify the field on OpenSearch-dashboards.\n")
         sys.exit()
 
-    ##Output as proper filetype
+    ##Output as proper filetype, JSON or CSV
     if("json" in args['format']): ##JSON formatter, uses json.dump to print to stdout or file
         if (not stdout):
             with x as outfile:
