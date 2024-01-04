@@ -42,8 +42,6 @@ def validate_input(checkInput):
         if(type(checkInput['out-filename']) == list):
             checkInput['out-filename']= " ".join(checkInput['out-filename'])
 
-        checkInput['out-filename'] = checkInput['out-filename'] + "." + checkInput['format'] ## Add format to file
-
         if os.path.isfile(checkInput['out-filename']): ##Check if file already exists
             if (checkInput['force'] == False):
                 print("\nUser specified output file already exists. Use -f to overwrite the file.\n")
@@ -51,7 +49,7 @@ def validate_input(checkInput):
         
         safe_dir = os.getcwd() ## Check for path traversal attack
         if os.path.commonprefix((os.path.realpath(checkInput['out-filename']),safe_dir)) != safe_dir:
-            print("Error: Out-file path must be in same working directory as getlogs.")
+            print("Error: Out-file path must be in the current working directory.")
             sys.exit()
 
         try:
@@ -73,7 +71,7 @@ def validate_input(checkInput):
     if checkInput['query-filename']: ##Use for plugging in queries
         safe_dir = os.getcwd() ## Check for path traversal attack
         if os.path.commonprefix((os.path.realpath(checkInput['query-filename']),safe_dir)) != safe_dir:
-            print("Error: Query file must be from the same working directory as getlogs.")
+            print("Error: Query file must be from the current working directory.")
             sys.exit()
 
         if (not os.path.isfile(checkInput['query-filename'])):
@@ -221,8 +219,8 @@ def get_arguments():
     parser.add_argument('-q', '--query-file ', required=False, dest="query-filename", metavar="FILENAME.*", help = "\n Filepath of existing saved query in current working directory. Program will submit query from file, ALL other query parmeters ignored. Supported filetypes: .txt, .json\n\n")
     parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Displays the actual query that will be submitted during execution.\n\n")
     parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (without filetype) in which to save the generated query. Query is saved as JSON file in current working directory.\n\n")
-    parser.add_argument('-o', '--out-file', required=False, dest="out-filename",  nargs='*', metavar="FILENAME", help = "\nName of file to write results to. Filetype is specified using -format. Supported filetypes: .csv, .json\n\n")
-    parser.add_argument('-fo','--format',  required=False, dest="format", default = "csv", choices = ['json', 'csv'], help = "\n Formats results into the specified file (from --out-file). If no output file is provided, results will be outputted to STDOUT. Supported formats for console output are json and csv. \n\n")
+    parser.add_argument('-o', '--out-file', required=False, dest="out-filename",  nargs='*', metavar="FILENAME", help = "\nName of file to write results to. If no output file is provided, results will be outputted to STDOUT. \n\n")
+    parser.add_argument('-fo','--format',  required=False, dest="format", default = "csv", choices = ['json', 'csv'], help = "\n Determines the output format for the returned log messages. Supported formats for output are json and csv. \n\n")
     parser.add_argument('-f','--force',  required=False, dest="force", action= "store_true", help = "\n If this option is provided, the output results file from --out-file will be overwritten if it already exists.\n\n")
     parser.add_argument('-fi','--fields',  required=False, dest="fields", nargs="*", metavar= "FIELDS", default=['@timestamp', 'level', 'kube.pod', 'message'], help = "\n Specify desired output columns from query. If a matching log is returned that does not have the specified field, a NULL value will be used as a placeholder. ID is a default field for every log, so it does not need to be specified as a field. \n Default fields: @timestamp level kube.pod message ID\n\n")
     parser.add_argument('-st', '--start', required=False, dest="dateTimeStart", nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime(time.localtime()) - 3600)), help = "\nDatetime for start of period for which logs are sought (default: 1 hour ago). Correct format is Y-M-D H:M:S. Ex: 2023-02-16 10:00:00\n\n")
@@ -311,7 +309,7 @@ def main():
     hitsList = [] ##Check to see if any fields in response matched user provided fields, collect matching fields
     for hit in response['hits']['hits']:
         try:
-            hit['fields']['id'] = hit['_id']
+            hit['fields']['ID'] = hit['_id']
             hitsList.append(hit['fields'])
         except KeyError as e:
             next
@@ -332,14 +330,14 @@ def main():
         if (not stdout):
             with x as outfile:
                 # deepcode ignore PT: <Same as before, Path traversal for outfile is checked on line 42>
-                json.dump(json.loads(hitsList), outfile, sort_keys=True, indent=2)
+                json.dump(hitsList, outfile, sort_keys=True, indent=2)
             print("Search complete. Results printed to " + args['out-filename'])
         else:
             print("Search complete.")
             sys.stdout.write(json.dumps(hitsList, sort_keys=True, indent=2))
 
     elif("csv" in args['format']): ##CSV writer implemented using dictwriter
-        args['fields'].append("id")
+        args['fields'].append("ID")
 
         if (not stdout):
             with x as csvfile:
