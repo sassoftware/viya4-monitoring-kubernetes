@@ -315,6 +315,7 @@ def main():
     hitsList = [] ##Check to see if any fields in response matched user provided fields, collect matching fields
     for hit in response['hits']['hits']:
         try:
+            hit['fields']['_id'] = hit['_id']
             hitsList.append(hit['fields'])
         except KeyError as e:
             next
