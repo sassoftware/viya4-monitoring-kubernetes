@@ -33,7 +33,7 @@ def validate_input(checkInput):
 
     ##Check for existence of Connection Settings in input dictionary
     if(not checkInput['userName'] or not checkInput['password'] or not checkInput['host'] or not checkInput['port']):
-        print('\nError: Missing required connection settings. Please specify username, password, host, and port. \nDefault values can be manually exported as environment variables ESHOST, ESPORT, ESUSER, ESPASSWD \nTo port-forward and skip ESHOST and ESPORT, use -pf')
+        print('\nError: Missing required connection settings. Please specify username, password, host, and port. \nDefault values can be manually exported as environment variables OSHOST, OSPORT, OSUSER, OSPASSWD \nTo port-forward and skip OSHOST and OSPORT, use -pf')
         print("Username:", checkInput['userName'], " Password:", checkInput['password'], " Host:", checkInput['host'], " Port:", checkInput['port'])
         sys.exit()
 
@@ -130,6 +130,7 @@ def build_query(args):
     """Generates Query using Opensearch DSL"""
     """Takes arguments from user and returns a JSON-format query to pass to OpenSearch API"""
     first = True 
+    sourcerequested = False
     argcounter=0    ##Counts unique options entered by user, sets min_match to this number
     if (not args['query-filename']):  
         tfile = tempfile.NamedTemporaryFile(delete = False)  ##If User has not specified query file, create temp file for one.
@@ -171,11 +172,16 @@ def build_query(args):
         temp.write('} },')
         temp.write(' "fields": [') ## Add fields param
         for i in range(len(args['fields'])):
+            if args['fields'][i]=="_source":
+               sourcerequested=True
             if i < len(args['fields']) - 1:
                 temp.write('"' + args['fields'][i] + '",' )
             else:
                temp.write('"' + args['fields'][i] + '"],' )
-        temp.write('"_source": {"excludes": [] } }')
+        if (sourcerequested==True):
+           temp.write('"_source": {"excludes": [] } }')
+        else:
+           temp.write('"_source": false }')
         temp.close()
        
         temp = open(tfile.name, 'r')
@@ -194,7 +200,7 @@ def get_arguments():
     """List of valid arguments that are read from user as soon as program is run, nargs=+ indicates that argument takes multiple whitespace separated values. """
    
     parser = argparse.ArgumentParser(prog='getLogs.py', usage='\n%(prog)s [options]', description="""This program generates OpenSearch DSL Queries from user specified parameters, and submits them to a database to retrieve logs. The flags below provide specifications for your Query, and can be placed in any order. \n
-    \033[1m NOTES: *All default values for username, password, host, and port, are derived from the ENV variables ESUSER, ESPASSWD, ESHOST, ESPORT in that respective order. '\033[0m' \n
+    \033[1m NOTES: *All default values for username, password, host, and port, are derived from the ENV variables OSUSER, OSPASSWD, OSHOST, OSPORT in that respective order. '\033[0m' \n
     \033[1m If you have default connections set in your environment variables, you can call this program without arguments and get the latest 10 logs from the target API in the default CSV format.  \033[0m \n
     Getlogs has a default set of fields that runs with every query (seen below). You can replace the default fields with your own space-separated set of fields using --fields. Ex: --fields kube.labels.sas_com/deployment properties.appname \n
     *The NAMESPACE*, POD*, CONTAINER*, LOGSOURCE* and LEVEL* options accept multiple, space-separated, values (e.g. --level INFO NONE). Please refrain from passing single quotes ('') into arguments. \n  
@@ -222,17 +228,17 @@ def get_arguments():
     parser.add_argument('-o', '--out-file', required=False, dest="out-filename",  nargs='*', metavar="FILENAME", help = "\nName of file to write results to. If no output file is provided, results will be outputted to STDOUT. \n\n")
     parser.add_argument('-fo','--format',  required=False, dest="format", default = "csv", choices = ['json', 'csv'], help = "\n Determines the output format for the returned log messages. Supported formats for output are json and csv. \n\n")
     parser.add_argument('-f','--force',  required=False, dest="force", action= "store_true", help = "\n If this option is provided, the output results file from --out-file will be overwritten if it already exists.\n\n")
-    parser.add_argument('-fi','--fields',  required=False, dest="fields", nargs="*", metavar= "FIELDS", default=['@timestamp', 'level', 'kube.pod', 'message'], help = "\n Specify desired output columns from query. If a matching log is returned that does not have the specified field, a NULL value will be used as a placeholder. ID is a default field for every log, so it does not need to be specified as a field. \n Default fields: @timestamp level kube.pod message ID\n\n")
+    parser.add_argument('-fi','--fields',  required=False, dest="fields", nargs="*", metavar= "FIELDS", default=['@timestamp', 'level', 'kube.pod', 'message'], help = "\n Specify desired output columns from query. If a matching log is returned that does not have the specified field, a NULL value will be used as a placeholder. The _id field is always provided for every log message. \n Default fields: @timestamp level kube.pod message _id\n\n")
     parser.add_argument('-st', '--start', required=False, dest="dateTimeStart", nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime(time.localtime()) - 3600)), help = "\nDatetime for start of period for which logs are sought (default: 1 hour ago). Correct format is Y-M-D H:M:S. Ex: 2023-02-16 10:00:00\n\n")
     parser.add_argument('-en', '--end', required=False, dest="dateTimeEnd",nargs='*', metavar="DATETIME",  default = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), help = "\nDatetime for end of period for which logs are sought (default: now). \n\n\n \t\t\t CONNECTION SETTINGS: \n\n")
     
     parser.add_argument('-i', '--index', required=False, dest="index", metavar="INDEX", default="viya_logs-*") ## help = "\nDetermine which index to perform the search in. Default: viya-logs-*\n\n
     ##Connection settings
-    parser.add_argument('-pf','--port-forward', required=False, dest="portforward", action = 'store_true', help = "\n If this option is provided, getlogs will use the value in your KUBECONFIG (case-sensitive) environment variable to port-forward and connect to the OpenSearch API. This skips ESHOST and ESPORT, but ESUSER and ESPASSWD are stil required to authenticate and connect to the database. \n\n")
-    parser.add_argument('-us','--user',  required=False, dest="userName", default=os.environ.get("ESUSER"), help = "\nUsername for connecting to OpenSearch (default: $ESUSER)\n\n")
-    parser.add_argument('-pw', '--password', required=False,  dest="password", default=os.environ.get("ESPASSWD"), help = "\nPassword for connecting to OpenSearch  (default: $ESPASSWD)\n\n")
-    parser.add_argument('-ho', '--host', required=False,  dest="host", default=os.environ.get("ESHOST"), help = "\nHostname for connection to OpenSearch Please ensure that host does not contain 'https://' (default: $ESHOST)\n\n")
-    parser.add_argument('-po', '--port', required=False,  dest="port", default=os.environ.get("ESPORT"), help = "\nPort number for connection to OpenSearch (default: $ESPORT)\n\n")
+    parser.add_argument('-pf','--port-forward', required=False, dest="portforward", action = 'store_true', help = "\n If this option is provided, getlogs will use the value in your KUBECONFIG (case-sensitive) environment variable to port-forward and connect to the OpenSearch API. This skips OSHOST and OSPORT, but OSUSER and OSPASSWD are stil required to authenticate and connect to the database. \n\n")
+    parser.add_argument('-us','--user',  required=False, dest="userName", default=os.environ.get("OSUSER"), help = "\nUsername for connecting to OpenSearch (default: $OSUSER)\n\n")
+    parser.add_argument('-pw', '--password', required=False,  dest="password", default=os.environ.get("OSPASSWD"), help = "\nPassword for connecting to OpenSearch  (default: $OSPASSWD)\n\n")
+    parser.add_argument('-ho', '--host', required=False,  dest="host", default=os.environ.get("OSHOST"), help = "\nHostname for connection to OpenSearch Please ensure that host does not contain 'https://' (default: $OSHOST)\n\n")
+    parser.add_argument('-po', '--port', required=False,  dest="port", default=os.environ.get("OSPORT"), help = "\nPort number for connection to OpenSearch (default: $OSPORT)\n\n")
     parser.add_argument('-nossl', '--disable-ssl', required=False, dest = "ssl", action= "store_false", help = "\n If this option is provided, SSL will not be used to connect to the database.\n\n")
     return parser.parse_args().__dict__
 
@@ -309,7 +315,7 @@ def main():
     hitsList = [] ##Check to see if any fields in response matched user provided fields, collect matching fields
     for hit in response['hits']['hits']:
         try:
-            hit['fields']['ID'] = hit['_id']
+            hit['fields']['_id'] = hit['_id']
             hitsList.append(hit['fields'])
         except KeyError as e:
             next
@@ -322,7 +328,7 @@ def main():
                 fieldDict[field] = ''.join(fieldDict[field])
 
     if (len(hitsList) == 0):
-        print("Error: No fields matched provided fieldnames. Please verify the field on OpenSearch-dashboards.\n")
+        print("Error: No fields matched provided fieldnames. Please verify the field on OpenSearch Dashboards.\n")
         sys.exit()
 
     ##Output as proper filetype, JSON or CSV
@@ -337,7 +343,7 @@ def main():
             sys.stdout.write(json.dumps(hitsList, sort_keys=True, indent=2))
 
     elif("csv" in args['format']): ##CSV writer implemented using dictwriter
-        args['fields'].append("ID")
+        args['fields'].append("_id")
 
         if (not stdout):
             with x as csvfile:

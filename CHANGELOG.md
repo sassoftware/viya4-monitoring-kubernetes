@@ -5,6 +5,11 @@
 * **Metrics**
   * [CHANGE] The KubeHpaMaxedOut alert has (effectively) been renamed KubeHpaMaxedOutMultiPod
 
+* **Logging**
+  * [FEATURE] The getlogs.py utility for exporting logs via the command line has been moved to "production"
+from "experimental" status.  Documentation for this optional Python-based tool is available in the 
+[SAS Viya Monitoring for Kubernetes Help Center](https://documentation.sas.com/?docsetId=obsrvdply&docsetVersion=latest&docsetTarget=p1wdkgnu7dp791n1h9xfyh68ltnt.htm).
+
 ## Version 1.2.20 (12DEC2023)
 
 * **Metrics**
