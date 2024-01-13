@@ -122,17 +122,19 @@ helm2ReleaseCheck es-exporter-$LOG_NS
 ## Get Helm Chart Name
 log_debug "Elasticsearch Exporter Helm Chart: repo [$ESEXPORTER_HELM_CHART_REPO] name [$ESEXPORTER_HELM_CHART_NAME] version [$ESEXPORTER_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference $ESEXPORTER_HELM_CHART_REPO $ESEXPORTER_HELM_CHART_NAME $ESEXPORTER_HELM_CHART_VERSION)"
+versionstring="$(get_helm_versionstring  $ESEXPORTER_HELM_CHART_VERSION)"
+
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 helm $helmDebug upgrade --install es-exporter \
  --namespace $LOG_NS \
- --version $ESEXPORTER_HELM_CHART_VERSION \
  -f $imageKeysFile \
  -f $primaryValuesFile \
  -f $wnpValuesFile \
  -f $openshiftValuesFile \
  -f $ES_OPEN_EXPORTER_USER_YAML \
  --set fullnameOverride=v4m-es-exporter  \
+ $versionstring \
  $chart2install
 
 log_info "Elasticsearch metric exporter has been deployed"

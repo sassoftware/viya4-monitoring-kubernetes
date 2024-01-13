@@ -327,13 +327,13 @@ fi
 # Get Helm Chart Name
 log_debug "OpenSearch Helm Chart: repo [$OPENSEARCH_HELM_CHART_REPO] name [$OPENSEARCH_HELM_CHART_NAME] version [$OPENSEARCH_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference $OPENSEARCH_HELM_CHART_REPO $OPENSEARCH_HELM_CHART_NAME $OPENSEARCH_HELM_CHART_VERSION)"
+versionstring="$(get_helm_versionstring  $OPENSEARCH_HELM_CHART_VERSION)"
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 
 # Deploy OpenSearch via Helm chart
 # NOTE: nodeGroup needed to get resource names we want
 helm $helmDebug upgrade --install opensearch \
-    --version $OPENSEARCH_HELM_CHART_VERSION \
     --namespace $LOG_NS \
     --values "$imageKeysFile" \
     --values logging/opensearch/opensearch_helm_values.yaml \
@@ -343,6 +343,7 @@ helm $helmDebug upgrade --install opensearch \
     --set nodeGroup=primary  \
     --set masterService=v4m-search \
     --set fullnameOverride=v4m-search \
+    $versionstring \
     $chart2install
 
 # ODFE => OpenSearch Migration
@@ -352,7 +353,6 @@ if [ "$deploy_temp_masters" == "true" ]; then
    #      was created during prior Helm chart deployment
    log_debug "Upgrade from ODFE to OpenSearch detected; creating temporary master-only nodes."
    helm $helmDebug upgrade --install opensearch-master \
-       --version $OPENSEARCH_HELM_CHART_VERSION \
        --namespace $LOG_NS \
        --values logging/opensearch/opensearch_helm_values.yaml \
        --values "$imageKeysFile" \
@@ -366,6 +366,7 @@ if [ "$deploy_temp_masters" == "true" ]; then
        --set rbac.create=false \
        --set masterService=v4m-search \
        --set fullnameOverride=v4m-master \
+       $versionstring \
        $chart2install
 fi
 

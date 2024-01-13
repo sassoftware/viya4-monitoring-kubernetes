@@ -145,11 +145,13 @@ fi
 # Get Helm Chart Name
 log_debug "OpenSearch Dashboards Helm Chart: repo [$OSD_HELM_CHART_REPO] name [$OSD_HELM_CHART_NAME] version [$OSD_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference $OSD_HELM_CHART_REPO $OSD_HELM_CHART_NAME $OSD_HELM_CHART_VERSION)"
+versionstring="$(get_helm_versionstring  $OSD_HELM_CHART_VERSION)"
+
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Deploy Elasticsearch via Helm chart
 helm $helmDebug upgrade --install v4m-osd \
-    --version $OSD_HELM_CHART_VERSION \
+    $versionstring \
     --namespace $LOG_NS \
     --values "$imageKeysFile" \
     --values logging/opensearch/osd_helm_values.yaml \

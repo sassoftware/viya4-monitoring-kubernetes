@@ -93,11 +93,12 @@ echo " DDDDDDDD"      #DEBUGGING-REMOVE
    ## Get Helm Chart Name
    log_debug "Prometheus Pushgateway Helm Chart: repo [$PUSHGATEWAY_CHART_REPO] name [$PUSHGATEWAY_CHART_NAME] version [$PUSHGATEWAY_CHART_VERSION]"
    chart2install="$(get_helmchart_reference $PUSHGATEWAY_CHART_REPO $PUSHGATEWAY_CHART_NAME $PUSHGATEWAY_CHART_VERSION)"
+   versionstring="$(get_helm_versionstring  $PUSHGATEWAY_CHART_VERSION)"
    log_debug "Installing Helm chart from artifact [$chart2install]"
 
    helm $helmDebug upgrade --install prometheus-pushgateway \
         --namespace $VIYA_NS \
-        --version $PUSHGATEWAY_CHART_VERSION \
+         $versionstring \
         --set service.clusterIP=$svcClusterIP \
         -f $imageKeysFile \
         -f monitoring/values-pushgateway.yaml \

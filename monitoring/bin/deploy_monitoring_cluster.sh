@@ -222,6 +222,7 @@ fi
 # Get Helm Chart Name
 log_debug "Kube-Prometheus Stack Helm Chart: repo [$KUBE_PROM_STACK_CHART_REPO] name [$KUBE_PROM_STACK_CHART_NAME] version [$KUBE_PROM_STACK_CHART_VERSION]"
 chart2install="$(get_helmchart_reference $KUBE_PROM_STACK_CHART_REPO $KUBE_PROM_STACK_CHART_NAME $KUBE_PROM_STACK_CHART_VERSION)"
+versionstring="$(get_helm_versionstring  $KUBE_PROM_STACK_CHART_VERSION)"
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 helm $helmDebug upgrade --install $promRelease \
@@ -244,7 +245,7 @@ helm $helmDebug upgrade --install $promRelease \
   --set grafana.fullnameOverride=$promName-grafana \
   --set grafana.adminPassword="$grafanaPwd" \
   --set prometheus.prometheusSpec.alertingEndpoints[0].namespace="$MON_NS" \
-  --version $KUBE_PROM_STACK_CHART_VERSION \
+  $versionstring \
   $chart2install
 
 sleep 2
@@ -299,6 +300,7 @@ if [ "$TRACING_ENABLE" == "true" ]; then
   # Get Helm Chart Name
   log_debug "Tempo Helm Chart: repo [$TEMPO_CHART_REPO] name [$TEMPO_CHART_NAME] version [$TEMPO_CHART_VERSION]"
   chart2install="$(get_helmchart_reference $TEMPO_CHART_REPO $TEMPO_CHART_NAME $TEMPO_CHART_VERSION)"
+  versionstring="$(get_helm_versionstring  $TEMPO_CHART_VERSION)"
   log_debug "Installing Helm chart from artifact [$chart2install]"
 
   log_info "Installing tempo"
@@ -307,7 +309,7 @@ if [ "$TRACING_ENABLE" == "true" ]; then
     -f $imageKeysFile \
     -f monitoring/values-tempo.yaml \
     -f "$TEMPO_USER_YAML" \
-    --version "$TEMPO_CHART_VERSION" \
+    $versionstring \
     $chart2install
 fi
 

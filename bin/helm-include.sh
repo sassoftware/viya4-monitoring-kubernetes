@@ -119,10 +119,20 @@ function get_helmchart_reference {
       echo "${chart_repository}/${chart_name}"
   fi
 }
-
+function get_helm_versionstring {
+    unset versionstring
+    chart_version=$3
+    if [ "$V4M_HELM_USE_LATEST"  == "true" ]; then
+       :  # return null string
+    else
+       versionstring="--version $chart_version"
+    fi
+    echo "$versionstring"
+}
 export HELM_VER_FULL HELM_VER_MAJOR HELM_VER_MINOR HELM_VER_PATCH
 export -f helm2ReleaseExists
 export -f helm3ReleaseExists
 export -f helm2ReleaseCheck
 export -f helmRepoAdd
 export -f get_helmchart_reference
+export -f get_helm_versionstring

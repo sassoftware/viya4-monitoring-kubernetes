@@ -105,11 +105,13 @@ fi
 ## Get Helm Chart Name
 log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference $FLUENTBIT_HELM_CHART_REPO $FLUENTBIT_HELM_CHART_NAME $FLUENTBIT_HELM_CHART_VERSION)"
+versionstring="$(get_helm_versionstring  $FLUENTBIT_HELM_CHART_VERSION)"
+
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb-events  \
-  --version $FLUENTBIT_HELM_CHART_VERSION \
+  $versionstring \
   --values $imageKeysFile \
   --values logging/fb/fluent-bit_helm_values_events.yaml  \
   --values $openshiftValuesFile \
