@@ -121,7 +121,7 @@ function get_helmchart_reference {
 }
 function get_helm_versionstring {
     unset versionstring
-    chart_version=$3
+    chart_version=$1
     if [ "$V4M_HELM_USE_LATEST"  == "true" ]; then
        :  # return null string
     else
