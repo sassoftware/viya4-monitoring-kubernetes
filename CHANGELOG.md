@@ -1,9 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.21 (17JAN2024)
 
 * **Metrics**
   * [CHANGE] The KubeHpaMaxedOut alert has (effectively) been renamed KubeHpaMaxedOutMultiPod
+  * [REMOVAL] Removed the Elasticsearch serviceMonitor from SAS Viya metric monitoring deployment.
 
 * **Logging**
   * [FEATURE] The getlogs.py utility for exporting logs via the command line has been moved to "production"
