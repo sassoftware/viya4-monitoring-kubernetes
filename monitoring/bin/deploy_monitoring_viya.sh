@@ -67,20 +67,11 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
 
       # Check for the image pull secret for the air gap environment and replace placeholders
       checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$VIYA_NS"
-###      replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-pushgateway.yaml"
-
-###      airgapValuesFile=$updatedAirgapValuesFile
-###   else
-###      airgapValuesFile=$TMP_DIR/empty.yaml
    fi
 
 
-######
-echo " DDDDDDDD"      #DEBUGGING-REMOVE
-generateImageKeysFile "$PUSHGATEWAY_FULL_IMAGE" "monitoring/pushgateway_container_image.template"
-cat "$imageKeysFile"  #DEBUGGING-REMOVE
-echo " DDDDDDDD"      #DEBUGGING-REMOVE
-
+   #Generate yaml file with all container-related keys
+   generateImageKeysFile "$PUSHGATEWAY_FULL_IMAGE" "monitoring/pushgateway_container_image.template"
 
    if helm3ReleaseExists prometheus-pushgateway $VIYA_NS; then
       kubectl delete deployment -n $VIYA_NS prometheus-pushgateway --ignore-not-found

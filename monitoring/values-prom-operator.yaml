@@ -9,6 +9,20 @@
 # Default Values
 # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
 
+
+## NOTE: All image.*, imagePullSecrets and related keys now derived from environment variables and generated at run-time (DO NOT SET HERE)
+##       See monitoring/prom-operator_container_image.template for complete list
+###global:
+###  imageRegistry: foo
+###  imagePullSecrets: foo
+###prometheusOperator:
+###  image:
+###    registry: foo
+###    repository: foo
+###    tag: foo
+###    pullPolicy: foo
+
+
 commonLabels:
   sas.com/monitoring-base: kube-viya-monitoring
 
@@ -17,10 +31,7 @@ commonLabels:
 # ===================
 # https://github.com/coreos/prometheus-operator
 prometheusOperator:
-###  image:
-###  #  registry: quay.io
-###  #  repository: prometheus-operator/prometheus-operator
-###    tag: v0.69.1
+###  image:   # See NOTE at top of file
   logFormat: json
   logLevel: info
   createCustomResource: false
@@ -36,11 +47,8 @@ prometheusOperator:
       requests:
         cpu: "50m"
         memory: "25Mi"
-###  prometheusConfigReloader:
-###    image:
-###    #  registry: quay.io
-###    #  repository: prometheus-operator/prometheus-config-reloader
-###      tag: v0.69.1
+  #prometheusConfigReloader:
+  # image:   # See NOTE at top of file
 
 # ======================
 # kubelet ServiceMonitor
@@ -65,8 +73,7 @@ kubeStateMetrics:
 # https://github.com/kubernetes/kube-state-metrics
 # https://github.com/helm/charts/tree/master/stable/kube-state-metrics
 kube-state-metrics:
-###  image:
-###    tag: v2.10.0
+  #image:   # See NOTE at top of file
   resources:
     requests:
       cpu: "25m"
@@ -86,8 +93,7 @@ prometheus:
     type: ClusterIP
     nodePort: null  
   prometheusSpec:
-###    image:
-###      tag: v2.47.1
+    #image:   # See NOTE at top of file
     logLevel: info
     logFormat: json
     podAntiAffinity: soft
@@ -126,8 +132,7 @@ alertmanager:
     type: ClusterIP
     nodePort: null
   alertmanagerSpec:
-###    image:
-###      tag: v0.26.0
+    #image: # See NOTE at top of file
     logFormat: json
     podAntiAffinity: soft
     retention: 240h
@@ -150,10 +155,7 @@ alertmanager:
 # https://github.com/prometheus/node_exporter
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
 prometheus-node-exporter:
-###  image:
-###  #  registry: quay.io
-###  #  repository: prometheus/node-exporter
-###    tag: v1.7.0
+  #image:  # See NOTE at top of file
   service:
     # Override the default port of 9100 to avoid potential conflicts
     port: 9110
@@ -183,8 +185,7 @@ prometheus-node-exporter:
 # =======
 # https://github.com/grafana/helm-charts/tree/main/charts/grafana
 grafana:
-###  image:
-###    tag: 10.2.1
+  #image: See NOTE at top of file
   initChownData:
     enabled: false
   "grafana.ini":
@@ -219,10 +220,7 @@ grafana:
       requests:
         cpu: "50m"
         memory: "100Mi"
-###    image:
-###    #  registry: quay.io
-###    #  repository: kiwigrid/k8s-sidecar
-###       tag: 1.25.2
+    #image: See NOTE at top of file
   deploymentStrategy:
     type: Recreate
   persistence:
