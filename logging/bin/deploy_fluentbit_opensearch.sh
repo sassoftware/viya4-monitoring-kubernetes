@@ -73,18 +73,11 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
   # Check for the image pull secret for the air gap environment and replace placeholders
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-###  replaceAirgapValuesInFiles "logging/airgap/airgap-fluent-bit.yaml"
-
-###  airgapValuesFile=$updatedAirgapValuesFile
-###else
-###  airgapValuesFile=$TMP_DIR/empty.yaml
 fi
 
-######
-echo " DDDDDDDD"      #DEBUGGING-REMOVE
+
+#Generate yaml file with all container-related keys
 generateImageKeysFile "$FB_FULL_IMAGE"          "logging/fb/fb_container_image.template"
-cat "$imageKeysFile"  #DEBUGGING-REMOVE
-echo " DDDDDDDD"      #DEBUGGING-REMOVE
 
 # Fluent Bit user customizations
 FB_OPENSEARCH_USER_YAML="${FB_OPENSEARCH_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-opensearch.yaml}"

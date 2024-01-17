@@ -71,20 +71,10 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
   # Check for the image pull secret for the air gap environment and replace placeholders
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-###   replaceAirgapValuesInFiles "logging/airgap/airgap-values-es-exporter.yaml"
-
-###   airgapValuesFile=$updatedAirgapValuesFile
-###else
-###   airgapValuesFile=$TMP_DIR/empty.yaml
 fi
 
-########
-echo "DDDDDDD"           #DEBUGGING-REMOVE
+#Generate yaml file with all container-related keys
 generateImageKeysFile "$ES_EXPORTER_FULL_IMAGE" "logging/esexporter/es-exporter_container_image.template"
-cat "$imageKeysFile"     #DEBUGGING-REMOVE
-echo "DDDDDDD"           #DEBUGGING-REMOVE
-
-
 
 # Load any user customizations/overrides
 ES_OPEN_EXPORTER_USER_YAML="${ES_OPEN_EXPORTER_USER_YAML:-$USER_DIR/logging/user-values-es-exporter.yaml}"

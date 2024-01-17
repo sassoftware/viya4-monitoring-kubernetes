@@ -35,22 +35,10 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
   # Check for the image pull secret for the air gap environment
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-
-  # Check for the image pull secret for the air gap environment and replace placeholders
-  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-###  replaceAirgapValuesInFiles "logging/airgap/airgap-opensearch-dashboards.yaml"
-
-###  airgapValuesFile=$updatedAirgapValuesFile
-
-###else
-###  airgapValuesFile=$TMP_DIR/empty.yaml
 fi
 
-######
-echo " DDDDDDDD"      #DEBUGGING-REMOVE
+#Generate yaml file with all container-related keys
 generateImageKeysFile "$OSD_FULL_IMAGE"         "logging/opensearch/osd_container_image.template"
-cat "$imageKeysFile"  #DEBUGGING-REMOVE
-echo " DDDDDDDD"      #DEBUGGING-REMOVE
 
 
 # Confirm namespace exists

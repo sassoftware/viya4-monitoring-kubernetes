@@ -43,19 +43,11 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
   # Check for the image pull secret for the air gap environment and replace placeholders
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-###  replaceAirgapValuesInFiles "logging/airgap/airgap-opensearch.yaml"
-
-###  airgapValuesFile=$updatedAirgapValuesFile
-###else
-###  airgapValuesFile=$TMP_DIR/empty.yaml
 fi
 
-######
-echo " DDDDDDDD"      #DEBUGGING-REMOVE
+#Generate yaml files with all container-related keys
 generateImageKeysFile "$OS_FULL_IMAGE"          "logging/opensearch/os_container_image.template"
 generateImageKeysFile "$OS_SYSCTL_FULL_IMAGE"   "$imageKeysFile"  "OS_SYSCTL_"
-cat "$imageKeysFile"  #DEBUGGING-REMOVE
-echo " DDDDDDDD"      #DEBUGGING-REMOVE
 
 # get credentials
 export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD}

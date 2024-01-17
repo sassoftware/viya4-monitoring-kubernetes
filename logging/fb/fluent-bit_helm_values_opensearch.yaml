@@ -3,8 +3,14 @@
 # Chart:  https://github.com/fluent/helm-charts/blob/fluent-bit-0.30.4/charts/fluent-bit
 # Default values: https://github.com/fluent/helm-charts/blob/fluent-bit-0.30.4/charts/fluent-bit/values.yaml
 
+
+## NOTE: All image.* and imagePullSecrets keys now derived from environment variables and generated at run-time (do not set here)
 ###image:
-###  tag: 2.1.10
+###  repository: foo
+###  pullPolicy: foo
+###  tag: foo
+###imagePullSecrets: foo
+
 podAnnotations: 
   fluentbit.io/parser: fluentbit
 podLabels:
