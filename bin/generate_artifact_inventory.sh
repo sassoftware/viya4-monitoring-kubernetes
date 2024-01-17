@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Copyright © 2023, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2024, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # NOTE: This script is NOT intended to be run by end-users.  It
