@@ -38,13 +38,20 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
   # Check for the image pull secret for the air gap environment and replace placeholders
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-  replaceAirgapValuesInFiles "logging/airgap/airgap-opensearch-dashboards.yaml"
+###  replaceAirgapValuesInFiles "logging/airgap/airgap-opensearch-dashboards.yaml"
 
-  airgapValuesFile=$updatedAirgapValuesFile
+###  airgapValuesFile=$updatedAirgapValuesFile
 
-else
-  airgapValuesFile=$TMP_DIR/empty.yaml
+###else
+###  airgapValuesFile=$TMP_DIR/empty.yaml
 fi
+
+######
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
+generateImageKeysFile "$OSD_FULL_IMAGE"         "logging/opensearch/osd_container_image.template"
+cat "$imageKeysFile"  #DEBUGGING-REMOVE
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
+
 
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
@@ -138,16 +145,18 @@ fi
 # Get Helm Chart Name
 log_debug "OpenSearch Dashboards Helm Chart: repo [$OSD_HELM_CHART_REPO] name [$OSD_HELM_CHART_NAME] version [$OSD_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference $OSD_HELM_CHART_REPO $OSD_HELM_CHART_NAME $OSD_HELM_CHART_VERSION)"
+versionstring="$(get_helm_versionstring  $OSD_HELM_CHART_VERSION)"
+
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Deploy Elasticsearch via Helm chart
 helm $helmDebug upgrade --install v4m-osd \
-    --version $OSD_HELM_CHART_VERSION \
+    $versionstring \
     --namespace $LOG_NS \
+    --values "$imageKeysFile" \
     --values logging/opensearch/osd_helm_values.yaml \
     --values "$wnpValuesFile" \
     --values "$nodeport_yaml" \
-    --values "$airgapValuesFile" \
     --values "$OSD_USER_YAML" \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
     --values "$OSD_PATH_INGRESS_YAML" \

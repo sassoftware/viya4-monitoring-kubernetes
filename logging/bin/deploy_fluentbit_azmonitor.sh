@@ -44,12 +44,18 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
   # Check for the image pull secret for the air gap environment
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-  replaceAirgapValuesInFiles "logging/airgap/airgap-fluent-bit.yaml"
+###  replaceAirgapValuesInFiles "logging/airgap/airgap-fluent-bit.yaml"
   
-  airgapValuesFile=$updatedAirgapValuesFile 
-else
-  airgapValuesFile=$TMP_DIR/empty.yaml
+###  airgapValuesFile=$updatedAirgapValuesFile 
+###else
+###  airgapValuesFile=$TMP_DIR/empty.yaml
 fi
+
+######
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
+generateImageKeysFile "$FB_FULL_IMAGE"          "logging/fb/fb_container_image.template"
+cat "$imageKeysFile"  #DEBUGGING-REMOVE
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
 
 # Fluent Bit user customizations
 FB_AZMONITOR_USER_YAML="${FB_AZMONITOR_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-azmonitor.yaml}"
@@ -172,8 +178,8 @@ kubectl -n $LOG_NS label configmap fbaz-env-vars   managed-by=v4m-es-script
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install v4m-fbaz  --namespace $LOG_NS  \
   --version $FLUENTBIT_HELM_CHART_VERSION \
+  --values $imageKeysFile \
   --values logging/fb/fluent-bit_helm_values_azmonitor.yaml \
-  --values $airgapValuesFile \
   --values $FB_AZMONITOR_USER_YAML \
   --values $tracingValuesFile \
   --set fullnameOverride=v4m-fbaz \

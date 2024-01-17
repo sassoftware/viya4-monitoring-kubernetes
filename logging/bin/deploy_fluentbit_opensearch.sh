@@ -73,12 +73,18 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
   # Check for the image pull secret for the air gap environment and replace placeholders
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-  replaceAirgapValuesInFiles "logging/airgap/airgap-fluent-bit.yaml"
+###  replaceAirgapValuesInFiles "logging/airgap/airgap-fluent-bit.yaml"
 
-  airgapValuesFile=$updatedAirgapValuesFile
-else
-  airgapValuesFile=$TMP_DIR/empty.yaml
+###  airgapValuesFile=$updatedAirgapValuesFile
+###else
+###  airgapValuesFile=$TMP_DIR/empty.yaml
 fi
+
+######
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
+generateImageKeysFile "$FB_FULL_IMAGE"          "logging/fb/fb_container_image.template"
+cat "$imageKeysFile"  #DEBUGGING-REMOVE
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
 
 # Fluent Bit user customizations
 FB_OPENSEARCH_USER_YAML="${FB_OPENSEARCH_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-opensearch.yaml}"
@@ -172,14 +178,15 @@ kubectl -n $LOG_NS label configmap fb-env-vars   managed-by=v4m-es-script
 ## Get Helm Chart Name
 log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference $FLUENTBIT_HELM_CHART_REPO $FLUENTBIT_HELM_CHART_NAME $FLUENTBIT_HELM_CHART_VERSION)"
+versionstring="$(get_helm_versionstring  $FLUENTBIT_HELM_CHART_VERSION)"
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
-  --version $FLUENTBIT_HELM_CHART_VERSION \
+    $versionstring \
+  --values $imageKeysFile \
   --values logging/fb/fluent-bit_helm_values_opensearch.yaml  \
   --values $openshiftValuesFile \
-  --values $airgapValuesFile \
   --values $tracingValuesFile \
   --values $FB_OPENSEARCH_USER_YAML   \
   --set fullnameOverride=v4m-fb \

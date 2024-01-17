@@ -24,6 +24,9 @@ if [ "$HELM_VER_MAJOR" == "2" ]; then
     exit 1
 fi
 
+if [ "$V4M_HELM_USE_LATEST"  == "true" ]; then
+  log_info "Environment variable V4M_HELM_USE_LATEST set; deploying *latest* version of all Helm charts"
+fi
 function helm2ReleaseExists {
   release=$1
   log_debug "Checking for Helm 2.x release of [$release]"
@@ -119,10 +122,19 @@ function get_helmchart_reference {
       echo "${chart_repository}/${chart_name}"
   fi
 }
+function get_helm_versionstring {
+    if [ "$V4M_HELM_USE_LATEST"  == "true" ]; then
+       :  # return null string
+    else
+       echo "--version $1"
+    fi
 
+    return
+}
 export HELM_VER_FULL HELM_VER_MAJOR HELM_VER_MINOR HELM_VER_PATCH
 export -f helm2ReleaseExists
 export -f helm3ReleaseExists
 export -f helm2ReleaseCheck
 export -f helmRepoAdd
 export -f get_helmchart_reference
+export -f get_helm_versionstring

@@ -137,12 +137,21 @@ if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
   # Check for the image pull secret for the air gap environment and replace placeholders
   checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-  replaceAirgapValuesInFiles "monitoring/airgap/airgap-grafana-values.yaml"
+###  replaceAirgapValuesInFiles "monitoring/airgap/airgap-grafana-values.yaml"
 
-  airgapValuesFile=$updatedAirgapValuesFile
-else
-  airgapValuesFile=$TMP_DIR/empty.yaml
+###  airgapValuesFile=$updatedAirgapValuesFile
+###else
+###  airgapValuesFile=$TMP_DIR/empty.yaml
 fi
+
+######
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
+generateImageKeysFile "$GRAFANA_FULL_IMAGE"     "monitoring/grafana_container_image.template"
+generateImageKeysFile "$GRAFANA_SIDECAR_FULL_IMAGE"   "$imageKeysFile"  "SIDECAR_"
+cat "$imageKeysFile"  #DEBUGGING-REMOVE
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
+
+
 
 OPENSHIFT_AUTH_ENABLE=${OPENSHIFT_AUTH_ENABLE:-true}
 if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
@@ -188,9 +197,9 @@ log_debug "Installing Helm chart from artifact [$chart2install]"
 
 helm upgrade --install $helmDebug \
   -n "$MON_NS" \
+  -f "$imageKeysFile" \
   -f "$wnpValuesFile" \
   -f "$grafanaYAML" \
-  -f "$airgapValuesFile" \
   -f "$grafanaAuthYAML" \
   -f "$userGrafanaYAML" \
   -f $tempoDSFile \
@@ -283,12 +292,18 @@ if [ "$TRACING_ENABLE" == "true" ]; then
 
     # Check for the image pull secret for the air gap environment and replace placeholders
     checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-    replaceAirgapValuesInFiles "monitoring/airgap/airgap-tempo-values.yaml"
+###    replaceAirgapValuesInFiles "monitoring/airgap/airgap-tempo-values.yaml"
 
-    airgapValuesFile=$updatedAirgapValuesFile
-  else
-    airgapValuesFile=$TMP_DIR/empty.yaml
+###    airgapValuesFile=$updatedAirgapValuesFile
+###  else
+###    airgapValuesFile=$TMP_DIR/empty.yaml
   fi
+
+######
+  echo " DDDDDDDD"      #DEBUGGING-REMOVE
+  generateImageKeysFile "$TEMPO_FULL_IMAGE" "monitoring/tempo_container_image.template"
+  cat "$imageKeysFile"  #DEBUGGING-REMOVE
+  echo " DDDDDDDD"      #DEBUGGING-REMOVE
 
   # Get Helm Chart Name
   log_debug "Tempo Helm Chart: repo [$TEMPO_CHART_REPO] name [$TEMPO_CHART_NAME] version [$TEMPO_CHART_VERSION]"
@@ -298,9 +313,9 @@ if [ "$TRACING_ENABLE" == "true" ]; then
   log_info "Installing tempo"
   helm upgrade --install v4m-tempo \
     -n "$MON_NS" \
+    -f "$imageKeysFile" \
     -f monitoring/openshift/tempo-values.yaml \
     -f "$TEMPO_USER_YAML" \
-    -f "$airgapValuesFile" \
     --version "$TEMPO_CHART_VERSION" \
     $chart2install
 fi

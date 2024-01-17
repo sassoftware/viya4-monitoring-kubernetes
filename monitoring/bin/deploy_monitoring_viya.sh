@@ -66,13 +66,21 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
       source bin/airgap-include.sh
 
       # Check for the image pull secret for the air gap environment and replace placeholders
-      checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-      replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-pushgateway.yaml"
+      checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$VIYA_NS"
+###      replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-pushgateway.yaml"
 
-      airgapValuesFile=$updatedAirgapValuesFile
-   else
-      airgapValuesFile=$TMP_DIR/empty.yaml
+###      airgapValuesFile=$updatedAirgapValuesFile
+###   else
+###      airgapValuesFile=$TMP_DIR/empty.yaml
    fi
+
+
+######
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
+generateImageKeysFile "$PUSHGATEWAY_FULL_IMAGE" "monitoring/pushgateway_container_image.template"
+cat "$imageKeysFile"  #DEBUGGING-REMOVE
+echo " DDDDDDDD"      #DEBUGGING-REMOVE
+
 
    if helm3ReleaseExists prometheus-pushgateway $VIYA_NS; then
       kubectl delete deployment -n $VIYA_NS prometheus-pushgateway --ignore-not-found
@@ -85,14 +93,15 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
    ## Get Helm Chart Name
    log_debug "Prometheus Pushgateway Helm Chart: repo [$PUSHGATEWAY_CHART_REPO] name [$PUSHGATEWAY_CHART_NAME] version [$PUSHGATEWAY_CHART_VERSION]"
    chart2install="$(get_helmchart_reference $PUSHGATEWAY_CHART_REPO $PUSHGATEWAY_CHART_NAME $PUSHGATEWAY_CHART_VERSION)"
+   versionstring="$(get_helm_versionstring  $PUSHGATEWAY_CHART_VERSION)"
    log_debug "Installing Helm chart from artifact [$chart2install]"
 
    helm $helmDebug upgrade --install prometheus-pushgateway \
         --namespace $VIYA_NS \
-        --version $PUSHGATEWAY_CHART_VERSION \
+         $versionstring \
         --set service.clusterIP=$svcClusterIP \
+        -f $imageKeysFile \
         -f monitoring/values-pushgateway.yaml \
-        -f $airgapValuesFile \
         -f $wnpValuesFile \
         -f $PUSHGATEWAY_USER_YAML \
          $chart2install

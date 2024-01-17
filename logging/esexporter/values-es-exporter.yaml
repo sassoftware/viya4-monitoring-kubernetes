@@ -9,11 +9,11 @@ replicaCount: 1
 ##
 restartPolicy: Always
 
-image:
-  repository: quay.io/prometheuscommunity/elasticsearch-exporter
-  tag: v1.6.0
-  pullPolicy: Always
-  pullSecret: ""
+#image:
+#  repository: quay.io/prometheuscommunity/elasticsearch-exporter
+#  tag: v1.6.0
+#  pullPolicy: Always
+#  pullSecret: ""
 
 # logfmt|json
 log:

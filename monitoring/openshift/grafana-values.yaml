@@ -1,5 +1,5 @@
-image:
-  tag: 10.0.3
+###image:
+###  tag: 10.0.3
 readinessProbe: null
 livenessProbe: null
 sidecar:
@@ -9,10 +9,10 @@ sidecar:
   datasources:
     enabled: true
     label: grafana_datasource
-  image:
-  #  registry: quay.io
-  #  repository: kiwigrid/k8s-sidecar
-    tag: 1.25.0
+###  image:
+###  #  registry: quay.io
+###  #  repository: kiwigrid/k8s-sidecar
+###    tag: 1.25.0
 deploymentStrategy:
   type: Recreate
 persistence:

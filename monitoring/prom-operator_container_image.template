@@ -1,0 +1,117 @@
+global:
+  imageRegistry: __GLOBAL_REGISTRY__
+  imagePullSecrets: __IMAGE_PULL_SECRETS__
+
+## Prometheus Operator
+prometheusOperator:
+  image:
+    registry: __IMAGE_REGISTRY__
+    repository: __IMAGE_REPO_2LEVEL__
+    tag: __IMAGE_TAG__
+    pullPolicy: __IMAGE_PULL_POLICY__
+
+  prometheusConfigReloader:
+    image: 
+      registry: __CONFIGRELOAD_IMAGE_REGISTRY__
+      repository: __CONFIGRELOAD_IMAGE_REPO_2LEVEL__
+      tag: __CONFIGRELOAD_IMAGE_TAG__
+
+  admissionWebhooks:
+# NOTE: We do NOT use the admissionWebHooks.deployment
+#    deployment:
+#      image:
+#        registry: __ADMWEBHOOK_IMAGE_REGISTRY__
+#        repository: __ADMWEBHOOK_IMAGE_REPO_2LEVEL__
+#        tag: __ADMWEBHOOK_IMAGE_TAG__
+#  	      pullPolicy: __ADMWEBHOOK_IMAGE_PULL_POLICY__
+    patch:
+      image:
+        registry: __ADMWEBHOOK_IMAGE_REGISTRY__
+        repository: __ADMWEBHOOK_IMAGE_REPO_2LEVEL__
+        tag: __ADMWEBHOOK_IMAGE_TAG__
+        pullPolicy: __ADMWEBHOOK_IMAGE_PULL_POLICY__
+
+## NOT USED BUT INTERESTING---start
+  ## Prometheus image to use for prometheuses managed by the operator
+  # prometheusDefaultBaseImage: prometheus/prometheus
+
+  ## Prometheus image registry to use for prometheuses managed by the operator
+  # prometheusDefaultBaseImageRegistry: quay.io
+
+  ## Alertmanager image to use for alertmanagers managed by the operator
+  # alertmanagerDefaultBaseImage: prometheus/alertmanager
+
+  ## Alertmanager image registry to use for alertmanagers managed by the operator
+  # alertmanagerDefaultBaseImageRegistry: quay.io
+
+## NOT USED BUT INTERESTING---end
+
+##Thanos - child under promOperator
+## NOTE: We do NOT use Thanos
+#  thanosImage:
+#    registry: __THANOS_IMAGE_REGISTRY__
+#    repository: __THANOS_IMAGE_REPO_2LEVEL__
+#    tag: __THANOS_IMAGE_TAG__
+
+
+##Alertmanager
+alertmanager:
+  alertmanagerSpec:
+    image:
+      registry: __ALERTMANAGER_IMAGE_REGISTRY__
+      repository: __ALERTMANAGER_IMAGE_REPO_2LEVEL__
+      tag: __ALERTMANAGER_IMAGE_TAG__
+
+## Grafana
+grafana:
+  image:
+    repository: __GRAFANA_IMAGE_REPO_2LEVEL__
+    tag: __GRAFANA_IMAGE_TAG__
+    ### TO DO: use tag: key here to peg
+    ###        to a specific version??
+  sidecar:
+    image:
+      repository: __SIDECAR_IMAGE_REPO_2LEVEL__
+
+## Kube-State-Metrics
+kube-state-metrics:
+### TO DO: Use these globals(kube-state-metrics)?
+###global:
+###  imageRegistry: __GLOBAL_REGISTRY__
+###  imagePullSecrets: __IMAGE_PULL_SECRETS__
+  image:
+    registry: __KSM_IMAGE_REGISTRY__
+    repository: __KSM_IMAGE_REPO_2LEVEL__
+    tag: __KSM_IMAGE_TAG__
+    pullPolicy: __KSM_IMAGE_PULL_POLICY__
+####  imagePullSecrets: __KSM_IMAGE_PULL_SECRETS__
+
+##Node Exporter
+prometheus-node-exporter:
+### TO DO: Use these globals(node exporter)?
+###global:
+###  imageRegistry: __GLOBAL_REGISTRY__
+###  imagePullSecrets: __IMAGE_PULL_SECRETS__
+  image:
+    registry: __NODEXPORT_IMAGE_REGISTRY__
+    repository: __NODEXPORT_IMAGE_REPO_2LEVEL__
+    tag: __NODEXPORT_IMAGE_TAG__
+    pullPolicy: __NODEXPORT_IMAGE_PULL_POLICY__
+####  imagePullSecrets: __IMAGE_PULL_SECRETS__
+
+##Prometheus
+prometheus:
+  prometheusSpec:
+    image:
+      registry: __PROMETHEUS_IMAGE_REGISTRY__
+      repository: __PROMETHEUS_IMAGE_REPO_2LEVEL__
+      tag: __PROMETHEUS_IMAGE_TAG__
+
+##ThanosRuller
+##NOTE: ThanosRuler is NOT used
+#thanosRuler:
+#  thanosRulerSpec:
+#    image:
+#      registry: __THANOSRULER_IMAGE_REGISTRY__
+#      repository: __THANOSRULER_IMAGE_REPO_2LEVEL__
+#      tag: __THANOSRULER_IMAGE_TAG__
