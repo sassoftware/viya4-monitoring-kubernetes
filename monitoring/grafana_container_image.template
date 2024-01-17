@@ -1,0 +1,29 @@
+global:
+  imageRegistry: __GLOBAL_REGISTRY__
+  imagePullSecrets: __IMAGE_PULL_SECRETS__
+
+image:
+ registry: __IMAGE_REGISTRY__
+ repository: __IMAGE_REPO_2LEVEL__
+ tag: __IMAGE_TAG__
+ pullPolicy: __IMAGE_PULL_POLICY__
+#### pullSecrets: __IMAGE_PULL_SECRETS__ 
+
+#initChownData:
+#  image:
+#    registry: __INITCHOWN_IMAGE_REGISTRY__
+#    repository: __INITCHOWN_IMAGE_REPO_2LEVEL__
+#    tag: __INITCHOWN_IMAGE_TAG__
+#  pullPolicy: __INITCHOWN_IMAGE_PULL_POLICY__
+#  pullSecrets:
+#  -name:  __INITCHOWN_IMAGE_PULL_SECRETS__
+
+#sidecar:
+#  image:
+#    registry: __SIDECAR_IMAGE_REGISTRY__
+#    repository: __SIDECAR_IMAGE_REPO_2LEVEL__
+#    tag: __SIDECAR_IMAGE_TAG__
+#  pullPolicy: __SIDECAR_IMAGE_PULL_POLICY__
+#  #pullSecrets:                            #NOT present in Helm chart but should it be?
+#  #- name:__SIDECAR_IMAGE_PULL_SECRETS__   #NOT present in Helm chart but should it be?
+
