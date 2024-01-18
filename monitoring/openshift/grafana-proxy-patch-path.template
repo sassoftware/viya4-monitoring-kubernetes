@@ -22,7 +22,7 @@ spec:
         - name: HTTP_PROXY
         - name: HTTPS_PROXY
         - name: NO_PROXY
-        image: __IMAGE_REPO_2LEVEL__:__IMAGE_TAG__
+        image: __IMAGE_REPO_3LEVEL__:__IMAGE_TAG__
         imagePullPolicy: __IMAGE_PULL_POLICY__
         name: grafana-proxy
         ports:
