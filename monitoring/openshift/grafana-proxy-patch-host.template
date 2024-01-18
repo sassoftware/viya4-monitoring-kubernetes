@@ -8,7 +8,12 @@ spec:
         - -http-address=
         - -email-domain=*
         - -upstream=http://localhost:3000
-        - -proxy-prefix=/grafana/oauth
+        # OLD (cluster check)
+        # - '-openshift-sar={"resource": "namespaces", "verb": "get"}'
+        # - '-openshift-delegate-urls={"/": {"resource": "namespaces", "verb": "get"}}'
+        # NEW (namespace-specific)
+        # - '-openshift-delegate-urls={"/": {"namespace":"openshift-user-workload-monitoring","resource":"services","name":"prometheus-user-workload","verb":"get"}}'
+        # - '--openshift-sar={"namespace":"openshift-user-workload-monitoring","resource":"services","name":"prometheus-user-workload","verb":"get"}'
         - -tls-cert=/etc/tls/private/tls.crt
         - -tls-key=/etc/tls/private/tls.key
         - -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token
@@ -22,8 +27,8 @@ spec:
         - name: HTTP_PROXY
         - name: HTTPS_PROXY
         - name: NO_PROXY
-        image: openshift/oauth-proxy:latest
-        imagePullPolicy: IfNotPresent
+        image: __IMAGE_REPO_2LEVEL__:__IMAGE_TAG__
+        imagePullPolicy: __IMAGE_PULL_POLICY__
         name: grafana-proxy
         ports:
         - containerPort: 3001
@@ -32,7 +37,7 @@ spec:
         readinessProbe:
           failureThreshold: 3
           httpGet:
-            path: /grafana/oauth/healthz
+            path: /oauth/healthz
             port: https
             scheme: HTTPS
           periodSeconds: 10

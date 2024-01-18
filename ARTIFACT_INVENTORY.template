@@ -31,6 +31,7 @@ registry/repository/image_name:version
 | Metrics | Configuration Reloader (Alertmanager, Prometheus) | __CONFIGRELOAD_FULL_IMAGE__ |
 | Metrics | Prometheus Pushgateway | __PUSHGATEWAY_FULL_IMAGE__ |
 | Metrics | Auto-load Sidecars (Grafana) | __GRAFANA_SIDECAR_FULL_IMAGE__ |
+| Metrics | OpenShift OAUTH Proxy (Grafana, OpenShift only) | __OPENSHIFT_OAUTHPROXY_FULL_IMAGE__ |
 | Metrics | Tempo | __TEMPO_FULL_IMAGE__ |
 
 ## Table 2. Helm Chart Repositories

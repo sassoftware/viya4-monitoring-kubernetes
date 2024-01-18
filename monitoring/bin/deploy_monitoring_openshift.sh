@@ -227,10 +227,18 @@ if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
 
   if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
     log_debug "Using path-based version of the OpenShift Grafana proxy patch"
-    cp monitoring/openshift/grafana-proxy-patch-path.yaml $grafanaProxyPatchYAML
+
+    #Generate yaml file with all container-related keys
+    generateImageKeysFile "$OPENSHIFT_OAUTHPROXY_FULL_IMAGE" "monitoring/openshift/grafana-proxy-patch-path.template"
+
+    cp $imageKeysFile $grafanaProxyPatchYAML
   else
     log_debug "Using host-based version of the OpenShift Grafana proxy patch"
-    cp monitoring/openshift/grafana-proxy-patch-host.yaml $grafanaProxyPatchYAML
+
+    #Generate yaml file with all container-related keys
+    generateImageKeysFile "$OPENSHIFT_OAUTHPROXY_FULL_IMAGE" "monitoring/openshift/grafana-proxy-patch-host.template"
+
+    cp $imageKeysFile $grafanaProxyPatchYAML
   fi
     
   log_debug "Deploying CA bundle..."
