@@ -341,7 +341,7 @@ function generateImageKeysFile {
    v4m_replace "__${prefix}IMAGE__"              "$IMAGE"                    "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE_TAG__"          "$VERSION"                  "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE_PULL_POLICY__"  "$v4m_pullPolicy"           "$imageKeysFile"
-   v4m_replace "__${prefix}IMAGE_PULL_SECRET__"  "pullsecret_text"           "$imageKeysFile"       #Handle Charts Accepting a Single Image Pull Secret
+   v4m_replace "__${prefix}IMAGE_PULL_SECRET__"  "$pullsecret_text"           "$imageKeysFile"       #Handle Charts Accepting a Single Image Pull Secret
    v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" "$pullsecrets_text"         "$imageKeysFile"       #Handle Charts Accepting Multiple Image Pull Secrets
 
    return 0
