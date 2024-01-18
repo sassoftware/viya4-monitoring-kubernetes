@@ -83,6 +83,9 @@ v4m_replace "__OSD_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 parseFullImage "$ES_EXPORTER_FULL_IMAGE"
 v4m_replace "__ES_EXPORTER_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
+parseFullImage "$OPENSHIFT_OAUTHPROXY_FULL_IMAGE"
+v4m_replace "__OPENSHIFT_OAUTHPROXY_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
+
 parseFullImage "$TEMPO_FULL_IMAGE"
 v4m_replace "__TEMPO_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
