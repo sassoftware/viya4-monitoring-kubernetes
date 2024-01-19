@@ -25,8 +25,10 @@ if [ "$HELM_VER_MAJOR" == "2" ]; then
 fi
 
 if [ "$V4M_HELM_USE_LATEST"  == "true" ]; then
-  log_info "Environment variable V4M_HELM_USE_LATEST set; deploying *latest* version of all Helm charts"
+  log_warn "******This feature is NOT intended for use outside the project maintainers*******"
+  log_warn "Environment variable V4M_HELM_USE_LATEST set; deploying *latest* version of all Helm charts"
 fi
+
 function helm2ReleaseExists {
   release=$1
   log_debug "Checking for Helm 2.x release of [$release]"

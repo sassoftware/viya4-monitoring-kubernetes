@@ -61,7 +61,10 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
         log_debug "No component_versions.env file found"
     fi
 
-
+    if [ "$V4M_OMIT_IMAGE_KEYS" == "true" ]; then
+       log_warn "******This feature is NOT intended for use outside the project maintainers*******"
+       log_warn "Environment variable V4M_OMIT_IMAGE_KEYS set to [true]; container image information from component_versions.env will be ignored."
+    fi
 
     export USER_DIR=${USER_DIR:-$(pwd)}
     if [ -d "$USER_DIR" ]; then
@@ -341,7 +344,7 @@ function generateImageKeysFile {
    v4m_replace "__${prefix}IMAGE__"              "$IMAGE"                    "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE_TAG__"          "$VERSION"                  "$imageKeysFile"
    v4m_replace "__${prefix}IMAGE_PULL_POLICY__"  "$v4m_pullPolicy"           "$imageKeysFile"
-   v4m_replace "__${prefix}IMAGE_PULL_SECRET__"  "$pullsecret_text"           "$imageKeysFile"       #Handle Charts Accepting a Single Image Pull Secret
+   v4m_replace "__${prefix}IMAGE_PULL_SECRET__"  "$pullsecret_text"          "$imageKeysFile"       #Handle Charts Accepting a Single Image Pull Secret
    v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" "$pullsecrets_text"         "$imageKeysFile"       #Handle Charts Accepting Multiple Image Pull Secrets
 
    return 0
