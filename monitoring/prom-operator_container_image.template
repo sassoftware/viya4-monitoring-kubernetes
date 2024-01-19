@@ -67,12 +67,13 @@ grafana:
   image:
     repository: __GRAFANA_IMAGE_REPO_2LEVEL__
     tag: __GRAFANA_IMAGE_TAG__
-    ### TO DO: use tag: key here to peg
-    ###        to a specific version??
+    pullPolicy: __GRAFANA_IMAGE_PULL_POLICY__
   sidecar:
     image:
       repository: __SIDECAR_IMAGE_REPO_2LEVEL__
       tag: __SIDECAR_IMAGE_TAG__
+    imagePullPolicy: __SIDECAR_IMAGE_PULL_POLICY__
+
 
 ## Kube-State-Metrics
 kube-state-metrics:
