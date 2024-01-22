@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+* **Overall**
+  * [TASK] Refactored how container image and Helm chart version information is handled to permit automatically generating this information from files.  Note
+that this change does NOT alter how users provide this information should they wish to change it.  User should continue to include this information in the 
+appropriate user values yaml file within their USER_DIR directory.  However, specifying a Helm chart or container image version different than the default
+should rarely be necessary or appropriate.
+
 * **Metrics**
   * [CHANGE] The KubeHpaMaxedOut alert has (effectively) been renamed KubeHpaMaxedOutMultiPod
 
