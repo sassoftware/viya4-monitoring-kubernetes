@@ -85,7 +85,7 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     log_info "User directory: $USER_DIR"
 
     export AIRGAP_DEPLOYMENT=${AIRGAP_DEPLOYMENT:-false}
-    
+
     CHECK_HELM=${CHECK_HELM:-true}
     if [ "$CHECK_HELM" == "true" ]; then
        source bin/helm-include.sh

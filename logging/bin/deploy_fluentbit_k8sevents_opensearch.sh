@@ -65,14 +65,6 @@ fi
 
 helmRepoAdd fluent https://fluent.github.io/helm-charts
 
-## Check for air gap deployment
-if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  source bin/airgap-include.sh
-
-  # Check for the image pull secret for the air gap environment and replace placeholders
-  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-fi
-
 #Generate yaml file with all container-related keys
 generateImageKeysFile "$FB_FULL_IMAGE"          "logging/fb/fb_container_image.template"
 

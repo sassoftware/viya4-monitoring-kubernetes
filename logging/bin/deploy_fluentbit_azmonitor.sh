@@ -38,14 +38,6 @@ fi
 
 log_info "Deploying Fluent Bit (Azure Monitor)"
 
-## Check for air gap deployment
-if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  source bin/airgap-include.sh
-
-  # Check for the image pull secret for the air gap environment
-  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-fi
-
 #Generate yaml file with all container-related keys#Generate yaml file with all container-related keys
 generateImageKeysFile "$FB_FULL_IMAGE"          "logging/fb/fb_container_image.template"
 

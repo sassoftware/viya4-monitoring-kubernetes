@@ -29,14 +29,6 @@ set -e
 #Fail if not using OpenSearch back-end
 require_opensearch
 
-## Check for air gap deployment
-if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  source bin/airgap-include.sh
-
-  # Check for the image pull secret for the air gap environment
-  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-fi
-
 #Generate yaml file with all container-related keys
 generateImageKeysFile "$OSD_FULL_IMAGE"         "logging/opensearch/osd_container_image.template"
 

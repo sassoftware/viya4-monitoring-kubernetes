@@ -37,14 +37,6 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   exit 1
 fi
 
-## Check for air gap deployment
-if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  source bin/airgap-include.sh
-
-  # Check for the image pull secret for the air gap environment and replace placeholders
-  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-fi
-
 #Generate yaml files with all container-related keys
 generateImageKeysFile "$OS_FULL_IMAGE"          "logging/opensearch/os_container_image.template"
 generateImageKeysFile "$OS_SYSCTL_FULL_IMAGE"   "$imageKeysFile"  "OS_SYSCTL_"

@@ -47,13 +47,6 @@ if [ -z "$(kubectl get ns $MON_NS -o name 2>/dev/null)" ]; then
   disable_sa_token_automount $MON_NS default
 fi
 
-if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  source bin/airgap-include.sh
-
-  # Check for the image pull secret for the air gap environment and replace placeholders
-  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-fi
-
 #Generate yaml file with all container-related keys
 generateImageKeysFile "$PROMOP_FULL_IMAGE"          "monitoring/prom-operator_container_image.template"
 generateImageKeysFile "$ALERTMANAGER_FULL_IMAGE"    "$imageKeysFile"  "ALERTMANAGER_"
@@ -257,14 +250,6 @@ log_verbose "Deploying cluster ServiceMonitors"
 
 if [ "$TRACING_ENABLE" == "true" ]; then
   log_info "Tracing enabled..."
-
-  ## Check for air gap deployment
-  if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-    source bin/airgap-include.sh
-
-    # Check for the image pull secret for the air gap environment and replace placeholders
-    checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-  fi
 
   #Generate yaml file with all container-related keys
   generateImageKeysFile "$TEMPO_FULL_IMAGE" "monitoring/tempo_container_image.template"

@@ -129,15 +129,8 @@ else
     TEMPO_USER_YAML=$TMP_DIR/empty.yaml
   fi
   tempoDSFile="monitoring/grafana-datasource-tempo.yaml"
-fi 
-
- ## Check for air gap deployment
-if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  source bin/airgap-include.sh
-
-  # Check for the image pull secret for the air gap environment and replace placeholders
-  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
 fi
+
 
 #Generate yaml file with all container-related keys
 generateImageKeysFile "$GRAFANA_FULL_IMAGE"     "monitoring/openshift/grafana_container_image.template"
@@ -287,7 +280,7 @@ if [ "$TRACING_ENABLE" == "true" ]; then
   log_info "Tracing enabled..."
 
   ## Check for air gap deployment
-  if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+  if [ "$XXXAIRGAP_DEPLOYMENT" == "true" ]; then
     source bin/airgap-include.sh
 
     # Check for the image pull secret for the air gap environment and replace placeholders
