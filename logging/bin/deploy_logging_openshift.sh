@@ -58,13 +58,6 @@ logging/bin/deploy_openshift_prereqs.sh
 export LOG_KB_TLS_ENABLE=true
 
 ##################################
-# Event Router                   #
-##################################
-log_info "STEP 1: Event Router"
-logging/bin/deploy_eventrouter.sh
-
-
-##################################
 # OpenSearch                     #
 ##################################
 log_info "STEP 1: OpenSearch"
