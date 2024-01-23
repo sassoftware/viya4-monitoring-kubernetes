@@ -1,12 +1,17 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Version 1.2.21 (17JAN2024)
-
+## Unreleased
 * **Overall**
   * [TASK] Refactored how container image and Helm chart version information is handled to permit automatically generating this information from files.  Note
 that this change does NOT alter how users provide this information should they wish to change it.  User should continue to include this information in the 
 appropriate user values yaml file within their USER_DIR directory.  However, specifying a Helm chart or container image version different than the default
 should rarely be necessary or appropriate.
+
+* **Logging**
+  * [REMOVAL] The deploy_eventrouter.sh script has been removed.  The [Event Router component](https://github.com/vmware-archive/eventrouter) it deployed
+is no longer actively developed and was replaced with a Fluent Bit deployment focused on collecting Kubernetes events in our 1.2.19 release.
+
+## Version 1.2.21 (17JAN2024)
 
 * **Metrics**
   * [CHANGE] The KubeHpaMaxedOut alert has (effectively) been renamed KubeHpaMaxedOutMultiPod
@@ -16,8 +21,6 @@ should rarely be necessary or appropriate.
   * [FEATURE] The getlogs.py utility for exporting logs via the command line has been moved to "production"
 from "experimental" status.  Documentation for this optional Python-based tool is available in the 
 [SAS Viya Monitoring for Kubernetes Help Center](https://documentation.sas.com/?docsetId=obsrvdply&docsetVersion=latest&docsetTarget=p1wdkgnu7dp791n1h9xfyh68ltnt.htm).
-  * [REMOVAL] The deploy_eventrouter.sh script has been removed.  The [Event Router component](https://github.com/vmware-archive/eventrouter) it deployed
-is no longer actively developed and was replaced with a Fluent Bit deployment focused on collecting Kubernetes events in our 1.2.19 release.
 
 ## Version 1.2.20 (12DEC2023)
 
