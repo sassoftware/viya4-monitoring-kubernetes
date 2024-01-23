@@ -67,9 +67,6 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
 
     if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
        source bin/airgap-include.sh
-
-       ##### Check for the image pull secret for the air gap environment and replace placeholders
-       ####checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
     fi
 
     source bin/version-include.sh
