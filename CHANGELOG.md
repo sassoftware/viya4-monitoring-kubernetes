@@ -15,6 +15,8 @@ should rarely be necessary or appropriate.
   * [FEATURE] The getlogs.py utility for exporting logs via the command line has been moved to "production"
 from "experimental" status.  Documentation for this optional Python-based tool is available in the 
 [SAS Viya Monitoring for Kubernetes Help Center](https://documentation.sas.com/?docsetId=obsrvdply&docsetVersion=latest&docsetTarget=p1wdkgnu7dp791n1h9xfyh68ltnt.htm).
+  * [REMOVAL] The deploy_eventrouter.sh script has been removed.  The [Event Router component](https://github.com/vmware-archive/eventrouter) it deployed
+is no longer actively developed and was replaced with a Fluent Bit deployment focused on collecting Kubernetes events in our 1.2.19 release.
 
 ## Version 1.2.20 (12DEC2023)
 
