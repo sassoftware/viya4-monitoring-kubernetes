@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.21 (17JAN2024)
 
 * **Overall**
   * [TASK] Refactored how container image and Helm chart version information is handled to permit automatically generating this information from files.  Note
@@ -10,6 +10,7 @@ should rarely be necessary or appropriate.
 
 * **Metrics**
   * [CHANGE] The KubeHpaMaxedOut alert has (effectively) been renamed KubeHpaMaxedOutMultiPod
+  * [REMOVAL] Removed the Elasticsearch serviceMonitor from SAS Viya metric monitoring deployment.
 
 * **Logging**
   * [FEATURE] The getlogs.py utility for exporting logs via the command line has been moved to "production"
