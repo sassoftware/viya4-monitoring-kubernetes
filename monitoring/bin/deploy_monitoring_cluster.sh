@@ -130,7 +130,6 @@ fi
 
 # Optional TLS Support
 tlsValuesFile=$TMP_DIR/empty.yaml
-tlsPromAlertingEndpointFile=$TMP_DIR/empty.yaml
 serviceMonitorEndpointScheme="http"
 
 if [ "$TLS_ENABLE" == "true" ]; then
@@ -138,14 +137,12 @@ if [ "$TLS_ENABLE" == "true" ]; then
   create_tls_certs $MON_NS monitoring ${apps[@]}
 
   tlsValuesFile=monitoring/tls/values-prom-operator-tls.yaml
-  ###tlsPromAlertingEndpointFile=monitoring/tls/prom-alertendpoint-host-https.yaml
   log_debug "Including TLS response file $tlsValuesFile"
 
   log_verbose "Provisioning TLS-enabled Prometheus datasource for Grafana"
   grafanaDS=grafana-datasource-prom-https.yaml
   if [ "$MON_TLS_PATH_INGRESS" == "true" ]; then
     grafanaDS=grafana-datasource-prom-https-path.yaml
-    ###tlsPromAlertingEndpointFile=monitoring/tls/prom-alertendpoint-path-https.yaml
   fi
   kubectl delete cm -n $MON_NS --ignore-not-found grafana-datasource-prom-https
   kubectl create cm -n $MON_NS grafana-datasource-prom-https --from-file monitoring/tls/$grafanaDS
@@ -220,7 +217,6 @@ helm $helmDebug upgrade --install $promRelease \
   -f $istioValuesFile \
   -f $tlsValuesFile \
   -f $airgapTLSValuesFile \
-  -f $tlsPromAlertingEndpointFile \
   -f $nodePortValuesFile \
   -f $wnpValuesFile \
   -f $PROM_OPER_USER_YAML \
@@ -239,12 +235,6 @@ helm $helmDebug upgrade --install $promRelease \
   $chart2install
 
 sleep 2
-
-if [ "$XXXTLS_ENABLE" == "true" ]; then
-  log_verbose "Patching Grafana ServiceMonitor for TLS"
-  kubectl patch servicemonitor -n $MON_NS $promName-grafana --type=json \
-    -p='[{"op": "replace", "path": "/spec/endpoints/0/scheme", "value":"https"},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig", "value":{}},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig/insecureSkipVerify", "value":true}]'
-fi
 
 #Container Security: Disable serviceAccount Token Automounting
 disable_sa_token_automount $MON_NS v4m-grafana
