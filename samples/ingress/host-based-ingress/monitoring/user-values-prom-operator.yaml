@@ -53,6 +53,12 @@ prometheus:
   prometheusSpec:
     # routePrefix: /prometheus
     externalUrl: https://prometheus.host.cluster.example.com
+    alertingEndpoints:
+      - name: v4m-alertmanager
+        port: http-web
+        scheme: https
+        tlsConfig:
+          insecureSkipVerify: true
 
 alertmanager:
   # Disable default configuration of NodePort

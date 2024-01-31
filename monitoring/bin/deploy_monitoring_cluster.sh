@@ -131,19 +131,21 @@ fi
 # Optional TLS Support
 tlsValuesFile=$TMP_DIR/empty.yaml
 tlsPromAlertingEndpointFile=$TMP_DIR/empty.yaml
+serviceMonitorEndpointScheme="http"
+
 if [ "$TLS_ENABLE" == "true" ]; then
   apps=( prometheus alertmanager grafana )
   create_tls_certs $MON_NS monitoring ${apps[@]}
 
   tlsValuesFile=monitoring/tls/values-prom-operator-tls.yaml
-  tlsPromAlertingEndpointFile=monitoring/tls/prom-alertendpoint-host-https.yaml
+  ###tlsPromAlertingEndpointFile=monitoring/tls/prom-alertendpoint-host-https.yaml
   log_debug "Including TLS response file $tlsValuesFile"
 
   log_verbose "Provisioning TLS-enabled Prometheus datasource for Grafana"
   grafanaDS=grafana-datasource-prom-https.yaml
   if [ "$MON_TLS_PATH_INGRESS" == "true" ]; then
     grafanaDS=grafana-datasource-prom-https-path.yaml
-    tlsPromAlertingEndpointFile=monitoring/tls/prom-alertendpoint-path-https.yaml
+    ###tlsPromAlertingEndpointFile=monitoring/tls/prom-alertendpoint-path-https.yaml
   fi
   kubectl delete cm -n $MON_NS --ignore-not-found grafana-datasource-prom-https
   kubectl create cm -n $MON_NS grafana-datasource-prom-https --from-file monitoring/tls/$grafanaDS
@@ -155,6 +157,8 @@ if [ "$TLS_ENABLE" == "true" ]; then
   sleep 1
   kubectl create cm -n $MON_NS node-exporter-tls-web-config --from-file monitoring/tls/node-exporter-web.yaml
   kubectl label cm -n $MON_NS node-exporter-tls-web-config sas.com/monitoring-base=kube-viya-monitoring
+
+  serviceMonitorEndpointScheme="https"
 fi
 
 nodePortValuesFile=$TMP_DIR/empty.yaml
@@ -229,13 +233,14 @@ helm $helmDebug upgrade --install $promRelease \
   --set kube-state-metrics.fullnameOverride=$promName-kube-state-metrics \
   --set grafana.fullnameOverride=$promName-grafana \
   --set grafana.adminPassword="$grafanaPwd" \
+  --set grafana.serviceMonitor.scheme="$serviceMonitorEndpointScheme" \
   --set prometheus.prometheusSpec.alertingEndpoints[0].namespace="$MON_NS" \
   --version $KUBE_PROM_STACK_CHART_VERSION \
   $chart2install
 
 sleep 2
 
-if [ "$TLS_ENABLE" == "true" ]; then
+if [ "$XXXTLS_ENABLE" == "true" ]; then
   log_verbose "Patching Grafana ServiceMonitor for TLS"
   kubectl patch servicemonitor -n $MON_NS $promName-grafana --type=json \
     -p='[{"op": "replace", "path": "/spec/endpoints/0/scheme", "value":"https"},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig", "value":{}},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig/insecureSkipVerify", "value":true}]'
