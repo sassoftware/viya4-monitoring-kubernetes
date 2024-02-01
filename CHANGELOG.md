@@ -1,5 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 
+## unreleased
+
+* **Metrics**
+  * [CHANGE] Helm settings related to configuring the Alertmanager endpoint for Prometheus moved into Ingress samples.  This consolidates the 
+majority of TLS-enabled ingres configuration in a single location and improves usability.
+
 ## Version 1.2.21 (17JAN2024)
 
 * **Metrics**
