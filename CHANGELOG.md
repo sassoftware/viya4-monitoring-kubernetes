@@ -1,5 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 
+
+## Unreleased
+
+* **Metrics**
+  * [FIX] Replaced obsolete container image name for OpenShift oauth proxy container
+
 ## Version 1.2.21 (17JAN2024)
 
 * **Metrics**

@@ -27,7 +27,7 @@ spec:
         - name: HTTP_PROXY
         - name: HTTPS_PROXY
         - name: NO_PROXY
-        image: openshift/oauth-proxy:latest
+        image: registry.redhat.io/openshift4/ose-oauth-proxy:latest
         imagePullPolicy: IfNotPresent
         name: grafana-proxy
         ports:
