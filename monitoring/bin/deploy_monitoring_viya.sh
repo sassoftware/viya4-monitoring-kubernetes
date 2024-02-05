@@ -120,6 +120,7 @@ if [ "$(kubectl get crd servicemonitors.monitoring.coreos.com -o name 2>/dev/nul
   kubectl delete --ignore-not-found ServiceMonitor -n $VIYA_NS sas-java-services
   kubectl delete --ignore-not-found ServiceMonitor -n $VIYA_NS sas-go-services
   kubectl delete --ignore-not-found ServiceMonitor -n $VIYA_NS sas-deployment-operator
+  kubectl delete --ignore-not-found ServiceMonitor -n $VIYA_NS sas-elasticsearch
 else
   log_warn "Prometheus Operator not found. Skipping deployment of ServiceMonitors."
 fi
