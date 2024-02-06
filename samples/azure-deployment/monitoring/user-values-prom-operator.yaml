@@ -36,6 +36,13 @@ prometheus:
   prometheusSpec:
     routePrefix: /prometheus
     externalUrl: https://host.cluster.example.com/prometheus
+    alertingEndpoints:
+      - name: v4m-alertmanager
+        port: http-web
+        pathPrefix: "/alertmanager"
+        scheme: https
+        tlsConfig:
+          insecureSkipVerify: true
     storageSpec:
       volumeClaimTemplate:
         spec:
