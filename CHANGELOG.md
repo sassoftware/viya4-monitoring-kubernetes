@@ -10,10 +10,10 @@ we will expect users to provide this information when they define the ingress re
 (e.g. Grafana, Prometheus and Alertmanger).  This will consolidate the connection and ingress configuration in the same place, the
 $USER_DIR/monitoring/user-values-prom-operator.yaml file.  This change will only be a **BREAKING CHANGE** when updating an existing deployment 
 that uses ingress to reach the metric monitoring applications or when using an ingress configurations based on the previous ingress sample.
-The ingress sample has been updated to work with the new approach (see note below).  If you do not update your configuration before the 
+The [ingress sample](samples/ingress) has been updated to work with the new approach (see note below).  If you do not update your configuration before the 
 change is released, Prometheus will not be able to send alerts to Alertmanger after the change.  The release of this change is tenatively 
 scheduled for our 1.2.23 release (expected mid-March).
-  * [CHANGE] The ingress samples have been updated to accomodate an upcoming, potentially breaking, change (see note above).  These updated 
+  * [CHANGE] The [ingress samples](samples/ingress) have been updated to accomodate an upcoming, potentially breaking, change (see note above).  These updated 
 ingress samples can be used now, prior to the change being released, since they are compatible with both the existing and new behavior.
   * [FIX] Replaced obsolete container image name for OpenShift oauth proxy container
 
