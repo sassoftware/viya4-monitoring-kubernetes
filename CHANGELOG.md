@@ -1,10 +1,18 @@
 # SAS Viya Monitoring for Kubernetes
 
-
 ## Unreleased
+* **Overall**
+  * [TASK] Refactored how container image and Helm chart version information is handled to permit automatically generating this information from files.  Note
+that this change does NOT alter how users provide this information should they wish to change it.  User should continue to include this information in the 
+appropriate user values yaml file within their USER_DIR directory.  However, specifying a Helm chart or container image version different than the default
+should rarely be necessary or appropriate.
 
 * **Metrics**
   * [FIX] Replaced obsolete container image name for OpenShift oauth proxy container
+
+* **Logging**
+  * [REMOVAL] The deploy_eventrouter.sh script has been removed.  The [Event Router component](https://github.com/vmware-archive/eventrouter) it deployed
+is no longer actively developed and was replaced with a Fluent Bit deployment focused on collecting Kubernetes events in our 1.2.19 release.
 
 ## Version 1.2.21 (17JAN2024)
 

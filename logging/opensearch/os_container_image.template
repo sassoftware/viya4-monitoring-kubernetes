@@ -1,0 +1,14 @@
+global:
+ dockerRegistry: __GLOBAL_REGISTRY_OSBUG__
+
+image:
+ repository: __IMAGE_REPO_2LEVEL__
+ tag: __IMAGE_TAG__
+ pullPolicy: __IMAGE_PULL_POLICY__
+
+imagePullSecrets: __IMAGE_PULL_SECRETS__
+
+sysctlInit:
+  #The image key below needs repo+image
+  image:  __OS_SYSCTL_IMAGE_REPO_2LEVEL__
+  imageTag: __OS_SYSCTL_IMAGE_TAG__

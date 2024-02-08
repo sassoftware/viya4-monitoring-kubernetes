@@ -65,18 +65,8 @@ helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-cha
 primaryValuesFile="logging/esexporter/values-es-exporter.yaml"
 log_debug "Deploying Elasticsearch Exporter"
 
-## Check for air gap deployment
-if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  source bin/airgap-include.sh
-
-  # Check for the image pull secret for the air gap environment and replace placeholders
-  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-  replaceAirgapValuesInFiles "logging/airgap/airgap-values-es-exporter.yaml"
-
-  airgapValuesFile=$updatedAirgapValuesFile
-else
-  airgapValuesFile=$TMP_DIR/empty.yaml
-fi
+#Generate yaml file with all container-related keys
+generateImageKeysFile "$ES_EXPORTER_FULL_IMAGE" "logging/esexporter/es-exporter_container_image.template"
 
 # Load any user customizations/overrides
 ES_OPEN_EXPORTER_USER_YAML="${ES_OPEN_EXPORTER_USER_YAML:-$USER_DIR/logging/user-values-es-exporter.yaml}"
@@ -114,17 +104,19 @@ helm2ReleaseCheck es-exporter-$LOG_NS
 ## Get Helm Chart Name
 log_debug "Elasticsearch Exporter Helm Chart: repo [$ESEXPORTER_HELM_CHART_REPO] name [$ESEXPORTER_HELM_CHART_NAME] version [$ESEXPORTER_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference $ESEXPORTER_HELM_CHART_REPO $ESEXPORTER_HELM_CHART_NAME $ESEXPORTER_HELM_CHART_VERSION)"
+versionstring="$(get_helm_versionstring  $ESEXPORTER_HELM_CHART_VERSION)"
+
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 helm $helmDebug upgrade --install es-exporter \
  --namespace $LOG_NS \
- --version $ESEXPORTER_HELM_CHART_VERSION \
+ -f $imageKeysFile \
  -f $primaryValuesFile \
  -f $wnpValuesFile \
  -f $openshiftValuesFile \
- -f $airgapValuesFile \
  -f $ES_OPEN_EXPORTER_USER_YAML \
  --set fullnameOverride=v4m-es-exporter  \
+ $versionstring \
  $chart2install
 
 log_info "Elasticsearch metric exporter has been deployed"

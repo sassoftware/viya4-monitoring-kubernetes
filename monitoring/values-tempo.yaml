@@ -1,3 +1,11 @@
+## NOTE: All image.*  keys now derived from environment variables and generated at run-time (do not set here)
+##tempo:
+##  repository: foo
+##  tag: foo
+##  pullPolicy: foo
+##  pullSecrets: foo
+
+
 # =======
 # Tempo
 # =======
@@ -5,8 +13,6 @@
 
 tempo:
   searchEnabled: true
-  repository: grafana/tempo
-  tag: null
 
   multitenancyEnabled: false
   # -- If true, Tempo will report anonymous usage data about the shape of a deployment to Grafana Labs

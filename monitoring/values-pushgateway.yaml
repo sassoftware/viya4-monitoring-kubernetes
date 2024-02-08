@@ -1,6 +1,9 @@
-image:
-#  repository: prom/pushgateway
-  tag: v1.6.2
+## NOTE: All image.*  keys now derived from environment variables and generated at run-time (do not set here)
+###image:
+###  repository: foo
+###  tag: foo
+###  pullPolicy: foo
+###  pullSecrets: foo
 
 securityContext: null
 

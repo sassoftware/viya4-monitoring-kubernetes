@@ -129,20 +129,13 @@ else
     TEMPO_USER_YAML=$TMP_DIR/empty.yaml
   fi
   tempoDSFile="monitoring/grafana-datasource-tempo.yaml"
-fi 
-
- ## Check for air gap deployment
-if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  source bin/airgap-include.sh
-
-  # Check for the image pull secret for the air gap environment and replace placeholders
-  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-  replaceAirgapValuesInFiles "monitoring/airgap/airgap-grafana-values.yaml"
-
-  airgapValuesFile=$updatedAirgapValuesFile
-else
-  airgapValuesFile=$TMP_DIR/empty.yaml
 fi
+
+
+#Generate yaml file with all container-related keys
+generateImageKeysFile "$GRAFANA_FULL_IMAGE"     "monitoring/openshift/grafana_container_image.template"
+generateImageKeysFile "$GRAFANA_SIDECAR_FULL_IMAGE"   "$imageKeysFile"  "SIDECAR_"
+
 
 OPENSHIFT_AUTH_ENABLE=${OPENSHIFT_AUTH_ENABLE:-true}
 if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
@@ -184,20 +177,21 @@ log_info "Deploying Grafana..."
 # Get Helm Chart Name
 log_debug "Grafana Helm Chart: repo [$OPENSHIFT_GRAFANA_CHART_REPO] name [$OPENSHIFT_GRAFANA_CHART_NAME] version [$OPENSHIFT_GRAFANA_CHART_VERSION]"
 chart2install="$(get_helmchart_reference $OPENSHIFT_GRAFANA_CHART_REPO $OPENSHIFT_GRAFANA_CHART_NAME $OPENSHIFT_GRAFANA_CHART_VERSION)"
+versionstring="$(get_helm_versionstring $OPENSHIFT_GRAFANA_CHART_VERSION)"
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 helm upgrade --install $helmDebug \
   -n "$MON_NS" \
+  -f "$imageKeysFile" \
   -f "$wnpValuesFile" \
   -f "$grafanaYAML" \
-  -f "$airgapValuesFile" \
   -f "$grafanaAuthYAML" \
   -f "$userGrafanaYAML" \
   -f $tempoDSFile \
   --set 'grafana\.ini'.server.domain=$OPENSHIFT_ROUTE_DOMAIN \
   --set 'grafana\.ini'.server.root_url=https://v4m-grafana-$MON_NS.$OPENSHIFT_ROUTE_DOMAIN$OPENSHIFT_ROUTE_PATH_GRAFANA \
   --set 'grafana\.ini'.server.serve_from_sub_path=$grafanaSubPath \
-  --version "$OPENSHIFT_GRAFANA_CHART_VERSION" \
+  $versionstring \
   --atomic \
   $grafanaPwd \
   $extraArgs \
@@ -226,10 +220,18 @@ if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
 
   if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
     log_debug "Using path-based version of the OpenShift Grafana proxy patch"
-    cp monitoring/openshift/grafana-proxy-patch-path.yaml $grafanaProxyPatchYAML
+
+    #Generate yaml file with all container-related keys
+    generateImageKeysFile "$OPENSHIFT_OAUTHPROXY_FULL_IMAGE" "monitoring/openshift/grafana-proxy-patch-path.template"
+
+    cp $imageKeysFile $grafanaProxyPatchYAML
   else
     log_debug "Using host-based version of the OpenShift Grafana proxy patch"
-    cp monitoring/openshift/grafana-proxy-patch-host.yaml $grafanaProxyPatchYAML
+
+    #Generate yaml file with all container-related keys
+    generateImageKeysFile "$OPENSHIFT_OAUTHPROXY_FULL_IMAGE" "monitoring/openshift/grafana-proxy-patch-host.template"
+
+    cp $imageKeysFile $grafanaProxyPatchYAML
   fi
     
   log_debug "Deploying CA bundle..."
@@ -277,31 +279,22 @@ fi
 if [ "$TRACING_ENABLE" == "true" ]; then
   log_info "Tracing enabled..."
 
-  ## Check for air gap deployment
-  if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-    source bin/airgap-include.sh
-
-    # Check for the image pull secret for the air gap environment and replace placeholders
-    checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-    replaceAirgapValuesInFiles "monitoring/airgap/airgap-tempo-values.yaml"
-
-    airgapValuesFile=$updatedAirgapValuesFile
-  else
-    airgapValuesFile=$TMP_DIR/empty.yaml
-  fi
+  #Generate yaml file with all container-related keys
+  generateImageKeysFile "$TEMPO_FULL_IMAGE" "monitoring/tempo_container_image.template"
 
   # Get Helm Chart Name
   log_debug "Tempo Helm Chart: repo [$TEMPO_CHART_REPO] name [$TEMPO_CHART_NAME] version [$TEMPO_CHART_VERSION]"
   chart2install="$(get_helmchart_reference $TEMPO_CHART_REPO $TEMPO_CHART_NAME $TEMPO_CHART_VERSION)"
+  versionstring="$(get_helm_versionstring $TEMPO_CHART_VERSION)"
   log_debug "Installing Helm chart from artifact [$chart2install]"
 
   log_info "Installing tempo"
   helm upgrade --install v4m-tempo \
     -n "$MON_NS" \
+    -f "$imageKeysFile" \
     -f monitoring/openshift/tempo-values.yaml \
     -f "$TEMPO_USER_YAML" \
-    -f "$airgapValuesFile" \
-    --version "$TEMPO_CHART_VERSION" \
+    $versionstring \
     $chart2install
 fi
 

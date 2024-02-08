@@ -9,11 +9,12 @@ replicaCount: 1
 ##
 restartPolicy: Always
 
-image:
-  repository: quay.io/prometheuscommunity/elasticsearch-exporter
-  tag: v1.6.0
-  pullPolicy: Always
-  pullSecret: ""
+## NOTE: All image.* keys now derived from environment variables and generated at run-time (do not set here)
+#image:
+#  repository: quay.io/prometheuscommunity/elasticsearch-exporter
+#  tag: v1.6.0
+#  pullPolicy: Always
+#  pullSecret: ""
 
 # logfmt|json
 log:

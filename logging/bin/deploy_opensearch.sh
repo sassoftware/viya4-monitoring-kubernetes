@@ -37,18 +37,9 @@ if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
   exit 1
 fi
 
-## Check for air gap deployment
-if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  source bin/airgap-include.sh
-
-  # Check for the image pull secret for the air gap environment and replace placeholders
-  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$LOG_NS"
-  replaceAirgapValuesInFiles "logging/airgap/airgap-opensearch.yaml"
-
-  airgapValuesFile=$updatedAirgapValuesFile
-else
-  airgapValuesFile=$TMP_DIR/empty.yaml
-fi
+#Generate yaml files with all container-related keys
+generateImageKeysFile "$OS_FULL_IMAGE"          "logging/opensearch/os_container_image.template"
+generateImageKeysFile "$OS_SYSCTL_FULL_IMAGE"   "$imageKeysFile"  "OS_SYSCTL_"
 
 # get credentials
 export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD}
@@ -320,22 +311,23 @@ fi
 # Get Helm Chart Name
 log_debug "OpenSearch Helm Chart: repo [$OPENSEARCH_HELM_CHART_REPO] name [$OPENSEARCH_HELM_CHART_NAME] version [$OPENSEARCH_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference $OPENSEARCH_HELM_CHART_REPO $OPENSEARCH_HELM_CHART_NAME $OPENSEARCH_HELM_CHART_VERSION)"
+versionstring="$(get_helm_versionstring  $OPENSEARCH_HELM_CHART_VERSION)"
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 
 # Deploy OpenSearch via Helm chart
 # NOTE: nodeGroup needed to get resource names we want
 helm $helmDebug upgrade --install opensearch \
-    --version $OPENSEARCH_HELM_CHART_VERSION \
     --namespace $LOG_NS \
+    --values "$imageKeysFile" \
     --values logging/opensearch/opensearch_helm_values.yaml \
     --values "$wnpValuesFile" \
-    --values "$airgapValuesFile" \
     --values "$ES_OPEN_USER_YAML" \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
     --set nodeGroup=primary  \
     --set masterService=v4m-search \
     --set fullnameOverride=v4m-search \
+    $versionstring \
     $chart2install
 
 # ODFE => OpenSearch Migration
@@ -345,11 +337,10 @@ if [ "$deploy_temp_masters" == "true" ]; then
    #      was created during prior Helm chart deployment
    log_debug "Upgrade from ODFE to OpenSearch detected; creating temporary master-only nodes."
    helm $helmDebug upgrade --install opensearch-master \
-       --version $OPENSEARCH_HELM_CHART_VERSION \
        --namespace $LOG_NS \
        --values logging/opensearch/opensearch_helm_values.yaml \
+       --values "$imageKeysFile" \
        --values "$wnpValuesFile" \
-       --values "$airgapValuesFile" \
        --values "$ES_OPEN_USER_YAML" \
        --values "$OPENSHIFT_SPECIFIC_YAML" \
        --set nodeGroup=temp_masters  \
@@ -359,6 +350,7 @@ if [ "$deploy_temp_masters" == "true" ]; then
        --set rbac.create=false \
        --set masterService=v4m-search \
        --set fullnameOverride=v4m-master \
+       $versionstring \
        $chart2install
 fi
 
