@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.22 (13FEB2024)
 * **Overall**
   * [TASK] Refactored how container image and Helm chart version information is handled to permit automatically generating this information from files.  Note
 that this change does NOT alter how users provide this information should they wish to change it.  User should continue to include this information in the 
