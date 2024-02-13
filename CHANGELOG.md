@@ -5,7 +5,7 @@
 
 * **Metrics**
   * [ANNOUNCEMENT] In an upcoming release, we will be making a **BREAKING CHANGE** related to how the connection between Prometheus and 
-Alertmanager is configured.  Currently, we define the prometheusSpec.alertingEndpoints.* keys programmatically; but, after this change, 
+Alertmanager is configured.  Currently, we define the `prometheusSpec.alertingEndpoints.*` keys programmatically; but, after this change, 
 we will expect users to provide this information when they define the ingress resources associated with the metric monitoring applications 
 (e.g. Grafana, Prometheus and Alertmanger).  This will consolidate the connection and ingress configuration in the same place, the
 $USER_DIR/monitoring/user-values-prom-operator.yaml file.  This change will only be a **BREAKING CHANGE** when updating an existing deployment 
