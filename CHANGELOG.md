@@ -14,6 +14,9 @@ should rarely be necessary or appropriate.
   * [REMOVAL] The deploy_eventrouter.sh script has been removed.  The [Event Router component](https://github.com/vmware-archive/eventrouter) it deployed
 is no longer actively developed and was replaced with a Fluent Bit deployment focused on collecting Kubernetes events in our 1.2.19 release.
 
+* **Tracing**
+  * [FEATURE] By default, the Tempo datasource will now add the logs datasource connection so traces and logs can be connected.
+
 ## Version 1.2.21 (17JAN2024)
 
 * **Metrics**
