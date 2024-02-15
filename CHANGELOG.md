@@ -2,9 +2,10 @@
 
 ## unreleased
 * **Overall**
-  * [TASK] Revised `samples/azure-deployment/README.md` to remove obsolete information and bring content up-to-date.  Corrected
-comments referencing OpenSearch connection information in `samples/generic-base/logging/user-values-es-exporter.yaml` and 
-`logging/user-values-es-exporter.yaml`.
+  * [TASK] Revised `samples/azure-deployment/README.md` to remove obsolete information and bring content up-to-date. 
+* **Logging**
+  * [TASK] Corrected comments referencing OpenSearch connection information in `samples/generic-base/logging/user-values-es-exporter.yaml`
+and `logging/user-values-es-exporter.yaml`.
 
 ## Version 1.2.22 (13FEB2024)
 * **Overall**
