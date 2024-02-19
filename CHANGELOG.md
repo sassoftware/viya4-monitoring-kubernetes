@@ -5,7 +5,7 @@
   * [FIX] Revised `samples/azure-deployment/README.md` to remove obsolete information and bring content up-to-date. (Fixes #612)
 
 * **Metrics**
-  * [FIX] Set environment variable MON_TLS_PATH_INGRESS to ensure correct datasource connection between Grafana
+  * [FIX] Set environment variable `MON_TLS_PATH_INGRESS` to ensure correct datasource connection between Grafana
 and Promethues in (Azure Deployment sample)[samples/azure-deployment]. (Fixes #614)
 
 * **Logging**
