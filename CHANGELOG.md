@@ -2,7 +2,7 @@
 
 ## unreleased
 * **Overall**
-  * [CHANGE] The minimum supported version of OpenShift is now 4.12.
+  * [CHANGE] Drop support for OpenShift 4.11; the minimum supported version of OpenShift is now 4.12.
 
 ## Version 1.2.22 (13FEB2024)
 * **Overall**
