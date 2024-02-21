@@ -1,5 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
+## unreleased
+* **Overall**
+  * [CHANGE] The minimum supported version of OpenShift is now 4.12.
+
 ## Version 1.2.22 (13FEB2024)
 * **Overall**
   * [TASK] Refactored how container image and Helm chart version information is handled to permit automatically generating this information from files.  Note
