@@ -11,6 +11,7 @@ and Promethues in [Azure Deployment sample](samples/azure-deployment). (Fixes #6
 * **Logging**
   * [FIX] Corrected comments referencing OpenSearch connection information in `samples/generic-base/logging/user-values-es-exporter.yaml`
 and `logging/user-values-es-exporter.yaml`.
+  * [FIX] Corrected typo in `logging/bin/deploy_fluentbit_azmonitor.sh` that prevented the script from executing properly.
 
 ## Version 1.2.22 (13FEB2024)
 * **Overall**
