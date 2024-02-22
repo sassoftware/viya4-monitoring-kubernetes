@@ -2,6 +2,7 @@
 
 ## unreleased
 * **Overall**
+  * [CHANGE] Drop support for OpenShift 4.11; the minimum supported version of OpenShift is now 4.12.
   * [FIX] Revised `samples/azure-deployment/README.md` to remove obsolete information and bring content up-to-date. (Fixes #612)
 
 * **Metrics**

@@ -49,12 +49,12 @@ function ocVersionCheck {
     ### Openshift versions that do not start with a 4 should produce an error.
     if (( "$OSHIFT_MAJOR_VERSION" != 4 )); then
       log_error "Unsupported OpenShift server version: $OSHIFT_FULL_VERSION"
-      log_error "Version 4.11+ is required"
+      log_error "Version 4.12+ is required"
       exit 1
-    ### 18OCT23: Openshift 4 versions earlier than 4.11 should produce an error.
-    elif (( "$OSHIFT_MINOR_VERSION" < 11 )); then
+    ### 21FEB24: Openshift 4 versions earlier than 4.12 should produce an error.
+    elif (( "$OSHIFT_MINOR_VERSION" < 12 )); then
       log_error "Unsupported OpenShift server version: $OSHIFT_FULL_VERSION"
-      log_error "Version 4.11+ is required"
+      log_error "Version 4.12+ is required"
       exit 1
     else
       log_debug "OpenShift server version check OK"
@@ -64,12 +64,12 @@ function ocVersionCheck {
     ### Openshift versions that do not start with a 4 should produce an error.
     if (( "$OC_MAJOR_VERSION" != 4 )); then
       log_error "Unsupported OpenShift client version: $OC_FULL_VERSION"
-      log_error "Version 4.10+ is required"
+      log_error "Version 4.11+ is required"
       exit 1
     ### Openshift 4 client version must be w/in 1 minor releases of server minimum.
-    elif (( "$OC_MINOR_VERSION" < 10 )); then
+    elif (( "$OC_MINOR_VERSION" < 11 )); then
       log_error "Unsupported OpenShift client version: $OC_FULL_VERSION"
-      log_error "Version 4.10+ is required"
+      log_error "Version 4.11+ is required"
       exit 1
     else
       log_debug "OpenShift client version check OK"
