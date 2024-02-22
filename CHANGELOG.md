@@ -1,5 +1,18 @@
 # SAS Viya Monitoring for Kubernetes
 
+## unreleased
+* **Overall**
+  * [FIX] Revised `samples/azure-deployment/README.md` to remove obsolete information and bring content up-to-date. (Fixes #612)
+
+* **Metrics**
+  * [FIX] Set environment variable `MON_TLS_PATH_INGRESS` to ensure correct datasource connection between Grafana
+and Promethues in [Azure Deployment sample](samples/azure-deployment). (Fixes #614)
+
+* **Logging**
+  * [FIX] Corrected comments referencing OpenSearch connection information in `samples/generic-base/logging/user-values-es-exporter.yaml`
+and `logging/user-values-es-exporter.yaml`.
+  * [FIX] Corrected typo in `logging/bin/deploy_fluentbit_azmonitor.sh` that prevented the script from executing properly.
+
 ## Version 1.2.22 (13FEB2024)
 * **Overall**
   * [TASK] Refactored how container image and Helm chart version information is handled to permit automatically generating this information from files.  Note

@@ -39,8 +39,20 @@ path-based ingress and are available at the following URLs. Be sure to
 replace the host names in the URLs with the host names for your deployment.
 
 * `https://host.mycluster.example.com/grafana`
+* `https://host.mycluster.example.com/dashboards`
+
+This sample does not make Prometheus and Alertmanager available since these
+web applications do not provide any sort of user-authentication.  However,
+if you want to make these applications available, you can do so by setting 
+the `enabled` key available in the appropriate section of the `monitoring/user-values=prom-operator.yaml`
+file (e.g. set the key `alertmanager.ingress.enabled` to 'true' to make 
+Alertmanager accessible).
+
+If you have chosen to make these applications available, the applications
+are available at the following URLs.  As mentioned above, be sure to
+replace the host names in the URLs with the host names for your deployment.
+
 * `https://host.mycluster.example.com/prometheus`
 * `https://host.mycluster.example.com/alertmanager`
-* `https://host.mycluster.example.com/kibana`
 
 For an example of using host-based ingress, see the [ingress sample](../ingress).
