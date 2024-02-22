@@ -6,7 +6,7 @@
 
 * **Metrics**
   * [FIX] Set environment variable `MON_TLS_PATH_INGRESS` to ensure correct datasource connection between Grafana
-and Promethues in (Azure Deployment sample)[samples/azure-deployment]. (Fixes #614)
+and Promethues in [Azure Deployment sample](samples/azure-deployment). (Fixes #614)
 
 * **Logging**
   * [FIX] Corrected comments referencing OpenSearch connection information in `samples/generic-base/logging/user-values-es-exporter.yaml`
