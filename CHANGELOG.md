@@ -1,5 +1,23 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Overall**
+
+* **Metrics**
+  * [UPGRADE] Kube-prometheus-stack Helm chart has been upgraded from version 54.0.1 to	56.6.2
+  * [UPGRADE] Prometheus Operator has been upgraded from version 0.69.1 to 0.71.2
+  * [UPGRADE] Prometheus has been upgraded from version 2.47.1 to 2.49.1
+  * [UPGRADE] Grafana has been upgraded from version 10.2.1 to 10.3.3
+  * [UPGRADE] Grafana Helm Chart has been upgraded from version 7.0.4 to 7.3.0
+  * [UPGRADE] K8s-sidecar	has been upgraded from version 1.25.2 to 1.25.4
+  * [UPGRADE] Kube-state-metrics has been upgraded from version 2.10.0 to 2.10.1
+  * [UPGRADE] Pushgateway has been upgraded from version 1.6.2 to 1.7.0
+  * [UPGRADE] Pushgateway Helm Chart has been upgraded from version 2.4.2 to 2.6.0
+
+* **Logging**
+
+* **Tracing**
+
 ## Version 1.2.22 (13FEB2024)
 * **Overall**
   * [TASK] Refactored how container image and Helm chart version information is handled to permit automatically generating this information from files.  Note
