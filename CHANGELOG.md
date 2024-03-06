@@ -8,6 +8,8 @@
 * **Metrics**
   * [FIX] Set environment variable `MON_TLS_PATH_INGRESS` to ensure correct datasource connection between Grafana
 and Promethues in [Azure Deployment sample](samples/azure-deployment). (Fixes #614)
+  * [CHANGE] Ghostunnel proxy has been removed from project. This was originally done for both Prometheus and Alertmanager. It has
+now been removed from Grafana.
 
 * **Logging**
   * [FIX] Corrected comments referencing OpenSearch connection information in `samples/generic-base/logging/user-values-es-exporter.yaml`
