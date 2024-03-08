@@ -2,8 +2,12 @@
 
 ## Unreleased
 * **Overall**
+  * [CHANGE] Drop support for OpenShift 4.11; the minimum supported version of OpenShift is now 4.12.
+  * [FIX] Revised `samples/azure-deployment/README.md` to remove obsolete information and bring content up-to-date. (Fixes #612)
 
 * **Metrics**
+  * [FIX] Set environment variable `MON_TLS_PATH_INGRESS` to ensure correct datasource connection between Grafana
+and Promethues in [Azure Deployment sample](samples/azure-deployment). (Fixes #614)
   * [UPGRADE] Kube-prometheus-stack Helm chart has been upgraded from version 54.0.1 to	56.6.2
   * [UPGRADE] Prometheus Operator has been upgraded from version 0.69.1 to 0.71.2
   * [UPGRADE] Prometheus has been upgraded from version 2.47.1 to 2.49.1
@@ -15,8 +19,12 @@
   * [UPGRADE] Pushgateway Helm Chart has been upgraded from version 2.4.2 to 2.6.0
 
 * **Logging**
+  * [FIX] Corrected comments referencing OpenSearch connection information in `samples/generic-base/logging/user-values-es-exporter.yaml`
+and `logging/user-values-es-exporter.yaml`.
+  * [FIX] Corrected typo in `logging/bin/deploy_fluentbit_azmonitor.sh` that prevented the script from executing properly.
 
 * **Tracing**
+
 
 ## Version 1.2.22 (13FEB2024)
 * **Overall**
