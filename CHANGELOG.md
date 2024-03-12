@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## unreleased
+## Unreleased
 * **Overall**
   * [CHANGE] Drop support for OpenShift 4.11; the minimum supported version of OpenShift is now 4.12.
   * [FIX] Revised `samples/azure-deployment/README.md` to remove obsolete information and bring content up-to-date. (Fixes #612)
@@ -9,11 +9,23 @@
   * [FIX] Set environment variable `MON_TLS_PATH_INGRESS` to ensure correct datasource connection between Grafana
 and Promethues in [Azure Deployment sample](samples/azure-deployment). (Fixes #614)
   * [CHANGE] Replaced the ghostunnel sidecar proxy with Grafana's native TLS capabilities and eliminated ghostunnel from the project.
+  * [UPGRADE] Kube-prometheus-stack Helm chart has been upgraded from version 54.0.1 to	56.6.2
+  * [UPGRADE] Prometheus Operator has been upgraded from version 0.69.1 to 0.71.2
+  * [UPGRADE] Prometheus has been upgraded from version 2.47.1 to 2.49.1
+  * [UPGRADE] Grafana has been upgraded from version 10.2.1 to 10.3.3
+  * [UPGRADE] Grafana Helm Chart has been upgraded from version 7.0.4 to 7.3.0
+  * [UPGRADE] K8s-sidecar	has been upgraded from version 1.25.2 to 1.25.4
+  * [UPGRADE] Kube-state-metrics has been upgraded from version 2.10.0 to 2.10.1
+  * [UPGRADE] Pushgateway has been upgraded from version 1.6.2 to 1.7.0
+  * [UPGRADE] Pushgateway Helm Chart has been upgraded from version 2.4.2 to 2.6.0
 
 * **Logging**
   * [FIX] Corrected comments referencing OpenSearch connection information in `samples/generic-base/logging/user-values-es-exporter.yaml`
 and `logging/user-values-es-exporter.yaml`.
   * [FIX] Corrected typo in `logging/bin/deploy_fluentbit_azmonitor.sh` that prevented the script from executing properly.
+
+* **Tracing**
+
 
 ## Version 1.2.22 (13FEB2024)
 * **Overall**
