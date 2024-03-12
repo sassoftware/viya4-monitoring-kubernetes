@@ -22,6 +22,7 @@ and Promethues in [Azure Deployment sample](samples/azure-deployment). (Fixes #6
   * [FIX] Corrected comments referencing OpenSearch connection information in `samples/generic-base/logging/user-values-es-exporter.yaml`
 and `logging/user-values-es-exporter.yaml`.
   * [FIX] Corrected typo in `logging/bin/deploy_fluentbit_azmonitor.sh` that prevented the script from executing properly.
+  * [UPGRADE] Fluent Bit has been upgraded from version 2.1.10 to 2.2.2
 
 * **Tracing**
 
