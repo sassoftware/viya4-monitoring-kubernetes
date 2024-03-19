@@ -8,6 +8,7 @@
 * **Metrics**
   * [FIX] Set environment variable `MON_TLS_PATH_INGRESS` to ensure correct datasource connection between Grafana
 and Promethues in [Azure Deployment sample](samples/azure-deployment). (Fixes #614)
+  * [CHANGE] Replaced the ghostunnel sidecar proxy with Grafana's native TLS capabilities and eliminated ghostunnel from the project.
   * [UPGRADE] Kube-prometheus-stack Helm chart has been upgraded from version 54.0.1 to	56.6.2
   * [UPGRADE] Prometheus Operator has been upgraded from version 0.69.1 to 0.71.2
   * [UPGRADE] Prometheus has been upgraded from version 2.47.1 to 2.49.1
@@ -22,6 +23,7 @@ and Promethues in [Azure Deployment sample](samples/azure-deployment). (Fixes #6
   * [FIX] Corrected comments referencing OpenSearch connection information in `samples/generic-base/logging/user-values-es-exporter.yaml`
 and `logging/user-values-es-exporter.yaml`.
   * [FIX] Corrected typo in `logging/bin/deploy_fluentbit_azmonitor.sh` that prevented the script from executing properly.
+  * [UPGRADE] Fluent Bit has been upgraded from version 2.1.10 to 2.2.2
 
 * **Tracing**
 
