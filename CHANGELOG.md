@@ -6,6 +6,15 @@
   * [FIX] Revised `samples/azure-deployment/README.md` to remove obsolete information and bring content up-to-date. (Fixes #612)
 
 * **Metrics**
+  * [ANNOUNCEMENT] In an upcoming release, we will be making a **BREAKING CHANGE** related to how the connection between Prometheus and 
+Alertmanager is configured.  Currently, we define the `prometheusSpec.alertingEndpoints.*` keys programmatically; but, after this change, 
+we will expect users to provide this information when they define the ingress resources associated with the metric monitoring applications 
+(e.g. Grafana, Prometheus and Alertmanger).  This will consolidate the connection and ingress configuration in the same place, the
+`$USER_DIR/monitoring/user-values-prom-operator.yaml` file.  This change will only be a **BREAKING CHANGE** when updating an existing deployment 
+that uses ingress to reach the metric monitoring applications or when using an ingress configurations based on the previous ingress sample.
+The [ingress sample](samples/ingress) has been updated to work with the new approach (see note below).  If you do not update your configuration before the 
+change is released, Prometheus will not be able to send alerts to Alertmanger after the change.  The release of this change is tenatively 
+scheduled for our 1.2.24 release (expected mid-April).
   * [FIX] Set environment variable `MON_TLS_PATH_INGRESS` to ensure correct datasource connection between Grafana
 and Promethues in [Azure Deployment sample](samples/azure-deployment). (Fixes #614)
   * [CHANGE] Replaced the ghostunnel sidecar proxy with Grafana's native TLS capabilities and eliminated ghostunnel from the project.
