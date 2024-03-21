@@ -6,7 +6,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.26f
+       Set  fb_configMap_version 0.2.26J
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -719,7 +719,9 @@ data:
        Rename          source      PROPS__source
        Rename          component   PROPS__component
     [FILTER]
-       # redis
+       #
+       # Redis
+       #
        Alias           flag_redis_msgs
        Name            modify
        Match           kube.*
@@ -734,14 +736,6 @@ data:
        Key_name        redis_message
        Parser          redis
        Reserve_Data    On
-    [FILTER]
-       Alias           post_redis
-       Name            modify
-       Match           kube.*
-       Condition       Key_value_matches  flagged4parsing redis
-       Copy            levelcode  level
-       Add             DB_redis_levelcode  levelcode
-
     [FILTER]
        #
        # Zalando (Postgres)
@@ -799,6 +793,7 @@ data:
        Parser          misc6
        Parser          misc7
        Parser          misc8
+       Parser          calico
        Parser          collectapiT
        Parser          collectapi
        Parser          haproxy_default
