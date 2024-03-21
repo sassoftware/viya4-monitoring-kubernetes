@@ -1,5 +1,12 @@
 # SAS Viya Monitoring for Kubernetes
 
+## unreleased
+* **Logging**
+  * [FIX] Corrected parser definition for Consul messages to eliminate ERROR/WARNING messages in Fluent Bit pod logs
+  * [CHANGE] Added parser/processing for Redis log messsages
+  * [CHANGE] Added parser/processing for Calico (CNI) log messsages
+
+
 ## Version 1.2.23 (19MAR2024)
 * **Overall**
   * [CHANGE] Drop support for OpenShift 4.11; the minimum supported version of OpenShift is now 4.12.
