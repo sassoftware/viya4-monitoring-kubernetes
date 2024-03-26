@@ -3,4 +3,4 @@ name: v4m
 description: SAS Viya 4 Monitoring for Kubernetes (https://github.com/sassoftware/viya4-monitoring-kubernetes)
 type: application
 version: "1.2.24-SNAPSHOT"
-appVersion: "1.2.23-SNAPSHOT"
+appVersion: "1.2.24-SNAPSHOT"
