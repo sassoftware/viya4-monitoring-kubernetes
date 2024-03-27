@@ -1,5 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Metrics**
+  * [FIX] Connect to Grafana using https from auto-provisioning sidecar containers when TLS is enabled
+
 ## Version 1.2.23 (19MAR2024)
 * **Overall**
   * [CHANGE] Drop support for OpenShift 4.11; the minimum supported version of OpenShift is now 4.12.
