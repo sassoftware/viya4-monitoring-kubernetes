@@ -1,5 +1,16 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Overall**
+
+* **Metrics**
+
+* **Logging**
+  * [UPGRADE] Upgraded OpenSearch/OpenSearch Dashboards from 2.10.0 to 2.12.0
+
+* **Tracing**
+
+
 ## Version 1.2.23 (19MAR2024)
 * **Overall**
   * [CHANGE] Drop support for OpenShift 4.11; the minimum supported version of OpenShift is now 4.12.
@@ -33,8 +44,6 @@ and Promethues in [Azure Deployment sample](samples/azure-deployment). (Fixes #6
 and `logging/user-values-es-exporter.yaml`.
   * [FIX] Corrected typo in `logging/bin/deploy_fluentbit_azmonitor.sh` that prevented the script from executing properly.
   * [UPGRADE] Fluent Bit has been upgraded from version 2.1.10 to 2.2.2
-
-* **Tracing**
 
 
 ## Version 1.2.22 (13FEB2024)
