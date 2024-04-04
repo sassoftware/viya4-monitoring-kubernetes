@@ -71,8 +71,15 @@ grafana:
     port: 3000
     targetPort: 3000
   sidecar:
+    dashboards:
+      reloadURL: "https://localhost:3000/api/admin/provisioning/dashboards/reload"
+      env:
+        REQ_SKIP_TLS_VERIFY: true
     datasources:
       defaultDatasourceEnabled: false
+      reloadURL: "https://localhost:3000/api/admin/provisioning/datasources/reload"
+      env:
+        REQ_SKIP_TLS_VERIFY: true
   "grafana.ini":
     server:
       protocol: https

@@ -4,7 +4,8 @@
 * **Overall**
 
 * **Metrics**
-
+  * [FIX] Connect to Grafana using https from auto-provisioning sidecar containers when TLS is enabled
+ 
 * **Logging**
   * [FIX] Corrected parser definition for Consul messages to eliminate ERROR/WARNING messages in Fluent Bit pod logs
   * [CHANGE] Added parser/processing for Redis log messsages
@@ -13,7 +14,6 @@
   * [UPGRADE] Elasticsearch Exporter has been upgraded from 1.6.0 to 1.7.0
 
 * **Tracing**
-
 
 ## Version 1.2.23 (19MAR2024)
 * **Overall**
