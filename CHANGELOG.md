@@ -6,6 +6,9 @@
 * **Metrics**
 
 * **Logging**
+  * [FIX] Corrected parser definition for Consul messages to eliminate ERROR/WARNING messages in Fluent Bit pod logs
+  * [CHANGE] Added parser/processing for Redis log messsages
+  * [CHANGE] Added parser/processing for Calico (CNI) log messsages
   * [UPGRADE] Upgraded OpenSearch/OpenSearch Dashboards from 2.10.0 to 2.12.0
   * [UPGRADE] Elasticsearch Exporter has been upgraded from 1.6.0 to 1.7.0
 
