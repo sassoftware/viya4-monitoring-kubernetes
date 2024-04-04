@@ -75,13 +75,11 @@ grafana:
       reloadURL: "https://localhost:3000/api/admin/provisioning/dashboards/reload"
       env:
         REQ_SKIP_TLS_VERIFY: true
-        #LOG_LEVEL: DEBUG
     datasources:
       defaultDatasourceEnabled: false
       reloadURL: "https://localhost:3000/api/admin/provisioning/datasources/reload"
       env:
         REQ_SKIP_TLS_VERIFY: true
-        #LOG_LEVEL: DEBUG
   "grafana.ini":
     server:
       protocol: https
