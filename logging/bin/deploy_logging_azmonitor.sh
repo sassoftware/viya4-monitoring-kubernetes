@@ -18,13 +18,11 @@ set -e
 
 log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 
-# Event Router
-log_info "STEP 1: Event Router"
-logging/bin/deploy_eventrouter.sh
-
+# K8S Events
+## TO DO: Originally deployed Event Router, deploy Fluent Bit for K8s event Collection?
 
 # Fluent Bit
-log_info "STEP 2: Deploying Fluent Bit"
+log_info "STEP 1: Deploying Fluent Bit"
 logging/bin/deploy_fluentbit_azmonitor.sh
 
 

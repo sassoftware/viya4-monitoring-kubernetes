@@ -61,7 +61,10 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
         log_debug "No component_versions.env file found"
     fi
 
-
+    if [ "$V4M_OMIT_IMAGE_KEYS" == "true" ]; then
+       log_warn "******This feature is NOT intended for use outside the project maintainers*******"
+       log_warn "Environment variable V4M_OMIT_IMAGE_KEYS set to [true]; container image information from component_versions.env will be ignored."
+    fi
 
     export USER_DIR=${USER_DIR:-$(pwd)}
     if [ -d "$USER_DIR" ]; then
@@ -82,7 +85,7 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     log_info "User directory: $USER_DIR"
 
     export AIRGAP_DEPLOYMENT=${AIRGAP_DEPLOYMENT:-false}
-    
+
     CHECK_HELM=${CHECK_HELM:-true}
     if [ "$CHECK_HELM" == "true" ]; then
        source bin/helm-include.sh
@@ -253,3 +256,101 @@ export -f trap_add
 export -f errexit_msg
 export -f disable_sa_token_automount
 export -f enable_pod_token_automount
+
+function parseFullImage {
+   fullImage="$1"
+   unset REGISTRY REPOS IMAGE VERSION FULL_IMAGE_ESCAPED
+
+   if [[ "$1" =~ (.*)\/(.*)\/(.*)\:(.*) ]]; then
+
+      REGISTRY="${BASH_REMATCH[1]}"
+      REPOS="${BASH_REMATCH[2]}"
+      IMAGE="${BASH_REMATCH[3]}"
+      VERSION="${BASH_REMATCH[4]}"
+      FULL_IMAGE_ESCAPED="$REGISTRY\/$REPOS\/$IMAGE\:$VERSION"
+      return 0
+   else
+      log_warn "Invalid value for full container image; does not fit expected pattern [$1]."
+      return 1
+   fi
+}
+
+
+function v4m_replace {
+
+    if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
+      sed -i '' s/"$1"/"$2"/g  "$3"
+    else
+      sed -i  s/"$1"/"$2"/g  "$3"
+    fi
+}
+
+function generateImageKeysFile {
+
+   #arg1 Full container image
+   #arg2 name of template file
+   #arg3 prefix to insert in placeholders (optional)
+
+   local pullsecret_text
+
+   if ! parseFullImage "$1";  then
+      log_error "Unable to parse full image [$1]"
+      return 1
+   fi
+
+   prefix=${3:-""}
+
+   imageKeysFile="$TMP_DIR/imageKeysFile.yaml"
+   template_file=$2
+
+   if [ "$template_file" != "$imageKeysFile" ]; then
+      rm -f  $imageKeysFile
+      cp $template_file  $imageKeysFile
+   else
+      log_debug "Modifying an existing imageKeysFile"
+   fi
+
+   if [ "$V4M_OMIT_IMAGE_KEYS" == "true" ]; then
+      cp $TMP_DIR/empty.yaml $imageKeysFile
+      return 0
+   fi
+
+   if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+      GLOBAL_REGISTRY_OSBUG="$AIRGAP_REGISTRY"
+      GLOBAL_REGISTRY="$AIRGAP_REGISTRY"
+      REGISTRY="$AIRGAP_REGISTRY"
+
+      if [ -n "$AIRGAP_IMAGE_PULL_SECRET_NAME" ]; then
+         pullsecrets_text="[name: ""$AIRGAP_IMAGE_PULL_SECRET_NAME""]"
+         pullsecret_text="$AIRGAP_IMAGE_PULL_SECRET_NAME"
+      else
+         pullsecrets_text="[]"
+         pullsecret_text="null"
+      fi
+   else
+      GLOBAL_REGISTRY_OSBUG='""'
+      GLOBAL_REGISTRY="null"
+      pullsecrets_text="[]"
+      pullsecret_text="null"
+   fi
+
+   v4m_pullPolicy=${V4M_PULL_POLICY:-"IfNotPresent"}
+
+   v4m_replace "__${prefix}GLOBAL_REGISTRY_OSBUG__"    "$GLOBAL_REGISTRY_OSBUG"          "$imageKeysFile"
+   v4m_replace "__${prefix}GLOBAL_REGISTRY__"    "$GLOBAL_REGISTRY"          "$imageKeysFile"
+   v4m_replace "__${prefix}IMAGE_REGISTRY__"     "$REGISTRY"                 "$imageKeysFile"
+   v4m_replace "__${prefix}IMAGE_REPO_3LEVEL__"  "$REGISTRY\/$REPOS\/$IMAGE" "$imageKeysFile"
+   v4m_replace "__${prefix}IMAGE_REPO_2LEVEL__"  "$REPOS\/$IMAGE"            "$imageKeysFile"
+   v4m_replace "__${prefix}IMAGE__"              "$IMAGE"                    "$imageKeysFile"
+   v4m_replace "__${prefix}IMAGE_TAG__"          "$VERSION"                  "$imageKeysFile"
+   v4m_replace "__${prefix}IMAGE_PULL_POLICY__"  "$v4m_pullPolicy"           "$imageKeysFile"
+   v4m_replace "__${prefix}IMAGE_PULL_SECRET__"  "$pullsecret_text"          "$imageKeysFile"       #Handle Charts Accepting a Single Image Pull Secret
+   v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" "$pullsecrets_text"         "$imageKeysFile"       #Handle Charts Accepting Multiple Image Pull Secrets
+
+   return 0
+}
+
+
+export -f parseFullImage
+export -f v4m_replace
+export -f generateImageKeysFile

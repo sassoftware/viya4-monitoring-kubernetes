@@ -41,12 +41,6 @@ log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 set -e
 
 ##################################
-# Event Router                   #
-##################################
-
-logging/bin/deploy_eventrouter.sh
-
-##################################
 # OpenSearch Dashboards (Kibana) #
 ##################################
 # OSD take a while to spin up...deploying it first

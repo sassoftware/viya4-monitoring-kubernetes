@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2020-2024, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname $BASH_SOURCE)/../.."
@@ -47,25 +47,17 @@ if [ -z "$(kubectl get ns $MON_NS -o name 2>/dev/null)" ]; then
   disable_sa_token_automount $MON_NS default
 fi
 
-if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-  source bin/airgap-include.sh
+#Generate yaml file with all container-related keys
+generateImageKeysFile "$PROMOP_FULL_IMAGE"          "monitoring/prom-operator_container_image.template"
+generateImageKeysFile "$ALERTMANAGER_FULL_IMAGE"    "$imageKeysFile"  "ALERTMANAGER_"
+generateImageKeysFile "$ADMWEBHOOK_FULL_IMAGE"      "$imageKeysFile"  "ADMWEBHOOK_"
+generateImageKeysFile "$KSM_FULL_IMAGE"             "$imageKeysFile"  "KSM_"
+generateImageKeysFile "$NODEXPORT_FULL_IMAGE"       "$imageKeysFile"  "NODEXPORT_"
+generateImageKeysFile "$PROMETHEUS_FULL_IMAGE"      "$imageKeysFile"  "PROMETHEUS_"
+generateImageKeysFile "$CONFIGRELOAD_FULL_IMAGE"    "$imageKeysFile"  "CONFIGRELOAD_"
+generateImageKeysFile "$GRAFANA_FULL_IMAGE"         "$imageKeysFile"  "GRAFANA_"
+generateImageKeysFile "$GRAFANA_SIDECAR_FULL_IMAGE" "$imageKeysFile"  "SIDECAR_"
 
-  # Check for the image pull secret for the air gap environment and replace placeholders
-  checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-  replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-prom-operator.yaml"
-
-  airgapValuesFile=$updatedAirgapValuesFile
-
-  if [ "$TLS_ENABLE" == "true" ]; then
-    replaceAirgapValuesInFiles "monitoring/airgap/airgap-values-prom-operator-tls.yaml"
-    airgapTLSValuesFile=$updatedAirgapValuesFile
-  else
-    airgapTLSValuesFile=$TMP_DIR/empty.yaml
-  fi
-else
-  airgapValuesFile=$TMP_DIR/empty.yaml
-  airgapTLSValuesFile=$TMP_DIR/empty.yaml
-fi
 
 set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
@@ -208,15 +200,16 @@ fi
 # Get Helm Chart Name
 log_debug "Kube-Prometheus Stack Helm Chart: repo [$KUBE_PROM_STACK_CHART_REPO] name [$KUBE_PROM_STACK_CHART_NAME] version [$KUBE_PROM_STACK_CHART_VERSION]"
 chart2install="$(get_helmchart_reference $KUBE_PROM_STACK_CHART_REPO $KUBE_PROM_STACK_CHART_NAME $KUBE_PROM_STACK_CHART_VERSION)"
+versionstring="$(get_helm_versionstring  $KUBE_PROM_STACK_CHART_VERSION)"
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 helm $helmDebug upgrade --install $promRelease \
   --namespace $MON_NS \
+  -f $imageKeysFile \
   -f monitoring/values-prom-operator.yaml \
-  -f $airgapValuesFile \
   -f $istioValuesFile \
   -f $tlsValuesFile \
-  -f $airgapTLSValuesFile \
+  -f $tlsPromAlertingEndpointFile \
   -f $nodePortValuesFile \
   -f $wnpValuesFile \
   -f $PROM_OPER_USER_YAML \
@@ -231,7 +224,7 @@ helm $helmDebug upgrade --install $promRelease \
   --set grafana.adminPassword="$grafanaPwd" \
   --set grafana.serviceMonitor.scheme="$serviceMonitorEndpointScheme" \
   --set prometheus.prometheusSpec.alertingEndpoints[0].namespace="$MON_NS" \
-  --version $KUBE_PROM_STACK_CHART_VERSION \
+  $versionstring \
   $chart2install
 
 sleep 2
@@ -254,18 +247,8 @@ log_verbose "Deploying cluster ServiceMonitors"
 if [ "$TRACING_ENABLE" == "true" ]; then
   log_info "Tracing enabled..."
 
-  ## Check for air gap deployment
-  if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-    source bin/airgap-include.sh
-
-    # Check for the image pull secret for the air gap environment and replace placeholders
-    checkForAirgapSecretInNamespace "$AIRGAP_IMAGE_PULL_SECRET_NAME" "$MON_NS"
-    replaceAirgapValuesInFiles "monitoring/airgap/airgap-tempo-values.yaml"
-
-    airgapValuesFile=$updatedAirgapValuesFile
-  else
-    airgapValuesFile=$TMP_DIR/empty.yaml
-  fi
+  #Generate yaml file with all container-related keys
+  generateImageKeysFile "$TEMPO_FULL_IMAGE" "monitoring/tempo_container_image.template"
 
   # Add the grafana helm chart repo
   helmRepoAdd grafana https://grafana.github.io/helm-charts
@@ -274,15 +257,16 @@ if [ "$TRACING_ENABLE" == "true" ]; then
   # Get Helm Chart Name
   log_debug "Tempo Helm Chart: repo [$TEMPO_CHART_REPO] name [$TEMPO_CHART_NAME] version [$TEMPO_CHART_VERSION]"
   chart2install="$(get_helmchart_reference $TEMPO_CHART_REPO $TEMPO_CHART_NAME $TEMPO_CHART_VERSION)"
+  versionstring="$(get_helm_versionstring  $TEMPO_CHART_VERSION)"
   log_debug "Installing Helm chart from artifact [$chart2install]"
 
   log_info "Installing tempo"
   helm upgrade --install v4m-tempo \
     -n "$MON_NS" \
+    -f $imageKeysFile \
     -f monitoring/values-tempo.yaml \
     -f "$TEMPO_USER_YAML" \
-    -f "$airgapValuesFile" \
-    --version "$TEMPO_CHART_VERSION" \
+    $versionstring \
     $chart2install
 fi
 

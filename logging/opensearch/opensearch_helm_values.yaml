@@ -1,5 +1,16 @@
-image:
-  tag: 2.10.0
+
+## NOTE: All image.* and imagePullSecrets (and related) keys now derived from environment variables and generated at run-time (do not set here)
+###global:
+###  dockerRegistry: foo 
+###image:
+###  repository: foo
+###  pullPolicy: foo
+###  tag: foo
+###imagePullSecrets: foo
+###sysctlInit:
+###  image: foo
+###  imageTag: foo
+
 
 config: 
   opensearch.yml: |

@@ -1,6 +1,12 @@
 kind: Deployment
-image:
-  tag: 2.1.10
+
+## NOTE: All image.* and imagePullSecrets keys now derived from environment variables and generated at run-time (do not set here)
+###image:
+###  repository: foo
+###  pullPolicy: foo
+###  tag: foo
+###imagePullSecrets: foo
+
 replicaCount: 0
 
 rbac:

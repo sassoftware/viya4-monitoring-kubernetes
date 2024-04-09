@@ -1,10 +1,84 @@
 # SAS Viya Monitoring for Kubernetes
 
-## unreleased
+## Unreleased
+* **Overall**
 
 * **Metrics**
+  * [FIX] Connect to Grafana using https from auto-provisioning sidecar containers when TLS is enabled
   * [CHANGE] Helm settings related to configuring the Alertmanager endpoint for Prometheus moved into Ingress samples.  This consolidates the 
 majority of TLS-enabled ingres configuration in a single location and improves usability.
+ 
+* **Logging**
+  * [FIX] Corrected parser definition for Consul messages to eliminate ERROR/WARNING messages in Fluent Bit pod logs
+  * [CHANGE] Added parser/processing for Redis log messsages
+  * [CHANGE] Added parser/processing for Calico (CNI) log messsages
+  * [UPGRADE] Upgraded OpenSearch/OpenSearch Dashboards from 2.10.0 to 2.12.0
+  * [UPGRADE] Elasticsearch Exporter has been upgraded from 1.6.0 to 1.7.0
+
+* **Tracing**
+
+## Version 1.2.23 (19MAR2024)
+* **Overall**
+  * [CHANGE] Drop support for OpenShift 4.11; the minimum supported version of OpenShift is now 4.12.
+  * [FIX] Revised `samples/azure-deployment/README.md` to remove obsolete information and bring content up-to-date. (Fixes #612)
+
+* **Metrics**
+  * [ANNOUNCEMENT] In an upcoming release, we will be making a **BREAKING CHANGE** related to how the connection between Prometheus and 
+Alertmanager is configured.  Currently, we define the `prometheusSpec.alertingEndpoints.*` keys programmatically; but, after this change, 
+we will expect users to provide this information when they define the ingress resources associated with the metric monitoring applications 
+(e.g. Grafana, Prometheus and Alertmanger).  This will consolidate the connection and ingress configuration in the same place, the
+`$USER_DIR/monitoring/user-values-prom-operator.yaml` file.  This change will only be a **BREAKING CHANGE** when updating an existing deployment 
+that uses ingress to reach the metric monitoring applications or when using an ingress configurations based on the previous ingress sample.
+The [ingress sample](samples/ingress) has been updated to work with the new approach (see note below).  If you do not update your configuration before the 
+change is released, Prometheus will not be able to send alerts to Alertmanger after the change.  The release of this change is tenatively 
+scheduled for our 1.2.24 release (expected mid-April).
+  * [FIX] Set environment variable `MON_TLS_PATH_INGRESS` to ensure correct datasource connection between Grafana
+and Promethues in [Azure Deployment sample](samples/azure-deployment). (Fixes #614)
+  * [CHANGE] Replaced the ghostunnel sidecar proxy with Grafana's native TLS capabilities and eliminated ghostunnel from the project.
+  * [UPGRADE] Kube-prometheus-stack Helm chart has been upgraded from version 54.0.1 to	56.6.2
+  * [UPGRADE] Prometheus Operator has been upgraded from version 0.69.1 to 0.71.2
+  * [UPGRADE] Prometheus has been upgraded from version 2.47.1 to 2.49.1
+  * [UPGRADE] Grafana has been upgraded from version 10.2.1 to 10.3.3
+  * [UPGRADE] Grafana Helm Chart has been upgraded from version 7.0.4 to 7.3.0
+  * [UPGRADE] K8s-sidecar	has been upgraded from version 1.25.2 to 1.25.4
+  * [UPGRADE] Kube-state-metrics has been upgraded from version 2.10.0 to 2.10.1
+  * [UPGRADE] Pushgateway has been upgraded from version 1.6.2 to 1.7.0
+  * [UPGRADE] Pushgateway Helm Chart has been upgraded from version 2.4.2 to 2.6.0
+
+* **Logging**
+  * [FIX] Corrected comments referencing OpenSearch connection information in `samples/generic-base/logging/user-values-es-exporter.yaml`
+and `logging/user-values-es-exporter.yaml`.
+  * [FIX] Corrected typo in `logging/bin/deploy_fluentbit_azmonitor.sh` that prevented the script from executing properly.
+  * [UPGRADE] Fluent Bit has been upgraded from version 2.1.10 to 2.2.2
+
+
+## Version 1.2.22 (13FEB2024)
+* **Overall**
+  * [TASK] Refactored how container image and Helm chart version information is handled to permit automatically generating this information from files.  Note
+that this change does NOT alter how users provide this information should they wish to change it.  User should continue to include this information in the 
+appropriate user values yaml file within their USER_DIR directory.  However, specifying a Helm chart or container image version different than the default
+should rarely be necessary or appropriate.
+
+* **Metrics**
+  * [ANNOUNCEMENT] In an upcoming release, we will be making a **BREAKING CHANGE** related to how the connection between Prometheus and 
+Alertmanager is configured.  Currently, we define the `prometheusSpec.alertingEndpoints.*` keys programmatically; but, after this change, 
+we will expect users to provide this information when they define the ingress resources associated with the metric monitoring applications 
+(e.g. Grafana, Prometheus and Alertmanger).  This will consolidate the connection and ingress configuration in the same place, the
+`$USER_DIR/monitoring/user-values-prom-operator.yaml` file.  This change will only be a **BREAKING CHANGE** when updating an existing deployment 
+that uses ingress to reach the metric monitoring applications or when using an ingress configurations based on the previous ingress sample.
+The [ingress sample](samples/ingress) has been updated to work with the new approach (see note below).  If you do not update your configuration before the 
+change is released, Prometheus will not be able to send alerts to Alertmanger after the change.  The release of this change is tenatively 
+scheduled for our 1.2.23 release (expected mid-March).
+  * [CHANGE] The [ingress samples](samples/ingress) have been updated to accomodate an upcoming, potentially breaking, change (see note above).  These updated 
+ingress samples can be used now, prior to the change being released, since they are compatible with both the existing and new behavior.
+  * [FIX] Replaced obsolete container image name for OpenShift oauth proxy container
+
+* **Logging**
+  * [REMOVAL] The deploy_eventrouter.sh script has been removed.  The [Event Router component](https://github.com/vmware-archive/eventrouter) it deployed
+is no longer actively developed and was replaced with a Fluent Bit deployment focused on collecting Kubernetes events in our 1.2.19 release.
+
+* **Tracing**
+  * [FEATURE] By default, the Tempo datasource will now add the logs datasource connection so traces and logs can be connected.
 
 ## Version 1.2.21 (17JAN2024)
 

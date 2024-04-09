@@ -1,5 +1,20 @@
-image:
-  tag: 10.0.3
+
+## NOTE: All image.* and related  keys now derived from environment variables and generated at run-time (do not set here)
+##global:
+##  imageRegistry: foo
+##  imagePullSecrets: foo
+##image:
+##  registry: foo
+##  repository: foo
+##  tag: foo
+##  pullPolicy: foo
+##sidecar:
+##  image:
+##    registry: foo
+##    repository: foo
+##    tag: foo
+
+
 readinessProbe: null
 livenessProbe: null
 sidecar:
@@ -9,10 +24,6 @@ sidecar:
   datasources:
     enabled: true
     label: grafana_datasource
-  image:
-  #  registry: quay.io
-  #  repository: kiwigrid/k8s-sidecar
-    tag: 1.25.0
 deploymentStrategy:
   type: Recreate
 persistence:

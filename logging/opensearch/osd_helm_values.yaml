@@ -1,5 +1,9 @@
-image:
-  tag: 2.10.0
+## NOTE: All image.* and imagePullSecrets keys now derived from environment variables and generated at run-time (do not set here)
+###image:
+###  repository: foo
+###  tag: foo
+###  pullPolicy
+###imagePullSecrets
 
 opensearchHosts: "https://v4m-search:9200"
 
