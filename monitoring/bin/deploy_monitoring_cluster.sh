@@ -209,7 +209,6 @@ helm $helmDebug upgrade --install $promRelease \
   -f monitoring/values-prom-operator.yaml \
   -f $istioValuesFile \
   -f $tlsValuesFile \
-  -f $tlsPromAlertingEndpointFile \
   -f $nodePortValuesFile \
   -f $wnpValuesFile \
   -f $PROM_OPER_USER_YAML \

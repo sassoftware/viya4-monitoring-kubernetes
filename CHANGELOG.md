@@ -5,7 +5,7 @@
 
 * **Metrics**
   * [FIX] Connect to Grafana using https from auto-provisioning sidecar containers when TLS is enabled
-  * [CHANGE] Helm settings related to configuring the Alertmanager endpoint for Prometheus moved into Ingress samples.  This consolidates the 
+  * **[BREAKING CHANGE]** Helm settings related to configuring the Alertmanager endpoint for Prometheus moved into Ingress samples.  This consolidates the 
 majority of TLS-enabled ingres configuration in a single location and improves usability.
  
 * **Logging**
