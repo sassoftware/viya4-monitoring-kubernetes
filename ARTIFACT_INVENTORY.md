@@ -18,9 +18,9 @@ registry/repository/image_name:version
 |----|----|----|
 | Logging | BusyBox (OpenSearch) | docker.io/library/busybox:latest |
 | Logging | Fluent Bit | cr.fluentbit.io/fluent/fluent-bit:2.2.2 |
-| Logging | Elasticsearch Exporter | quay.io/prometheuscommunity/elasticsearch-exporter:v1.6.0 |
-| Logging | OpenSearch | docker.io/opensearchproject/opensearch:2.10.0 |
-| Logging | OpenSearch Dashboards| docker.io/opensearchproject/opensearch-dashboards:2.10.0 |
+| Logging | Elasticsearch Exporter | quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0 |
+| Logging | OpenSearch | docker.io/opensearchproject/opensearch:2.12.0 |
+| Logging | OpenSearch Dashboards| docker.io/opensearchproject/opensearch-dashboards:2.12.0 |
 | Metrics | Alertmanager | quay.io/prometheus/alertmanager:v0.26.0 |
 | Metrics | Grafana | docker.io/grafana/grafana:10.3.3 |
 | Metrics | Admission Webhook | registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6 |
@@ -50,10 +50,10 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 
 | Subsystem | Component | Helm Chart Repository | Helm Chart Name |Helm Chart Version | Helm Archive File Name|
 |--|--|--|--|--|--|
-| Logging | Elasticsearch Exporter| prometheus-community | prometheus-elasticsearch-exporter | 5.3.1 | prometheus-community/prometheus-elasticsearch-exporter-5.3.1.tgz |
+| Logging | Elasticsearch Exporter| prometheus-community | prometheus-elasticsearch-exporter | 5.6.0 | prometheus-community/prometheus-elasticsearch-exporter-5.6.0.tgz |
 | Logging | Fluent Bit| fluent | fluent-bit | 0.43.0 | fluent/fluent-bit-0.43.0.tgz |
-| Logging | OpenSearch| opensearch | opensearch | 2.15.0 | opensearch/opensearch-2.15.0.tgz |
-| Logging | OpenSearch Dashboard| opensearch | opensearch-dashboards | 2.13.0 | opensearch/opensearch-dashboards-2.13.0.tgz |
+| Logging | OpenSearch| opensearch | opensearch | 2.18.0 | opensearch/opensearch-2.18.0.tgz |
+| Logging | OpenSearch Dashboard| opensearch | opensearch-dashboards | 2.16.0 | opensearch/opensearch-dashboards-2.16.0.tgz |
 | Metrics | Grafana (on OpenShift)| grafana | grafana | 7.3.0 | grafana/grafana-7.3.0.tgz |
 | Metrics | Kube Prometheus Stack| prometheus-community | kube-prometheus-stack | 56.6.2 | prometheus-community/kube-prometheus-stack-56.6.2.tgz |
 | Metrics | Prometheus Pushgateway| prometheus-community | prometheus-pushgateway | 2.6.0 | prometheus-community/prometheus-pushgateway-2.6.0.tgz |
