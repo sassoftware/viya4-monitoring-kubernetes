@@ -6,7 +6,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.25
+       Set  fb_configMap_version 0.2.26
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -720,6 +720,24 @@ data:
        Rename          component   PROPS__component
     [FILTER]
        #
+       # Redis
+       #
+       Alias           flag_redis_msgs
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_matches   temp_k8sapp_name sas-redis-server|sas-airflow-redis
+       Copy            message   redis_message
+       Rename          message   unparsed_message
+       Add             flagged4parsing redis
+    [FILTER]
+       Alias           parse_redis_msgs
+       Name            parser
+       Match           kube.*
+       Key_name        redis_message
+       Parser          redis
+       Reserve_Data    On
+    [FILTER]
+       #
        # Zalando (Postgres)
        #
        Alias           flag_zpg
@@ -773,6 +791,7 @@ data:
        Parser          misc6
        Parser          misc7
        Parser          misc8
+       Parser          calico
        Parser          collectapiT
        Parser          collectapi
        Parser          haproxy_default
@@ -832,7 +851,7 @@ data:
        Alias          fix_level_debug
        Name           modify
        Match          *
-       Condition      Key_value_matches level (?i:DEBUG)|(?:\AD\z)|(?i:hint)|(?i:fine)|(?i:DBG)|(?i:DETAIL)
+       Condition      Key_value_matches level (?i:DEBUG)|(?:\AD\z)|(?i:hint)|(?i:fine)|(?i:DBG)|(?i:DETAIL)|(\.)
        Set            level DEBUG
        Set            __temp_level_fixed   Y
     [FILTER]
@@ -859,7 +878,7 @@ data:
        Name           modify
        Match          *
        Condition      Key_value_does_not_equal __temp_level_fixed Y
-       Condition      Key_value_matches level (?i:inf\w*)|(?i:note\w*)|(?i:log\w*)|(?:\AI\z)|(?i:Normal)|(?i:notice)
+       Condition      Key_value_matches level (?i:inf\w*)|(?i:note\w*)|(?i:log\w*)|(?:\AI\z)|(?i:Normal)|(?i:notice)|(-)|(\*)
        Set            level INFO
        Set            __temp_level_fixed   Y
     [FILTER]
@@ -886,7 +905,7 @@ data:
        Name           modify
        Match          *
        Condition      Key_value_does_not_equal __temp_level_fixed Y
-       Condition      Key_value_matches level (?i:war\w*)|(?:\AW\z)|(?i:wrn\w*)
+       Condition      Key_value_matches level (?i:war\w*)|(?:\AW\z)|(?i:wrn\w*)|(#)
        Set            level WARNING
        Set            __temp_level_fixed   Y
     [FILTER]
