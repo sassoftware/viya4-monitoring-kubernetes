@@ -1,8 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
-* **Overall**
-
+## Version 1.2.24 (16APR2024)
 * **Metrics**
   * [FIX] Connect to Grafana using https from auto-provisioning sidecar containers when TLS is enabled
  
@@ -12,8 +10,6 @@
   * [CHANGE] Added parser/processing for Calico (CNI) log messsages
   * [UPGRADE] Upgraded OpenSearch/OpenSearch Dashboards from 2.10.0 to 2.12.0
   * [UPGRADE] Elasticsearch Exporter has been upgraded from 1.6.0 to 1.7.0
-
-* **Tracing**
 
 ## Version 1.2.23 (19MAR2024)
 * **Overall**
