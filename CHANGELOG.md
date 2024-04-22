@@ -1,5 +1,15 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Overall**
+
+* **Metrics**
+
+* **Logging**
+
+* **Tracing**
+  * [UPGRADE] Upgraded Tempo from 2.2.0 to 2.4.1
+
 ## Version 1.2.24 (16APR2024)
 * **Metrics**
   * [FIX] Connect to Grafana using https from auto-provisioning sidecar containers when TLS is enabled
