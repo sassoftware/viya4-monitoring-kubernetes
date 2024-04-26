@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -23,8 +26,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 11350,
   "graphTooltip": 1,
-  "id": 178,
-  "iteration": 1646060994231,
+  "id": 177,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -75,7 +77,6 @@
         "y": 0
       },
       "id": 50,
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
@@ -89,12 +90,26 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "8.4.1",
+      "pluginVersion": "11.0.0-preview",
       "repeatDirection": "v",
       "targets": [
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "sum (erlang_vm_allocators{usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n* 100",
           "format": "time_series",
           "intervalFactor": 1,
@@ -151,7 +166,6 @@
         "y": 0
       },
       "id": 51,
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
@@ -165,12 +179,26 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "8.4.1",
+      "pluginVersion": "11.0.0-preview",
       "repeatDirection": "v",
       "targets": [
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "(\n  sum (erlang_vm_allocators{usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n  -\n  sum (erlang_vm_allocators{usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n) / sum (erlang_vm_allocators{usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n* 100",
           "format": "time_series",
           "intervalFactor": 1,
@@ -225,7 +253,6 @@
         "y": 0
       },
       "id": 215,
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "none",
@@ -239,12 +266,26 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "8.4.1",
+      "pluginVersion": "11.0.0-preview",
       "repeatDirection": "v",
       "targets": [
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "sum (erlang_vm_allocators{usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
           "format": "time_series",
           "intervalFactor": 1,
@@ -299,7 +340,6 @@
         "y": 0
       },
       "id": 216,
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "none",
@@ -313,12 +353,26 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "8.4.1",
+      "pluginVersion": "11.0.0-preview",
       "repeatDirection": "v",
       "targets": [
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "sum (erlang_vm_allocators{usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n-\nsum (erlang_vm_allocators{usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
           "format": "time_series",
           "intervalFactor": 1,
@@ -373,7 +427,6 @@
         "y": 0
       },
       "id": 188,
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "none",
@@ -387,12 +440,26 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "8.4.1",
+      "pluginVersion": "11.0.0-preview",
       "repeatDirection": "v",
       "targets": [
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "sum (erlang_vm_allocators{usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
           "format": "time_series",
           "intervalFactor": 1,
@@ -447,7 +514,6 @@
         "y": 0
       },
       "id": 214,
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "none",
@@ -461,12 +527,26 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "8.4.1",
+      "pluginVersion": "11.0.0-preview",
       "repeatDirection": "v",
       "targets": [
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "sum (rabbitmq_process_resident_memory_bytes * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
           "format": "time_series",
           "intervalFactor": 1,
@@ -477,26 +557,52 @@
       "type": "stat"
     },
     {
-      "columns": [
-        {
-          "text": "Min",
-          "value": "min"
-        },
-        {
-          "text": "Max",
-          "value": "max"
-        },
-        {
-          "text": "Avg",
-          "value": "avg"
-        },
-        {
-          "text": "Current",
-          "value": "current"
-        }
-      ],
       "datasource": "Prometheus",
-      "fontSize": "100%",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "decimals": 1,
+          "displayName": "",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Metric"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "custom.align"
+              }
+            ]
+          }
+        ]
+      },
       "gridPos": {
         "h": 7,
         "w": 8,
@@ -504,135 +610,237 @@
         "y": 3
       },
       "id": 59,
-      "pluginVersion": "6.4.1",
-      "scroll": true,
-      "showHeader": true,
-      "sort": {
-        "col": 3,
-        "desc": true
-      },
-      "styles": [
-        {
-          "alias": "",
-          "align": "auto",
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
           ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 0,
-          "mappingType": 1,
-          "pattern": "Metric",
-          "thresholds": [],
-          "type": "string",
-          "unit": "short"
+          "show": false
         },
-        {
-          "alias": "",
-          "align": "auto",
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 1,
-          "mappingType": 1,
-          "pattern": "/.*/",
-          "thresholds": [],
-          "type": "number",
-          "unit": "decbytes"
-        }
-      ],
+        "showHeader": true
+      },
+      "pluginVersion": "11.0.0-preview",
       "targets": [
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "rabbitmq_process_resident_memory_bytes * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"}",
           "legendFormat": "Resident Set Size",
           "refId": "A"
         },
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "sum (erlang_vm_allocators{usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
           "legendFormat": "Allocated Used",
           "refId": "B"
         },
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "sum (erlang_vm_allocators{usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n-\nsum (erlang_vm_allocators{usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
           "legendFormat": "Allocated Unused",
           "refId": "C"
         }
       ],
-      "transform": "timeseries_aggregations",
-      "type": "table-old"
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "includeTimeField": false,
+            "reducers": [
+              "min",
+              "max",
+              "mean",
+              "lastNotNull"
+            ]
+          }
+        }
+      ],
+      "type": "table"
     },
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "links": []
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "decbytes"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Allocated Used"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#37872D",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Allocated Unused"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#FADE2A",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Resident Set Size"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#C4162A",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "A",
+                  "mode": "none"
+                }
+              }
+            ]
+          }
+        ]
       },
-      "fill": 0,
-      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 16,
         "x": 8,
         "y": 3
       },
-      "hiddenSeries": false,
       "id": 61,
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": true,
-        "sort": "current",
-        "sortDesc": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.4.1",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "repeatDirection": "v",
-      "seriesOverrides": [
-        {
-          "alias": "Allocated Used",
-          "color": "#37872D"
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
         },
-        {
-          "alias": "Allocated Unused",
-          "color": "#FADE2A"
-        },
-        {
-          "alias": "Resident Set Size",
-          "color": "#C4162A",
-          "stack": false
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "desc"
         }
-      ],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
+      },
+      "pluginVersion": "8.4.1",
+      "repeatDirection": "v",
       "targets": [
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "rabbitmq_process_resident_memory_bytes * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"}",
           "format": "time_series",
           "instant": false,
@@ -641,46 +849,41 @@
           "refId": "A"
         },
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "sum (erlang_vm_allocators{usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
           "legendFormat": "Allocated Used",
           "refId": "B"
         },
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "sum (erlang_vm_allocators{usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n-\nsum (erlang_vm_allocators{usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
           "legendFormat": "Allocated Unused",
           "refId": "C"
         }
       ],
-      "thresholds": [],
-      "timeRegions": [],
-      "tooltip": {
-        "shared": true,
-        "sort": 2,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "mode": "time",
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "decimals": 1,
-          "format": "decbytes",
-          "logBase": 1,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "logBase": 1,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false
-      }
+      "type": "timeseries"
     },
     {
       "collapsed": false,
@@ -693,31 +896,78 @@
       },
       "id": 226,
       "panels": [],
+      "targets": [
+        {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "Allocated by Allocator Type",
       "type": "row"
     },
     {
-      "columns": [
-        {
-          "text": "Min",
-          "value": "min"
-        },
-        {
-          "text": "Max",
-          "value": "max"
-        },
-        {
-          "text": "Avg",
-          "value": "avg"
-        },
-        {
-          "text": "Current",
-          "value": "current"
-        }
-      ],
       "datasource": "Prometheus",
       "description": "",
-      "fontSize": "100%",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "decimals": 1,
+          "displayName": "",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Metric"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Memory Allocator"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "custom.align"
+              }
+            ]
+          }
+        ]
+      },
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -725,115 +975,150 @@
         "y": 11
       },
       "id": 55,
-      "pluginVersion": "6.4.1",
-      "scroll": true,
-      "showHeader": true,
-      "sort": {
-        "col": 3,
-        "desc": true
-      },
-      "styles": [
-        {
-          "alias": "Memory Allocator",
-          "align": "auto",
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
           ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 0,
-          "mappingType": 1,
-          "pattern": "Metric",
-          "thresholds": [],
-          "type": "string",
-          "unit": "short"
+          "show": false
         },
-        {
-          "alias": "",
-          "align": "auto",
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 1,
-          "mappingType": 1,
-          "pattern": "/.*/",
-          "thresholds": [],
-          "type": "number",
-          "unit": "decbytes"
-        }
-      ],
+        "showHeader": true
+      },
+      "pluginVersion": "11.0.0-preview",
       "targets": [
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "sum by(alloc) (erlang_vm_allocators{usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
           "legendFormat": "{{alloc}}",
           "refId": "A"
         }
       ],
-      "transform": "timeseries_aggregations",
-      "type": "table-old"
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "includeTimeField": false,
+            "reducers": [
+              "min",
+              "max",
+              "mean",
+              "lastNotNull"
+            ]
+          }
+        }
+      ],
+      "type": "table"
     },
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "links": []
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "decbytes"
         },
         "overrides": []
       },
-      "fill": 0,
-      "fillGradient": 0,
       "gridPos": {
         "h": 10,
         "w": 16,
         "x": 8,
         "y": 11
       },
-      "hiddenSeries": false,
       "id": 53,
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": true,
-        "sort": "current",
-        "sortDesc": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.4.1",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "repeatDirection": "v",
-      "seriesOverrides": [
-        {
-          "alias": "binary_alloc"
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "desc"
         }
-      ],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
+      },
+      "pluginVersion": "8.4.1",
+      "repeatDirection": "v",
       "targets": [
         {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
           "expr": "sum by(alloc) (erlang_vm_allocators{usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
           "format": "time_series",
           "instant": false,
@@ -842,36 +1127,7 @@
           "refId": "A"
         }
       ],
-      "thresholds": [],
-      "timeRegions": [],
-      "tooltip": {
-        "shared": true,
-        "sort": 2,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "mode": "time",
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "decimals": 1,
-          "format": "decbytes",
-          "logBase": 1,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "logBase": 1,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false
-      }
+      "type": "timeseries"
     },
     {
       "collapsed": true,
@@ -949,6 +1205,18 @@
           "pluginVersion": "8.4.1",
           "targets": [
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"mbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"carriers_size\", kind=\"mbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n* 100",
               "format": "time_series",
               "instant": false,
@@ -1021,6 +1289,18 @@
           "pluginVersion": "8.4.1",
           "targets": [
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"mbcs\", alloc=\"$memory_allocator\", usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"mbcs\", alloc=\"$memory_allocator\", usage=\"carriers\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "format": "time_series",
               "instant": false,
@@ -1093,6 +1373,18 @@
           "pluginVersion": "8.4.1",
           "targets": [
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"mbcs\", alloc=\"$memory_allocator\", usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"mbcs\", alloc=\"$memory_allocator\", usage=\"blocks\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "format": "time_series",
               "instant": false,
@@ -1168,6 +1460,18 @@
           "pluginVersion": "8.4.1",
           "targets": [
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"mbcs_pool\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"carriers_size\", kind=\"mbcs_pool\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n* 100",
               "format": "time_series",
               "instant": false,
@@ -1240,6 +1544,18 @@
           "pluginVersion": "8.4.1",
           "targets": [
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"mbcs_pool\", alloc=\"$memory_allocator\", usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"mbcs_pool\", alloc=\"$memory_allocator\", usage=\"carriers\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "format": "time_series",
               "instant": false,
@@ -1312,6 +1628,18 @@
           "pluginVersion": "8.4.1",
           "targets": [
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"mbcs_pool\", alloc=\"$memory_allocator\", usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"mbcs_pool\", alloc=\"$memory_allocator\", usage=\"blocks\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "format": "time_series",
               "instant": false,
@@ -1387,6 +1715,18 @@
           "pluginVersion": "8.4.1",
           "targets": [
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"sbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"carriers_size\", kind=\"sbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n* 100",
               "format": "time_series",
               "instant": false,
@@ -1459,6 +1799,18 @@
           "pluginVersion": "8.4.1",
           "targets": [
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"sbcs\", alloc=\"$memory_allocator\", usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"sbcs\", alloc=\"$memory_allocator\", usage=\"carriers\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "format": "time_series",
               "instant": false,
@@ -1531,6 +1883,18 @@
           "pluginVersion": "8.4.1",
           "targets": [
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"sbcs\", alloc=\"$memory_allocator\", usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"sbcs\", alloc=\"$memory_allocator\", usage=\"blocks\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "format": "time_series",
               "instant": false,
@@ -1613,31 +1977,103 @@
           ],
           "targets": [
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"mbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock - Used",
               "refId": "A"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"carriers_size\", kind=\"mbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n-\nsum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"mbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock - Unused",
               "refId": "B"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"mbcs_pool\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock Pool - Used",
               "refId": "C"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"carriers_size\", kind=\"mbcs_pool\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n-\nsum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"mbcs_pool\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock Pool - Unused",
               "refId": "D"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"sbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Singleblock - Used",
               "refId": "E"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"carriers_size\", kind=\"sbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n-\nsum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"sbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Singleblock - Unused",
               "refId": "F"
@@ -1723,6 +2159,18 @@
           "steppedLine": false,
           "targets": [
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"mbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "format": "time_series",
               "intervalFactor": 1,
@@ -1730,26 +2178,86 @@
               "refId": "A"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"carriers_size\", kind=\"mbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n-\nsum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"mbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock - Unused",
               "refId": "B"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"mbcs_pool\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock Pool - Used",
               "refId": "C"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"carriers_size\", kind=\"mbcs_pool\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n-\nsum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"mbcs_pool\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock Pool - Unused",
               "refId": "D"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"sbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Singleblock - Used",
               "refId": "E"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"carriers_size\", kind=\"sbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n-\nsum (erlang_vm_allocators{alloc=~\"$memory_allocator\", usage=\"blocks_size\", kind=\"sbcs\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Singleblock - Unused",
               "refId": "F"
@@ -1859,31 +2367,103 @@
           ],
           "targets": [
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"mbcs\", alloc=\"$memory_allocator\", usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"mbcs\", alloc=\"$memory_allocator\", usage=\"carriers\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock - Carrier",
               "refId": "A"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"mbcs\", alloc=\"$memory_allocator\", usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"mbcs\", alloc=\"$memory_allocator\", usage=\"blocks\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock - Block",
               "refId": "B"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"mbcs_pool\", alloc=\"$memory_allocator\", usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"mbcs_pool\", alloc=\"$memory_allocator\", usage=\"carriers\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock Pool - Carrier",
               "refId": "C"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"mbcs_pool\", alloc=\"$memory_allocator\", usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"mbcs_pool\", alloc=\"$memory_allocator\", usage=\"blocks\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock Pool - Block",
               "refId": "D"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"sbcs\", alloc=\"$memory_allocator\", usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"sbcs\", alloc=\"$memory_allocator\", usage=\"carriers\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Singleblock - Carrier",
               "refId": "E"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"sbcs\", alloc=\"$memory_allocator\", usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"sbcs\", alloc=\"$memory_allocator\", usage=\"blocks\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Singleblock - Block",
               "refId": "F"
@@ -1969,6 +2549,18 @@
           "steppedLine": false,
           "targets": [
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"mbcs\", alloc=\"$memory_allocator\", usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"mbcs\", alloc=\"$memory_allocator\", usage=\"blocks\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "format": "time_series",
               "intervalFactor": 1,
@@ -1976,26 +2568,86 @@
               "refId": "A"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"mbcs\", alloc=\"$memory_allocator\", usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"mbcs\", alloc=\"$memory_allocator\", usage=\"carriers\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock - Carrier",
               "refId": "B"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"mbcs_pool\", alloc=\"$memory_allocator\", usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"mbcs_pool\", alloc=\"$memory_allocator\", usage=\"blocks\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock Pool - Block",
               "refId": "C"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"mbcs_pool\", alloc=\"$memory_allocator\", usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"mbcs_pool\", alloc=\"$memory_allocator\", usage=\"carriers\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Multiblock Pool - Carrier",
               "refId": "D"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"sbcs\", alloc=\"$memory_allocator\", usage=\"blocks_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"sbcs\", alloc=\"$memory_allocator\", usage=\"blocks\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Singleblock - Block",
               "refId": "E"
             },
             {
+              "datasource": {
+                "0": "P",
+                "1": "r",
+                "2": "o",
+                "3": "m",
+                "4": "e",
+                "5": "t",
+                "6": "h",
+                "7": "e",
+                "8": "u",
+                "9": "s"
+              },
               "expr": "sum (erlang_vm_allocators{kind=\"sbcs\", alloc=\"$memory_allocator\", usage=\"carriers_size\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})\n/\nsum (erlang_vm_allocators{kind=\"sbcs\", alloc=\"$memory_allocator\", usage=\"carriers\"} * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\", rabbitmq_node=\"$rabbitmq_node\"})",
               "legendFormat": "Singleblock - Carrier",
               "refId": "F"
@@ -2035,13 +2687,29 @@
         }
       ],
       "repeat": "memory_allocator",
+      "targets": [
+        {
+          "datasource": {
+            "0": "P",
+            "1": "r",
+            "2": "o",
+            "3": "m",
+            "4": "e",
+            "5": "t",
+            "6": "h",
+            "7": "e",
+            "8": "u",
+            "9": "s"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "$memory_allocator",
       "type": "row"
     }
   ],
   "refresh": "15s",
-  "schemaVersion": 35,
-  "style": "dark",
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": [
@@ -2067,10 +2735,13 @@
       {
         "current": {
           "selected": false,
-          "text": "d42829",
-          "value": "d42829"
+          "text": "d81257",
+          "value": "d81257"
         },
-        "datasource": "Prometheus",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "definition": "label_values(rabbitmq_identity_info, namespace)",
         "hide": 0,
         "includeAll": false,
@@ -2094,10 +2765,13 @@
       {
         "current": {
           "selected": false,
-          "text": "rabbit@sas-rabbitmq-server-0.sas-rabbitmq-server.d42829.svc.cluster.local",
-          "value": "rabbit@sas-rabbitmq-server-0.sas-rabbitmq-server.d42829.svc.cluster.local"
+          "text": "rabbit@sas-rabbitmq-server-0.sas-rabbitmq-server.d81257.svc.cluster.local",
+          "value": "rabbit@sas-rabbitmq-server-0.sas-rabbitmq-server.d81257.svc.cluster.local"
         },
-        "datasource": "Prometheus",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "definition": "label_values(rabbitmq_identity_info{namespace=\"$namespace\"}, rabbitmq_cluster)",
         "hide": 0,
         "includeAll": false,
@@ -2121,10 +2795,13 @@
       {
         "current": {
           "selected": false,
-          "text": "rabbit@sas-rabbitmq-server-0.sas-rabbitmq-server.d42829.svc.cluster.local",
-          "value": "rabbit@sas-rabbitmq-server-0.sas-rabbitmq-server.d42829.svc.cluster.local"
+          "text": "rabbit@sas-rabbitmq-server-0.sas-rabbitmq-server.d81257.svc.cluster.local",
+          "value": "rabbit@sas-rabbitmq-server-0.sas-rabbitmq-server.d81257.svc.cluster.local"
         },
-        "datasource": "Prometheus",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "definition": "label_values(rabbitmq_identity_info{rabbitmq_cluster=\"$rabbitmq_cluster\", namespace=\"$namespace\"}, rabbitmq_node)",
         "hide": 0,
         "includeAll": false,
@@ -2151,7 +2828,10 @@
           "text": "All",
           "value": "$__all"
         },
-        "datasource": "Prometheus",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
         "definition": "label_values(erlang_vm_allocators, alloc)",
         "hide": 0,
         "includeAll": true,
@@ -2178,6 +2858,7 @@
     "from": "now-15m",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {
     "refresh_intervals": [
       "15s",
@@ -2199,8 +2880,8 @@
     ]
   },
   "timezone": "",
-  "title": "RabbitMQ-Erlang",
-  "uid": "20210118",
+  "title": "RabbitMQ-Erlang (MIGRATED)",
+  "uid": "fdjxcr8ys2m0wd",
   "version": 2,
   "weekStart": ""
 }
