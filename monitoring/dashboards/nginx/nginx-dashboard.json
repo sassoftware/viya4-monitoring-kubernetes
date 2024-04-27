@@ -1482,6 +1482,17 @@
           "options": {
             "reducers": []
           }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {}
+          }
         }
       ],
       "type": "table"
@@ -1494,6 +1505,7 @@
       "fieldConfig": {
         "defaults": {
           "custom": {
+            "align": "auto",
             "cellOptions": {
               "type": "auto"
             },
@@ -1506,7 +1518,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1520,26 +1533,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Time"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Time"
-              },
-              {
-                "id": "unit",
-                "value": "time: YYYY-MM-DD HH:mm:ss"
-              },
-              {
-                "id": "custom.align"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Current"
+              "options": "Last *"
             },
             "properties": [
               {
@@ -1565,7 +1559,8 @@
                   "mode": "absolute",
                   "steps": [
                     {
-                      "color": "rgba(245, 54, 54, 0.9)"
+                      "color": "rgba(245, 54, 54, 0.9)",
+                      "value": null
                     },
                     {
                       "color": "rgba(237, 129, 40, 0.89)",
@@ -1577,6 +1572,18 @@
                     }
                   ]
                 }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Field"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Certificate"
               }
             ]
           }
@@ -1802,8 +1809,8 @@
     ]
   },
   "timezone": "browser",
-  "title": "NGINX Ingress controller (MIGRATED)",
+  "title": "NGINX Ingress controller (MIGRATED Fixed)",
   "uid": "ddk0dbzbu33swa",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
