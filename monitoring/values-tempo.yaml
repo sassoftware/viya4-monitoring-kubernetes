@@ -22,10 +22,27 @@ tempo:
     enabled: true
     remoteWriteUrl: "http://v4m-prometheus.monitoring:9090/api/v1/write"
 
-  # global_overrides:
-  #   metrics_generator_processors:
-  #     - service-graphs
+  global_overrides:
+    # strategy: local
+    # limit_bytes: 15000000
+    max_traces_per_user: 5000000
+    ingestion_burst_size_bytes: 500000000
+    ingestion_rate_limit_bytes: 500000000
+    # metrics_generator_processors:
+    # - service-graphs
+    # - span-metrics
 
+  # overrides:
+  #   defaults:
+  #     ingestion:
+  #       strategy: local
+  #       limit_bytes: 15000000
+  #       max_traces_per_user: 10000
+  #       ingestion_burst_size_bytes: 100000000
+  #       ingestion_rate_limit_bytes: 50000000
+  #       metrics_generator_processors:
+  #               - service-graphs
+  #               - span-metrics
   retention: 24h
 
   # Tempo server configuration
@@ -33,6 +50,19 @@ tempo:
   server:
     # -- HTTP server listen port
     http_listen_port: 3100
+    grpc_server_max_recv_msg_size: 500000000
+    grpc_server_max_send_msg_size: 500000000
+
+  querier:
+    frontend_worker:
+      grpc_client_config:
+        max_send_msg_size: 500000000
+    trace_by_id:
+      query_timeout: "60s"
+    search:
+      query_timeout: "120s"
+    max_concurrent_queries: 50
+
   storage:
     trace:
       # tempo storage backend
