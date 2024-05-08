@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Metrics**
+  * [CHANGE] New Grafana dashboard Perf/Analysis added
+  * [CHANGE] Server-Side Apply now used in monitoring/bin/deploy_dashboards.sh script
+
 ## Version 1.2.24 (16APR2024)
 * **Metrics**
   * [FIX] Connect to Grafana using https from auto-provisioning sidecar containers when TLS is enabled
