@@ -16,7 +16,7 @@ jobs:
     - name: Run the generate script
       run: |
         chmod +x ./.github/workflows/build-artifact/generate_inventory.sh
-        ./.github/workflows/artifact/generate_inventory.sh
+        ./.github/workflows/build-artifact/generate_inventory.sh
         ls
         cat ARTIFACT_INVENTORY.md
       shell: bash
