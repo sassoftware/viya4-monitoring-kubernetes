@@ -4,6 +4,8 @@
 * **Overall**
 
 * **Metrics**
+  * [CHANGE] New Grafana dashboard Perf/Analysis added
+  * [CHANGE] Server-Side Apply now used in monitoring/bin/deploy_dashboards.sh script
 
 * **Logging**
 
