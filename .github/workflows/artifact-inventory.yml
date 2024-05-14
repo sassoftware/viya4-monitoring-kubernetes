@@ -1,0 +1,29 @@
+name: update-artifact-inventory
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+      # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Runs commands using the runners shell
+    - name: Run the generate script
+      run: |
+        chmod +x ./.github/workflows/build-artifact/generate_inventory.sh
+        ./.github/workflows/artifact/generate_inventory.sh
+        ls
+        cat ARTIFACT_INVENTORY.md
+      shell: bash
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v6
+      with:
+        commit-message: Update artifact inventory
+        branch: update-artifact-inventory
+        title: Update ARTIFACT_INVENTORY
+        base: main
