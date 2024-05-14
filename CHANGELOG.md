@@ -1,16 +1,13 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
-* **Overall**
-
+## Version 1.2.25 (14MAY2024)
 * **Metrics**
   * [CHANGE] New Grafana dashboard Perf/Analysis added
   * [CHANGE] Server-Side Apply now used in monitoring/bin/deploy_dashboards.sh script
 
-* **Logging**
-
 * **Tracing**
   * [UPGRADE] Upgraded Tempo from 2.2.0 to 2.4.1
+  * [CHANGE] Performance enhancements made to Tempo configuration to handle more traces
 
 ## Version 1.2.24 (16APR2024)
 * **Metrics**
