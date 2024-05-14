@@ -15,11 +15,8 @@ jobs:
     # Runs commands using the runners shell
     - name: Run the generate script
       run: |
-        ls
-        pwd
-        chmod +x ./.github/workflows/artifact/generate_inventory.sh
+        chmod +x ./.github/workflows/build-artifact/generate_inventory.sh
         ./.github/workflows/artifact/generate_inventory.sh
-        ls
         cat ARTIFACT_INVENTORY.md
       shell: bash
     - name: Create Pull Request
