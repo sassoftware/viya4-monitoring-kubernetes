@@ -1,5 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Logging**
+  * [SECURITY] Upgraded to Fluent Bit 3.0.4 to address critical security vulnerability (CVE-2024-4323)
+
 ## Version 1.2.25 (14MAY2024)
 * **Metrics**
   * [CHANGE] New Grafana dashboard Perf/Analysis added
