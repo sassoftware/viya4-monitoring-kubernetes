@@ -1,5 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Overall**
+  * [CHANGE] Eliminated use of `--short` option (deprecated in Kubernetes 1.28) from `kubectl version` commands
+
 ## Version 1.2.25 (14MAY2024)
 * **Metrics**
   * [CHANGE] New Grafana dashboard Perf/Analysis added
