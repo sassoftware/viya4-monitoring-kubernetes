@@ -1,6 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+* **Overall**
+  * [CHANGE] Eliminated use of `--short` option (deprecated in Kubernetes 1.28) from `kubectl version` commands
+
 * **Logging**
   * [SECURITY] Upgraded to Fluent Bit 3.0.6 to address critical security vulnerability [(CVE-2024-4323)](https://fluentbit.io/blog/2024/05/21/statement-on-cve-2024-4323-and-its-fix/)
 
