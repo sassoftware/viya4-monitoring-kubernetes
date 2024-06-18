@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -20,14 +23,15 @@
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "gnetId": null,
   "graphTooltip": 0,
-  "id": 111,
+  "id": 188,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 3,
@@ -37,17 +41,30 @@
       },
       "id": 11,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "![](https://www.sas.com/en_us/navigation/header/global-links-header/_jcr_content/par/styledcontainer_3b8d/par/image_baf8.img.png/1593461099449.png)\n",
         "mode": "markdown"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 3,
@@ -57,17 +74,30 @@
       },
       "id": 2,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "<h1>Welcome to SAS<sup>®</sup> Viya<sup>®</sup> Monitoring for Kubernetes</h1>\n",
         "mode": "html"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 6,
@@ -77,17 +107,30 @@
       },
       "id": 19,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "![](https://raw.githubusercontent.com/sassoftware/viya4-monitoring-kubernetes/master/img/sasViyaLogo_classicBlue.png)\n",
         "mode": "markdown"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 3,
@@ -97,17 +140,30 @@
       },
       "id": 9,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "## SAS Viya Dashboards for Administrators\n\nMonitor the performance of SAS Viya components:",
         "mode": "markdown"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 8,
@@ -117,17 +173,30 @@
       },
       "id": 13,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "![](https://miro.medium.com/max/921/1*7puR5_CHvGxJmnepMfUwYg.png)\n",
         "mode": "markdown"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 3,
@@ -137,19 +206,31 @@
       },
       "id": 6,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "## Kubernetes Dashboards for Administrators\nMonitor the performance of clusters and namespaces:",
         "mode": "markdown"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
-      "folderId": null,
       "gridPos": {
         "h": 5,
         "w": 10,
@@ -160,7 +241,8 @@
       "id": 21,
       "limit": 4,
       "options": {
-        "folderId": null,
+        "includeVars": false,
+        "keepTime": false,
         "maxItems": 4,
         "query": "",
         "showHeadings": false,
@@ -171,7 +253,7 @@
           "welcome-viya"
         ]
       },
-      "pluginVersion": "8.2.1",
+      "pluginVersion": "11.0.0-preview",
       "query": "",
       "recent": false,
       "search": true,
@@ -179,15 +261,22 @@
       "tags": [
         "welcome-viya"
       ],
-      "timeFrom": null,
-      "timeShift": null,
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "dashlist"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
-      "folderId": null,
       "gridPos": {
         "h": 5,
         "w": 10,
@@ -198,7 +287,8 @@
       "id": 20,
       "limit": 4,
       "options": {
-        "folderId": null,
+        "includeVars": false,
+        "keepTime": false,
         "maxItems": 4,
         "query": "",
         "showHeadings": false,
@@ -209,7 +299,7 @@
           "welcome-cluster"
         ]
       },
-      "pluginVersion": "8.2.1",
+      "pluginVersion": "11.0.0-preview",
       "query": "",
       "recent": false,
       "search": true,
@@ -217,13 +307,21 @@
       "tags": [
         "welcome-cluster"
       ],
-      "timeFrom": null,
-      "timeShift": null,
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "dashlist"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 3,
@@ -233,17 +331,30 @@
       },
       "id": 12,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": " ",
         "mode": "markdown"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 2,
@@ -253,17 +364,30 @@
       },
       "id": 24,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "## Documentation and Support\n",
         "mode": "markdown"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 4,
@@ -273,17 +397,30 @@
       },
       "id": 14,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "![](https://support.sas.com/en/support-home/_jcr_content/par/styledcontainer_1511041706/par/styledcontainer/par/styledcontainer_1517765672/par/image.img.png/1504883235316.png)\n",
         "mode": "markdown"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 2,
@@ -293,17 +430,30 @@
       },
       "id": 22,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "## Other Dashboards\n",
         "mode": "markdown"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 4,
@@ -313,17 +463,30 @@
       },
       "id": 23,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "",
         "mode": "markdown"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 4,
@@ -333,17 +496,30 @@
       },
       "id": 16,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "### SAS Viya\n\n* [Operations](https://documentation.sas.com/?softwareId=mysas&softwareVersion=prod&docsetId=k8sag&docsetTarget=p1n1sa2fm6xpr3n18dppwdpv6pfr.htm)\n* [Administration](https://documentation.sas.com/?softwareId=viyaadmin&softwareVersion=prod&docsetId=calmonitoring&docsetTarget=titlepage.htm&locale=en)\n* [SAS Technical Support](https://support.sas.com)\n",
         "mode": "markdown"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 7,
@@ -353,19 +529,31 @@
       },
       "id": 26,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "### Get More Help\n\n * [SAS Viya Monitoring for Kubernetes Help Center](http://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default)\n* [SAS Viya Monitoring on GitHub](https://github.com/sassoftware/viya4-monitoring-kubernetes)\n* [View Open Issues](https://github.com/sassoftware/viya4-monitoring-kubernetes/issues)\n* [Report a New Issue](https://github.com/sassoftware/viya4-monitoring-kubernetes/issues/new)",
         "mode": "markdown"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
-      "folderId": null,
       "gridPos": {
         "h": 12,
         "w": 10,
@@ -376,6 +564,8 @@
       "id": 4,
       "limit": 10,
       "options": {
+        "includeVars": false,
+        "keepTime": false,
         "maxItems": 10,
         "query": "",
         "showHeadings": true,
@@ -384,7 +574,7 @@
         "showStarred": true,
         "tags": []
       },
-      "pluginVersion": "8.2.1",
+      "pluginVersion": "11.0.0-preview",
       "query": "",
       "recent": true,
       "search": false,
@@ -393,13 +583,21 @@
         "sas-viya",
         "welcome"
       ],
-      "timeFrom": null,
-      "timeShift": null,
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "dashlist"
     },
     {
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": {
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "",
       "gridPos": {
         "h": 7,
@@ -409,18 +607,28 @@
       },
       "id": 25,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "### Grafana\n\n* [Documentation](https://grafana.com/docs/grafana/latest)\n* [Tutorials](https://grafana.com/tutorials)\n* [Community Dashboards](https://grafana.com/grafana/dashboards/)",
         "mode": "markdown"
       },
-      "pluginVersion": "8.2.1",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "11.0.0-preview",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "refId": "A"
+        }
+      ],
       "transparent": true,
       "type": "text"
     }
   ],
-  "schemaVersion": 31,
-  "style": "dark",
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
@@ -429,6 +637,7 @@
     "from": "now-6h",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {
     "hidden": true,
     "refresh_intervals": [
@@ -444,7 +653,8 @@
     ]
   },
   "timezone": "",
-  "title": "SAS Viya Welcome",
-  "uid": "Dye6UTIMz",
-  "version": 6
+  "title": "SAS Viya Welcome (MIGRATED)",
+  "uid": "fdjxed8sx9wxsc",
+  "version": 1,
+  "weekStart": ""
 }
