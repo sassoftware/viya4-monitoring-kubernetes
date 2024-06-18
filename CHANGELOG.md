@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.26 (18JUN2024)
 * **Overall**
   * [CHANGE] Eliminated use of `--short` option (deprecated in Kubernetes 1.28) from `kubectl version` commands
 
