@@ -20,7 +20,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 5450,
   "graphTooltip": 0,
-  "id": 166,
+  "id": 49,
   "links": [],
   "panels": [
     {
@@ -73,7 +73,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -202,8 +202,8 @@
       "options": {
         "legend": {
           "calcs": [
-            "lastNotNull",
-            "max"
+            "max",
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "right",
@@ -250,7 +250,7 @@
           "custom": {
             "align": "auto",
             "cellOptions": {
-              "type": "auto"
+              "type": "color-text"
             },
             "inspect": false
           },
@@ -259,7 +259,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "blue",
                 "value": null
               },
               {
@@ -330,11 +330,8 @@
                   "mode": "absolute",
                   "steps": [
                     {
-                      "color": "rgba(50, 172, 45, 0.97)",
+                      "color": "blue",
                       "value": null
-                    },
-                    {
-                      "color": "rgba(237, 129, 40, 0.89)"
                     }
                   ]
                 }
@@ -429,9 +426,10 @@
           ],
           "show": false
         },
-        "showHeader": true
+        "showHeader": true,
+        "sortBy": []
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -569,8 +567,8 @@
     "type": "timepicker"
   },
   "timezone": "browser",
-  "title": "Alerts (MIGRATED)",
-  "uid": "fdjxamq6susjkb",
+  "title": "Alerts (MIGRATED) 620",
+  "uid": "bdpd71dld6874e",
   "version": 1,
   "weekStart": ""
 }

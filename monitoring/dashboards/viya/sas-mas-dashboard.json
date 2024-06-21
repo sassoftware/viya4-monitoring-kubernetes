@@ -24,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 186,
+  "id": 63,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -256,7 +256,7 @@
         "sizing": "auto",
         "text": {}
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": "Prometheus",
@@ -316,7 +316,7 @@
         "sizing": "auto",
         "text": {}
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": "Prometheus",
@@ -376,7 +376,7 @@
         "sizing": "auto",
         "text": {}
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": "Prometheus",
@@ -436,7 +436,7 @@
         "sizing": "auto",
         "text": {}
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": "Prometheus",
@@ -496,7 +496,7 @@
         "sizing": "auto",
         "text": {}
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": "Prometheus",
@@ -556,7 +556,7 @@
         "sizing": "auto",
         "text": {}
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": "Prometheus",
@@ -1683,8 +1683,8 @@
     ]
   },
   "timezone": "browser",
-  "title": "SAS Micro Analytic Service (MIGRATED)",
-  "uid": "ddjxe3awl0l4we",
-  "version": 1,
+  "title": "SAS Micro Analytic Service (MIGRATED) 621",
+  "uid": "fdpgmguofn3eob",
+  "version": 2,
   "weekStart": ""
 }

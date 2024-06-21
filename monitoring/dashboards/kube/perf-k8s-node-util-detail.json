@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 171,
+  "id": 56,
   "links": [],
   "panels": [
     {
@@ -312,7 +312,7 @@
         "sizing": "auto",
         "text": {}
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -520,7 +520,7 @@
         "sizing": "auto",
         "text": {}
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -625,9 +625,9 @@
       "options": {
         "legend": {
           "calcs": [
-            "mean",
+            "min",
             "max",
-            "min"
+            "mean"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -819,56 +819,86 @@
       "type": "timeseries"
     },
     {
-      "aliasColors": {},
-      "autoMigrateFrom": "graph",
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": {
         "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
-          "links": []
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 40,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
         },
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 4,
       "gridPos": {
         "h": 7,
         "w": 12,
         "x": 0,
         "y": 24
       },
-      "hiddenSeries": false,
       "id": 8,
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
-      "percentage": false,
       "pluginVersion": "7.5.4",
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
       "targets": [
         {
           "datasource": {
@@ -882,89 +912,90 @@
           "refId": "A"
         }
       ],
-      "thresholds": [],
-      "timeRegions": [],
       "title": "Network Received",
-      "tooltip": {
-        "shared": true,
-        "sort": 2,
-        "value_type": "individual"
-      },
-      "type": "timeseries",
-      "xaxis": {
-        "mode": "time",
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "bytes",
-          "logBase": 1,
-          "min": 0,
-          "show": true
-        },
-        {
-          "format": "bytes",
-          "logBase": 1,
-          "min": 0,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false
-      }
+      "type": "timeseries"
     },
     {
-      "aliasColors": {},
-      "autoMigrateFrom": "graph",
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": {
         "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
-          "links": []
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
         },
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 3,
       "gridPos": {
         "h": 7,
         "w": 12,
         "x": 12,
         "y": 24
       },
-      "hiddenSeries": false,
       "id": 9,
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
-      "percentage": false,
       "pluginVersion": "7.5.4",
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
       "targets": [
         {
           "datasource": {
@@ -978,37 +1009,8 @@
           "refId": "A"
         }
       ],
-      "thresholds": [],
-      "timeRegions": [],
       "title": "Network Transmitted",
-      "tooltip": {
-        "shared": true,
-        "sort": 2,
-        "value_type": "individual"
-      },
-      "type": "timeseries",
-      "xaxis": {
-        "mode": "time",
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "bytes",
-          "logBase": 1,
-          "min": 0,
-          "show": true
-        },
-        {
-          "format": "bytes",
-          "logBase": 1,
-          "min": 0,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false
-      }
+      "type": "timeseries"
     }
   ],
   "refresh": false,
@@ -1069,8 +1071,8 @@
       {
         "current": {
           "selected": false,
-          "text": "aks-generic-41158879-vmss000019",
-          "value": "aks-generic-41158879-vmss000019"
+          "text": "apollo-m1.opsmonitor.sashq-d.openstack.sas.com",
+          "value": "apollo-m1.opsmonitor.sashq-d.openstack.sas.com"
         },
         "datasource": {
           "type": "prometheus",
@@ -1099,8 +1101,8 @@
       {
         "current": {
           "selected": false,
-          "text": "192.168.0.6:9110",
-          "value": "192.168.0.6:9110"
+          "text": "10.104.90.173:9110",
+          "value": "10.104.90.173:9110"
         },
         "datasource": {
           "type": "prometheus",
@@ -1158,8 +1160,8 @@
     ]
   },
   "timezone": "",
-  "title": "Perf / Node Utilization Detail (MIGRATED)",
-  "uid": "edjxbuvso5nuod",
-  "version": 1,
+  "title": "Perf / Node Utilization Detail (MIGRATED) 620",
+  "uid": "bdpdq38npaf40b",
+  "version": 2,
   "weekStart": ""
 }

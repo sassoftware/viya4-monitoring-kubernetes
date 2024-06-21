@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 172,
+  "id": 55,
   "links": [],
   "panels": [
     {
@@ -119,13 +119,13 @@
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -227,7 +227,7 @@
             "lastNotNull"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -353,13 +353,13 @@
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -460,7 +460,7 @@
             "lastNotNull"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -619,10 +619,10 @@
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -774,7 +774,7 @@
             "lastNotNull"
           ],
           "displayMode": "table",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -842,59 +842,91 @@
       "type": "row"
     },
     {
-      "aliasColors": {},
-      "autoMigrateFrom": "graph",
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": {
         "uid": "$datasource"
       },
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "links": []
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 70,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
         },
         "overrides": []
       },
-      "fill": 10,
-      "fillGradient": 7,
       "gridPos": {
         "h": 7,
         "w": 11,
         "x": 0,
         "y": 27
       },
-      "hiddenSeries": false,
       "id": 7,
-      "legend": {
-        "alignAsTable": true,
-        "avg": true,
-        "current": true,
-        "max": true,
-        "min": false,
-        "rightSide": true,
-        "show": true,
-        "sort": "avg",
-        "sortDesc": true,
-        "total": false,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null as zero",
       "options": {
-        "alertThreshold": true
+        "legend": {
+          "calcs": [
+            "max",
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
-      "percentage": false,
       "pluginVersion": "7.5.4",
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
       "targets": [
         {
           "datasource": {
@@ -910,88 +942,92 @@
           "step": 10
         }
       ],
-      "thresholds": [],
-      "timeRegions": [],
       "title": "Disk IO Utilization (2 local disk will cause 100% to go to 50%... TODO fix)",
-      "tooltip": {
-        "shared": true,
-        "sort": 2,
-        "value_type": "individual"
-      },
-      "type": "timeseries",
-      "xaxis": {
-        "mode": "time",
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "percentunit",
-          "logBase": 1,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "logBase": 1,
-          "show": false
-        }
-      ],
-      "yaxis": {
-        "align": false
-      }
+      "type": "timeseries"
     },
     {
-      "aliasColors": {},
-      "autoMigrateFrom": "graph",
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": {
         "uid": "$datasource"
       },
       "fieldConfig": {
         "defaults": {
-          "links": []
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 70,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
         },
         "overrides": []
       },
-      "fill": 10,
-      "fillGradient": 7,
       "gridPos": {
         "h": 7,
         "w": 11,
         "x": 11,
         "y": 27
       },
-      "hiddenSeries": false,
       "id": 8,
-      "legend": {
-        "alignAsTable": true,
-        "avg": false,
-        "current": true,
-        "max": false,
-        "min": false,
-        "rightSide": true,
-        "show": true,
-        "total": false,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null as zero",
       "options": {
-        "alertThreshold": true
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
-      "percentage": false,
       "pluginVersion": "7.5.4",
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
       "targets": [
         {
           "datasource": {
@@ -1007,36 +1043,8 @@
           "step": 10
         }
       ],
-      "thresholds": [],
-      "timeRegions": [],
       "title": "Disk IO Saturation",
-      "tooltip": {
-        "shared": true,
-        "sort": 2,
-        "value_type": "individual"
-      },
-      "type": "timeseries",
-      "xaxis": {
-        "mode": "time",
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "percentunit",
-          "logBase": 1,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "logBase": 1,
-          "show": false
-        }
-      ],
-      "yaxis": {
-        "align": false
-      }
+      "type": "timeseries"
     },
     {
       "collapsed": false,
@@ -1065,58 +1073,92 @@
       "type": "row"
     },
     {
-      "aliasColors": {},
-      "autoMigrateFrom": "graph",
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": {
         "uid": "$datasource"
       },
-      "decimals": 0,
       "description": "node local storage like ext4, xfs\nexcluding tmpfs & fuse.lxcfs",
       "fieldConfig": {
         "defaults": {
-          "links": []
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
         },
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 1,
       "gridPos": {
         "h": 12,
         "w": 11,
         "x": 0,
         "y": 35
       },
-      "hiddenSeries": false,
       "id": 17,
-      "legend": {
-        "alignAsTable": true,
-        "avg": true,
-        "current": true,
-        "max": true,
-        "min": true,
-        "rightSide": false,
-        "show": true,
-        "total": false,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null as zero",
       "options": {
-        "alertThreshold": true
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
-      "percentage": false,
       "pluginVersion": "7.5.4",
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
       "targets": [
         {
           "datasource": {
@@ -1164,36 +1206,8 @@
           "step": 10
         }
       ],
-      "thresholds": [],
-      "timeRegions": [],
       "title": "Disk Capacity Used",
-      "tooltip": {
-        "shared": true,
-        "sort": 2,
-        "value_type": "individual"
-      },
-      "type": "timeseries",
-      "xaxis": {
-        "mode": "time",
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "percentunit",
-          "logBase": 1,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "logBase": 1,
-          "show": false
-        }
-      ],
-      "yaxis": {
-        "align": false
-      }
+      "type": "timeseries"
     }
   ],
   "refresh": "1m",
@@ -1360,8 +1374,8 @@
     ]
   },
   "timezone": "",
-  "title": "Perf / Node Utilization (MIGRATED)",
-  "uid": "edjxby0bdhy4gb",
-  "version": 1,
+  "title": "Perf / Node Utilization (MIGRATED) 620",
+  "uid": "ddpdptyhvslq8f",
+  "version": 2,
   "weekStart": ""
 }

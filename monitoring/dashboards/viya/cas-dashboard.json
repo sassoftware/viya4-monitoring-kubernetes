@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 191,
+  "id": 59,
   "links": [],
   "panels": [
     {
@@ -42,12 +42,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "blue",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -56,169 +52,22 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "cas_server"
+              "id": "byRegexp",
+              "options": "/.*/"
             },
             "properties": [
               {
-                "id": "displayName",
-                "value": "CAS Server"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "version"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "CAS Version"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "name"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "OS Type"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "release"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "OS Kernel"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "system"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "OS Architecture"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "version"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "OS Version"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "state"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "State"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 24,
         "x": 0,
         "y": 0
@@ -236,7 +85,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -253,9 +102,32 @@
       "title": "CAS Server Info",
       "transformations": [
         {
-          "id": "merge",
+          "id": "organize",
           "options": {
-            "reducers": []
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "build_date": true,
+              "build_time": true,
+              "container": true,
+              "endpoint": true,
+              "instance": true,
+              "job": true,
+              "namespace": true,
+              "pod": true,
+              "sas_deployment": true,
+              "service": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "cas_server": "CAS Server",
+              "name": "OS Type",
+              "release": "OS Kernal",
+              "state": "State",
+              "system": "OS Architecture",
+              "version": "CAS Version"
+            }
           }
         }
       ],
@@ -300,7 +172,7 @@
         "h": 3,
         "w": 3,
         "x": 8,
-        "y": 3
+        "y": 4
       },
       "id": 19,
       "maxDataPoints": 100,
@@ -321,7 +193,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -376,7 +248,7 @@
         "h": 3,
         "w": 3,
         "x": 13,
-        "y": 3
+        "y": 4
       },
       "id": 18,
       "maxDataPoints": 100,
@@ -397,7 +269,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -480,16 +352,16 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 6
+        "y": 7
       },
       "id": 12,
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -583,16 +455,16 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 6
+        "y": 7
       },
       "id": 13,
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -686,7 +558,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 16
+        "y": 17
       },
       "id": 5,
       "options": {
@@ -785,7 +657,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 16
+        "y": 17
       },
       "id": 8,
       "options": {
@@ -847,10 +719,9 @@
       {
         "allValue": ".*",
         "current": {
-          "isNone": true,
           "selected": false,
-          "text": "None",
-          "value": ""
+          "text": "d79837",
+          "value": "d79837"
         },
         "datasource": {
           "type": "prometheus",
@@ -879,10 +750,9 @@
       {
         "allValue": ".*",
         "current": {
-          "isNone": true,
           "selected": false,
-          "text": "None",
-          "value": ""
+          "text": "cas-shared-default",
+          "value": "cas-shared-default"
         },
         "datasource": {
           "type": "prometheus",
@@ -929,8 +799,8 @@
     ]
   },
   "timezone": "",
-  "title": "SAS CAS Overview (MIGRATED)",
-  "uid": "edjxf5x4dlp8gc",
-  "version": 2,
+  "title": "SAS CAS Overview (MIGRATED) 620",
+  "uid": "edpdstt1pngg0d",
+  "version": 1,
   "weekStart": ""
 }

@@ -41,7 +41,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 189,
+  "id": 58,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -128,7 +128,7 @@
         "textMode": "name",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -212,7 +212,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -297,7 +297,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -411,8 +411,8 @@
       "options": {
         "legend": {
           "calcs": [
-            "lastNotNull",
-            "max"
+            "max",
+            "lastNotNull"
           ],
           "displayMode": "list",
           "placement": "bottom",
@@ -514,9 +514,9 @@
       "options": {
         "legend": {
           "calcs": [
+            "max",
             "mean",
-            "lastNotNull",
-            "max"
+            "lastNotNull"
           ],
           "displayMode": "list",
           "placement": "bottom",
@@ -615,8 +615,8 @@
       "options": {
         "legend": {
           "calcs": [
-            "lastNotNull",
-            "max"
+            "max",
+            "lastNotNull"
           ],
           "displayMode": "list",
           "placement": "bottom",
@@ -1223,8 +1223,8 @@
       "options": {
         "legend": {
           "calcs": [
-            "lastNotNull",
-            "max"
+            "max",
+            "lastNotNull"
           ],
           "displayMode": "list",
           "placement": "bottom",
@@ -1357,8 +1357,8 @@
         "allFormat": "glob",
         "current": {
           "selected": false,
-          "text": "sas-annotations-7d4bc84f75-gv9wj",
-          "value": "sas-annotations-7d4bc84f75-gv9wj"
+          "text": "sas-annotations-848d75d488-28rhg",
+          "value": "sas-annotations-848d75d488-28rhg"
         },
         "datasource": {
           "uid": "$Datasource"
@@ -1417,8 +1417,8 @@
     ]
   },
   "timezone": "browser",
-  "title": "SAS Go Service Details (MIGRATED)",
-  "uid": "cdjxewkbvgg00c",
+  "title": "SAS Go Service Details (MIGRATED) 620",
+  "uid": "adpdrstlg2iv4b",
   "version": 1,
   "weekStart": ""
 }

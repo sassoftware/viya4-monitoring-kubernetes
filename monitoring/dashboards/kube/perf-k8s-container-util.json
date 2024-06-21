@@ -22,7 +22,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 87,
+  "id": 53,
   "links": [],
   "panels": [
     {
@@ -114,7 +114,7 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 11,
+        "w": 12,
         "x": 0,
         "y": 1
       },
@@ -122,9 +122,9 @@
       "options": {
         "legend": {
           "calcs": [
-            "mean",
+            "min",
             "max",
-            "min"
+            "mean"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -218,17 +218,17 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 11,
-        "x": 11,
+        "w": 12,
+        "x": 12,
         "y": 1
       },
       "id": 38,
       "options": {
         "legend": {
           "calcs": [
-            "mean",
+            "min",
             "max",
-            "min"
+            "mean"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -334,7 +334,7 @@
       },
       "gridPos": {
         "h": 12,
-        "w": 11,
+        "w": 12,
         "x": 0,
         "y": 10
       },
@@ -342,9 +342,9 @@
       "options": {
         "legend": {
           "calcs": [
+            "max",
             "mean",
-            "lastNotNull",
-            "max"
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -446,17 +446,17 @@
       },
       "gridPos": {
         "h": 12,
-        "w": 11,
-        "x": 11,
+        "w": 12,
+        "x": 12,
         "y": 10
       },
       "id": 2,
       "options": {
         "legend": {
           "calcs": [
+            "max",
             "mean",
-            "lastNotNull",
-            "max"
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -558,7 +558,7 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 11,
+        "w": 12,
         "x": 0,
         "y": 22
       },
@@ -566,10 +566,10 @@
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -662,18 +662,18 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 11,
-        "x": 11,
+        "w": 12,
+        "x": 12,
         "y": 22
       },
       "id": 35,
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -766,7 +766,7 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 11,
+        "w": 12,
         "x": 0,
         "y": 32
       },
@@ -774,10 +774,10 @@
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -870,18 +870,18 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 11,
-        "x": 11,
+        "w": 12,
+        "x": 12,
         "y": 32
       },
       "id": 48,
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -951,7 +951,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "line"
+              "mode": "dashed"
             }
           },
           "mappings": [],
@@ -963,7 +963,7 @@
                 "color": "rgba(50, 116, 217, 0.2)"
               },
               {
-                "color": "transparent",
+                "color": "#00ff00",
                 "value": 100
               }
             ]
@@ -974,7 +974,7 @@
       },
       "gridPos": {
         "h": 11,
-        "w": 11,
+        "w": 12,
         "x": 0,
         "y": 41
       },
@@ -982,8 +982,8 @@
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "max"
+            "max",
+            "mean"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -1051,7 +1051,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "line"
+              "mode": "dashed"
             }
           },
           "mappings": [],
@@ -1063,7 +1063,7 @@
                 "color": "rgba(50, 116, 217, 0.2)"
               },
               {
-                "color": "transparent",
+                "color": "#00ff00",
                 "value": 100
               }
             ]
@@ -1074,16 +1074,16 @@
       },
       "gridPos": {
         "h": 11,
-        "w": 11,
-        "x": 11,
+        "w": 12,
+        "x": 12,
         "y": 41
       },
       "id": 15,
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "max"
+            "max",
+            "mean"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -1151,7 +1151,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "line"
+              "mode": "dashed"
             }
           },
           "mappings": [],
@@ -1164,7 +1164,7 @@
                 "color": "rgba(50, 116, 217, 0.2)"
               },
               {
-                "color": "transparent",
+                "color": "#00ff00",
                 "value": 100
               }
             ]
@@ -1175,7 +1175,7 @@
       },
       "gridPos": {
         "h": 11,
-        "w": 11,
+        "w": 12,
         "x": 0,
         "y": 52
       },
@@ -1183,9 +1183,9 @@
       "options": {
         "legend": {
           "calcs": [
+            "max",
             "mean",
-            "lastNotNull",
-            "max"
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -1254,7 +1254,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "line"
+              "mode": "dashed"
             }
           },
           "mappings": [],
@@ -1267,7 +1267,7 @@
                 "color": "rgba(50, 116, 217, 0.2)"
               },
               {
-                "color": "transparent",
+                "color": "#00ff00",
                 "value": 100
               }
             ]
@@ -1278,20 +1278,22 @@
       },
       "gridPos": {
         "h": 11,
-        "w": 11,
-        "x": 11,
+        "w": 12,
+        "x": 12,
         "y": 52
       },
       "id": 29,
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "max"
+            "max",
+            "mean"
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Max",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -1377,7 +1379,7 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 20,
+        "w": 24,
         "x": 0,
         "y": 63
       },
@@ -1385,10 +1387,10 @@
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "right",
@@ -1487,8 +1489,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
-        "w": 20,
+        "h": 6,
+        "w": 24,
         "x": 0,
         "y": 70
       },
@@ -1496,10 +1498,10 @@
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "right",
@@ -1590,16 +1592,16 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 20,
+        "w": 24,
         "x": 0,
-        "y": 77
+        "y": 76
       },
       "id": 5,
       "options": {
         "legend": {
           "calcs": [
-            "max",
-            "min"
+            "min",
+            "max"
           ],
           "displayMode": "table",
           "placement": "right",
@@ -1637,7 +1639,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 85
+        "y": 84
       },
       "id": 44,
       "panels": [
@@ -1694,6 +1696,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -1717,6 +1736,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -1740,6 +1776,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -1763,6 +1816,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -1786,6 +1856,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -1809,6 +1896,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -1832,6 +1936,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -1908,7 +2029,8 @@
                     }
                   },
                   {
-                    "id": "custom.align"
+                    "id": "custom.align",
+                    "value": "auto"
                   },
                   {
                     "id": "thresholds",
@@ -1944,6 +2066,7 @@
             "cellHeight": "sm",
             "footer": {
               "countRows": false,
+              "enablePagination": false,
               "fields": "",
               "reducer": [
                 "sum"
@@ -1958,7 +2081,7 @@
               }
             ]
           },
-          "pluginVersion": "11.0.0-preview",
+          "pluginVersion": "11.0.0",
           "targets": [
             {
               "datasource": {
@@ -2053,7 +2176,9 @@
               "id": "organize",
               "options": {
                 "excludeByName": {
-                  "Time": true
+                  "Time": true,
+                  "namespace": true,
+                  "node": true
                 },
                 "includeByName": {},
                 "indexByName": {},
@@ -2116,6 +2241,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -2135,6 +2277,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -2154,6 +2313,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -2173,6 +2349,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -2192,6 +2385,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -2211,6 +2421,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -2230,6 +2457,23 @@
                   },
                   {
                     "id": "custom.align"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "blue"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -2380,6 +2624,7 @@
             "cellHeight": "sm",
             "footer": {
               "countRows": false,
+              "enablePagination": false,
               "fields": "",
               "reducer": [
                 "sum"
@@ -2389,7 +2634,7 @@
             "showHeader": true,
             "sortBy": []
           },
-          "pluginVersion": "11.0.0-preview",
+          "pluginVersion": "11.0.0",
           "targets": [
             {
               "datasource": {
@@ -2843,8 +3088,8 @@
           "options": {
             "legend": {
               "calcs": [
-                "mean",
-                "max"
+                "max",
+                "mean"
               ],
               "displayMode": "table",
               "placement": "bottom",
@@ -2966,8 +3211,8 @@
           "options": {
             "legend": {
               "calcs": [
-                "mean",
-                "max"
+                "max",
+                "mean"
               ],
               "displayMode": "table",
               "placement": "bottom",
@@ -3053,7 +3298,7 @@
             "content": "",
             "mode": "markdown"
           },
-          "pluginVersion": "11.0.0-preview",
+          "pluginVersion": "11.0.0",
           "targets": [
             {
               "datasource": {
@@ -3309,8 +3554,8 @@
     ]
   },
   "timezone": "",
-  "title": "Perf / Container Utilization (MIGRATED Fixed)",
-  "uid": "edjxu7vhamhhcd",
-  "version": 1,
+  "title": "Perf / Container Utilization (MIGRATED Fixed) 620",
+  "uid": "fdpdnt7vituyoc",
+  "version": 2,
   "weekStart": ""
 }
