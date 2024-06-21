@@ -41,7 +41,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 180,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -128,7 +127,7 @@
         "textMode": "name",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -212,7 +211,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -297,7 +296,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -411,8 +410,8 @@
       "options": {
         "legend": {
           "calcs": [
-            "lastNotNull",
-            "max"
+            "max",
+            "lastNotNull"
           ],
           "displayMode": "list",
           "placement": "bottom",
@@ -514,9 +513,9 @@
       "options": {
         "legend": {
           "calcs": [
+            "max",
             "mean",
-            "lastNotNull",
-            "max"
+            "lastNotNull"
           ],
           "displayMode": "list",
           "placement": "bottom",
@@ -615,8 +614,8 @@
       "options": {
         "legend": {
           "calcs": [
-            "lastNotNull",
-            "max"
+            "max",
+            "lastNotNull"
           ],
           "displayMode": "list",
           "placement": "bottom",
@@ -786,7 +785,7 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 12,
+        "w": 9,
         "x": 0,
         "y": 12
       },
@@ -840,7 +839,7 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 10,
+            "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -852,10 +851,9 @@
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
-              "log": 10,
-              "type": "log"
+              "type": "linear"
             },
-            "showPoints": "never",
+            "showPoints": "auto",
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -865,10 +863,8 @@
               "mode": "off"
             }
           },
-          "decimals": 0,
           "links": [],
           "mappings": [],
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -881,64 +877,43 @@
                 "value": 80
               }
             ]
-          },
-          "unit": "short"
+          }
         },
         "overrides": []
       },
       "gridPos": {
         "h": 7,
-        "w": 6,
-        "x": 12,
+        "w": 9,
+        "x": 9,
         "y": 12
       },
-      "id": 61,
+      "id": 146,
       "options": {
+        "alertThreshold": true,
         "legend": {
-          "calcs": [
-            "lastNotNull",
-            "max"
-          ],
+          "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
           "maxHeight": 600,
-          "mode": "multi",
+          "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "8.2.1",
       "targets": [
         {
           "datasource": {
             "uid": "$Datasource"
           },
-          "expr": "process_open_fds{job=~\"$application\", pod=~\"$instance\"}",
-          "format": "time_series",
-          "hide": false,
-          "intervalFactor": 2,
-          "legendFormat": "open",
-          "metric": "",
-          "refId": "A",
-          "step": 2400
-        },
-        {
-          "datasource": {
-            "uid": "$Datasource"
-          },
-          "expr": "process_max_fds{job=~\"$application\", pod=~\"$instance\"}",
-          "format": "time_series",
-          "hide": false,
-          "intervalFactor": 2,
-          "legendFormat": "max",
-          "metric": "",
-          "refId": "B",
-          "step": 2400
+          "expr": "go_goroutines{namespace=~\"$namespace\", job=~\"$application\", pod=~\"$instance\"}",
+          "legendFormat": "{{level}}",
+          "range": true,
+          "refId": "A"
         }
       ],
-      "title": "File Descriptors",
+      "title": "Go Routines",
       "type": "timeseries"
     },
     {
@@ -1175,79 +1150,181 @@
       "type": "timeseries"
     },
     {
-      "collapsed": true,
       "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "$Datasource"
       },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "log": 10,
+              "type": "log"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 12,
+        "y": 20
+      },
+      "id": 61,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "8.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "$Datasource"
+          },
+          "expr": "process_open_fds{job=~\"$application\", pod=~\"$instance\"}",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "open",
+          "metric": "",
+          "refId": "A",
+          "step": 2400
+        },
+        {
+          "datasource": {
+            "uid": "$Datasource"
+          },
+          "expr": "process_max_fds{job=~\"$application\", pod=~\"$instance\"}",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 2,
+          "legendFormat": "max",
+          "metric": "",
+          "refId": "B",
+          "step": 2400
+        }
+      ],
+      "title": "File Descriptors",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
         "y": 27
       },
-      "id": 146,
-      "panels": [
-        {
-          "datasource": {
-            "type": "elasticsearch",
-            "uid": "PDF8E1733EF19439E"
-          },
-          "gridPos": {
-            "h": 24,
-            "w": 18,
-            "x": 0,
-            "y": 28
-          },
-          "id": 148,
-          "options": {
-            "dedupStrategy": "none",
-            "enableLogDetails": true,
-            "prettifyLogMessage": false,
-            "showCommonLabels": false,
-            "showLabels": false,
-            "showTime": true,
-            "sortOrder": "Descending",
-            "wrapLogMessage": true
-          },
-          "targets": [
-            {
-              "alias": "",
-              "bucketAggs": [],
-              "datasource": {
-                "type": "elasticsearch",
-                "uid": "PDF8E1733EF19439E"
-              },
-              "metrics": [
-                {
-                  "hide": false,
-                  "id": "1",
-                  "settings": {
-                    "limit": "500"
-                  },
-                  "type": "logs"
-                }
-              ],
-              "query": "logsource:\"$application\"",
-              "refId": "A",
-              "timeField": "@timestamp"
-            }
-          ],
-          "title": "Logs",
-          "type": "logs"
-        }
-      ],
+      "id": 147,
+      "panels": [],
+      "title": "Logs",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "uid": "ViyaLogs"
+      },
+      "gridPos": {
+        "h": 24,
+        "w": 18,
+        "x": 0,
+        "y": 28
+      },
+      "id": 148,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
       "targets": [
         {
+          "alias": "",
+          "bucketAggs": [],
           "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "ViyaLogs"
           },
-          "refId": "A"
+          "metrics": [
+            {
+              "hide": false,
+              "id": "1",
+              "settings": {
+                "limit": "500"
+              },
+              "type": "logs"
+            }
+          ],
+          "query": "logsource:\"$application\"",
+          "refId": "A",
+          "timeField": "@timestamp"
         }
       ],
       "title": "Logs",
-      "type": "row"
+      "type": "logs"
     }
   ],
   "refresh": "",
@@ -1283,7 +1360,6 @@
           "value": "$__all"
         },
         "datasource": {
-          "type": "prometheus",
           "uid": "$Datasource"
         },
         "definition": "label_values(sas_build_info{sas_service_base=\"golang\"},namespace)",
@@ -1313,7 +1389,6 @@
           "value": "sas-annotations"
         },
         "datasource": {
-          "type": "prometheus",
           "uid": "$Datasource"
         },
         "definition": "label_values(go_info{sas_service_base=\"golang\",namespace=~\"$namespace\"}, service)",
@@ -1340,11 +1415,10 @@
         "allFormat": "glob",
         "current": {
           "selected": false,
-          "text": "sas-annotations-7d4bc84f75-gv9wj",
-          "value": "sas-annotations-7d4bc84f75-gv9wj"
+          "text": "sas-annotations-68696c5c67-5wzws",
+          "value": "sas-annotations-68696c5c67-5wzws"
         },
         "datasource": {
-          "type": "prometheus",
           "uid": "$Datasource"
         },
         "definition": "label_values(go_info{job=\"$application\",namespace=~\"$namespace\"}, pod)",
@@ -1401,8 +1475,8 @@
     ]
   },
   "timezone": "browser",
-  "title": "SAS Go Service Details with Logs (MIGRATED)",
-  "uid": "fdjxdcrud4su8e",
+  "title": "SAS Go Service Details with Logs (MIGRATED) 620",
+  "uid": "3j9N_AlZk",
   "version": 1,
   "weekStart": ""
 }

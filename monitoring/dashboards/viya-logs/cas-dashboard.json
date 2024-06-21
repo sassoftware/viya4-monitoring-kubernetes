@@ -11,12 +11,6 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
-        "target": {
-          "limit": 100,
-          "matchAny": false,
-          "tags": [],
-          "type": "dashboard"
-        },
         "type": "dashboard"
       }
     ]
@@ -25,33 +19,18 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 179,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
       "collapsed": false,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
         "y": 0
       },
-      "id": 21,
+      "id": 20,
       "panels": [],
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "refId": "A"
-        }
-      ],
       "title": "CAS Server",
       "type": "row"
     },
@@ -75,12 +54,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "blue",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -89,169 +64,22 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "cas_server"
+              "id": "byRegexp",
+              "options": "/.*/"
             },
             "properties": [
               {
-                "id": "displayName",
-                "value": "CAS Server"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "version"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "CAS Version"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "name"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "OS Type"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "release"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "OS Kernel"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "system"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "OS Architecture"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "version"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "OS Version"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "state"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "State"
-              },
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "custom.align"
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 24,
         "x": 0,
         "y": 1
@@ -269,7 +97,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -286,9 +114,32 @@
       "title": "CAS Server Info",
       "transformations": [
         {
-          "id": "merge",
+          "id": "organize",
           "options": {
-            "reducers": []
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "build_date": true,
+              "build_time": true,
+              "container": true,
+              "endpoint": true,
+              "instance": true,
+              "job": true,
+              "namespace": true,
+              "pod": true,
+              "sas_deployment": true,
+              "service": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "cas_server": "CAS Server",
+              "name": "OS Type",
+              "release": "OS Kernal",
+              "state": "State",
+              "system": "OS Architecture",
+              "version": "CAS Version"
+            }
           }
         }
       ],
@@ -333,7 +184,7 @@
         "h": 3,
         "w": 3,
         "x": 8,
-        "y": 4
+        "y": 5
       },
       "id": 19,
       "maxDataPoints": 100,
@@ -354,7 +205,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -409,7 +260,7 @@
         "h": 3,
         "w": 3,
         "x": 13,
-        "y": 4
+        "y": 5
       },
       "id": 18,
       "maxDataPoints": 100,
@@ -430,7 +281,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0-preview",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -513,16 +364,16 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 7
+        "y": 8
       },
       "id": 12,
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -534,7 +385,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "8.2.1",
+      "pluginVersion": "7.4.1",
       "targets": [
         {
           "datasource": {
@@ -616,16 +467,16 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 7
+        "y": 8
       },
       "id": 13,
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -637,7 +488,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "8.2.1",
+      "pluginVersion": "7.4.1",
       "targets": [
         {
           "datasource": {
@@ -719,7 +570,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 17
+        "y": 18
       },
       "id": 5,
       "options": {
@@ -735,7 +586,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "8.2.1",
+      "pluginVersion": "7.4.1",
       "targets": [
         {
           "datasource": {
@@ -818,7 +669,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 17
+        "y": 18
       },
       "id": 8,
       "options": {
@@ -834,7 +685,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "8.2.1",
+      "pluginVersion": "7.4.1",
       "targets": [
         {
           "datasource": {
@@ -852,22 +703,17 @@
     },
     {
       "collapsed": true,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 26
       },
-      "id": 23,
+      "id": 21,
       "panels": [
         {
           "datasource": {
-            "type": "elasticsearch",
-            "uid": "PDF8E1733EF19439E"
+            "uid": "ViyaLogs"
           },
           "gridPos": {
             "h": 20,
@@ -875,7 +721,7 @@
             "x": 0,
             "y": 2
           },
-          "id": 25,
+          "id": 22,
           "options": {
             "dedupStrategy": "none",
             "enableLogDetails": true,
@@ -891,8 +737,7 @@
               "alias": "",
               "bucketAggs": [],
               "datasource": {
-                "type": "elasticsearch",
-                "uid": "PDF8E1733EF19439E"
+                "uid": "ViyaLogs"
               },
               "metrics": [
                 {
@@ -910,15 +755,6 @@
           ],
           "title": "Logs",
           "type": "logs"
-        }
-      ],
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "refId": "A"
         }
       ],
       "title": "Logs",
@@ -954,10 +790,9 @@
       {
         "allValue": ".*",
         "current": {
-          "isNone": true,
           "selected": false,
-          "text": "None",
-          "value": ""
+          "text": "d81257",
+          "value": "d81257"
         },
         "datasource": {
           "type": "prometheus",
@@ -986,10 +821,9 @@
       {
         "allValue": ".*",
         "current": {
-          "isNone": true,
           "selected": false,
-          "text": "None",
-          "value": ""
+          "text": "cas-shared-default",
+          "value": "cas-shared-default"
         },
         "datasource": {
           "type": "prometheus",
@@ -1036,8 +870,8 @@
     ]
   },
   "timezone": "",
-  "title": "SAS CAS Overview with Logs (MIGRATED)",
-  "uid": "fdjxd7jwy562ob",
-  "version": 2,
+  "title": "SAS CAS Overview with Logs (MIGRATED) 620",
+  "uid": "Ofw6e__Wk",
+  "version": 1,
   "weekStart": ""
 }
