@@ -1601,7 +1601,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "Kubernetes Deployment metrics (MIGRATED Fixes)",
+  "title": "Kubernetes Deployment metrics",
   "uid": "cdjxrn75nfh8ge",
   "version": 3,
   "weekStart": ""
