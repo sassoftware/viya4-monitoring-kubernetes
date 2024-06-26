@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 56,
+  "id": 98,
   "links": [],
   "panels": [
     {
@@ -631,7 +631,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Max",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -1032,6 +1034,7 @@
         "name": "datasource",
         "options": [],
         "query": "prometheus",
+        "queryValue": "",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -1071,8 +1074,8 @@
       {
         "current": {
           "selected": false,
-          "text": "apollo-m1.opsmonitor.sashq-d.openstack.sas.com",
-          "value": "apollo-m1.opsmonitor.sashq-d.openstack.sas.com"
+          "text": "gemini-m1.opsmonitor.sashq-d.openstack.sas.com",
+          "value": "gemini-m1.opsmonitor.sashq-d.openstack.sas.com"
         },
         "datasource": {
           "type": "prometheus",
@@ -1101,8 +1104,8 @@
       {
         "current": {
           "selected": false,
-          "text": "10.104.90.173:9110",
-          "value": "10.104.90.173:9110"
+          "text": "10.104.221.46:9110",
+          "value": "10.104.221.46:9110"
         },
         "datasource": {
           "type": "prometheus",
@@ -1161,7 +1164,7 @@
   },
   "timezone": "",
   "title": "Perf / Node Utilization Detail",
-  "uid": "bdpdq38npaf40b",
-  "version": 2,
+  "uid": "adpuzo6i8f9xcb",
+  "version": 1,
   "weekStart": ""
 }

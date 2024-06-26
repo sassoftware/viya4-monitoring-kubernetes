@@ -22,7 +22,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 53,
+  "id": 95,
   "links": [],
   "panels": [
     {
@@ -348,7 +348,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -460,7 +462,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -573,7 +577,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -677,7 +683,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -781,7 +789,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -885,7 +895,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -987,7 +999,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Max",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -1087,7 +1101,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Max",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -1189,7 +1205,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Max",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -1394,7 +1412,9 @@
           ],
           "displayMode": "table",
           "placement": "right",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -1505,7 +1525,9 @@
           ],
           "displayMode": "table",
           "placement": "right",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -1605,7 +1627,9 @@
           ],
           "displayMode": "table",
           "placement": "right",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Max",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -1646,7 +1670,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "${datasource}"
           },
           "description": "NOTE: using rules metrics, and % values are \"current use\" as a % of cpu",
           "fieldConfig": {
@@ -2086,7 +2110,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "sum by (pod,container) (kube_pod_container_resource_requests{job=\"kube-state-metrics\", resource=\"cpu\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\"})",
               "format": "table",
@@ -2097,7 +2121,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "sum by (pod,container) (kube_pod_container_resource_limits{job=\"kube-state-metrics\", resource=\"cpu\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\"})",
               "format": "table",
@@ -2108,7 +2132,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "(max_over_time(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\"}[$__range]))",
               "format": "table",
@@ -2119,7 +2143,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "(avg_over_time(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\"}[$__range]))",
               "format": "table",
@@ -2130,7 +2154,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "sum by (pod,container) (irate(container_cpu_usage_seconds_total{job=\"kubelet\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\", image!=\"\"}[4m]))",
               "format": "table",
@@ -2142,7 +2166,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "sum by (pod,container) (irate(container_cpu_usage_seconds_total{job=\"kubelet\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\", image!=\"\"}[4m])) / sum by (pod,container) (kube_pod_container_resource_requests{job=\"kube-state-metrics\", resource=\"cpu\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\"})\r",
               "format": "table",
@@ -2154,7 +2178,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "sum by (pod,container) (irate(container_cpu_usage_seconds_total{job=\"kubelet\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\", image!=\"\"}[4m])) / sum by (pod,container) (kube_pod_container_resource_limits{job=\"kube-state-metrics\", resource=\"cpu\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\"})",
               "format": "table",
@@ -2191,7 +2215,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "${datasource}"
           },
           "description": "NOTE: using rules metrics, and % values are \"current use\" as a % of mem",
           "fieldConfig": {
@@ -2632,14 +2656,19 @@
               "show": false
             },
             "showHeader": true,
-            "sortBy": []
+            "sortBy": [
+              {
+                "desc": true,
+                "displayName": "% of Lim(cur)"
+              }
+            ]
           },
           "pluginVersion": "11.0.0",
           "targets": [
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "sum by (pod,container) (kube_pod_container_resource_requests{job=\"kube-state-metrics\", resource=\"memory\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\"})\r",
               "format": "table",
@@ -2650,7 +2679,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "sum by (pod,container) (kube_pod_container_resource_limits{job=\"kube-state-metrics\", resource=\"memory\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\"})\r",
               "format": "table",
@@ -2661,7 +2690,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "(max_over_time(node_namespace_pod_container:container_memory_working_set_bytes{namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\"}[$__range]))",
               "format": "table",
@@ -2672,7 +2701,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "(max_over_time(node_namespace_pod_container:container_memory_cache{namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\"}[$__range]))",
               "format": "table",
@@ -2684,7 +2713,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "(avg_over_time(node_namespace_pod_container:container_memory_working_set_bytes{namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\"}[$__range]))",
               "format": "table",
@@ -2696,7 +2725,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "(avg_over_time(node_namespace_pod_container:container_memory_cache{namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\"}[$__range]))",
               "format": "table",
@@ -2709,7 +2738,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "sum by (pod,container) (container_memory_usage_bytes{job=\"kubelet\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\", image!=\"\"})\r",
               "format": "table",
@@ -2721,7 +2750,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "sum by (pod,container) (container_memory_usage_bytes{job=\"kubelet\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\", image!=\"\"})\r / sum by (pod,container) (kube_pod_container_resource_requests{job=\"kube-state-metrics\", resource=\"memory\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\"})\r",
               "format": "table",
@@ -2733,7 +2762,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "${datasource}"
               },
               "expr": "sum by (pod,container) (container_memory_usage_bytes{job=\"kubelet\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\", image!=\"\"})\r / sum by (pod,container) (kube_pod_container_resource_limits{job=\"kube-state-metrics\", resource=\"memory\", namespace=~\"$namespace\", pod=~\"$pod\", container=~\"$container\", container!=\"POD\"})\r",
               "format": "table",
@@ -3330,7 +3359,7 @@
       "type": "row"
     }
   ],
-  "refresh": "1m",
+  "refresh": "",
   "schemaVersion": 39,
   "tags": [
     "kubernetes-cluster",
@@ -3341,8 +3370,8 @@
       {
         "current": {
           "selected": false,
-          "text": "Prometheus",
-          "value": "PBFA97CFB590B2093"
+          "text": "prometheus-1",
+          "value": "ddprsjoyabxfka"
         },
         "hide": 0,
         "includeAll": false,
@@ -3350,6 +3379,7 @@
         "name": "datasource",
         "options": [],
         "query": "prometheus",
+        "queryValue": "",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -3555,7 +3585,7 @@
   },
   "timezone": "",
   "title": "Perf / Container Utilization",
-  "uid": "fdpdnt7vituyoc",
-  "version": 2,
+  "uid": "edpuwmiugcidce",
+  "version": 3,
   "weekStart": ""
 }

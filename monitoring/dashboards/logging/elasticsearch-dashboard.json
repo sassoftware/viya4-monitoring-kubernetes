@@ -20,7 +20,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 2322,
   "graphTooltip": 1,
-  "id": 52,
+  "id": 91,
   "links": [
     {
       "asDropdown": true,
@@ -1363,7 +1363,7 @@
             "h": 11,
             "w": 12,
             "x": 0,
-            "y": 3
+            "y": 9
           },
           "id": 7,
           "options": {
@@ -1376,7 +1376,9 @@
               ],
               "displayMode": "table",
               "placement": "bottom",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -1464,7 +1466,7 @@
             "h": 11,
             "w": 12,
             "x": 12,
-            "y": 3
+            "y": 9
           },
           "id": 27,
           "options": {
@@ -1477,7 +1479,9 @@
               ],
               "displayMode": "table",
               "placement": "bottom",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -1815,7 +1819,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 5
+            "y": 11
           },
           "id": 79,
           "options": {
@@ -1912,7 +1916,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 12
+            "y": 18
           },
           "id": 80,
           "options": {
@@ -2074,7 +2078,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -2207,7 +2213,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -2310,7 +2318,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -2427,14 +2437,16 @@
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull",
+            "min",
             "max",
-            "min"
+            "mean",
+            "lastNotNull"
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -2576,7 +2588,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -2690,7 +2704,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -2827,7 +2843,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -3030,7 +3048,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Mean",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -3335,7 +3355,7 @@
             "h": 11,
             "w": 12,
             "x": 0,
-            "y": 9
+            "y": 70
           },
           "id": 33,
           "options": {
@@ -3436,7 +3456,7 @@
             "h": 11,
             "w": 12,
             "x": 12,
-            "y": 9
+            "y": 70
           },
           "id": 5,
           "options": {
@@ -3537,7 +3557,7 @@
             "h": 11,
             "w": 12,
             "x": 0,
-            "y": 20
+            "y": 81
           },
           "id": 3,
           "options": {
@@ -3587,7 +3607,7 @@
               },
               "custom": {
                 "axisBorderShow": false,
-                "axisCenteredZero": false,
+                "axisCenteredZero": true,
                 "axisColorMode": "text",
                 "axisLabel": "Time",
                 "axisPlacement": "auto",
@@ -3638,7 +3658,7 @@
             "h": 11,
             "w": 12,
             "x": 12,
-            "y": 20
+            "y": 81
           },
           "id": 87,
           "options": {
@@ -3787,7 +3807,7 @@
             "h": 11,
             "w": 24,
             "x": 0,
-            "y": 10
+            "y": 71
           },
           "id": 48,
           "options": {
@@ -3800,7 +3820,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -4008,7 +4030,7 @@
             "h": 11,
             "w": 24,
             "x": 0,
-            "y": 21
+            "y": 82
           },
           "id": 49,
           "options": {
@@ -4021,7 +4043,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -4195,7 +4219,7 @@
               },
               "custom": {
                 "axisBorderShow": false,
-                "axisCenteredZero": false,
+                "axisCenteredZero": true,
                 "axisColorMode": "text",
                 "axisLabel": "",
                 "axisPlacement": "auto",
@@ -4267,7 +4291,7 @@
             "h": 20,
             "w": 6,
             "x": 0,
-            "y": 11
+            "y": 72
           },
           "id": 45,
           "options": {
@@ -4386,7 +4410,7 @@
             "h": 20,
             "w": 6,
             "x": 6,
-            "y": 11
+            "y": 72
           },
           "id": 46,
           "options": {
@@ -4398,7 +4422,9 @@
               ],
               "displayMode": "table",
               "placement": "bottom",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -4505,7 +4531,7 @@
             "h": 20,
             "w": 6,
             "x": 12,
-            "y": 11
+            "y": 72
           },
           "id": 43,
           "options": {
@@ -4517,7 +4543,9 @@
               ],
               "displayMode": "table",
               "placement": "bottom",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -4624,7 +4652,7 @@
             "h": 20,
             "w": 6,
             "x": 18,
-            "y": 11
+            "y": 72
           },
           "id": 44,
           "options": {
@@ -4749,7 +4777,7 @@
             "h": 11,
             "w": 12,
             "x": 0,
-            "y": 12
+            "y": 73
           },
           "id": 4,
           "options": {
@@ -4762,7 +4790,9 @@
               ],
               "displayMode": "table",
               "placement": "bottom",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -4850,7 +4880,7 @@
             "h": 11,
             "w": 12,
             "x": 12,
-            "y": 12
+            "y": 73
           },
           "id": 34,
           "options": {
@@ -4863,7 +4893,9 @@
               ],
               "displayMode": "table",
               "placement": "bottom",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -4951,7 +4983,7 @@
             "h": 11,
             "w": 8,
             "x": 0,
-            "y": 23
+            "y": 84
           },
           "id": 35,
           "options": {
@@ -4964,7 +4996,9 @@
               ],
               "displayMode": "table",
               "placement": "bottom",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -5052,7 +5086,7 @@
             "h": 11,
             "w": 8,
             "x": 8,
-            "y": 23
+            "y": 84
           },
           "id": 36,
           "options": {
@@ -5065,7 +5099,9 @@
               ],
               "displayMode": "table",
               "placement": "bottom",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -5153,7 +5189,7 @@
             "h": 11,
             "w": 8,
             "x": 16,
-            "y": 23
+            "y": 84
           },
           "id": 84,
           "options": {
@@ -5166,7 +5202,9 @@
               ],
               "displayMode": "table",
               "placement": "bottom",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -5281,7 +5319,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 13
+            "y": 74
           },
           "id": 85,
           "options": {
@@ -5293,7 +5331,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -5378,7 +5418,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 20
+            "y": 81
           },
           "id": 86,
           "options": {
@@ -5390,7 +5430,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -5502,7 +5544,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 14
+            "y": 75
           },
           "id": 75,
           "options": {
@@ -5514,7 +5556,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -5599,7 +5643,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 21
+            "y": 82
           },
           "id": 83,
           "options": {
@@ -5611,7 +5655,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -5696,19 +5742,21 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 28
+            "y": 89
           },
           "id": 76,
           "options": {
             "legend": {
               "calcs": [
-                "mean",
+                "min",
                 "max",
-                "min"
+                "mean"
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -5759,47 +5807,110 @@
       "id": 104,
       "panels": [
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
           "datasource": {
             "uid": "$datasource"
           },
-          "fill": 1,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byValue",
+                  "options": {
+                    "op": "gte",
+                    "reducer": "allIsZero",
+                    "value": 0
+                  }
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": true,
+                      "tooltip": true,
+                      "viz": false
+                    }
+                  }
+                ]
+              }
+            ]
+          },
           "gridPos": {
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 99
+            "y": 76
           },
           "id": 61,
-          "legend": {
-            "alignAsTable": true,
-            "avg": true,
-            "current": false,
-            "hideZero": true,
-            "max": true,
-            "min": true,
-            "rightSide": true,
-            "show": true,
-            "sort": "avg",
-            "sortDesc": true,
-            "total": false,
-            "values": true
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "maxHeight": 600,
+              "mode": "multi",
+              "sort": "desc"
+            }
           },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
           "targets": [
             {
               "datasource": {
@@ -5812,74 +5923,114 @@
               "refId": "A"
             }
           ],
-          "thresholds": [],
           "title": "Index writer with only primary shards on all nodes in bytes",
-          "tooltip": {
-            "shared": true,
-            "sort": 2,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "mode": "time",
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "bytes",
-              "logBase": 1,
-              "show": true
-            },
-            {
-              "format": "short",
-              "logBase": 1,
-              "show": false
-            }
-          ]
+          "type": "timeseries"
         },
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
           "datasource": {
             "uid": "$datasource"
           },
-          "fill": 1,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byValue",
+                  "options": {
+                    "op": "gte",
+                    "reducer": "allIsZero",
+                    "value": 0
+                  }
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": true,
+                      "tooltip": true,
+                      "viz": false
+                    }
+                  }
+                ]
+              }
+            ]
+          },
           "gridPos": {
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 106
+            "y": 83
           },
           "id": 62,
-          "legend": {
-            "alignAsTable": true,
-            "avg": true,
-            "current": false,
-            "hideZero": true,
-            "max": true,
-            "min": true,
-            "rightSide": true,
-            "show": true,
-            "sort": "avg",
-            "sortDesc": true,
-            "total": false,
-            "values": true
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "maxHeight": 600,
+              "mode": "multi",
+              "sort": "desc"
+            }
           },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
           "targets": [
             {
               "datasource": {
@@ -5892,31 +6043,8 @@
               "refId": "A"
             }
           ],
-          "thresholds": [],
           "title": "Index writer with all shards on all nodes in bytes",
-          "tooltip": {
-            "shared": true,
-            "sort": 2,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "mode": "time",
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "bytes",
-              "logBase": 1,
-              "show": true
-            },
-            {
-              "format": "short",
-              "logBase": 1,
-              "show": false
-            }
-          ]
+          "type": "timeseries"
         }
       ],
       "targets": [
@@ -6007,7 +6135,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 16
+            "y": 77
           },
           "id": 55,
           "options": {
@@ -6019,7 +6147,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -6104,7 +6234,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 23
+            "y": 84
           },
           "id": 56,
           "options": {
@@ -6116,7 +6246,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -6201,7 +6333,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 30
+            "y": 91
           },
           "id": 65,
           "options": {
@@ -6298,7 +6430,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 37
+            "y": 98
           },
           "id": 66,
           "options": {
@@ -6422,7 +6554,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 17
+            "y": 78
           },
           "id": 57,
           "options": {
@@ -6434,7 +6566,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -6519,7 +6653,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 24
+            "y": 85
           },
           "id": 58,
           "options": {
@@ -6531,7 +6665,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -6643,7 +6779,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 18
+            "y": 79
           },
           "id": 59,
           "options": {
@@ -6655,7 +6791,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -6740,7 +6878,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 25
+            "y": 86
           },
           "id": 60,
           "options": {
@@ -6752,7 +6890,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -6864,7 +7004,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 19
+            "y": 80
           },
           "id": 63,
           "options": {
@@ -6876,7 +7016,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -6961,7 +7103,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 26
+            "y": 87
           },
           "id": 64,
           "options": {
@@ -6973,7 +7115,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -7085,7 +7229,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 20
+            "y": 81
           },
           "id": 67,
           "options": {
@@ -7097,7 +7241,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -7182,7 +7328,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 27
+            "y": 88
           },
           "id": 68,
           "options": {
@@ -7194,7 +7340,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -7306,7 +7454,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 21
+            "y": 82
           },
           "id": 69,
           "options": {
@@ -7318,7 +7466,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -7403,19 +7553,21 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 28
+            "y": 89
           },
           "id": 70,
           "options": {
             "legend": {
               "calcs": [
-                "mean",
+                "min",
                 "max",
-                "min"
+                "mean"
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -7527,7 +7679,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 22
+            "y": 83
           },
           "id": 71,
           "options": {
@@ -7539,7 +7691,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -7624,7 +7778,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 29
+            "y": 90
           },
           "id": 72,
           "options": {
@@ -7636,7 +7790,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -7769,7 +7925,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 23
+            "y": 84
           },
           "id": 73,
           "options": {
@@ -7781,7 +7937,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -7887,7 +8045,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 30
+            "y": 91
           },
           "id": 74,
           "options": {
@@ -8120,8 +8278,8 @@
       {
         "current": {
           "selected": false,
-          "text": "10.254.87.14:9108",
-          "value": "10.254.87.14:9108"
+          "text": "10.254.124.199:9108",
+          "value": "10.254.124.199:9108"
         },
         "datasource": {
           "type": "prometheus",
@@ -8175,7 +8333,7 @@
   },
   "timezone": "browser",
   "title": "Elasticsearch",
-  "uid": "edpdiz385qkn4d",
-  "version": 2,
+  "uid": "edputii7hmhogb",
+  "version": 3,
   "weekStart": ""
 }

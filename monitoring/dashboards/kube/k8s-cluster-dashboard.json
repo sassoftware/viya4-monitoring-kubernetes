@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 85,
+  "id": 93,
   "links": [],
   "panels": [
     {
@@ -1253,7 +1253,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 11
+            "y": 10
           },
           "id": 17,
           "options": {
@@ -1264,7 +1264,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Last *",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -1381,7 +1383,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 12
+            "y": 11
           },
           "id": 24,
           "options": {
@@ -1392,7 +1394,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Last *",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -1539,7 +1543,7 @@
             "h": 13,
             "w": 24,
             "x": 0,
-            "y": 5
+            "y": 12
           },
           "id": 20,
           "options": {
@@ -1550,7 +1554,9 @@
               ],
               "displayMode": "table",
               "placement": "bottom",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Last *",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -1668,7 +1674,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 6
+            "y": 13
           },
           "id": 25,
           "options": {
@@ -1679,7 +1685,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Last *",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -1796,7 +1804,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 7
+            "y": 14
           },
           "id": 27,
           "options": {
@@ -1807,7 +1815,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Last *",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -1952,7 +1962,7 @@
             "h": 13,
             "w": 24,
             "x": 0,
-            "y": 8
+            "y": 15
           },
           "id": 28,
           "options": {
@@ -1964,6 +1974,8 @@
               "displayMode": "table",
               "placement": "bottom",
               "showLegend": true,
+              "sortBy": "Last *",
+              "sortDesc": true,
               "width": 200
             },
             "tooltip": {
@@ -2081,7 +2093,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 9
+            "y": 16
           },
           "id": 16,
           "options": {
@@ -2092,7 +2104,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Last *",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -2223,7 +2237,7 @@
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 10
+            "y": 17
           },
           "id": 30,
           "options": {
@@ -2234,7 +2248,9 @@
               ],
               "displayMode": "table",
               "placement": "right",
-              "showLegend": true
+              "showLegend": true,
+              "sortBy": "Last *",
+              "sortDesc": true
             },
             "tooltip": {
               "maxHeight": 600,
@@ -2487,7 +2503,7 @@
   },
   "timezone": "browser",
   "title": "Kubernetes Cluster",
-  "uid": "cdjxqybxnz8cge",
+  "uid": "cdpuvb3we988wc",
   "version": 1,
   "weekStart": ""
 }

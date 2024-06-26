@@ -20,7 +20,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 741,
   "graphTooltip": 0,
-  "id": 86,
+  "id": 94,
   "links": [],
   "panels": [
     {
@@ -807,7 +807,9 @@
           ],
           "displayMode": "table",
           "placement": "right",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -910,7 +912,9 @@
           ],
           "displayMode": "table",
           "placement": "right",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -1013,7 +1017,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1040,7 +1045,9 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -1247,6 +1254,8 @@
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true,
           "width": 200
         },
         "tooltip": {
@@ -1466,6 +1475,8 @@
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true,
           "width": 200
         },
         "tooltip": {
@@ -1602,7 +1613,7 @@
   },
   "timezone": "browser",
   "title": "Kubernetes Deployment metrics",
-  "uid": "cdjxrn75nfh8ge",
-  "version": 3,
+  "uid": "edpuvm7i3hhxce",
+  "version": 1,
   "weekStart": ""
 }
