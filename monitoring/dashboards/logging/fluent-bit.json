@@ -135,7 +135,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "${datasource}"
       },
       "description": "",
       "fieldConfig": {
@@ -219,7 +219,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "${datasource}"
           },
           "expr": "- sum(rate(fluentbit_input_records_total{pod!~\"v4m-fb-events.*\",node=~\"$node\"}[5m]))",
           "interval": "",
@@ -229,7 +229,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "${datasource}"
           },
           "expr": "sum(rate(fluentbit_output_proc_records_total{pod!~\"v4m-fb-events.*\",node=~\"$node\"}[5m]))",
           "interval": "",
@@ -710,7 +710,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -806,7 +807,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -910,7 +912,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -968,12 +971,12 @@
     }
   ],
   "schemaVersion": 39,
-  "tags": [],
+  "tags": ["logging"],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "Prometheus",
           "value": "PBFA97CFB590B2093"
         },
@@ -1049,6 +1052,6 @@
   "timezone": "",
   "title": "Fluent Bit - Log Message Collection",
   "uid": "bdpuuduborgg0b",
-  "version": 1,
+  "version": 3,
   "weekStart": ""
 }
