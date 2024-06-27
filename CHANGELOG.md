@@ -1,5 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Metrics**
+  * [CHANGE] Grafana dashboards for RabbitMQ upgraded to newer versions
+  * [CHANGE] All Grafana dashboards (maintained as part of this project) migrated to Grafana 11
+
+
 ## Version 1.2.26 (18JUN2024)
 * **Overall**
   * [CHANGE] Eliminated use of `--short` option (deprecated in Kubernetes 1.28) from `kubectl version` commands
