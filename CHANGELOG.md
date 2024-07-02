@@ -7,6 +7,18 @@
   * [CHANGE] Some Grafana dashboards inherited from the Kube-Prometheus Stack Helm chart do not
 work with Grafana 11.x due to Angular migration or other issues. As a **temporary** fix, we have
 removed these dashboards and replaced them with our versions of them.  **This fix will be removed when these issues have been resolved.**
+  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 56.6.2 to 61.1.1.
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded from 7.3.0 to 8.2.1.
+  * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 2.6.0 to 2.13.0.
+  * [UPGRADE] Alertmanager has been upgraded from 0.26.0 to 0.27.0.
+  * [UPGRADE] The config-reloader has been upgraded from 0.71.2 to 0.75.0.
+  * [UPGRADE] Grafana has been upgraded from 10.3.3 to 11.1.0.
+  * [UPGRADE] The k8s-sidecar has been upgraded from 1.25.4 to 1.26.1.
+  * [UPGRADE] Kube-State-Metrics has been upgraded from 2.10.1 to 2.12.0.
+  * [UPGRADE] Node-Exporter has been upgraded from 1.7.0 to 1.8.1.
+  * [UPGRADE] Prometheus has been upgraded from 2.49.1 to 2.53.0.
+  * [UPGRADE] Prometheus Operator has been upgraded from 0.71.2 to 0.75.0.
+  * [UPGRADE] Prometheus Pushgateway has been upgraded from 2.6.0 to 2.13.0.
 
 
 ## Version 1.2.26 (18JUN2024)
