@@ -4,6 +4,9 @@
 * **Metrics**
   * [CHANGE] Grafana dashboards for RabbitMQ upgraded to newer versions
   * [CHANGE] All Grafana dashboards (maintained as part of this project) migrated to Grafana 11
+  * [CHANGE] Some Grafana dashboards inherited from the Kube-Prometheus Stack Helm chart do not
+work with Grafana 11.x due to Angular migration or other issues. As a **temporary** fix, we have
+removed these dashboards and replaced them with our versions of them.  **This fix will be removed when these issues have been resolved.**
 
 
 ## Version 1.2.26 (18JUN2024)

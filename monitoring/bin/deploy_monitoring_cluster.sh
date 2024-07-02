@@ -324,6 +324,27 @@ fi
 echo ""
 monitoring/bin/deploy_dashboards.sh
 
+# 01JUL24 Temporary Fix
+# Some Grafana dashboards inherited from the Kube-Prometheus Stack Helm
+# chart do not work with Grafana 11 due to Angular migration or other
+# issues.  As a **temporary** fix, we will remove these dashboards and
+# replace them with our versions of them.  This fix will be removed
+# when these issues have been resolved.
+V4M_TEMP_REPLACE_PROBLEMATIC_MIXIN_DASHBOARDS="${V4M_TEMP_REPLACE_PROBLEMATIC_MIXIN_DASHBOARDS:-false}"
+if [ "$V4M_TEMP_REPLACE_PROBLEMATIC_MIXIN_DASHBOARDS" == "true" ]; then
+   log_info "Replacing some Kube-Prometheus Stack-supplied Grafana dashboards with our own versions due to incompatabilities."
+
+   # remove configMaps definining exising Grafana dashboards
+   kubectl -n $MON_NS delete configmap  v4m-cluster-total         --ignore-not-found
+   kubectl -n $MON_NS delete configmap  v4m-namespace-by-pod      --ignore-not-found
+   kubectl -n $MON_NS delete configmap  v4m-namespace-by-workload --ignore-not-found
+   kubectl -n $MON_NS delete configmap  v4m-prometheus            --ignore-not-found
+
+   # deploy our versions of these dashboards
+   monitoring/bin/deploy_dashboards.sh monitoring/dashboards/mixinfixes
+
+fi
+
 set +e
 # call function to get HTTP/HTTPS ports from ingress controller
 get_ingress_ports
