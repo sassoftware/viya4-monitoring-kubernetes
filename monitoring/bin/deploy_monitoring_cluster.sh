@@ -330,7 +330,7 @@ monitoring/bin/deploy_dashboards.sh
 # issues.  As a **temporary** fix, we will remove these dashboards and
 # replace them with our versions of them.  This fix will be removed
 # when these issues have been resolved.
-V4M_TEMP_REPLACE_PROBLEMATIC_MIXIN_DASHBOARDS="${V4M_TEMP_REPLACE_PROBLEMATIC_MIXIN_DASHBOARDS:-false}"
+V4M_TEMP_REPLACE_PROBLEMATIC_MIXIN_DASHBOARDS="${V4M_TEMP_REPLACE_PROBLEMATIC_MIXIN_DASHBOARDS:-true}"
 if [ "$V4M_TEMP_REPLACE_PROBLEMATIC_MIXIN_DASHBOARDS" == "true" ]; then
    log_info "Replacing some Kube-Prometheus Stack-supplied Grafana dashboards with our own versions due to incompatabilities."
 
