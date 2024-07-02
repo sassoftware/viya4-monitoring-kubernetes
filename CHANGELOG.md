@@ -18,7 +18,7 @@ removed these dashboards and replaced them with our versions of them.  **This fi
   * [UPGRADE] Node-Exporter has been upgraded from 1.7.0 to 1.8.1.
   * [UPGRADE] Prometheus has been upgraded from 2.49.1 to 2.53.0.
   * [UPGRADE] Prometheus Operator has been upgraded from 0.71.2 to 0.75.0.
-  * [UPGRADE] Prometheus Pushgateway has been upgraded from 2.6.0 to 2.13.0.
+  * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.7.0 to 1.8.0.
 
 
 ## Version 1.2.26 (18JUN2024)
