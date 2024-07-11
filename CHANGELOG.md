@@ -1,6 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+* **Overall**
+  * [FIX] Modified renew-tls-certs.sh script to regenerate the root CA cert when renewing auto-generated certs
+
 * **Metrics**
   * [CHANGE] Grafana dashboards for RabbitMQ upgraded to newer versions
   * [CHANGE] All Grafana dashboards (maintained as part of this project) migrated to Grafana 11
