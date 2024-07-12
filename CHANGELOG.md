@@ -7,6 +7,7 @@
   * [CHANGE] Some Grafana dashboards inherited from the Kube-Prometheus Stack Helm chart do not
 work with Grafana 11.x due to Angular migration or other issues. As a **temporary** fix, we have
 removed these dashboards and replaced them with our versions of them.  **This fix will be removed when these issues have been resolved.**
+  * [CHANGE] Sample of user-values-openshift-grafana.yaml added to generic-base sample
   * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 56.6.2 to 61.1.1.
   * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded from 7.3.0 to 8.2.1.
   * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 2.6.0 to 2.13.0.
