@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.27 (16JUL2024)
 * **Overall**
   * [FIX] Modified renew-tls-certs.sh script to regenerate the root CA cert when renewing auto-generated certs
 
