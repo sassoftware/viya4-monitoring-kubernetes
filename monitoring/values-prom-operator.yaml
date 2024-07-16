@@ -203,6 +203,8 @@ grafana:
   service:
     type: NodePort
     nodePort: 31100
+  testFramework:
+    enabled: false
   plugins: []
   resources:
     requests:
