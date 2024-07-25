@@ -2,7 +2,7 @@
 
 ## unreleased
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.12.0 to 2.15.0
-  * [UPGRADE] Fluent Bit upgraded from 3.0.7 to 3.1.3
+  * [UPGRADE] Fluent Bit upgraded from 3.0.6 to 3.1.3
 
 
 ## Version 1.2.27 (16JUL2024)
