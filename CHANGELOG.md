@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+## unreleased
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.12.0 to 2.15.0
+  * [UPGRADE] Fluent Bit upgraded from 3.0.7 to 3.1.3
+
+
 ## Version 1.2.27 (16JUL2024)
 * **Overall**
   * [FIX] Modified renew-tls-certs.sh script to regenerate the root CA cert when renewing auto-generated certs
