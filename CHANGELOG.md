@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## unreleased
+## Version 1.2.28 (13AUG2024)
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.12.0 to 2.15.0
   * [UPGRADE] Fluent Bit upgraded from 3.0.6 to 3.1.3
 
