@@ -93,7 +93,10 @@ disable_sa_token_automount $MON_NS grafana-serviceaccount
 log_debug "Adding cluster role..."
 oc adm policy add-cluster-role-to-user cluster-monitoring-view -z grafana-serviceaccount -n $MON_NS
 log_debug "Obtaining token..."
-grafanaToken=$(oc serviceaccounts get-token grafana-serviceaccount -n $MON_NS)
+###grafanaToken=$(oc serviceaccounts get-token grafana-serviceaccount -n $MON_NS)
+grafanaToken=$(oc create token grafana-serviceaccount -n $MON_NS --duration 2160h)  # 2160hours = 90 days
+###REMOVE FOLLOWING DEBUG LINE
+log_debug "Grafana Token:[$grafanaToken]"    #REMOVE
 if [ "$grafanaToken" == "" ]; then
   log_error "Unable to obtain authentication token for [grafana-serviceaccount]"
   exit 1
