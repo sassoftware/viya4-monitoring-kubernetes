@@ -18,7 +18,7 @@ if [[ "$KUBE_CLIENT_VER" =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
    KUBE_CLIENT_MAJOR=${BASH_REMATCH[1]}
    KUBE_CLIENT_MINOR=${BASH_REMATCH[2]}
    KUBE_CLIENT_PATCH=${BASH_REMATCH[3]}
-   log_debug "Kubernetes Client - Major: [$KUBE_CLIENT_MAJOR] Minor: [$KUBE_CLIENT_MINOR] Patch: [$KUBE_CLIENT_PATCH]"
+   log_debug "Kubernetes CLIENT - Major: [$KUBE_CLIENT_MAJOR] Minor: [$KUBE_CLIENT_MINOR] Patch: [$KUBE_CLIENT_PATCH]"
 else
    log_error "Kubernetes Client Version does not match expected pattern.";
 fi;
