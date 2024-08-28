@@ -107,7 +107,7 @@ log_debug "Obtaining token..."
 if [ "$OSHIFT_MAJOR_VERSION" -eq "4" ] && [ "$OSHIFT_MINOR_VERSION" -gt "15" ]; then
    # OCP 4.16: removed deprecated oc serviceaccounts get-token command
    # NOTE: 12000 hours = 500 days although OpenShift *may* expire token after 12 months
-   grafanaToken=$(oc create token grafana-serviceaccount -n $MON_NS --duration 600s)
+   grafanaToken=$(oc create token grafana-serviceaccount -n $MON_NS --duration 12000h)
 else
    grafanaToken=$(oc serviceaccounts get-token grafana-serviceaccount -n $MON_NS)
 fi
