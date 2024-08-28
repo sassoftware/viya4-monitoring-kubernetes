@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+## unreleased
+* **Metrics**
+  * [FIX] Updated deploy_monitoring_openshift.sh to be compatible with OpenShift 4.16+
+
+
 ## Version 1.2.28 (13AUG2024)
 * **Logging**
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.12.0 to 2.15.0
