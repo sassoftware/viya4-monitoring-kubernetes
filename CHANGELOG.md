@@ -2,7 +2,7 @@
 
 ## unreleased
 * **Metrics**
-  * [FIX] Replace deprecated `oc serviceacounts get-token command` in deploy_monitoring_openshift.sh for OpenShift 4.16+
+  * [FIX] Replace deprecated `oc serviceacounts get-token` command in deploy_monitoring_openshift.sh for OpenShift 4.16+
 
 
 ## Version 1.2.28 (13AUG2024)
