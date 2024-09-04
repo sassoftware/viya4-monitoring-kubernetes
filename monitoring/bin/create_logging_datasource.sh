@@ -178,16 +178,36 @@ else
 fi
 
 # Install OpenSearch datasource plug-in to Grafana
-grafanaPod=$(kubectl -n $MON_NS get pods -l app.kubernetes.io/name=grafana -o name)
+grafanaPod=$(kubectl -n $MON_NS get pods -l app.kubernetes.io/name=grafana -o jsonpath='{.items[0].metadata.name}')
 log_debug "Grafana Pod [$grafanaPod]"
 
 pluginInstalled=$(kubectl exec -n $MON_NS $grafanaPod  -- bash -c "grafana cli plugins ls |grep -c opensearch-datasource|| true")
 log_debug "Grafana OpenSearch Datasource Plugin installed? [$pluginInstalled]"
 
 if [ "$pluginInstalled" == "0" ] || [ "$forcePluginInstall" == "Y" ]; then
-   pluginZip="https://github.com/grafana/opensearch-datasource/releases/download/v2.17.4/grafana-opensearch-datasource-2.17.4.linux_amd64.zip"
-   kubectl exec -n $MON_NS $grafanaPod  -- curl -sL --output /var/lib/grafana/plugins/opensearch-datasource.zip $pluginZip
-   kubectl exec -n $MON_NS $grafanaPod  -- unzip -o /var/lib/grafana/plugins/opensearch-datasource.zip -d /var/lib/grafana/plugins/
+
+   log_info "Installing OpenSearch Datasource plugin"
+   pluginVersion="${GRAFANA_DATASOURCE_PLUGIN_VERSION:-2.17.4}"
+   pluginFile="grafana-opensearch-datasource-$pluginVersion.linux_amd64.zip"
+
+   if [ -n "$AIRGAP_HELM_REPO" ]; then
+      log_debug "Air-gapped deployment detected; loading OpenSearch Datasource plugin from USER_DIR/monitoring directory"
+
+      userPluginFile="$USER_DIR/monitoring/$pluginFile"
+      if [ -f "$userPluginFile" ]; then
+         kubectl cp $userPluginFile $MON_NS/$grafanaPod:/var/lib/grafana/plugins
+         kubectl exec -n $MON_NS $grafanaPod  -- unzip -o /var/lib/grafana/plugins/$pluginFile -d /var/lib/grafana/plugins/
+      else
+         log_error "The OpenSearch datasource plugin to Grafana zip file was NOT found in the expected location [$userPluginFile]"
+         exit 1
+      fi
+   else
+      log_debug "Using Grafana CLI to install plugin (version [$pluginVersion])"
+      kubectl exec -n $MON_NS $grafanaPod  -- grafana cli plugins install grafana-opensearch-datasource $pluginVersion
+      log_info "You may ignore any previous messages regarding restarting the Grafana pod; it will be restarted automatically."
+   fi
+else
+   log_debug "The OpenSearch datasource plugin is already installed; skipping installation."
 fi
 
 # Adds the logging data source to Grafana
