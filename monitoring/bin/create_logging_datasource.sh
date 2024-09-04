@@ -158,17 +158,11 @@ cp monitoring/grafana-datasource-opensearch.yaml $monDir/grafana-datasource-open
 
 # Replace placeholders
 log_debug "Replacing variables in $monDir/grafana-datasource-opensearch.yaml file"
-if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-    sed -i '' "s/__namespace__/$LOG_NS/g" $monDir/grafana-datasource-opensearch.yaml
-    sed -i '' "s/__ES_SERVICENAME__/$ES_SERVICENAME/g" $monDir/grafana-datasource-opensearch.yaml
-    sed -i '' "s/__userID__/$grfds_user/g" $monDir/grafana-datasource-opensearch.yaml
-    sed -i '' "s/__passwd__/$grfds_passwd/g" $monDir/grafana-datasource-opensearch.yaml
-else
-    sed -i "s/__namespace__/$LOG_NS/g" $monDir/grafana-datasource-opensearch.yaml
-    sed -i "s/__ES_SERVICENAME__/$ES_SERVICENAME/g" $monDir/grafana-datasource-opensearch.yaml
-    sed -i "s/__userID__/$grfds_user/g" $monDir/grafana-datasource-opensearch.yaml
-    sed -i "s/__passwd__/$grfds_passwd/g" $monDir/grafana-datasource-opensearch.yaml
-fi
+v4m_replace "__namespace__"         "$LOG_NS"         "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__ES_SERVICENAME__"    "$ES_SERVICENAME" "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__userID__"            "$grfds_user"     "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__passwd__"            "$grfds_passwd"   "$monDir/grafana-datasource-opensearch.yaml"
+
 
 # Removes old Elasticsearch data source if one exists
 if [ "$cluster" == "true" ]; then
