@@ -2,7 +2,7 @@ apiVersion: 1
 
 datasources:
 - name: ViyaLogs
-  type: elasticsearch
+  type: grafana-opensearch-datasource
   access: proxy
   database: viya_logs-*
   url: https://__ES_SERVICENAME__.__namespace__:9200
@@ -11,7 +11,7 @@ datasources:
   jsonData:
     tlsSkipVerify: true
     timeField: "@timestamp"
-    esVersion: '7.10.0'
+    version: '2.12.0'
     logMessageField: message
     logLevelField: level.keyword
   secureJsonData:
