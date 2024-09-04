@@ -151,23 +151,23 @@ else
    ./logging/bin/user.sh CREATE -ns $tenantNS -t $tenant -u $grfds_user -p "$grfds_passwd" -g
 fi
 
-# Create temporary directory for string replacement in the grafana-datasource-es.yaml file
+# Create temporary directory for string replacement in the grafana-datasource-opensearch.yaml file
 monDir=$TMP_DIR/$MON_NS
 mkdir -p $monDir
-cp monitoring/grafana-datasource-es.yaml $monDir/grafana-datasource-es.yaml
+cp monitoring/grafana-datasource-opensearch.yaml $monDir/grafana-datasource-opensearch.yaml
 
 # Replace placeholders
-log_debug "Replacing variables in $monDir/grafana-datasource-es.yaml file"
+log_debug "Replacing variables in $monDir/grafana-datasource-opensearch.yaml file"
 if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-    sed -i '' "s/__namespace__/$LOG_NS/g" $monDir/grafana-datasource-es.yaml
-    sed -i '' "s/__ES_SERVICENAME__/$ES_SERVICENAME/g" $monDir/grafana-datasource-es.yaml    
-    sed -i '' "s/__userID__/$grfds_user/g" $monDir/grafana-datasource-es.yaml
-    sed -i '' "s/__passwd__/$grfds_passwd/g" $monDir/grafana-datasource-es.yaml
+    sed -i '' "s/__namespace__/$LOG_NS/g" $monDir/grafana-datasource-opensearch.yaml
+    sed -i '' "s/__ES_SERVICENAME__/$ES_SERVICENAME/g" $monDir/grafana-datasource-opensearch.yaml
+    sed -i '' "s/__userID__/$grfds_user/g" $monDir/grafana-datasource-opensearch.yaml
+    sed -i '' "s/__passwd__/$grfds_passwd/g" $monDir/grafana-datasource-opensearch.yaml
 else
-    sed -i "s/__namespace__/$LOG_NS/g" $monDir/grafana-datasource-es.yaml
-    sed -i "s/__ES_SERVICENAME__/$ES_SERVICENAME/g" $monDir/grafana-datasource-es.yaml
-    sed -i "s/__userID__/$grfds_user/g" $monDir/grafana-datasource-es.yaml
-    sed -i "s/__passwd__/$grfds_passwd/g" $monDir/grafana-datasource-es.yaml
+    sed -i "s/__namespace__/$LOG_NS/g" $monDir/grafana-datasource-opensearch.yaml
+    sed -i "s/__ES_SERVICENAME__/$ES_SERVICENAME/g" $monDir/grafana-datasource-opensearch.yaml
+    sed -i "s/__userID__/$grfds_user/g" $monDir/grafana-datasource-opensearch.yaml
+    sed -i "s/__passwd__/$grfds_passwd/g" $monDir/grafana-datasource-opensearch.yaml
 fi
 
 # Removes old Elasticsearch data source if one exists
@@ -183,14 +183,28 @@ else
     fi
 fi
 
+# Install OpenSearch datasource plug-in to Grafana
+if [ "$cluster" == "true" ]; then
+
+   grafanaPod=$(kubectl -n $MON_NS get pods -l app.kubernetes.io/name=grafana -o name)
+   log_debug "Grafana Pod [$grafanaPod]"
+
+   pluginInstalled=$(kubectl exec -n $MON_NS $grafanaPod  -- bash -c "grafana cli plugins ls |grep -c opensearch-datasource|| true")
+   log_debug "Grafana OpenSearch Datasource Plugin installed? [$pluginInstalled]"
+
+   if [ "$pluginInstalled" == "0" ] || [ "$forcePluginInstall" == "Y" ]; then
+      pluginZip="https://github.com/grafana/opensearch-datasource/releases/download/v2.17.4/grafana-opensearch-datasource-2.17.4.linux_amd64.zip"
+      kubectl exec -n $MON_NS $grafanaPod  -- curl -sL --output /var/lib/grafana/plugins/opensearch-datasource.zip $pluginZip
+      kubectl exec -n $MON_NS $grafanaPod  -- unzip -o /var/lib/grafana/plugins/opensearch-datasource.zip -d /var/lib/grafana/plugins/
+   fi
+fi
+
 # Adds the logging data source to Grafana
 log_info "Provisioning logging data source in Grafana"
 if [ "$cluster" == "true" ]; then
-    kubectl create secret generic -n $MON_NS grafana-datasource-es --from-file $monDir/grafana-datasource-es.yaml
-    kubectl label secret -n $MON_NS grafana-datasource-es grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
-else
-    kubectl create secret generic -n $tenantNS v4m-grafana-datasource-es-$tenant --from-file $monDir/grafana-datasource-es.yaml
-    kubectl label secret -n $tenantNS v4m-grafana-datasource-es-$tenant grafana_datasource-$tenant=true sas.com/monitoring-base=kube-viya-monitoring
+    kubectl delete secret generic -n $MON_NS grafana-datasource-opensearch --ignore-not-found
+    kubectl create secret generic -n $MON_NS grafana-datasource-opensearch --from-file $monDir/grafana-datasource-opensearch.yaml
+    kubectl label secret -n $MON_NS grafana-datasource-opensearch grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
 fi
 
 # Deploy the log-enabled Viya dashboards
