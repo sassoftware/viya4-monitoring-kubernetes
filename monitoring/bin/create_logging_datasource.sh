@@ -178,19 +178,16 @@ else
 fi
 
 # Install OpenSearch datasource plug-in to Grafana
-if [ "$cluster" == "true" ]; then
+grafanaPod=$(kubectl -n $MON_NS get pods -l app.kubernetes.io/name=grafana -o name)
+log_debug "Grafana Pod [$grafanaPod]"
 
-   grafanaPod=$(kubectl -n $MON_NS get pods -l app.kubernetes.io/name=grafana -o name)
-   log_debug "Grafana Pod [$grafanaPod]"
+pluginInstalled=$(kubectl exec -n $MON_NS $grafanaPod  -- bash -c "grafana cli plugins ls |grep -c opensearch-datasource|| true")
+log_debug "Grafana OpenSearch Datasource Plugin installed? [$pluginInstalled]"
 
-   pluginInstalled=$(kubectl exec -n $MON_NS $grafanaPod  -- bash -c "grafana cli plugins ls |grep -c opensearch-datasource|| true")
-   log_debug "Grafana OpenSearch Datasource Plugin installed? [$pluginInstalled]"
-
-   if [ "$pluginInstalled" == "0" ] || [ "$forcePluginInstall" == "Y" ]; then
-      pluginZip="https://github.com/grafana/opensearch-datasource/releases/download/v2.17.4/grafana-opensearch-datasource-2.17.4.linux_amd64.zip"
-      kubectl exec -n $MON_NS $grafanaPod  -- curl -sL --output /var/lib/grafana/plugins/opensearch-datasource.zip $pluginZip
-      kubectl exec -n $MON_NS $grafanaPod  -- unzip -o /var/lib/grafana/plugins/opensearch-datasource.zip -d /var/lib/grafana/plugins/
-   fi
+if [ "$pluginInstalled" == "0" ] || [ "$forcePluginInstall" == "Y" ]; then
+   pluginZip="https://github.com/grafana/opensearch-datasource/releases/download/v2.17.4/grafana-opensearch-datasource-2.17.4.linux_amd64.zip"
+   kubectl exec -n $MON_NS $grafanaPod  -- curl -sL --output /var/lib/grafana/plugins/opensearch-datasource.zip $pluginZip
+   kubectl exec -n $MON_NS $grafanaPod  -- unzip -o /var/lib/grafana/plugins/opensearch-datasource.zip -d /var/lib/grafana/plugins/
 fi
 
 # Adds the logging data source to Grafana
