@@ -184,7 +184,7 @@ log_debug "Grafana Pod [$grafanaPod]"
 pluginInstalled=$(kubectl exec -n $MON_NS $grafanaPod  -- bash -c "grafana cli plugins ls |grep -c opensearch-datasource|| true")
 log_debug "Grafana OpenSearch Datasource Plugin installed? [$pluginInstalled]"
 
-if [ "$pluginInstalled" == "0" ] || [ "$forcePluginInstall" == "Y" ]; then
+if [ "$pluginInstalled" == "0" ]; then
 
    log_info "Installing OpenSearch Datasource plugin"
    pluginVersion="${GRAFANA_DATASOURCE_PLUGIN_VERSION:-2.17.4}"
