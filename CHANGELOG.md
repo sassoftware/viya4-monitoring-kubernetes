@@ -1,5 +1,14 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Logging**
+  * [CHANGE] Updated link to SAS documentation in the SAS Update Checker Report (within 
+OpenSearch Dashboards) to be version-independent
+
+* **Metrics**
+  * [FIX] Changed metric label (from 'CAS Version' to 'OS Version') on SAS CAS Overview 
+dashboard (within Grafana) to reflect information displayed
+
 ## Version 1.2.28 (13AUG2024)
 * **Logging**
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.12.0 to 2.15.0
