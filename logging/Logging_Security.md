@@ -1,1 +1,1 @@
-See [Controlling User Access to Log Monitoring](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=p1nee94eh0x1ymn1blz03g48jz2y.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
+See [Control User Access to Log Monitoring](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=p1nee94eh0x1ymn1blz03g48jz2y.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
