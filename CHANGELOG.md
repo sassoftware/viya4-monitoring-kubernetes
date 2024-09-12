@@ -1,6 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+* **Overall**
+  * [DOCUMENTATION] Reorganization of content to improve readability and flow.
+  * [TASK] Updated links (within markdown files, dashboards, etc.) to reflect documentation reorganization
+
 * **Logging**
   * [CHANGE] Updated link to SAS documentation in the SAS Update Checker Report (within 
 OpenSearch Dashboards) to be version-independent
@@ -8,6 +12,8 @@ OpenSearch Dashboards) to be version-independent
 * **Metrics**
   * [FIX] Changed metric label (from 'CAS Version' to 'OS Version') on SAS CAS Overview 
 dashboard (within Grafana) to reflect information displayed
+  * [FIX] Replace deprecated `oc serviceacounts get-token` command in deploy_monitoring_openshift.sh for OpenShift 4.16+
+
 
 ## Version 1.2.28 (13AUG2024)
 * **Logging**
