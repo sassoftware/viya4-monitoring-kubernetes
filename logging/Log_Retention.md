@@ -1,1 +1,1 @@
-See [Adjust the Retention Period for Log Messages](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1dwvmcsjvmw61n0zyiasrfae2yh.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
+See [Adjust the Retention Period for Log Messages](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n1dwvmcsjvmw61n0zyiasrfae2yh.htm) in the SAS Viya Monitoring for Kubernetes Help Center.

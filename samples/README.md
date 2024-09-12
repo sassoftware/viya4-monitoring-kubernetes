@@ -19,7 +19,7 @@ each deployment file.
 You customize your logging deployment by specifying values in `user.env` and
 `*.yaml` files. These files are stored in a local directory outside of your
 repository that is identified by the `USER_DIR` environment variable. 
-For information about the customization process, see [Pre-deployment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1ajbblsxpcgl5n11t13wgtd4d7c.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
+For information about the customization process, see [Create the Deployment Directory](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=p15fe8611w9njkn1fucwbvlz8tyg.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
 
 The customization files in each sample provide a starting point for the
 customization files for a deployment that supports a specific situation.

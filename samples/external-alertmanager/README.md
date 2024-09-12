@@ -1,12 +1,11 @@
 # Using an External Alertmanager
 
-**Note:** Before using this sample, be sure to read [Configuring Alertmanager](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=p1hedx6j957ztfn1vs4likzvjv6o.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
+**Note:** Before using this sample, be sure to read [Configure Alertmanager](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n1f1zksk28wn8wn1q115nbz1tdln) in the SAS Viya Monitoring for Kubernetes Help Center.
 
 You customize your monitoring deployment by specifying values in `user.env` and
 `*.yaml` files. These files are stored in a local directory outside of your
 repository that is identified by the `USER_DIR` environment variable. See 
-[Pre-deployment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1ajbblsxpcgl5n11t13wgtd4d7c.htm) for information
-about the customization process.
+[Create the Deployment Directory](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=p15fe8611w9njkn1fucwbvlz8tyg.htm) for information about the customization process.
 
 The customization files in this sample provide a starting point for the
 customization files for a deployment that supports an external instance of
@@ -28,7 +27,7 @@ your Alertmanager instance.
 2. Define a service that points to the Alertmanager instance that you want to
 use.
 
-3. Deploy monitoring using the standard deployment script. See [Deploy](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1rhzwx0mcnnnun17q11v85bspyk.htm).
+3. Deploy monitoring using the standard deployment script. See [Deploy](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n1rhzwx0mcnnnun17q11v85bspyk.htm).
 
 4. Deploy the `alertmanager-endpoint.yaml` file to the monitoring namespace:
 
