@@ -14,7 +14,7 @@ _The Viya Monitoring for Kubernetes Docker Container allows you to work with the
 
 * Docker must be installed on your workstation.
 * A local copy of the repository must be created. See 
-[Copy the Repository](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n0b7mrzohgnb1ln1qq4tyaheq36r.htm) in the SAS Viya Monitoring for Kubernetes Help Center. 
+[Create the Deployment Directory](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=p15fe8611w9njkn1fucwbvlz8tyg.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
 
 ## Preparing the Docker Container
 
@@ -24,7 +24,7 @@ To ensure that your kubeconfig files are available from within the Docker contai
 
 ### (Optional) user_dir Directory
 
-You can customize the SAS Viya Monitoring for Kubernetes deployment by editing files in a USER_DIR directory. See [Pre-deployment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1ajbblsxpcgl5n11t13wgtd4d7c.htm).
+You can customize the SAS Viya Monitoring for Kubernetes deployment by editing files in a USER_DIR directory. See [Create the Deployment Directory](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=p15fe8611w9njkn1fucwbvlz8tyg.htm).
 
 If you would like to customize your deployment, you will need to copy the contents of your USER_DIR directory to the `./v4m-container/user_dir` directory or mount the file or directory during your `docker run` command.
 
