@@ -49,7 +49,7 @@
         "content": "![](https://www.sas.com/en_us/navigation/header/global-links-header/_jcr_content/par/styledcontainer_3b8d/par/image_baf8.img.png/1593461099449.png)\n",
         "mode": "markdown"
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -82,7 +82,7 @@
         "content": "<h1>Welcome to SAS<sup>®</sup> Viya<sup>®</sup> Monitoring for Kubernetes</h1>\n",
         "mode": "html"
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -115,7 +115,7 @@
         "content": "![](https://raw.githubusercontent.com/sassoftware/viya4-monitoring-kubernetes/master/img/sasViyaLogo_classicBlue.png)\n",
         "mode": "markdown"
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -148,7 +148,7 @@
         "content": "## SAS Viya Dashboards for Administrators\n\nMonitor the performance of SAS Viya components:",
         "mode": "markdown"
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -181,7 +181,7 @@
         "content": "![](https://miro.medium.com/max/921/1*7puR5_CHvGxJmnepMfUwYg.png)\n",
         "mode": "markdown"
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -214,7 +214,7 @@
         "content": "## Kubernetes Dashboards for Administrators\nMonitor the performance of clusters and namespaces:",
         "mode": "markdown"
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -245,6 +245,7 @@
         "keepTime": false,
         "maxItems": 4,
         "query": "",
+        "showFolderNames": true,
         "showHeadings": false,
         "showRecentlyViewed": false,
         "showSearch": true,
@@ -253,7 +254,7 @@
           "welcome-viya"
         ]
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "query": "",
       "recent": false,
       "search": true,
@@ -291,6 +292,7 @@
         "keepTime": false,
         "maxItems": 4,
         "query": "",
+        "showFolderNames": true,
         "showHeadings": false,
         "showRecentlyViewed": false,
         "showSearch": true,
@@ -299,7 +301,7 @@
           "welcome-cluster"
         ]
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "query": "",
       "recent": false,
       "search": true,
@@ -339,7 +341,7 @@
         "content": "",
         "mode": "markdown"
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -372,7 +374,7 @@
         "content": "## Documentation and Support\n",
         "mode": "markdown"
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -405,7 +407,7 @@
         "content": "![](https://support.sas.com/en/support-home/_jcr_content/par/styledcontainer_1511041706/par/styledcontainer/par/styledcontainer_1517765672/par/image.img.png/1504883235316.png)\n",
         "mode": "markdown"
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -438,7 +440,7 @@
         "content": "## Other Dashboards\n",
         "mode": "markdown"
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -468,10 +470,10 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "### SAS Viya\n\n* [Operations](https://documentation.sas.com/?softwareId=mysas&softwareVersion=prod&docsetId=k8sag&docsetTarget=p1n1sa2fm6xpr3n18dppwdpv6pfr.htm)\n* [Administration](https://documentation.sas.com/?softwareId=viyaadmin&softwareVersion=prod&docsetId=calmonitoring&docsetTarget=titlepage.htm&locale=en)\n* [SAS Technical Support](https://support.sas.com)\n",
+        "content": "### SAS Viya\n\n* [Operations](https://documentation.sas.com/?cdcId=itopscdc&cdcVersion=default&docsetId=itopswlcm&docsetTarget=home.htm)\n* [Administration](https://documentation.sas.com/?cdcId=sasadmincdc&cdcVersion=default&docsetId=sasadminwlcm&docsetTarget=home.htm)\n* [SAS Technical Support](https://support.sas.com)\n",
         "mode": "markdown"
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -501,10 +503,10 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "### Get More Help\n\n * [SAS Viya Monitoring for Kubernetes Help Center](http://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default)\n* [SAS Viya Monitoring on GitHub](https://github.com/sassoftware/viya4-monitoring-kubernetes)\n* [View Open Issues](https://github.com/sassoftware/viya4-monitoring-kubernetes/issues)\n* [Report a New Issue](https://github.com/sassoftware/viya4-monitoring-kubernetes/issues/new)",
+        "content": "### Get More Help\n\n* [SAS Viya Monitoring for Kubernetes Help Center](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvwlcm&docsetTarget=titlepage.htm)\n* [SAS Viya Monitoring on GitHub](https://github.com/sassoftware/viya4-monitoring-kubernetes)\n* [View Open Issues](https://github.com/sassoftware/viya4-monitoring-kubernetes/issues)\n* [Report a New Issue](https://github.com/sassoftware/viya4-monitoring-kubernetes/issues/new)",
         "mode": "markdown"
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -535,13 +537,14 @@
         "keepTime": false,
         "maxItems": 10,
         "query": "",
+        "showFolderNames": true,
         "showHeadings": true,
         "showRecentlyViewed": true,
         "showSearch": false,
         "showStarred": true,
         "tags": []
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "query": "",
       "recent": true,
       "search": false,
@@ -582,7 +585,7 @@
         "content": "### Grafana\n\n* [Documentation](https://grafana.com/docs/grafana/latest)\n* [Tutorials](https://grafana.com/tutorials)\n* [Community Dashboards](https://grafana.com/grafana/dashboards/)",
         "mode": "markdown"
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
@@ -604,7 +607,6 @@
     "from": "now-6h",
     "to": "now"
   },
-  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {
     "hidden": true,
     "refresh_intervals": [
