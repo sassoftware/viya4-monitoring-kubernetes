@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.29 (16SEP2024)
 * **Overall**
   * [DOCUMENTATION] Reorganization of content to improve readability and flow.
   * [TASK] Updated links (within markdown files, dashboards, etc.) to reflect documentation reorganization
