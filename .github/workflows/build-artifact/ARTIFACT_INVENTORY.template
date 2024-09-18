@@ -61,7 +61,8 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 
 ## Table 4. Miscellaneous Component Version Information
 This table provides version information for some miscellaneous components deployed by SAS Viya Monitoring for Kubernetes.
+
 | Component | Version | Project Repository | Notes |
-|--|--|--|
+|--|--|--|--|
 | OpenSearch Datasource Plugin (Grafana) | __GRAFANA_DATASOURCE_PLUGIN_VERSION__ | https://github.com/grafana/opensearch-datasource/releases |Allows Grafana to surface log messages stored in OpenSearch |
 
