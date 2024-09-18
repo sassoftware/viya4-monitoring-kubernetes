@@ -156,12 +156,18 @@ monDir=$TMP_DIR/$MON_NS
 mkdir -p $monDir
 cp monitoring/grafana-datasource-opensearch.yaml $monDir/grafana-datasource-opensearch.yaml
 
+#Determine OpenSearch version programatically
+parseFullImage "$OS_FULL_IMAGE"
+opensearch_version="${VERSION:-2.12.0}"
+log_debug "OpenSearch version [$opensearch_version] will be specified in datasource definition."
+
 # Replace placeholders
 log_debug "Replacing variables in $monDir/grafana-datasource-opensearch.yaml file"
-v4m_replace "__namespace__"         "$LOG_NS"         "$monDir/grafana-datasource-opensearch.yaml"
-v4m_replace "__ES_SERVICENAME__"    "$ES_SERVICENAME" "$monDir/grafana-datasource-opensearch.yaml"
-v4m_replace "__userID__"            "$grfds_user"     "$monDir/grafana-datasource-opensearch.yaml"
-v4m_replace "__passwd__"            "$grfds_passwd"   "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__namespace__"          "$LOG_NS"               "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__ES_SERVICENAME__"     "$ES_SERVICENAME"       "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__userID__"             "$grfds_user"           "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__passwd__"             "$grfds_passwd"         "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__opensearch_version__" "$opensearch_version"   "$monDir/grafana-datasource-opensearch.yaml"
 
 
 # Removes old Elasticsearch data source if one exists
