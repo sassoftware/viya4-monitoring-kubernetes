@@ -58,3 +58,10 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 | Metrics | Kube Prometheus Stack| __KUBE_PROM_STACK_CHART_REPO__ | __KUBE_PROM_STACK_CHART_NAME__ | __KUBE_PROM_STACK_CHART_VERSION__ | __KUBE_PROM_STACK_CHART_ARCHIVE__ |
 | Metrics | Prometheus Pushgateway| __PUSHGATEWAY_CHART_REPO__ | __PUSHGATEWAY_CHART_NAME__ | __PUSHGATEWAY_CHART_VERSION__ | __PUSHGATEWAY_CHART_ARCHIVE__ |
 | Metrics | Tempo | __TEMPO_CHART_REPO__ | __TEMPO_CHART_NAME__ | __TEMPO_CHART_VERSION__ | __TEMPO_CHART_ARCHIVE__ |
+
+## Table 4. Micellaenous Component Version Information
+This table provides version information for miscelleneous components deployed by SAS Viya Monitoring for Kubernetes.
+| Component | Version | Notes |
+|--|--|--|
+| OpenSearch Datasource Plugin (Grafana) | __GRAFANA_DATASOURCE_PLUGIN_VERSION__ | Allows Grafana to surface log messages stored in OpenSearch |
+

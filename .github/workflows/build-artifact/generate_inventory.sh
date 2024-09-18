@@ -36,6 +36,9 @@ function buildHelmArchiveFilename {
 
 }
 
+##
+## Helm Chart (Table #3)
+##
 buildHelmArchiveFilename "ESEXPORTER_HELM"
 buildHelmArchiveFilename "FLUENTBIT_HELM"
 buildHelmArchiveFilename "OPENSEARCH_HELM"
@@ -45,6 +48,10 @@ buildHelmArchiveFilename "KUBE_PROM_STACK"
 buildHelmArchiveFilename "PUSHGATEWAY"
 buildHelmArchiveFilename "TEMPO"
 
+
+##
+## Container Images (Table #1)
+##
 parseFullImage "$ALERTMANAGER_FULL_IMAGE"
 v4m_replace "__ALERTMANAGER_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
@@ -95,5 +102,10 @@ v4m_replace "__TEMPO_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
 parseFullImage "$PUSHGATEWAY_FULL_IMAGE"
 v4m_replace "__PUSHGATEWAY_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
+
+##
+## Misc components (Table #4)
+##
+v4m_replace "__GRAFANA_DATASOURCE_PLUGIN_VERSION__" "$GRAFANA_DATASOURCE_PLUGIN_VERSION" "$file" 
 
 log_notice "Be sure to review the generated file [$file] prior to adding/committing it to the repo"
