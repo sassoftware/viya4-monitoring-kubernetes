@@ -223,6 +223,8 @@ grafana:
         cpu: "50m"
         memory: "100Mi"
     #image: See NOTE at top of file
+  #delete provisioned datasource if no longer configured
+  prune: true
   deploymentStrategy:
     type: Recreate
   persistence:
