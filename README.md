@@ -13,10 +13,6 @@ Log monitoring and metric monitoring can be deployed independently or together. 
 
 For information about SAS® Viya® Monitoring for Kubernetes, see the following sections in the SAS Viya Monitoring for Kubernetes Help Center:
 
-- For an introduction, see [About SAS® Viya® Monitoring for Kubernetes](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n0bzfdp3bn6p4vn1lj9pm2hy8t0q.htm).
+- For an introduction, see [About SAS® Viya® Monitoring for Kubernetes](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0bzfdp3bn6p4vn1lj9pm2hy8t0q.htm).
 
-- For information about the application components deployed by SAS® Viya® Monitoring for Kubernetes, the prerequisites, and more, see [Getting Started](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n18d875xbudfken18v75gj7mopxq.htm).
-
-- For information about pre-deployment and customization, see [Pre-deployment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1ajbblsxpcgl5n11t13wgtd4d7c.htm).
-
-- For information about deployment, see [Deploy](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvdply&docsetTarget=n1rhzwx0mcnnnun17q11v85bspyk.htm).
+- For information about the components in SAS® Viya® Monitoring for Kubernetes, the prerequisites, and more, see [Getting Started](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n18d875xbudfken18v75gj7mopxq.htm) in the SAS Viya Monitoring for Kubernetes Help Center.

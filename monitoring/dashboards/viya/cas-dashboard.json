@@ -126,7 +126,7 @@
               "release": "OS Kernal",
               "state": "State",
               "system": "OS Architecture",
-              "version": "CAS Version"
+              "version": "OS Version"
             }
           }
         }

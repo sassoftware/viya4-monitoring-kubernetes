@@ -5,6 +5,32 @@
   * [CHANGE] The `create_logging_datasource.sh` script now uses the OpenSearch datasource plugin
 rather the Elasticsearch datasource plugin when creating the **ViyaLogs** datasource in Grafana.
 The plugin is downloaded and installed if it is not already in place.
+  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 61.1.1 to 62.7.0.
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded from 8.2.1 to 8.5.1.
+  * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 2.13.0 to 2.14.0.
+  * [UPGRADE] The config-reloader has been upgraded from 0.75.0 to 0.76.1.
+  * [UPGRADE] Grafana has been upgraded from 11.1.0 to 11.2.0.
+  * [UPGRADE] The k8s-sidecar has been upgraded from 1.26.1 to 1.27.4.
+  * [UPGRADE] Kube-State-Metrics has been upgraded from 2.12.0 to 2.13.0.
+  * [UPGRADE] Node-Exporter has been upgraded from 1.8.1 to 1.8.2.
+  * [UPGRADE] Prometheus has been upgraded from 2.53.0 to 2.54.1.
+  * [UPGRADE] Prometheus Operator has been upgraded from 0.75.0 to 0.76.1.
+  * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.8.0 to 1.9.0.
+
+## Version 1.2.29 (16SEP2024)
+* **Overall**
+  * [DOCUMENTATION] Reorganization of content to improve readability and flow.
+  * [TASK] Updated links (within markdown files, dashboards, etc.) to reflect documentation reorganization
+
+* **Logging**
+  * [CHANGE] Updated link to SAS documentation in the SAS Update Checker Report (within 
+OpenSearch Dashboards) to be version-independent
+
+* **Metrics**
+  * [FIX] Changed metric label (from 'CAS Version' to 'OS Version') on SAS CAS Overview 
+dashboard (within Grafana) to reflect information displayed
+  * [FIX] Replace deprecated `oc serviceacounts get-token` command in deploy_monitoring_openshift.sh for OpenShift 4.16+
+
 
 
 ## Version 1.2.28 (13AUG2024)
