@@ -2,8 +2,8 @@
 
 ## Unreleased
 * **Metrics**
-  * [CHANGE] The create_logging_datasource.sh script now uses the OpenSearch datasource plugin
-rather the Elasticsearch datasource plugin when creating the ViyaLogs datasource in Grafana.
+  * [CHANGE] The `create_logging_datasource.sh` script now uses the OpenSearch datasource plugin
+rather the Elasticsearch datasource plugin when creating the **ViyaLogs** datasource in Grafana.
 The plugin is downloaded and installed if it is not already in place.
 
 
