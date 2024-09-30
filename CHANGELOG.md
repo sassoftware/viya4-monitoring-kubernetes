@@ -1,5 +1,12 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Metrics**
+  * [CHANGE] The create_logging_datasource.sh script now uses the OpenSearch datasource plugin
+rather the Elasticsearch datasource plugin when creating the ViyaLogs datasource in Grafana.
+The plugin is downloaded and installed if it is not already in place.
+
+
 ## Version 1.2.28 (13AUG2024)
 * **Logging**
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.12.0 to 2.15.0
