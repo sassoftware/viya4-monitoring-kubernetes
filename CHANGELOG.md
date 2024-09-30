@@ -17,6 +17,7 @@ The plugin is downloaded and installed if it is not already in place.
   * [UPGRADE] Prometheus Operator has been upgraded from 0.75.0 to 0.76.1.
   * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.8.0 to 1.9.0.
 
+
 ## Version 1.2.29 (16SEP2024)
 * **Overall**
   * [DOCUMENTATION] Reorganization of content to improve readability and flow.
@@ -30,7 +31,6 @@ OpenSearch Dashboards) to be version-independent
   * [FIX] Changed metric label (from 'CAS Version' to 'OS Version') on SAS CAS Overview 
 dashboard (within Grafana) to reflect information displayed
   * [FIX] Replace deprecated `oc serviceacounts get-token` command in deploy_monitoring_openshift.sh for OpenShift 4.16+
-
 
 
 ## Version 1.2.28 (13AUG2024)
