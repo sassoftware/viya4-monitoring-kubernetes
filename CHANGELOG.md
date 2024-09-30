@@ -2,6 +2,9 @@
 
 ## Unreleased
 * **Metrics**
+  * [CHANGE] The `create_logging_datasource.sh` script now uses the OpenSearch datasource plugin
+rather the Elasticsearch datasource plugin when creating the **ViyaLogs** datasource in Grafana.
+The plugin is downloaded and installed if it is not already in place.
   * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 61.1.1 to 62.7.0.
   * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded from 8.2.1 to 8.5.1.
   * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 2.13.0 to 2.14.0.
@@ -13,6 +16,7 @@
   * [UPGRADE] Prometheus has been upgraded from 2.53.0 to 2.54.1.
   * [UPGRADE] Prometheus Operator has been upgraded from 0.75.0 to 0.76.1.
   * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.8.0 to 1.9.0.
+
 
 ## Version 1.2.29 (16SEP2024)
 * **Overall**

@@ -151,24 +151,24 @@ else
    ./logging/bin/user.sh CREATE -ns $tenantNS -t $tenant -u $grfds_user -p "$grfds_passwd" -g
 fi
 
-# Create temporary directory for string replacement in the grafana-datasource-es.yaml file
+# Create temporary directory for string replacement in the grafana-datasource-opensearch.yaml file
 monDir=$TMP_DIR/$MON_NS
 mkdir -p $monDir
-cp monitoring/grafana-datasource-es.yaml $monDir/grafana-datasource-es.yaml
+cp monitoring/grafana-datasource-opensearch.yaml $monDir/grafana-datasource-opensearch.yaml
+
+#Determine OpenSearch version programatically
+parseFullImage "$OS_FULL_IMAGE"
+opensearch_version="${VERSION:-2.12.0}"
+log_debug "OpenSearch version [$opensearch_version] will be specified in datasource definition."
 
 # Replace placeholders
-log_debug "Replacing variables in $monDir/grafana-datasource-es.yaml file"
-if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-    sed -i '' "s/__namespace__/$LOG_NS/g" $monDir/grafana-datasource-es.yaml
-    sed -i '' "s/__ES_SERVICENAME__/$ES_SERVICENAME/g" $monDir/grafana-datasource-es.yaml    
-    sed -i '' "s/__userID__/$grfds_user/g" $monDir/grafana-datasource-es.yaml
-    sed -i '' "s/__passwd__/$grfds_passwd/g" $monDir/grafana-datasource-es.yaml
-else
-    sed -i "s/__namespace__/$LOG_NS/g" $monDir/grafana-datasource-es.yaml
-    sed -i "s/__ES_SERVICENAME__/$ES_SERVICENAME/g" $monDir/grafana-datasource-es.yaml
-    sed -i "s/__userID__/$grfds_user/g" $monDir/grafana-datasource-es.yaml
-    sed -i "s/__passwd__/$grfds_passwd/g" $monDir/grafana-datasource-es.yaml
-fi
+log_debug "Replacing variables in $monDir/grafana-datasource-opensearch.yaml file"
+v4m_replace "__namespace__"          "$LOG_NS"               "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__ES_SERVICENAME__"     "$ES_SERVICENAME"       "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__userID__"             "$grfds_user"           "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__passwd__"             "$grfds_passwd"         "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__opensearch_version__" "$opensearch_version"   "$monDir/grafana-datasource-opensearch.yaml"
+
 
 # Removes old Elasticsearch data source if one exists
 if [ "$cluster" == "true" ]; then
@@ -183,14 +183,45 @@ else
     fi
 fi
 
+# Install OpenSearch datasource plug-in to Grafana
+grafanaPod=$(kubectl -n $MON_NS get pods -l app.kubernetes.io/name=grafana -o jsonpath='{.items[0].metadata.name}')
+log_debug "Grafana Pod [$grafanaPod]"
+
+pluginInstalled=$(kubectl exec -n $MON_NS $grafanaPod  -- bash -c "grafana cli plugins ls |grep -c opensearch-datasource|| true")
+log_debug "Grafana OpenSearch Datasource Plugin installed? [$pluginInstalled]"
+
+if [ "$pluginInstalled" == "0" ]; then
+
+   log_info "Installing OpenSearch Datasource plugin"
+   pluginVersion="${GRAFANA_DATASOURCE_PLUGIN_VERSION:-2.17.4}"
+   pluginFile="grafana-opensearch-datasource-$pluginVersion.linux_amd64.zip"
+
+   if [ -n "$AIRGAP_HELM_REPO" ]; then
+      log_debug "Air-gapped deployment detected; loading OpenSearch Datasource plugin from USER_DIR/monitoring directory"
+
+      userPluginFile="$USER_DIR/monitoring/$pluginFile"
+      if [ -f "$userPluginFile" ]; then
+         kubectl cp $userPluginFile $MON_NS/$grafanaPod:/var/lib/grafana/plugins
+         kubectl exec -n $MON_NS $grafanaPod  -- unzip -o /var/lib/grafana/plugins/$pluginFile -d /var/lib/grafana/plugins/
+      else
+         log_error "The OpenSearch datasource plugin to Grafana zip file was NOT found in the expected location [$userPluginFile]"
+         exit 1
+      fi
+   else
+      log_debug "Using Grafana CLI to install plugin (version [$pluginVersion])"
+      kubectl exec -n $MON_NS $grafanaPod  -- grafana cli plugins install grafana-opensearch-datasource $pluginVersion
+      log_info "You may ignore any previous messages regarding restarting the Grafana pod; it will be restarted automatically."
+   fi
+else
+   log_debug "The OpenSearch datasource plugin is already installed; skipping installation."
+fi
+
 # Adds the logging data source to Grafana
 log_info "Provisioning logging data source in Grafana"
 if [ "$cluster" == "true" ]; then
-    kubectl create secret generic -n $MON_NS grafana-datasource-es --from-file $monDir/grafana-datasource-es.yaml
-    kubectl label secret -n $MON_NS grafana-datasource-es grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
-else
-    kubectl create secret generic -n $tenantNS v4m-grafana-datasource-es-$tenant --from-file $monDir/grafana-datasource-es.yaml
-    kubectl label secret -n $tenantNS v4m-grafana-datasource-es-$tenant grafana_datasource-$tenant=true sas.com/monitoring-base=kube-viya-monitoring
+    kubectl delete secret generic -n $MON_NS grafana-datasource-opensearch --ignore-not-found
+    kubectl create secret generic -n $MON_NS grafana-datasource-opensearch --from-file $monDir/grafana-datasource-opensearch.yaml
+    kubectl label secret -n $MON_NS grafana-datasource-opensearch grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
 fi
 
 # Deploy the log-enabled Viya dashboards
