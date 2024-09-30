@@ -58,3 +58,11 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 | Metrics | Kube Prometheus Stack| prometheus-community | kube-prometheus-stack | 62.7.0 | prometheus-community/kube-prometheus-stack-62.7.0.tgz |
 | Metrics | Prometheus Pushgateway| prometheus-community | prometheus-pushgateway | 2.14.0 | prometheus-community/prometheus-pushgateway-2.14.0.tgz |
 | Metrics | Tempo | grafana | tempo | 1.7.2 | grafana/tempo-1.7.2.tgz |
+
+## Table 4. Miscellaneous Component Version Information
+This table provides version information for some miscellaneous components deployed by SAS Viya Monitoring for Kubernetes.
+
+| Component | Version | Project Repository | Notes |
+|--|--|--|--|
+| OpenSearch Datasource Plugin (Grafana) | 2.18.0 | https://github.com/grafana/opensearch-datasource/releases |Allows Grafana to surface log messages stored in OpenSearch |
+
