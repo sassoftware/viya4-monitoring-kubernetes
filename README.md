@@ -1,5 +1,4 @@
 # SAS® Viya® Monitoring for Kubernetes
-
 ## Overview
 SAS® Viya® Monitoring for Kubernetes provides scripts and customization
 options to deploy metric monitoring, alerts, and log-message aggregation for SAS® Viya®.
