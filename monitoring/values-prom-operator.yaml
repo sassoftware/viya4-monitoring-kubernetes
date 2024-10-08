@@ -83,6 +83,42 @@ kube-state-metrics:
   extraArgs:
   - --metric-labels-allowlist=nodes=[*],namespaces=[*],pods=[*],deployments=[*],statefulsets=[*],daemonsets=[*],jobs=[*]
 
+  # Available collectors for kube-state-metrics.
+  # By default, all available resources are enabled, comment out to disable.
+  collectors:
+    - certificatesigningrequests
+    - configmaps
+    - cronjobs
+    - daemonsets
+    - deployments
+    - endpoints
+    - horizontalpodautoscalers
+    - ingresses
+    - jobs
+    - leases
+    - limitranges
+    - mutatingwebhookconfigurations
+    - namespaces
+    - networkpolicies
+    - nodes
+    - persistentvolumeclaims
+    - persistentvolumes
+    - poddisruptionbudgets
+    - pods
+    - replicasets
+    - replicationcontrollers
+    - resourcequotas
+    ## Metrics on Secrets disabled to
+    ## eliminate need for granting 
+    ## 'list' permission to ClusterRole
+    #- secrets
+    - services
+    - statefulsets
+    - storageclasses
+    - validatingwebhookconfigurations
+    - volumeattachments
+
+
 # ==========
 # Prometheus
 # ==========
