@@ -68,3 +68,4 @@ config:
 
 securityContext:
   readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
