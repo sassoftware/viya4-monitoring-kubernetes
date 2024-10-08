@@ -3,7 +3,7 @@
 ## Unreleased
 * **Metrics**
   * [SECURITY] Metrics (collected by Kube State Metrics) related to Kubernetes Secret have been disabled 
-to eliminate the need to grant `list` permission (for Secret resources) to the KSM ClusterRole (see PR#XXX)
+to eliminate the need to grant `list` permission (for Secret resources) to the KSM ClusterRole (see PR#684)
   * [CHANGE] The `create_logging_datasource.sh` script now uses the OpenSearch datasource plugin
 rather the Elasticsearch datasource plugin when creating the **ViyaLogs** datasource in Grafana.
 The plugin is downloaded and installed if it is not already in place.
