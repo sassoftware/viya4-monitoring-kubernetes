@@ -1,6 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+* **Logging**
+  * [SECURITY] OpenSearch Dashboards pod securityContext updated to set allowPrivilegeEscalation to 'false'
+
 * **Metrics**
   * [SECURITY] Metrics (collected by Kube State Metrics) related to Kubernetes Secret have been disabled 
 to eliminate the need to grant `list` permission (for Secret resources) to the KSM ClusterRole (see PR#684)
