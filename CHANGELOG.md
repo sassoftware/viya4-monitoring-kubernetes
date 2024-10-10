@@ -1,8 +1,8 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.30 (11OCT2024)
 * **Logging**
-  * [SECURITY] OpenSearch Dashboards pod securityContext updated to set allowPrivilegeEscalation to 'false'
+  * [SECURITY] OpenSearch Dashboards pod `securityContext` updated to set allowPrivilegeEscalation to 'false'
 
 * **Metrics**
   * [SECURITY] Metrics (collected by Kube State Metrics) related to Kubernetes Secret have been disabled 
