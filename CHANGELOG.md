@@ -1,5 +1,13 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Logging**
+  * [SECURITY] Fluent Bit log collecting pods no longer run as `root` user and now run with `readOnlyRootFilesystem` 
+set to 'true'. In addition, the database used to maintain state information for the log collector has moved
+to a hostPath volume and renamed. A new initContainer has been added to handle migrating any existing state 
+information and make adjustments to file ownership/permissions. NOTE: This initContainer runs under the `root`
+user but runs only briefly during the initial deployment process.
+
 ## Version 1.2.30 (11OCT2024)
 * **Logging**
   * [SECURITY] OpenSearch Dashboards pod `securityContext` updated to set allowPrivilegeEscalation to 'false'

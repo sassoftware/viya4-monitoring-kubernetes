@@ -24,7 +24,14 @@ extraVolumeMounts:
 - mountPath: /fluent-bit/etc/viya-tracing.conf
   name: tracing-config
   subPath: viya-tracing.conf
+- mountPath: /var/log/v4m-fb-storage
+  name: v4m-fb-storage
+  readOnly: false
 extraVolumes:
+- hostPath:
+    path: /var/log/v4m-fb-storage
+    type: DirectoryOrCreate
+  name: v4m-fb-storage
 - configMap:
     defaultMode: 420
     name: fb-viya-parsers
@@ -33,6 +40,10 @@ extraVolumes:
     defaultMode: 420
     name: fb-viya-tracing
   name: tracing-config
+- configMap:
+    defaultMode: 0755
+    name: fb-dbmigrate-script
+  name: dbmigrate-script
 fullConfigMap: false
 existingConfigMap: fb-fluent-bit-config
 
@@ -63,3 +74,34 @@ resources:
   requests:
     cpu: 100m
     memory: 128Mi
+
+###podSecurityContext:
+###  fsGroup: 3301     ###23OCT24
+
+securityContext:
+  runAsUser: 3301
+  readOnlyRootFilesystem: true
+  privileged: false
+  capabilities:
+    drop: ["all"]
+    add: ["CHOWN"]
+
+
+initContainers:
+- name: chowner-v4m-fb-storage
+  image: docker.io/library/busybox:latest
+  command: ['sh', '-c', "./usr/bin/migrate_fbstate_db.sh"]
+  securityContext:
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop: ["all"]
+      add: ["CHOWN"]
+    runAsUser: 0
+    runAsNonRoot: false
+  volumeMounts:
+  - name: v4m-fb-storage
+    mountPath: /var/log/v4m-fb-storage
+  - name: dbmigrate-script
+    mountPath: /usr/bin/migrate_fbstate_db.sh
+    readOnly: true
+    subPath: migrate_fbstate_db.sh

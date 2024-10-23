@@ -159,6 +159,11 @@ kubectl -n $LOG_NS create configmap fb-env-vars \
 
 kubectl -n $LOG_NS label configmap fb-env-vars   managed-by=v4m-es-script
 
+# Create ConfigMap containing Fluent Bit database migration script
+kubectl -n $LOG_NS delete configmap fb-dbmigrate-script --ignore-not-found
+kubectl -n $LOG_NS create configmap fb-dbmigrate-script --from-file logging/fb/migrate_fbstate_db.sh
+kubectl -n $LOG_NS label  configmap fb-dbmigrate-script managed-by=v4m-es-script
+
 ## Get Helm Chart Name
 log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference $FLUENTBIT_HELM_CHART_REPO $FLUENTBIT_HELM_CHART_NAME $FLUENTBIT_HELM_CHART_VERSION)"
