@@ -29,6 +29,10 @@ extraVolumeMounts:
   readOnly: false
 extraVolumes:
 - hostPath:
+    path: /var/log
+    #type: DirectoryOrCreate
+  name: var-log
+- hostPath:
     path: /var/log/v4m-fb-storage
     type: DirectoryOrCreate
   name: v4m-fb-storage
@@ -105,3 +109,6 @@ initContainers:
     mountPath: /usr/bin/migrate_fbstate_db.sh
     readOnly: true
     subPath: migrate_fbstate_db.sh
+  - mountPath: /var/log
+    name: var-log
+    readOnly: true

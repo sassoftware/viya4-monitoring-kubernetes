@@ -27,6 +27,7 @@ kubectl -n $LOG_NS delete configmap fb-fluent-bit-config   --ignore-not-found
 kubectl -n $LOG_NS delete configmap fb-viya-parsers        --ignore-not-found
 kubectl -n $LOG_NS delete configmap fb-viya-tracing        --ignore-not-found
 kubectl -n $LOG_NS delete configmap fb-env-vars            --ignore-not-found
+kubectl -n $LOG_NS delete configmap fb-dbmigrate-script    --ignore-not-found
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""

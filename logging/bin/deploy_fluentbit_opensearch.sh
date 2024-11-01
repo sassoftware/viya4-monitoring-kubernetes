@@ -159,6 +159,12 @@ kubectl -n $LOG_NS create configmap fb-env-vars \
 
 kubectl -n $LOG_NS label configmap fb-env-vars   managed-by=v4m-es-script
 
+# Check to see if we are upgrading from earlier version requiring root access
+if [ "$( kubectl -n $LOG_NS get configmap fb-dbmigrate-script -o name --ignore-not-found)" != "configmap/fb-dbmigrate-script" ]; then
+   log_debug "An earlier FB configuration requiring 'root detected; stopping FB pod to allow migration"
+   kubectl -n "$LOG_NS" delete daemonset v4m-fb --ignore-not-found
+fi
+
 # Create ConfigMap containing Fluent Bit database migration script
 kubectl -n $LOG_NS delete configmap fb-dbmigrate-script --ignore-not-found
 kubectl -n $LOG_NS create configmap fb-dbmigrate-script --from-file logging/fb/migrate_fbstate_db.sh
@@ -181,8 +187,12 @@ helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
   --set fullnameOverride=v4m-fb \
   $chart2install
 
+#pause to allow migration script to complete (if necessary)
+sleep 20
+
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
 disable_sa_token_automount $LOG_NS v4m-fb
+# FB pods will restart after following call if automount is not already enabled
 enable_pod_token_automount $LOG_NS daemonset v4m-fb
 
 # Force restart of daemonset to ensure we pick up latest config changes
