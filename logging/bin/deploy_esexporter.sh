@@ -51,7 +51,7 @@ if helm3ReleaseExists es-exporter $LOG_NS; then
    if [ -n "$monNamespace" ]; then
       log_debug "Removing obsolete serviceMonitor [$monNamespace/elasticsearch]"
       kubectl delete -n $monNamespace servicemonitor elasticsearch
-      log_debuge "Deploying an updated serviceMonitor for Elasticsearch  [$monNamespace/elasticsearch-v2]"
+      log_debug "Deploying an updated serviceMonitor for Elasticsearch  [$monNamespace/elasticsearch-v2]"
       kubectl apply  -n $monNamespace -f monitoring/monitors/logging/serviceMonitor-elasticsearch-v2.yaml
    fi
 else
