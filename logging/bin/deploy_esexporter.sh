@@ -67,10 +67,6 @@ fi
 
 helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
 
-## Commenting out because it might be redundant code.
-# log_verbose "Updating Helm repositories"
-# helm repo update
-
 primaryValuesFile="logging/esexporter/values-es-exporter.yaml"
 log_debug "Deploying Elasticsearch Exporter"
 
