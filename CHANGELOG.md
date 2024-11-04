@@ -6,6 +6,7 @@
   * [UPGRADE] Elasticsearch Exporter upgraded from 1.7.0 to 1.8.0. Note that this included a change to the pod labels that
 required a new serviceMonitor (elasticsearch-v2) be deployed.
   * [UPGRADE] Fluent Bit upgraded from 3.1.3 to 3.1.9
+  * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.18.0 to 2.21.1
 
 ## Version 1.2.30 (11OCT2024)
 * **Logging**
