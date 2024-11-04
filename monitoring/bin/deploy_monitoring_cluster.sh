@@ -291,7 +291,7 @@ fi
 kubectl apply -n $MON_NS -f monitoring/monitors/kube/podMonitor-eventrouter.yaml 2>/dev/null
 
 # Elasticsearch ServiceMonitor
-kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-elasticsearch.yaml
+kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-elasticsearch-v2.yaml
 
 # Fluent Bit ServiceMonitors
 kubectl apply -n $MON_NS -f monitoring/monitors/logging/serviceMonitor-fluent-bit.yaml

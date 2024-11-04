@@ -2,6 +2,14 @@
 
 ## Version 1.2.30 (11OCT2024)
 * **Logging**
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.15.0 to 2.17.1
+  * [UPGRADE] Elasticsearch Exporter upgraded from 1.7.0 to 1.8.0. Note that this included a change to the pod labels that
+required a new serviceMonitor (elasticsearch-v2) be deployed.
+  * [UPGRADE] Elasticsearch Exporter upgraded from 1.7.0 to 1.8.0.
+  * [UPGRADE] Fluent Bit upgraded from 3.1.3 to 3.1.9
+
+## Version 1.2.30 (11OCT2024)
+* **Logging**
   * [SECURITY] OpenSearch Dashboards pod `securityContext` updated to set allowPrivilegeEscalation to 'false'
 
 * **Metrics**
