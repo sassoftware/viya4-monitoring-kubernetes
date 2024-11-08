@@ -28,10 +28,10 @@ extraVolumeMounts:
   name: v4m-fb-storage
   readOnly: false
 extraVolumes:
-- hostPath:
-    path: /var/log
-    #type: DirectoryOrCreate
-  name: var-log
+###- hostPath:
+###    path: /var/log
+###    #type: DirectoryOrCreate
+###  name: var-log
 - hostPath:
     path: /var/log/v4m-fb-storage
     type: DirectoryOrCreate
@@ -94,6 +94,7 @@ securityContext:
 initContainers:
 - name: chowner-v4m-fb-storage
   image: docker.io/library/busybox:latest
+  imagePullPolicy: IfNotPresent
   command: ['sh', '-c', "./usr/bin/migrate_fbstate_db.sh"]
   securityContext:
     readOnlyRootFilesystem: true
@@ -107,8 +108,8 @@ initContainers:
     mountPath: /var/log/v4m-fb-storage
   - name: dbmigrate-script
     mountPath: /usr/bin/migrate_fbstate_db.sh
-    readOnly: true
+    readOnly: false
     subPath: migrate_fbstate_db.sh
   - mountPath: /var/log
-    name: var-log
+    name: varlog
     readOnly: true

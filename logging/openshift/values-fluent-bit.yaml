@@ -2,3 +2,6 @@ securityContext:
   privileged: true
 openShift:
   enabled: true
+  securityContextConstraints:
+    create: false
+    existingName: "privileged"
