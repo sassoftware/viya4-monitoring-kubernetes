@@ -97,6 +97,7 @@ initContainers:
   imagePullPolicy: IfNotPresent
   command: ['sh', '-c', "./usr/bin/migrate_fbstate_db.sh"]
   securityContext:
+    privileged: true
     readOnlyRootFilesystem: true
     capabilities:
       drop: ["all"]

@@ -3,5 +3,4 @@ securityContext:
 openShift:
   enabled: true
   securityContextConstraints:
-    create: false
-    existingName: "privileged"
+    create: true
