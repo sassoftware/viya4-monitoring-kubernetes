@@ -3,4 +3,5 @@ securityContext:
 openShift:
   enabled: true
   securityContextConstraints:
-    create: true
+    create: false
+    existingName: v4m-logging-v2

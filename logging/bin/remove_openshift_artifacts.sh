@@ -19,7 +19,9 @@ if [ "$OPENSHIFT_ARTIFACTS_REMOVE" != "true" ]; then
 fi
 
 # remove custom OpenShift SCC
-oc delete scc v4mlogging --ignore-not-found
+oc delete scc v4mlogging     --ignore-not-found
+oc delete scc v4m-logging-v2 --ignore-not-found
+
 
 
 log_info "OpenShift Prerequisites have been removed."

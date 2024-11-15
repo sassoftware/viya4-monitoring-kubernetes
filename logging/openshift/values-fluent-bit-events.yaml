@@ -1,4 +1,4 @@
 securityContext: 
-  privileged: true
+  privileged: false
 openShift:
   enabled: true
