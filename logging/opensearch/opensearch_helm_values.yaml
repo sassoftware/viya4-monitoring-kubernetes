@@ -175,3 +175,8 @@ sysctlInit:
 
 #sysctlVmMaxMapCount:
 #  262144
+
+
+securityContext:
+  seccompProfile: 
+    type: RuntimeDefault

@@ -69,3 +69,6 @@ config:
 securityContext:
   readOnlyRootFilesystem: true
   allowPrivilegeEscalation: false
+  seccompProfile: 
+    type: RuntimeDefault
+
