@@ -1,3 +1,4 @@
+podSecurityContext: null
 securityContext: 
   privileged: true
 openShift:
