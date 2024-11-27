@@ -1,3 +1,5 @@
+podSecurityContext: 
+  seccompProfile: {}
 securityContext: 
   privileged: true
 openShift:
