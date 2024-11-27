@@ -177,6 +177,6 @@ sysctlInit:
 #  262144
 
 
-securityContext:
+podSecurityContext:
   seccompProfile: 
     type: RuntimeDefault
