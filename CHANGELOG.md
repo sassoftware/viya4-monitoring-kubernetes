@@ -2,7 +2,8 @@
 
 ## Unreleased
 * **Logging**
-  * [SECURITY] Set `seccompProfile` to `RuntimeDefault` for OpenSearch, OpenSearch Dashboards and Fluent Bit pods
+  * [SECURITY] Set `seccompProfile` to `RuntimeDefault` for OpenSearch, OpenSearch Dashboards and Fluent Bit pods in
+non-OpenShift environments.
 
 ## Version 1.2.31 (15NOV2024)
 * **Logging**
