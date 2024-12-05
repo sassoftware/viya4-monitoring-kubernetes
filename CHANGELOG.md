@@ -1,6 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+* **Overall**
+  * [CHANGE] Comments added to user.env files within samples/generic-base to clarify security best-practices; other
+cleanup.
 * **Logging**
   * [SECURITY] Set `seccompProfile` to `RuntimeDefault` for OpenSearch, OpenSearch Dashboards and Fluent Bit pods in
 non-OpenShift environments.
