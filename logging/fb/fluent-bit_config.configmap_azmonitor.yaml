@@ -6,7 +6,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.26
+       Set  fb_configMap_version 0.2.27crexp
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -363,6 +363,7 @@ data:
        Match           kube.*
        Key_name        collectapi_message
        Parser          crunchy_poo
+       Parser          crunchy_exporter
        Parser          collectapi
        Parser          collectapiT
        Parser          crunchy_green
