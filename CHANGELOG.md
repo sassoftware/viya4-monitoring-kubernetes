@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.32 (09DEC2024)
 * **Overall**
   * [CHANGE] Comments added to user.env files within samples/generic-base to clarify security best-practices; other
 cleanup.
