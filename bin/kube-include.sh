@@ -34,15 +34,15 @@ fi;
 
 # SAS Viya 4 versions
 # supported by SAS Tech Support
-# Updated: 27SEP24
-# 2022.09 LTS 1.21 1.24  (EOL: 1.21, 1.22, 1.23)
-# 2023.03 LTS 1.23 1.25
+# Updated: 03DEC24
+# 2023.03 LTS 1.23 1.25  (EOL: 1.23)
 # 2023.10 LTS 1.25 1.27
 # 2024.03 LTS 1.26 1.28
-# 2024.06     1.27 1.29
-# 2024.07     1.27 1.29
+# 2024.09 LTS 1.28 1.30
 # 2024.08     1.27 1.29
 # 2024.09     1.28 1.30
+# 2024.10     1.28 1.30
+# 2024.11     1.28 1.30
 
 
 # Client version allowed to be one minor version earlier than minimum server version

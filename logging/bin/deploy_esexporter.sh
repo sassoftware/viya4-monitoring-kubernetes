@@ -40,10 +40,19 @@ if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
 
 
 if helm3ReleaseExists es-exporter $LOG_NS; then
-   #remove an existing instance if it does NOT target OPENSEARCH (i.e. targets ODFE)
-   if [ -z $(kubectl -n $LOG_NS get pods -l "app=prometheus-elasticsearch-exporter,searchbackend=opensearch" -o name 2>/dev/null) ]; then
+   #remove an existing instance if it does NOT have the most current set of labels
+   # NOTE: pod label 'app' changed to 'app.kubernetes.io/name' w/Helm chart 6.x
+   if [ -z $(kubectl -n $LOG_NS get pods -l "app.kubernetes.io/name=prometheus-elasticsearch-exporter,searchbackend=opensearch" -o name 2>/dev/null) ]; then
       log_debug "Removing an outdated version of Helm release [es-exporter]"
       helm -n $LOG_NS delete es-exporter
+   fi
+
+   monNamespace=$(kubectl get servicemonitor -A --field-selector=metadata.name=elasticsearch -l sas.com/monitoring-base=kube-viya-monitoring -o=custom-columns=NAMESPACE:.metadata.namespace --no-headers)
+   if [ -n "$monNamespace" ]; then
+      log_debug "Removing obsolete serviceMonitor [$monNamespace/elasticsearch]"
+      kubectl delete -n $monNamespace servicemonitor elasticsearch
+      log_debug "Deploying an updated serviceMonitor for Elasticsearch  [$monNamespace/elasticsearch-v2]"
+      kubectl apply  -n $monNamespace -f monitoring/monitors/logging/serviceMonitor-elasticsearch-v2.yaml
    fi
 else
    log_debug "No existing Helm release [es-exporter] found."
@@ -57,10 +66,6 @@ if [ "$HELM_DEBUG" == "true" ]; then
 fi
 
 helmRepoAdd prometheus-community https://prometheus-community.github.io/helm-charts
-
-## Commenting out because it might be redundant code.
-# log_verbose "Updating Helm repositories"
-# helm repo update
 
 primaryValuesFile="logging/esexporter/values-es-exporter.yaml"
 log_debug "Deploying Elasticsearch Exporter"

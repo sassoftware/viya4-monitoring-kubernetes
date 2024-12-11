@@ -79,9 +79,6 @@ resources:
     cpu: 100m
     memory: 128Mi
 
-###podSecurityContext:
-###  fsGroup: 3301     ###23OCT24
-
 securityContext:
   runAsUser: 3301
   readOnlyRootFilesystem: true
@@ -89,7 +86,6 @@ securityContext:
   capabilities:
     drop: ["all"]
     add: ["CHOWN"]
-
 
 initContainers:
 - name: chowner-v4m-fb-storage
@@ -114,3 +110,7 @@ initContainers:
   - mountPath: /var/log
     name: varlog
     readOnly: true
+
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault

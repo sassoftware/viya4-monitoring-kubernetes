@@ -38,6 +38,10 @@ securityContext:
   runAsUser: 1001
   readOnlyRootFilesystem: true
 
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+
 resources:
 #  limits:
 #    cpu: 100m

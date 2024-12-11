@@ -8,6 +8,25 @@ to a hostPath volume and renamed. A new initContainer has been added to handle m
 information and make adjustments to file ownership/permissions. NOTE: This initContainer runs under the `root`
 user but runs only briefly during the initial deployment process.
 
+
+## Version 1.2.32 (09DEC2024)
+* **Overall**
+  * [CHANGE] Comments added to user.env files within samples/generic-base to clarify security best-practices; other
+cleanup.
+* **Logging**
+  * [SECURITY] Set `seccompProfile` to `RuntimeDefault` for OpenSearch, OpenSearch Dashboards and Fluent Bit pods in
+non-OpenShift environments.
+
+
+## Version 1.2.31 (15NOV2024)
+* **Logging**
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.15.0 to 2.17.1
+  * [UPGRADE] Elasticsearch Exporter upgraded from 1.7.0 to 1.8.0. Note that this included a change to the pod labels that
+required a new serviceMonitor (elasticsearch-v2) be deployed.
+  * [UPGRADE] Fluent Bit upgraded from 3.1.3 to 3.1.9
+  * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.18.0 to 2.21.1
+
+
 ## Version 1.2.30 (11OCT2024)
 * **Logging**
   * [SECURITY] OpenSearch Dashboards pod `securityContext` updated to set allowPrivilegeEscalation to 'false'
