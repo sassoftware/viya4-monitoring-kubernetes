@@ -363,6 +363,7 @@ data:
        Match           kube.*
        Key_name        collectapi_message
        Parser          crunchy_poo
+       Parser          crunchy_exporter
        Parser          collectapi
        Parser          collectapiT
        Parser          crunchy_green

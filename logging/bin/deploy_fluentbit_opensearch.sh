@@ -98,7 +98,7 @@ fi
 log_debug "Using FB ConfigMap:" $FB_CONFIGMAP
 
 # Multiline parser setup
-LOG_MULTILINE_ENABLED=${LOG_MULTILINE_ENABLED}
+LOG_MULTILINE_ENABLED=${LOG_MULTILINE_ENABLED:-true}
 if [ "$LOG_MULTILINE_ENABLED" == "true" ]; then
   LOG_MULTILINE_PARSER="docker, cri"
 else
