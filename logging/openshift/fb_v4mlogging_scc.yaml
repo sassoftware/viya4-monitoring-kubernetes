@@ -17,6 +17,8 @@ runAsUser:
   type: RunAsAny
 seLinuxContext:
   type: MustRunAs
+seccompProfiles:
+- runtime/default
 fsGroup:
   type: MustRunAs
 supplementalGroups:
