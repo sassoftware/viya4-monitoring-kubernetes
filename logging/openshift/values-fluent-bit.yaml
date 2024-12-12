@@ -1,6 +1,3 @@
-podSecurityContext: null
-securityContext: 
-  privileged: true
 openShift:
   enabled: true
   securityContextConstraints:

@@ -83,39 +83,18 @@ securityContext:
   runAsUser: 3301
   readOnlyRootFilesystem: true
   privileged: false
+  allowPrivilegeEscalation: false
   capabilities:
     drop: ["all"]
-    add: ["CHOWN"]
 
 podSecurityContext:
+  runAsNonRoot: true
   seccompProfile:
     type: RuntimeDefault
 
 ##
-## NOTE: An initContainer is defined in logging/fb/fb_initcontainer_image.template
+## NOTE: An initContainer is also deployed; it is defined
+##       in logging/fb/fb_initcontainer_image.template
+##       which is passed to the Helm install command
+##       after value substitution.
 ##
-
-##initContainers:
-##- name: chowner-v4m-fb-storage
-##  image: docker.io/library/busybox:latest
-##  imagePullPolicy: IfNotPresent
-##  command: ['sh', '-c', "./usr/bin/migrate_fbstate_db.sh"]
-##  securityContext:
-##    privileged: true
-##    readOnlyRootFilesystem: true
-##    capabilities:
-##      drop: ["all"]
-##      add: ["CHOWN"]
-##    runAsUser: 0
-##    runAsNonRoot: false
-##  volumeMounts:
-##  - name: v4m-fb-storage
-##    mountPath: /var/log/v4m-fb-storage
-##  - name: dbmigrate-script
-##    mountPath: /usr/bin/migrate_fbstate_db.sh
-##    readOnly: false
-##    subPath: migrate_fbstate_db.sh
-##  - mountPath: /var/log
-##    name: varlog
-##    readOnly: true
-
