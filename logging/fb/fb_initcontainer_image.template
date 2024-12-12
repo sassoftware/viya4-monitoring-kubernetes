@@ -6,6 +6,7 @@ initContainers:
   command: ['sh', '-c', "./usr/bin/migrate_fbstate_db.sh"]
   securityContext:
     privileged: true
+    allowPrivilegeEscalation: true
     readOnlyRootFilesystem: true
     capabilities:
       drop: ["all"]
