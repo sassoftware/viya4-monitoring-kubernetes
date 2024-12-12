@@ -68,7 +68,8 @@ else
 fi
 
 #Generate yaml file with all container-related keys
-generateImageKeysFile "$FB_FULL_IMAGE"          "logging/fb/fb_container_image.template"
+generateImageKeysFile "$FB_FULL_IMAGE"                "logging/fb/fb_container_image.template"
+generateImageKeysFile "$FB_INITCONTAINER_FULL_IMAGE"  "logging/fb/fb_initcontainer_image.template"
 
 # Fluent Bit user customizations
 FB_OPENSEARCH_USER_YAML="${FB_OPENSEARCH_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-opensearch.yaml}"
@@ -161,7 +162,7 @@ kubectl -n $LOG_NS label configmap fb-env-vars   managed-by=v4m-es-script
 
 # Check to see if we are upgrading from earlier version requiring root access
 if [ "$( kubectl -n $LOG_NS get configmap fb-dbmigrate-script -o name --ignore-not-found)" != "configmap/fb-dbmigrate-script" ]; then
-   log_debug "An earlier FB configuration requiring 'root detected; stopping FB pod to allow migration"
+   log_debug "Removing FB pods (if they exist) to allow migration."
    kubectl -n "$LOG_NS" delete daemonset v4m-fb --ignore-not-found
 fi
 
