@@ -85,7 +85,7 @@ securityContext:
   privileged: false
   allowPrivilegeEscalation: false
   capabilities:
-    drop: ["all"]
+    drop: ["ALL"]
 
 podSecurityContext:
   runAsNonRoot: true

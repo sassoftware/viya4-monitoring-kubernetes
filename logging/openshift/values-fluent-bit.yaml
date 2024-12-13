@@ -1,4 +1,6 @@
-podSecurityContext: null
+securityContext:
+  privileged: true
+  allowPrivilegeEscalation: true
 
 openShift:
   enabled: true
