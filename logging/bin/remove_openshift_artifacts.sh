@@ -21,6 +21,7 @@ fi
 # remove custom OpenShift SCC
 oc delete scc v4mlogging     --ignore-not-found
 oc delete scc v4m-logging-v2 --ignore-not-found
+oc delete scc v4m-k8sevents  --ignore-not-found
 
 
 
