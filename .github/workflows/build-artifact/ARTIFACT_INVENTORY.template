@@ -16,9 +16,9 @@ registry/repository/image_name:version
 
 | Subsystem| Component | Fully Qualified Container-Image Name (registry/repository/image_name:version)|
 |----|----|----|
-| Logging | BusyBox (OpenSearch) | __OS_SYSCTL_FULL_IMAGE__ |
 | Logging | Fluent Bit | __FB_FULL_IMAGE__ |
 | Logging | Elasticsearch Exporter | __ES_EXPORTER_FULL_IMAGE__ |
+| Logging | initContainer (Fluent Bit, OpenSearch) | __OS_SYSCTL_FULL_IMAGE__ |
 | Logging | OpenSearch | __OS_FULL_IMAGE__ |
 | Logging | OpenSearch Dashboards| __OSD_FULL_IMAGE__ |
 | Metrics | Alertmanager | __ALERTMANAGER_FULL_IMAGE__ |
