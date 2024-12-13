@@ -2,11 +2,15 @@
 
 ## Unreleased
 * **Logging**
-  * [SECURITY] Fluent Bit log collecting pods no longer run as `root` user and now run with `readOnlyRootFilesystem` 
-set to 'true'. In addition, the database used to maintain state information for the log collector has moved
-to a hostPath volume and renamed. A new initContainer has been added to handle migrating any existing state 
-information and make adjustments to file ownership/permissions. NOTE: This initContainer runs under the `root`
-user but runs only briefly during the initial deployment process.
+  * [SECURITY] Fluent Bit log collecting pods no longer run as `root` user.  In addition, the database used to
+maintain state information for the log collector has moved to a hostPath volume and renamed. A new initContainer
+has been added to handle migrating any existing state information and make adjustments to file ownership/permissions.
+NOTE: This initContainer runs under as `root` user but only runs briefly during the initial deployment process.
+  * [SECURITY] Runtime security controls for all Fluent Bit pods (inc. both log collecting and Kubernetes event
+collecting) have been tightened.  Changes include: adding seecompProfile; and disallowing privileged containers,
+privilege escalation and write access to root filesystem.
+  * [SECURITY] On OpenShift, all Fluent Bit pods now use custom SCC objects to support changes described above.
+  * [CHANGE] Improved handling of long log messages and those from some Crunchy Data pods
 
 
 ## Version 1.2.32 (09DEC2024)
