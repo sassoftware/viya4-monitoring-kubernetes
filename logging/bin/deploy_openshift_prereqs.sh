@@ -32,6 +32,13 @@ else
    oc create -f logging/openshift/fb_v4m-logging-v2_scc.yaml
 fi
 
+# create the 'v4m-k8sevents' SCC, if it does not already exist
+if oc get scc v4m-k8sevents 2>/dev/null 1>&2; then
+   log_info "Skipping scc creation; using existing scc [v4m-k8sevents]"
+else
+   oc create -f logging/openshift/fb_v4m-k8sevents_scc.yaml
+fi
+
 log_info "OpenShift Prerequisites have been deployed."
 
 log_debug "Script [$this_script] has completed [$(date)]"

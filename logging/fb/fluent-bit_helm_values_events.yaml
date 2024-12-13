@@ -34,6 +34,8 @@ extraVolumeMounts:
   subPath: v4m_fb_events.db
 
 securityContext:
+  privileged: false
+  allowPrivilegeEscalation: false
   runAsNonRoot: true
   runAsUser: 1001
   readOnlyRootFilesystem: true

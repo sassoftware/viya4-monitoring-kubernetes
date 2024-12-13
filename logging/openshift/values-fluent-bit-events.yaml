@@ -1,6 +1,6 @@
-podSecurityContext: null
-
-securityContext: 
-  privileged: false
 openShift:
   enabled: true
+  securityContextConstraints:
+    create: false
+    existingName: v4m-k8sevents
+
