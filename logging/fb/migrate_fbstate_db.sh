@@ -1,9 +1,8 @@
 #! /bin/sh
 
-# Copyright Ã‚Â© 2024, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2024, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-cleanup="${CLEANUP:-false}"
 newFilename="${NEW_FILENAME:-v4m_fb.db}"
 newDir="${NEW_DIR:-/var/log/v4m-fb-storage}"
 oldFile="${OLD_FILE:-/var/log/sas_viya_flb.db}"
@@ -15,10 +14,6 @@ if [ ! -f "$newFile" ]; then
    if [ -f "$oldFile" ]; then
       echo "INFO Migrating [$oldFile] to [$newFile]"
       cp $oldFile $newFile
-      if [ "$cleanup" == "true" ] && [ "$?" == "0" ]; then
-         echo "INFO Deleting [$newFile]"
-         rm -f $newFile
-      fi
     else
        echo "INFO No previous instance of [$oldFile] found"
    fi
