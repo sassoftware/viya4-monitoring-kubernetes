@@ -39,7 +39,8 @@ fi
 log_info "Deploying Fluent Bit (Azure Monitor)"
 
 #Generate yaml file with all container-related keys#Generate yaml file with all container-related keys
-generateImageKeysFile "$FB_FULL_IMAGE"          "logging/fb/fb_container_image.template"
+generateImageKeysFile "$FB_FULL_IMAGE"               "logging/fb/fb_container_image.template"
+generateImageKeysFile "$FB_INITCONTAINER_FULL_IMAGE" "logging/fb/fb_initcontainer_image.template"
 
 # Fluent Bit user customizations
 FB_AZMONITOR_USER_YAML="${FB_AZMONITOR_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-azmonitor.yaml}"
@@ -94,7 +95,7 @@ else
 fi
 
 # Multiline parser setup
-LOG_MULTILINE_ENABLED="${LOG_MULTILINE_ENABLED}"
+LOG_MULTILINE_ENABLED="${LOG_MULTILINE_ENABLED:-true}"
 if [ "$LOG_MULTILINE_ENABLED" == "true" ]; then
   LOG_MULTILINE_PARSER="docker, cri"
 else
@@ -154,6 +155,18 @@ kubectl -n $LOG_NS create configmap fbaz-env-vars \
 
 kubectl -n $LOG_NS label configmap fbaz-env-vars   managed-by=v4m-es-script
 
+# Check to see if we are upgrading from earlier version requiring root access
+if [ "$( kubectl -n $LOG_NS get configmap fbaz-dbmigrate-script -o name --ignore-not-found)" != "configmap/fbaz-dbmigrate-script" ]; then
+   log_debug "Removing FB pods (if they exist) to allow migration."
+   kubectl -n "$LOG_NS" delete daemonset v4m-fbaz --ignore-not-found
+fi
+
+# Create ConfigMap containing Fluent Bit database migration script
+kubectl -n $LOG_NS delete configmap fbaz-dbmigrate-script --ignore-not-found
+kubectl -n $LOG_NS create configmap fbaz-dbmigrate-script --from-file logging/fb/migrate_fbstate_db.sh
+kubectl -n $LOG_NS label  configmap fbaz-dbmigrate-script managed-by=v4m-es-script
+
+
  ## Get Helm Chart Name
  log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"
  chart2install="$(get_helmchart_reference $FLUENTBIT_HELM_CHART_REPO $FLUENTBIT_HELM_CHART_NAME $FLUENTBIT_HELM_CHART_VERSION)"
@@ -170,9 +183,12 @@ helm $helmDebug upgrade --install v4m-fbaz  --namespace $LOG_NS  \
   --set fullnameOverride=v4m-fbaz \
   $chart2install
 
+#pause to allow migration script to complete (if necessary)
+sleep 20
 
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
 disable_sa_token_automount $LOG_NS v4m-fbaz
+# FB pods will restart after following call if automount is not already enabled
 enable_pod_token_automount $LOG_NS daemonset v4m-fbaz
 
 # Force restart of daemonset to ensure we pick up latest config changes

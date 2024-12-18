@@ -6,7 +6,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.26
+       Set  fb_configMap_version 0.2.27noroot2a
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -363,6 +363,7 @@ data:
        Match           kube.*
        Key_name        collectapi_message
        Parser          crunchy_poo
+       Parser          crunchy_exporter
        Parser          collectapi
        Parser          collectapiT
        Parser          crunchy_green
@@ -974,6 +975,7 @@ data:
        Allowlist_key  properties
     [INPUT]
        Name             tail
+       Alias            tail4logs
        Path             /var/log/containers/*.log
        Exclude_Path     /var/log/containers/v4m-*.log
        Parser           ${KUBERNETES_RUNTIME_LOGFMT}
@@ -984,12 +986,13 @@ data:
        Skip_Long_Lines  On
        Read_from_Head   On
        Ignore_Older     1d
-       DB               /var/log/sas_viya_flb.db
+       DB               /var/log/v4m-fb-storage/v4m_fb.db
        DB.locking       On
        storage.type     filesystem
     [INPUT]
        # NOTE: ** METALOGGING **
        Name             tail
+       Alias            tail4ops
        Path             /var/log/containers/v4m-*.log
        Parser           ${KUBERNETES_RUNTIME_LOGFMT}
        Tag              opsK.*
@@ -998,7 +1001,7 @@ data:
        Skip_Long_Lines  On
        Read_from_Head   On
        Ignore_Older     1d
-       DB               /var/log/sas_viya_flb.db
+       DB               /var/log/v4m-fb-storage/v4m_fb.db
        DB.locking       On
        storage.type     filesystem
     [OUTPUT]
@@ -1053,7 +1056,7 @@ data:
        HTTP_Server  On
        HTTP_Listen  0.0.0.0
        HTTP_Port    2020
-       storage.path /tmp/fb_buffer/
+       storage.path /var/log/v4m-fb-storage
        storage.checksum off
        storage.sync normal
        storage.backlog.mem_limit 5M
