@@ -55,7 +55,7 @@ helm2ReleaseCheck fb-$LOG_NS
 # Check for an existing Helm release of stable/fluent-bit
 if helm3ReleaseExists fb $LOG_NS; then
    log_verbose "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
-   helm  $helmDebug  delete -n $LOG_NS fb
+   helm  $helmDebug  delete -n "$LOG_NS" fb
 
    if [ $(kubectl get servicemonitors -A |grep fluent-bit-v2 -c) -ge 1 ]; then
       log_debug "Updated serviceMonitor [fluent-bit-v2] appears to be deployed."
@@ -107,11 +107,11 @@ else
 fi
 
 # Create ConfigMap containing Fluent Bit configuration
-kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
+kubectl -n "$LOG_NS" apply -f $FB_CONFIGMAP
 
 # Create ConfigMap containing Viya-customized parsers (delete it first)
-kubectl -n $LOG_NS delete configmap fb-viya-parsers --ignore-not-found
-kubectl -n $LOG_NS create configmap fb-viya-parsers  --from-file=logging/fb/viya-parsers.conf
+kubectl -n "$LOG_NS" delete configmap fb-viya-parsers --ignore-not-found
+kubectl -n "$LOG_NS" create configmap fb-viya-parsers  --from-file=logging/fb/viya-parsers.conf
 
 TRACING_ENABLE="${TRACING_ENABLE:-false}"
 if [ "$TRACING_ENABLE" == "true" ]; then
@@ -151,14 +151,14 @@ fi
 MON_NS="${MON_NS:-monitoring}"
 
 # Create ConfigMap containing Kubernetes container runtime log format
-kubectl -n $LOG_NS delete configmap fb-env-vars --ignore-not-found
-kubectl -n $LOG_NS create configmap fb-env-vars \
+kubectl -n "$LOG_NS" delete configmap fb-env-vars --ignore-not-found
+kubectl -n "$LOG_NS" create configmap fb-env-vars \
                    --from-literal=KUBERNETES_RUNTIME_LOGFMT="$KUBERNETES_RUNTIME_LOGFMT" \
                    --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}"         \
                    --from-literal=SEARCH_SERVICENAME="${ES_SERVICENAME}"                 \
                    --from-literal=MON_NS="${MON_NS}"
 
-kubectl -n $LOG_NS label configmap fb-env-vars   managed-by=v4m-es-script
+kubectl -n "$LOG_NS" label configmap fb-env-vars   managed-by=v4m-es-script
 
 # Check to see if we are upgrading from earlier version requiring root access
 if [ "$( kubectl -n $LOG_NS get configmap fb-dbmigrate-script -o name --ignore-not-found)" != "configmap/fb-dbmigrate-script" ]; then
@@ -167,9 +167,9 @@ if [ "$( kubectl -n $LOG_NS get configmap fb-dbmigrate-script -o name --ignore-n
 fi
 
 # Create ConfigMap containing Fluent Bit database migration script
-kubectl -n $LOG_NS delete configmap fb-dbmigrate-script --ignore-not-found
-kubectl -n $LOG_NS create configmap fb-dbmigrate-script --from-file logging/fb/migrate_fbstate_db.sh
-kubectl -n $LOG_NS label  configmap fb-dbmigrate-script managed-by=v4m-es-script
+kubectl -n "$LOG_NS" delete configmap fb-dbmigrate-script --ignore-not-found
+kubectl -n "$LOG_NS" create configmap fb-dbmigrate-script --from-file logging/fb/migrate_fbstate_db.sh
+kubectl -n "$LOG_NS" label  configmap fb-dbmigrate-script managed-by=v4m-es-script
 
 ## Get Helm Chart Name
 log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"
@@ -189,6 +189,7 @@ helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
   $chart2install
 
 #pause to allow migration script to complete (if necessary)
+log_debug "Pausing to allow migration script to complete"
 sleep 20
 
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod

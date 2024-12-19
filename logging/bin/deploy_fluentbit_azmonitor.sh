@@ -67,7 +67,7 @@ if [ "$(kubectl -n $LOG_NS get secret connection-info-azmonitor -o name 2>/dev/n
 
    if [ "$AZMONITOR_CUSTOMER_ID" != "NotProvided"  ] && [ "$AZMONITOR_SHARED_KEY" != "NotProvided" ]; then
       log_info "Creating secret [connection-info-azmonitor] in [$LOG_NS] namespace to hold Azure connection information."
-      kubectl -n $LOG_NS create secret generic connection-info-azmonitor --from-literal=customer_id=$AZMONITOR_CUSTOMER_ID --from-literal=shared_key=$AZMONITOR_SHARED_KEY
+      kubectl -n "$LOG_NS" create secret generic connection-info-azmonitor --from-literal=customer_id="$AZMONITOR_CUSTOMER_ID" --from-literal=shared_key="$AZMONITOR_SHARED_KEY"
    else
       log_error "Unable to create secret [$LOG_NS/connection-info-azmonitor] because missing required information: [AZMONITOR_CUSTOMER_ID: $AZMONITOR_CUSTOMER_ID ; AZMONITOR_SHARED_KEY: $AZMONITOR_SHARED_KEY]."
       log_error "You must provide this information via environment variables or create the secret [connection-info-azmonitor] before running this script."
@@ -75,14 +75,14 @@ if [ "$(kubectl -n $LOG_NS get secret connection-info-azmonitor -o name 2>/dev/n
    fi
 else
    log_info "Obtaining connection information from existing secret [$LOG_NS/connection-info-azmonitor]"
-   export AZMONITOR_CUSTOMER_ID=$(kubectl -n $LOG_NS get secret connection-info-azmonitor -o=jsonpath="{.data.customer_id}" |base64 --decode)
-   export AZMONITOR_SHARED_KEY=$(kubectl -n $LOG_NS get secret connection-info-azmonitor -o=jsonpath="{.data.shared_key}" |base64 --decode)
+   export AZMONITOR_CUSTOMER_ID=$(kubectl -n "$LOG_NS" get secret connection-info-azmonitor -o=jsonpath="{.data.customer_id}" |base64 --decode)
+   export AZMONITOR_SHARED_KEY=$(kubectl -n "$LOG_NS" get secret connection-info-azmonitor -o=jsonpath="{.data.shared_key}" |base64 --decode)
 fi
 
 # Check for an existing Helm release of stable/fluent-bit
 if helm3ReleaseExists fbaz $LOG_NS; then
    log_info "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
-   helm  $helmDebug  delete -n $LOG_NS fbaz
+   helm  $helmDebug  delete -n "$LOG_NS" fbaz
 
    if [ $(kubectl get servicemonitors -A |grep fluent-bit-v2 -c) -ge 1 ]; then
       log_debug "Updated serviceMonitor [fluent-bit-v2] appears to be deployed."
@@ -103,11 +103,11 @@ else
 fi
 
 # Create ConfigMap containing Fluent Bit configuration
-kubectl -n $LOG_NS apply -f $FB_CONFIGMAP
+kubectl -n "$LOG_NS" apply -f $FB_CONFIGMAP
 
 # Create ConfigMap containing Viya-customized parsers (delete it first)
-kubectl -n $LOG_NS delete configmap fbaz-viya-parsers --ignore-not-found
-kubectl -n $LOG_NS create configmap fbaz-viya-parsers  --from-file=logging/fb/viya-parsers.conf
+kubectl -n "$LOG_NS" delete configmap fbaz-viya-parsers --ignore-not-found
+kubectl -n "$LOG_NS" create configmap fbaz-viya-parsers  --from-file=logging/fb/viya-parsers.conf
 
 TRACING_ENABLE="${TRACING_ENABLE:-false}"
 if [ "$TRACING_ENABLE" == "true" ]; then
@@ -147,13 +147,13 @@ fi
 MON_NS="${MON_NS:-monitoring}"
 
 # Create ConfigMap containing Kubernetes container runtime log format
-kubectl -n $LOG_NS delete configmap fbaz-env-vars --ignore-not-found
-kubectl -n $LOG_NS create configmap fbaz-env-vars \
+kubectl -n "$LOG_NS" delete configmap fbaz-env-vars --ignore-not-found
+kubectl -n "$LOG_NS" create configmap fbaz-env-vars \
                    --from-literal=KUBERNETES_RUNTIME_LOGFMT=$KUBERNETES_RUNTIME_LOGFMT \
                    --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}" \
                    --from-literal=MON_NS="${MON_NS}"
 
-kubectl -n $LOG_NS label configmap fbaz-env-vars   managed-by=v4m-es-script
+kubectl -n "$LOG_NS" label configmap fbaz-env-vars   managed-by=v4m-es-script
 
 # Check to see if we are upgrading from earlier version requiring root access
 if [ "$( kubectl -n $LOG_NS get configmap fbaz-dbmigrate-script -o name --ignore-not-found)" != "configmap/fbaz-dbmigrate-script" ]; then
@@ -162,9 +162,9 @@ if [ "$( kubectl -n $LOG_NS get configmap fbaz-dbmigrate-script -o name --ignore
 fi
 
 # Create ConfigMap containing Fluent Bit database migration script
-kubectl -n $LOG_NS delete configmap fbaz-dbmigrate-script --ignore-not-found
-kubectl -n $LOG_NS create configmap fbaz-dbmigrate-script --from-file logging/fb/migrate_fbstate_db.sh
-kubectl -n $LOG_NS label  configmap fbaz-dbmigrate-script managed-by=v4m-es-script
+kubectl -n "$LOG_NS" delete configmap fbaz-dbmigrate-script --ignore-not-found
+kubectl -n "$LOG_NS" create configmap fbaz-dbmigrate-script --from-file logging/fb/migrate_fbstate_db.sh
+kubectl -n "$LOG_NS" label  configmap fbaz-dbmigrate-script managed-by=v4m-es-script
 
 
  ## Get Helm Chart Name
