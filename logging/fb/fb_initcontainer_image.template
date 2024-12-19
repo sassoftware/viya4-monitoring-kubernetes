@@ -1,0 +1,26 @@
+initContainers:
+- name: chowner-v4m-fb-storage
+  image: __IMAGE_REPO_3LEVEL__:__IMAGE_TAG__
+  imagePullPolicy: IfNotPresent
+  command: ['sh', '-c', "./usr/bin/migrate_fbstate_db.sh"]
+  securityContext:
+    privileged: true
+    allowPrivilegeEscalation: true
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop: ["all"]
+      add: ["CHOWN"]
+    runAsUser: 0
+    runAsNonRoot: false
+  volumeMounts:
+  - name: v4m-fb-storage
+    mountPath: /var/log/v4m-fb-storage
+  - name: dbmigrate-script
+    mountPath: /usr/bin/migrate_fbstate_db.sh
+    readOnly: false
+    subPath: migrate_fbstate_db.sh
+  - mountPath: /var/log
+    name: varlog
+    readOnly: true
+
+
