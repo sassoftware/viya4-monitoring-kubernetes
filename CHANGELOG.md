@@ -1,5 +1,14 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Logging**
+  * [SECURITY] OpenSearch pods has been reconfigured to allow `readOnlyRootFilesystem` to be set to 'true'. A
+new initContainer has been added to facilitate this.
+  * [SECURITY] Other runtime security controls for OpenSearch pods have also been tightened.  Changes include: 
+disallowing privileged containers, privilege escalation and removing all Linux capabilities. NOTE: some
+initContainers continue to run as `root` user but only run briefly during the initial deployment process.
+
+
 ## Version 1.2.32 (09DEC2024)
 * **Overall**
   * [CHANGE] Comments added to user.env files within samples/generic-base to clarify security best-practices; other
