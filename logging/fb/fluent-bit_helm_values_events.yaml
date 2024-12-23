@@ -39,6 +39,8 @@ securityContext:
   runAsNonRoot: true
   runAsUser: 1001
   readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
 
 podSecurityContext:
   seccompProfile:
