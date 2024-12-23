@@ -6,9 +6,13 @@
 maintain state information for the log collector has moved to a hostPath volume and been renamed. A new initContainer
 has been added to handle migrating any existing state information and make adjustments to file ownership/permissions.
 NOTE: This initContainer runs under as `root` user but only runs briefly during the initial deployment process.
-  * [SECURITY] Runtime security controls for all Fluent Bit pods (inc. both log collecting and Kubernetes event
-collecting) have been tightened.  Changes include: adding seccompProfile; and disallowing privileged containers,
-privilege escalation and write access to the root filesystem.
+  * [SECURITY] OpenSearch pods has been reconfigured to allow `readOnlyRootFilesystem` to be set to 'true'. A
+new initContainer has been added to facilitate this.
+  * [SECURITY] Runtime security controls for log monitoring stack (i.e. Fluent Bit, OpenSearch, OpenSearch
+Dashboards and Elasticsearch Exporter) pods have been tightened.  Changes include: adding seccompProfile; 
+and disallowing privileged containers, privilege escalation and removing all Linux capabilities.  As noted
+above, some initContainers require less restrictive security but these only run briefly during the initial
+deployment process.
   * [SECURITY] On OpenShift, all Fluent Bit pods now use custom SCC objects to support changes described above.
   * [CHANGE] Improved handling of long log messages and those from some Crunchy Data pods
 
