@@ -1,0 +1,21 @@
+extraInitContainers:
+  - name: copy-conf-data
+##    image: opensearchproject/opensearch:2.17.1
+    image: __IMAGE_REPO_3LEVEL__:__IMAGE_TAG__
+    imagePullPolicy: __IMAGE_PULL_POLICY__
+    command:
+    - sh
+    - -c
+    - cp -r /usr/share/opensearch/config/* /config/
+    - chmod -R 777 /config/
+    - ls /config/
+    volumeMounts:
+      - name: configdir
+        mountPath: /config/
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      capabilities:
+        drop: ["ALL"]
