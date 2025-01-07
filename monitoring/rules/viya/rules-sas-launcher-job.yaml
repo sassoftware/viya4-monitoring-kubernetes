@@ -9,7 +9,7 @@ spec:
   - name: sas-launcher-job-info.rules
     interval: 6s
     rules:
-    - expr: sum((label_replace(kube_pod_labels{label_sas_com_created_by="sas-launcher"},"job_pod","$1","pod","(.+)") * on (job_pod) group_left(job_name,queue_name) sas_job_info{}) * on (pod) group_left(node) kube_pod_info{}) without (container, endpoint, instance, job, service)
+    - expr: sum((label_replace(kube_pod_labels{label_sas_com_created_by="sas-launcher"},"job_pod","$1","pod","(.+)") * on (job_pod) group_left(job_name,queue_name) sas_job_info{}) * on (namespace,pod) group_left(node) kube_pod_info{pod_ip!="",host_ip!=""}) without(container, endpoint, instance, job, service)
       record: ':sas_launcher_pod_info:'
     - expr: sum(:sas_launcher_pod_info:* on (namespace, pod) group_left(phase) (kube_pod_status_phase{}==1)) without (endpoint,instance,job,service)
       record: ':sas_launcher_pod_status:'

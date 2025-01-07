@@ -1,5 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Metrics**
+  * [FIX] Rule defintion for `:sas_launcher_pod_info:` updated to: support multiple SAS Viya deployments
+running in same cluster and address a problem (seen on OpenShift) when there is a significant delay between
+a pod being created and being assigned an IP address.
+
 ## Version 1.2.32 (09DEC2024)
 * **Overall**
   * [CHANGE] Comments added to user.env files within samples/generic-base to clarify security best-practices; other
