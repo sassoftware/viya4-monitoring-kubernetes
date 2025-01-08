@@ -16,9 +16,9 @@ registry/repository/image_name:version
 
 | Subsystem| Component | Fully Qualified Container-Image Name (registry/repository/image_name:version)|
 |----|----|----|
-| Logging | BusyBox (OpenSearch) | docker.io/library/busybox:latest |
 | Logging | Fluent Bit | cr.fluentbit.io/fluent/fluent-bit:3.1.9 |
 | Logging | Elasticsearch Exporter | quay.io/prometheuscommunity/elasticsearch-exporter:v1.8.0 |
+| Logging | initContainer (Fluent Bit, OpenSearch) | docker.io/library/busybox:latest |
 | Logging | OpenSearch | docker.io/opensearchproject/opensearch:2.17.1 |
 | Logging | OpenSearch Dashboards| docker.io/opensearchproject/opensearch-dashboards:2.17.1 |
 | Metrics | Alertmanager | quay.io/prometheus/alertmanager:v0.27.0 |
