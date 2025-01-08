@@ -31,7 +31,14 @@ extraVolumeMounts:
 - mountPath: /fluent-bit/etc/viya-tracing.conf
   name: tracing-config
   subPath: viya-tracing.conf
+- mountPath: /var/log/v4m-fb-storage
+  name: v4m-fb-storage
+  readOnly: false
 extraVolumes:
+- hostPath:
+    path: /var/log/v4m-fb-storage
+    type: DirectoryOrCreate
+  name: v4m-fb-storage
 - configMap:
     defaultMode: 420
     name: fbaz-viya-parsers
@@ -40,6 +47,10 @@ extraVolumes:
     defaultMode: 420
     name: fbaz-viya-tracing
   name: tracing-config
+- configMap:
+    defaultMode: 0755
+    name: fbaz-dbmigrate-script
+  name: dbmigrate-script
 fullConfigMap: false
 existingConfigMap: fbaz-fluent-bit-config
 
@@ -70,6 +81,22 @@ resources:
     cpu: 100m
     memory: 128Mi
 
+securityContext:
+  runAsUser: 3301
+  readOnlyRootFilesystem: true
+  privileged: false
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+
 podSecurityContext:
+  runAsNonRoot: true
   seccompProfile:
     type: RuntimeDefault
+
+##
+## NOTE: An initContainer is also deployed; it is defined
+##       in logging/fb/fb_initcontainer_image.template
+##       which is passed to the Helm install command
+##       after value substitution.
+##

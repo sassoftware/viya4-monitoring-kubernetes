@@ -173,3 +173,6 @@ prometheusRule:
     annotations:
       description: The heap usage is over 90% for 15m
       summary: Elasticsearch node {{$labels.node}} heap usage is high
+
+securityContext:
+  privileged: false

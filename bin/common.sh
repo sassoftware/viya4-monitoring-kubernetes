@@ -289,7 +289,11 @@ function generateImageKeysFile {
 
    #arg1 Full container image
    #arg2 name of template file
-   #arg3 prefix to insert in placeholders (optional)
+   #arg3 prefix to insert in placeholders (optional; defaults to "")
+   #arg4 flag to override omit_image_key logic (optional; defaults to "false")
+
+   #NOTE: arg4 is required to handle 2 initContainers (for OpenSearch and Fluent Bit)
+   #      for which the template file contains settings other than image specs
 
    local pullsecret_text
 
@@ -299,6 +303,7 @@ function generateImageKeysFile {
    fi
 
    prefix=${3:-""}
+   ignoreOmitImageKeys=${4:-"false"}
 
    imageKeysFile="$TMP_DIR/imageKeysFile.yaml"
    template_file=$2
@@ -310,7 +315,7 @@ function generateImageKeysFile {
       log_debug "Modifying an existing imageKeysFile"
    fi
 
-   if [ "$V4M_OMIT_IMAGE_KEYS" == "true" ]; then
+   if [ "$V4M_OMIT_IMAGE_KEYS" == "true" ] && [ "$ignoreOmitImageKeys" != "true" ]; then
       cp $TMP_DIR/empty.yaml $imageKeysFile
       return 0
    fi

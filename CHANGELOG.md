@@ -1,5 +1,22 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Logging**
+  * [SECURITY] Fluent Bit log collecting pods no longer run as `root` user.  In addition, the database used to
+maintain state information for the log collector has moved to a hostPath volume and been renamed. A new initContainer
+has been added to handle migrating any existing state information and make adjustments to file ownership/permissions.
+NOTE: This initContainer runs under as `root` user but only runs briefly during the initial deployment process.
+  * [SECURITY] OpenSearch pods has been reconfigured to allow `readOnlyRootFilesystem` to be set to 'true'. A
+new initContainer has been added to facilitate this.
+  * [SECURITY] Runtime security controls for log monitoring stack (i.e. Fluent Bit, OpenSearch, OpenSearch
+Dashboards and Elasticsearch Exporter) pods have been tightened.  Changes include: adding seccompProfile; 
+and disallowing privileged containers, privilege escalation and removing all Linux capabilities.  As noted
+above, some initContainers require less restrictive security but these only run briefly during the initial
+deployment process.
+  * [SECURITY] On OpenShift, all Fluent Bit pods now use custom SCC objects to support changes described above.
+  * [CHANGE] Improved handling of long log messages and those from some Crunchy Data pods
+
+
 ## Version 1.2.32 (09DEC2024)
 * **Overall**
   * [CHANGE] Comments added to user.env files within samples/generic-base to clarify security best-practices; other
@@ -8,6 +25,7 @@ cleanup.
   * [SECURITY] Set `seccompProfile` to `RuntimeDefault` for OpenSearch, OpenSearch Dashboards and Fluent Bit pods in
 non-OpenShift environments.
 
+
 ## Version 1.2.31 (15NOV2024)
 * **Logging**
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.15.0 to 2.17.1
@@ -15,6 +33,7 @@ non-OpenShift environments.
 required a new serviceMonitor (elasticsearch-v2) be deployed.
   * [UPGRADE] Fluent Bit upgraded from 3.1.3 to 3.1.9
   * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.18.0 to 2.21.1
+
 
 ## Version 1.2.30 (11OCT2024)
 * **Logging**
