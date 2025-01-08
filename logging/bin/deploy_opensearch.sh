@@ -40,7 +40,7 @@ fi
 #Generate yaml files with all container-related keys
 generateImageKeysFile "$OS_FULL_IMAGE"          "logging/opensearch/os_container_image.template"
 generateImageKeysFile "$OS_SYSCTL_FULL_IMAGE"   "$imageKeysFile"  "OS_SYSCTL_"
-generateImageKeysFile "$OS_FULL_IMAGE"          "logging/opensearch/os_initcontainer_image.template"
+generateImageKeysFile "$OS_FULL_IMAGE"          "logging/opensearch/os_initcontainer_image.template" "" "true"
 
 # get credentials
 export ES_ADMIN_PASSWD=${ES_ADMIN_PASSWD}

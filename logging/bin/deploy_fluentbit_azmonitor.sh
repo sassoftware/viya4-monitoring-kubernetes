@@ -40,7 +40,7 @@ log_info "Deploying Fluent Bit (Azure Monitor)"
 
 #Generate yaml file with all container-related keys#Generate yaml file with all container-related keys
 generateImageKeysFile "$FB_FULL_IMAGE"               "logging/fb/fb_container_image.template"
-generateImageKeysFile "$FB_INITCONTAINER_FULL_IMAGE" "logging/fb/fb_initcontainer_image.template"
+generateImageKeysFile "$FB_INITCONTAINER_FULL_IMAGE" "logging/fb/fb_initcontainer_image.template" "" "true"
 
 # Fluent Bit user customizations
 FB_AZMONITOR_USER_YAML="${FB_AZMONITOR_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-azmonitor.yaml}"
