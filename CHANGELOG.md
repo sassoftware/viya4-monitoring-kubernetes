@@ -1,7 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
-
+## Version 1.2.33 (14JAN2025)
 * **Logging**
   * [SECURITY] Fluent Bit log collecting pods no longer run as `root` user.  In addition, the database used to
 maintain state information for the log collector has moved to a hostPath volume and been renamed. A new initContainer
@@ -10,7 +9,7 @@ NOTE: This initContainer runs under as `root` user but only runs briefly during 
   * [SECURITY] OpenSearch pods has been reconfigured to allow `readOnlyRootFilesystem` to be set to 'true'. A
 new initContainer has been added to facilitate this.
   * [SECURITY] Runtime security controls for log monitoring stack (i.e. Fluent Bit, OpenSearch, OpenSearch
-Dashboards and Elasticsearch Exporter) pods have been tightened.  Changes include: adding seccompProfile; 
+Dashboards and Elasticsearch Exporter) pods have been tightened.  Changes include: adding seccompProfile;
 and disallowing privileged containers, privilege escalation and removing all Linux capabilities.  As noted
 above, some initContainers require less restrictive security but these only run briefly during the initial
 deployment process.
@@ -46,7 +45,7 @@ required a new serviceMonitor (elasticsearch-v2) be deployed.
   * [SECURITY] OpenSearch Dashboards pod `securityContext` updated to set allowPrivilegeEscalation to 'false'
 
 * **Metrics**
-  * [SECURITY] Metrics (collected by Kube State Metrics) related to Kubernetes Secret have been disabled 
+  * [SECURITY] Metrics (collected by Kube State Metrics) related to Kubernetes Secret have been disabled
 to eliminate the need to grant `list` permission (for Secret resources) to the KSM ClusterRole (see PR#684)
   * [CHANGE] The `create_logging_datasource.sh` script now uses the OpenSearch datasource plugin
 rather the Elasticsearch datasource plugin when creating the **ViyaLogs** datasource in Grafana.
@@ -70,11 +69,11 @@ The plugin is downloaded and installed if it is not already in place.
   * [TASK] Updated links (within markdown files, dashboards, etc.) to reflect documentation reorganization
 
 * **Logging**
-  * [CHANGE] Updated link to SAS documentation in the SAS Update Checker Report (within 
+  * [CHANGE] Updated link to SAS documentation in the SAS Update Checker Report (within
 OpenSearch Dashboards) to be version-independent
 
 * **Metrics**
-  * [FIX] Changed metric label (from 'CAS Version' to 'OS Version') on SAS CAS Overview 
+  * [FIX] Changed metric label (from 'CAS Version' to 'OS Version') on SAS CAS Overview
 dashboard (within Grafana) to reflect information displayed
   * [FIX] Replace deprecated `oc serviceacounts get-token` command in deploy_monitoring_openshift.sh for OpenShift 4.16+
 
@@ -130,7 +129,7 @@ removed these dashboards and replaced them with our versions of them.  **This fi
 ## Version 1.2.24 (16APR2024)
 * **Metrics**
   * [FIX] Connect to Grafana using https from auto-provisioning sidecar containers when TLS is enabled
- 
+
 * **Logging**
   * [FIX] Corrected parser definition for Consul messages to eliminate ERROR/WARNING messages in Fluent Bit pod logs
   * [CHANGE] Added parser/processing for Redis log messsages
@@ -144,14 +143,14 @@ removed these dashboards and replaced them with our versions of them.  **This fi
   * [FIX] Revised `samples/azure-deployment/README.md` to remove obsolete information and bring content up-to-date. (Fixes #612)
 
 * **Metrics**
-  * [ANNOUNCEMENT] In an upcoming release, we will be making a **BREAKING CHANGE** related to how the connection between Prometheus and 
-Alertmanager is configured.  Currently, we define the `prometheusSpec.alertingEndpoints.*` keys programmatically; but, after this change, 
-we will expect users to provide this information when they define the ingress resources associated with the metric monitoring applications 
+  * [ANNOUNCEMENT] In an upcoming release, we will be making a **BREAKING CHANGE** related to how the connection between Prometheus and
+Alertmanager is configured.  Currently, we define the `prometheusSpec.alertingEndpoints.*` keys programmatically; but, after this change,
+we will expect users to provide this information when they define the ingress resources associated with the metric monitoring applications
 (e.g. Grafana, Prometheus and Alertmanger).  This will consolidate the connection and ingress configuration in the same place, the
-`$USER_DIR/monitoring/user-values-prom-operator.yaml` file.  This change will only be a **BREAKING CHANGE** when updating an existing deployment 
+`$USER_DIR/monitoring/user-values-prom-operator.yaml` file.  This change will only be a **BREAKING CHANGE** when updating an existing deployment
 that uses ingress to reach the metric monitoring applications or when using an ingress configurations based on the previous ingress sample.
-The [ingress sample](samples/ingress) has been updated to work with the new approach (see note below).  If you do not update your configuration before the 
-change is released, Prometheus will not be able to send alerts to Alertmanger after the change.  The release of this change is tenatively 
+The [ingress sample](samples/ingress) has been updated to work with the new approach (see note below).  If you do not update your configuration before the
+change is released, Prometheus will not be able to send alerts to Alertmanger after the change.  The release of this change is tenatively
 scheduled for our 1.2.24 release (expected mid-April).
   * [FIX] Set environment variable `MON_TLS_PATH_INGRESS` to ensure correct datasource connection between Grafana
 and Promethues in [Azure Deployment sample](samples/azure-deployment). (Fixes #614)
@@ -176,21 +175,21 @@ and `logging/user-values-es-exporter.yaml`.
 ## Version 1.2.22 (13FEB2024)
 * **Overall**
   * [TASK] Refactored how container image and Helm chart version information is handled to permit automatically generating this information from files.  Note
-that this change does NOT alter how users provide this information should they wish to change it.  User should continue to include this information in the 
+that this change does NOT alter how users provide this information should they wish to change it.  User should continue to include this information in the
 appropriate user values yaml file within their USER_DIR directory.  However, specifying a Helm chart or container image version different than the default
 should rarely be necessary or appropriate.
 
 * **Metrics**
-  * [ANNOUNCEMENT] In an upcoming release, we will be making a **BREAKING CHANGE** related to how the connection between Prometheus and 
-Alertmanager is configured.  Currently, we define the `prometheusSpec.alertingEndpoints.*` keys programmatically; but, after this change, 
-we will expect users to provide this information when they define the ingress resources associated with the metric monitoring applications 
+  * [ANNOUNCEMENT] In an upcoming release, we will be making a **BREAKING CHANGE** related to how the connection between Prometheus and
+Alertmanager is configured.  Currently, we define the `prometheusSpec.alertingEndpoints.*` keys programmatically; but, after this change,
+we will expect users to provide this information when they define the ingress resources associated with the metric monitoring applications
 (e.g. Grafana, Prometheus and Alertmanger).  This will consolidate the connection and ingress configuration in the same place, the
-`$USER_DIR/monitoring/user-values-prom-operator.yaml` file.  This change will only be a **BREAKING CHANGE** when updating an existing deployment 
+`$USER_DIR/monitoring/user-values-prom-operator.yaml` file.  This change will only be a **BREAKING CHANGE** when updating an existing deployment
 that uses ingress to reach the metric monitoring applications or when using an ingress configurations based on the previous ingress sample.
-The [ingress sample](samples/ingress) has been updated to work with the new approach (see note below).  If you do not update your configuration before the 
-change is released, Prometheus will not be able to send alerts to Alertmanger after the change.  The release of this change is tenatively 
+The [ingress sample](samples/ingress) has been updated to work with the new approach (see note below).  If you do not update your configuration before the
+change is released, Prometheus will not be able to send alerts to Alertmanger after the change.  The release of this change is tenatively
 scheduled for our 1.2.23 release (expected mid-March).
-  * [CHANGE] The [ingress samples](samples/ingress) have been updated to accomodate an upcoming, potentially breaking, change (see note above).  These updated 
+  * [CHANGE] The [ingress samples](samples/ingress) have been updated to accomodate an upcoming, potentially breaking, change (see note above).  These updated
 ingress samples can be used now, prior to the change being released, since they are compatible with both the existing and new behavior.
   * [FIX] Replaced obsolete container image name for OpenShift oauth proxy container
 
@@ -209,7 +208,7 @@ is no longer actively developed and was replaced with a Fluent Bit deployment fo
 
 * **Logging**
   * [FEATURE] The getlogs.py utility for exporting logs via the command line has been moved to "production"
-from "experimental" status.  Documentation for this optional Python-based tool is available in the 
+from "experimental" status.  Documentation for this optional Python-based tool is available in the
 [SAS Viya Monitoring for Kubernetes Help Center](https://documentation.sas.com/?docsetId=obsrvdply&docsetVersion=latest&docsetTarget=p1wdkgnu7dp791n1h9xfyh68ltnt.htm).
 
 ## Version 1.2.20 (12DEC2023)
@@ -299,8 +298,8 @@ added new corresponding OpenSearch Grafana dashboard.
   * [UPGRADE] Grafana has been upgraded from version 9.5.2 to 9.5.5. This version contains a fix to address vulnerability [CVE-2023-3128](https://nvd.nist.gov/vuln/detail/CVE-2023-3128)
   * [FIX] Removed hard-coded reference to 'monitoring' namespace in Prometheus URL w/in Grafana datasource
   * [FIX] Unset MON_TLS_PATH_INGRESS in samples/generic-base/monitoring/user.env
-  * [DEPRECATION] Support for tenant-level metric monitoring (specifically, deploying tenant-level instances 
-of Prometheus and Grafana), is moved from 'experiemental' to 'deprecated' status and will be removed in 
+  * [DEPRECATION] Support for tenant-level metric monitoring (specifically, deploying tenant-level instances
+of Prometheus and Grafana), is moved from 'experiemental' to 'deprecated' status and will be removed in
 an upcoming release.
 
 * **Logging**
@@ -394,13 +393,13 @@ message to the console output if this occurs.
 ## Version 1.2.10 (14FEB2023)
 * **Overall**
   * [SECURITY] Disabled the automounting of API credentials for all serviceAccount resources associated with deployed
-    components. Automounting of credentials is now enabled at the _pod_ level in a small number of cases (Event Router, 
+    components. Automounting of credentials is now enabled at the _pod_ level in a small number of cases (Event Router,
     Fluent Bit, Kube State Metrics and Prometheus Operator) where needed to support required functionality.  If necessary,
     these changes can be disabled by setting the SEC_DISABLE_SA_TOKEN_AUTOMOUNT environment variable to 'false'.
 
 * **Logging**
-  * [UPGRADE] Moved to OpenSearch and OpenSearch Dashboards version 2.4.1.  As part of this change, 
-    an initContainer (fsgoup-volume - used to run a chown command) and the Performance Analyzer agent 
+  * [UPGRADE] Moved to OpenSearch and OpenSearch Dashboards version 2.4.1.  As part of this change,
+    an initContainer (fsgoup-volume - used to run a chown command) and the Performance Analyzer agent
     (which ran alongside OpenSearch) were disabled.  Both can be re-enabled, if necessary, by setting
     keys in your $USER_DIR/ user-values-opensearch.yaml file.
   * [CHANGE] The TLS samples, both with host-based and path-based ingress, were modified to work with
@@ -428,7 +427,7 @@ message to the console output if this occurs.
 ## Version 1.2.8 (13DEC2022)
 
 * **Overall**
-  * [ANNOUNCEMENT] - The documentation for this project has been redesigned and is now located in the [SAS Viya Monitoring for Kubernetes Help Center](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvwlcm&docsetTarget=titlepage.htm).  
+  * [ANNOUNCEMENT] - The documentation for this project has been redesigned and is now located in the [SAS Viya Monitoring for Kubernetes Help Center](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=default&docsetId=obsrvwlcm&docsetTarget=titlepage.htm). 
     A limited amount of documentation, primarily related to experimental features, remains available as markdown files in the project repo.
 
 * **Metrics**
@@ -550,7 +549,7 @@ message to the console output if this occurs.
   * [FIX] - Updated SAS Viya logo on the Grafana Welcome screen so that it is easier to see on darker background.
   * [FIX] - Fixed an issue that pod names were concatenated when multiple instances of tenant monitoring have been deployed.
   * [CHANGE] - Combined the functionality of the create_elasticsearch_datasource_cluster.sh and create_elasticsearch_datasource_tenant.sh scripts into one script (create_elasticsearch_datasource.sh).
-  
+
 * **Logging**
   * [ANNOUNCEMENT] - In our next release, we expect to move to using OpenSearch rather than Open Distro for Elasticseach as the search back-end supporting our log monitoring capabilities. While this change will have only minor impact on the user interface (primarily some cosmetic changes), it will have a more significant impact on the deployment process. Therefore, this should be considered a breaking change. It will involve:
     * changes to many script names, including the names of the primary deployment and removal scripts;
@@ -578,23 +577,23 @@ message to the console output if this occurs.
 
 * **Monitoring**
   * [EXPERIMENTAL] - A new script, `create_elasticsearch_datasource.sh`, that
-    creates datasource(s) which allow collected log messages collected to be 
+    creates datasource(s) which allow collected log messages collected to be
     viewed within Grafana.
 
 * **Logging**
   * [FEATURE] - New role-based access controls and roles are created during
-    initial deployment and the onboarding process to facilitate the creation 
-    of datasource(s) which allow collected log messages collected to be 
+    initial deployment and the onboarding process to facilitate the creation
+    of datasource(s) which allow collected log messages collected to be
     viewed in Grafana.
-  * [FIX] - Corrected annotations on Grafana ingress objects in the Azure 
+  * [FIX] - Corrected annotations on Grafana ingress objects in the Azure
     Deployment sample. (Fixes #318)
   * [EXPERIMENTAL] - Running `logging/bin/deploy_logging_opensearch.sh` instead
     of `logging/bin/deploy_logging_open.sh` will deploy log monitoring with
-    OpenSearch 1.3.1 (instead of Open Distro for Elasticsearch 1.13.3) as the 
+    OpenSearch 1.3.1 (instead of Open Distro for Elasticsearch 1.13.3) as the
     search back-end.  [OpenSearch](http://opensearch.org) will become the default (only) back-end
-    in a coming release.  The files `user-values-elasticsearch-opensearch.yaml` 
-    and `user-values-osd-opensearch.yaml` replace the `user-values-elasticsearch.yaml` 
-    file for providing user-supplied values during the Helm deployment process 
+    in a coming release.  The files `user-values-elasticsearch-opensearch.yaml`
+    and `user-values-osd-opensearch.yaml` replace the `user-values-elasticsearch.yaml`
+    file for providing user-supplied values during the Helm deployment process
     and use a different set of keys.
 
 ## Version 1.1.6 (15MAR22)
@@ -638,7 +637,7 @@ message to the console output if this occurs.
     Fluent Bit
   * [FEATURE] - `logging/bin/change_internal_password.sh` now supports the
     recently added `logadm` user
-  
+
   * [CHANGE] - The deprecated `KB_TLS_ENABLE` flag has been removed. Kibana TLS
     is now controlled via the normal `TLS_ENABLE` and `LOG_TLS_ENABLE` flags
   * [FIX] - Several status check  in scripts have been simplified to use
@@ -663,11 +662,11 @@ message to the console output if this occurs.
 * **Overall**
   * [CHANGE] The [ingress sample](samples/ingress) is deprecated in favor of
     the [TLS sample](samples/tls)
-  * [FIX] The [TLS Sample](samples/tls) is now more consistent across 
+  * [FIX] The [TLS Sample](samples/tls) is now more consistent across
     monitoring/logging and host/path-based ingress
   * [FIX] The [CloudWatch sample](samples/cloudwatch) has been updated to support
     IMDSv2, which is used by [viya4-iac-aws](https://github.com/sassoftware/viya4-iac-aws)
-  * [CHANGE] Samples have been reviewed and updated as needed for 
+  * [CHANGE] Samples have been reviewed and updated as needed for
     consistency and correctness
 
 * **Monitoring**
