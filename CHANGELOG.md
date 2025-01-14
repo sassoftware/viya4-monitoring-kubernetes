@@ -1,6 +1,7 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
+
 * **Logging**
   * [SECURITY] Fluent Bit log collecting pods no longer run as `root` user.  In addition, the database used to
 maintain state information for the log collector has moved to a hostPath volume and been renamed. A new initContainer
@@ -15,6 +16,11 @@ above, some initContainers require less restrictive security but these only run 
 deployment process.
   * [SECURITY] On OpenShift, all Fluent Bit pods now use custom SCC objects to support changes described above.
   * [CHANGE] Improved handling of long log messages and those from some Crunchy Data pods
+
+* **Metrics**
+  * [FIX] Rule defintion for `:sas_launcher_pod_info:` updated to: support multiple SAS Viya deployments
+running in same cluster and address a data problem seen on OpenShift when there is a significant delay (> 1s)
+between when a pod being created and it being assigned an IP address.
 
 
 ## Version 1.2.32 (09DEC2024)
