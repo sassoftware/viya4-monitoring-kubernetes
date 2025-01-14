@@ -1,5 +1,9 @@
-podSecurityContext: null
-securityContext: 
+securityContext:
   privileged: true
+  allowPrivilegeEscalation: true
+
 openShift:
   enabled: true
+  securityContextConstraints:
+    create: false
+    existingName: v4m-logging-v2

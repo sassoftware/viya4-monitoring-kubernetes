@@ -69,6 +69,7 @@ config:
 securityContext:
   readOnlyRootFilesystem: true
   allowPrivilegeEscalation: false
+  privileged: false
 
 podSecurityContext:
   seccompProfile: 
