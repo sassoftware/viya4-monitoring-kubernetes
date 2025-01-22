@@ -5,6 +5,8 @@
   * [CHANGE] Removed temporary fix (added w/1.2.27) replacing a small number of Grafana dashboards
 inherited from the Kube-Prometheus Stack Helm chart that did not work with Grafana 11.x due to Angular 
 migration or other issues. Current version of these dashboards all appear to be compatible with Grafana 11.x.
+  * [CHANGE] Node Exporter deployment onto Mac and AIX nodes disabled by default.  This also suppresses
+deployment of the (generally unused) `Node Exporter/MacOS` dashboard within Grafana.
   * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 62.7.0 to 68.3.0.
   * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded from 8.5.1 to 8.8.4.
   * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 2.14.0 to 2.17.0.
