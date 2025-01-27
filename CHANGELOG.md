@@ -1,5 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 
+## unreleased
+* **Overall**
+  * [CHANGE] A minor tweak to an internal function, v4m_replace, was made to improve its handling of 
+some special characters.
+
+
 ## Version 1.2.33 (14JAN2025)
 * **Logging**
   * [SECURITY] Fluent Bit log collecting pods no longer run as `root` user.  In addition, the database used to
