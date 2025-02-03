@@ -21,16 +21,16 @@ registry/repository/image_name:version
 | Logging | initContainer (Fluent Bit, OpenSearch) | docker.io/library/busybox:latest |
 | Logging | OpenSearch | docker.io/opensearchproject/opensearch:2.17.1 |
 | Logging | OpenSearch Dashboards| docker.io/opensearchproject/opensearch-dashboards:2.17.1 |
-| Metrics | Alertmanager | quay.io/prometheus/alertmanager:v0.27.0 |
-| Metrics | Grafana | docker.io/grafana/grafana:11.2.0 |
+| Metrics | Alertmanager | quay.io/prometheus/alertmanager:v0.28.0 |
+| Metrics | Grafana | docker.io/grafana/grafana:11.4.0 |
 | Metrics | Admission Webhook | registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6 |
-| Metrics | Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.13.0 |
+| Metrics | Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.14.0 |
 | Metrics | Node Exporter | quay.io/prometheus/node-exporter:v1.8.2 |
-| Metrics | Prometheus | quay.io/prometheus/prometheus:v2.54.1 |
-| Metrics | Prometheus Operator | quay.io/prometheus-operator/prometheus-operator:v0.76.1 |
-| Metrics | Configuration Reloader (Alertmanager, Prometheus) | quay.io/prometheus-operator/prometheus-config-reloader:v0.76.1 |
-| Metrics | Prometheus Pushgateway | quay.io/prometheus/pushgateway:v1.9.0 |
-| Metrics | Auto-load Sidecars (Grafana) | quay.io/kiwigrid/k8s-sidecar:1.27.4 |
+| Metrics | Prometheus | quay.io/prometheus/prometheus:v3.1.0 |
+| Metrics | Prometheus Operator | quay.io/prometheus-operator/prometheus-operator:v0.79.2 |
+| Metrics | Configuration Reloader (Alertmanager, Prometheus) | quay.io/prometheus-operator/prometheus-config-reloader:v0.79.2 |
+| Metrics | Prometheus Pushgateway | quay.io/prometheus/pushgateway:v1.11.0 |
+| Metrics | Auto-load Sidecars (Grafana) | quay.io/kiwigrid/k8s-sidecar:1.28.0 |
 | Metrics | OpenShift OAUTH Proxy (Grafana, OpenShift only) | registry.redhat.io/openshift4/ose-oauth-proxy:latest |
 | Metrics | Tempo | docker.io/grafana/tempo:2.4.1 |
 
@@ -54,9 +54,9 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 | Logging | Fluent Bit| fluent | fluent-bit | 0.47.10 | fluent/fluent-bit-0.47.10.tgz |
 | Logging | OpenSearch| opensearch | opensearch | 2.26.0 | opensearch/opensearch-2.26.0.tgz |
 | Logging | OpenSearch Dashboard| opensearch | opensearch-dashboards | 2.24.0 | opensearch/opensearch-dashboards-2.24.0.tgz |
-| Metrics | Grafana (on OpenShift)| grafana | grafana | 8.5.1 | grafana/grafana-8.5.1.tgz |
-| Metrics | Kube Prometheus Stack| prometheus-community | kube-prometheus-stack | 62.7.0 | prometheus-community/kube-prometheus-stack-62.7.0.tgz |
-| Metrics | Prometheus Pushgateway| prometheus-community | prometheus-pushgateway | 2.14.0 | prometheus-community/prometheus-pushgateway-2.14.0.tgz |
+| Metrics | Grafana (on OpenShift)| grafana | grafana | 8.8.4 | grafana/grafana-8.8.4.tgz |
+| Metrics | Kube Prometheus Stack| prometheus-community | kube-prometheus-stack | 68.3.0 | prometheus-community/kube-prometheus-stack-68.3.0.tgz |
+| Metrics | Prometheus Pushgateway| prometheus-community | prometheus-pushgateway | 2.17.0 | prometheus-community/prometheus-pushgateway-2.17.0.tgz |
 | Metrics | Tempo | grafana | tempo | 1.7.2 | grafana/tempo-1.7.2.tgz |
 
 ## Table 4. Miscellaneous Component Version Information
@@ -64,5 +64,5 @@ This table provides version information for some miscellaneous components deploy
 
 | Component | Version | Project Repository | Notes |
 |--|--|--|--|
-| OpenSearch Datasource Plugin (Grafana) | 2.21.1 | https://github.com/grafana/opensearch-datasource/releases |Allows Grafana to surface log messages stored in OpenSearch |
+| OpenSearch Datasource Plugin (Grafana) | 2.22.3 | https://github.com/grafana/opensearch-datasource/releases |Allows Grafana to surface log messages stored in OpenSearch |
 
