@@ -1304,7 +1304,15 @@
       "targets": [
         {
           "alias": "",
-          "bucketAggs": [],
+          "bucketAggs": [
+            {
+              "id": "1",
+              "settings": {
+                "interval": "auto"
+              },
+              "type": "date_histogram"
+            }
+          ],
           "datasource": {
             "uid": "ViyaLogs"
           },
@@ -1476,7 +1484,7 @@
   },
   "timezone": "browser",
   "title": "SAS Go Service Details with Logs",
-  "uid": "3j9N_AlZk",
+  "uid": "3j9N_AlZk22",
   "version": 1,
   "weekStart": ""
 }

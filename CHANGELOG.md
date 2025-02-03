@@ -1,5 +1,26 @@
 # SAS Viya Monitoring for Kubernetes
 
+## unreleased
+* **Metrics**
+  * [CHANGE] Removed temporary fix (added w/1.2.27) replacing a small number of Grafana dashboards
+inherited from the Kube-Prometheus Stack Helm chart that did not work with Grafana 11.x due to Angular 
+migration or other issues. Current version of these dashboards all appear to be compatible with Grafana 11.x.
+  * [CHANGE] Node Exporter deployment onto Mac and AIX nodes disabled by default.  This also suppresses
+deployment of the (generally unused) `Node Exporter/MacOS` dashboard within Grafana.
+  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 62.7.0 to 68.3.0.
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded from 8.5.1 to 8.8.4.
+  * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 2.14.0 to 2.17.0.
+  * [UPGRADE] Alertmanager has been upgraded from 0.27.0 to 0.28.0.
+  * [UPGRADE] The config-reloader has been upgraded from 0.76.1 to 0.79.2.
+  * [UPGRADE] Grafana has been upgraded from 11.2.0 to 11.4.0.
+  * [UPGRADE] The k8s-sidecar has been upgraded from 1.27.4 to 1.28.0.
+  * [UPGRADE] Kube-State-Metrics has been upgraded from 2.13.0 to 2.14.0.
+  * [UPGRADE] Prometheus has been upgraded from 2.54.1 to 3.1.0.
+  * [UPGRADE] Prometheus Operator has been upgraded from 0.76.1 to 0.79.2.
+  * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.9.0 to 1.11.0.
+
+
+
 ## Version 1.2.33 (14JAN2025)
 * **Logging**
   * [SECURITY] Fluent Bit log collecting pods no longer run as `root` user.  In addition, the database used to
