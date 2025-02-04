@@ -279,9 +279,9 @@ function parseFullImage {
 function v4m_replace {
 
     if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-      sed -i '' s/"$1"/"$2"/g  "$3"
+      sed -i '' "s;$1;$2;g"  "$3"
     else
-      sed -i  s/"$1"/"$2"/g  "$3"
+      sed -i  "s;$1;$2;g"  "$3"
     fi
 }
 

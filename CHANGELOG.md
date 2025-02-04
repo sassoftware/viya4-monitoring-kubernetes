@@ -1,6 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## unreleased
+
+* **Overall**
+  * [CHANGE] A minor tweak to an internal function, v4m_replace, was made to improve its handling of 
+some special characters.
+
 * **Metrics**
   * [CHANGE] Removed temporary fix (added w/1.2.27) replacing a small number of Grafana dashboards
 inherited from the Kube-Prometheus Stack Helm chart that did not work with Grafana 11.x due to Angular 
@@ -18,6 +23,7 @@ deployment of the (generally unused) `Node Exporter/MacOS` dashboard within Graf
   * [UPGRADE] Prometheus has been upgraded from 2.54.1 to 3.1.0.
   * [UPGRADE] Prometheus Operator has been upgraded from 0.76.1 to 0.79.2.
   * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.9.0 to 1.11.0.
+
 
 
 
