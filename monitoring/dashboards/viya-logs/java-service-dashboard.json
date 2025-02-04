@@ -3746,6 +3746,15 @@
             {
               "alias": "",
               "bucketAggs": [],
+              "bucketAggs": [
+                {
+                  "id": "1",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
               "datasource": {
                 "uid": "ViyaLogs"
               },

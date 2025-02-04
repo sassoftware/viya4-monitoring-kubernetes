@@ -187,7 +187,16 @@ alertmanager:
               storage: 10Gi
           volumeMode: Filesystem
 
+# =======================
 # Prometheus Node Exporter
+# =======================
+nodeExporter:
+  operatingSystems:
+    aix:
+      enabled: false
+    darwin:
+      enabled: false
+
 # https://github.com/prometheus/node_exporter
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
 prometheus-node-exporter:
