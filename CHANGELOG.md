@@ -5,7 +5,7 @@
 * **Overall**
   * [CHANGE] A minor tweak to an internal function, v4m_replace, was made to improve its handling of 
 some special characters.
-  * [FIX] An internal function, display_notices, was updated to use local variable rather than global one.
+  * [FIX] Use locally-scoped IFS variable within the display_notices function
 
 * **Metrics**
   * [CHANGE] Removed temporary fix (added w/1.2.27) replacing a small number of Grafana dashboards
