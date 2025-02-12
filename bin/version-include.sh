@@ -23,7 +23,7 @@ function populateValuesYAML() {
       echo '"user_dir":' >> "$v4mValuesYAML"
       echo "  path: $USER_DIR" >> "$v4mValuesYAML"
       echo '  files: |' >> "$v4mValuesYAML"
-      l=($(find "$USER_DIR" -type f))
+      l=($(find "$USER_DIR" -type f|sort))
       for (( i=0; i<${#l[@]}; i++ )); do
         fullPath=${l[i]}
         path=${fullPath#"$USER_DIR/"}
