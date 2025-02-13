@@ -2,9 +2,12 @@
 
 ## unreleased
 
+* **Tracing**
+  * [UPGRADE] Upgraded Tempo from 2.2.0 to 2.7.0
+
 * **Metrics**
   * [CHANGE] Removed temporary fix (added w/1.2.27) replacing a small number of Grafana dashboards
-inherited from the Kube-Prometheus Stack Helm chart that did not work with Grafana 11.x due to Angular 
+inherited from the Kube-Prometheus Stack Helm chart that did not work with Grafana 11.x due to Angular
 migration or other issues. Current version of these dashboards all appear to be compatible with Grafana 11.x.
   * [CHANGE] Node Exporter deployment onto Mac and AIX nodes disabled by default.  This also suppresses
 deployment of the (generally unused) `Node Exporter/MacOS` dashboard within Grafana.
@@ -21,7 +24,7 @@ deployment of the (generally unused) `Node Exporter/MacOS` dashboard within Graf
   * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.9.0 to 1.11.0.
 
 * **Overall**
-  * [CHANGE] A minor tweak to an internal function, `v4m_replace`, was made to improve its handling of 
+  * [CHANGE] A minor tweak to an internal function, `v4m_replace`, was made to improve its handling of
 some special characters.
   * [CHANGE] A minor tweak to an internal function, `populateValuesYAML`, was made to sort the list of
 files in the USER_DIR directory captured as part of deploying the V4M Helm Chart.
