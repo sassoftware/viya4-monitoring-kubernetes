@@ -24,7 +24,7 @@ deployment of the (generally unused) `Node Exporter/MacOS` dashboard within Graf
 some special characters.
   * [CHANGE] A minor tweak to an internal function, `populateValuesYAML`, was made to sort the list of
 files in the USER_DIR directory captured as part of deploying the V4M Helm Chart.
- * [FIX] Use locally-scoped IFS variable within the `display_notices` function
+  * [FIX] Use locally-scoped IFS variable within the `display_notices` function
 
 
 ## Version 1.2.33 (14JAN2025)
