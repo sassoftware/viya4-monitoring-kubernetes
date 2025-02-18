@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## unreleased
+## Version 1.2.34 (18FEB2025)
 * **Metrics**
   * [CHANGE] Removed temporary fix (added w/1.2.27) replacing a small number of Grafana dashboards
 inherited from the Kube-Prometheus Stack Helm chart that did not work with Grafana 11.x due to Angular
