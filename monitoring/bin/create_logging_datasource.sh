@@ -48,7 +48,6 @@ if user_exists "$grfds_user"; then
 fi
 
 grfds_passwd="$(randomPassword)"
-###grfds_passwd="ABC!Fish123!"
 
 ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u $grfds_user -p "$grfds_passwd" -g
 

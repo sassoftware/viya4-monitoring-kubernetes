@@ -2,9 +2,10 @@
 
 ## Unreleased
 * **Metrics**
-  * [FIX] Corrected a bug that prevented the create_logging_datasource.sh script from being run on OpenShift clusters.
-  * [CHANGE] As part of making the above fix, obsolete functionality related to running the create_logging_datasource.sh
+  * [FIX] Corrected bug preventing the `create_logging_datasource.sh` script from being run on OpenShift clusters.
+  * [CHANGE] As part of making the above fix, obsolete functionality related to running the `create_logging_datasource.sh`
 script to deploy datasource within namespace/tenant-level instances of Grafana was removed.
+  * [FIX] Corrected timing of call to `create_logging_datasource.sh` script within `deploy_monitoring_openshift.sh` script.
 
 
 ## Version 1.2.34 (18FEB2025)
