@@ -45,7 +45,9 @@ log_info "Configuring OpenSearch Dashboards...this may take a few minutes"
 
 # wait for pod to show as "running" and "ready"
 log_info "Waiting for OpenSearch Dashboards pods to be ready ($(date) - timeout 10m)"
-kubectl -n $LOG_NS wait pods --selector "app=opensearch-dashboards"  --for condition=Ready --timeout=10m
+osdlabels="$(kubectl -n $LOG_NS get deployment v4m-osd -o=jsonpath='{.spec.selector.matchLabels}'|sed s/{//g|sed s/}//g|sed s/\"//g|sed s/:/=/g)"
+
+kubectl -n $LOG_NS wait pods --selector "$osdlabels"  --for condition=Ready --timeout=10m
 
 set +e  # disable exit on error
 
