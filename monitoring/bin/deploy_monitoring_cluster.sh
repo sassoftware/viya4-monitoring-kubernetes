@@ -6,6 +6,7 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 source bin/service-url-include.sh
+source bin/autoingress-include.sh
 
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
@@ -14,6 +15,8 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
     exit 1
   fi
 fi
+
+generateIngressPromOperator
 
 source bin/tls-include.sh
 if verify_cert_generator $MON_NS prometheus alertmanager grafana; then
@@ -194,7 +197,10 @@ else
     TEMPO_USER_YAML=$TMP_DIR/empty.yaml
   fi
   tempoDSFile="monitoring/grafana-datasource-tempo.yaml"
-fi 
+fi
+
+# YAML file container auto-generated ingress definitions (or not)
+PROM_OPERATOR_INGRESS_YAML="${PROM_OPERATOR_INGRESS_YAML:-$TMP_DIR/empty.yaml}"
 
 # Get Helm Chart Name
 log_debug "Kube-Prometheus Stack Helm Chart: repo [$KUBE_PROM_STACK_CHART_REPO] name [$KUBE_PROM_STACK_CHART_NAME] version [$KUBE_PROM_STACK_CHART_VERSION]"
@@ -211,6 +217,7 @@ helm $helmDebug upgrade --install $promRelease \
   -f $tlsPromAlertingEndpointFile \
   -f $nodePortValuesFile \
   -f $wnpValuesFile \
+  -f $PROM_OPERATOR_INGRESS_YAML \
   -f $PROM_OPER_USER_YAML \
   -f $tempoDSFile \
   --atomic \

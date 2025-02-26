@@ -7,6 +7,7 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 source bin/tls-include.sh
+source bin/autoingress-include.sh
 source logging/bin/apiaccess-include.sh
 
 this_script=`basename "$0"`
@@ -19,6 +20,8 @@ if [ "$ELASTICSEARCH_ENABLE" != "true" ]; then
   log_verbose "Environment variable [ELASTICSEARCH_ENABLE] is not set to 'true'; exiting WITHOUT deploying OpenSearch"
   exit 0
 fi
+
+generateIngressOpenSearch
 
 set -e
 
@@ -308,6 +311,8 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
     OPENSHIFT_SPECIFIC_YAML=logging/openshift/values-opensearch-openshift.yaml
 fi
 
+# YAML file container auto-generated ingress definitions (or not)
+OPENSEARCH_INGRESS_YAML="${OPENSEARCH_INGRESS_YAML:-$TMP_DIR/empty.yaml}"
 
 # Get Helm Chart Name
 log_debug "OpenSearch Helm Chart: repo [$OPENSEARCH_HELM_CHART_REPO] name [$OPENSEARCH_HELM_CHART_NAME] version [$OPENSEARCH_HELM_CHART_VERSION]"
@@ -323,6 +328,7 @@ helm $helmDebug upgrade --install opensearch \
     --values "$imageKeysFile" \
     --values logging/opensearch/opensearch_helm_values.yaml \
     --values "$wnpValuesFile" \
+    --values "$OPENSEARCH_INGRESS_YAML" \
     --values "$ES_OPEN_USER_YAML" \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
     --set nodeGroup=primary  \

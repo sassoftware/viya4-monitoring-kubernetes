@@ -1,5 +1,13 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Overall**
+  * [EXPERIMENTAL] The auto-generation of Ingress resources for the web applications is now available on an *experimental*
+basis.  Users are **only** required to provide a BASE_DOMAIN (e.g. cluster.example.com).  Host-based ingress is configured
+by default although path-based ingress can be requested.  This *experimental* feature requires `yq` (Mike Farah) version 
+4.45.1+ be installed.  See [Autogeneration of Ingress Resources](autogenerate.md) for more information.
+
+
 ## Version 1.2.34 (18FEB2025)
 * **Metrics**
   * [CHANGE] Removed temporary fix (added w/1.2.27) replacing a small number of Grafana dashboards

@@ -7,6 +7,7 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 source bin/tls-include.sh
+source bin/autoingress-include.sh
 source logging/bin/apiaccess-include.sh
 
 this_script=`basename "$0"`
@@ -19,6 +20,8 @@ if [ "$OPENSEARCHDASH_ENABLE" != "true" ]; then
   log_verbose "Environment variable [OPENSEARCHDASH_ENABLE] is not set to 'true'; exiting WITHOUT deploying OpenSearch Dashboards"
   exit 0
 fi
+
+generateIngressOSD
 
 set -e
 
@@ -122,6 +125,9 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
     OPENSHIFT_SPECIFIC_YAML=logging/openshift/values-osd-openshift.yaml
 fi
 
+# YAML file container auto-generated ingress definitions (or not)
+OSD_INGRESS_YAML="${OSD_INGRESS_YAML:-$TMP_DIR/empty.yaml}"
+
 # Get Helm Chart Name
 log_debug "OpenSearch Dashboards Helm Chart: repo [$OSD_HELM_CHART_REPO] name [$OSD_HELM_CHART_NAME] version [$OSD_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference $OSD_HELM_CHART_REPO $OSD_HELM_CHART_NAME $OSD_HELM_CHART_VERSION)"
@@ -136,6 +142,7 @@ helm $helmDebug upgrade --install v4m-osd \
     --values "$imageKeysFile" \
     --values logging/opensearch/osd_helm_values.yaml \
     --values "$wnpValuesFile" \
+    --values "$OSD_INGRESS_YAML" \
     --values "$nodeport_yaml" \
     --values "$OSD_USER_YAML" \
     --values "$OPENSHIFT_SPECIFIC_YAML" \
