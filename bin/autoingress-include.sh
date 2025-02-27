@@ -8,13 +8,13 @@
 function checkYqVersion {
    # confirm yq installed and correct version
    local goodver yq_version
-   goodver="yq \(.+mikefarah.+\) version (v)?(4\..+)"
+   goodver="yq \(.+mikefarah.+\) version (v)?(4\.(4[5-9]|[5-9][0-9])\..+)"
    yq_version=$(yq --version)
    if [ "$?" == "1" ]; then
       log_error "Required component [yq] not available."
       return 1
    elif [[ ! $yq_version =~ $goodver ]]; then
-      log_error "Incorrect version [$yq_version] found."
+      log_error "Incorrect version [$yq_version] found; version 4.45.1+ required."
       return 1
    else
       log_debug "A valid version [$yq_version] of yq detected"
@@ -28,7 +28,7 @@ AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
 
 if [ "$AUTOGENERATE_INGRESS" != "true" ]; then
    log_debug "Autogeneration of ingresss definitions is NOT enabled"
-   AUTOINGRESS_SOURCED=true
+   export AUTOINGRESS_SOURCED="NotNeeded"
 fi
 
 if [ -z "$AUTOINGRESS_SOURCED" ]; then
@@ -59,9 +59,10 @@ if [ -z "$AUTOINGRESS_SOURCED" ]; then
    mkdir $TMP_DIR/ingress
    cp -r samples/ingress/${routing}-based-ingress/* $TMP_DIR/ingress
 
-   AUTOINGRESS_SOURCED=true
+   export AUTOINGRESS_SOURCED="true"
+
 else
-   log_debug "autoingress-include.sh was already sourced"
+   log_debug "autoingress-include.sh was already sourced [$AUTOINGRESS_SOURCED]"
 fi
 
 
@@ -84,7 +85,6 @@ function generateIngressPromOperator {
          ALERTMANAGER_FQDN="$BASE_DOMAIN/$ALERTMANAGER_PATH"
       fi
    fi
-   log_debug "Alertmanager fqdn: $ALERTMANAGER_FQDN"
 
    GRAFANA_INGRESS_ENABLED="${GRAFANA_INGRESS_ENABLED:-true}"
    GRAFANA_FQDN="${GRAFANA_FQDN}"
@@ -96,7 +96,6 @@ function generateIngressPromOperator {
          GRAFANA_FQDN="$BASE_DOMAIN/$GRAFANA_PATH"
       fi
    fi
-   log_debug "Grafana fqdn: $GRAFANA_FQDN"
 
    PROMETHEUS_INGRESS_ENABLED="${PROMETHEUS_INGRESS_ENABLED:-false}"
    PROMETHEUS_FQDN="${PROMETHEUS_FQDN}"
@@ -108,7 +107,10 @@ function generateIngressPromOperator {
          PROMETHEUS_FQDN="$BASE_DOMAIN/$PROMETHEUS_PATH"
       fi
    fi
-   log_debug "Prometheus fqdn: $PROMETHEUS_FQDN"
+
+   log_debug "ALERTMANAGER_INGRESS_ENABLED [$ALERTMANAGER_INGRESS_ENABLED] ALERTMANAGER_FQDN [$ALERTMANAGER_FQDN] ALERTMANAGER_PATH [$ALERTMANAGER_PATH]"
+   log_debug "GRAFANA_INGRESS_ENABLED      [$GRAFANA_INGRESS_ENABLED]      GRAFANA_FQDN      [$GRAFANA_FQDN]      GRAFANA_PATH      [$GRAFANA_PATH]"
+   log_debug "PROMETHEUS_INGRESS_ENABLED   [$PROMETHEUS_INGRESS_ENABLED]   PROMETHEUS_FQDN   [$PROMETHEUS_FQDN]   PROMETHEUS_PATH   [$PROMETHEUS_PATH]"
 
    export PROM_OPERATOR_INGRESS_YAML
    export ALERTMANAGER_INGRESS_ENABLED ALERTMANAGER_FQDN ALERTMANAGER_PATH
@@ -124,28 +126,28 @@ function generateIngressPromOperator {
    if [ "$routing" == "host" ]; then
       yq -i '.alertmanager.ingress.hosts.[0]=env(ALERTMANAGER_FQDN)'          $PROM_OPERATOR_INGRESS_YAML
       yq -i '.alertmanager.ingress.tls.[0].hosts.[0]=env(ALERTMANAGER_FQDN)'  $PROM_OPERATOR_INGRESS_YAML
-      rooturl="https://$ALERTMANAGER_FQDN" yq -i '.alertmanager.alertmanagerSpec.externalUrl=env(rooturl)' $PROM_OPERATOR_INGRESS_YAML
+      exturl="https://$ALERTMANAGER_FQDN" yq -i '.alertmanager.alertmanagerSpec.externalUrl=env(exturl)'  $PROM_OPERATOR_INGRESS_YAML
 
       yq -i '.grafana.ingress.hosts.[0]=env(GRAFANA_FQDN)'                    $PROM_OPERATOR_INGRESS_YAML
       yq -i '.grafana.ingress.tls.[0].hosts.[0]=env(GRAFANA_FQDN)'            $PROM_OPERATOR_INGRESS_YAML
       yq -i '.grafana."grafana.ini".server.domain=env(BASE_DOMAIN)'           $PROM_OPERATOR_INGRESS_YAML
-      rooturl="https://$GRAFANA_FQDN" yq -i '.grafana."grafana.ini".server.root_url=env(rooturl)' $PROM_OPERATOR_INGRESS_YAML
+      rooturl="https://$GRAFANA_FQDN" yq -i '.grafana."grafana.ini".server.root_url=env(rooturl)'         $PROM_OPERATOR_INGRESS_YAML
 
       yq -i '.prometheus.ingress.hosts.[0]=env(PROMETHEUS_FQDN)'              $PROM_OPERATOR_INGRESS_YAML
       yq -i '.prometheus.ingress.tls.[0].hosts.[0]=env(PROMETHEUS_FQDN)'      $PROM_OPERATOR_INGRESS_YAML
-      rooturl="https://$PROMETHEUS_FQDN" yq -i '.prometheus.prometheusSpec.externalUrl=env(rooturl)'       $PROM_OPERATOR_INGRESS_YAML
+      exturl="https://$PROMETHEUS_FQDN" yq -i '.prometheus.prometheusSpec.externalUrl=env(exturl)'        $PROM_OPERATOR_INGRESS_YAML
    else
       yq -i '.alertmanager.ingress.hosts.[0]=env(BASE_DOMAIN)'                $PROM_OPERATOR_INGRESS_YAML
       yq -i '.alertmanager.ingress.tls.[0].hosts=env(BASE_DOMAIN)'            $PROM_OPERATOR_INGRESS_YAML
-      pathslash="/$ALERTMANAGER_PATH" yq -i '.alertmanager.ingress.path=env(pathslash)'                    $PROM_OPERATOR_INGRESS_YAML
+      slashpath="/$ALERTMANAGER_PATH" yq -i '.alertmanager.ingress.path=env(slashpath)'                   $PROM_OPERATOR_INGRESS_YAML
 
       yq -i '.grafana.ingress.hosts.[0]=env(BASE_DOMAIN)'                     $PROM_OPERATOR_INGRESS_YAML
       yq -i '.grafana.ingress.tls.[0].hosts=env(BASE_DOMAIN)'                 $PROM_OPERATOR_INGRESS_YAML
-      pathslash="/$GRAFANA_PATH" yq -i '.grafana.ingress.path=env(pathslash)' $PROM_OPERATOR_INGRESS_YAML
+      slashpath="/$GRAFANA_PATH" yq -i '.grafana.ingress.path=env(slashpath)' $PROM_OPERATOR_INGRESS_YAML
 
       yq -i '.prometheus.ingress.hosts.[0]=env(BASE_DOMAIN)'                  $PROM_OPERATOR_INGRESS_YAML
       yq -i '.prometheus.ingress.tls.[0].hosts=env(BASE_DOMAIN)'              $PROM_OPERATOR_INGRESS_YAML
-      pathslash="/$PROMETHEUS_PATH" yq -i '.prometheus.ingress.path=env(pathslash)'                        $PROM_OPERATOR_INGRESS_YAML
+      slashpath="/$PROMETHEUS_PATH" yq -i '.prometheus.ingress.path=env(slashpath)'                       $PROM_OPERATOR_INGRESS_YAML
    fi
 }
 
@@ -168,7 +170,8 @@ function generateIngressOpenSearch {
          OPENSEARCH_FQDN="$BASE_DOMAIN/$OPENSEARCH_PATH"
       fi
    fi
-   log_debug "OpenSearch fqdn: $opensearch_fqdn"
+
+   log_debug "OPENSEARCH_INGRESS_ENABLED [$OPENSEARCH_INGRESS_ENABLED] OPENSEARCH_FQDN [$OPENSEARCH_FQDN] OPENSEARCH_PATH [$OPENSEARCH_PATH]"
 
    export OPENSEARCH_INGRESS_YAML OPENSEARCH_INGRESS_ENABLED OPENSEARCH_FQDN OPENSEARCH_PATH
 
@@ -178,11 +181,11 @@ function generateIngressOpenSearch {
       yq -i '.ingress.hosts.[0]=env(OPENSEARCH_FQDN)'                    $OPENSEARCH_INGRESS_YAML
       yq -i '.ingress.tls.[0].hosts.[0]=env(OPENSEARCH_FQDN)'            $OPENSEARCH_INGRESS_YAML
    else
-      pathslash="/$OPENSEARCH_PATH" yq -i '.ingress.path=env(pathslash)' $OPENSEARCH_INGRESS_YAML
+      slashpath="/$OPENSEARCH_PATH" yq -i '.ingress.path=env(slashpath)' $OPENSEARCH_INGRESS_YAML
       yq -i '.ingress.hosts.[0]=env(BASE_DOMAIN)'                        $OPENSEARCH_INGRESS_YAML
 
       yq -i '.ingress.tls.[0].hosts.[0]=env(BASE_DOMAIN)'                $OPENSEARCH_INGRESS_YAML
-      pathslash="/$OPENSEARCH_PATH" yq -i '.ingress.annotations["nginx.ingress.kubernetes.io/rewrite-target"]=env(pathslash)' $OPENSEARCH_INGRESS_YAML
+      slashpath="/$OPENSEARCH_PATH" yq -i '.ingress.annotations["nginx.ingress.kubernetes.io/rewrite-target"]=env(slashpath)' $OPENSEARCH_INGRESS_YAML
 
       # Need to use printf to preserve newlines
       printf -v snippet "rewrite (?i)/$OPENSEARCH_PATH/(.*) /\$1 break;\nrewrite (?i)/${OPENSEARCH_PATH}$ / break;"  ;
@@ -212,9 +215,9 @@ function generateIngressOSD {
       fi
    fi
 
-   export OSD_INGRESS_YAML OSD_INGRESS_ENABLED OSD_FQDN OSD_PATH
+   log_debug "OSD_INGRESS_ENABLED [$OSD_INGRESS_ENABLED] OSD_FQDN [$OSD_FQDN] OSD_PATH [$OSD_PATH]"
 
-   log_debug "OSD fqdn: $OSD_FQDN"
+   export OSD_INGRESS_YAML OSD_INGRESS_ENABLED OSD_FQDN OSD_PATH
 
    yq -i '.ingress.enabled=env(OSD_INGRESS_ENABLED)'           $OSD_INGRESS_YAML
    if [ "$routing" == "host" ]; then
@@ -222,21 +225,20 @@ function generateIngressOSD {
       yq -i '.ingress.tls.[0].hosts.[0]=env(OSD_FQDN)'         $OSD_INGRESS_YAML
    else
 
-      ##TO DO: define snippet and pathslash as shell vars
-      ##       and then export them rather than define them
-      ##       as env vars inline below?  Then unset them after use?
+      export slashpath="/$OSD_PATH"
 
-      pathslash="/$OSD_PATH" yq -i '(.extraEnvs.[] | select(has("name")) | select(.name == "SERVER_BASEPATH")).value=env(pathslash)'  $OSD_INGRESS_YAML
+      yq -i '(.extraEnvs.[] | select(has("name")) | select(.name == "SERVER_BASEPATH")).value=env(slashpath)' $OSD_INGRESS_YAML
 
       yq -i '.ingress.hosts.[0].host=env(BASE_DOMAIN)'         $OSD_INGRESS_YAML
-      pathslash="/$OSD_PATH" yq -i '.ingress.hosts.[0].paths.[0].path=env(pathslash)'                                          $OSD_INGRESS_YAML
+      yq -i '.ingress.hosts.[0].paths.[0].path=env(slashpath)' $OSD_INGRESS_YAML
       yq -i '.ingress.tls.[0].hosts.[0]=env(BASE_DOMAIN)'      $OSD_INGRESS_YAML
-      pathslash="/$OSD_PATH" yq -i '.ingress.annotations["nginx.ingress.kubernetes.io/rewrite-target"]=env(pathslash)'         $OSD_INGRESS_YAML
+      yq -i '.ingress.annotations["nginx.ingress.kubernetes.io/rewrite-target"]=env(slashpath)'               $OSD_INGRESS_YAML
 
       # Need to use printf to preserve newlines
       printf -v snippet "rewrite (?i)/$OSD_PATH/(.*) /\$1 break;\nrewrite (?i)/${OSD_PATH}$ / break;"  ;
       snippet="$snippet"    yq -i '.ingress.annotations["nginx.ingress.kubernetes.io/configuration-snippet"]=strenv(snippet)'  $OSD_INGRESS_YAML
 
+      unset slashpath
    fi
 
 }
