@@ -25,6 +25,7 @@ function checkYqVersion {
 export -f checkYqVersion
 
 AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
+AUTOGENERATE_STORAGECLASS="${AUTOGENERATE_STORAGECLASS:-false}"
 
 if [ "$AUTOGENERATE_INGRESS" != "true" ]; then
    log_debug "Autogeneration of ingresss definitions is NOT enabled"
@@ -149,6 +150,19 @@ function generateIngressPromOperator {
       yq -i '.prometheus.ingress.tls.[0].hosts=env(BASE_DOMAIN)'              $PROM_OPERATOR_INGRESS_YAML
       slashpath="/$PROMETHEUS_PATH" yq -i '.prometheus.ingress.path=env(slashpath)'                       $PROM_OPERATOR_INGRESS_YAML
    fi
+
+   if [ "$AUTOGENERATE_STORAGECLASS" == "true" ]; then
+
+      ###storageClass for PVCs
+      STORAGECLASS="${STORAGECLASS:-default}"
+      ALERTMANAGER_STORAGECLASS="${ALERTMANAGER_STORAGECLASS:-$STORAGECLASS}"
+      PROMETHEUS_STORAGECLASS="${PROMETHEUS_STORAGECLASS:-$STORAGECLASS}"
+
+      sc="$ALERTMANAGER_STORAGECLASS" yq -i '.alertmanager.alertmanagerSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=env(sc)'  $PROM_OPERATOR_INGRESS_YAML
+      sc="$PROMETHEUS_STORAGECLASS"   yq -i '.prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=env(sc)'      $PROM_OPERATOR_INGRESS_YAML
+
+   fi
+
 }
 
 function generateIngressOpenSearch {
@@ -193,6 +207,15 @@ function generateIngressOpenSearch {
 
    fi
 
+   if [ "$AUTOGENERATE_STORAGECLASS" == "true" ]; then
+
+      ###storageClass for PVC
+      STORAGECLASS="${STORAGECLASS:-default}"
+      OPENSEARCH_STORAGECLASS="${OPENSEARCH_STORAGECLASS:-$STORAGECLASS}"
+
+      sc="$OPENSEARCH_STORAGECLASS" yq -i '.persistence.storageClass=env(sc)' $OPENSEARCH_INGRESS_YAML
+
+   fi
 }
 
 function generateIngressOSD {
