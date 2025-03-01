@@ -27,8 +27,8 @@ export -f checkYqVersion
 AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
 AUTOGENERATE_STORAGECLASS="${AUTOGENERATE_STORAGECLASS:-false}"
 
-if [ "$AUTOGENERATE_INGRESS" != "true" ]; then
-   log_debug "Autogeneration of ingresss definitions is NOT enabled"
+if [ "$AUTOGENERATE_INGRESS" != "true" ] && [ "$AUTOGENERATE_STORAGECLASS" != "true" ]; then
+   log_debug "No autogeneration of YAML enabled"
    export AUTOINGRESS_SOURCED="NotNeeded"
 fi
 
@@ -42,26 +42,50 @@ if [ -z "$AUTOINGRESS_SOURCED" ]; then
       log_warn "Web applications will be made accessible via OpenShift routes instead (if enabled)."
    fi
 
-   #validate required inputs
-   BASE_DOMAIN="${BASE_DOMAIN}"
-   if [ -z "$BASE_DOMAIN" ]; then
-      log_error "Required parameter [BASE_DOMAIN] not provided"
-      exit
+   if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
+
+      #validate required inputs
+      BASE_DOMAIN="${BASE_DOMAIN}"
+      if [ -z "$BASE_DOMAIN" ]; then
+         log_error "Required parameter [BASE_DOMAIN] not provided"
+         exit
+      fi
+
+      log_debug "Autogeneration of Ingress definitions has been enabled"
+
+      ###routing="${ROUTING:-host}"
+
+      ####copy appropriate ingress sample into TMP_DIR
+      ###mkdir $TMP_DIR/ingress
+      ###cp -r samples/ingress/${routing}-based-ingress/* $TMP_DIR/
+
    fi
 
-   ##TO DO: Validate various *FQDN env vars here?
-   ##TO DO: Validate various *PATH env vars here?
+   if [ "$AUTOGENERATE_STORAGECLASS" == "true" ]; then
 
-   log_debug "Autogeneration of Ingress definitions has been enabled"
+      log_debug "Autogeneration of StorageClass specfication has been enabled"
 
-   routing="${ROUTING:-host}"
+      #validate required inputs
+      STORAGECLASS="${STORAGECLASS}"
+      if [ -z "$STORAGECLASS" ]; then
+         log_error "Required parameter [STORAGECLASS] not provided"
+         exit
+      else
+         if $(kubectl get storageClass "$STORAGECLASS" -o name &>/dev/null); then
+            log_debug "The specified StorageClass [$STORAGECLASS] exists"
+         else
+            log_error "The specified StorageClass [$STORAGECLASS] does NOT exist"
+            exit 1
+         fi
+      fi
 
-   #copy appropriate ingress sample into TMP_DIR
-   mkdir $TMP_DIR/ingress
-   cp -r samples/ingress/${routing}-based-ingress/* $TMP_DIR/ingress
+      export STORAGECLASS
+   fi
 
    export AUTOINGRESS_SOURCED="true"
 
+elif [ "$AUTOINGRESS_SOURCE" == "NotNeeded" ]; then
+   log_debug "autoingress-include.sh not needed" 
 else
    log_debug "autoingress-include.sh was already sourced [$AUTOINGRESS_SOURCED]"
 fi
@@ -74,7 +98,28 @@ function generateIngressPromOperator {
       return
    fi
 
-   PROM_OPERATOR_INGRESS_YAML="$TMP_DIR/ingress/monitoring/user-values-prom-operator.yaml"
+   local autogenerate_yaml ingressSampleFile
+
+   autogenerate_yaml="$1"
+
+   if [ -z "$autogenerate_yaml" ]; then
+      log_error "Required filename NOT provided"
+      exit 1
+   elif [ ! -f "$autogenerate_yaml" ]; then
+      log_debug "Creating file [$autogenerate_yaml]"
+      touch "$autogenerate_yaml"
+   else
+      log_debug "File [$autogenerate_yaml] already exists"
+   fi
+
+   routing="${ROUTING:-host}"
+   log_debug "ROUTING [$routing]"
+
+   ingressSampleFile="samples/ingress/${routing}-based-ingress/monitoring/user-values-prom-operator.yaml"
+
+   #intialized the yaml file w/appropriate ingress sample
+   yq -i eval-all '. as $item ireduce ({}; . * $item )' "$autogenerate_yaml" "$ingressSampleFile"
+
 
    ALERTMANAGER_INGRESS_ENABLED="${ALERTMANAGER_INGRESS_ENABLED:-false}"
    ALERTMANAGER_FQDN="${ALERTMANAGER_FQDN}"
@@ -113,56 +158,81 @@ function generateIngressPromOperator {
    log_debug "GRAFANA_INGRESS_ENABLED      [$GRAFANA_INGRESS_ENABLED]      GRAFANA_FQDN      [$GRAFANA_FQDN]      GRAFANA_PATH      [$GRAFANA_PATH]"
    log_debug "PROMETHEUS_INGRESS_ENABLED   [$PROMETHEUS_INGRESS_ENABLED]   PROMETHEUS_FQDN   [$PROMETHEUS_FQDN]   PROMETHEUS_PATH   [$PROMETHEUS_PATH]"
 
-   export PROM_OPERATOR_INGRESS_YAML
    export ALERTMANAGER_INGRESS_ENABLED ALERTMANAGER_FQDN ALERTMANAGER_PATH
    export GRAFANA_INGRESS_ENABLED GRAFANA_FQDN GRAFANA_PATH
    export PROMETHEUS_INGRESS_ENABLED PROMETHEUS_FQDN PROMETHEUS_PATH
 
    ###enable/disable ingress for each app
-   yq -i '.alertmanager.ingress.enabled=env(ALERTMANAGER_INGRESS_ENABLED)'    $PROM_OPERATOR_INGRESS_YAML
-   yq -i '.grafana.ingress.enabled=env(GRAFANA_INGRESS_ENABLED)'              $PROM_OPERATOR_INGRESS_YAML
-   yq -i '.prometheus.ingress.enabled=env(PROMETHEUS_INGRESS_ENABLED)'        $PROM_OPERATOR_INGRESS_YAML
+   yq -i '.alertmanager.ingress.enabled=env(ALERTMANAGER_INGRESS_ENABLED)'    "$autogenerate_yaml"
+   yq -i '.grafana.ingress.enabled=env(GRAFANA_INGRESS_ENABLED)'              "$autogenerate_yaml"
+   yq -i '.prometheus.ingress.enabled=env(PROMETHEUS_INGRESS_ENABLED)'        "$autogenerate_yaml"
+
+   log_debug "GREG*****ROUTING [$routing]"
 
    ###hosts, paths and fqdn
    if [ "$routing" == "host" ]; then
-      yq -i '.alertmanager.ingress.hosts.[0]=env(ALERTMANAGER_FQDN)'          $PROM_OPERATOR_INGRESS_YAML
-      yq -i '.alertmanager.ingress.tls.[0].hosts.[0]=env(ALERTMANAGER_FQDN)'  $PROM_OPERATOR_INGRESS_YAML
-      exturl="https://$ALERTMANAGER_FQDN" yq -i '.alertmanager.alertmanagerSpec.externalUrl=env(exturl)'  $PROM_OPERATOR_INGRESS_YAML
+      yq -i '.alertmanager.ingress.hosts.[0]=env(ALERTMANAGER_FQDN)'          "$autogenerate_yaml"
+      yq -i '.alertmanager.ingress.tls.[0].hosts.[0]=env(ALERTMANAGER_FQDN)'  "$autogenerate_yaml"
+      exturl="https://$ALERTMANAGER_FQDN" yq -i '.alertmanager.alertmanagerSpec.externalUrl=env(exturl)'  "$autogenerate_yaml"
 
-      yq -i '.grafana.ingress.hosts.[0]=env(GRAFANA_FQDN)'                    $PROM_OPERATOR_INGRESS_YAML
-      yq -i '.grafana.ingress.tls.[0].hosts.[0]=env(GRAFANA_FQDN)'            $PROM_OPERATOR_INGRESS_YAML
-      yq -i '.grafana."grafana.ini".server.domain=env(BASE_DOMAIN)'           $PROM_OPERATOR_INGRESS_YAML
-      rooturl="https://$GRAFANA_FQDN" yq -i '.grafana."grafana.ini".server.root_url=env(rooturl)'         $PROM_OPERATOR_INGRESS_YAML
+      yq -i '.grafana.ingress.hosts.[0]=env(GRAFANA_FQDN)'                    "$autogenerate_yaml"
+      yq -i '.grafana.ingress.tls.[0].hosts.[0]=env(GRAFANA_FQDN)'            "$autogenerate_yaml"
+      yq -i '.grafana."grafana.ini".server.domain=env(BASE_DOMAIN)'           "$autogenerate_yaml"
+      rooturl="https://$GRAFANA_FQDN" yq -i '.grafana."grafana.ini".server.root_url=env(rooturl)'         "$autogenerate_yaml"
 
-      yq -i '.prometheus.ingress.hosts.[0]=env(PROMETHEUS_FQDN)'              $PROM_OPERATOR_INGRESS_YAML
-      yq -i '.prometheus.ingress.tls.[0].hosts.[0]=env(PROMETHEUS_FQDN)'      $PROM_OPERATOR_INGRESS_YAML
-      exturl="https://$PROMETHEUS_FQDN" yq -i '.prometheus.prometheusSpec.externalUrl=env(exturl)'        $PROM_OPERATOR_INGRESS_YAML
+      yq -i '.prometheus.ingress.hosts.[0]=env(PROMETHEUS_FQDN)'              "$autogenerate_yaml"
+      yq -i '.prometheus.ingress.tls.[0].hosts.[0]=env(PROMETHEUS_FQDN)'      "$autogenerate_yaml"
+      exturl="https://$PROMETHEUS_FQDN" yq -i '.prometheus.prometheusSpec.externalUrl=env(exturl)'        "$autogenerate_yaml"
    else
-      yq -i '.alertmanager.ingress.hosts.[0]=env(BASE_DOMAIN)'                $PROM_OPERATOR_INGRESS_YAML
-      yq -i '.alertmanager.ingress.tls.[0].hosts=env(BASE_DOMAIN)'            $PROM_OPERATOR_INGRESS_YAML
-      slashpath="/$ALERTMANAGER_PATH" yq -i '.alertmanager.ingress.path=env(slashpath)'                   $PROM_OPERATOR_INGRESS_YAML
+      yq -i '.alertmanager.ingress.hosts.[0]=env(BASE_DOMAIN)'                "$autogenerate_yaml"
+      yq -i '.alertmanager.ingress.tls.[0].hosts=env(BASE_DOMAIN)'            "$autogenerate_yaml"
+      slashpath="/$ALERTMANAGER_PATH" yq -i '.alertmanager.ingress.path=env(slashpath)'                   "$autogenerate_yaml"
+      exturl="https://$ALERTMANAGER_FQDN" yq -i '.alertmanager.alertmanagerSpec.externalUrl=env(exturl)'  "$autogenerate_yaml"
 
-      yq -i '.grafana.ingress.hosts.[0]=env(BASE_DOMAIN)'                     $PROM_OPERATOR_INGRESS_YAML
-      yq -i '.grafana.ingress.tls.[0].hosts=env(BASE_DOMAIN)'                 $PROM_OPERATOR_INGRESS_YAML
-      slashpath="/$GRAFANA_PATH" yq -i '.grafana.ingress.path=env(slashpath)' $PROM_OPERATOR_INGRESS_YAML
+      yq -i '.grafana.ingress.hosts.[0]=env(BASE_DOMAIN)'                     "$autogenerate_yaml"
+      yq -i '.grafana.ingress.tls.[0].hosts=env(BASE_DOMAIN)'                 "$autogenerate_yaml"
+      slashpath="/$GRAFANA_PATH" yq -i '.grafana.ingress.path=env(slashpath)' "$autogenerate_yaml"
+      yq -i '.grafana."grafana.ini".server.domain=env(BASE_DOMAIN)'           "$autogenerate_yaml"
+      rooturl="https://$GRAFANA_FQDN" yq -i '.grafana."grafana.ini".server.root_url=env(rooturl)'         "$autogenerate_yaml"
 
-      yq -i '.prometheus.ingress.hosts.[0]=env(BASE_DOMAIN)'                  $PROM_OPERATOR_INGRESS_YAML
-      yq -i '.prometheus.ingress.tls.[0].hosts=env(BASE_DOMAIN)'              $PROM_OPERATOR_INGRESS_YAML
-      slashpath="/$PROMETHEUS_PATH" yq -i '.prometheus.ingress.path=env(slashpath)'                       $PROM_OPERATOR_INGRESS_YAML
+      yq -i '.prometheus.ingress.hosts.[0]=env(BASE_DOMAIN)'                  "$autogenerate_yaml"
+      yq -i '.prometheus.ingress.tls.[0].hosts=env(BASE_DOMAIN)'              "$autogenerate_yaml"
+      slashpath="/$PROMETHEUS_PATH" yq -i '.prometheus.ingress.path=env(slashpath)'                       "$autogenerate_yaml"
+      slashpath="/$PROMETHEUS_PATH" yq -i '.prometheus.prometheusSpec.routePrefix=env(slashpath)'         "$autogenerate_yaml"
+      exturl="https://$PROMETHEUS_FQDN" yq -i '.prometheus.prometheusSpec.externalUrl=env(exturl)'        "$autogenerate_yaml"
+      slashpath="/$ALERTMANAGER_PATH" yq -i '.prometheus.prometheusSpec.alertingEndpoints.pathPrefix=env(slashpath)'        "$autogenerate_yaml"
    fi
+
+}
+
+function generateStorageClassPromOperator {
+
+    # input parms: $1  output file
 
    if [ "$AUTOGENERATE_STORAGECLASS" == "true" ]; then
 
+      local autogenerate_yaml ingressSampleFile
+
+      autogenerate_yaml="$1"
+
+      if [ -z "$autogenerate_yaml" ]; then
+         log_error "Required filename NOT provided"
+         exit 1
+      elif [ ! -f "$autogenerate_yaml" ]; then
+         log_debug "Creating file [$autogenerate_yaml]"
+         touch "$autogenerate_yaml"
+      else
+         log_debug "File [$autogenerate_yaml] already exists"
+      fi
+
       ###storageClass for PVCs
-      STORAGECLASS="${STORAGECLASS:-default}"
       ALERTMANAGER_STORAGECLASS="${ALERTMANAGER_STORAGECLASS:-$STORAGECLASS}"
       PROMETHEUS_STORAGECLASS="${PROMETHEUS_STORAGECLASS:-$STORAGECLASS}"
 
-      sc="$ALERTMANAGER_STORAGECLASS" yq -i '.alertmanager.alertmanagerSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=env(sc)'  $PROM_OPERATOR_INGRESS_YAML
-      sc="$PROMETHEUS_STORAGECLASS"   yq -i '.prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=env(sc)'      $PROM_OPERATOR_INGRESS_YAML
+      sc="$ALERTMANAGER_STORAGECLASS" yq -i '.alertmanager.alertmanagerSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=env(sc)'  "$autogenerate_yaml"
+      sc="$PROMETHEUS_STORAGECLASS"   yq -i '.prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=env(sc)'      "$autogenerate_yaml"
 
    fi
-
 }
 
 function generateIngressOpenSearch {
@@ -267,4 +337,6 @@ function generateIngressOSD {
 }
 
 export -f generateIngressPromOperator generateIngressOpenSearch generateIngressOSD
+
+export -f generateStorageClassPromOperator
 
