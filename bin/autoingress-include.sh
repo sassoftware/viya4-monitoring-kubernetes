@@ -53,12 +53,6 @@ if [ -z "$AUTOINGRESS_SOURCED" ]; then
 
       log_debug "Autogeneration of Ingress definitions has been enabled"
 
-      ###routing="${ROUTING:-host}"
-
-      ####copy appropriate ingress sample into TMP_DIR
-      ###mkdir $TMP_DIR/ingress
-      ###cp -r samples/ingress/${routing}-based-ingress/* $TMP_DIR/
-
    fi
 
    if [ "$AUTOGENERATE_STORAGECLASS" == "true" ]; then
@@ -167,8 +161,6 @@ function generateIngressPromOperator {
    yq -i '.grafana.ingress.enabled=env(GRAFANA_INGRESS_ENABLED)'              "$autogenerate_yaml"
    yq -i '.prometheus.ingress.enabled=env(PROMETHEUS_INGRESS_ENABLED)'        "$autogenerate_yaml"
 
-   log_debug "GREG*****ROUTING [$routing]"
-
    ###hosts, paths and fqdn
    if [ "$routing" == "host" ]; then
       yq -i '.alertmanager.ingress.hosts.[0]=env(ALERTMANAGER_FQDN)'          "$autogenerate_yaml"
@@ -211,7 +203,7 @@ function generateStorageClassPromOperator {
 
    if [ "$AUTOGENERATE_STORAGECLASS" == "true" ]; then
 
-      local autogenerate_yaml ingressSampleFile
+      local autogenerate_yaml
 
       autogenerate_yaml="$1"
 
