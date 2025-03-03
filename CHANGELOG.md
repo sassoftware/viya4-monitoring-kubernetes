@@ -1,5 +1,13 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Metrics**
+  * [FIX] Corrected bug preventing the `create_logging_datasource.sh` script from being run on OpenShift clusters.
+  * [CHANGE] As part of making the above fix, obsolete functionality related to running the `create_logging_datasource.sh`
+script to deploy datasource within namespace/tenant-level instances of Grafana was removed.
+  * [FIX] Corrected timing of call to `create_logging_datasource.sh` script within `deploy_monitoring_openshift.sh` script.
+
+
 ## Version 1.2.34 (18FEB2025)
 * **Metrics**
   * [CHANGE] Removed temporary fix (added w/1.2.27) replacing a small number of Grafana dashboards
