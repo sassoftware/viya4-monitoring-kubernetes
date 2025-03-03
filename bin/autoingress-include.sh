@@ -40,6 +40,8 @@ if [ -z "$AUTOINGRESS_SOURCED" ]; then
    if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
       log_warn "Setting AUTOGENERATE_INGRESS to 'true' is not valid on OpenShift clusters; ignoring option."
       log_warn "Web applications will be made accessible via OpenShift routes instead (if enabled)."
+
+      export AUTOGENERATE_INGRESS="false"
    fi
 
    if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
@@ -59,21 +61,6 @@ if [ -z "$AUTOINGRESS_SOURCED" ]; then
 
       log_debug "Autogeneration of StorageClass specfication has been enabled"
 
-      #validate required inputs
-      STORAGECLASS="${STORAGECLASS}"
-      if [ -z "$STORAGECLASS" ]; then
-         log_error "Required parameter [STORAGECLASS] not provided"
-         exit
-      else
-         if $(kubectl get storageClass "$STORAGECLASS" -o name &>/dev/null); then
-            log_debug "The specified StorageClass [$STORAGECLASS] exists"
-         else
-            log_error "The specified StorageClass [$STORAGECLASS] does NOT exist"
-            exit 1
-         fi
-      fi
-
-      export STORAGECLASS
    fi
 
    export AUTOINGRESS_SOURCED="true"
@@ -197,36 +184,6 @@ function generateIngressPromOperator {
 
 }
 
-function generateStorageClassPromOperator {
-
-    # input parms: $1  output file
-
-   if [ "$AUTOGENERATE_STORAGECLASS" == "true" ]; then
-
-      local autogenerate_yaml
-
-      autogenerate_yaml="$1"
-
-      if [ -z "$autogenerate_yaml" ]; then
-         log_error "Required filename NOT provided"
-         exit 1
-      elif [ ! -f "$autogenerate_yaml" ]; then
-         log_debug "Creating file [$autogenerate_yaml]"
-         touch "$autogenerate_yaml"
-      else
-         log_debug "File [$autogenerate_yaml] already exists"
-      fi
-
-      ###storageClass for PVCs
-      ALERTMANAGER_STORAGECLASS="${ALERTMANAGER_STORAGECLASS:-$STORAGECLASS}"
-      PROMETHEUS_STORAGECLASS="${PROMETHEUS_STORAGECLASS:-$STORAGECLASS}"
-
-      sc="$ALERTMANAGER_STORAGECLASS" yq -i '.alertmanager.alertmanagerSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=env(sc)'  "$autogenerate_yaml"
-      sc="$PROMETHEUS_STORAGECLASS"   yq -i '.prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=env(sc)'      "$autogenerate_yaml"
-
-   fi
-}
-
 function generateIngressOpenSearch {
 
    if [ "$AUTOGENERATE_INGRESS" != "true" ]; then
@@ -234,7 +191,20 @@ function generateIngressOpenSearch {
       return
    fi
 
-   OPENSEARCH_INGRESS_YAML="$TMP_DIR/ingress/logging/user-values-opensearch.yaml"
+   local autogenerate_yaml 
+
+   autogenerate_yaml="$1"
+
+   if [ -z "$autogenerate_yaml" ]; then
+      log_error "Required filename NOT provided"
+      exit 1
+   elif [ ! -f "$autogenerate_yaml" ]; then
+      log_debug "Creating file [$autogenerate_yaml]"
+      touch "$autogenerate_yaml"
+   else
+      log_debug "File [$autogenerate_yaml] already exists"
+   fi
+
 
    OPENSEARCH_INGRESS_ENABLED="${OPENSEARCH_INGRESS_ENABLED:-false}"
    OPENSEARCH_FQDN="${OPENSEARCH_FQDN}"     #TODO: NEEDED?
@@ -249,33 +219,23 @@ function generateIngressOpenSearch {
 
    log_debug "OPENSEARCH_INGRESS_ENABLED [$OPENSEARCH_INGRESS_ENABLED] OPENSEARCH_FQDN [$OPENSEARCH_FQDN] OPENSEARCH_PATH [$OPENSEARCH_PATH]"
 
-   export OPENSEARCH_INGRESS_YAML OPENSEARCH_INGRESS_ENABLED OPENSEARCH_FQDN OPENSEARCH_PATH
+   export autogenerate_yaml OPENSEARCH_INGRESS_ENABLED OPENSEARCH_FQDN OPENSEARCH_PATH
 
-   yq -i '.ingress.enabled= env(OPENSEARCH_INGRESS_ENABLED)'             $OPENSEARCH_INGRESS_YAML
+   yq -i '.ingress.enabled= env(OPENSEARCH_INGRESS_ENABLED)'             $autogenerate_yaml
 
    if [ "$routing" == "host" ]; then
-      yq -i '.ingress.hosts.[0]=env(OPENSEARCH_FQDN)'                    $OPENSEARCH_INGRESS_YAML
-      yq -i '.ingress.tls.[0].hosts.[0]=env(OPENSEARCH_FQDN)'            $OPENSEARCH_INGRESS_YAML
+      yq -i '.ingress.hosts.[0]=env(OPENSEARCH_FQDN)'                    $autogenerate_yaml
+      yq -i '.ingress.tls.[0].hosts.[0]=env(OPENSEARCH_FQDN)'            $autogenerate_yaml
    else
-      slashpath="/$OPENSEARCH_PATH" yq -i '.ingress.path=env(slashpath)' $OPENSEARCH_INGRESS_YAML
-      yq -i '.ingress.hosts.[0]=env(BASE_DOMAIN)'                        $OPENSEARCH_INGRESS_YAML
+      slashpath="/$OPENSEARCH_PATH" yq -i '.ingress.path=env(slashpath)' $autogenerate_yaml
+      yq -i '.ingress.hosts.[0]=env(BASE_DOMAIN)'                        $autogenerate_yaml
 
-      yq -i '.ingress.tls.[0].hosts.[0]=env(BASE_DOMAIN)'                $OPENSEARCH_INGRESS_YAML
-      slashpath="/$OPENSEARCH_PATH" yq -i '.ingress.annotations["nginx.ingress.kubernetes.io/rewrite-target"]=env(slashpath)' $OPENSEARCH_INGRESS_YAML
+      yq -i '.ingress.tls.[0].hosts.[0]=env(BASE_DOMAIN)'                $autogenerate_yaml
+      slashpath="/$OPENSEARCH_PATH" yq -i '.ingress.annotations["nginx.ingress.kubernetes.io/rewrite-target"]=env(slashpath)' $autogenerate_yaml
 
       # Need to use printf to preserve newlines
       printf -v snippet "rewrite (?i)/$OPENSEARCH_PATH/(.*) /\$1 break;\nrewrite (?i)/${OPENSEARCH_PATH}$ / break;"  ;
-      snippet="$snippet"    yq -i '.ingress.annotations["nginx.ingress.kubernetes.io/configuration-snippet"]=strenv(snippet)'  $OPENSEARCH_INGRESS_YAML
-
-   fi
-
-   if [ "$AUTOGENERATE_STORAGECLASS" == "true" ]; then
-
-      ###storageClass for PVC
-      STORAGECLASS="${STORAGECLASS:-default}"
-      OPENSEARCH_STORAGECLASS="${OPENSEARCH_STORAGECLASS:-$STORAGECLASS}"
-
-      sc="$OPENSEARCH_STORAGECLASS" yq -i '.persistence.storageClass=env(sc)' $OPENSEARCH_INGRESS_YAML
+      snippet="$snippet"    yq -i '.ingress.annotations["nginx.ingress.kubernetes.io/configuration-snippet"]=strenv(snippet)'  $autogenerate_yaml
 
    fi
 }
@@ -328,7 +288,94 @@ function generateIngressOSD {
 
 }
 
+
 export -f generateIngressPromOperator generateIngressOpenSearch generateIngressOSD
 
-export -f generateStorageClassPromOperator
 
+function generateStorageClassReference {
+    # input parms: $1  appname
+    # input parms: $2  output file
+
+   if [ "$AUTOGENERATE_STORAGECLASS" != "true" ]; then
+      log_debug "Autogeneration of StorageClass References NOT enabled; exiting generateStorageClassReference"
+      return
+   fi
+
+   local autogenerate_yaml storageClass appname
+
+   appname="$1"
+   autogenerate_yaml="$2"
+
+   if [ -z "$autogenerate_yaml" ]; then
+      log_error "Required filename NOT provided"
+      exit 1
+   elif [ ! -f "$autogenerate_yaml" ]; then
+      log_debug "Creating file [$autogenerate_yaml]"
+      touch "$autogenerate_yaml"
+   else
+      log_debug "File [$autogenerate_yaml] already exists"
+   fi
+
+   case "$appname" in
+      "opensearch")
+         storageClass="${OPENSEARCH_STORAGECLASS:-$STORAGECLASS}"
+         checkStorageClass OPENSEARCH_STORAGECLASS
+         sc="$storageClass" yq -i '.persistence.storageClass=env(sc)' $autogenerate_yaml
+      ;;
+      "alertmanager")
+         storageClass="${ALERTMANAGER_STORAGECLASS:-$STORAGECLASS}"
+         checkStorageClass ALERTMANAGER_STORAGECLASS
+         sc="$storageClass" yq -i '.alertmanager.alertmanagerSpec.storage.volumeClaimTemplate.spec.storageClassName=env(sc)' "$autogenerate_yaml"
+
+       ;;
+      "grafana")               #Grafana deployed via Prometheus Operator Helm Chart
+         storageClass="${GRAFANA_STORAGECLASS:-$STORAGECLASS}"
+         checkStorageClass GRAFANA_STORAGECLASS
+         sc="$storageClass" yq -i '.grafana.persistence.storageClassName=env(sc)' "$autogenerate_yaml"
+      ;;
+      "grafana_standalone")    #Grafana deployed via Grafana Helm Chart
+         storageClass="${GRAFANA_STORAGECLASS:-$STORAGECLASS}"
+         checkStorageClass GRAFANA_STORAGECLASS
+         sc="$storageClass" yq -i '.persistence.storageClassName=env(sc)' "$autogenerate_yaml"
+      ;;
+      "prometheus")
+         storageClass="${PROMETHEUS_STORAGECLASS:-$STORAGECLASS}"
+         checkStorageClass PROMETHEUS_STORAGECLASS
+         sc="$storageClass"   yq -i '.prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=env(sc)'    "$autogenerate_yaml"
+      ;;
+      "pushgateway")
+         storageClass="${PUSHGATEWAY_STORAGECLASS:-$STORAGECLASS}"
+         checkStorageClass PUSHGATEWAY_STORAGECLASS
+         sc="$storageClass" yq -i 'persistentVolume.storageClass=env(sc)' $autogenerate_yaml
+      ;;
+      *)
+         log_error "Unrecognized application name [$appname] passed to generateStorage"
+         exit 1
+      ;;
+   esac
+
+}
+
+function checkStorageClass {
+    # input parms: $1  storageclass
+    local storageClass storageClassEnvVar
+    storageClassEnvVar="$1"
+    storageClass="${!1:-$STORAGECLASS}"
+
+    if [ -z "$storageClass" ]; then
+         log_error "Required parameter not provided.  Either [$storageClassEnvVar] or [STORAGECLASS] MUST be provided."
+         exit 1
+    else
+       if $(kubectl get storageClass "$storageClass" -o name &>/dev/null); then
+          log_debug "The specified StorageClass [$storageClass] exists"
+       else
+          log_error "The specified StorageClass [$storageClass] does NOT exist"
+          exit 1
+       fi
+    fi
+
+}
+
+
+
+export -f generateStorageClassReference checkStorageClass
