@@ -205,6 +205,14 @@ function generateIngressOpenSearch {
       log_debug "File [$autogenerate_yaml] already exists"
    fi
 
+   routing="${ROUTING:-host}"
+   log_debug "ROUTING [$routing]"
+
+   ingressSampleFile="samples/ingress/${routing}-based-ingress/logging/user-values-opensearch.yaml"
+
+   #intialized the yaml file w/appropriate ingress sample
+   yq -i eval-all '. as $item ireduce ({}; . * $item )' "$autogenerate_yaml" "$ingressSampleFile"
+
 
    OPENSEARCH_INGRESS_ENABLED="${OPENSEARCH_INGRESS_ENABLED:-false}"
    OPENSEARCH_FQDN="${OPENSEARCH_FQDN}"     #TODO: NEEDED?
@@ -219,7 +227,7 @@ function generateIngressOpenSearch {
 
    log_debug "OPENSEARCH_INGRESS_ENABLED [$OPENSEARCH_INGRESS_ENABLED] OPENSEARCH_FQDN [$OPENSEARCH_FQDN] OPENSEARCH_PATH [$OPENSEARCH_PATH]"
 
-   export autogenerate_yaml OPENSEARCH_INGRESS_ENABLED OPENSEARCH_FQDN OPENSEARCH_PATH
+   export OPENSEARCH_INGRESS_ENABLED OPENSEARCH_FQDN OPENSEARCH_PATH
 
    yq -i '.ingress.enabled= env(OPENSEARCH_INGRESS_ENABLED)'             $autogenerate_yaml
 
@@ -247,7 +255,27 @@ function generateIngressOSD {
       return
    fi
 
-   OSD_INGRESS_YAML="$TMP_DIR/ingress/logging/user-values-osd.yaml"
+   local autogenerate_yaml
+
+   autogenerate_yaml="$1"
+
+   if [ -z "$autogenerate_yaml" ]; then
+      log_error "Required filename NOT provided"
+      exit 1
+   elif [ ! -f "$autogenerate_yaml" ]; then
+      log_debug "Creating file [$autogenerate_yaml]"
+      touch "$autogenerate_yaml"
+   else
+      log_debug "File [$autogenerate_yaml] already exists"
+   fi
+
+   routing="${ROUTING:-host}"
+   log_debug "ROUTING [$routing]"
+
+   ingressSampleFile="samples/ingress/${routing}-based-ingress/logging/user-values-osd.yaml"
+
+   #intialized the yaml file w/appropriate ingress sample
+   yq -i eval-all '. as $item ireduce ({}; . * $item )' "$autogenerate_yaml" "$ingressSampleFile"
 
    OSD_INGRESS_ENABLED="${OSD_INGRESS_ENABLED:-true}"
    OSD_FQDN="${OSD_FQDN}"    #TODO: NEEDED?
@@ -262,26 +290,26 @@ function generateIngressOSD {
 
    log_debug "OSD_INGRESS_ENABLED [$OSD_INGRESS_ENABLED] OSD_FQDN [$OSD_FQDN] OSD_PATH [$OSD_PATH]"
 
-   export OSD_INGRESS_YAML OSD_INGRESS_ENABLED OSD_FQDN OSD_PATH
+   export OSD_INGRESS_ENABLED OSD_FQDN OSD_PATH
 
-   yq -i '.ingress.enabled=env(OSD_INGRESS_ENABLED)'           $OSD_INGRESS_YAML
+   yq -i '.ingress.enabled=env(OSD_INGRESS_ENABLED)'           $autogenerate_yaml
    if [ "$routing" == "host" ]; then
-      yq -i '.ingress.hosts.[0].host=env(OSD_FQDN)'            $OSD_INGRESS_YAML
-      yq -i '.ingress.tls.[0].hosts.[0]=env(OSD_FQDN)'         $OSD_INGRESS_YAML
+      yq -i '.ingress.hosts.[0].host=strenv(OSD_FQDN)'            $autogenerate_yaml
+      yq -i '.ingress.tls.[0].hosts.[0]=env(OSD_FQDN)'         $autogenerate_yaml
    else
 
       export slashpath="/$OSD_PATH"
 
-      yq -i '(.extraEnvs.[] | select(has("name")) | select(.name == "SERVER_BASEPATH")).value=env(slashpath)' $OSD_INGRESS_YAML
+      yq -i '(.extraEnvs.[] | select(has("name")) | select(.name == "SERVER_BASEPATH")).value=env(slashpath)' $autogenerate_yaml
 
-      yq -i '.ingress.hosts.[0].host=env(BASE_DOMAIN)'         $OSD_INGRESS_YAML
-      yq -i '.ingress.hosts.[0].paths.[0].path=env(slashpath)' $OSD_INGRESS_YAML
-      yq -i '.ingress.tls.[0].hosts.[0]=env(BASE_DOMAIN)'      $OSD_INGRESS_YAML
-      yq -i '.ingress.annotations["nginx.ingress.kubernetes.io/rewrite-target"]=env(slashpath)'               $OSD_INGRESS_YAML
+      yq -i '.ingress.hosts.[0].host=env(BASE_DOMAIN)'         $autogenerate_yaml
+      yq -i '.ingress.hosts.[0].paths.[0].path=env(slashpath)' $autogenerate_yaml
+      yq -i '.ingress.tls.[0].hosts.[0]=env(BASE_DOMAIN)'      $autogenerate_yaml
+      yq -i '.ingress.annotations["nginx.ingress.kubernetes.io/rewrite-target"]=env(slashpath)'               $autogenerate_yaml
 
       # Need to use printf to preserve newlines
       printf -v snippet "rewrite (?i)/$OSD_PATH/(.*) /\$1 break;\nrewrite (?i)/${OSD_PATH}$ / break;"  ;
-      snippet="$snippet"    yq -i '.ingress.annotations["nginx.ingress.kubernetes.io/configuration-snippet"]=strenv(snippet)'  $OSD_INGRESS_YAML
+      snippet="$snippet"    yq -i '.ingress.annotations["nginx.ingress.kubernetes.io/configuration-snippet"]=strenv(snippet)'  $autogenerate_yaml
 
       unset slashpath
    fi
