@@ -100,8 +100,8 @@ kubectl -n $LOG_NS create secret generic  v4m-osd-tls-enabled  --from-literal en
 log_info "Deploying OpenSearch Dashboards"
 
 # Remove pre-OSD 2.19.0 version due to label changes
-if [ "$(kubectl -n $LOG_NS get deployment v4m-osd -o jsonpath={.spec.template.metadata.labels}) 2>/dev/null" == '{"app":"opensearch-dashboards","release":"v4m-osd"}' ]; then
-   log_debug "An earlier version of OpenSearch Dashboards was found running and will be removed"
+if [ "$(kubectl -n $LOG_NS get deployment v4m-osd -o jsonpath={.spec.template.metadata.labels} 2>/dev/null)" == '{"app":"opensearch-dashboards","release":"v4m-osd"}' ]; then
+   log_debug "An earlier version of OpenSearch Dashboards (>2.19) was found running and will be removed"
    kubectl -n $LOG_NS delete deployment v4m-osd
 fi
 
