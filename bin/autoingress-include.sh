@@ -124,6 +124,13 @@ function generateIngressPromOperator {
       fi
    fi
 
+
+   ##TO DO: Need to handle impacts on Grafana Datasource and Alerting endpoint definitions
+   ##       when a non-standard path is provided to Alertmanager and/or Prometheus
+   ##       See  lines 134-142 in deploy_monitoring_cluster.
+   ##       Possiby move call to autogenerate AFTER those lines and add yq calls here
+   ##       to make the necessary changes.  Eventually (perhaps) replace those yaml fragment files
+
    PROMETHEUS_INGRESS_ENABLED="${PROMETHEUS_INGRESS_ENABLED:-false}"
    PROMETHEUS_FQDN="${PROMETHEUS_FQDN}"
    PROMETHEUS_PATH="${PROMETHEUS_PATH:-prometheus}"
@@ -164,22 +171,23 @@ function generateIngressPromOperator {
       exturl="https://$PROMETHEUS_FQDN" yq -i '.prometheus.prometheusSpec.externalUrl=env(exturl)'        "$autogenerate_yaml"
    else
       yq -i '.alertmanager.ingress.hosts.[0]=env(BASE_DOMAIN)'                "$autogenerate_yaml"
-      yq -i '.alertmanager.ingress.tls.[0].hosts=env(BASE_DOMAIN)'            "$autogenerate_yaml"
+      yq -i '.alertmanager.ingress.tls.[0].hosts.[0]=env(BASE_DOMAIN)'        "$autogenerate_yaml"
       slashpath="/$ALERTMANAGER_PATH" yq -i '.alertmanager.ingress.path=env(slashpath)'                   "$autogenerate_yaml"
+      slashpath="/$ALERTMANAGER_PATH" yq -i '.alertmanager.alertmanagerSpec.routePrefix=env(slashpath)'   "$autogenerate_yaml"
       exturl="https://$ALERTMANAGER_FQDN" yq -i '.alertmanager.alertmanagerSpec.externalUrl=env(exturl)'  "$autogenerate_yaml"
 
       yq -i '.grafana.ingress.hosts.[0]=env(BASE_DOMAIN)'                     "$autogenerate_yaml"
-      yq -i '.grafana.ingress.tls.[0].hosts=env(BASE_DOMAIN)'                 "$autogenerate_yaml"
+      yq -i '.grafana.ingress.tls.[0].hosts.[0]=env(BASE_DOMAIN)'             "$autogenerate_yaml"
       slashpath="/$GRAFANA_PATH" yq -i '.grafana.ingress.path=env(slashpath)' "$autogenerate_yaml"
       yq -i '.grafana."grafana.ini".server.domain=env(BASE_DOMAIN)'           "$autogenerate_yaml"
       rooturl="https://$GRAFANA_FQDN" yq -i '.grafana."grafana.ini".server.root_url=env(rooturl)'         "$autogenerate_yaml"
 
       yq -i '.prometheus.ingress.hosts.[0]=env(BASE_DOMAIN)'                  "$autogenerate_yaml"
-      yq -i '.prometheus.ingress.tls.[0].hosts=env(BASE_DOMAIN)'              "$autogenerate_yaml"
+      yq -i '.prometheus.ingress.tls.[0].hosts.[0]=env(BASE_DOMAIN)'          "$autogenerate_yaml"
       slashpath="/$PROMETHEUS_PATH" yq -i '.prometheus.ingress.path=env(slashpath)'                       "$autogenerate_yaml"
       slashpath="/$PROMETHEUS_PATH" yq -i '.prometheus.prometheusSpec.routePrefix=env(slashpath)'         "$autogenerate_yaml"
       exturl="https://$PROMETHEUS_FQDN" yq -i '.prometheus.prometheusSpec.externalUrl=env(exturl)'        "$autogenerate_yaml"
-      slashpath="/$ALERTMANAGER_PATH" yq -i '.prometheus.prometheusSpec.alertingEndpoints.pathPrefix=env(slashpath)'        "$autogenerate_yaml"
+      slashpath="/$ALERTMANAGER_PATH" yq -i '.prometheus.prometheusSpec.alertingEndpoints.[0].pathPrefix=env(slashpath)'        "$autogenerate_yaml"
    fi
 
 }
