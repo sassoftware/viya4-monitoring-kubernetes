@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Logging**
+  * [FIX] Corrected a bug preventing requested container image details, inc. registry info, from being honored
+
+
 ## Version 1.2.34 (18FEB2025)
 * **Metrics**
   * [CHANGE] Removed temporary fix (added w/1.2.27) replacing a small number of Grafana dashboards
