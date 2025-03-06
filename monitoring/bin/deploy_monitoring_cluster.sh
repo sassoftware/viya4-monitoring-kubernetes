@@ -192,6 +192,11 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
    routing="${ROUTING:-host}"
    log_debug "ROUTING [$routing]"
 
+   if [ "$MON_TLS_PATH_INGRESS" != "true" ] && [ "$routing" == "path" ]; then
+      log_error "Environment variable MON_TLS_PATH_INGRESS must be set to 'true' when ROUTING='path'."
+      exit 1
+   fi
+
    ingressSampleFile="samples/ingress/${routing}-based-ingress/monitoring/user-values-prom-operator.yaml"
 
    #intialized the yaml file w/appropriate ingress sample
@@ -285,7 +290,7 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
 
       #Handle Prometheus datasource definition for Grafana
       ##Copy and update YAML file
-      cp "$grafanaDS" "$TMP_DIR/grfanaDS.yaml"
+      cp monitoring/tls/$grafanaDS "$TMP_DIR/grfanaDS.yaml"
       promurl="https://v4m-prometheus:9090/$PROMETHEUS_PATH" yq -i '.datasources.[0].url=env(promurl)'     "$grafanaDS"
 
       ##Re-create configmap

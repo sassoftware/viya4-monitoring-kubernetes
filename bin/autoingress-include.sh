@@ -8,7 +8,7 @@
 function checkYqVersion {
    # confirm yq installed and correct version
    local goodver yq_version
-   goodver="yq \(.+mikefarah.+\) version (v)?(4\.(4[5-9]|[5-9][0-9])\..+)"
+   goodver="yq \(.+mikefarah.+\) version (v)?(4\.(4[4-9]|[5-9][0-9])\..+)"
    yq_version=$(yq --version)
    if [ "$?" == "1" ]; then
       log_error "Required component [yq] not available."
