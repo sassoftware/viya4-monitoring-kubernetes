@@ -7,7 +7,7 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 source bin/tls-include.sh
-source bin/autoingress-include.sh
+source bin/autogenerate-include.sh
 source logging/bin/apiaccess-include.sh
 
 this_script=`basename "$0"`

@@ -29,10 +29,10 @@ AUTOGENERATE_STORAGECLASS="${AUTOGENERATE_STORAGECLASS:-false}"
 
 if [ "$AUTOGENERATE_INGRESS" != "true" ] && [ "$AUTOGENERATE_STORAGECLASS" != "true" ]; then
    log_debug "No autogeneration of YAML enabled"
-   export AUTOINGRESS_SOURCED="NotNeeded"
+   export AUTOGENERATE_SOURCED="NotNeeded"
 fi
 
-if [ -z "$AUTOINGRESS_SOURCED" ]; then
+if [ -z "$AUTOGENERATE_SOURCED" ]; then
 
    checkYqVersion
 
@@ -63,12 +63,12 @@ if [ -z "$AUTOINGRESS_SOURCED" ]; then
 
    fi
 
-   export AUTOINGRESS_SOURCED="true"
+   export AUTOGENERATE_SOURCED="true"
 
-elif [ "$AUTOINGRESS_SOURCE" == "NotNeeded" ]; then
-   log_debug "autoingress-include.sh not needed" 
+elif [ "$AUTOGENERATE_SOURCED" == "NotNeeded" ]; then
+   log_debug "autogenerate-include.sh not needed" 
 else
-   log_debug "autoingress-include.sh was already sourced [$AUTOINGRESS_SOURCED]"
+   log_debug "autogenerate-include.sh was already sourced [$AUTOGENERATE_SOURCED]"
 fi
 
 

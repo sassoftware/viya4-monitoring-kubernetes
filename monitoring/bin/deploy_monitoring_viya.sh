@@ -6,7 +6,7 @@
 cd "$(dirname $BASH_SOURCE)/../.."
 source monitoring/bin/common.sh
 source bin/openshift-include.sh
-source bin/autoingress-include.sh
+source bin/autogenerate-include.sh
 
 # If openshift deployment, ensure user-workload monitoring is enabled
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
