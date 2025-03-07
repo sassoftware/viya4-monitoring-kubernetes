@@ -6,6 +6,15 @@
   * [CHANGE] As part of making the above fix, obsolete functionality related to running the `create_logging_datasource.sh`
 script to deploy datasource within namespace/tenant-level instances of Grafana was removed.
   * [FIX] Corrected timing of call to `create_logging_datasource.sh` script within `deploy_monitoring_openshift.sh` script.
+* **Logging**
+  * [CHANGE]  The pod labels assigned to the OpenSearch Dashboards pod changed as part of the upgrade (see below).
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.17.1 to 2.19.1. 
+  * [UPGRADE] OpenSearch Helm chart upgraded from 2.26.0 to 2.32.0. 
+  * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 2.24.0 to 2.28.0
+  * [UPGRADE] Fluent Bit upgraded from 3.1.9 to 3.2.6
+  * [UPGRADE] Fluent Bit Helm chart upgraded from 0.47.10 to 0.48.6
+  * [UPGRADE] Elasticsearch Exporer Helm chart upgraded from 6.5.0 to 6.6.1
+  * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.21.1 to 2.23.1
 
 
 ## Version 1.2.34 (18FEB2025)
