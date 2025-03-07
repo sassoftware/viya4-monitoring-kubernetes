@@ -73,10 +73,13 @@ fi
 
 
 function checkStorageClass {
-    # input parms: $1  storageclass
+    # input parms: $1  *Name of env var* identifying storageClass
+    # input parms: $2  storageClass
+    # NOTE: Using 2 vars b/c Mac doesn't support indirection (e.g. x="${!1}")
+
     local storageClass storageClassEnvVar
     storageClassEnvVar="$1"
-    storageClass="${!1:-$STORAGECLASS}"
+    storageClass="${2:-$STORAGECLASS}"
 
     if [ -z "$storageClass" ]; then
          log_error "Required parameter not provided.  Either [$storageClassEnvVar] or [STORAGECLASS] MUST be provided."
