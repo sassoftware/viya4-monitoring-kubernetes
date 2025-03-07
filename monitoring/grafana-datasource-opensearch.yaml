@@ -1,7 +1,7 @@
 apiVersion: 1
 deleteDatasources: 
 - name: ViyaLogs
-#prune: true
+prune: true
 datasources:
 - name: ViyaLogs
   type: grafana-opensearch-datasource
