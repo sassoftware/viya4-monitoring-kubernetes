@@ -69,6 +69,9 @@ fi
 
 #Generate yaml file with all container-related keys
 generateImageKeysFile "$FB_FULL_IMAGE"                "logging/fb/fb_container_image.template"
+#Copy imageKeysFile since next call will replace existing one
+cp "$imageKeysFile" "$TMP_DIR/fb_imagekeysfile.yaml"
+
 generateImageKeysFile "$FB_INITCONTAINER_FULL_IMAGE"  "logging/fb/fb_initcontainer_image.template" "" "true"
 
 # Fluent Bit user customizations
@@ -180,6 +183,7 @@ log_debug "Installing Helm chart from artifact [$chart2install]"
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
     $versionstring \
+  --values $TMP_DIR/fb_imagekeysfile.yaml \
   --values $imageKeysFile \
   --values logging/fb/fluent-bit_helm_values_opensearch.yaml  \
   --values $openshiftValuesFile \

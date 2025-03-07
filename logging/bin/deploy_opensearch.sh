@@ -40,6 +40,9 @@ fi
 #Generate yaml files with all container-related keys
 generateImageKeysFile "$OS_FULL_IMAGE"          "logging/opensearch/os_container_image.template"
 generateImageKeysFile "$OS_SYSCTL_FULL_IMAGE"   "$imageKeysFile"  "OS_SYSCTL_"
+#Copy imageKeysFile since next call will replace existing one
+cp "$imageKeysFile" "$TMP_DIR/opensearch_imagekeysfile.yaml"
+
 generateImageKeysFile "$OS_FULL_IMAGE"          "logging/opensearch/os_initcontainer_image.template" "" "true"
 
 # get credentials
@@ -320,6 +323,7 @@ log_debug "Installing Helm chart from artifact [$chart2install]"
 # NOTE: nodeGroup needed to get resource names we want
 helm $helmDebug upgrade --install opensearch \
     --namespace $LOG_NS \
+    --values "$TMP_DIR/opensearch_imagekeysfile.yaml" \
     --values "$imageKeysFile" \
     --values logging/opensearch/opensearch_helm_values.yaml \
     --values "$wnpValuesFile" \
