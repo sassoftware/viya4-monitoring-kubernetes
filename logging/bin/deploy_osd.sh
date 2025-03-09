@@ -73,6 +73,7 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
    routing="${ROUTING:-host}"
    log_debug "ROUTING [$routing]"
 
+   ## tested with sample version: 0.2.1
    ingressSampleFile="samples/ingress/${routing}-based-ingress/logging/user-values-osd.yaml"
 
    #intialized the yaml file w/appropriate ingress sample

@@ -1,3 +1,6 @@
+## Sample: ingress/path-based-ingress Version: 0.2.1
+
+
 grafana:
   # Disable default configuration of NodePort
   service:

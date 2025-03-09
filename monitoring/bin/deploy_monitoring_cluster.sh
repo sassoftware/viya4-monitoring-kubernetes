@@ -197,6 +197,7 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
       exit 1
    fi
 
+   ## tested with sample version: 0.2.1
    ingressSampleFile="samples/ingress/${routing}-based-ingress/monitoring/user-values-prom-operator.yaml"
 
    #intialized the yaml file w/appropriate ingress sample

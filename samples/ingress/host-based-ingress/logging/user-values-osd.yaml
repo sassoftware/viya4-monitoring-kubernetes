@@ -1,3 +1,6 @@
+## Sample: ingress/host-based-ingress Version: 0.2.1
+
+
 ingress:
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
