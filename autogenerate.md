@@ -129,15 +129,16 @@ functionality.
 
 ## Summary of Autogeneration Capabilities by Component
 
-|Component|Autogenerate Ingress? |Autogenerate storageClass Reference? |
-|--|--|--|
-|Alertmanager| Y | Y |
-|Grafana|Y |Y|
-|OpenSearch|Y|Y|
-|OpenSearch Dashboards|Y|n/a|
-|Prometheus|Y|Y|
-|Prometheus Pushgateway|N|Y|
-
+|Deployment Script|Component|Autogenerate Ingress? |Autogenerate storageClass Reference? |
+|--|--|--|--|
+|monitoring/bin/deploy_monitoring_cluster.sh|Alertmanager| Y | Y |
+|monitoring/bin/deploy_monitoring_cluster.sh|Grafana|Y |Y|
+|monitoring/bin/deploy_monitoring_cluster.sh|Prometheus|Y|Y|
+||
+|logging/bin/deploy_logging.sh|OpenSearch|Y|Y|
+|logging/bin/deploy_logging.sh|OpenSearch Dashboards|Y|n/a|
+||
+|monitoring/bin/deploy_monitoring_viya.sh|Prometheus Pushgateway|N|Y|
 
 
 # Transitioning from deploying SAS Viya Monitoring using the SAS Viya 4 Deployment (DaC) Project
