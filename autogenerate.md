@@ -127,6 +127,18 @@ functionality.
 |OPENSEARCH_STORAGECLASS|`$STORAGECLASS`|storageClass for OpenSearch PVC|
 |PUSHGATEWAY_STORAGECLASS|`$STORAGECLASS`|storageClass for Prometheus Pushgateway PVC|
 
+## Summary of Autogeneration Capabilities by Component
+
+|Component|Autogenerate Ingress? |Autogenerate storageClass Reference? |
+|--|--|--|
+|Alertmanager| Y | Y |
+|Grafana|Y |Y|
+|OpenSearch|Y|Y|
+|OpenSearch Dashboards|Y|n/a|
+|Prometheus|Y|Y|
+|Prometheus Pushgateway|N|Y|
+
+
 
 # Transitioning from deploying SAS Viya Monitoring using the SAS Viya 4 Deployment (DaC) Project
 The [SAS Viya 4 Deployment project] (https://github.com/sassoftware/viya4-deployment) (DaC)
