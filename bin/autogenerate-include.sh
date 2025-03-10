@@ -60,13 +60,13 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
          log_debug "Path ingress requested, setting MON_TLS_PATH_INGRESS to 'true'"
       fi
 
-      log_debug "Autogeneration of Ingress definitions has been enabled"
+      log_info "Autogeneration of Ingress definitions has been enabled"
 
    fi
 
    if [ "$AUTOGENERATE_STORAGECLASS" == "true" ]; then
 
-      log_debug "Autogeneration of StorageClass specfication has been enabled"
+      log_info "Autogeneration of StorageClass specfication has been enabled"
 
    fi
 
