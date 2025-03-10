@@ -36,21 +36,23 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
 
    checkYqVersion
 
-   # Confirm NOT on OpenShift
-   if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
-      log_warn "Setting AUTOGENERATE_INGRESS to 'true' is not valid on OpenShift clusters; ignoring option."
-      log_warn "Web applications will be made accessible via OpenShift routes instead (if enabled)."
-
-      export AUTOGENERATE_INGRESS="false"
-   fi
-
    if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
+
+      # Confirm NOT on OpenShift
+      if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
+         log_error "Setting AUTOGENERATE_INGRESS to 'true' is not valid on OpenShift clusters."
+         log_error "Web applications will be made accessible via OpenShift routes instead (if enabled)."
+
+         export AUTOGENERATE_INGRESS="false"
+         exit 1
+      fi
+
 
       #validate required inputs
       BASE_DOMAIN="${BASE_DOMAIN}"
       if [ -z "$BASE_DOMAIN" ]; then
          log_error "Required parameter [BASE_DOMAIN] not provided"
-         exit
+         exit 1
       fi
 
       routing="${ROUTING:-host}"
