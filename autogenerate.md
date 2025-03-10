@@ -59,19 +59,19 @@ Information on the full set of parameters is provided below.
 |BASE_DOMAIN| *none* | **REQUIRED** The host domain used in constructing URLs to web applications on this cluster. `BASE_DOMAIN` is **required** even if providing FQDN for the applications.|
 |ROUTING|`host`| `host` or `path` to indicate whether host based or path based ingress should be configured|
 |ALERTMANAGER_FQDN|for host-based routing: `$ALERTMANAGER_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`	|Fully Qualified Domain Name to access Alertmanager|
-|ALERTMANAGER_INGRESS_ENABLED|`false`|true/false Enable ingress for Alertmanager|
+|ALERTMANAGER_INGRESS_ENABLE|`false`|true/false Enable ingress for Alertmanager|
 |ALERTMANAGER_PATH|`alertmanager`|host/path segment used to construct FQDN and Paths|
 |GRAFANA_FQDN|for host-based routing: `$GRAFANA_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`|Fully Qualified Domain Name to access Grafana|
-|GRAFANA_INGRESS_ENABLED|`true`|true/false Enable ingress for Grafana|
+|GRAFANA_INGRESS_ENABLE|`true`|true/false Enable ingress for Grafana|
 |GRAFANA_PATH|`grafana`|host/path segment used to construct FQDN and Paths|
 |OPENSEARCH_FQDN| for host-based routing: `$OPENSEARCH_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`|Fully Qualified Domain Name to access OpenSearch|
-|OPENSEARCH_INGRESS_ENABLED|`false`|true/false Enable ingress for OpenSearch|
+|OPENSEARCH_INGRESS_ENABLE|`false`|true/false Enable ingress for OpenSearch|
 |OPENSEARCH_PATH|`search`|host/path segment used to construct FQDN and Paths|
 |OSD_FQDN|for host-based routing: `$OSD_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`|Fully Qualified Domain Name to access OpenSearch Dashboards|
-|OSD_INGRESS_ENABLED|`true`|true/false Enable ingress for OpenSearch Dashboards|
+|OSD_INGRESS_ENABLE|`true`|true/false Enable ingress for OpenSearch Dashboards|
 |OSD_PATH|dashboards|host/path segment used to construct FQDN and Paths|
 |PROMETHEUS_FQDN|for host-based routing: `$PROMETHEUS_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`|Fully Qualified Domain Name to access Prometheus|
-|PROMETHEUS_INGRESS_ENABLED| `false`|true/false Enable ingress for Prometheus|
+|PROMETHEUS_INGRESS_ENABLE| `false`|true/false Enable ingress for Prometheus|
 |PROMETHEUS_PATH|`prometheus`|host/path segment used to construct FQDN and Paths|
 
 
