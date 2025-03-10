@@ -53,6 +53,13 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
          exit
       fi
 
+      routing="${ROUTING:-host}"
+
+      if [ "$routing" != "host" ]; then
+         MON_TLS_PATH_INGRESS="true"
+         log_debug "Path ingress requested, setting MON_TLS_PATH_INGRESS to 'true'"
+      fi
+
       log_debug "Autogeneration of Ingress definitions has been enabled"
 
    fi
