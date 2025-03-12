@@ -242,10 +242,10 @@ def get_arguments():
     parser.add_argument('-nossl', '--disable-ssl', required=False, dest = "ssl", action= "store_false", help = "\n If this option is provided, SSL will not be used to connect to the database.\n\n")
 
     # Add arguments for path-based ingress configuration
-    parser.add_argument('--path-based', required=False, dest="path_based", action="store_true",
-                        help="Specify if path-based ingress is used (will use 'opensearch' as default prefix)")
-    parser.add_argument('--url-prefix', required=False, dest="url_prefix",
-                        default=None, help="URL prefix for path-based ingress. Overrides the default 'opensearch' prefix.")
+    parser.add_argument('--path-based', required=False, dest="path_based", nargs='?',
+                        const="opensearch", default=None,
+                        help="Specify if path-based ingress is used. Without a value, defaults to 'opensearch' prefix. "
+                             "You can also specify a custom prefix, e.g. --path-based my-custom-prefix")
 
     return parser.parse_args().__dict__
 
@@ -258,12 +258,9 @@ def main():
         args['host'] = 'localhost'
         args['port'] = open_port()
 
-    if args['url_prefix'] is not None:
-        # User explicitly specified a custom URL prefix
-        url_prefix = args['url_prefix']
-    elif args['path_based']:
-        # User specified path-based ingress but no custom prefix
-        url_prefix = "opensearch"  # Use default prefix
+    if args['path_based']:
+        # User specified path-based ingress - either default or custom
+        url_prefix = args['path_based']  # Will be "opensearch" or custom value
 
     # Establish Client Using User Authorization and Connection Settings
 
