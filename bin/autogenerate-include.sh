@@ -8,13 +8,13 @@
 function checkYqVersion {
    # confirm yq installed and correct version
    local goodver yq_version
-   goodver="yq \(.+mikefarah.+\) version (v)?(4\.(4[4-9]|[5-9][0-9])\..+)"
+   goodver="yq \(.+mikefarah.+\) version (v)?(4\.(3[2-9]|[4-9][0-9])\..+)"
    yq_version=$(yq --version)
    if [ "$?" == "1" ]; then
       log_error "Required component [yq] not available."
       return 1
    elif [[ ! $yq_version =~ $goodver ]]; then
-      log_error "Incorrect version [$yq_version] found; version 4.45.1+ required."
+      log_error "Incorrect version [$yq_version] found; version 4.32.2+ required."
       return 1
    else
       log_debug "A valid version [$yq_version] of yq detected"
@@ -34,7 +34,9 @@ fi
 
 if [ -z "$AUTOGENERATE_SOURCED" ]; then
 
-   checkYqVersion
+   if ! checkYqVersion; then
+     exit 1
+   fi
 
    if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
 
