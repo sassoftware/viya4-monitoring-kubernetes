@@ -16,7 +16,7 @@ values YAML file within the USER_DIR directory to meet their organization’s re
 Refer to the [Pre-deployment topic](https://go.documentation.sas.com/doc/en/obsrvcdc/v_003/obsrvdply/p15fe8611w9njkn1fucwbvlz8tyg.htm) within the documentation for details about that process.
 
 This functionality requires an additional utility be available on the host where 
-the deployment scripts are run.  A recent version (4.44.3+) of the `yq` utility, specifically 
+the deployment scripts are run.  A recent version (4.32.2+) of the `yq` utility, specifically 
 [the Golang-based version maintained by Mike Farah](https://github.com/mikefarah/yq), must be 
 available.  NOTE: while the requirement for this utility is currently only related to 
 these experimental features, it is expected to become a standard requirement for the 
