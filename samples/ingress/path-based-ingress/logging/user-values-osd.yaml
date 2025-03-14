@@ -1,3 +1,6 @@
+## Sample: ingress/path-based-ingress Version: 0.2.1
+
+
 extraEnvs:
 # SERVER_BASEPATH needed for path-based ingress
 - name: SERVER_BASEPATH

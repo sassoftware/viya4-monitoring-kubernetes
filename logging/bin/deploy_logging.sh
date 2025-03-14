@@ -5,6 +5,7 @@
 
 cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
+source bin/autogenerate-include.sh
 
 #Fail if not using OpenSearch back-end
 require_opensearch

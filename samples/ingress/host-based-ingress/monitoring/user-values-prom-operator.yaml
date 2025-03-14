@@ -1,3 +1,6 @@
+## Sample: ingress/host-based-ingress Version: 0.2.2
+
+
 grafana:
   # Disable default configuration of NodePort
   service:
@@ -15,6 +18,7 @@ grafana:
     hosts:
     - grafana.host.cluster.example.com
     path: /
+    pathType: Prefix
   "grafana.ini":
     server:
       domain: host.cluster.example.com
@@ -50,6 +54,8 @@ prometheus:
       secretName: prometheus-ingress-tls-secret
     hosts:
     - prometheus.host.cluster.example.com
+    path: /
+    pathType: Prefix
   prometheusSpec:
     # routePrefix: /prometheus
     externalUrl: https://prometheus.host.cluster.example.com
@@ -79,6 +85,8 @@ alertmanager:
       secretName: alertmanager-ingress-tls-secret
     hosts:
     - alertmanager.host.cluster.example.com
+    path: /
+    pathType: Prefix
   alertmanagerSpec:
     # routePrefix: /alertmanager
     externalUrl: https://alertmanager.host.cluster.example.com

@@ -1,3 +1,6 @@
+## Sample: ingress/path-based-ingress Version: 0.2.1
+
+
 # OpenSearch ingress is optional
 
 # This sample does NOT expose OpenSearch via Ingress by default.
