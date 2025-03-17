@@ -110,7 +110,7 @@ if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
   log_verbose "Updating Prometheus Operator custom resource definitions"
   crds=( alertmanagerconfigs alertmanagers prometheuses prometheusrules podmonitors servicemonitors thanosrulers probes )
   for crd in "${crds[@]}"; do
-    
+
     ## Determine CRD URL - if in an airgap environment, look for them in USER_DIR.
     if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
       crdURL=$USER_DIR/monitoring/prometheus-operator-crd/$PROM_OPERATOR_CRD_VERSION/monitoring.coreos.com_$crd.yaml
@@ -124,7 +124,7 @@ if [ "$PROM_OPERATOR_CRD_UPDATE" == "true" ]; then
       fi
     else
       crdURL="https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$PROM_OPERATOR_CRD_VERSION/example/prometheus-operator-crd/monitoring.coreos.com_$crd.yaml"
-    fi 
+    fi
 
     if kubectl get crd $crd.monitoring.coreos.com 1>/dev/null 2>&1; then
       kubectl replace -f $crdURL
@@ -390,12 +390,6 @@ helm $helmDebug upgrade --install $promRelease \
 
 sleep 2
 
-if [ "$TLS_ENABLE" == "true" ]; then
-  log_verbose "Patching Grafana ServiceMonitor for TLS"
-  kubectl patch servicemonitor -n $MON_NS $promName-grafana --type=json \
-    -p='[{"op": "replace", "path": "/spec/endpoints/0/scheme", "value":"https"},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig", "value":{}},{"op": "replace", "path": "/spec/endpoints/0/tlsConfig/insecureSkipVerify", "value":true}]'
-fi
-
 #Container Security: Disable serviceAccount Token Automounting
 disable_sa_token_automount $MON_NS v4m-grafana
 disable_sa_token_automount $MON_NS sas-ops-acct      #Used w/Prometheus
@@ -543,7 +537,7 @@ fi
 
 if [ "$showPass" == "true" ]; then
   # Find the grafana pod
- 
+
   log_notice " Generated Grafana admin password is: $grafanaPwd"
   log_notice " To change the password, run the following script (replace myNewPassword with an updated password):"
   log_notice " monitoring/bin/change_grafana_admin_password.sh -p myNewPassword"
@@ -551,5 +545,3 @@ fi
 
 log_message ""
 log_notice " Successfully deployed components to the [$MON_NS] namespace"
-
-

@@ -40,10 +40,10 @@ alertmanager:
 
 prometheus-node-exporter:
   extraArgs:
-  - '--web.config.file=/opt/node-exporter/node-exporter-web.yaml'
+    - "--web.config.file=/opt/node-exporter/node-exporter-web.yaml"
   configmaps:
-  - name: node-exporter-tls-web-config
-    mountPath: /opt/node-exporter
+    - name: node-exporter-tls-web-config
+      mountPath: /opt/node-exporter
 
 # node-exporter helm chart does not yet support HTTPS
 # node-exporter:
@@ -62,11 +62,11 @@ grafana:
       scheme: HTTPS
       port: 3000
   extraSecretMounts:
-  - name: grafana-tls
-    mountPath: /cert
-    secretName: grafana-tls-secret
-    readOnly: true
-    subPath: ""
+    - name: grafana-tls
+      mountPath: /cert
+      secretName: grafana-tls-secret
+      readOnly: true
+      subPath: ""
   service:
     port: 3000
     targetPort: 3000
@@ -80,6 +80,10 @@ grafana:
       reloadURL: "https://localhost:3000/api/admin/provisioning/datasources/reload"
       env:
         REQ_SKIP_TLS_VERIFY: true
+  serviceMonitor:
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
   "grafana.ini":
     server:
       protocol: https
