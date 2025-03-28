@@ -1,7 +1,7 @@
 # SAS Viya Monitoring for Kubernetes
 
 ## Unreleased
-  * [UPGRADE] Fluent Bit upgraded from 3.2.6 to 3.2.9
+  * [UPGRADE] Fluent Bit upgraded from 3.2.6 to 3.2.10 (includes security fixes)
   * [UPGRADE] Fluent Bit Helm chart upgraded from 0.48.6 to 0.48.9
 
 
