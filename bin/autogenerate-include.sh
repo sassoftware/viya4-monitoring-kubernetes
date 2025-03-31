@@ -57,12 +57,12 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
          exit 1
       fi
 
-      routing="${ROUTING:-host}"
+      ingressRouting="${ROUTING:-host}"
       
-      if [ "$routing" == "path" ]; then
+      if [ "$ingressRouting" == "path" ]; then
          MON_TLS_PATH_INGRESS="true"
          log_debug "Path ingress requested, setting MON_TLS_PATH_INGRESS to 'true'"
-      elif [ "$routing" != "host" ] && [ "$routing" != "path" ]; then
+      elif [ "$ingressRouting" != "host" ] && [ "$ingressRouting" != "path" ]; then
          log_error "Invalid ROUTING value, valid values are 'host' or 'path'"
          exit 1
       fi
