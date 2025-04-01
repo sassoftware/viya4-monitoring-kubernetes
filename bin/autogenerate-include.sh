@@ -29,8 +29,8 @@ function create_ingress_certs {
 
    namespace="$1"
    secretName="$2"
-   certFile="${3:-$v4mIngressCert}"
-   keyFile="${4:-$v4mIngressKey}"
+   certFile="${3:-$INGRESS_CERT}"
+   keyFile="${4:-$INGRESS_KEY}"
 
    if [ -f "$certFile" ] && [ -f "$keyFile" ]; then
       kubectl delete secret "$secretName" --namespace "$namespace" --ignore-not-found 
@@ -77,27 +77,28 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
          exit 1
       fi
 
-      ingressRouting="${ROUTING:-host}"
+      ROUTING="${ROUTING:-host}"
       
-      if [ "$ingressRouting" == "path" ]; then
-         MON_TLS_PATH_INGRESS="true"
+      if [ "$ROUTING" == "path" ]; then
+         export MON_TLS_PATH_INGRESS="true"
          log_debug "Path ingress requested, setting MON_TLS_PATH_INGRESS to 'true'"
-      elif [ "$ingressRouting" != "host" ] && [ "$ingressRouting" != "path" ]; then
+      elif [ "$ROUTING" != "host" ] && [ "$ROUTING" != "path" ]; then
          log_error "Invalid ROUTING value, valid values are 'host' or 'path'"
          exit 1
       fi
 
-      v4mIngressCert="${INGRESS_CERT}"
-      v4mIngressKey="${INGRESS_KEY}"
-      if [ "$v4mIngressCert/$v4mIngressKey" != "/" ]; then
-         if [ ! -f "$v4mIngressCert" ] || [ ! -f "$v4mIngressKey" ]; then
+      INGRESS_CERT="${INGRESS_CERT}"
+      INGRESS_KEY="${INGRESS_KEY}"
+      if [ "$INGRESS_CERT/$INGRESS_KEY" != "/" ]; then
+         if [ ! -f "$INGRESS_CERT" ] || [ ! -f "$INGRESS_KEY" ]; then
             # Only WARN b/c missing cert doesn't prevent deployment and it can be created afterwards
-            log_warn "Missing Ingress certificate file; specified Ingress cert [$v4mIngressCert] and/or key [$v4mIngressKey] file is missing."
+            log_warn "Missing Ingress certificate file; specified Ingress cert [$INGRESS_CERT] and/or key [$INGRESS_KEY] file is missing."
             log_warn "You can create the missing Kubernetes secrets after deployment. See Enable TLS for Ingress topic in Help Center documentation."
-            v4mIngressCert=""
-            v4mIngressKey=""
+            #unset variable values to prevent further attempted use
+            unset INGRESS_CERT
+            unset INGRESS_KEY
          else
-            log_debug "Ingress cert [$v4mIngressCert] and key [$v4mIngressKey] files exist."
+            log_debug "Ingress cert [$INGRESS_CERT] and key [$INGRESS_KEY] files exist."
          fi
       fi
 
