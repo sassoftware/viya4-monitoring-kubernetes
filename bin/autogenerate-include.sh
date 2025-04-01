@@ -27,13 +27,15 @@ export -f checkYqVersion
 function create_ingress_certs {
    local certFile keyFile namespace secretName
 
-   namespce="$1"
+   namespace="$1"
    secretName="$2"
    certFile="${3:-$v4mIngressCert}"
    keyFile="${4:-$v4mIngressKey}"
 
    if [ -f "$certFile" ] && [ -f "$keyFile" ]; then
-      kubectl create secret tls $secretName --namespace "$namespace" --key="$keyFile" --cert="$certFile" 
+      kubectl delete secret "$secretName" --namespace "$namespace" --ignore-not-found 
+      kubectl create secret tls "$secretName" --namespace "$namespace" --key="$keyFile" --cert="$certFile" 
+      kubectl -n $namespace label secret $secretName  managed-by="v4m-es-script"
    elif [ ! -z "$certFile$keyFile" ]; then
       log_warn "Missing Ingress certificate file; specified Ingress cert [$certFile] and/or key [$keyFile] file is missing."
       log_warn "Create the missing Kubernetes secrets after deployment; use command: kubectl -create secret tls $secretName --namespace $namespace --key=cert_key_file --cert=cert_file"

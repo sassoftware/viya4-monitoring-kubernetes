@@ -73,8 +73,9 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OSD_INGRESS_ENABLE" == "true" ];
 
    osdIngressCert="${OSD_INGRESS_CERT:-$v4mIngressCert}"
    osdIngressKey="${OSD_INGRESS_KEY:-$v4mIngressKey}"
-
+   
    create_ingress_certs "$LOG_NS" kibana-ingress-tls-secret "$osdIngressCert" "$osdIngressKey" 
+   
 
    # osdIngressCert="${OSD_INGRESS_CERT:-$v4mIngressCert}"
    # osdIngressKey="${OSD_INGRESS_KEY:-$v4mIngressKey}"
