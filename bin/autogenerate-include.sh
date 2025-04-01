@@ -24,6 +24,24 @@ function checkYqVersion {
 
 export -f checkYqVersion
 
+function create_ingress_certs {
+   local certFile keyFile namespace secretName
+
+   namespce="$1"
+   secretName="$2"
+   certFile="${3:-$v4mIngressCert}"
+   keyFile="${4:-$v4mIngressKey}"
+
+   if [ -f "$certFile" ] && [ -f "$keyFile" ]; then
+      kubectl create secret tls $secretName --namespace "$namespace" --key="$keyFile" --cert="$certFile" 
+   elif [ ! -z "$certFile$keyFile" ]; then
+      log_warn "Missing Ingress certificate file; specified Ingress cert [$certFile] and/or key [$keyFile] file is missing."
+      log_warn "Create the missing Kubernetes secrets after deployment; use command: kubectl -create secret tls $secretName --namespace $namespace --key=cert_key_file --cert=cert_file"
+   fi   
+}
+
+export -f create_ingress_certs
+
 AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
 AUTOGENERATE_STORAGECLASS="${AUTOGENERATE_STORAGECLASS:-false}"
 
@@ -65,6 +83,20 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
       elif [ "$ingressRouting" != "host" ] && [ "$ingressRouting" != "path" ]; then
          log_error "Invalid ROUTING value, valid values are 'host' or 'path'"
          exit 1
+      fi
+
+      v4mIngressCert="${INGRESS_CERT}"
+      v4mIngressKey="${INGRESS_KEY}"
+      if [ "$v4mIngressCert/$v4mIngressKey" != "/" ]; then
+         if [ ! -f "$v4mIngressCert" ] || [ ! -f "$v4mIngressKey" ]; then
+            # Only WARN b/c missing cert doesn't prevent deployment and it can be created afterwards
+            log_warn "Missing Ingress certificate file; specified Ingress cert [$v4mIngressCert] and/or key [$v4mIngressKey] file is missing."
+            log_warn "You can create the missing Kubernetes secrets after deployment. See Enable TLS for Ingress topic in Help Center documentation."
+            v4mIngressCert=""
+            v4mIngressKey=""
+         else
+            log_debug "Ingress cert [$v4mIngressCert] and key [$v4mIngressKey] files exist."
+         fi
       fi
 
       log_info "Autogeneration of Ingress definitions has been enabled"

@@ -157,11 +157,23 @@ information on the environment variables supported by SAS Viya Monitoring and pr
 |**Ingress object definition**|
 ||
 |`V4M_ROUTING`|`ROUTING`|The type of ingress routing to create.  Note that the environment variable values are slightly different than the values used by the DaC Config Vars (i.e. `host` and `path` vs. `host-based` and `path-based`)|
+|`V4M__CERT`|`INGRESS_CERT`|File containing TLS certificate to use for all SAS Viya Monitoring ingress|
+|`V4M__KEY`|`INGRESS_KEY`|File containing TLS key to use for all SAS Viya Monitoring ingress|
 |`V4M_ALERTMANAGER_FQDN`|`ALERTMANAGER_FQDN`|URL for accessing Alertmanager web app|
+|`V4M_ALERTMANAGER_CERT`|`ALERTMANAGER_INGRESS_CERT`|File containing TLS certificate to use for Alertmanager ingress|
+|`V4M_ALERTMANAGER_KEY`|`ALERTMANAGER_INGRESS_KEY`|File containing TLS key to use for Alertmanager ingress|
 |`V4M_ELASTICSEARCH_FQDN`|`OPENSEARCH_FQDN`|URL for accessing OpenSearch API endpoint|
+|`V4M_ELASTICSEARCH_CERT`|`OPENSEARCH_INGRESS_CERT`|File containing TLS certificate to use for OpenSearch ingress|
+|`V4M_ELASTICSEARCH_KEY`|`OPENSEARCH_INGRESS_KEY`|File containing TLS key to use for OpenSearch ingress|
 |`V4M_GRAFANA_FQDN`|`GRAFANA_FQDN`|URL for accessing Grafana web app|
+|`V4M_GRAFANA_CERT`|`GRAFANA_INGRESS_CERT`|File containing TLS certificate to use for Grafana ingress|
+|`V4M_GRAFANA_KEY`|`GRAFANA_INGRESS_KEY`|File containing TLS key to use for Grafana ingress|
 |`V4M_KIBANA_FQDN`|`OSD_FQDN`|URL for accessing Alertmanager web app|
-|`V4M_PROMETHEUS_FQDN`|`PROMETHEUS_FQDN`|URL for accessing OpenSearch Dashboards web app|    
+|`V4M_KIBANA_CERT`|`OSD_INGRESS_CERT`|File containing TLS certificate to use for OpenSearch Dashboards ingress|
+|`V4M_KIBANA_KEY`|`OSD_INGRESS_KEY`|File containing TLS key to use for OpenSearch Dashboards ingress|
+|`V4M_PROMETHEUS_FQDN`|`PROMETHEUS_FQDN`|URL for accessing Prometheus web app|    
+|`V4M_PROMETHEUS_CERT`|`PROMETHEUS_INGRESS_CERT`|File containing TLS certificate to use for Prometheus ingress|
+|`V4M_PROMETHEUS_KEY`|`PROMETHEUS_INGRESS_KEY`|File containing TLS key to use for Prometheus ingress|
 |`V4M_BASE_DOMAIN`|`BASE_DOMAIN`|The host domain used in constructing URLs to web applications on this cluster.|
 ||
 |**StorageClass specification**|

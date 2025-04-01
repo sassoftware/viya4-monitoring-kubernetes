@@ -202,6 +202,11 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
 
 
    ALERTMANAGER_INGRESS_ENABLE="${ALERTMANAGER_INGRESS_ENABLE:-false}"
+   
+   amIngressCert="${ALERTMANAGER_INGRESS_CERT}"
+   amIngressKey="${ALERTMANAGER_INGRESS_KEY}"
+   create_ingress_certs "$MON_NS" "alertmanager-ingress-tls-secret" "$amIngressCert" "$amIngressKey" 
+
    ALERTMANAGER_FQDN="${ALERTMANAGER_FQDN}"
    ALERTMANAGER_PATH="${ALERTMANAGER_PATH:-alertmanager}"
    if [ -z "$ALERTMANAGER_FQDN"  ]; then
@@ -212,7 +217,13 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
       fi
    fi
 
+
    GRAFANA_INGRESS_ENABLE="${GRAFANA_INGRESS_ENABLE:-true}"
+
+   grIngressCert="${GRAFANA_INGRESS_CERT}"
+   grIngressKey="${GRAFANA_INGRESS_KEY}"
+   create_ingress_certs "$MON_NS" "grafana-ingress-tls-secret" "$grIngressCert" "$grIngressKey" 
+
    GRAFANA_FQDN="${GRAFANA_FQDN}"
    GRAFANA_PATH="${GRAFANA_PATH:-grafana}"
    if [ -z "$GRAFANA_FQDN" ]; then
@@ -224,6 +235,10 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
    fi
 
    PROMETHEUS_INGRESS_ENABLE="${PROMETHEUS_INGRESS_ENABLE:-false}"
+   prIngressCert="${PROMETHEUS_INGRESS_CERT}"
+   prIngressKey="${PROMETHEUS_INGRESS_KEY}"
+   create_ingress_certs "$MON_NS" "alertmanager-ingress-tls-secret" "$prIngressCert" "$prIngressKey" 
+
    PROMETHEUS_FQDN="${PROMETHEUS_FQDN}"
    PROMETHEUS_PATH="${PROMETHEUS_PATH:-prometheus}"
    if [ -z "$PROMETHEUS_FQDN" ]; then
