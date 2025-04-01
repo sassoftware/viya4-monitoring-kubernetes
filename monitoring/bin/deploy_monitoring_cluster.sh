@@ -237,7 +237,7 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
    PROMETHEUS_INGRESS_ENABLE="${PROMETHEUS_INGRESS_ENABLE:-false}"
    prIngressCert="${PROMETHEUS_INGRESS_CERT}"
    prIngressKey="${PROMETHEUS_INGRESS_KEY}"
-   create_ingress_certs "$MON_NS" "alertmanager-ingress-tls-secret" "$prIngressCert" "$prIngressKey" 
+   create_ingress_certs "$MON_NS" "prometheus-ingress-tls-secret" "$prIngressCert" "$prIngressKey" 
 
    PROMETHEUS_FQDN="${PROMETHEUS_FQDN}"
    PROMETHEUS_PATH="${PROMETHEUS_PATH:-prometheus}"
