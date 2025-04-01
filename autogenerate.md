@@ -39,9 +39,6 @@ the corresponding Ingress resources.
 
 It is important to understand the limitations of this automation.
 * the generated ingress resources are specific to nginx 
-* This automation is “all or nothing”, if you choose to use this functionality ingress 
-resources will be defined for all of the web applications even if access to some of 
-applications is disabled.
 * This automation only supports the specific ingress configuration option included in the 
 samples.  If you need additional or a only subset of those included, you will need to 
 manually define your ingress resources
@@ -58,22 +55,33 @@ Information on the full set of parameters is provided below.
 |AUTOGENERATE_INGRESS|`false`|When `true` the ingress definitions should be auto-generated|
 |BASE_DOMAIN| *none* | **REQUIRED** The host domain used in constructing URLs to web applications on this cluster. `BASE_DOMAIN` is **required** even if providing FQDN for the applications.|
 |ROUTING|`host`| `host` or `path` to indicate whether host based or path based ingress should be configured|
-|ALERTMANAGER_FQDN|for host-based routing: `$ALERTMANAGER_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`	|Fully Qualified Domain Name to access Alertmanager|
+|INGRESS_CERT| *none* |File containing TLS certificate to use for ingress of SAS Viya Monitoring web applications|
+|INGRESS_KEY| *none* |File containing TLS key to use for ingress of SAS Viya Monitoring web applications|
 |ALERTMANAGER_INGRESS_ENABLE|`false`|true/false Enable ingress for Alertmanager|
+|ALERTMANAGER_FQDN|for host-based routing: `$ALERTMANAGER_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`	|Fully Qualified Domain Name to access Alertmanager|
 |ALERTMANAGER_PATH|`alertmanager`|host/path segment used to construct FQDN and Paths|
-|GRAFANA_FQDN|for host-based routing: `$GRAFANA_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`|Fully Qualified Domain Name to access Grafana|
+|ALERTMANAGER_INGRESS_CERT|`$INGRESS_CERT`|File containing TLS certificate to use for Alertmanager ingress|
+|ALERTMANAGER_INGRESS_KEY|`$INGRESS_KEY`|File containing TLS key to use for Alertmanager ingress|
 |GRAFANA_INGRESS_ENABLE|`true`|true/false Enable ingress for Grafana|
+|GRAFANA_FQDN|for host-based routing: `$GRAFANA_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`|Fully Qualified Domain Name to access Grafana|
 |GRAFANA_PATH|`grafana`|host/path segment used to construct FQDN and Paths|
-|OPENSEARCH_FQDN| for host-based routing: `$OPENSEARCH_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`|Fully Qualified Domain Name to access OpenSearch|
+|GRAFANA_INGRESS_CERT|`$INGRESS_CERT`|File containing TLS certificate to use for Grafana ingress|
+|GRAFANA_INGRESS_KEY|`$INGRESS_KEY`|File containing TLS key to use for Grafana ingress|
 |OPENSEARCH_INGRESS_ENABLE|`false`|true/false Enable ingress for OpenSearch|
+|OPENSEARCH_FQDN| for host-based routing: `$OPENSEARCH_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`|Fully Qualified Domain Name to access OpenSearch|
 |OPENSEARCH_PATH|`search`|host/path segment used to construct FQDN and Paths|
-|OSD_FQDN|for host-based routing: `$OSD_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`|Fully Qualified Domain Name to access OpenSearch Dashboards|
+|OPENSEARCH_INGRESS_CERT|`$INGRESS_CERT`|File containing TLS certificate to use for OpenSearch ingress|
+|OPENSEARCH_INGRESS_KEY|`$INGRESS_KEY`|File containing TLS key to use for OpenSearch ingress|
 |OSD_INGRESS_ENABLE|`true`|true/false Enable ingress for OpenSearch Dashboards|
-|OSD_PATH|dashboards|host/path segment used to construct FQDN and Paths|
-|PROMETHEUS_FQDN|for host-based routing: `$PROMETHEUS_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`|Fully Qualified Domain Name to access Prometheus|
+|OSD_FQDN|for host-based routing: `$OSD_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`|Fully Qualified Domain Name to access OpenSearch Dashboards|
+|OSD_PATH|`dashboards`|host/path segment used to construct FQDN and Paths|
+|OSD_INGRESS_CERT|`$INGRESS_CERT`|File containing TLS certificate to use for OpenSearch Dashboards ingress|
+|OSD_INGRESS_KEY|`$INGRESS_KEY`|File containing TLS key to use for OpenSearch Dashboards ingress|
 |PROMETHEUS_INGRESS_ENABLE| `false`|true/false Enable ingress for Prometheus|
+|PROMETHEUS_FQDN|for host-based routing: `$PROMETHEUS_PATH.$BASE_DOMAIN` <p> for path-based routing: `BASE_DOMAIN`|Fully Qualified Domain Name to access Prometheus|
 |PROMETHEUS_PATH|`prometheus`|host/path segment used to construct FQDN and Paths|
-
+|PROMETHEUS_INGRESS_CERT|`$INGRESS_CERT`|File containing TLS certificate to use for Prometheus ingress|
+|PROMETHEUS_INGRESS_KEY|`$INGRESS_KEY`|File containing TLS key to use for Prometheus ingress|
 
 If a fully qualified domain name is provided for any of the applications , its value will 
 override the `BASE_DOMAIN` value.  Conversely, if a fully qualified domain name is not 
