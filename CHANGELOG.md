@@ -1,4 +1,15 @@
 # SAS Viya Monitoring for Kubernetes
+## unreleased
+* **Overall**
+  * [ANNOUNCEMENT] As announced previously, this project now *requires*  the `yq` command-line processor for YAML.  Specifically, a recent version (4.32+) of the [Golang-based (Mike Farah) version of `yq`](https://github.com/mikefarah/yq)
+needs to be installed.  While this utility is *currently* only used in a few places, we expect its use to become
+much more extensive over time.
+  * [FEATURE] The auto-generation of Ingress resources for the web applications has moved from *experimental*
+to *production* status.  As noted earlier, this feature requires the `yq` utility.  See the [Autogeneration of Ingress](link_to_come) 
+topic within the Help Center documentation for further information.
+  * [FEATURE] The auto-generation of storageClass references for PVC definitions has moved from *experimental*
+to *production* status.  As noted earlier, this feature requires the `yq` utility.  See the [Autogeneration of storageClass References](link_to_come) 
+topic within the Help Center documentation for further information.
 
 ## Version 1.2.35 (18MAR2025)
 * **Overall**
