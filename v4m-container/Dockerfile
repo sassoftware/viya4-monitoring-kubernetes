@@ -1,12 +1,12 @@
-# Start with a clearly defined base image
 FROM frolvlad/alpine-glibc:latest
 
-# Define ARGs with clear default values
+# Version of the Viya Monitoring for Kubernetes deployment to download to the container
 ARG V4M_TAG="stable"
 ARG OS=linux
 ARG ARCH=amd64
 ARG HELM_VER=v3.8.0
 ARG KUBECTL_VER=v1.23.4
+# oc versions: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/
 ARG OC_VER=4.8
 
 # Set environment variables in a single layer
