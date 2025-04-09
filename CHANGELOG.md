@@ -1,5 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 
+## unreleased
+* **Metrics**
+  * [FIX] Corrected bugs related to authentication/TLS configuration of Grafana sidecars on OpenShift which prevented auto-provisioning of 
+datasources and dashboards
+
+
 ## Version 1.2.35 (18MAR2025)
 * **Overall**
   * [ANNOUNCEMENT] Starting with our next release, this project will *require* that the `yq` command-line processor for YAML

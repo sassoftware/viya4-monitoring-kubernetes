@@ -163,7 +163,8 @@ if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
   extraArgs="--set service.targetPort=3001"
 else
   grafanaAuthYAML="monitoring/openshift/grafana-tls-only-values.yaml"
-  log_debug "Creating the Grafana service to generate TLS certs..."
+  #Creating the service now b/c certs will be generated and must exist prior to pod starting
+  log_debug "Creating the Grafana service; annotations will trigger generation of TLS certs."
   kubectl apply -n $MON_NS -f monitoring/openshift/v4m-grafana-svc.yaml
   log_debug "Sleeping 5 sec..."
   sleep 5

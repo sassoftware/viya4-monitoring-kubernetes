@@ -78,3 +78,5 @@ testFramework:
     mode: console
   "log.console":
       format: json
+  "auth.basic":
+    enabled: true
