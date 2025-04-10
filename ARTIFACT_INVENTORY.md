@@ -16,7 +16,7 @@ registry/repository/image_name:version
 
 | Subsystem| Component | Fully Qualified Container-Image Name (registry/repository/image_name:version)|
 |----|----|----|
-| Logging | Fluent Bit | cr.fluentbit.io/fluent/fluent-bit:3.2.6 |
+| Logging | Fluent Bit | cr.fluentbit.io/fluent/fluent-bit:3.2.10 |
 | Logging | Elasticsearch Exporter | quay.io/prometheuscommunity/elasticsearch-exporter:v1.8.0 |
 | Logging | initContainer (Fluent Bit, OpenSearch) | docker.io/library/busybox:latest |
 | Logging | OpenSearch | docker.io/opensearchproject/opensearch:2.19.1 |
@@ -51,7 +51,7 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 | Subsystem | Component | Helm Chart Repository | Helm Chart Name |Helm Chart Version | Helm Archive File Name|
 |--|--|--|--|--|--|
 | Logging | Elasticsearch Exporter| prometheus-community | prometheus-elasticsearch-exporter | 6.6.1 | prometheus-community/prometheus-elasticsearch-exporter-6.6.1.tgz |
-| Logging | Fluent Bit| fluent | fluent-bit | 0.48.6 | fluent/fluent-bit-0.48.6.tgz |
+| Logging | Fluent Bit| fluent | fluent-bit | 0.48.9 | fluent/fluent-bit-0.48.9.tgz |
 | Logging | OpenSearch| opensearch | opensearch | 2.32.0 | opensearch/opensearch-2.32.0.tgz |
 | Logging | OpenSearch Dashboard| opensearch | opensearch-dashboards | 2.28.0 | opensearch/opensearch-dashboards-2.28.0.tgz |
 | Metrics | Grafana (on OpenShift)| grafana | grafana | 8.8.4 | grafana/grafana-8.8.4.tgz |
