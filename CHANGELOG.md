@@ -1,9 +1,13 @@
 # SAS Viya Monitoring for Kubernetes
 
+
 ## unreleased
 * **Metrics**
   * [FIX] Corrected bugs related to authentication/TLS configuration of Grafana sidecars on OpenShift which prevented auto-provisioning of 
 datasources and dashboards
+* **Logging**
+  * [UPGRADE] Fluent Bit upgraded from 3.2.6 to 3.2.10 (includes security fixes)
+  * [UPGRADE] Fluent Bit Helm chart upgraded from 0.48.6 to 0.48.9
 
 
 ## Version 1.2.35 (18MAR2025)
