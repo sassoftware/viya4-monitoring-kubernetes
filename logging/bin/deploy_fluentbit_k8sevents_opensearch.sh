@@ -17,8 +17,8 @@ log_debug "Script [$this_script] has started [$(date)]"
 FLUENT_BIT_EVENTS_ENABLED=${FLUENT_BIT_EVENTS_ENABLED:-true}
 
 if [ "$FLUENT_BIT_EVENTS_ENABLED" != "true" ]; then
-   log_info "Environment variable [FLUENT_BIT_EVENTS_ENABLED] is not set to 'true'; exiting WITHOUT deploying Fluent Bit deployment"
-   exit 0
+  log_info "Environment variable [FLUENT_BIT_EVENTS_ENABLED] is not set to 'true'; exiting WITHOUT deploying Fluent Bit deployment"
+  exit 0
 fi
 
 set -e
@@ -33,30 +33,32 @@ log_info "Deploying Fluent Bit for collecting Kubernetes Events..."
 # Remove an existing Event Routher deployment?
 REMOVE_EVENTROUTER=${REMOVE_EVENTROUTER:-true}
 if [ "$REMOVE_EVENTROUTER" == "true" ]; then
-   if [ "$(kubectl get deployment -n "$LOG_NS" -o name -l app=eventrouter 2>/dev/null)" == "" ]; then
-      log_debug "No existing instance of Event Router found in namespace [$LOG_NS]."
-   else
-     log_debug "Removing an existing instance of Event Router found in namespace [$LOG_NS]."
-     logging/bin/remove_eventrouter.sh
-   fi
+  if [ "$(kubectl get deployment -n "$LOG_NS" -o name -l app=eventrouter 2> /dev/null)" == "" ]; then
+    log_debug "No existing instance of Event Router found in namespace [$LOG_NS]."
+  else
+    log_debug "Removing an existing instance of Event Router found in namespace [$LOG_NS]."
+    logging/bin/remove_eventrouter.sh
+  fi
 fi
-
 
 # check for pre-reqs
 # Confirm namespace exists
-if [ "$(kubectl get ns "$LOG_NS" -o name 2>/dev/null)" == "" ]; then
+if [ "$(kubectl get ns "$LOG_NS" -o name 2> /dev/null)" == "" ]; then
   log_error "Namespace [$LOG_NS] does NOT exist."
   exit 1
 fi
 
 # get credentials
-if [ "$(kubectl -n "$LOG_NS" get secret internal-user-logcollector -o name 2>/dev/null)" == "" ]; then
-   export ES_LOGCOLLECTOR_PASSWD=${ES_LOGCOLLECTOR_PASSWD}
-   create_user_secret internal-user-logcollector logcollector "$ES_LOGCOLLECTOR_PASSWD" managed-by=v4m-es-script
+if [ "$(kubectl -n "$LOG_NS" get secret internal-user-logcollector -o name 2> /dev/null)" == "" ]; then
+  export ES_LOGCOLLECTOR_PASSWD=${ES_LOGCOLLECTOR_PASSWD}
+  create_user_secret internal-user-logcollector logcollector "$ES_LOGCOLLECTOR_PASSWD" managed-by=v4m-es-script
 else
-   get_credentials_from_secret logcollector
-   rc=$?
-   if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit "$rc";fi
+  get_credentials_from_secret logcollector
+  rc=$?
+  if [ "$rc" != "0" ]; then
+    log_debug "RC=$rc"
+    exit "$rc"
+  fi
 fi
 
 HELM_DEBUG="${HELM_DEBUG:-false}"
@@ -64,7 +66,6 @@ helmDebug=""
 if [ "$HELM_DEBUG" == "true" ]; then
   helmDebug="--debug"
 fi
-
 
 helmRepoAdd fluent https://fluent.github.io/helm-charts
 
@@ -78,7 +79,6 @@ if [ ! -f "$FB_EVENTS_USER_YAML" ]; then
   FB_EVENTS_USER_YAML=$TMP_DIR/empty.yaml
 fi
 
-
 # Point to OpenShift response file or dummy as appropriate
 openshiftValuesFile="$TMP_DIR/empty.yaml"
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
@@ -87,7 +87,6 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
 else
   log_debug "Fluent Bit is NOT being deployed on OpenShift cluster"
 fi
-
 
 ## Get Helm Chart Name
 log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"

@@ -22,11 +22,11 @@ log_info "Removing Fluent Bit (Azure Monitor output) [$fbRelease] components fro
 helm delete -n "$LOG_NS" "$fbRelease"
 
 log_info "Removing ConfigMaps"
-kubectl -n "$LOG_NS" delete configmap fbaz-fluent-bit-config   --ignore-not-found
-kubectl -n "$LOG_NS" delete configmap fbaz-viya-parsers        --ignore-not-found
-kubectl -n "$LOG_NS" delete configmap fbaz-viya-tracing        --ignore-not-found
-kubectl -n "$LOG_NS" delete configmap fbaz-env-vars            --ignore-not-found
-kubectl -n "$LOG_NS" delete configmap fbaz-dbmigrate-script    --ignore-not-found
+kubectl -n "$LOG_NS" delete configmap fbaz-fluent-bit-config --ignore-not-found
+kubectl -n "$LOG_NS" delete configmap fbaz-viya-parsers --ignore-not-found
+kubectl -n "$LOG_NS" delete configmap fbaz-viya-tracing --ignore-not-found
+kubectl -n "$LOG_NS" delete configmap fbaz-env-vars --ignore-not-found
+kubectl -n "$LOG_NS" delete configmap fbaz-dbmigrate-script --ignore-not-found
 
 # Should we leave secret in place?
 log_info "Removing Connection information (secret)"

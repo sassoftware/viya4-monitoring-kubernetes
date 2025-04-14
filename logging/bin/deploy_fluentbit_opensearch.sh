@@ -3,7 +3,10 @@
 # Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-cd "$(dirname "$BASH_SOURCE")/../.." || { echo "Failed to change directory"; exit 1; }
+cd "$(dirname "$BASH_SOURCE")/../.." || {
+  echo "Failed to change directory"
+  exit 1
+}
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 
@@ -15,8 +18,8 @@ log_debug "Script [$this_script] has started [$(date)]"
 FLUENT_BIT_ENABLED=${FLUENT_BIT_ENABLED:-true}
 
 if [ "$FLUENT_BIT_ENABLED" != "true" ]; then
-   log_info "Environment variable [FLUENT_BIT_ENABLED] is not set to 'true'; existing WITHOUT deploying Fluent Bit"
-   exit 0
+  log_info "Environment variable [FLUENT_BIT_ENABLED] is not set to 'true'; existing WITHOUT deploying Fluent Bit"
+  exit 0
 fi
 
 set -e
@@ -28,7 +31,7 @@ log_info "Deploying Fluent Bit ..."
 
 # check for pre-reqs
 # Confirm namespace exists
-if [ "$(kubectl get ns "$LOG_NS" -o name 2>/dev/null)" == "" ]; then
+if [ "$(kubectl get ns "$LOG_NS" -o name 2> /dev/null)" == "" ]; then
   log_error "Namespace [$LOG_NS] does NOT exist."
   exit 1
 fi
@@ -55,15 +58,15 @@ helm2ReleaseCheck "fb-$LOG_NS"
 
 # Check for an existing Helm release of stable/fluent-bit
 if helm3ReleaseExists fb "$LOG_NS"; then
-   log_verbose "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
-   helm $helmDebug delete -n "$LOG_NS" fb
+  log_verbose "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
+  helm $helmDebug delete -n "$LOG_NS" fb
 
-   if [ "$(kubectl get servicemonitors -A | grep -c fluent-bit-v2)" -ge 1 ]; then
-      log_debug "Updated serviceMonitor [fluent-bit-v2] appears to be deployed."
-   elif [ "$(kubectl get servicemonitors -A | grep -c fluent-bit)" -ge 1 ]; then
-      log_warn "You appear to have an obsolete service monitor in place for monitoring Fluent Bit."
-      log_warn "Run monitoring/bin/deploy_monitoring_cluster.sh to deploy the current set of service monitors."
-   fi
+  if [ "$(kubectl get servicemonitors -A | grep -c fluent-bit-v2)" -ge 1 ]; then
+    log_debug "Updated serviceMonitor [fluent-bit-v2] appears to be deployed."
+  elif [ "$(kubectl get servicemonitors -A | grep -c fluent-bit)" -ge 1 ]; then
+    log_warn "You appear to have an obsolete service monitor in place for monitoring Fluent Bit."
+    log_warn "Run monitoring/bin/deploy_monitoring_cluster.sh to deploy the current set of service monitors."
+  fi
 else
   log_debug "No existing release of the deprecated stable/fluent-bit Helm chart was found"
 fi
@@ -93,11 +96,11 @@ else
 fi
 
 if [ -f "$USER_DIR/logging/fluent-bit_config.configmap_opensearch.yaml" ]; then
-   # use copy in USER_DIR
-   FB_CONFIGMAP="$USER_DIR/logging/fluent-bit_config.configmap_opensearch.yaml"
+  # use copy in USER_DIR
+  FB_CONFIGMAP="$USER_DIR/logging/fluent-bit_config.configmap_opensearch.yaml"
 else
-   # use copy in repo
-   FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_opensearch.yaml"
+  # use copy in repo
+  FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_opensearch.yaml"
 fi
 log_debug "Using FB ConfigMap: $FB_CONFIGMAP"
 
@@ -134,22 +137,22 @@ fi
 # Check for Kubernetes container runtime log format info
 KUBERNETES_RUNTIME_LOGFMT="${KUBERNETES_RUNTIME_LOGFMT:-}"
 if [ -z "$KUBERNETES_RUNTIME_LOGFMT" ]; then
-   somenode=$(kubectl get nodes | awk 'NR==2 { print $1 }')
-   # Quote the jsonpath expression to avoid SC1083
-   runtime=$(kubectl get node "$somenode" -o "jsonpath={.status.nodeInfo.containerRuntimeVersion}" | awk -F: '{print $1}')
-   log_debug "Kubernetes container runtime [$runtime] found on node [$somenode]"
-   case $runtime in
-    docker)
-      KUBERNETES_RUNTIME_LOGFMT="docker"
-      ;;
-    containerd|cri-o)
-      KUBERNETES_RUNTIME_LOGFMT="criwithlog"
-      ;;
-    *)
-      log_warn "Unrecognized Kubernetes container runtime [$runtime]; using default parser"
-      KUBERNETES_RUNTIME_LOGFMT="docker"
-      ;;
-   esac
+  somenode=$(kubectl get nodes | awk 'NR==2 { print $1 }')
+  # Quote the jsonpath expression to avoid SC1083
+  runtime=$(kubectl get node "$somenode" -o "jsonpath={.status.nodeInfo.containerRuntimeVersion}" | awk -F: '{print $1}')
+  log_debug "Kubernetes container runtime [$runtime] found on node [$somenode]"
+  case $runtime in
+  docker)
+    KUBERNETES_RUNTIME_LOGFMT="docker"
+    ;;
+  containerd | cri-o)
+    KUBERNETES_RUNTIME_LOGFMT="criwithlog"
+    ;;
+  *)
+    log_warn "Unrecognized Kubernetes container runtime [$runtime]; using default parser"
+    KUBERNETES_RUNTIME_LOGFMT="docker"
+    ;;
+  esac
 fi
 
 MON_NS="${MON_NS:-monitoring}"
@@ -157,17 +160,17 @@ MON_NS="${MON_NS:-monitoring}"
 # Create ConfigMap containing Kubernetes container runtime log format
 kubectl -n "$LOG_NS" delete configmap fb-env-vars --ignore-not-found
 kubectl -n "$LOG_NS" create configmap fb-env-vars \
-                   --from-literal=KUBERNETES_RUNTIME_LOGFMT="$KUBERNETES_RUNTIME_LOGFMT" \
-                   --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}" \
-                   --from-literal=SEARCH_SERVICENAME="${ES_SERVICENAME}" \
-                   --from-literal=MON_NS="${MON_NS}"
+  --from-literal=KUBERNETES_RUNTIME_LOGFMT="$KUBERNETES_RUNTIME_LOGFMT" \
+  --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}" \
+  --from-literal=SEARCH_SERVICENAME="${ES_SERVICENAME}" \
+  --from-literal=MON_NS="${MON_NS}"
 
 kubectl -n "$LOG_NS" label configmap fb-env-vars managed-by=v4m-es-script
 
 # Check to see if we are upgrading from earlier version requiring root access
 if [ "$(kubectl -n "$LOG_NS" get configmap fb-dbmigrate-script -o name --ignore-not-found)" != "configmap/fb-dbmigrate-script" ]; then
-   log_debug "Removing FB pods (if they exist) to allow migration."
-   kubectl -n "$LOG_NS" delete daemonset v4m-fb --ignore-not-found
+  log_debug "Removing FB pods (if they exist) to allow migration."
+  kubectl -n "$LOG_NS" delete daemonset v4m-fb --ignore-not-found
 fi
 
 # Create ConfigMap containing Fluent Bit database migration script
@@ -183,7 +186,7 @@ log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Deploy Fluent Bit via Helm chart
 helm $helmDebug upgrade --install --namespace "$LOG_NS" v4m-fb \
-    "$versionstring" \
+  "$versionstring" \
   --values "$TMP_DIR/fb_imagekeysfile.yaml" \
   --values "$imageKeysFile" \
   --values logging/fb/fluent-bit_helm_values_opensearch.yaml \

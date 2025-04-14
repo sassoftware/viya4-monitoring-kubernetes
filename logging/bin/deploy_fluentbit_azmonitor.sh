@@ -17,8 +17,8 @@ log_debug "Script [$this_script] has started [$(date)]"
 FLUENT_BIT_ENABLED=${FLUENT_BIT_ENABLED:-true}
 
 if [ "$FLUENT_BIT_ENABLED" != "true" ]; then
-   log_info "Environment variable [FLUENT_BIT_ENABLED] is not set to 'true'; existing WITHOUT deploying Fluent Bit"
-   exit 0
+  log_info "Environment variable [FLUENT_BIT_ENABLED] is not set to 'true'; existing WITHOUT deploying Fluent Bit"
+  exit 0
 fi
 
 set -e
@@ -39,7 +39,7 @@ helm2ReleaseCheck "fb-$LOG_NS"
 helmRepoAdd fluent https://fluent.github.io/helm-charts
 
 # Confirm namespace exists
-if [ "$(kubectl get ns "$LOG_NS" -o name 2>/dev/null)" == "" ]; then
+if [ "$(kubectl get ns "$LOG_NS" -o name 2> /dev/null)" == "" ]; then
   log_error "The specified namespace [$LOG_NS] does not exist."
   exit 1
 fi
@@ -62,55 +62,55 @@ if [ ! -f "$FB_AZMONITOR_USER_YAML" ]; then
 fi
 
 if [ -f "$USER_DIR/logging/fluent-bit_config.configmap_azmonitor.yaml" ]; then
-   # use copy in USER_DIR
-   FB_CONFIGMAP="$USER_DIR/logging/fluent-bit_config.configmap_azmonitor.yaml"
+  # use copy in USER_DIR
+  FB_CONFIGMAP="$USER_DIR/logging/fluent-bit_config.configmap_azmonitor.yaml"
 else
-   # use copy in repo
-   FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_azmonitor.yaml"
+  # use copy in repo
+  FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_azmonitor.yaml"
 fi
 log_info "Using FB ConfigMap: $FB_CONFIGMAP"
 
 # Check/Create Connection Info Secret
-if [ "$(kubectl -n "$LOG_NS" get secret connection-info-azmonitor -o name 2>/dev/null)" == "" ]; then
+if [ "$(kubectl -n "$LOG_NS" get secret connection-info-azmonitor -o name 2> /dev/null)" == "" ]; then
 
-   export AZMONITOR_CUSTOMER_ID="${AZMONITOR_CUSTOMER_ID:-NotProvided}"
-   export AZMONITOR_SHARED_KEY="${AZMONITOR_SHARED_KEY:-NotProvided}"
+  export AZMONITOR_CUSTOMER_ID="${AZMONITOR_CUSTOMER_ID:-NotProvided}"
+  export AZMONITOR_SHARED_KEY="${AZMONITOR_SHARED_KEY:-NotProvided}"
 
-   if [ "$AZMONITOR_CUSTOMER_ID" != "NotProvided" ] && [ "$AZMONITOR_SHARED_KEY" != "NotProvided" ]; then
-      log_info "Creating secret [connection-info-azmonitor] in [$LOG_NS] namespace to hold Azure connection information."
-      kubectl -n "$LOG_NS" create secret generic connection-info-azmonitor --from-literal=customer_id="$AZMONITOR_CUSTOMER_ID" --from-literal=shared_key="$AZMONITOR_SHARED_KEY"
-   else
-      log_error "Unable to create secret [$LOG_NS/connection-info-azmonitor] because missing required information: [AZMONITOR_CUSTOMER_ID: $AZMONITOR_CUSTOMER_ID ; AZMONITOR_SHARED_KEY: $AZMONITOR_SHARED_KEY]."
-      log_error "You must provide this information via environment variables or create the secret [connection-info-azmonitor] before running this script."
-      exit 1
-   fi
+  if [ "$AZMONITOR_CUSTOMER_ID" != "NotProvided" ] && [ "$AZMONITOR_SHARED_KEY" != "NotProvided" ]; then
+    log_info "Creating secret [connection-info-azmonitor] in [$LOG_NS] namespace to hold Azure connection information."
+    kubectl -n "$LOG_NS" create secret generic connection-info-azmonitor --from-literal=customer_id="$AZMONITOR_CUSTOMER_ID" --from-literal=shared_key="$AZMONITOR_SHARED_KEY"
+  else
+    log_error "Unable to create secret [$LOG_NS/connection-info-azmonitor] because missing required information: [AZMONITOR_CUSTOMER_ID: $AZMONITOR_CUSTOMER_ID ; AZMONITOR_SHARED_KEY: $AZMONITOR_SHARED_KEY]."
+    log_error "You must provide this information via environment variables or create the secret [connection-info-azmonitor] before running this script."
+    exit 1
+  fi
 else
-   log_info "Obtaining connection information from existing secret [$LOG_NS/connection-info-azmonitor]"
-   # Fix SC2155: Declare and assign separately
-   AZMONITOR_CUSTOMER_ID=$(kubectl -n "$LOG_NS" get secret connection-info-azmonitor -o=jsonpath="{.data.customer_id}" | base64 --decode)
-   export AZMONITOR_CUSTOMER_ID
-   AZMONITOR_SHARED_KEY=$(kubectl -n "$LOG_NS" get secret connection-info-azmonitor -o=jsonpath="{.data.shared_key}" | base64 --decode)
-   export AZMONITOR_SHARED_KEY
+  log_info "Obtaining connection information from existing secret [$LOG_NS/connection-info-azmonitor]"
+  # Fix SC2155: Declare and assign separately
+  AZMONITOR_CUSTOMER_ID=$(kubectl -n "$LOG_NS" get secret connection-info-azmonitor -o=jsonpath="{.data.customer_id}" | base64 --decode)
+  export AZMONITOR_CUSTOMER_ID
+  AZMONITOR_SHARED_KEY=$(kubectl -n "$LOG_NS" get secret connection-info-azmonitor -o=jsonpath="{.data.shared_key}" | base64 --decode)
+  export AZMONITOR_SHARED_KEY
 fi
 
 # Check for an existing Helm release of stable/fluent-bit
 if helm3ReleaseExists fbaz "$LOG_NS"; then
-   log_info "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
-   helm "$helmDebug" delete -n "$LOG_NS" fbaz
+  log_info "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
+  helm "$helmDebug" delete -n "$LOG_NS" fbaz
 
-   # Fix SC2155: Declare and assign separately
-   num_service_monitors_v2=$(kubectl get servicemonitors -A | grep -c fluent-bit-v2 || true)
-   if [ "$num_service_monitors_v2" -ge 1 ]; then
-      log_debug "Updated serviceMonitor [fluent-bit-v2] appears to be deployed."
-   else
-      num_service_monitors=$(kubectl get servicemonitors -A | grep -c fluent-bit || true)
-      if [ "$num_service_monitors" -ge 1 ]; then
-         log_warn "You appear to have an obsolete service monitor in place for monitoring Fluent Bit."
-         log_warn "Run monitoring/bin/deploy_monitoring_cluster.sh to deploy the current set of service monitors."
-      fi
-   fi
+  # Fix SC2155: Declare and assign separately
+  num_service_monitors_v2=$(kubectl get servicemonitors -A | grep -c fluent-bit-v2 || true)
+  if [ "$num_service_monitors_v2" -ge 1 ]; then
+    log_debug "Updated serviceMonitor [fluent-bit-v2] appears to be deployed."
+  else
+    num_service_monitors=$(kubectl get servicemonitors -A | grep -c fluent-bit || true)
+    if [ "$num_service_monitors" -ge 1 ]; then
+      log_warn "You appear to have an obsolete service monitor in place for monitoring Fluent Bit."
+      log_warn "Run monitoring/bin/deploy_monitoring_cluster.sh to deploy the current set of service monitors."
+    fi
+  fi
 else
-   log_debug "No existing release of the deprecated stable/fluent-bit Helm chart was found"
+  log_debug "No existing release of the deprecated stable/fluent-bit Helm chart was found"
 fi
 
 # Multiline parser setup
@@ -147,22 +147,22 @@ fi
 # Check for Kubernetes container runtime log format info
 KUBERNETES_RUNTIME_LOGFMT="${KUBERNETES_RUNTIME_LOGFMT:-}"
 if [ -z "$KUBERNETES_RUNTIME_LOGFMT" ]; then
-   # Fix SC2155: Declare and assign separately
-   somenode=$(kubectl get nodes | awk 'NR==2 { print $1 }')
-   runtime=$(kubectl get node "$somenode" -o "jsonpath={.status.nodeInfo.containerRuntimeVersion}" | awk -F: '{print $1}')
-   log_debug "Kubernetes container runtime [$runtime] found on node [$somenode]"
-   case $runtime in
-    docker)
-      KUBERNETES_RUNTIME_LOGFMT="docker"
-      ;;
-    containerd|cri-o)
-      KUBERNETES_RUNTIME_LOGFMT="criwithlog"
-      ;;
-    *)
-      log_warn "Unrecognized Kubernetes container runtime [$runtime]; using default parser"
-      KUBERNETES_RUNTIME_LOGFMT="docker"
-      ;;
-   esac
+  # Fix SC2155: Declare and assign separately
+  somenode=$(kubectl get nodes | awk 'NR==2 { print $1 }')
+  runtime=$(kubectl get node "$somenode" -o "jsonpath={.status.nodeInfo.containerRuntimeVersion}" | awk -F: '{print $1}')
+  log_debug "Kubernetes container runtime [$runtime] found on node [$somenode]"
+  case $runtime in
+  docker)
+    KUBERNETES_RUNTIME_LOGFMT="docker"
+    ;;
+  containerd | cri-o)
+    KUBERNETES_RUNTIME_LOGFMT="criwithlog"
+    ;;
+  *)
+    log_warn "Unrecognized Kubernetes container runtime [$runtime]; using default parser"
+    KUBERNETES_RUNTIME_LOGFMT="docker"
+    ;;
+  esac
 fi
 
 MON_NS="${MON_NS:-monitoring}"
@@ -170,16 +170,16 @@ MON_NS="${MON_NS:-monitoring}"
 # Create ConfigMap containing Kubernetes container runtime log format
 kubectl -n "$LOG_NS" delete configmap fbaz-env-vars --ignore-not-found
 kubectl -n "$LOG_NS" create configmap fbaz-env-vars \
-                   --from-literal=KUBERNETES_RUNTIME_LOGFMT="$KUBERNETES_RUNTIME_LOGFMT" \
-                   --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}" \
-                   --from-literal=MON_NS="${MON_NS}"
+  --from-literal=KUBERNETES_RUNTIME_LOGFMT="$KUBERNETES_RUNTIME_LOGFMT" \
+  --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}" \
+  --from-literal=MON_NS="${MON_NS}"
 
 kubectl -n "$LOG_NS" label configmap fbaz-env-vars managed-by=v4m-es-script
 
 # Check to see if we are upgrading from earlier version requiring root access
 if [ "$(kubectl -n "$LOG_NS" get configmap fbaz-dbmigrate-script -o name --ignore-not-found)" != "configmap/fbaz-dbmigrate-script" ]; then
-   log_debug "Removing FB pods (if they exist) to allow migration."
-   kubectl -n "$LOG_NS" delete daemonset v4m-fbaz --ignore-not-found
+  log_debug "Removing FB pods (if they exist) to allow migration."
+  kubectl -n "$LOG_NS" delete daemonset v4m-fbaz --ignore-not-found
 fi
 
 # Create ConfigMap containing Fluent Bit database migration script
