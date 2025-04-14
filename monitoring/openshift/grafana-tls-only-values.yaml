@@ -17,6 +17,17 @@ extraSecretMounts:
   readOnly: true
   subPath: ""
 
+sidecar:
+  dashboards:
+    reloadURL: "https://localhost:3001/api/admin/provisioning/dashboards/reload"    
+    env:
+      REQ_SKIP_TLS_VERIFY: true
+  datasources:
+    defaultDatasourceEnabled: false
+    reloadURL: "https://localhost:3001/api/admin/provisioning/datasources/reload"    
+    env:
+      REQ_SKIP_TLS_VERIFY: true
+
 service:
   enabled: false
 
