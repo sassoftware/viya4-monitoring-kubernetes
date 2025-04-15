@@ -61,7 +61,7 @@ function helm2ReleaseCheck {
       log_error "A Helm 2.x release of [$release] already exists"
       log_error "Helm [$HELM_VER_FULL] cannot manage the Helm 2.x release of [$release]"
       exit 1
-    fi  
+    fi
   fi
 }
 
@@ -72,7 +72,7 @@ function helmRepoAdd {
   ## If this is an air gap deployment, do nothing
   if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
     return 0
-  fi 
+  fi
 
   HELM_FORCE_REPO_UPDATE=${HELM_FORCE_REPO_UPDATE:-true}
   if [[ ! $(helm repo list 2>/dev/null) =~ $repo[[:space:]] ]]; then
@@ -128,7 +128,8 @@ function get_helm_versionstring {
     if [ "$V4M_HELM_USE_LATEST"  == "true" ]; then
        :  # return null string
     else
-       echo "--version $1"
+       # Explicitly use printf instead of echo to avoid quote issues
+       printf -- "--version %s" "$1"
     fi
 
     return

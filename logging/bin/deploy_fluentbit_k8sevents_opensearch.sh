@@ -4,9 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
-# shellcheck source=logging/bin/common.sh
 source logging/bin/common.sh
-# shellcheck source=logging/bin/secrets-include.sh
 source logging/bin/secrets-include.sh
 
 this_script=$(basename "$0")

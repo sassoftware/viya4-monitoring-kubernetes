@@ -3,9 +3,7 @@
 # Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-# shellcheck source=/dev/null
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
-# shellcheck source=/dev/null
 source logging/bin/common.sh
 
 # Fix SC2155: Declare and assign separately
