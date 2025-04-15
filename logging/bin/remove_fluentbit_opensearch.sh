@@ -3,7 +3,10 @@
 # Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-cd "$(dirname "$0")/../.." || exit 1
+cd "$(dirname "$BASH_SOURCE")/../.." || {
+  echo "Failed to change directory"
+  exit 1
+}
 source logging/bin/common.sh
 this_script=$(basename "$0")
 
