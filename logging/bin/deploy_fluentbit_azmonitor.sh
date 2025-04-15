@@ -178,13 +178,14 @@ kubectl -n "$LOG_NS" label configmap fbaz-dbmigrate-script managed-by=v4m-es-scr
 
 ## Get Helm Chart Name
 log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"
-chart2install=$(get_helmchart_reference "$FLUENTBIT_HELM_CHART_REPO" "$FLUENTBIT_HELM_CHART_NAME" "$FLUENTBIT_HELM_CHART_VERSION")
-versionstring=$(get_helm_versionstring "$FLUENTBIT_HELM_CHART_VERSION")
+chart2install="$(get_helmchart_reference "$FLUENTBIT_HELM_CHART_REPO" "$FLUENTBIT_HELM_CHART_NAME" "$FLUENTBIT_HELM_CHART_VERSION")"
+versionstring="$(get_helm_versionstring "$FLUENTBIT_HELM_CHART_VERSION")"
+
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Deploy Fluent Bit via Helm chart
 # shellcheck disable=SC2086
-helm "$helmDebug" upgrade --install v4m-fbaz --namespace "$LOG_NS" \
+helm $helmDebug upgrade --install v4m-fbaz --namespace "$LOG_NS" \
     $versionstring \
     --values "$TMP_DIR/fb_imagekeysfile.yaml" \
     --values "$imageKeysFile" \
@@ -193,7 +194,6 @@ helm "$helmDebug" upgrade --install v4m-fbaz --namespace "$LOG_NS" \
     --values "$tracingValuesFile" \
     --set fullnameOverride=v4m-fbaz \
     "$chart2install"
-
 # pause to allow migration script to complete (if necessary)
 sleep 20
 

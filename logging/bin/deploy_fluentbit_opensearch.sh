@@ -181,6 +181,7 @@ kubectl -n "$LOG_NS" label configmap fb-dbmigrate-script managed-by=v4m-es-scrip
 log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference "$FLUENTBIT_HELM_CHART_REPO" "$FLUENTBIT_HELM_CHART_NAME" "$FLUENTBIT_HELM_CHART_VERSION")"
 versionstring="$(get_helm_versionstring "$FLUENTBIT_HELM_CHART_VERSION")"
+
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Deploy Fluent Bit via Helm chart
