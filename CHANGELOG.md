@@ -5,10 +5,12 @@
 needs to be installed.  While this utility is *currently* only used in a few places, we expect its use to become
 much more extensive over time.
   * [FEATURE] The auto-generation of Ingress resources for the web applications has moved from *experimental*
-to *production* status.  As noted earlier, this feature requires the `yq` utility.  See the [Autogeneration of Ingress](link_to_come) 
+to *production* status.  As noted earlier, this feature requires the `yq` utility.  See the 
+[Configure Ingress Access to Web Applications](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
 topic within the Help Center documentation for further information.
   * [FEATURE] The auto-generation of storageClass references for PVC definitions has moved from *experimental*
-to *production* status.  As noted earlier, this feature requires the `yq` utility.  See the [Autogeneration of storageClass References](link_to_come) 
+to *production* status.  As noted earlier, this feature requires the `yq` utility.  See the 
+[Customize StorageClass](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#p1lvxtk81r8jgun1d789fqaz3lq1)
 topic within the Help Center documentation for further information.
 
 ## Version 1.2.35 (18MAR2025)
