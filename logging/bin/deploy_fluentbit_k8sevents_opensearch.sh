@@ -95,7 +95,6 @@ log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Deploy Fluent Bit via Helm chart
 #shellcheck disable=SC2154,SC2086
-#imagekeysfile is generated in generateImageKeysFile
 helm $helmDebug upgrade --install --namespace "$LOG_NS" v4m-fb-events \
     $versionstring \
     --values "$imageKeysFile" \

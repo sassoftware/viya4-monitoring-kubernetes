@@ -6,7 +6,6 @@
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
 source logging/bin/common.sh
 
-# Fix SC2155: Declare and assign separately
 this_script=$(basename "$0")
 
 log_debug "Script [$this_script] has started [$(date)]"
@@ -26,11 +25,6 @@ helmDebug=""
 if [ "$HELM_DEBUG" == "true" ]; then
     helmDebug="--debug"
 fi
-
-# Address SC2154: Ensure variables from common.sh are available or defined
-# The following variables are expected to be set in common.sh:
-# LOG_NS, TMP_DIR, USER_DIR, FB_FULL_IMAGE, FB_INITCONTAINER_FULL_IMAGE
-# imageKeysFile, FLUENTBIT_HELM_CHART_REPO, FLUENTBIT_HELM_CHART_NAME, FLUENTBIT_HELM_CHART_VERSION
 
 helm2ReleaseCheck "fb-$LOG_NS"
 
@@ -84,7 +78,6 @@ if [ "$(kubectl -n "$LOG_NS" get secret connection-info-azmonitor -o name 2> /de
     fi
 else
     log_info "Obtaining connection information from existing secret [$LOG_NS/connection-info-azmonitor]"
-    # Fix SC2155: Declare and assign separately
     AZMONITOR_CUSTOMER_ID=$(kubectl -n "$LOG_NS" get secret connection-info-azmonitor -o=jsonpath="{.data.customer_id}" | base64 --decode)
     export AZMONITOR_CUSTOMER_ID
     AZMONITOR_SHARED_KEY=$(kubectl -n "$LOG_NS" get secret connection-info-azmonitor -o=jsonpath="{.data.shared_key}" | base64 --decode)
@@ -96,7 +89,6 @@ if helm3ReleaseExists fbaz "$LOG_NS"; then
     log_info "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
     helm "$helmDebug" delete -n "$LOG_NS" fbaz
 
-    # Fix SC2155: Declare and assign separately
     num_service_monitors_v2=$(kubectl get servicemonitors -A | grep -c fluent-bit-v2 || true)
     if [ "$num_service_monitors_v2" -ge 1 ]; then
         log_debug "Updated serviceMonitor [fluent-bit-v2] appears to be deployed."
@@ -145,7 +137,6 @@ fi
 # Check for Kubernetes container runtime log format info
 KUBERNETES_RUNTIME_LOGFMT="${KUBERNETES_RUNTIME_LOGFMT:-}"
 if [ -z "$KUBERNETES_RUNTIME_LOGFMT" ]; then
-    # Fix SC2155: Declare and assign separately
     somenode=$(kubectl get nodes | awk 'NR==2 { print $1 }')
     runtime=$(kubectl get node "$somenode" -o "jsonpath={.status.nodeInfo.containerRuntimeVersion}" | awk -F: '{print $1}')
     log_debug "Kubernetes container runtime [$runtime] found on node [$somenode]"
@@ -187,7 +178,6 @@ kubectl -n "$LOG_NS" label configmap fbaz-dbmigrate-script managed-by=v4m-es-scr
 
 ## Get Helm Chart Name
 log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"
-# Fix SC2155: Declare and assign separately
 chart2install=$(get_helmchart_reference "$FLUENTBIT_HELM_CHART_REPO" "$FLUENTBIT_HELM_CHART_NAME" "$FLUENTBIT_HELM_CHART_VERSION")
 versionstring=$(get_helm_versionstring "$FLUENTBIT_HELM_CHART_VERSION")
 log_debug "Installing Helm chart from artifact [$chart2install]"
