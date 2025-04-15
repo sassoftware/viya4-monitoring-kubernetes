@@ -12,9 +12,9 @@ log_debug "Script [$this_script] has started [$(date)]"
 helm2ReleaseCheck "fbaz-$LOG_NS"
 
 if helm3ReleaseExists fbaz "$LOG_NS"; then
-  fbRelease=fbaz
+    fbRelease=fbaz
 else
-  fbRelease=v4m-fbaz
+    fbRelease=v4m-fbaz
 fi
 
 log_info "Removing Fluent Bit (Azure Monitor output) [$fbRelease] components from the [$LOG_NS] namespace [$(date)]"

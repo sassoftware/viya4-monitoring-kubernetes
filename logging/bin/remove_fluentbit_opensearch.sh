@@ -12,9 +12,9 @@ log_debug "Script [$this_script] has started [$(date)]"
 helm2ReleaseCheck "fb-$LOG_NS"
 
 if helm3ReleaseExists fb "$LOG_NS"; then
-  fbRelease=fb
+    fbRelease=fb
 else
-  fbRelease=v4m-fb
+    fbRelease=v4m-fb
 fi
 
 log_info "Removing Fluent Bit components [$fbRelease] from the [$LOG_NS] namespace [$(date)]"

@@ -11,7 +11,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SHELLCHECK_OPTS: -e SC1004 # exclude some shellcheck warnings.
-          SHFMT_OPTS: -s -i 2 -bn -sr -ln bash # shfmt: simplify (s), 2-space indentation (-i 2), braces on same line (-bn), space after redirects (-sr), bash dialect (-ln bash)
+          SHFMT_OPTS: -s -i 4 -bn -sr -ln bash # shfmt: simplify (s), 4-space indentation (-i 4), braces on same line (-bn), space after redirects (-sr), bash dialect (-ln bash)
         with:
           sh_checker_only_diff: true # only run against files that were updated
           sh_checker_comment: true # include results as github comment

@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname "$BASH_SOURCE")/../.." || {
-  echo "Failed to change directory"
-  exit 1
+    echo "Failed to change directory"
+    exit 1
 }
 source logging/bin/common.sh
 this_script=$(basename "$0")
