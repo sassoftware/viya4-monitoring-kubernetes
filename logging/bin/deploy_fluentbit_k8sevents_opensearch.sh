@@ -94,10 +94,10 @@ versionstring="$(get_helm_versionstring "$FLUENTBIT_HELM_CHART_VERSION")"
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Deploy Fluent Bit via Helm chart
-#shellcheck disable=SC2154
+#shellcheck disable=SC2154,SC2086
 #imagekeysfile is generated in generateImageKeysFile
 helm $helmDebug upgrade --install --namespace "$LOG_NS" v4m-fb-events \
-    "$versionstring" \
+    $versionstring \
     --values "$imageKeysFile" \
     --values logging/fb/fluent-bit_helm_values_events.yaml \
     --values "$openshiftValuesFile" \

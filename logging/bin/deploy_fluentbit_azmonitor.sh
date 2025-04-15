@@ -193,8 +193,9 @@ versionstring=$(get_helm_versionstring "$FLUENTBIT_HELM_CHART_VERSION")
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Deploy Fluent Bit via Helm chart
+# shellcheck disable=SC2086
 helm "$helmDebug" upgrade --install v4m-fbaz --namespace "$LOG_NS" \
-    "$versionstring" \
+    $versionstring \
     --values "$TMP_DIR/fb_imagekeysfile.yaml" \
     --values "$imageKeysFile" \
     --values logging/fb/fluent-bit_helm_values_azmonitor.yaml \
