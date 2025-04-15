@@ -138,7 +138,6 @@ fi
 KUBERNETES_RUNTIME_LOGFMT="${KUBERNETES_RUNTIME_LOGFMT:-}"
 if [ -z "$KUBERNETES_RUNTIME_LOGFMT" ]; then
     somenode=$(kubectl get nodes | awk 'NR==2 { print $1 }')
-    # Quote the jsonpath expression to avoid SC1083
     runtime=$(kubectl get node "$somenode" -o "jsonpath={.status.nodeInfo.containerRuntimeVersion}" | awk -F: '{print $1}')
     log_debug "Kubernetes container runtime [$runtime] found on node [$somenode]"
     case $runtime in
