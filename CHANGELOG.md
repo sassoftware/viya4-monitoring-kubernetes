@@ -1,5 +1,5 @@
 # SAS Viya Monitoring for Kubernetes
-## unreleased
+## Version 1.2.36 (15APR2025)
 * **Overall**
   * [ANNOUNCEMENT] As announced previously, this project now *requires*  the `yq` command-line processor for YAML.  Specifically, a recent version (4.32+) of the [Golang-based (Mike Farah) version of `yq`](https://github.com/mikefarah/yq)
 needs to be installed.  While this utility is *currently* only used in a few places, we expect its use to become
