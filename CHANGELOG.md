@@ -12,9 +12,8 @@ topic within the Help Center documentation for further information.
 to *production* status.  As noted earlier, this feature requires the `yq` utility.  See the 
 [Customize StorageClass](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#p1lvxtk81r8jgun1d789fqaz3lq1)
 topic within the Help Center documentation for further information.
-
-
-## unreleased
+  * [FIX] Resolved an issue with the V4M Container which prevented the `oc` command from being installed properly.
+  * [TASK] The V4M Dockerfile has been revised and simplified to speed up the build process and require less memory.
 * **Metrics**
   * [FIX] Corrected bugs related to authentication/TLS configuration of Grafana sidecars on OpenShift which prevented auto-provisioning of 
 datasources and dashboards
