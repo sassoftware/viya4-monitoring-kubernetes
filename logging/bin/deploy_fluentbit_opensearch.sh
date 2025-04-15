@@ -1,13 +1,16 @@
-#! /bin/bash
+#!/bin/bash
 
 # Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-cd "$(dirname $BASH_SOURCE)/../.."
+cd "$(dirname "$BASH_SOURCE")/../.." || {
+    echo "Failed to change directory"
+    exit 1
+}
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 
-this_script=`basename "$0"`
+this_script=$(basename "$0")
 
 log_debug "Script [$this_script] has started [$(date)]"
 
@@ -15,8 +18,8 @@ log_debug "Script [$this_script] has started [$(date)]"
 FLUENT_BIT_ENABLED=${FLUENT_BIT_ENABLED:-true}
 
 if [ "$FLUENT_BIT_ENABLED" != "true" ]; then
-   log_info "Environment variable [FLUENT_BIT_ENABLED] is not set to 'true'; existing WITHOUT deploying Fluent Bit"
-   exit
+    log_info "Environment variable [FLUENT_BIT_ENABLED] is not set to 'true'; existing WITHOUT deploying Fluent Bit"
+    exit 0
 fi
 
 set -e
@@ -28,127 +31,127 @@ log_info "Deploying Fluent Bit ..."
 
 # check for pre-reqs
 # Confirm namespace exists
-if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
-  log_error "Namespace [$LOG_NS] does NOT exist."
-  exit 1
+if [ "$(kubectl get ns "$LOG_NS" -o name 2> /dev/null)" == "" ]; then
+    log_error "Namespace [$LOG_NS] does NOT exist."
+    exit 1
 fi
 
 # get credentials
 get_credentials_from_secret logcollector
 rc=$?
-if [ "$rc" != "0" ] ;then log_debug "RC=$rc"; exit $rc;fi
-
-
-HELM_DEBUG="${HELM_DEBUG:-false}"
-if [ "$HELM_DEBUG" == "true" ]; then
-  helmDebug="--debug"
+if [ "$rc" != "0" ]; then
+    log_debug "RC=$rc"
+    exit $rc
 fi
 
+HELM_DEBUG="${HELM_DEBUG:-false}"
+helmDebug=""
+if [ "$HELM_DEBUG" == "true" ]; then
+    helmDebug="--debug"
+fi
 
 helmRepoAdd fluent https://fluent.github.io/helm-charts
 #log_verbose "Updating Helm repositories..."
 #helm repo update
 
-
-helm2ReleaseCheck fb-$LOG_NS
+helm2ReleaseCheck "fb-$LOG_NS"
 
 # Check for an existing Helm release of stable/fluent-bit
-if helm3ReleaseExists fb $LOG_NS; then
-   log_verbose "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
-   helm  $helmDebug  delete -n "$LOG_NS" fb
+if helm3ReleaseExists fb "$LOG_NS"; then
+    log_verbose "Removing an existing release of deprecated stable/fluent-bit Helm chart from from the [$LOG_NS] namespace [$(date)]"
+    helm $helmDebug delete -n "$LOG_NS" fb
 
-   if [ $(kubectl get servicemonitors -A |grep fluent-bit-v2 -c) -ge 1 ]; then
-      log_debug "Updated serviceMonitor [fluent-bit-v2] appears to be deployed."
-   elif [ $(kubectl get servicemonitors -A |grep fluent-bit -c) -ge 1 ]; then
-      log_warn "You appear to have an obsolete service monitor in place for monitoring Fluent Bit."
-      log_warn "Run monitoring/bin/deploy_monitoring_cluster.sh to deploy the current set of service monitors."
-   fi
+    if [ "$(kubectl get servicemonitors -A | grep -c fluent-bit-v2)" -ge 1 ]; then
+        log_debug "Updated serviceMonitor [fluent-bit-v2] appears to be deployed."
+    elif [ "$(kubectl get servicemonitors -A | grep -c fluent-bit)" -ge 1 ]; then
+        log_warn "You appear to have an obsolete service monitor in place for monitoring Fluent Bit."
+        log_warn "Run monitoring/bin/deploy_monitoring_cluster.sh to deploy the current set of service monitors."
+    fi
 else
-  log_debug "No existing release of the deprecated stable/fluent-bit Helm chart was found"
+    log_debug "No existing release of the deprecated stable/fluent-bit Helm chart was found"
 fi
 
 #Generate yaml file with all container-related keys
-generateImageKeysFile "$FB_FULL_IMAGE"                "logging/fb/fb_container_image.template"
+generateImageKeysFile "$FB_FULL_IMAGE" "logging/fb/fb_container_image.template"
 #Copy imageKeysFile since next call will replace existing one
+#shellcheck disable=SC2154
 cp "$imageKeysFile" "$TMP_DIR/fb_imagekeysfile.yaml"
 
-generateImageKeysFile "$FB_INITCONTAINER_FULL_IMAGE"  "logging/fb/fb_initcontainer_image.template" "" "true"
+generateImageKeysFile "$FB_INITCONTAINER_FULL_IMAGE" "logging/fb/fb_initcontainer_image.template" "" "true"
 
 # Fluent Bit user customizations
 FB_OPENSEARCH_USER_YAML="${FB_OPENSEARCH_USER_YAML:-$USER_DIR/logging/user-values-fluent-bit-opensearch.yaml}"
 if [ ! -f "$FB_OPENSEARCH_USER_YAML" ]; then
-  log_debug "[$FB_OPENSEARCH_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
-  FB_OPENSEARCH_USER_YAML=$TMP_DIR/empty.yaml
+    log_debug "[$FB_OPENSEARCH_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
+    FB_OPENSEARCH_USER_YAML=$TMP_DIR/empty.yaml
 fi
-
 
 # Point to OpenShift response file or dummy as appropriate
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
-  log_info "Deploying Fluent Bit on OpenShift cluster"
-  openshiftValuesFile="logging/openshift/values-fluent-bit.yaml"
+    log_info "Deploying Fluent Bit on OpenShift cluster"
+    openshiftValuesFile="logging/openshift/values-fluent-bit.yaml"
 else
-  log_debug "Fluent Bit is NOT being deployed on OpenShift cluster"
-  openshiftValuesFile="$TMP_DIR/empty.yaml"
+    log_debug "Fluent Bit is NOT being deployed on OpenShift cluster"
+    openshiftValuesFile="$TMP_DIR/empty.yaml"
 fi
-
 
 if [ -f "$USER_DIR/logging/fluent-bit_config.configmap_opensearch.yaml" ]; then
-   # use copy in USER_DIR
-   FB_CONFIGMAP="$USER_DIR/logging/fluent-bit_config.configmap_opensearch.yaml"
+    # use copy in USER_DIR
+    FB_CONFIGMAP="$USER_DIR/logging/fluent-bit_config.configmap_opensearch.yaml"
 else
-   # use copy in repo
-   FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_opensearch.yaml"
+    # use copy in repo
+    FB_CONFIGMAP="logging/fb/fluent-bit_config.configmap_opensearch.yaml"
 fi
-log_debug "Using FB ConfigMap:" $FB_CONFIGMAP
+log_debug "Using FB ConfigMap: $FB_CONFIGMAP"
 
 # Multiline parser setup
 LOG_MULTILINE_ENABLED=${LOG_MULTILINE_ENABLED:-true}
 if [ "$LOG_MULTILINE_ENABLED" == "true" ]; then
-  LOG_MULTILINE_PARSER="docker, cri"
+    LOG_MULTILINE_PARSER="docker, cri"
 else
-  LOG_MULTILINE_PARSER=""
+    LOG_MULTILINE_PARSER=""
 fi
 
 # Create ConfigMap containing Fluent Bit configuration
-kubectl -n "$LOG_NS" apply -f $FB_CONFIGMAP
+kubectl -n "$LOG_NS" apply -f "$FB_CONFIGMAP"
 
 # Create ConfigMap containing Viya-customized parsers (delete it first)
 kubectl -n "$LOG_NS" delete configmap fb-viya-parsers --ignore-not-found
-kubectl -n "$LOG_NS" create configmap fb-viya-parsers  --from-file=logging/fb/viya-parsers.conf
+kubectl -n "$LOG_NS" create configmap fb-viya-parsers --from-file=logging/fb/viya-parsers.conf
 
 TRACING_ENABLE="${TRACING_ENABLE:-false}"
 if [ "$TRACING_ENABLE" == "true" ]; then
-  # Create ConfigMap containing tracing config
-  kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
-  kubectl -n "$LOG_NS" create configmap fb-viya-tracing  --from-file=logging/fb/viya-tracing.conf
+    # Create ConfigMap containing tracing config
+    kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
+    kubectl -n "$LOG_NS" create configmap fb-viya-tracing --from-file=logging/fb/viya-tracing.conf
 
-  tracingValuesFile="logging/fb/fluent-bit_helm_values_tracing.yaml"
-else 
-  # Create empty ConfigMap for tracing since it is expected to exist in main config
-  kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
-  kubectl -n "$LOG_NS" create configmap fb-viya-tracing  --from-file="$TMP_DIR"/empty.yaml
+    tracingValuesFile="logging/fb/fluent-bit_helm_values_tracing.yaml"
+else
+    # Create empty ConfigMap for tracing since it is expected to exist in main config
+    kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
+    kubectl -n "$LOG_NS" create configmap fb-viya-tracing --from-file="$TMP_DIR"/empty.yaml
 
-  tracingValuesFile=$TMP_DIR/empty.yaml
+    tracingValuesFile="$TMP_DIR/empty.yaml"
 fi
 
 # Check for Kubernetes container runtime log format info
-KUBERNETES_RUNTIME_LOGFMT="${KUBERNETES_RUNTIME_LOGFMT}"
+KUBERNETES_RUNTIME_LOGFMT="${KUBERNETES_RUNTIME_LOGFMT:-}"
 if [ -z "$KUBERNETES_RUNTIME_LOGFMT" ]; then
-   somenode=$(kubectl get nodes | awk 'NR==2 { print $1 }')
-   runtime=$(kubectl get node $somenode -o jsonpath={.status.nodeInfo.containerRuntimeVersion} | awk -F: '{print $1}')
-   log_debug "Kubernetes container runtime [$runtime] found on node [$somenode]"
-   case $runtime in
+    somenode=$(kubectl get nodes | awk 'NR==2 { print $1 }')
+    runtime=$(kubectl get node "$somenode" -o "jsonpath={.status.nodeInfo.containerRuntimeVersion}" | awk -F: '{print $1}')
+    log_debug "Kubernetes container runtime [$runtime] found on node [$somenode]"
+    case $runtime in
     docker)
-      KUBERNETES_RUNTIME_LOGFMT="docker"
-      ;;
-    containerd|cri-o)
-      KUBERNETES_RUNTIME_LOGFMT="criwithlog"
-      ;;
+        KUBERNETES_RUNTIME_LOGFMT="docker"
+        ;;
+    containerd | cri-o)
+        KUBERNETES_RUNTIME_LOGFMT="criwithlog"
+        ;;
     *)
-      log_warn "Unrecognized Kubernetes container runtime [$runtime]; using default parser"
-      KUBERNETES_RUNTIME_LOGFMT="docker"
-      ;;
-   esac
+        log_warn "Unrecognized Kubernetes container runtime [$runtime]; using default parser"
+        KUBERNETES_RUNTIME_LOGFMT="docker"
+        ;;
+    esac
 fi
 
 MON_NS="${MON_NS:-monitoring}"
@@ -156,50 +159,52 @@ MON_NS="${MON_NS:-monitoring}"
 # Create ConfigMap containing Kubernetes container runtime log format
 kubectl -n "$LOG_NS" delete configmap fb-env-vars --ignore-not-found
 kubectl -n "$LOG_NS" create configmap fb-env-vars \
-                   --from-literal=KUBERNETES_RUNTIME_LOGFMT="$KUBERNETES_RUNTIME_LOGFMT" \
-                   --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}"         \
-                   --from-literal=SEARCH_SERVICENAME="${ES_SERVICENAME}"                 \
-                   --from-literal=MON_NS="${MON_NS}"
+    --from-literal=KUBERNETES_RUNTIME_LOGFMT="$KUBERNETES_RUNTIME_LOGFMT" \
+    --from-literal=LOG_MULTILINE_PARSER="${LOG_MULTILINE_PARSER}" \
+    --from-literal=SEARCH_SERVICENAME="${ES_SERVICENAME}" \
+    --from-literal=MON_NS="${MON_NS}"
 
-kubectl -n "$LOG_NS" label configmap fb-env-vars   managed-by=v4m-es-script
+kubectl -n "$LOG_NS" label configmap fb-env-vars managed-by=v4m-es-script
 
 # Check to see if we are upgrading from earlier version requiring root access
-if [ "$( kubectl -n $LOG_NS get configmap fb-dbmigrate-script -o name --ignore-not-found)" != "configmap/fb-dbmigrate-script" ]; then
-   log_debug "Removing FB pods (if they exist) to allow migration."
-   kubectl -n "$LOG_NS" delete daemonset v4m-fb --ignore-not-found
+if [ "$(kubectl -n "$LOG_NS" get configmap fb-dbmigrate-script -o name --ignore-not-found)" != "configmap/fb-dbmigrate-script" ]; then
+    log_debug "Removing FB pods (if they exist) to allow migration."
+    kubectl -n "$LOG_NS" delete daemonset v4m-fb --ignore-not-found
 fi
 
 # Create ConfigMap containing Fluent Bit database migration script
 kubectl -n "$LOG_NS" delete configmap fb-dbmigrate-script --ignore-not-found
-kubectl -n "$LOG_NS" create configmap fb-dbmigrate-script --from-file logging/fb/migrate_fbstate_db.sh
-kubectl -n "$LOG_NS" label  configmap fb-dbmigrate-script managed-by=v4m-es-script
+kubectl -n "$LOG_NS" create configmap fb-dbmigrate-script --from-file=logging/fb/migrate_fbstate_db.sh
+kubectl -n "$LOG_NS" label configmap fb-dbmigrate-script managed-by=v4m-es-script
 
 ## Get Helm Chart Name
 log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"
-chart2install="$(get_helmchart_reference $FLUENTBIT_HELM_CHART_REPO $FLUENTBIT_HELM_CHART_NAME $FLUENTBIT_HELM_CHART_VERSION)"
-versionstring="$(get_helm_versionstring  $FLUENTBIT_HELM_CHART_VERSION)"
+chart2install="$(get_helmchart_reference "$FLUENTBIT_HELM_CHART_REPO" "$FLUENTBIT_HELM_CHART_NAME" "$FLUENTBIT_HELM_CHART_VERSION")"
+versionstring="$(get_helm_versionstring "$FLUENTBIT_HELM_CHART_VERSION")"
+
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Deploy Fluent Bit via Helm chart
-helm $helmDebug upgrade --install --namespace $LOG_NS v4m-fb  \
+# shellcheck disable=SC2086
+helm $helmDebug upgrade --install --namespace "$LOG_NS" v4m-fb \
     $versionstring \
-  --values $TMP_DIR/fb_imagekeysfile.yaml \
-  --values $imageKeysFile \
-  --values logging/fb/fluent-bit_helm_values_opensearch.yaml  \
-  --values $openshiftValuesFile \
-  --values $tracingValuesFile \
-  --values $FB_OPENSEARCH_USER_YAML   \
-  --set fullnameOverride=v4m-fb \
-  $chart2install
+    --values "$TMP_DIR/fb_imagekeysfile.yaml" \
+    --values "$imageKeysFile" \
+    --values logging/fb/fluent-bit_helm_values_opensearch.yaml \
+    --values "$openshiftValuesFile" \
+    --values "$tracingValuesFile" \
+    --values "$FB_OPENSEARCH_USER_YAML" \
+    --set fullnameOverride=v4m-fb \
+    "$chart2install"
 
 #pause to allow migration script to complete (if necessary)
 log_debug "Pausing to allow migration script to complete"
 sleep 20
 
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
-disable_sa_token_automount $LOG_NS v4m-fb
+disable_sa_token_automount "$LOG_NS" v4m-fb
 # FB pods will restart after following call if automount is not already enabled
-enable_pod_token_automount $LOG_NS daemonset v4m-fb
+enable_pod_token_automount "$LOG_NS" daemonset v4m-fb
 
 # Force restart of daemonset to ensure we pick up latest config changes
 # since Helm won't notice if the only changes are in the configMap
@@ -207,7 +212,5 @@ kubectl -n "$LOG_NS" rollout restart daemonset v4m-fb
 
 log_info "Fluent Bit deployment completed"
 
-
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""
-
