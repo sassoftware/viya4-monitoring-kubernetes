@@ -244,6 +244,8 @@ grafana:
         format: json
     dashboards:
       default_home_dashboard_path: /tmp/dashboards/viya-welcome-dashboard.json
+    feature_toggles:
+      prometheusSpecialCharsInLabelValues: true
 
   service:
     type: NodePort
