@@ -20,7 +20,7 @@ if [[ "$KUBE_CLIENT_VER" =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
     KUBE_CLIENT_PATCH=${BASH_REMATCH[3]}
     log_debug "Kubernetes CLIENT - Major: [$KUBE_CLIENT_MAJOR] Minor: [$KUBE_CLIENT_MINOR] Patch: [$KUBE_CLIENT_PATCH]"
 else
-   log_error "Kubernetes Client Version does not match expected pattern.";
+    log_error "Kubernetes Client Version does not match expected pattern.";
 fi;
 
 if [[ "$KUBE_SERVER_VER" =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
@@ -44,7 +44,6 @@ fi;
 # 2025.03     1.29 1.31
 # 2025.04     1.29 1.31
 
-
 # Client version allowed to be one minor version earlier than minimum server version
 if [ "$KUBE_CLIENT_MAJOR" -eq "1" ] && [ "$KUBE_CLIENT_MINOR" -gt "22" ]; then
     :
@@ -53,7 +52,7 @@ else
     log_warn "This script might not work as expected. Support might not be available until kubectl is upgraded to a supported version."
 fi
 
-if [ "$KUBE_SERVER_MAJOR" -eq "1" ] && [ "$KUBE_SERVER_MINOR" -gt "23"  ]; then
+if [ "$KUBE_SERVER_MAJOR" -eq "1" ] && [ "$KUBE_SERVER_MINOR" -gt "23" ]; then
     :
 else
     log_warn "The detected version of Kubernetes [$KUBE_SERVER_VER] is not supported by any of the currently supported releases of SAS Viya."
