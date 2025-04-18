@@ -1,4 +1,21 @@
 # SAS Viya Monitoring for Kubernetes
+## unreleased ##
+* **Metrics**
+  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 68.3.0 to 70.5.0.
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded from 8.8.4 to 8.12.0.
+  * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 2.17.0 to 3.1.0.
+  * [UPGRADE] The config-reloader has been upgraded from 0.79.2 to 0.81.0.
+  * [UPGRADE] Grafana has been upgraded from 11.4.0 to 11.6.0.
+  * [UPGRADE] The k8s-sidecar has been upgraded from 1.28.0 to 1.30.04.
+  * [UPGRADE] Kube-State-Metrics has been upgraded from 2.14.0 to 2.15.0.
+  * [UPGRADE] Node-Exporter has been upgraded from 1.8.2 to 1.9.1.
+  * [UPGRADE] Prometheus has been upgraded from 3.1.0 to 3.2.1.
+  * [UPGRADE] Prometheus Operator has been upgraded from 0.79.2 to 0.81.0.
+  * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.11.0 to 1.11.1.
+  * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.23.1 to 2.24.0
+  * [UPGRADE] Admission Webhook upgraded from v1.5.1 to v1.5.2
+
+
 ## Version 1.2.36 (15APR2025)
 * **Overall**
   * [ANNOUNCEMENT] As announced previously, this project now *requires*  the `yq` command-line processor for YAML.  Specifically, a recent version (4.32+) of the [Golang-based (Mike Farah) version of `yq`](https://github.com/mikefarah/yq)
