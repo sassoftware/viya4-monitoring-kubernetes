@@ -6,7 +6,7 @@
   * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 2.17.0 to 3.1.0.
   * [UPGRADE] The config-reloader has been upgraded from 0.79.2 to 0.81.0.
   * [UPGRADE] Grafana has been upgraded from 11.4.0 to 11.6.0.
-  * [UPGRADE] The k8s-sidecar has been upgraded from 1.28.0 to 1.30.04.
+  * [UPGRADE] The k8s-sidecar has been upgraded from 1.28.0 to 1.30.0.
   * [UPGRADE] Kube-State-Metrics has been upgraded from 2.14.0 to 2.15.0.
   * [UPGRADE] Node-Exporter has been upgraded from 1.8.2 to 1.9.1.
   * [UPGRADE] Prometheus has been upgraded from 3.1.0 to 3.2.1.
