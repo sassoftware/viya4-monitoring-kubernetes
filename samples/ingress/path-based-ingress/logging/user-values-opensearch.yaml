@@ -1,4 +1,4 @@
-## Sample: ingress/path-based-ingress Version: 0.2.1
+## Sample: ingress/path-based-ingress Version: 0.3.1
 
 
 # OpenSearch ingress is optional
@@ -13,12 +13,9 @@ ingress:
   enabled: false
   ingressClassName: nginx
   annotations:
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      rewrite (?i)/opensearch/(.*) /$1 break;
-      rewrite (?i)/opensearch$ / break;
-    nginx.ingress.kubernetes.io/rewrite-target: /opensearch
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-  path: /opensearch
+  path: /opensearch(/|$)(.*)
   pathType: Prefix
   hosts:
     - host.cluster.example.com

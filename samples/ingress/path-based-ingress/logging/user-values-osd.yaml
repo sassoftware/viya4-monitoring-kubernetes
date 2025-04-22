@@ -1,5 +1,4 @@
-## Sample: ingress/path-based-ingress Version: 0.2.1
-
+## Sample: ingress/path-based-ingress Version: 0.3.1
 
 extraEnvs:
 # SERVER_BASEPATH needed for path-based ingress
@@ -29,20 +28,16 @@ ingress:
   ingressClassName: nginx
   annotations:
     nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      rewrite (?i)/dashboards/(.*) /$1 break;
-      rewrite (?i)/dashboards$ / break;
-    nginx.ingress.kubernetes.io/rewrite-target: /dashboards
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
   enabled: true
   hosts:
     - host: host.cluster.example.com
       paths:
-        - path: /dashboards
+        - path: /dashboards(/|$)(.*)
           backend:
             serviceName: v4m-osd
             servicePort: 5601
-
   tls:
     - secretName: kibana-ingress-tls-secret
       hosts:
