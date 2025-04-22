@@ -12,21 +12,21 @@ source logging/bin/secrets-include.sh
 source logging/bin/rbac-include.sh
 
 # Check to see if monitoring/Viya namespace provided exists and components have already been deployed
-if kubectl -n "$MON_NS" get deployment v4m-grafana &>/dev/null; then
-   log_debug "Grafana deployment found in [$MON_NS] namespace.  Continuing."
+if kubectl -n "$MON_NS" get deployment v4m-grafana &> /dev/null; then
+    log_debug "Grafana deployment found in [$MON_NS] namespace.  Continuing."
 else
-   log_error "No monitoring components found in the [$MON_NS] namespace."
-   log_error "Monitoring needs to be deployed in this namespace in order to configure the logging data source in Grafana."
-   exit 1
+    log_error "No monitoring components found in the [$MON_NS] namespace."
+    log_error "Monitoring needs to be deployed in this namespace in order to configure the logging data source in Grafana."
+    exit 1
 fi
 
 # Check to see if logging namespace provided exists and components have already been deployed
-if kubectl -n "$LOG_NS" get statefulSet v4m-search &>/dev/null; then
-  log_debug "Logging deployment found in [$LOG_NS] namespace.  Continuing."
+if kubectl -n "$LOG_NS" get statefulSet v4m-search &> /dev/null; then
+    log_debug "Logging deployment found in [$LOG_NS] namespace.  Continuing."
 else
-  log_error "Search backend was not found in the [$LOG_NS] namespace."
-  log_error "All of the required log monitoring components need to be deployed in this namespace before this script can configure the logging data source."
-  exit 1
+    log_error "Search backend was not found in the [$LOG_NS] namespace."
+    log_error "All of the required log monitoring components need to be deployed in this namespace before this script can configure the logging data source."
+    exit 1
 fi
 
 # get admin credentials
@@ -38,13 +38,12 @@ export ES_ADMIN_PASSWD=$(kubectl -n "$LOG_NS" get secret internal-user-admin -o=
 get_sec_api_url
 get_credentials_from_secret admin
 
-
 # Set user ID and password
 grfds_user="V4M_ALL_grafana_ds"
 
 if user_exists "$grfds_user"; then
-   log_verbose "Removing the existing [$grfds_user] utility account."
-   delete_user "$grfds_user"
+    log_verbose "Removing the existing [$grfds_user] utility account."
+    delete_user "$grfds_user"
 fi
 
 grfds_passwd="$(randomPassword)"
@@ -63,12 +62,11 @@ log_debug "OpenSearch version [$opensearch_version] will be specified in datasou
 
 # Replace placeholders
 log_debug "Replacing variables in $monDir/grafana-datasource-opensearch.yaml file"
-v4m_replace "__namespace__"          "$LOG_NS"               "$monDir/grafana-datasource-opensearch.yaml"
-v4m_replace "__ES_SERVICENAME__"     "$ES_SERVICENAME"       "$monDir/grafana-datasource-opensearch.yaml"
-v4m_replace "__userID__"             "$grfds_user"           "$monDir/grafana-datasource-opensearch.yaml"
-v4m_replace "__passwd__"             "$grfds_passwd"         "$monDir/grafana-datasource-opensearch.yaml"
-v4m_replace "__opensearch_version__" "$opensearch_version"   "$monDir/grafana-datasource-opensearch.yaml"
-
+v4m_replace "__namespace__" "$LOG_NS" "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__ES_SERVICENAME__" "$ES_SERVICENAME" "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__userID__" "$grfds_user" "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__passwd__" "$grfds_passwd" "$monDir/grafana-datasource-opensearch.yaml"
+v4m_replace "__opensearch_version__" "$opensearch_version" "$monDir/grafana-datasource-opensearch.yaml"
 
 # Removes old OpenSearch data source if one exists
 log_info "Removing any existing logging data source secret ..."
@@ -83,28 +81,28 @@ log_debug "Grafana OpenSearch Datasource Plugin installed? [$pluginInstalled]"
 
 if [ "$pluginInstalled" = "0" ]; then
 
-   log_info "Installing OpenSearch Datasource plugin"
-   pluginVersion="${GRAFANA_DATASOURCE_PLUGIN_VERSION:-2.17.4}"
-   pluginFile="grafana-opensearch-datasource-$pluginVersion.linux_amd64.zip"
+    log_info "Installing OpenSearch Datasource plugin"
+    pluginVersion="${GRAFANA_DATASOURCE_PLUGIN_VERSION:-2.17.4}"
+    pluginFile="grafana-opensearch-datasource-$pluginVersion.linux_amd64.zip"
 
-   if [ -n "$AIRGAP_HELM_REPO" ]; then
-      log_debug "Air-gapped deployment detected; loading OpenSearch Datasource plugin from USER_DIR/monitoring directory"
+    if [ -n "$AIRGAP_HELM_REPO" ]; then
+        log_debug "Air-gapped deployment detected; loading OpenSearch Datasource plugin from USER_DIR/monitoring directory"
 
-      userPluginFile="$USER_DIR/monitoring/$pluginFile"
-      if [ -f "$userPluginFile" ]; then
-         kubectl cp "$userPluginFile" "$MON_NS/$grafanaPod:/var/lib/grafana/plugins"
-         kubectl exec -n "$MON_NS" "$grafanaPod" -- unzip -o /var/lib/grafana/plugins/"$pluginFile" -d /var/lib/grafana/plugins/
-      else
-         log_error "The OpenSearch datasource plugin to Grafana zip file was NOT found in the expected location [$userPluginFile]"
-         exit 1
-      fi
-   else
-      log_debug "Using Grafana CLI to install plugin (version [$pluginVersion])"
-      kubectl exec -n "$MON_NS" "$grafanaPod" -- grafana cli plugins install grafana-opensearch-datasource "$pluginVersion"
-      log_info "You may ignore any previous messages regarding restarting the Grafana pod; it will be restarted automatically."
-   fi
+        userPluginFile="$USER_DIR/monitoring/$pluginFile"
+        if [ -f "$userPluginFile" ]; then
+            kubectl cp "$userPluginFile" "$MON_NS/$grafanaPod:/var/lib/grafana/plugins"
+            kubectl exec -n "$MON_NS" "$grafanaPod" -- unzip -o /var/lib/grafana/plugins/"$pluginFile" -d /var/lib/grafana/plugins/
+        else
+            log_error "The OpenSearch datasource plugin to Grafana zip file was NOT found in the expected location [$userPluginFile]"
+            exit 1
+        fi
+    else
+        log_debug "Using Grafana CLI to install plugin (version [$pluginVersion])"
+        kubectl exec -n "$MON_NS" "$grafanaPod" -- grafana cli plugins install grafana-opensearch-datasource "$pluginVersion"
+        log_info "You may ignore any previous messages regarding restarting the Grafana pod; it will be restarted automatically."
+    fi
 else
-   log_debug "The OpenSearch datasource plugin is already installed; skipping installation."
+    log_debug "The OpenSearch datasource plugin is already installed; skipping installation."
 fi
 
 # Adds the logging data source to Grafana
