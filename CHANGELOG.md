@@ -1,4 +1,13 @@
 # SAS Viya Monitoring for Kubernetes
+## unreleased
+* **Logging**
+  * [CHANGE] Removed use of `nginx.ingress.kubernetes.io/configuration-snippet` 
+  annotation in auto-generated ingress resource definitions for OpenSearch and OpenSearch Dashboards.
+  * [CHANGE] Updated [path-based ingress samples](samples/ingress/README.md) to
+  remove use of `nginx.ingress.kubernetes.io/configuration-snippet` annotation 
+  in ingress definitions for OpenSearch and OpenSearch Dashboards.
+
+
 ## Version 1.2.36 (15APR2025)
 * **Overall**
   * [ANNOUNCEMENT] As announced previously, this project now *requires*  the `yq` command-line processor for YAML.  Specifically, a recent version (4.32+) of the [Golang-based (Mike Farah) version of `yq`](https://github.com/mikefarah/yq)
