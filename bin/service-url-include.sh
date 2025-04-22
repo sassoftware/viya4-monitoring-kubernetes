@@ -83,6 +83,8 @@ function get_ingress_url {
      v4m_rc=1
      echo ""
      return
+  else
+     path="${path%(/|$)(.*)}"   #strip '(/|$)(.*)' from path
   fi
 
   tls_info=$(get_k8s_info "$namespace" "ingress/$name" "$json_ingress_tls")
