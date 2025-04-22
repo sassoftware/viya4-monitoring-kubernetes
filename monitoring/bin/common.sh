@@ -1,3 +1,5 @@
+#! /bin/bash
+
 # Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -8,9 +10,10 @@ if [ "$SAS_MONITORING_COMMON_SOURCED" = "" ]; then
   source bin/common.sh
 
   if [ -f "$USER_DIR/monitoring/user.env" ]; then
-      userEnv=$(grep -v '^[[:blank:]]*$' $USER_DIR/monitoring/user.env | grep -v '^#' | xargs)
+      userEnv=$(grep -v '^[[:blank:]]*$' "$USER_DIR/monitoring/user.env" | grep -v '^#' | xargs)
       log_verbose "Loading user environment file: $USER_DIR/monitoring/user.env"
-      if [ "$userEnv" ]; then
+      if [ -n "$userEnv" ]; then
+        # shellcheck disable=SC2086,SC2163
         export $userEnv
       fi
   fi
@@ -18,10 +21,10 @@ if [ "$SAS_MONITORING_COMMON_SOURCED" = "" ]; then
   export MON_NS="${MON_NS:-monitoring}"
   export TLS_ENABLE="${MON_TLS_ENABLE:-${TLS_ENABLE:-true}}"
 
-  if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
+  if [ "$AIRGAP_DEPLOYMENT" = "true" ]; then
 
      #Special processing to handle Viya-level deployment script
-     if [ `basename "$0"` == "deploy_monitoring_viya.sh" ]; then
+     if [ "$(basename "$0")" = "deploy_monitoring_viya.sh" ]; then
         V4M_NS="$VIYA_NS"
      else
         export V4M_NS=$MON_NS
@@ -36,7 +39,6 @@ if [ "$SAS_MONITORING_COMMON_SOURCED" = "" ]; then
 
   source bin/version-include.sh
   export SAS_MONITORING_COMMON_SOURCED=true
-
 
 fi
 echo ""

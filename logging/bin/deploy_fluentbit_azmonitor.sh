@@ -41,7 +41,6 @@ log_info "Deploying Fluent Bit (Azure Monitor)"
 # Generate yaml file with all container-related keys
 generateImageKeysFile "$FB_FULL_IMAGE" "logging/fb/fb_container_image.template"
 # Copy imageKeysFile since next call will replace existing one
-#shellcheck disable=SC2154
 cp "$imageKeysFile" "$TMP_DIR/fb_imagekeysfile.yaml"
 
 generateImageKeysFile "$FB_INITCONTAINER_FULL_IMAGE" "logging/fb/fb_initcontainer_image.template" "" "true"
