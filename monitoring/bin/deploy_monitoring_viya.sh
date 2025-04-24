@@ -101,9 +101,9 @@ if [ "$PUSHGATEWAY_ENABLED" = "true" ]; then
     versionstring="$(get_helm_versionstring "$PUSHGATEWAY_CHART_VERSION")"
     log_debug "Installing Helm chart from artifact [$chart2install]"
 
-    helm "${helmDebug:-}" upgrade --install prometheus-pushgateway \
+    helm $helmDebug upgrade --install prometheus-pushgateway \
         --namespace "$VIYA_NS" \
-        "$versionstring" \
+        $versionstring \
         --set service.clusterIP="$svcClusterIP" \
         -f "$imageKeysFile" \
         -f monitoring/values-pushgateway.yaml \

@@ -199,7 +199,8 @@ chart2install="$(get_helmchart_reference "$OPENSHIFT_GRAFANA_CHART_REPO" "$OPENS
 versionstring="$(get_helm_versionstring "$OPENSHIFT_GRAFANA_CHART_VERSION")"
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
-helm upgrade --install "${helmDebug:-}" \
+# shellcheck disable=SC2086
+helm upgrade --install $helmDebug \
     -n "$MON_NS" \
     -f "$imageKeysFile" \
     -f "$wnpValuesFile" \
@@ -211,7 +212,7 @@ helm upgrade --install "${helmDebug:-}" \
     --set 'grafana\.ini'.server.domain="$OPENSHIFT_ROUTE_DOMAIN" \
     --set 'grafana\.ini'.server.root_url="https://v4m-grafana-$MON_NS.$OPENSHIFT_ROUTE_DOMAIN$OPENSHIFT_ROUTE_PATH_GRAFANA" \
     --set 'grafana\.ini'.server.serve_from_sub_path="$grafanaSubPath" \
-    "$versionstring" \
+    $versionstring \
     --atomic \
     "${grafanaPwd:-}" \
     "${extraArgs:-}" \
@@ -309,12 +310,13 @@ if [ "$TRACING_ENABLE" = "true" ]; then
     log_debug "Installing Helm chart from artifact [$chart2install]"
 
     log_info "Installing tempo"
+    # shellcheck disable=SC2086
     helm upgrade --install v4m-tempo \
         -n "$MON_NS" \
         -f "$imageKeysFile" \
         -f monitoring/openshift/tempo-values.yaml \
         -f "$TEMPO_USER_YAML" \
-        "$versionstring" \
+        $versionstring \
         "$chart2install"
 fi
 
