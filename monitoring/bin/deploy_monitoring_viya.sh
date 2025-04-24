@@ -101,6 +101,7 @@ if [ "$PUSHGATEWAY_ENABLED" = "true" ]; then
     versionstring="$(get_helm_versionstring "$PUSHGATEWAY_CHART_VERSION")"
     log_debug "Installing Helm chart from artifact [$chart2install]"
 
+    # shellcheck disable=SC2086
     helm $helmDebug upgrade --install prometheus-pushgateway \
         --namespace "$VIYA_NS" \
         $versionstring \
