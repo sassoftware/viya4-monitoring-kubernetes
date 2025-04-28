@@ -47,12 +47,19 @@ if helm3ReleaseExists es-exporter $LOG_NS; then
       helm -n $LOG_NS delete es-exporter
    fi
 
-   monNamespace=$(kubectl get servicemonitor -A --field-selector=metadata.name=elasticsearch -l sas.com/monitoring-base=kube-viya-monitoring -o=custom-columns=NAMESPACE:.metadata.namespace --no-headers)
-   if [ -n "$monNamespace" ]; then
-      log_debug "Removing obsolete serviceMonitor [$monNamespace/elasticsearch]"
-      kubectl delete -n $monNamespace servicemonitor elasticsearch
-      log_debug "Deploying an updated serviceMonitor for Elasticsearch  [$monNamespace/elasticsearch-v2]"
-      kubectl apply  -n $monNamespace -f monitoring/monitors/logging/serviceMonitor-elasticsearch-v2.yaml
+   if kubectl get crd servicemonitors.monitoring.coreos.com 2>1 1>/dev/null; then
+      #serviceMonitor CRD may not be present if metric monitoring stack is not deployed
+      monNamespace=$(kubectl get servicemonitor -A --field-selector=metadata.name=elasticsearch -l sas.com/monitoring-base=kube-viya-monitoring -o=custom-columns=NAMESPACE:.metadata.namespace --no-headers)
+      if [ -n "$monNamespace" ]; then
+         log_debug "Removing obsolete serviceMonitor [$monNamespace/elasticsearch]"
+         kubectl delete -n $monNamespace servicemonitor elasticsearch
+         log_debug "Deploying an updated serviceMonitor for Elasticsearch  [$monNamespace/elasticsearch-v2]"
+         kubectl apply  -n $monNamespace -f monitoring/monitors/logging/serviceMonitor-elasticsearch-v2.yaml
+      else
+         log_debug "No instance of the obsolete elasticsearch serviceMonitor found."
+      fi
+   else
+      log_debug "No serviceMonitor CRD detected; skipping check for obsolete elasticseach serviceMonitor instance."
    fi
 else
    log_debug "No existing Helm release [es-exporter] found."
