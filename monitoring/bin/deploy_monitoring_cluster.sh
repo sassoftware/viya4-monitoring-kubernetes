@@ -206,7 +206,6 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
     amIngressKey="${ALERTMANAGER_INGRESS_KEY}"
     create_ingress_certs "$MON_NS" "alertmanager-ingress-tls-secret" "$amIngressCert" "$amIngressKey"
 
-    # Don't assign the variable to itself
     ALERTMANAGER_PATH="${ALERTMANAGER_PATH:-alertmanager}"
     if [ -z "$ALERTMANAGER_FQDN" ]; then
         if [ "$ROUTING" == "host" ]; then
@@ -222,7 +221,6 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
     grIngressKey="${GRAFANA_INGRESS_KEY}"
     create_ingress_certs "$MON_NS" "grafana-ingress-tls-secret" "$grIngressCert" "$grIngressKey"
 
-    # Don't assign the variable to itself
     GRAFANA_PATH="${GRAFANA_PATH:-grafana}"
     if [ -z "$GRAFANA_FQDN" ]; then
         if [ "$ROUTING" == "host" ]; then
@@ -237,7 +235,6 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
     prIngressKey="${PROMETHEUS_INGRESS_KEY}"
     create_ingress_certs "$MON_NS" "prometheus-ingress-tls-secret" "$prIngressCert" "$prIngressKey"
 
-    # Don't assign the variable to itself
     PROMETHEUS_PATH="${PROMETHEUS_PATH:-prometheus}"
     if [ -z "$PROMETHEUS_FQDN" ]; then
         if [ "$ROUTING" == "host" ]; then
