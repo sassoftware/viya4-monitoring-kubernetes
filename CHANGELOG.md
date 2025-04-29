@@ -1,4 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
+## unreleased
+* **Logging**
+  * [FIX] Resolved issue causing deploy_esexporter.sh to fail when doing an upgrade-in-place and serviceMonitor CRD is not installed.
+
+
 ## Version 1.2.36 (15APR2025)
 * **Overall**
   * [ANNOUNCEMENT] As announced previously, this project now *requires*  the `yq` command-line processor for YAML.  Specifically, a recent version (4.32+) of the [Golang-based (Mike Farah) version of `yq`](https://github.com/mikefarah/yq)
