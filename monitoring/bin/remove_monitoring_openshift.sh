@@ -7,7 +7,7 @@ cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
 source monitoring/bin/common.sh
 
 if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
-    if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" = "true" ]; then
+    if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
         log_error "This script should only be run on OpenShift clusters"
         log_error "Run monitoring/bin/remove_monitoring_cluster.sh instead"
         exit 1
@@ -43,7 +43,7 @@ removeV4MInfo "$MON_NS" "v4m"
 
 removeV4MInfo "$MON_NS" "v4m-metrics"
 
-if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" = "true" ]; then
+if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
     log_info "Deleting the [$MON_NS] namespace..."
     if kubectl delete namespace "$MON_NS" --timeout "$KUBE_NAMESPACE_DELETE_TIMEOUT"; then
         log_info "[$MON_NS] namespace and monitoring components successfully removed"
@@ -96,7 +96,7 @@ for crd in "${crds[@]}"; do
         echo "$out"
     fi
 done
-if [ "$empty" = "true" ]; then
+if [ "$empty" == "true" ]; then
     log_info "  The [$MON_NS] namespace is empty and should be safe to delete."
 else
     log_warn "  The [$MON_NS] namespace is not empty."

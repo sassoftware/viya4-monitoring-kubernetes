@@ -46,7 +46,7 @@ if helm3ReleaseExists v4m-tempo "$MON_NS"; then
     helm uninstall --namespace "$MON_NS" v4m-tempo
 fi
 
-if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" = "true" ]; then
+if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
     log_info "Deleting the [$MON_NS] namespace..."
     if kubectl delete namespace "$MON_NS" --timeout "$KUBE_NAMESPACE_DELETE_TIMEOUT"; then
         log_info "[$MON_NS] namespace and monitoring components successfully removed"
@@ -69,7 +69,7 @@ log_verbose "Removing configmaps and secrets"
 kubectl delete cm --ignore-not-found -n "$MON_NS" -l sas.com/monitoring-base=kube-viya-monitoring
 kubectl delete secret --ignore-not-found -n "$MON_NS" -l sas.com/monitoring-base=kube-viya-monitoring
 
-if [ "$MON_DELETE_PVCS_ON_REMOVE" = "true" ]; then
+if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
     log_verbose "Removing known monitoring PVCs"
     kubectl delete pvc --ignore-not-found -n "$MON_NS" -l app=alertmanager
     kubectl delete pvc --ignore-not-found -n "$MON_NS" -l app.kubernetes.io/name=grafana

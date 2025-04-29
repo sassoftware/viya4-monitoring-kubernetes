@@ -21,10 +21,10 @@ if [ "$SAS_MONITORING_COMMON_SOURCED" = "" ]; then
     export MON_NS="${MON_NS:-monitoring}"
     export TLS_ENABLE="${MON_TLS_ENABLE:-${TLS_ENABLE:-true}}"
 
-    if [ "$AIRGAP_DEPLOYMENT" = "true" ]; then
+    if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
         #Special processing to handle Viya-level deployment script
-        if [ "$(basename "$0")" = "deploy_monitoring_viya.sh" ]; then
+        if [ "$(basename "$0")" == "deploy_monitoring_viya.sh" ]; then
             V4M_NS="$VIYA_NS"
         else
             export V4M_NS=$MON_NS

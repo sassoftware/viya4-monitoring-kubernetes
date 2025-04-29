@@ -76,52 +76,52 @@ if [ "$1" != "" ]; then
 fi
 
 log_info "Deploying dashboards to the [$DASH_NS] namespace ..."
-if [ "$WELCOME_DASH" = "true" ]; then
+if [ "$WELCOME_DASH" == "true" ]; then
     log_verbose "Deploying welcome dashboards"
     deploy_dashboards "welcome"
 fi
 
-if [ "$KUBE_DASH" = "true" ]; then
+if [ "$KUBE_DASH" == "true" ]; then
     log_verbose "Deploying Kubernetes cluster dashboards"
     deploy_dashboards "kube"
 fi
 
-if [ "$ISTIO_DASH" = "true" ]; then
+if [ "$ISTIO_DASH" == "true" ]; then
     log_verbose "Deploying Istio dashboards"
     deploy_dashboards "istio"
 fi
 
-if [ "$LOGGING_DASH" = "true" ]; then
+if [ "$LOGGING_DASH" == "true" ]; then
     log_verbose "Deploying Logging dashboards"
     deploy_dashboards "logging"
 fi
 
-if [ "$VIYA_DASH" = "true" ]; then
+if [ "$VIYA_DASH" == "true" ]; then
     log_verbose "Deploying SAS Viya dashboards"
     deploy_dashboards "viya"
 fi
 
-if [ "$VIYA_LOGS_DASH" = "true" ]; then
+if [ "$VIYA_LOGS_DASH" == "true" ]; then
     log_verbose "Deploying SAS Viya dashboards with log support"
     deploy_dashboards "viya-logs"
 fi
 
-if [ "$PGMONITOR_DASH" = "true" ]; then
+if [ "$PGMONITOR_DASH" == "true" ]; then
     log_verbose "Deploying Postgres dashboards"
     deploy_dashboards "pgmonitor"
 fi
 
-if [ "$RABBITMQ_DASH" = "true" ]; then
+if [ "$RABBITMQ_DASH" == "true" ]; then
     log_verbose "Deploying RabbitMQ dashboards"
     deploy_dashboards "rabbitmq"
 fi
 
-if [ "$NGINX_DASH" = "true" ]; then
+if [ "$NGINX_DASH" == "true" ]; then
     log_verbose "Deploying NGINX dashboards"
     deploy_dashboards "nginx"
 fi
 
-if [ "$USER_DASH" = "true" ]; then
+if [ "$USER_DASH" == "true" ]; then
     userDashDir="$USER_DIR/monitoring/dashboards"
     if [ -d "$userDashDir" ]; then
         log_verbose "Deploying user dashboards from [$userDashDir]"
