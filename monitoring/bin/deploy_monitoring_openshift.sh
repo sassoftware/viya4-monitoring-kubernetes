@@ -227,11 +227,7 @@ if [ "$OPENSHIFT_AUTH_ENABLE" == "true" ]; then
     log_debug "Adding ClusterRoleBinding for grafana-serviceaccount..."
     crbYAML=$TMP_DIR/grafana-serviceaccount-binding.yaml
     cp monitoring/openshift/grafana-serviceaccount-binding.yaml "$crbYAML"
-    if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-        sed -i '' "s/__MON_NS__/$MON_NS/g" "$crbYAML"
-    else
-        sed -i "s/__MON_NS__/$MON_NS/g" "$crbYAML"
-    fi
+    v4m_replace "__MON_NS__" "$MON_NS" "$crbYAML"
 
     kubectl apply -f "$crbYAML"
 
