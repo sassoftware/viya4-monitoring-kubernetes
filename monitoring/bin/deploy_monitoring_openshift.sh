@@ -214,8 +214,8 @@ helm upgrade --install $helmDebug \
     --set 'grafana\.ini'.server.serve_from_sub_path="$grafanaSubPath" \
     $versionstring \
     --atomic \
-    "${grafanaPwd:-}" \
-    "${extraArgs:-}" \
+    ${grafanaPwd:-} \
+    ${extraArgs:-} \
     v4m-grafana \
     "$chart2install"
 
