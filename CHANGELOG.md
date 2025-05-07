@@ -1,4 +1,5 @@
 # SAS Viya Monitoring for Kubernetes
+
 ## unreleased ##
 * **Metrics**
   * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 68.3.0 to 70.8.0.
@@ -14,6 +15,8 @@
   * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.11.0 to 1.11.1.
   * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.23.1 to 2.24.0
   * [UPGRADE] Admission Webhook upgraded from v1.5.1 to v1.5.2
+* **Logging**
+  * [FIX] Resolved issue causing deploy_esexporter.sh to fail when doing an upgrade-in-place and serviceMonitor CRD is not installed.
 
 
 ## Version 1.2.36 (15APR2025)
