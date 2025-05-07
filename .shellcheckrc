@@ -2,3 +2,5 @@
 disable=SC1091
 # Disables the check for expanding an array, as it predictably gives first element
 disable=SC2128
+# Disables check for var not set in same file
+disable=SC2154
