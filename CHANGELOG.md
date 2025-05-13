@@ -15,6 +15,8 @@
   * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.11.0 to 1.11.1.
   * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.23.1 to 2.24.0
   * [UPGRADE] Admission Webhook upgraded from v1.5.1 to v1.5.2
+  * [CHANGE] Enable Grafana feature flag: prometheusSpecialCharsInLabelValues to improve handling of special characters in metric labels (addresses #699)
+
 * **Logging**
   * [FIX] Resolved issue causing deploy_esexporter.sh to fail when doing an upgrade-in-place and serviceMonitor CRD is not installed.
 
@@ -25,17 +27,17 @@
 needs to be installed.  While this utility is *currently* only used in a few places, we expect its use to become
 much more extensive over time.
   * [FEATURE] The auto-generation of Ingress resources for the web applications has moved from *experimental*
-to *production* status.  As noted earlier, this feature requires the `yq` utility.  See the 
+to *production* status.  As noted earlier, this feature requires the `yq` utility.  See the
 [Configure Ingress Access to Web Applications](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
 topic within the Help Center documentation for further information.
   * [FEATURE] The auto-generation of storageClass references for PVC definitions has moved from *experimental*
-to *production* status.  As noted earlier, this feature requires the `yq` utility.  See the 
+to *production* status.  As noted earlier, this feature requires the `yq` utility.  See the
 [Customize StorageClass](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#p1lvxtk81r8jgun1d789fqaz3lq1)
 topic within the Help Center documentation for further information.
   * [FIX] Resolved an issue with the V4M Container which prevented the `oc` command from being installed properly.
   * [TASK] The V4M Dockerfile has been revised and simplified to speed up the build process and require less memory.
 * **Metrics**
-  * [FIX] Corrected bugs related to authentication/TLS configuration of Grafana sidecars on OpenShift which prevented auto-provisioning of 
+  * [FIX] Corrected bugs related to authentication/TLS configuration of Grafana sidecars on OpenShift which prevented auto-provisioning of
 datasources and dashboards
 * **Logging**
   * [UPGRADE] Fluent Bit upgraded from 3.2.6 to 3.2.10 (includes security fixes)
