@@ -39,9 +39,7 @@ spec:
           annotations:
             description:
               Checks for accumulation of Rabbitmq ready messages > 10,000.  It
-              could impact Model Studio pipelines.  Follow the steps in the runbook url
-              to help troubleshoot.  The runbook covers potential orphan queues and/or
-              bottlenecking of queues due to catalog service.
+              could impact Model Studio pipelines.
             summary:
               Rabbitmq ready messages > 10,000.  This means there is a large backlog
               of messages due to high activity (which can be temporary) or something has
@@ -85,11 +83,9 @@ spec:
         - alert: catalog-dbconn
           annotations:
             description:
-              "Checks the in-use catalog database connections > 21.  The default
+              Checks the in-use catalog database connections > 21.  The default
               db connection pool is 22.   If it reaches the limit, the rabbitmq queues
               starts to fill up with ready messages causing issues with Model Studio pipelines.
-
-              Click on the runbook URL on how to remediate the issue."
             summary:
               The active catalog database connections > 21.  If it reaches the
               max. db connections, it will impact the rabbitmq queues.
@@ -100,24 +96,16 @@ spec:
         - alert: compute-age
           annotations:
             description:
-              "It looks for compute pods > 1 day.  Most likely, it is orphaned
+              It looks for compute pods > 1 day.  Most likely, it is orphaned
               compute pod that is lingering.  Consider killing it.
-
-              There is an airflow job that sweeps the VFL fleet regularly to look for
-              these compute pods as well for deletion."
-            summary:
-              SAS compute-server pods > 1 day old. Compute pods in VFL do not need
-              to be running longer than 1 day since there are no long running jobs.
+            summary: SAS compute-server pods > 1 day old.
           expr: (time() - kube_pod_created{pod=~"sas-compute-server-.*"})/60/60/24
           for: 5m
           labels:
             severity: warning
         - alert: crunchy-pgdata
           annotations:
-            description:
-              "Checks to see /pgdata filesystem is more than 50% full.
-
-              Go to the Runbook URL to follow the troubleshooting steps."
+            description: "Checks to see /pgdata filesystem is more than 50% full."
             summary:
               /pgdata storage > 50% full.  This typically happens when the WAL
               logs are increasing and not being cleared.
@@ -132,10 +120,8 @@ spec:
         - alert: crunchy-backrest-repo
           annotations:
             description:
-              "Checks to see /pgbackrest/repo1 filesystem is more than 50%
+              Checks to see /pgbackrest/repo1 filesystem is more than 50%
               full.
-
-              Go to the Runbook URL to follow the troubleshooting steps."
             summary:
               /pgbackrest/repo1 storage > 50% full in the pgbackrest repo.  This
               typically happens when the archived WAL logs are increasing and not being
