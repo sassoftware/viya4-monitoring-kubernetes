@@ -21,7 +21,7 @@ if [[ $KUBE_CLIENT_VER =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
     log_debug "Kubernetes CLIENT - Major: [$KUBE_CLIENT_MAJOR] Minor: [$KUBE_CLIENT_MINOR] Patch: [$KUBE_CLIENT_PATCH]"
 else
     log_error "Kubernetes Client Version does not match expected pattern."
-fi;
+fi
 
 if [[ $KUBE_SERVER_VER =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
     KUBE_SERVER_MAJOR=${BASH_REMATCH[1]}
@@ -30,7 +30,7 @@ if [[ $KUBE_SERVER_VER =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
     log_debug "Kubernetes SERVER - Major: [$KUBE_SERVER_MAJOR] Minor: [$KUBE_SERVER_MINOR] Patch: [$KUBE_SERVER_PATCH]"
 else
     log_error "Kubernetes SERVER Version does not match expected pattern."
-fi;
+fi
 
 # SAS Viya 4 versions
 # supported by SAS Tech Support
