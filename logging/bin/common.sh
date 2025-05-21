@@ -16,7 +16,7 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     fi
 
     #Check for obsolete env var
-    if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ]; then
+    if [  -n "$LOG_SEARCH_BACKEND" ]; then
         log_error "Support for the LOG_SEARCH_BACKEND environment variable has been removed."
         log_error "This script is only appropriate for use with OpenSearch as the search back-end."
         log_error "The LOG_SEARCH_BACKEND environment variable is currently set to [$LOG_SEARCH_BACKEND]"
