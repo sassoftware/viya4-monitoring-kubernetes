@@ -14,7 +14,7 @@ fi
 KUBE_CLIENT_VER=$(kubectl version --output=json | tr -d '\n' | tr -s " " | sed -E 's/^\{.*"clientVersion": \{([^\}]+)}.*/\1\n/' | sed -E 's/.*"gitVersion": "([^\"]*)".*$/\1/')
 KUBE_SERVER_VER=$(kubectl version --output=json | tr -d '\n' | tr -s " " | sed -E 's/^\{.*"serverVersion": \{([^\}]+)}.*/\1\n/' | sed -E 's/.*"gitVersion": "([^\"]*)".*$/\1/')
 
-if [[ "$KUBE_CLIENT_VER" =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+if [[ $KUBE_CLIENT_VER =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
     KUBE_CLIENT_MAJOR=${BASH_REMATCH[1]}
     KUBE_CLIENT_MINOR=${BASH_REMATCH[2]}
     KUBE_CLIENT_PATCH=${BASH_REMATCH[3]}
@@ -23,7 +23,7 @@ else
     log_error "Kubernetes Client Version does not match expected pattern.";
 fi;
 
-if [[ "$KUBE_SERVER_VER" =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+if [[ $KUBE_SERVER_VER =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
     KUBE_SERVER_MAJOR=${BASH_REMATCH[1]}
     KUBE_SERVER_MINOR=${BASH_REMATCH[2]}
     KUBE_SERVER_PATCH=${BASH_REMATCH[3]}
