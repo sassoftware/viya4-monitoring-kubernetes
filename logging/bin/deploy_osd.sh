@@ -27,9 +27,6 @@ set -e
 # check for pre-reqs
 #
 
-#Fail if not using OpenSearch back-end
-require_opensearch
-
 #Generate yaml file with all container-related keys
 generateImageKeysFile "$OSD_FULL_IMAGE"         "logging/opensearch/osd_container_image.template"
 
