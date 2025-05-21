@@ -15,16 +15,14 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
         fi
     fi
 
-
-    function require_opensearch {
-       if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ]; then
-          log_error "This script is only appropriate for use with OpenSearch as the search back-end."
-          log_error "The LOG_SEARCH_BACKEND environment variable is currently set to [$LOG_SEARCH_BACKEND]"
-          exit 1
-       fi
-    }
-    export -f require_opensearch
-
+    #Check for obsolete env var
+    if [ "$LOG_SEARCH_BACKEND" != "OPENSEARCH" ]; then
+        log_error "Support for the LOG_SEARCH_BACKEND environment variable has been removed."
+        log_error "This script is only appropriate for use with OpenSearch as the search back-end."
+        log_error "The LOG_SEARCH_BACKEND environment variable is currently set to [$LOG_SEARCH_BACKEND]"
+        exit 1
+    fi
+    
     export LOG_NS="${LOG_NS:-logging}"
 
     #if TLS (w/in cluster; for all monitoring components) is requested, require TLS into OSD pod, too
@@ -35,33 +33,16 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     # TLS is required for logging components so hard-code to 'true'
     export TLS_ENABLE="true"
 
-    # OpenSearch or OpenDistro for Elasticsearch
-    export LOG_SEARCH_BACKEND="${LOG_SEARCH_BACKEND:-OPENSEARCH}"
-    log_debug "Search Backend set to [$LOG_SEARCH_BACKEND]"
+    # set some OpenSearch/OSD env vars
+    export ES_SERVICENAME="v4m-search"
+    export ES_INGRESSNAME="v4m-search"
 
-    if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
-       export ES_SERVICENAME="v4m-search"
-       export ES_INGRESSNAME="v4m-search"
+    export KB_SERVICENAME="v4m-osd"
+    export KB_INGRESSNAME="v4m-osd"
+    export KB_SERVICEPORT="http"
 
-       export KB_SERVICENAME="v4m-osd"
-       export KB_INGRESSNAME="v4m-osd"
-       export KB_SERVICEPORT="http"
-
-       export ES_PLUGINS_DIR="_plugins"
-       export LOG_XSRF_HEADER="osd-xsrf:true"
-    else
-       export ES_SERVICENAME="v4m-es-client-service"
-       export ES_INGRESSNAME="v4m-es-client-service"
-
-       export KB_SERVICENAME="v4m-es-kibana-svc"
-       export KB_INGRESSNAME="v4m-es-kibana-ing"
-       export KB_SERVICEPORT="kibana-svc"
-
-
-       export ES_PLUGINS_DIR="_opendistro"
-       export LOG_XSRF_HEADER="kbn-xsrf: true"
-    fi
-
+    export ES_PLUGINS_DIR="_plugins"
+    export LOG_XSRF_HEADER="osd-xsrf:true"
 
     export V4M_NS=$LOG_NS
 
@@ -73,8 +54,6 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
 
     export SAS_LOGGING_COMMON_SOURCED=true
 
-    #Environment vars related to upgrading ODFE 1.7.0 to ODFE 1.13.x
-    export KB_GLOBAL_EXPORT_FILE=${KB_GLOBAL_EXPORT_FILE:-"$TMP_DIR/kibana_global_content.ndjson"}
 fi
 echo ""
 

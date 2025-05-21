@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Copyright © 2022, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2022-2025, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname $BASH_SOURCE)/../.."
@@ -124,9 +124,9 @@ fi
 #Generate yaml files with all container-related keys
 generateImageKeysFile "$OS_FULL_IMAGE"          "logging/opensearch/os_container_image.template"
 generateImageKeysFile "$OS_SYSCTL_FULL_IMAGE"   "$imageKeysFile"  "OS_SYSCTL_"
+
 #Copy imageKeysFile since next call will replace existing one
 cp "$imageKeysFile" "$TMP_DIR/opensearch_imagekeysfile.yaml"
-
 generateImageKeysFile "$OS_FULL_IMAGE"          "logging/opensearch/os_initcontainer_image.template" "" "true"
 
 # get credentials
@@ -223,10 +223,6 @@ fi
 
 helmRepoAdd opensearch  https://opensearch-project.github.io/helm-charts
 
-## Commenting out as it might be redundant code
-# log_verbose "Updating Helm repositories"
-# helm repo update
-
 # Check for existing OpenSearch helm release
 if [ "$(helm -n $LOG_NS list --filter 'opensearch' -q)" == "opensearch" ]; then
    log_debug "The Helm release [opensearch] already exists; upgrading the release."
@@ -241,93 +237,10 @@ helm2ReleaseCheck odfe-$LOG_NS
 # Check for existing Open Distro helm release
 if [ "$(helm -n $LOG_NS list --filter 'odfe' -q)" == "odfe" ]; then
 
-   log_info "An existing ODFE-based deployment was detected; migrating to an OpenSearch-based deployment."
-   existingODFE="true"
+   log_error "An existing ODFE-based deployment was detected.  It must be removed before deploying the current version."
+   exit 1
 
-   #
-   #Migrate Kibana content if upgrading from ODFE 1.7.0
-   #
-   if [ "$(helm -n $LOG_NS list -o yaml --filter odfe |grep app_version)" == "- app_version: 1.8.0" ]; then
-
-      # Prior to our 1.1.0 release we used ODFE 1.7.0
-      log_info "Migrating content from Open Distro for Elasticsearch 1.7.0"
-
-      #export exisiting content from global tenant
-      #KB_GLOBAL_EXPORT_FILE="$TMP_DIR/kibana_global_content.ndjson"
-
-      log_debug "Exporting exisiting content from global tenant to temporary file [$KB_GLOBAL_EXPORT_FILE]."
-
-      set +e
-
-      #Need to connect to existing ODFE instance:
-      #   *unset vars returned by call to get_kb_api_url to force regeneration
-      #   *pass ODFE-specific values to get_kb_api_url
-      unset kb_api_url
-      unset kbpfpid
-      get_kb_api_url "ODFE" "v4m-es-kibana-svc"  "kibana-svc" "v4m-es-kibana-ing" "false"
-
-      #Need to confirm KB URL works...might not if TLS enabled.
-      #If that's the case, reset things and do it again with TLS=true.
-
-      response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET "${kb_api_url}/status" -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
-
-      if [[ $response != 2* ]]; then
-         log_debug "Unable to connect to Kibana using HTTP; will try using HTTPS"
-         stop_kb_portforwarding
-         unset kb_api_url
-         unset kbpfpid
-         get_kb_api_url "ODFE" "v4m-es-kibana-svc"  "kibana-svc" "v4m-es-kibana-ing" "true"
-      else
-         log_debug "Confirmed connection to Kibana"
-      fi
-
-      content2export='{"type": ["config", "url","visualization", "dashboard", "search", "index-pattern"],"excludeExportDetails": false}'
-
-      #The 'kb-xsrf' reference below is correct since we are interacting with ODFE KB
-      response=$(curl -s -o $KB_GLOBAL_EXPORT_FILE  -w  "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_export" -d "$content2export"  -H "kbn-xsrf: true" -H 'Content-Type: application/json' -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
-
-      if [[ $response != 2* ]]; then
-         log_warn "There was an issue exporting the existing content from Kibana [$response]"
-         log_debug "Failed response details: $(tail -n1 $KB_GLOBAL_EXPORT_FILE)"
-         #TODO: Exit here?  Display messages as shown?  Add BIG MESSAGE about potential loss of content?
-      else
-         log_info "Content from existing Kibana instance cached for migration. [$response]"
-         log_debug "Export details: $(tail -n1 $KB_GLOBAL_EXPORT_FILE)"
-      fi
-
-      #Remove traces of ODFE interaction
-      stop_kb_portforwarding
-      unset kb_api_url
-      unset kbpfpid
-   fi
-
-   #
-   # Upgrade from ODFE to OpenSearch
-   #
-
-   # Remove Fluent Bit Helm release to
-   # avoid losing log messages during transition
-   if helm3ReleaseExists v4m-fb $LOG_NS; then
-      log_debug "Removing the Fluent Bit Helm release"
-      helm -n $LOG_NS delete v4m-fb
-   fi
-
-   # Remove the existing ODFE Helm release
-   log_debug "Removing an existing ODFE Helm release"
-   helm -n $LOG_NS delete odfe
-   sleep 20
-
-   #bypass security setup since 
-   #it was already configured
-   existingSearch=true
-
-   #Migrate PVCs
-   source logging/bin/migrate_odfe_pvcs-include.sh
-else
-   log_debug "No obsolete Helm release of [odfe] was found."
-   existingODFE="false"
 fi
-
 
 # OpenSearch user customizations
 ES_OPEN_USER_YAML="${ES_OPEN_USER_YAML:-$USER_DIR/logging/user-values-opensearch.yaml}"
@@ -427,31 +340,6 @@ helm $helmDebug upgrade --install opensearch \
     $versionstring \
     $chart2install
 
-# ODFE => OpenSearch Migration
-if [ "$deploy_temp_masters" == "true" ]; then
-
-   #NOTE: rbac.create set to 'false' since ServiceAccount
-   #      was created during prior Helm chart deployment
-   log_debug "Upgrade from ODFE to OpenSearch detected; creating temporary master-only nodes."
-   helm $helmDebug upgrade --install opensearch-master \
-       --namespace $LOG_NS \
-       --values logging/opensearch/opensearch_helm_values.yaml \
-       --values "$imageKeysFile" \
-       --values "$wnpValuesFile" \
-       --values "$ES_OPEN_USER_YAML" \
-       --values "$OPENSHIFT_SPECIFIC_YAML" \
-       --set nodeGroup=temp_masters  \
-       --set ingress.enabled=false \
-       --set replicas=2 \
-       --set roles={master} \
-       --set rbac.create=false \
-       --set masterService=v4m-search \
-       --set fullnameOverride=v4m-master \
-       $versionstring \
-       $chart2install
-fi
-
-
 # waiting for PVCs to be bound
 declare -i pvcCounter=0
 pvc_status=$(kubectl -n $LOG_NS get pvc  v4m-search-v4m-search-0  -o=jsonpath="{.status.phase}")
@@ -483,61 +371,11 @@ kubectl -n $LOG_NS wait pods v4m-search-0 --for=condition=Ready --timeout=10m
 log_verbose "Waiting [2] minutes to allow OpenSearch to initialize [$(date)]"
 sleep 120
 
-# ODFE => OpenSearch Migration
-if [ "$deploy_temp_masters" == "true" ]; then
-
-   log_verbose "Upgrade to OpenSearch from Open Distro for Elasticsearch processing continues..."
-   log_info "Waiting up to [3] minutes for 'master-only' ES pods to be Ready [$(date)]"
-   kubectl -n $LOG_NS wait pods  -l app.kubernetes.io/instance=opensearch-master --for=condition=Ready --timeout=3m
-
-   #TODO: Remove 'master-only' nodes from list of 'master-eligible' ES nodes via API call?
-   # get_es_api_url
-   # curl call to remove 'master-only' nodes from list of 'master-eligible' nodes
-   # curl -X POST $es_api_url/_cluster/voting_config_exclusions?node_names=v4m-master-0,v4m-master-1,v4m-master-2
-   # sleep 60
-   # Probably (?) can skip the scale down and just uninstall Helm release
-
-
-   # Scale down master statefulset by 1 (to 1)
-   log_debug "Removing 'master-only' ES nodes needed only during upgrade to OpenSearch"
-
-   kubectl -n $LOG_NS scale statefulset v4m-master --replicas 1
-   ## wait for 1 minute (probably excessive, but...)
-   sleep 30
-
-   #Scale down master statefulset by 1 (to 0)
-   kubectl -n $LOG_NS scale statefulset v4m-master --replicas 0
-   ##wait for 1 minute (probably excessive, but...)
-   sleep 30
-
-   #uninstall the Helm release
-   helm -n $LOG_NS delete opensearch-master
-   ##wait for 30 secs? 1 min?
-   sleep 30
-
-   #Delete "master" PVCs
-   ## Add labels?  Appears labels were overwritten by Helm chart
-   kubectl -n $LOG_NS delete pvc v4m-master-v4m-master-0 v4m-master-v4m-master-1 v4m-master-v4m-master-2 --ignore-not-found
-fi
-
-# Reconcile count of 'data' nodes
-if [ "$existingODFE" == "true" ]; then
-
-   min_data_nodes=$((odfe_data_pvc_count - 1))
-   search_node_count=$(kubectl -n $LOG_NS get statefulset v4m-search -o jsonpath='{.spec.replicas}' 2>/dev/null)
-
-   if [ "$search_node_count" -gt "0" ] && [ "$min_data_nodes" -gt "0" ] && [ "$search_node_count" -lt "$min_data_nodes" ]; then
-      log_warn "There were insufficient OpenSearch nodes [$search_node_count] configured to handle all of the data from the original ODFE 'data' nodes"
-      log_warn "This OpenSearch cluster has been scaled up to [$min_data_nodes] nodes to ensure no loss of data."
-      kubectl -n $LOG_NS scale statefulset v4m-search --replicas=$min_data_nodes
-   fi
-fi
-
 set +e
 
 # Run the security admin script on the pod
 # Add some logic to find ES release
-if [ "$existingSearch" == "false" ] && [ "$existingODFE" != "true" ]; then
+if [ "$existingSearch" == "false" ] ; then
   kubectl -n $LOG_NS exec v4m-search-0 -c opensearch -- config/run_securityadmin.sh
   # Retrieve log file from security admin script
   kubectl -n $LOG_NS cp v4m-search-0:config/run_securityadmin.log $TMP_DIR/run_securityadmin.log -c opensearch
