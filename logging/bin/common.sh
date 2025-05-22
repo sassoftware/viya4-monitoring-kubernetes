@@ -26,7 +26,7 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
         log_error "The LOG_SEARCH_BACKEND environment variable is currently set to [$LOG_SEARCH_BACKEND]"
         exit 1
     fi
-    
+
     export LOG_NS="${LOG_NS:-logging}"
 
     #if TLS (w/in cluster; for all monitoring components) is requested, require TLS into OSD pod, too
