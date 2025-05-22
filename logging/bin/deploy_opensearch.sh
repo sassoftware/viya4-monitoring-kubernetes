@@ -110,9 +110,6 @@ set -e
 # check for pre-reqs
 #
 
-#Fail if not using OpenSearch back-end
-require_opensearch
-
 checkDefaultStorageClass
 
 # Confirm namespace exists
