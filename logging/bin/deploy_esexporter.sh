@@ -25,7 +25,7 @@ log_info "Deploying Elasticsearch metric exporter ..."
 # check for pre-reqs
 
 # Confirm namespace exists
-if [ -z "$(kubectl get ns "$LOG_NS" -o name 2> /dev/null)"  ]; then
+if [ -z "$(kubectl get ns "$LOG_NS" -o name 2> /dev/null)" ]; then
     log_error "Namespace [$LOG_NS] does NOT exist."
     exit 1
 fi
@@ -33,9 +33,9 @@ fi
 # get credentials
 get_credentials_from_secret metricgetter
 rc=$?
-if [ "$rc" != "0" ] ;then
+if [ "$rc" != "0" ]; then
     log_debug "RC=$rc"
-    exit $rc;
+    exit $rc
 fi
 
 
@@ -100,7 +100,6 @@ else
     wnpValuesFile="$TMP_DIR/empty.yaml"
 fi
 
-
 # Point to OpenShift response file or dummy as appropriate
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
     log_verbose "Deploying Elasticsearch metric exporter onto OpenShift cluster"
@@ -128,7 +127,7 @@ helm "$helmDebug" upgrade --install es-exporter \
     -f "$wnpValuesFile" \
     -f "$openshiftValuesFile" \
     -f "$ES_OPEN_EXPORTER_USER_YAML" \
-    --set fullnameOverride=v4m-es-exporter  \
+    --set fullnameOverride=v4m-es-exporter \
     $versionstring \
     "$chart2install"
 
