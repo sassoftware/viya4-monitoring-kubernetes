@@ -55,7 +55,7 @@ log_info "Waiting (up to more 8 minutes) for OpenSearch Dashboards API endpoint 
 for pause in 30 30 60 30 30 30 30 30 30 60 60 60; do
 
     get_kb_api_url
-    response=$(curl -s -o /dev/null -w "%{http_code}" -XGET  "${kb_api_url}/api/status"  --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD"  --insecure)
+    response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "${kb_api_url}/api/status" --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
 
     # returns 503 (and outputs "Kibana server is not ready yet") when Kibana isn't ready yet
     # TO DO: check for 503 specifically?
