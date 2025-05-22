@@ -22,11 +22,8 @@ if [ "$KIBANA_CONTENT_DEPLOY" != "true" ]; then
     exit 0
 fi
 
-# temp file used to capture command output
-tmpfile=$TMP_DIR/output.txt
-
 # Confirm namespace exists
-if [ -z "$(kubectl get ns "$LOG_NS" -o name 2>/dev/null)" ]; then
+if [ -z "$(kubectl get ns "$LOG_NS" -o name 2> /dev/null)" ]; then
     log_error "Namespace [$LOG_NS] does NOT exist."
     exit 1
 fi
@@ -34,15 +31,14 @@ fi
 # get credentials
 get_credentials_from_secret admin
 rc=$?
-if [ "$rc" != "0" ] ;then
+if [ "$rc" != "0" ]; then
     log_debug "RC=$rc"
-    exit $rc;
+    exit $rc
 fi
 
 set -e
 
 log_info "Configuring OpenSearch Dashboards...this may take a few minutes"
-
 
 # wait for pod to show as "running" and "ready"
 log_info "Waiting for OpenSearch Dashboards pods to be ready ($(date) - timeout 10m)"
@@ -57,9 +53,9 @@ set +e # disable exit on error
 # Confirm OSD is ready
 log_info "Waiting (up to more 8 minutes) for OpenSearch Dashboards API endpoint to be ready"
 for pause in 30 30 60 30 30 30 30 30 30 60 60 60; do
-    
+
     get_kb_api_url
-    response=$(curl -s -o /dev/null -w  "%{http_code}" -XGET  "${kb_api_url}/api/status"  --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD"  --insecure)
+    response=$(curl -s -o /dev/null -w "%{http_code}" -XGET  "${kb_api_url}/api/status"  --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD"  --insecure)
 
     # returns 503 (and outputs "Kibana server is not ready yet") when Kibana isn't ready yet
     # TO DO: check for 503 specifically?
@@ -83,7 +79,7 @@ if [ "$kibanaready" != "TRUE" ]; then
     exit 1
 fi
 
-set +e  # disable exit on error
+set +e # disable exit on error
 
 # get Security API URL
 get_sec_api_url

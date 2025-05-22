@@ -16,7 +16,6 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
     fi
 fi
 
-
 # set flag indicating wrapper/driver script being run
 export LOGGING_DRIVER=true
 
@@ -27,9 +26,9 @@ export LOGGING_DRIVER=true
 checkDefaultStorageClass
 
 # Create namespace if it doesn't exist
-if [ -z "$(kubectl get ns "$LOG_NS" -o name 2>/dev/null)" ]; then
+if [ -z "$(kubectl get ns "$LOG_NS" -o name 2> /dev/null)" ]; then
     kubectl create ns "$LOG_NS"
-    
+   
     #Container Security: Disable serviceAccount Token Automounting
     disable_sa_token_automount "$LOG_NS" default
 fi
@@ -88,7 +87,6 @@ set +e
 bin/show_app_url.sh OSD OS
 set -e
 
-
 ##################################
 # Version Info                   #
 ##################################
@@ -103,7 +101,6 @@ if ! deployV4MInfo "$LOG_NS" "v4m-logs"; then
     log_warn "Unable to update SAS Viya Monitoring Helm chart release"
 fi
 
-
 # Write any "notices" to console
 log_message ""
 display_notices
@@ -111,4 +108,3 @@ display_notices
 log_message ""
 log_notice "The deployment of logging components has completed [$(date)]"
 echo ""
-

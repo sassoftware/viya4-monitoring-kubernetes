@@ -14,13 +14,13 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
 
         log_verbose "Loading user environment file: $USER_DIR/logging/user.env"
         if [ "$userEnv" ]; then
-         # shellcheck disable=SC2086,SC2163
-          export $userEnv
+            # shellcheck disable=SC2086,SC2163
+            export $userEnv
         fi
     fi
 
     #Check for obsolete env var
-    if [  -n "$LOG_SEARCH_BACKEND" ]; then
+    if [ -n "$LOG_SEARCH_BACKEND" ]; then
         log_error "Support for the LOG_SEARCH_BACKEND environment variable has been removed."
         log_error "This script is only appropriate for use with OpenSearch as the search back-end."
         log_error "The LOG_SEARCH_BACKEND environment variable is currently set to [$LOG_SEARCH_BACKEND]"
@@ -51,7 +51,7 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     export V4M_NS=$LOG_NS
 
     if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-       source bin/airgap-include.sh
+        source bin/airgap-include.sh
     fi
 
     source bin/version-include.sh
@@ -60,4 +60,3 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
 
 fi
 echo ""
-
