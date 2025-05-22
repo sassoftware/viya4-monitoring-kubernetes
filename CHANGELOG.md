@@ -1,5 +1,23 @@
 # SAS Viya Monitoring for Kubernetes
 
+## unreleased
+* **Logging**
+  * [ANNOUNCEMENT] The [OpenDistro for Elasticsearch (ODFE) project](https://opendistro.github.io/for-elasticsearch/) reached end-of-line in May of 2022 and our project moved to
+  OpenSearch shorly thereafter.  This release removes all remaining support for ODFE; including support for migration from ODFE
+  and ability to use utility scripts (e.g. change_internal_password.sh) with ealier ODFE-backed deployments.  
+  * [REMOVAL] Remove support for migrating from an earlier deployment which included ODFE.
+  * [REMOVAL] Remove support for the `LOG_SEARCH_BACKEND` environment variable.  Scripts will terminate with an ERROR message if
+  this environment variable is detected.
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.19.1 to 2.19.2.
+  * [UPGRADE] OpenSearch Helm chart upgraded from 2.32.0 to 2.34.0.
+  * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 2.28.0 to 2.30.0
+  * [UPGRADE] Fluent Bit upgraded from 3.2.10 to 4.0.2
+  * [UPGRADE] Fluent Bit Helm chart upgraded from 0.48.6 to 0.49.0
+  * [UPGRADE] Elasticsearch Exporer upgraded from 1.8.0 to 1.9.0
+  * [UPGRADE] Elasticsearch Exporer Helm chart upgraded from 6.6.1 to 6.7.2
+  * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.24.0 to 2.26.1
+
+
 ## Version 1.2.37 (13MAY2025)
 * **Metrics**
   * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 68.3.0 to 70.8.0.

@@ -28,9 +28,6 @@ tmpfile=$TMP_DIR/output.txt
 set -e
 
 # check for pre-reqs
-#Fail if not using OpenSearch back-end
-require_opensearch
-
 
 # Confirm namespace exists
 if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then

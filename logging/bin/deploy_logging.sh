@@ -7,9 +7,6 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 source bin/autogenerate-include.sh
 
-#Fail if not using OpenSearch back-end
-require_opensearch
-
 # Confirm NOT on OpenShift
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
   if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then

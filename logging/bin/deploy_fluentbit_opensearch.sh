@@ -24,9 +24,6 @@ fi
 
 set -e
 
-#Fail if not using OpenSearch back-end
-require_opensearch
-
 log_info "Deploying Fluent Bit ..."
 
 # check for pre-reqs

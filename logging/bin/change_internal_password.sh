@@ -27,15 +27,10 @@ function show_usage {
    echo ""
 }
 
-if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
-   targetpod="v4m-search-0"
-   targetcontainer="opensearch"
-   toolsrootdir="/usr/share/opensearch/plugins/opensearch-security"
-else
-   targetpod="v4m-es-master-0"
-   targetcontainer="elasticsearch"
-   toolsrootdir="/usr/share/elasticsearch/plugins/opendistro_security"
-fi
+# set vars used in curl commands
+targetpod="v4m-search-0"
+targetcontainer="opensearch"
+toolsrootdir="/usr/share/opensearch/plugins/opensearch-security"
 
 USER_NAME=${1}
 NEW_PASSWD="${2}"
@@ -258,17 +253,10 @@ if [ "$success" == "true" ]; then
           log_notice "                        *********** IMPORTANT NOTE ***********                        "
           log_notice "                                                                                      "
           log_notice " After changing the password for the [kibanaserver] user, you need to restart the     "
-          if [ "$LOG_SEARCH_BACKEND" == "OPENSEARCH" ]; then
-             log_notice " OpenSearch Dashboards pod to ensure OpenSearch Dashboards can still be accessed and used. "
-             log_notice "                                                                                      "
-             log_notice " This can be done by submitting the following command:                                "
-             log_notice "              kubectl -n $LOG_NS delete pods -l 'app=opensearch-dashboards'"
-          else
-             log_notice " Kibana pod to ensure Kibana can still be accessed and used."
-             log_notice ""
-             log_notice " This can be done by submitting the following command:"
-             log_notice "       kubectl -n $LOG_NS delete pods -l 'app=v4m-es,role=kibana'"
-          fi
+          log_notice " OpenSearch Dashboards pod to ensure OpenSearch Dashboards can still be accessed and used. "
+          log_notice "                                                                                      "
+          log_notice " This can be done by submitting the following command:                                "
+          log_notice "              kubectl -n $LOG_NS delete pods -l 'app=opensearch-dashboards'"
           echo ""
           ;;
         metricgetter)
