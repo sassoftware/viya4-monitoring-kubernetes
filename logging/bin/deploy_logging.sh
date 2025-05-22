@@ -3,17 +3,17 @@
 # Copyright © 2022, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-cd "$(dirname $BASH_SOURCE)/../.."
+cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
 source logging/bin/common.sh
 source bin/autogenerate-include.sh
 
 # Confirm NOT on OpenShift
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
-  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
-    log_error "This script should NOT be run on OpenShift clusters"
-    log_error "Run logging/bin/deploy_logging_openshift.sh instead"
-    exit 1
-  fi
+    if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+        log_error "This script should NOT be run on OpenShift clusters"
+        log_error "Run logging/bin/deploy_logging_openshift.sh instead"
+        exit 1
+    fi
 fi
 
 
@@ -27,11 +27,11 @@ export LOGGING_DRIVER=true
 checkDefaultStorageClass
 
 # Create namespace if it doesn't exist
-if [ "$(kubectl get ns $LOG_NS -o name 2>/dev/null)" == "" ]; then
-  kubectl create ns $LOG_NS
-
-  #Container Security: Disable serviceAccount Token Automounting
-  disable_sa_token_automount $LOG_NS default
+if [ -z "$(kubectl get ns "$LOG_NS" -o name 2>/dev/null)" ]; then
+    kubectl create ns "$LOG_NS"
+    
+    #Container Security: Disable serviceAccount Token Automounting
+    disable_sa_token_automount "$LOG_NS" default
 fi
 
 log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
@@ -94,13 +94,13 @@ set -e
 ##################################
 
 # If a deployment with the old name exists, remove it first
-if helm3ReleaseExists v4m $LOG_NS; then
-  log_verbose "Removing outdated SAS Viya Monitoring Helm chart release from [$LOG_NS] namespace"
-  helm uninstall -n "$LOG_NS" "v4m"
+if helm3ReleaseExists v4m "$LOG_NS"; then
+    log_verbose "Removing outdated SAS Viya Monitoring Helm chart release from [$LOG_NS] namespace"
+    helm uninstall -n "$LOG_NS" "v4m"
 fi
 
 if ! deployV4MInfo "$LOG_NS" "v4m-logs"; then
-  log_warn "Unable to update SAS Viya Monitoring Helm chart release"
+    log_warn "Unable to update SAS Viya Monitoring Helm chart release"
 fi
 
 
