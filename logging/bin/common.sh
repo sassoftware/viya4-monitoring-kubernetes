@@ -1,3 +1,5 @@
+#! /bin/bash
+
 # Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -8,9 +10,11 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     source bin/common.sh
 
     if [ -f "$USER_DIR/logging/user.env" ]; then
-        userEnv=$(grep -v '^[[:blank:]]*$' $USER_DIR/logging/user.env | grep -v '^#' | xargs)
+        userEnv=$(grep -v '^[[:blank:]]*$' "$USER_DIR/logging/user.env" | grep -v '^#' | xargs)
+
         log_verbose "Loading user environment file: $USER_DIR/logging/user.env"
         if [ "$userEnv" ]; then
+         # shellcheck disable=SC2086,SC2163
           export $userEnv
         fi
     fi
