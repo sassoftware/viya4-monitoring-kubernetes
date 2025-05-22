@@ -28,7 +28,7 @@ checkDefaultStorageClass
 # Create namespace if it doesn't exist
 if [ -z "$(kubectl get ns "$LOG_NS" -o name 2> /dev/null)" ]; then
     kubectl create ns "$LOG_NS"
-  
+ 
     #Container Security: Disable serviceAccount Token Automounting
     disable_sa_token_automount "$LOG_NS" default
 fi
