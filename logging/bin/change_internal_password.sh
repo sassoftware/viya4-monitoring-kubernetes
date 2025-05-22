@@ -12,18 +12,18 @@ source logging/bin/apiaccess-include.sh
 this_script=$(basename "$0")
 
 function show_usage {
-    log_info  ""
-    log_info  "Usage: $this_script USERNAME [PASSWORD] "
-    log_info  ""
-    log_info  "Changes the password for one of the special internal user accounts used by other components of the monitoring system to communicate "
-    log_info  "with OpenSearch.  In addition, the script upates the internal cache (i.e. corresponding Kubernetes secret) with the new value."
-    log_info  ""
-    log_info  "     USERNAME - REQUIRED; the internal username for which the password is be changed; "
-    log_info  "                MUST be one of: admin, kibanaserver, logadm, logcollector or metricgetter"
-    log_info  ""
-    log_info  "     PASSWORD - OPTIONAL; the new password.  If not provided, a random 32-character password will be generated."
-    log_info  "                Note: PASSWORD is REQUIRED when USERNAME is 'logadm'."
-    log_info  ""
+    log_info ""
+    log_info "Usage: $this_script USERNAME [PASSWORD] "
+    log_info ""
+    log_info "Changes the password for one of the special internal user accounts used by other components of the monitoring system to communicate "
+    log_info "with OpenSearch.  In addition, the script upates the internal cache (i.e. corresponding Kubernetes secret) with the new value."
+    log_info ""
+    log_info "     USERNAME - REQUIRED; the internal username for which the password is be changed; "
+    log_info "                MUST be one of: admin, kibanaserver, logadm, logcollector or metricgetter"
+    log_info ""
+    log_info "     PASSWORD - OPTIONAL; the new password.  If not provided, a random 32-character password will be generated."
+    log_info "                Note: PASSWORD is REQUIRED when USERNAME is 'logadm'."
+    log_info ""
     echo ""
 }
 
@@ -41,17 +41,17 @@ if [ "$USER_NAME" == "" ]; then
     exit 1
 else
     case "$USER_NAME" in
-    admin);;
-    logcollector);;
+    admin) ;;
+    logcollector) ;;
     logadm)
         if [ -z "$NEW_PASSWD" ]; then
             log_error "No password provided.  A new password is REQUIRED when using this script to change the [logadm] account password"
             exit 1
         fi
         ;;
-    kibanaserver);;
-    metricgetter);;
-    --help|-h)
+    kibanaserver) ;;
+    metricgetter) ;;
+    --help| -h)
         show_usage
         exit
         ;;
@@ -63,7 +63,6 @@ else
     esac
 fi
 
-
 if [ "$NEW_PASSWD" == "" ]; then
     # generate password if one not provided
     NEW_PASSWD="$(randomPassword)"
@@ -74,7 +73,7 @@ if [ "$USER_NAME" != "logadm" ]; then
     #get current credentials from Kubernetes secret
     if [ -z "$(kubectl -n "$LOG_NS" get secret internal-user-"$USER_NAME" -o=name 2> /dev/null)" ]; then
         log_warn "The Kubernetes secret [internal-user-$USER_NAME], containing credentials for the user, was not found."
-        # TO DO: How to handle case where secret does not exist?  Should never happen. 
+        # TO DO: How to handle case where secret does not exist?  Should never happen.
         # exit
         ES_USER=$USER_NAME
     else
@@ -82,8 +81,8 @@ if [ "$USER_NAME" != "logadm" ]; then
         ES_PASSWD=$(kubectl -n "$LOG_NS" get secret internal-user-"$USER_NAME" -o=jsonpath="{.data.password}" |base64 --decode)
     fi
 else
-  ES_USER=$USER_NAME
-  ES_PASSWD="do_not_know_current_password"
+    ES_USER=$USER_NAME
+    ES_PASSWD="do_not_know_current_password"
 fi
 
 get_sec_api_url
