@@ -38,7 +38,6 @@ if [ "$rc" != "0" ]; then
     exit $rc
 fi
 
-
 if helm3ReleaseExists es-exporter "$LOG_NS"; then
     #remove an existing instance if it does NOT have the most current set of labels
     # NOTE: pod label 'app' changed to 'app.kubernetes.io/name' w/Helm chart 6.x
@@ -120,7 +119,7 @@ versionstring="$(get_helm_versionstring "$ESEXPORTER_HELM_CHART_VERSION")"
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # shellcheck disable=SC2086
-helm "$helmDebug" upgrade --install es-exporter \
+helm $helmDebug upgrade --install es-exporter \
     --namespace "$LOG_NS" \
     -f "$imageKeysFile" \
     -f "$primaryValuesFile" \
