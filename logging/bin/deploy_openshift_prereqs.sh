@@ -18,7 +18,6 @@ if [ "$OPENSHIFT_PREREQS_ENABLE" != "true" ]; then
     exit
 fi
 
-
 # link OpenSearch serviceAccounts to 'privileged' scc
 oc adm policy add-scc-to-user privileged -z v4m-os -n "$LOG_NS"
 
@@ -33,7 +32,7 @@ fi
 if oc get scc v4m-k8sevents 2> /dev/null 1>&2; then
     log_info "Skipping scc creation; using existing scc [v4m-k8sevents]"
 else
-     oc create -f logging/openshift/fb_v4m-k8sevents_scc.yaml
+    oc create -f logging/openshift/fb_v4m-k8sevents_scc.yaml
 fi
 
 log_info "OpenShift Prerequisites have been deployed."
