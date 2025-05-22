@@ -51,7 +51,7 @@ else
         ;;
     kibanaserver) ;;
     metricgetter) ;;
-    --help| -h)
+    --help | -h)
         show_usage
         exit
         ;;
@@ -77,8 +77,8 @@ if [ "$USER_NAME" != "logadm" ]; then
         # exit
         ES_USER=$USER_NAME
     else
-        ES_USER=$(kubectl -n "$LOG_NS" get secret internal-user-"$USER_NAME" -o=jsonpath="{.data.\username}" |base64 --decode)
-        ES_PASSWD=$(kubectl -n "$LOG_NS" get secret internal-user-"$USER_NAME" -o=jsonpath="{.data.password}" |base64 --decode)
+        ES_USER=$(kubectl -n "$LOG_NS" get secret internal-user-"$USER_NAME" -o=jsonpath="{.data.\username}" | base64 --decode)
+        ES_PASSWD=$(kubectl -n "$LOG_NS" get secret internal-user-"$USER_NAME" -o=jsonpath="{.data.password}" | base64 --decode)
     fi
 else
     ES_USER=$USER_NAME
@@ -97,19 +97,19 @@ if [[ $response == 4* ]]; then
     if [ "$USER_NAME" != "admin" ]; then
         log_debug "Will attempt to use admin credentials to change password for [$USER_NAME]"
 
-        ES_ADMIN_USER=$(kubectl -n "$LOG_NS" get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
-        ES_ADMIN_PASSWD=$(kubectl -n "$LOG_NS" get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
+        ES_ADMIN_USER=$(kubectl -n "$LOG_NS" get secret internal-user-admin -o=jsonpath="{.data.username}" | base64 --decode)
+        ES_ADMIN_PASSWD=$(kubectl -n "$LOG_NS" get secret internal-user-admin -o=jsonpath="{.data.password}" | base64 --decode)
 
         # make sure hash utility is executable
-        kubectl -n "$LOG_NS" exec $targetpod -c $targetcontainer --  chmod +x $toolsrootdir/tools/hash.sh
+        kubectl -n "$LOG_NS" exec $targetpod -c $targetcontainer -- chmod +x $toolsrootdir/tools/hash.sh
         # get hash of new password
         # shellcheck disable=2063
-        hashed_passwd=$(kubectl -n "$LOG_NS" exec $targetpod  -c $targetcontainer --  $toolsrootdir/tools/hash.sh -p "$NEW_PASSWD" | grep -v '*')
+        hashed_passwd=$(kubectl -n "$LOG_NS" exec $targetpod -c $targetcontainer -- $toolsrootdir/tools/hash.sh -p "$NEW_PASSWD" | grep -v '*')
         rc=$?
         if [ "$rc" == "0" ]; then
 
             #try changing password using admin password
-            response=$(curl -s -o /dev/null -w "%{http_code}"  -XPATCH "$sec_api_url/internalusers/$ES_USER"   -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "/hash", "value" : "'"$hashed_passwd"'"}]'  --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
+            response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/internalusers/$ES_USER" -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "/hash", "value" : "'"$hashed_passwd"'"}]'  --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
             if [[ "$response" == "404" ]]; then
                 log_error "Unable to change password for [$USER_NAME] because that user does not exist. [$response]"
                 success="non-existent_user"
@@ -137,7 +137,7 @@ if [[ $response == 4* ]]; then
                 success="false"
             fi
         else
-            log_error "Unable to obtain a hash of the new password; password not changed. [rc: $rc]";
+            log_error "Unable to obtain a hash of the new password; password not changed. [rc: $rc]"
         fi
     else
         log_debug "Attempting to change password for user [admin] using the admin certs rather than cached password"
@@ -146,7 +146,7 @@ if [[ $response == 4* ]]; then
         kubectl -n "$LOG_NS" exec $targetpod  -c $targetcontainer --  chmod +x $toolsrootdir/tools/hash.sh
         # get hash of new password
         # shellcheck disable=2063
-        hashed_passwd=$(kubectl -n "$LOG_NS" exec $targetpod  -c $targetcontainer --  $toolsrootdir/tools/hash.sh -p "$NEW_PASSWD" | grep -v '*')
+        hashed_passwd=$(kubectl -n "$LOG_NS" exec $targetpod -c $targetcontainer -- $toolsrootdir/tools/hash.sh -p "$NEW_PASSWD" | grep -v '*')
 
         #obtain admin cert
         rm -f "$TMP_DIR"/tls.crt
@@ -156,7 +156,7 @@ if [[ $response == 4* ]]; then
             success="false"
         else
             log_debug "File tls.crt obtained from Kubernetes secret"
-            echo "$admin_tls_cert" |base64 --decode > "$TMP_DIR"/admin_tls.crt
+            echo "$admin_tls_cert" | base64 --decode > "$TMP_DIR"/admin_tls.crt
 
             #obtain admin TLS key
             rm -f "$TMP_DIR"/tls.key
@@ -169,7 +169,7 @@ if [[ $response == 4* ]]; then
                 echo "$admin_tls_key" |base64 --decode > "$TMP_DIR"/admin_tls.key
 
                 # Attempt to change password using admin certs
-                response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/internalusers/$ES_USER"   -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "/hash", "value" : "'"$hashed_passwd"'"}]'  --cert "$TMP_DIR"/admin_tls.crt --key "$TMP_DIR"/admin_tls.key  --insecure)
+                response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/internalusers/$ES_USER" -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "/hash", "value" : "'"$hashed_passwd"'"}]' --cert "$TMP_DIR"/admin_tls.crt --key "$TMP_DIR"/admin_tls.key --insecure)
 
                 if [[ $response == 2* ]]; then
                     log_debug "Password for [$USER_NAME] has been changed in OpenSearch. [$response]"
@@ -210,7 +210,7 @@ if [ "$success" == "true" ]; then
             log_error "Try re-running this script again OR manually creating the secret using the command: "
             log_error "kubectl -n $LOG_NS create secret generic --from-literal=username=$USER_NAME --from-literal=password=$NEW_PASSWD"
         else
-        case $USER_NAME in
+            case $USER_NAME in
             admin)
 
                 if [ "$autogenerated_password" == "true" ]; then
@@ -269,7 +269,7 @@ if [ "$success" == "true" ]; then
             *)
                 log_error "The user name [$USER_NAME] you provided is not one of the supported internal users; exiting"
                 exit 2
-        esac
+            esac
         fi
     fi
 elif [ "$success" == "false" ]; then
