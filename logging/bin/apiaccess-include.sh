@@ -167,7 +167,6 @@ function get_kb_api_url {
     # Global vars:      kb_api_url - URL to access KB API/service
     #                   kbpfpid    - process id of KB portforwarding
 
-
     if [ -n "$kb_api_url" ]; then
         log_debug "Kibana API Endpoint already set [$kb_api_url]"
         return 0
