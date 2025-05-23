@@ -35,7 +35,6 @@ if [ -z "$(kubectl get ns "$LOG_NS" -o name 2> /dev/null)" ]; then
     exit 1
 fi
 
-
 # get credentials
 get_credentials_from_secret admin
 rc=$?
@@ -67,7 +66,6 @@ if [ "$esready" != "TRUE" ]; then
     log_error "Review the OpenSearch pod's events and log to identify the issue and resolve it before trying again."
     exit 1
 fi
-
 
 # Create Index Management (I*M) Policy  objects
 function set_retention_period {
@@ -131,7 +129,7 @@ function add_ism_template {
         return
     fi
 
-    if grep -q '"ism_template":null' $TMP_DIR/ism_policy_patch.json; then
+    if grep -q '"ism_template":null' "$TMP_DIR"/ism_policy_patch.json; then
         log_debug "No ISM Template on policy [$policy_name]; adding one."
 
         #remove crud returned but not needed
@@ -155,7 +153,6 @@ function add_ism_template {
             sed -i'.bak' "s/viya_infra_idxmgmt_policy/viya-infra-idxmgmt-policy/g" "$TMP_DIR"/ism_policy_patch.json
             policy_name="viya-infra-idxmgmt-policy"
         fi
-
 
         #load revised policy
         response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$ism_api_url/policies/$policy_name" -H 'Content-Type: application/json' -d "@$TMP_DIR/ism_policy_patch.json" --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
@@ -219,7 +216,7 @@ fi
 
 OPS_LOG_RETENTION_PERIOD="${OPS_LOG_RETENTION_PERIOD:-1}"
 set_retention_period viya_ops_idxmgmt_policy OPS_LOG_RETENTION_PERIOD
-add_ism_template "viya_ops_idxmgmt_policy" "viya_ops-*"  50
+add_ism_template "viya_ops_idxmgmt_policy" "viya_ops-*" 50
 
 # Load template
 response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/viya-ops-template" -H 'Content-Type: application/json' -d @logging/opensearch/set_index_template_settings_ops.json --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
@@ -262,7 +259,7 @@ if [ "$LOG_CREATE_LOGADM_USER" == "true" ]; then
         LOGGING_DRIVER=true ./logging/bin/user.sh CREATE -ns _all_ -t _all_ -u logadm -p "$LOG_LOGADM_PASSWD"
     fi
 else
-   log_debug "Skipping creation of 'logadm' user because LOG_CREATE_LOGADM_USER not 'true' [$LOG_CREATE_LOGADM_USER]"
+    log_debug "Skipping creation of 'logadm' user because LOG_CREATE_LOGADM_USER not 'true' [$LOG_CREATE_LOGADM_USER]"
 fi
 
 #Initialize OSD Reporting Plugin indices
