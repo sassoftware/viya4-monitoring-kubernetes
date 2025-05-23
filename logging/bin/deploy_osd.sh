@@ -31,7 +31,7 @@ set -e
 generateImageKeysFile "$OSD_FULL_IMAGE" "logging/opensearch/osd_container_image.template"
 
 # Confirm namespace exists
-if [ -z "$(kubectl get ns "$LOG_NS" -o name 2>/dev/null)"  ]; then
+if [ -z "$(kubectl get ns "$LOG_NS" -o name 2> /dev/null)" ]; then
     log_error "Namespace [$LOG_NS] does NOT exist."
     exit 1
 fi
@@ -44,7 +44,7 @@ create_user_secret internal-user-kibanaserver kibanaserver "$ES_KIBANASERVER_PAS
 
 # Verify cert generator is available (if necessary)
 if verify_cert_generator "$LOG_NS" kibana; then
-     log_debug "cert generator check OK [$cert_generator_ok]"
+    log_debug "cert generator check OK [$cert_generator_ok]"
 else
     log_error "A required TLS cert does not exist and the expected certificate generator mechanism [$cert_generator] is not available to create the missing cert"
     exit 1
@@ -116,7 +116,7 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OSD_INGRESS_ENABLE" == "true" ];
         unset slashpath
     fi
 else
-   log_debug "Autogeneration of ingresss NOT enabled"
+    log_debug "Autogeneration of ingresss NOT enabled"
 fi
 
 # enable debug on Helm via env var
@@ -126,7 +126,7 @@ if [ "$HELM_DEBUG" == "true" ]; then
     helmDebug="--debug"
 fi
 
-helmRepoAdd opensearch  https://opensearch-project.github.io/helm-charts
+helmRepoAdd opensearch https://opensearch-project.github.io/helm-charts
 
 KB_KNOWN_NODEPORT_ENABLE=${KB_KNOWN_NODEPORT_ENABLE:-false}
 
