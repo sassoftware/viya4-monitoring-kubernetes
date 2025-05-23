@@ -29,10 +29,10 @@ function stop_portforwarding {
         set +e
     fi
 
-    if ps -p "$pid" > /dev/null;  then
+    if ps -p "$pid" > /dev/null; then
         log_debug "Killing port-forwarding process [$pid]."
         kill -9 "$pid"
-        wait "$pid" 2> /dev/null  # suppresses message reporting process has been killed
+        wait "$pid" 2> /dev/null # suppresses message reporting process has been killed
     else
         log_debug "No portforwarding processID found; nothing to terminate."
     fi
@@ -53,7 +53,7 @@ function stop_es_portforwarding {
 
     if [ -n "$espfpid" ]; then
         log_debug "ES PF PID for stopping: $espfpid"
-        stop_portforwarding $espfpid
+        stop_portforwarding "$espfpid"
         unset espfpid
         unset es_api_url
     fi
@@ -72,7 +72,7 @@ function stop_kb_portforwarding {
         unset kbpfpid
         unset kb_api_url
     fi
- }
+}
 
 function get_api_url {
     #
@@ -110,13 +110,13 @@ function get_api_url {
 
         # determine which port port-forwarding is using
         pfRegex='Forwarding from .+:([0-9]+)'
-        myline=$(head -n1  "$tmpfile")
+        myline=$(head -n1 "$tmpfile")
 
         if [[ $myline =~ $pfRegex ]]; then
-            TEMP_PORT="${BASH_REMATCH[1]}";
+            TEMP_PORT="${BASH_REMATCH[1]}"
             log_debug "TEMP_PORT=${TEMP_PORT}"
         else
-            log_error "Unable to identify the temporary port used for port-forwarding [$servicename]; exiting script.";
+            log_error "Unable to identify the temporary port used for port-forwarding [$servicename]; exiting script."
             return 1
         fi
 
@@ -178,7 +178,7 @@ function get_kb_api_url {
     tlsrequired="$(kubectl -n "$LOG_NS" get secret v4m-osd-tls-enabled -o=jsonpath="{.data.enable_tls}" | base64 --decode)"
     log_debug "TLS required to connect to Kibana? [$tlsrequired]"
 
-    get_api_url "$KB_SERVICENAME" '{.spec.ports[?(@.name=="'"${KB_SERVICEPORT}"'")].port}'  "$tlsrequired"  "$KB_INGRESSNAME"
+    get_api_url "$KB_SERVICENAME" '{.spec.ports[?(@.name=="'"${KB_SERVICEPORT}"'")].port}' "$tlsrequired" "$KB_INGRESSNAME"
     rc=$?
 
     if [ "$rc" == "0" ]; then
