@@ -16,4 +16,3 @@ helm delete -n "$LOG_NS" es-exporter
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""
-
