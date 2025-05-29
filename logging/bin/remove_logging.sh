@@ -40,18 +40,18 @@ logging/bin/remove_eventrouter.sh
 logging/bin/remove_fluentbit_k8sevents_opensearch.sh
 
 if [ "$LOG_DELETE_PVCS_ON_REMOVE" == "true" ]; then
-  log_verbose "Removing known logging PVCs..."
-  kubectl delete pvc --ignore-not-found -n "$LOG_NS" -l app.kubernetes.io/name=opensearch
+    log_verbose "Removing known logging PVCs..."
+    kubectl delete pvc --ignore-not-found -n "$LOG_NS" -l app.kubernetes.io/name=opensearch
 fi
 
 if [ "$LOG_DELETE_SECRETS_ON_REMOVE" == "true" ]; then
-  log_verbose "Removing known logging secrets..."
-  kubectl delete secret --ignore-not-found -n "$LOG_NS" -l managed-by=v4m-es-script
+    log_verbose "Removing known logging secrets..."
+    kubectl delete secret --ignore-not-found -n "$LOG_NS" -l managed-by=v4m-es-script
 fi
 
 if [ "$LOG_DELETE_CONFIGMAPS_ON_REMOVE" == "true" ]; then
-  log_verbose "Removing known logging configmaps..."
-  kubectl delete configmap --ignore-not-found -n "$LOG_NS" -l managed-by=v4m-es-script
+    log_verbose "Removing known logging configmaps..."
+    kubectl delete configmap --ignore-not-found -n "$LOG_NS" -l managed-by=v4m-es-script
 fi
 
 # Check for and remove any v4m deployments with old naming convention
@@ -60,21 +60,21 @@ removeV4MInfo "$LOG_NS" "v4m"
 removeV4MInfo "$LOG_NS" "v4m-logs"
 
 if [ "$LOG_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
-  log_info "Deleting the [$LOG_NS] namespace..."
-  if kubectl delete namespace "$LOG_NS" --timeout "$KUBE_NAMESPACE_DELETE_TIMEOUT"; then
-    log_info "[$LOG_NS] namespace and logging components successfully removed"
-    exit 0
-  else
-    log_error "Unable to delete the [$LOG_NS] namespace"
-    exit 1
-  fi
+    log_info "Deleting the [$LOG_NS] namespace..."
+    if kubectl delete namespace "$LOG_NS" --timeout "$KUBE_NAMESPACE_DELETE_TIMEOUT"; then
+        log_info "[$LOG_NS] namespace and logging components successfully removed"
+        exit 0
+    else
+        log_error "Unable to delete the [$LOG_NS] namespace"
+        exit 1
+    fi
 fi
 
 log_info "Waiting 60 sec for resources to terminate..."
 sleep 60
 
 log_info "Checking contents of the [$LOG_NS] namespace:"
-objects=( all pvc secret configmap)
+objects=(all pvc secret configmap)
 empty="true"
 for object in "${objects[@]}"; do
     out=$(kubectl get -n "$LOG_NS" "$object" 2>&1)
