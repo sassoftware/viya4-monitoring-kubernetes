@@ -77,7 +77,7 @@ log_info "Checking contents of the [$LOG_NS] namespace:"
 objects=( all pvc secret configmap)
 empty="true"
 for object in "${objects[@]}"; do
-    out=$(kubectl get -n $LOG_NS $object 2>&1)
+    out=$(kubectl get -n "$LOG_NS" "$object" 2>&1)
       if [[ "$out" =~ 'No resources found' ]]; then
         :
     else
