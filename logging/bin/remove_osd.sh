@@ -13,7 +13,7 @@ log_debug "Script [$this_script] has started [$(date)]"
 log_info "Removing OpenSearch Dashboards [$(date)]"
 helm delete -n "$LOG_NS" v4m-osd
 
-kubectl -n "$LOG_NS" delete secret v4m-osd-tls-enabled  --ignore-not-found
+kubectl -n "$LOG_NS" delete secret v4m-osd-tls-enabled --ignore-not-found
 
 log_debug "Script [$this_script] has completed [$(date)]"
 echo ""
