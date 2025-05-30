@@ -108,7 +108,7 @@ if [[ $response == 4* ]]; then
 
             #try changing password using admin password
             response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/internalusers/$ES_USER" -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "/hash", "value" : "'"$hashed_passwd"'"}]' --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
-            if [[ "$response" == "404" ]]; then
+            if [[ $response == "404" ]]; then
                 log_error "Unable to change password for [$USER_NAME] because that user does not exist. [$response]"
                 success="non-existent_user"
             elif [[ $response == 4* ]]; then

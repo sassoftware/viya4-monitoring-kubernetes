@@ -99,11 +99,10 @@ else
 fi
 
 # Import OSD Searches, Visualizations and Dashboard Objects using curl
-# shfmt: ignoring suggested reformat to maintain readability
-./logging/bin/import_osd_content.sh logging/osd/common          cluster_admins
+./logging/bin/import_osd_content.sh logging/osd/common cluster_admins
 ./logging/bin/import_osd_content.sh logging/osd/cluster_admins  cluster_admins
-./logging/bin/import_osd_content.sh logging/osd/namespace       cluster_admins
-./logging/bin/import_osd_content.sh logging/osd/tenant          cluster_admins
+./logging/bin/import_osd_content.sh logging/osd/namespace cluster_admins
+./logging/bin/import_osd_content.sh logging/osd/tenant cluster_admins
 
 log_info "Configuring OpenSearch Dashboards has been completed"
 
