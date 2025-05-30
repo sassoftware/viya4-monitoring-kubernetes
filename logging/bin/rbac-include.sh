@@ -243,7 +243,7 @@ function remove_rolemapping {
                         cp logging/opensearch/rbac/backend_rolemapping_delete.json "$TMP_DIR"/"${targetrole}"_backend_rolemapping_delete.json
 
                         #update json template file w/revised list of backend roles
-                        sed -i'.bak' "s/xxBACKENDROLESxx/$newroles/g"     "$TMP_DIR"/"${targetrole}"_backend_rolemapping_delete.json # BACKENDROLES
+                        sed -i'.bak' "s/xxBACKENDROLESxx/$newroles/g" "$TMP_DIR"/"${targetrole}"_backend_rolemapping_delete.json # BACKENDROLES
 
                         # Replace the rolemappings for the $targetrole with the revised list of backend roles
                         response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/rolesmapping/$targetrole" -H 'Content-Type: application/json' -d @"$TMP_DIR"/"${targetrole}"_backend_rolemapping_delete.json --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
