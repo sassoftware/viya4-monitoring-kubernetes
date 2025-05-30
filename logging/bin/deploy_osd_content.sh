@@ -100,7 +100,7 @@ fi
 
 # Import OSD Searches, Visualizations and Dashboard Objects using curl
 ./logging/bin/import_osd_content.sh logging/osd/common cluster_admins
-./logging/bin/import_osd_content.sh logging/osd/cluster_admins  cluster_admins
+./logging/bin/import_osd_content.sh logging/osd/cluster_admins cluster_admins
 ./logging/bin/import_osd_content.sh logging/osd/namespace cluster_admins
 ./logging/bin/import_osd_content.sh logging/osd/tenant cluster_admins
 
