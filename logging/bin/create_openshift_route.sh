@@ -15,14 +15,14 @@ log_debug "Script [$this_script] has started [$(date)]"
 ##################################
 
 if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
-  if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
-    log_error "This script should only be run on OpenShift clusters"
-    exit 1
-  fi
+    if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+        log_error "This script should only be run on OpenShift clusters"
+        exit 1
+    fi
 fi
 
 app=${1}
-app=$(echo "$app"| tr '[:lower:]' '[:upper:]')
+app=$(echo "$app" | tr '[:lower:]' '[:upper:]')
 
 case "$app" in
 "OPENSEARCH" | "OS")
@@ -57,7 +57,7 @@ case "$app" in
         route_path="/"
     fi
     ;;
-""|*)
+"" | *)
     log_error "Application name is invalid or missing."
     log_error "The APPLICATION NAME is required; valid values are: OpenSearch or OpenSearchDashboards"
     exit 1
@@ -93,21 +93,20 @@ if [ "$OPENSHIFT_PATH_ROUTES" == "true" ]; then
 fi
 
 if [ "$rc" != "0" ]; then
-   log_error "There was a problem creating the route for [$route_name]. [$rc]"
-   exit 1
+    log_error "There was a problem creating the route for [$route_name]. [$rc]"
+    exit 1
 fi
 
 if [ "$tls_enable" == "true" ]; then
-   # identify secret containing destination CA
-   oc -n "$namespace" annotate route $route_name cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret
+    # identify secret containing destination CA
+    oc -n "$namespace" annotate route $route_name cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret
 fi
 
-
 if oc -n "$namespace" get secret $ingress_tls_secret 2> /dev/null 1>&2; then
-   # Add annotation to identify secret containing TLS certs
-   oc -n "$namespace" annotate route $route_name cert-utils-operator.redhat-cop.io/certs-from-secret=$ingress_tls_secret
+    # Add annotation to identify secret containing TLS certs
+    oc -n "$namespace" annotate route $route_name cert-utils-operator.redhat-cop.io/certs-from-secret=$ingress_tls_secret
 else
-   log_debug "The ingress secret [$ingress_tls_secret] does NOT exists, omitting annotation [certs-from-secret]."
+    log_debug "The ingress secret [$ingress_tls_secret] does NOT exists, omitting annotation [certs-from-secret]."
 fi
 
 log_info "OpenShift Route [$route_name] has been created."
