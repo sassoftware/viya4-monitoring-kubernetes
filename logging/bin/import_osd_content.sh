@@ -23,10 +23,10 @@ function import_file {
     if [ -f "$file" ]; then
         # ODFE 1.7.0: successful request returns: {"success":true,"successCount":20}
         # ODFE 1.13.x: successful request returns: {"successCount":1,"success":true,"successResults":[...content details...]}
-        response=$(curl -s -o "$TMP_DIR"/curl.response -w "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_import?overwrite=true" -H "securitytenant: $tenant"  -H "$LOG_XSRF_HEADER"   --form file=@"$file" --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure )
+        response=$(curl -s -o "$TMP_DIR"/curl.response -w "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_import?overwrite=true" -H "securitytenant: $tenant" -H "$LOG_XSRF_HEADER" --form file=@"$file" --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
 
         if [[ $response == 2* ]]; then
-            if grep -q '"success":true' "$TMP_DIR"/curl.response ; then
+            if grep -q '"success":true' "$TMP_DIR"/curl.response; then
                 log_verbose "Deployed content from file [$file] - Success! [$response]"
             else
                 log_warn "Unable to deploy content from file [$file]. [$response]"
@@ -58,13 +58,13 @@ function import_content_batch {
     for f in "$dir"/*.ndjson; do
         if [ -f "$f" ]; then
             log_debug "Adding $f to $tmpfile"
-            cat "$f" >>"$tmpfile"
+            cat "$f" >> "$tmpfile"
             echo " " >> "$tmpfile"
             ((item_count++))
         fi
     done
 
-    if [[ "$item_count" -gt 0 ]]; then
+    if [[ $item_count -gt 0 ]]; then
         log_debug "$item_count items packed into $tmpfile for loading"
         import_file "$tmpfile"
     else
@@ -99,14 +99,14 @@ function import_content {
 
 if [ "$#" != "2" ]; then
     log_error "Invalid set of arguments"
-    log_message  ""
-    log_message  "Usage: $this_script [CONTENT_LOCATION] [TENANT_SPACE]"
-    log_message  ""
-    log_message  "Loads content from the specified location into the specified tenant space."
-    log_message  ""
-    log_message  "     CONTENT_LOCATION  - (Required) The location, either a single file or a directory, containing content to be imported. Note: content must be in form of .ndjson files."
-    log_message  "     TENANT_SPACE      - (Required) The tenant space to which the content should be imported.  Note: the tenant space must already exist."
-    log_message  ""
+    log_message ""
+    log_message "Usage: $this_script [CONTENT_LOCATION] [TENANT_SPACE]"
+    log_message ""
+    log_message "Loads content from the specified location into the specified tenant space."
+    log_message ""
+    log_message "     CONTENT_LOCATION  - (Required) The location, either a single file or a directory, containing content to be imported. Note: content must be in form of .ndjson files."
+    log_message "     TENANT_SPACE      - (Required) The tenant space to which the content should be imported.  Note: the tenant space must already exist."
+    log_message ""
     exit 1
 fi
 
@@ -138,19 +138,19 @@ else
 fi
 
 # Convert tenant to all lower-case
-tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
+tenant=$(echo "$tenant" | tr '[:upper:]' '[:lower:]')
 
 # get credentials
 get_credentials_from_secret admin
 rc=$?
 if [ "$rc" != "0" ]; then
     log_info "RC=$rc"
-    exit $rc;
+    exit $rc
 fi
 
 if kibana_tenant_exists "$tenant"; then
     log_debug "Confirmed OpenSearch Dashboards tenant space [$tenant] exists"
-elif [ "$tenant" == "global" ];then
+elif [ "$tenant" == "global" ]; then
     log_debug "OpenSearch Dashboards tenant space [global] specified."
 else
     log_error "Specified tenant space [$tenant] does not exist. Target OpenSearch Dashboards tenant space must exist."
@@ -171,16 +171,16 @@ if [ -f "$1" ]; then
         exit 1
     fi
 elif [ -d "$1" ]; then
-        # Deploy specified directory of OSD content
-        log_info "Importing content in [$1] to tenant space [$tenant]..."
-        if [ "$batch_kibana_content" != "true" ]; then
-            log_debug "'BATCH_KIBANA_CONTENT' flag set to 'false'; loading files individually from directory"
-            import_content "$1"
-        else
-            import_content_batch "$1"
-        fi
+    # Deploy specified directory of OSD content
+    log_info "Importing content in [$1] to tenant space [$tenant]..."
+    if [ "$batch_kibana_content" != "true" ]; then
+        log_debug "'BATCH_KIBANA_CONTENT' flag set to 'false'; loading files individually from directory"
+        import_content "$1"
+    else
+        import_content_batch "$1"
+    fi
 
-        import_problems=$?
+    import_problems=$?
 
 elif [ "$ignore_not_found" == "true" ]; then
     log_debug "The specified file/directory to import [$1] does not exist or cannot be accessed but --ignore-not-found flag has been set."
