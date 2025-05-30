@@ -131,7 +131,6 @@ function add_rolemapping {
         log_debug "Existing rolemappings for [$targetrole] obtained. [$response]"
         log_debug "$(cat "$TMP_DIR"/rolemapping.json)"
 
-
         if grep -q "$berole" "$TMP_DIR"/rolemapping.json; then
             log_debug "A rolemapping between [$targetrole] and  back-end role [$berole] already appears to exist; leaving as-is."
             return 0
@@ -217,7 +216,7 @@ function remove_rolemapping {
             log_debug "$(cat "$TMP_DIR"/rolemapping.json)"
 
             regex='"backend_roles":\[((("[_0-9a-zA-Z\-]+",?)?)+)\]'
-            json=$(cat  "$TMP_DIR"/rolemapping.json)
+            json=$(cat "$TMP_DIR"/rolemapping.json)
 
             if [[ $json =~ $regex ]]; then
 
@@ -234,27 +233,27 @@ function remove_rolemapping {
                     # Extract and reconstruct backend_roles array from rolemapping json
                     newroles=$(echo "$be_roles" | sed "s/\"$berole2remove\"//g;s/,,,/,/g;s/,,/,/g; s/,]/]/g;s/\[,/\[/g")
                     if [ "$be_roles" == "$newroles" ]; then
-                    log_debug "The backend role [$berole2remove] is not mapped to [$targetrole]; moving on."
-                    return 0
-                    else
-
-                    log_debug "Updated Back-end Role ($targetrole): $newroles"
-
-                    # Copy RBAC template
-                    cp logging/opensearch/rbac/backend_rolemapping_delete.json "$TMP_DIR"/"${targetrole}"_backend_rolemapping_delete.json
-
-                    #update json template file w/revised list of backend roles
-                    sed -i'.bak' "s/xxBACKENDROLESxx/$newroles/g"     "$TMP_DIR"/"${targetrole}"_backend_rolemapping_delete.json # BACKENDROLES
-
-                    # Replace the rolemappings for the $targetrole with the revised list of backend roles
-                    response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/rolesmapping/$targetrole" -H 'Content-Type: application/json' -d @"$TMP_DIR"/"${targetrole}"_backend_rolemapping_delete.json --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
-                    if [[ $response != 2* ]]; then
-                        log_error "There was an issue updating the rolesmapping for [$targetrole] to remove link with backend-role [$berole2remove]. [$response]"
-                        return 1
-                    else
-                        log_info "Security rolemapping deleted between [$targetrole] and backend-role [$berole2remove]. [$response]"
+                        log_debug "The backend role [$berole2remove] is not mapped to [$targetrole]; moving on."
                         return 0
-                    fi
+                    else
+
+                        log_debug "Updated Back-end Role ($targetrole): $newroles"
+
+                        # Copy RBAC template
+                        cp logging/opensearch/rbac/backend_rolemapping_delete.json "$TMP_DIR"/"${targetrole}"_backend_rolemapping_delete.json
+
+                        #update json template file w/revised list of backend roles
+                        sed -i'.bak' "s/xxBACKENDROLESxx/$newroles/g"     "$TMP_DIR"/"${targetrole}"_backend_rolemapping_delete.json # BACKENDROLES
+
+                        # Replace the rolemappings for the $targetrole with the revised list of backend roles
+                        response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/rolesmapping/$targetrole" -H 'Content-Type: application/json' -d @"$TMP_DIR"/"${targetrole}"_backend_rolemapping_delete.json --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
+                        if [[ $response != 2* ]]; then
+                            log_error "There was an issue updating the rolesmapping for [$targetrole] to remove link with backend-role [$berole2remove]. [$response]"
+                            return 1
+                        else
+                            log_info "Security rolemapping deleted between [$targetrole] and backend-role [$berole2remove]. [$response]"
+                            return 0
+                        fi
                     fi
                 fi
             fi
@@ -365,7 +364,7 @@ function delete_user {
     username=$1
 
     if user_exists "$username"; then
-        response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "${sec_api_url}/internalusers/$username" --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure )
+        response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "${sec_api_url}/internalusers/$username" --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
 
         if [[ $response == 2* ]]; then
             log_debug "User [$username] deleted. [$response]"
