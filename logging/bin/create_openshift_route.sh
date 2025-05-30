@@ -102,7 +102,7 @@ if [ "$tls_enable" == "true" ]; then
     oc -n "$namespace" annotate route $route_name cert-utils-operator.redhat-cop.io/destinationCA-from-secret=$tls_secret
 fi
 
-if oc -n "$namespace" get secret $ingress_tls_secret 2> /dev/null 1>&2; then
+if oc -n "$namespace" get secret $ingress_tls_secret > /dev/null 2>&1; then
     # Add annotation to identify secret containing TLS certs
     oc -n "$namespace" annotate route $route_name cert-utils-operator.redhat-cop.io/certs-from-secret=$ingress_tls_secret
 else

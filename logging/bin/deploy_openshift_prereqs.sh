@@ -22,14 +22,14 @@ fi
 oc adm policy add-scc-to-user privileged -z v4m-os -n "$LOG_NS"
 
 # create the 'v4m-logging-v2' SCC, if it does not already exist
-if oc get scc v4m-logging-v2 2> /dev/null 1>&2; then
+if oc get scc v4m-logging-v2 > /dev/null 2>&1; then
     log_info "Skipping scc creation; using existing scc [v4m-logging-v2]"
 else
     oc create -f logging/openshift/fb_v4m-logging-v2_scc.yaml
 fi
 
 # create the 'v4m-k8sevents' SCC, if it does not already exist
-if oc get scc v4m-k8sevents 2> /dev/null 1>&2; then
+if oc get scc v4m-k8sevents > /dev/null 2>&1; then
     log_info "Skipping scc creation; using existing scc [v4m-k8sevents]"
 else
     oc create -f logging/openshift/fb_v4m-k8sevents_scc.yaml

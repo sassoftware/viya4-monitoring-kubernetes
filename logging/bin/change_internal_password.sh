@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
+# shellcheck disable=SC2034
+CHECK_HELM=false
 
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
@@ -140,8 +142,6 @@ if [[ $response == 4* ]]; then
     else
         log_debug "Attempting to change password for user [admin] using the admin certs rather than cached password"
 
-        # make sure hash utility is executable
-        kubectl -n "$LOG_NS" exec $targetpod -c $targetcontainer -- chmod +x $toolsrootdir/tools/hash.sh
         # get hash of new password
         # shellcheck disable=2063
         hashed_passwd=$(kubectl -n "$LOG_NS" exec $targetpod -c $targetcontainer -- $toolsrootdir/tools/hash.sh -p "$NEW_PASSWD" | grep -v '*')
