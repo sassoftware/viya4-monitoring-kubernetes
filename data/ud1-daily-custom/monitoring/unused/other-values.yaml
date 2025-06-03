@@ -1,0 +1,78 @@
+# EKS
+
+prometheus:
+  enabled: true
+  # Disable default configuration of NodePort
+  service:
+    type: ClusterIP
+    nodePort: null
+  # Define path-based ingress
+  ingress:
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    enabled: true
+    ingressClassName: nginx
+    tls:
+    - hosts:
+      - host.mycluster.example.com
+      secretName: prometheus-ingress-tls-secret
+    hosts:
+    - host.mycluster.example.com
+    path: /prometheus
+    pathType: Prefix
+  prometheusSpec:
+    routePrefix: /prometheus
+    externalUrl: https://host.mycluster.example.com/prometheus
+
+alertmanager:
+  enabled: true
+  # Disable default configuration of NodePort
+  service:
+    type: ClusterIP
+    nodePort: null
+  # Define path-based ingress
+  ingress:
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    enabled: true
+    ingressClassName: nginx
+    tls:
+    - hosts:
+      - host.mycluster.example.com
+      secretName: alertmanager-ingress-tls-secret
+    hosts:
+    - host.mycluster.example.com
+    path: /alertmanager
+    pathType: Prefix
+  alertmanagerSpec:
+    routePrefix: /alertmanager
+    externalUrl: https://host.mycluster.example.com/alertmanager
+
+grafana:
+  enabled: true
+  # Disable default configuration of NodePort
+  service:
+    type: ClusterIP
+    nodePort: null
+  # Define path-based ingress
+  ingress:
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    enabled: true
+    ingressClassName: nginx
+    tls:
+    - hosts:
+      - host.mycluster.example.com
+      secretName: grafana-ingress-tls-secret
+    hosts:
+    - host.mycluster.example.com
+    path: /grafana
+    pathType: Prefix
+  testFramework:
+    enabled: false
+  "grafana.ini":
+    server:
+      domain: host.mycluster.example.com
+      root_url: https://host.mycluster.example.com/grafana
+      serve_from_sub_path: true
+  

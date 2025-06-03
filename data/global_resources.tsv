@@ -1,0 +1,6 @@
+*** Variables ***
+${dataDir}	data/
+${dash_set_one}	data/custom_dashboards/dash_set_1
+${single_dash}	data/custom_dashboards
+${dash_set_two}	data/custom_dashboards/dash_set_2
+${requested_user_dir}	ud1-daily-custom
