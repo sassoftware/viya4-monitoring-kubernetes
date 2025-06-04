@@ -31,6 +31,7 @@ function create_secret_from_file {
             if [ -n "$label" ]; then
                 log_debug "Applying label [$label] to newly created secret [$secret_name]"
                 # shellcheck disable=SC2086
+                # quoting $label results in invalid kubectl syntax
                 kubectl -n "$LOG_NS" label secret "$secret_name" $label
             fi
 
@@ -69,6 +70,7 @@ function create_user_secret {
             if [ -n "$label" ]; then
                 log_debug "Applying label [$label] to newly created secret [$secret_name]"
                 # shellcheck disable=SC2086
+                # quoting $label results in invalid kubectl syntax
                 kubectl -n "$LOG_NS" label secret "$secret_name" $label
             fi
 
