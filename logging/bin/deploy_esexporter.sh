@@ -46,8 +46,7 @@ if helm3ReleaseExists es-exporter "$LOG_NS"; then
         helm -n "$LOG_NS" delete es-exporter
     fi
 
-    # shellcheck disable=2210
-    if kubectl get crd servicemonitors.monitoring.coreos.com 2> 1 1> /dev/null; then
+    if kubectl get crd servicemonitors.monitoring.coreos.com > /dev/null 2>&1; then
         #serviceMonitor CRD may not be present if metric monitoring stack is not deployed
         monNamespace=$(kubectl get servicemonitor -A --field-selector=metadata.name=elasticsearch -l sas.com/monitoring-base=kube-viya-monitoring -o=custom-columns=NAMESPACE:.metadata.namespace --no-headers)
         if [ -n "$monNamespace" ]; then
