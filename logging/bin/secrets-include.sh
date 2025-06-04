@@ -28,9 +28,10 @@ function create_secret_from_file {
         if [ "$(kubectl -n "$LOG_NS" create secret generic "$secret_name" --from-file="$filepath"/"$file")" == "secret/$secret_name created" ]; then
             log_verbose "Created secret for OpenSearch config file [$file]"
 
-            if [ "$label" != "" ]; then
+            if [ -n "$label" ]; then
                 log_debug "Applying label [$label] to newly created secret [$secret_name]"
-                kubectl -n "$LOG_NS" label secret "$secret_name" "$label"
+                # shellcheck disable=SC2086
+                kubectl -n "$LOG_NS" label secret "$secret_name" $label
             fi
 
             return 0
@@ -54,7 +55,7 @@ function create_user_secret {
 
         # log_debug "Will attempt to create secret [$secret_name]"
 
-        if [ "$password" == "" ]; then
+        if [ -z "$password" ]; then
             # generate password if one not provided
             log_debug "Generating random password for [$username]"
             password="$(randomPassword)"
@@ -65,9 +66,10 @@ function create_user_secret {
 
             log_verbose "Created secret for OpenSearch user credentials [$username]"
 
-            if [ "$label" != "" ]; then
+            if [ -n "$label" ]; then
                 log_debug "Applying label [$label] to newly created secret [$secret_name]"
-                kubectl -n "$LOG_NS" label secret "$secret_name" "$label"
+                # shellcheck disable=SC2086
+                kubectl -n "$LOG_NS" label secret "$secret_name" $label
             fi
 
             return 0
