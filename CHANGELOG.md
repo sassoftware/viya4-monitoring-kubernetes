@@ -1,5 +1,12 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Logging**
+  * [CHANGE] The Fluent Bit Deployment used for Kubernetes Event collection can now be integrated into the
+SAS Viya Workload node placement strategy.
+  * [CHANGE] An obsolete configuration file related to the Event Router has been removed from the repo.
+
+
 ## Version 1.2.37 (13MAY2025)
 * **Metrics**
   * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 68.3.0 to 70.8.0.
