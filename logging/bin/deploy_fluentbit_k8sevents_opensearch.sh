@@ -21,6 +21,18 @@ fi
 
 set -e
 
+# Enable workload node placement?
+LOG_NODE_PLACEMENT_ENABLE=${LOG_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
+
+# Optional workload node placement support
+if [ "$LOG_NODE_PLACEMENT_ENABLE" == "true" ]; then
+    log_verbose "Enabling Fluent Bit (K8s Event Collector) for workload node placement"
+    wnpValuesFile="logging/node-placement/values-fluent-bit-events-wnp.yaml"
+else
+    log_debug "Workload node placement support is disabled for Fluent Bit (K8s Event Collector)"
+    wnpValuesFile="$TMP_DIR/empty.yaml"
+fi
+
 #Fail if not using OpenSearch back-end
 require_opensearch
 
@@ -99,6 +111,7 @@ helm $helmDebug upgrade --install --namespace "$LOG_NS" v4m-fb-events \
     $versionstring \
     --values "$imageKeysFile" \
     --values logging/fb/fluent-bit_helm_values_events.yaml \
+    --values "$wnpValuesFile" \
     --values "$openshiftValuesFile" \
     --values "$FB_EVENTS_USER_YAML" \
     --set fullnameOverride=v4m-fb-events \
