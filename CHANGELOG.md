@@ -5,6 +5,14 @@
   * [CHANGE] The Fluent Bit Deployment used for Kubernetes Event collection can now be integrated into the
 SAS Viya Workload node placement strategy.
   * [CHANGE] An obsolete configuration file related to the Event Router has been removed from the repo.
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.19.1 to 2.19.2.
+  * [UPGRADE] OpenSearch Helm chart upgraded from 2.32.0 to 2.34.0.
+  * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 2.28.0 to 2.30.0
+  * [UPGRADE] Fluent Bit upgraded from 3.2.10 to 4.0.2
+  * [UPGRADE] Fluent Bit Helm chart upgraded from 0.48.6 to 0.49.0
+  * [UPGRADE] Elasticsearch Exporer upgraded from 1.8.0 to 1.9.0
+  * [UPGRADE] Elasticsearch Exporer Helm chart upgraded from 6.6.1 to 6.7.2
+  * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.24.0 to 2.26.1
 
 
 ## Version 1.2.37 (13MAY2025)
