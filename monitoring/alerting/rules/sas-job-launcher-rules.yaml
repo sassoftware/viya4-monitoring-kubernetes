@@ -1,0 +1,74 @@
+apiVersion: 1
+groups:
+  - name: SAS Job Launcher
+    folder: Job Monitoring
+    interval: 1m
+    rules:
+      - uid: sas_job_launcher_ready
+        title: SAS Job Launcher Pod Not Running
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              expr: sum(:sas_launcher_pod_status:{phase="Running"})
+              interval: ""
+              intervalMs: 1000
+              maxDataPoints: 43200
+              datasource:
+                type: prometheus
+                uid: prometheus
+              instant: true
+              refId: A
+              editorMode: code
+              range: false
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+              refId: B
+              datasource:
+                type: __expr__
+                uid: __expr__
+              intervalMs: 1000
+              maxDataPoints: 43200
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              refId: C
+              datasource:
+                type: __expr__
+                uid: __expr__
+              conditions:
+                - type: query
+                  evaluator:
+                    type: lt
+                    params:
+                      - 1
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    type: last
+                    params: []
+              intervalMs: 1000
+              maxDataPoints: 43200
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: No SAS Job Launcher pods in Running state
+          description:
+            Checks if any SAS launcher jobs are in Running state. If none are
+            running, this may indicate an issue with job launching or orchestration.
+        labels:
+          severity: warning
