@@ -1,19 +1,21 @@
 apiVersion: 1
 groups:
-  - orgId: 1
-    name: SAS Viya Alerts
-    folder: CAS Alerts
+  - folder: CAS Alerts
     interval: 5m
+    name: SAS Viya Alerts
+    orgId: 1
     rules:
-      - uid: fc41d560-9a18-4168-8a6a-615e60dc70de
-        title: cas-restart
+      - annotations:
+          description:
+            Check to see that the CAS pod existed for a short time. This implies
+            that CAS pod has restarted for whatever the reason. Will need to further investigate
+            the cause.
+          summary:
+            The current CAS (sas-cas-server-default-controller) pod < 15 minutes
+            in existence. Mostly likely it is due to restart of the CAS pod.
         condition: C
         data:
-          - refId: A
-            relativeTimeRange:
-              from: 600
-              to: 0
-            datasourceUid: prometheus
+          - datasourceUid: prometheus
             model:
               disableTextWrap: false
               editorMode: code
@@ -27,11 +29,11 @@ groups:
               range: false
               refId: A
               useBackend: false
-          - refId: B
+            refId: A
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -55,11 +57,11 @@ groups:
               reducer: last
               refId: B
               type: reduce
-          - refId: C
+            refId: B
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -83,28 +85,29 @@ groups:
               maxDataPoints: 43200
               refId: C
               type: threshold
-        noDataState: NoData
-        execErrState: Error
-        for: 5m
-        annotations:
-          description:
-            Check to see that the CAS pod existed for a short time.  This implies
-            that CAS pod has restarted for whatever the reason.  Will need to further
-            investigate the cause.
-          summary:
-            The current CAS (sas-cas-server-default-controller) pod < 15 minutes
-            in existence.  Mostly likely it is due to restart of the CAS pod.
-        labels: {}
-        isPaused: false
-      - uid: ca744a08-e4e9-49b7-85a1-79e9fe05d4c1
-        title: cas-memory
-        condition: C
-        data:
-          - refId: A
+            refId: C
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: prometheus
+        execErrState: Error
+        for: 5m
+        isPaused: false
+        labels: {}
+        noDataState: NoData
+        title: cas-restart
+        uid: fc41d560-9a18-4168-8a6a-615e60dc70de
+      - annotations:
+          description:
+            Checks the CAS memory usage. If it is > 300GB, it will alert. Currently,
+            max. memory is 512GB. The expectation is that this alert will be an early
+            warning sign to investigate large memory usage as typical usage is less than
+            the threshold. Want to prevent OOMkill of CAS.
+          summary:
+            CAS memory > 300GB. This can be due to a program or pipeline taking
+            all the available memory.
+        condition: C
+        data:
+          - datasourceUid: prometheus
             model:
               editorMode: code
               exemplar: false
@@ -116,11 +119,11 @@ groups:
               maxDataPoints: 43200
               range: false
               refId: A
-          - refId: B
+            refId: A
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -144,11 +147,11 @@ groups:
               reducer: last
               refId: B
               type: reduce
-          - refId: C
+            refId: B
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -172,27 +175,18 @@ groups:
               maxDataPoints: 43200
               refId: C
               type: threshold
-        noDataState: NoData
+            refId: C
+            relativeTimeRange:
+              from: 600
+              to: 0
         execErrState: Error
         for: 5m
-        annotations:
-          description:
-            Checks the CAS memory usage.  If it is > 300GB, it will alert.  Currently,
-            max. memory is 512GB.  The expectation is that this alert will be an early
-            warning sign to investigate large memory usage as typical usage is less than
-            the threshold.  Want to prevent OOMkill of CAS.
-          summary:
-            CAS memory > 300GB.  This can be due to a program or pipeline taking
-            all the available memory.
-        labels: {}
         isPaused: false
-      - uid: cas_restart_alert
-        title: CAS Restart Alert
-        condition: A
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
+        labels: {}
+        noDataState: NoData
+        title: cas-memory
+        uid: ca744a08-e4e9-49b7-85a1-79e9fe05d4c1
+      - annotations:
           description:
             Check to see that the CAS pod existed for a short time. This implies
             that CAS pod has restarted for whatever the reason. Will need to further investigate
@@ -200,51 +194,79 @@ groups:
           summary:
             The current CAS (sas-cas-server-default-controller) pod < 15 minutes
             in existence. Mostly likely it is due to restart of the CAS pod.
+        condition: A
         data:
-          - refId: A
-            datasourceUid: prometheus
-            relativeTimeRange:
-              from: 300
-              to: 0
+          - datasourceUid: prometheus
             model:
               expr: cas_grid_uptime_seconds_total
               instant: true
-      - uid: cas_memory_usage
-        title: CAS Memory Usage
-        condition: A
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
         for: 5m
         labels:
           severity: warning
-        annotations:
+        title: CAS Restart Alert
+        uid: cas_restart_alert
+      - annotations:
           description: Checks the CAS memory usage. If it is > 300GB, it will alert.
           summary:
             CAS memory > 300GB. This can be due to a program or pipeline taking
             all the available memory.
+        condition: A
         data:
-          - refId: A
-            datasourceUid: prometheus
-            relativeTimeRange:
-              from: 300
-              to: 0
+          - datasourceUid: prometheus
             model:
               expr:
                 (cas_node_mem_size_bytes{type="physical"} - cas_node_mem_free_bytes{type="physical"})
                 / 1073741824 > 300
               instant: true
-  - orgId: 1
-    name: SAS Viya Alerts
-    folder: Viya Platform Alerts
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: CAS Memory Usage
+        uid: cas_memory_usage
+      - annotations:
+          description:
+            CAS thread count is higher than 400. May indicate overloaded CAS
+            server.
+          summary: CAS is using more than 400 threads.
+        condition: A
+        data:
+          - datasourceUid: prometheus
+            model:
+              expr: cas_thread_count > 400
+              instant: true
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: CAS Thread Count High
+        uid: cas_thread_count
+  - folder: Viya Platform Alerts
     interval: 5m
+    name: SAS Viya Alerts
+    orgId: 1
     rules:
-      - uid: e45e6d74-e396-40ce-a061-2a294295e61b
-        title: viya-readiness
+      - annotations:
+          description:
+            Checks for the Ready state of sas-readiness pod. Will need to check
+            the status of the Viya pods since sas-readiness pod reflects the health of
+            the Viya services.
+          summary:
+            sas-readiness pod is not in Ready state. This means that one or more
+            of the Viya services are not in a good state.
         condition: C
         data:
-          - refId: A
-            relativeTimeRange:
-              from: 600
-              to: 0
-            datasourceUid: prometheus
+          - datasourceUid: prometheus
             model:
               disableTextWrap: false
               editorMode: builder
@@ -258,11 +280,11 @@ groups:
               range: false
               refId: A
               useBackend: false
-          - refId: B
+            refId: A
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -286,11 +308,11 @@ groups:
               reducer: last
               refId: B
               type: reduce
-          - refId: C
+            refId: B
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -314,28 +336,30 @@ groups:
               maxDataPoints: 43200
               refId: C
               type: threshold
-        noDataState: NoData
-        execErrState: Error
-        for: 5m
-        annotations:
-          description:
-            Checks for the Ready state of sas-readiness pod.  Will need to
-            check the status of the Viya pods since sas-readiness pod reflects the health
-            of the Viya services.
-          summary:
-            sas-readiness pod is not in Ready state.  This means that one or more
-            of the Viya services are not in a good state.
-        labels: {}
-        isPaused: false
-      - uid: efb36686-4e44-4de8-80c4-7dde9130da90
-        title: rabbitmq-readymessages
-        condition: C
-        data:
-          - refId: A
+            refId: C
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: prometheus
+        execErrState: Error
+        for: 5m
+        isPaused: false
+        labels: {}
+        noDataState: NoData
+        title: viya-readiness
+        uid: e45e6d74-e396-40ce-a061-2a294295e61b
+      - annotations:
+          description:
+            Checks for accumulation of Rabbitmq ready messages > 10,000. It
+            could impact Model Studio pipelines. Follow the steps in the  url to help
+            troubleshoot. The  covers potential orphan queues and/or bottlenecking of
+            queues due to catalog service.
+          summary:
+            Rabbitmq ready messages > 10,000. This means there is a large backlog
+            of messages due to high activity (which can be temporary) or something has
+            gone wrong.
+        condition: C
+        data:
+          - datasourceUid: prometheus
             model:
               disableTextWrap: false
               editorMode: builder
@@ -349,11 +373,11 @@ groups:
               range: false
               refId: A
               useBackend: false
-          - refId: B
+            refId: A
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -377,11 +401,11 @@ groups:
               reducer: last
               refId: B
               type: reduce
-          - refId: C
+            refId: B
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -405,31 +429,30 @@ groups:
               maxDataPoints: 43200
               refId: C
               type: threshold
-        noDataState: NoData
-        execErrState: Error
-        for: 5m
-        annotations:
-          description:
-            Checks for accumulation of Rabbitmq ready messages > 10,000.  It
-            could impact Model Studio pipelines.  Follow the steps in the runbook url
-            to help troubleshoot.  The runbook covers potential orphan queues and/or bottlenecking
-            of queues due to catalog service.
-          runbook_url: https://sas-institute.atlassian.net/wiki/spaces/ITSSA/pages/1032552466/Troubleshooting+a+model+studio+project+where+the+Data+node+was+stuck+on+Running
-          summary:
-            Rabbitmq ready messages > 10,000.  This means there is a large backlog
-            of messages due to high activity (which can be temporary) or something has
-            gone wrong.
-        labels: {}
-        isPaused: false
-      - uid: ed69b8e4-ce60-44a0-8f51-83743df0e448
-        title: compute-age
-        condition: C
-        data:
-          - refId: A
+            refId: C
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: prometheus
+        execErrState: Error
+        for: 5m
+        isPaused: false
+        labels: {}
+        noDataState: NoData
+        title: rabbitmq-readymessages
+        uid: efb36686-4e44-4de8-80c4-7dde9130da90
+      - annotations:
+          description:
+            "It looks for compute pods > 1 day. Most likely, it is orphaned
+            compute pod that is lingering. Consider killing it.
+
+            There is an airflow job that sweeps the VFL fleet regularly to look for these
+            compute pods as well for deletion."
+          summary:
+            SAS compute-server pods > 1 day old. Compute pods in VFL do not need
+            to be running longer than 1 day since there are no long running jobs.
+        condition: C
+        data:
+          - datasourceUid: prometheus
             model:
               editorMode: code
               expr: (time() - kube_pod_created{pod=~"sas-compute-server-.*"})/60/60/24
@@ -439,11 +462,11 @@ groups:
               maxDataPoints: 43200
               range: false
               refId: A
-          - refId: B
+            refId: A
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -467,11 +490,11 @@ groups:
               reducer: last
               refId: B
               type: reduce
-          - refId: C
+            refId: B
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -495,30 +518,28 @@ groups:
               maxDataPoints: 43200
               refId: C
               type: threshold
-        noDataState: OK
-        execErrState: Error
-        for: 5m
-        annotations:
-          description:
-            "It looks for compute pods > 1 day.  Most likely, it is orphaned
-            compute pod that is lingering.  Consider killing it.
-
-            There is an airflow job that sweeps the VFL fleet regularly to look for these
-            compute pods as well for deletion."
-          summary:
-            SAS compute-server pods > 1 day old. Compute pods in VFL do not need
-            to be running longer than 1 day since there are no long running jobs.
-        labels: {}
-        isPaused: true
-      - uid: e7ecb843-f1bd-48b7-8c8c-58571d1642ad
-        title: viya-pod-restarts
-        condition: C
-        data:
-          - refId: A
+            refId: C
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: prometheus
+        execErrState: Error
+        for: 5m
+        isPaused: true
+        labels: {}
+        noDataState: OK
+        title: compute-age
+        uid: ed69b8e4-ce60-44a0-8f51-83743df0e448
+      - annotations:
+          description:
+            Checks the restart count of the pod(s). Will need to check why
+            the pod(s) have restarted so many times. One possible cause is OOMkill. This
+            means we will need to increase the memory limit.
+          summary:
+            The number of pod restarts > 20. The service pod(s) have restarted
+            many times due to issues.
+        condition: C
+        data:
+          - datasourceUid: prometheus
             model:
               disableTextWrap: false
               editorMode: builder
@@ -532,11 +553,11 @@ groups:
               range: false
               refId: A
               useBackend: false
-          - refId: B
+            refId: A
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -560,11 +581,11 @@ groups:
               reducer: last
               refId: B
               type: reduce
-          - refId: C
+            refId: B
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -588,26 +609,18 @@ groups:
               maxDataPoints: 43200
               refId: C
               type: threshold
-        noDataState: NoData
+            refId: C
+            relativeTimeRange:
+              from: 600
+              to: 0
         execErrState: Error
         for: 5m
-        annotations:
-          description:
-            Checks the restart count of the pod(s).  Will need to check why
-            the pod(s) have restarted so many times.  One possible cause is OOMkill.  This
-            means we will need to increase the memory limit.
-          summary:
-            The number of pod restarts > 20.  The service pod(s) have restarted
-            many times due to issues.
-        labels: {}
         isPaused: false
-      - uid: viya_readiness
-        title: Viya Readiness
-        condition: A
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
+        labels: {}
+        noDataState: NoData
+        title: viya-pod-restarts
+        uid: e7ecb843-f1bd-48b7-8c8c-58571d1642ad
+      - annotations:
           description:
             Checks for the Ready state of sas-readiness pod. Will need to check
             the status of the Viya pods since sas-readiness pod reflects the health of
@@ -615,89 +628,140 @@ groups:
           summary:
             sas-readiness pod is not in Ready state. This means that one or more
             of the Viya services are not in a good state.
+        condition: A
         data:
-          - refId: A
-            datasourceUid: prometheus
-            relativeTimeRange:
-              from: 300
-              to: 0
+          - datasourceUid: prometheus
             model:
               expr: kube_pod_container_status_ready{container="sas-readiness"}
               instant: true
-      - uid: rabbitmq_ready_msgs
-        title: RabbitMQ Ready Messages
-        condition: A
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
         for: 5m
         labels:
           severity: warning
-        annotations:
+        title: Viya Readiness
+        uid: viya_readiness
+      - annotations:
           description:
             Checks for accumulation of Rabbitmq ready messages > 10,000. It
             could impact Model Studio pipelines.
           summary:
             Rabbitmq ready messages > 10,000. This means there is a large backlog
             of messages due to high activity or something has gone wrong.
+        condition: A
         data:
-          - refId: A
-            datasourceUid: prometheus
-            relativeTimeRange:
-              from: 300
-              to: 0
+          - datasourceUid: prometheus
             model:
               expr: rabbitmq_queue_messages_ready > 10000
               instant: true
-      - uid: compute_pod_age
-        title: Compute Pod Age
-        condition: A
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
-          description: Looks for compute pods > 1 day.
-          summary: SAS compute-server pods > 1 day old.
-        data:
-          - refId: A
-            datasourceUid: prometheus
+            refId: A
             relativeTimeRange:
               from: 300
               to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: RabbitMQ Ready Messages
+        uid: rabbitmq_ready_msgs
+      - annotations:
+          description: Looks for compute pods > 1 day.
+          summary: SAS compute-server pods > 1 day old.
+        condition: A
+        data:
+          - datasourceUid: prometheus
             model:
               expr:
                 (time() - kube_pod_created{pod=~"sas-compute-server-.*"}) / 60 / 60
                 / 24 > 1
               instant: true
-      - uid: viya_pod_restarts
-        title: Viya Pod Restarts
-        condition: A
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
-          description: Checks if any Viya pods have restarted > 20 times.
-          summary: The number of pod restarts > 20. Investigate for OOM or instability.
-        data:
-          - refId: A
-            datasourceUid: prometheus
+            refId: A
             relativeTimeRange:
               from: 300
               to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: Compute Pod Age
+        uid: compute_pod_age
+      - annotations:
+          description: Checks if any Viya pods have restarted > 20 times.
+          summary: The number of pod restarts > 20. Investigate for OOM or instability.
+        condition: A
+        data:
+          - datasourceUid: prometheus
             model:
               expr: kube_pod_container_status_restarts_total{namespace="viya"} > 20
               instant: true
-  - orgId: 1
-    name: SAS Viya Alerts
-    folder: Other Alerts
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: Viya Pod Restarts
+        uid: viya_pod_restarts
+      - annotations:
+          description:
+            RabbitMQ has a high number of unacknowledged messages. This may
+            indicate stuck consumers or performance issues.
+          summary: Unacked messages in RabbitMQ are greater than 5000.
+        condition: A
+        data:
+          - datasourceUid: prometheus
+            model:
+              expr: rabbitmq_queue_messages_unacknowledged > 5000
+              instant: true
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: RabbitMQ Unacked Messages High
+        uid: rabbitmq_unacked_messages
+      - annotations:
+          description:
+            Viya service API response latency is high (95th percentile over
+            1s).
+          summary: Degraded performance on Viya APIs.
+        condition: A
+        data:
+          - datasourceUid: prometheus
+            model:
+              expr:
+                histogram_quantile(0.95, sum(rate(http_server_requests_duration_seconds_bucket{job=~"sas-.*"}[5m]))
+                by (le)) > 1
+              instant: true
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: Viya API Latency High
+        uid: viya_api_latency
+  - folder: Other Alerts
     interval: 5m
+    name: SAS Viya Alerts
+    orgId: 1
     rules:
-      - uid: d52b3c24-acf4-4b5e-ae52-31ff8f167330
-        title: NFS-share
+      - annotations:
+          description:
+            Checks if the NFS share attached to CAS is > 85% full. Use command
+            "du -h -d 1" to to find the location where large files are located in the
+            NFS shares. Most likely it will be one of the home directories due to runaway
+            size of a casuser table or Viya backups.
+          summary:
+            NFS share > 85% full. Typically, it is due to users filling their own
+            home directory or backups.
         condition: C
         data:
-          - refId: A
-            relativeTimeRange:
-              from: 600
-              to: 0
-            datasourceUid: prometheus
+          - datasourceUid: prometheus
             model:
               editorMode: code
               expr:
@@ -711,11 +775,11 @@ groups:
               maxDataPoints: 43200
               range: false
               refId: A
-          - refId: B
+            refId: A
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -739,11 +803,11 @@ groups:
               reducer: last
               refId: B
               type: reduce
-          - refId: C
+            refId: B
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -767,29 +831,29 @@ groups:
               maxDataPoints: 43200
               refId: C
               type: threshold
-        noDataState: NoData
-        execErrState: Error
-        for: 5m
-        annotations:
-          description:
-            Checks if the NFS share attached to CAS is > 85% full.  Use command
-            "du -h -d 1" to to find the location where large files are located in the
-            NFS shares.  Most likely it will be one of the home directories due to runaway
-            size of a casuser table or Viya backups.
-          summary:
-            NFS share > 85% full.  Typically, it is due to users filling their
-            own home directory or backups.
-        labels: {}
-        isPaused: false
-      - uid: abe80c6a-3add-477a-b228-f8283704570f
-        title: crunchy-backrest-repo
-        condition: C
-        data:
-          - refId: A
+            refId: C
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: prometheus
+        execErrState: Error
+        for: 5m
+        isPaused: false
+        labels: {}
+        noDataState: NoData
+        title: NFS-share
+        uid: d52b3c24-acf4-4b5e-ae52-31ff8f167330
+      - annotations:
+          description:
+            "Checks to see /pgbackrest/repo1 filesystem is more than 50% full.
+
+            Go to the  URL to follow the troubleshooting steps."
+          summary:
+            /pgbackrest/repo1 storage > 50% full in the pgbackrest repo. This typically
+            happens when the archived WAL logs are increasing and not being expired and
+            cleared.
+        condition: C
+        data:
+          - datasourceUid: prometheus
             model:
               editorMode: code
               expr:
@@ -803,11 +867,11 @@ groups:
               maxDataPoints: 43200
               range: false
               refId: A
-          - refId: B
+            refId: A
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -831,11 +895,11 @@ groups:
               reducer: last
               refId: B
               type: reduce
-          - refId: C
+            refId: B
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -859,38 +923,25 @@ groups:
               maxDataPoints: 43200
               refId: C
               type: threshold
-        noDataState: NoData
+            refId: C
+            relativeTimeRange:
+              from: 600
+              to: 0
         execErrState: Error
         for: 5m
-        annotations:
-          description:
-            "Checks to see /pgbackrest/repo1 filesystem is more than 50% full.
-
-            Go to the Runbook URL to follow the troubleshooting steps."
-          runbook_url: https://sas-institute.atlassian.net/wiki/spaces/ITSSA/pages/1247543297/When+Crunchy+database+disk+space+is+full
-          summary:
-            /pgbackrest/repo1 storage > 50% full in the pgbackrest repo.  This
-            typically happens when the archived WAL logs are increasing and not being
-            expired and cleared.
-        labels: {}
         isPaused: false
-      - uid: nfs_share_usage
-        title: NFS Share Usage
-        condition: A
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
+        labels: {}
+        noDataState: NoData
+        title: crunchy-backrest-repo
+        uid: abe80c6a-3add-477a-b228-f8283704570f
+      - annotations:
           description: Checks if the NFS share attached to CAS is > 85% full.
           summary:
             NFS share > 85% full. Typically, it is due to users filling their home
             directory or backups.
+        condition: A
         data:
-          - refId: A
-            datasourceUid: prometheus
-            relativeTimeRange:
-              from: 21600
-              to: 0
+          - datasourceUid: prometheus
             model:
               expr:
                 "((kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=\"cas-default-data\"\
@@ -898,23 +949,23 @@ groups:
                 })\n / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=\"cas-default-data\"\
                 }) * 100 > 85"
               instant: true
-      - uid: pgbackrest_repo_usage
-        title: Crunchy Backrest Repo Usage
-        condition: A
+            refId: A
+            relativeTimeRange:
+              from: 21600
+              to: 0
         for: 5m
         labels:
           severity: warning
-        annotations:
+        title: NFS Share Usage
+        uid: nfs_share_usage
+      - annotations:
           description: Checks if /pgbackrest/repo1 is more than 50% full.
           summary:
             /pgbackrest/repo1 storage > 50% full. Possibly due to unexpired WAL
             logs.
+        condition: A
         data:
-          - refId: A
-            datasourceUid: prometheus
-            relativeTimeRange:
-              from: 300
-              to: 0
+          - datasourceUid: prometheus
             model:
               expr:
                 "((kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~\"sas-crunchy-platform-postgres-repo1\"\
@@ -922,20 +973,33 @@ groups:
                 })\n / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~\"sas-crunchy-platform-postgres-repo1\"\
                 }) * 100 > 50"
               instant: true
-  - orgId: 1
-    name: SAS Viya Alerts
-    folder: Database Alerts
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: Crunchy Backrest Repo Usage
+        uid: pgbackrest_repo_usage
+  - folder: Database Alerts
     interval: 5m
+    name: SAS Viya Alerts
+    orgId: 1
     rules:
-      - uid: fc65fbaf-c196-4eb4-a130-f45cc46b775b
-        title: catalog-dbconn
+      - annotations:
+          description:
+            "Checks the in-use catalog database connections > 21. The default
+            db connection pool is 22.  If it reaches the limit, the rabbitmq queues starts
+            to fill up with ready messages causing issues with Model Studio pipelines.
+
+            Click on the  URL on how to remediate the issue."
+          summary:
+            The active catalog database connections > 21. If it reaches the max.
+            db connections, it will impact the rabbitmq queues.
         condition: C
         data:
-          - refId: A
-            relativeTimeRange:
-              from: 600
-              to: 0
-            datasourceUid: prometheus
+          - datasourceUid: prometheus
             model:
               disableTextWrap: false
               editorMode: builder
@@ -949,11 +1013,11 @@ groups:
               range: false
               refId: A
               useBackend: false
-          - refId: B
+            refId: A
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -977,11 +1041,11 @@ groups:
               reducer: last
               refId: B
               type: reduce
-          - refId: C
+            refId: B
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -1005,31 +1069,27 @@ groups:
               maxDataPoints: 43200
               refId: C
               type: threshold
-        noDataState: NoData
-        execErrState: Error
-        for: 5m
-        annotations:
-          description:
-            "Checks the in-use catalog database connections > 21.  The default
-            db connection pool is 22.   If it reaches the limit, the rabbitmq queues starts
-            to fill up with ready messages causing issues with Model Studio pipelines.
-
-            Click on the runbook URL on how to remediate the issue."
-          runbook_url: https://sas-institute.atlassian.net/wiki/spaces/ITSSA/pages/1032552466/Troubleshooting+a+model+studio+project+where+the+Data+node+was+stuck+on+Running
-          summary:
-            The active catalog database connections > 21.  If it reaches the max.
-            db connections, it will impact the rabbitmq queues.
-        labels: {}
-        isPaused: false
-      - uid: fb411e28-b2e5-43d0-a413-e6dedbf154c4
-        title: crunchy-pgdata
-        condition: C
-        data:
-          - refId: A
+            refId: C
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: prometheus
+        execErrState: Error
+        for: 5m
+        isPaused: false
+        labels: {}
+        noDataState: NoData
+        title: catalog-dbconn
+        uid: fc65fbaf-c196-4eb4-a130-f45cc46b775b
+      - annotations:
+          description: "Checks to see /pgdata filesystem is more than 50% full.
+
+            Go to the  URL to follow the troubleshooting steps."
+          summary:
+            /pgdata storage > 50% full. This typically happens when the WAL logs
+            are increasing and not being cleared.
+        condition: C
+        data:
+          - datasourceUid: prometheus
             model:
               disableTextWrap: false
               editorMode: code
@@ -1047,11 +1107,11 @@ groups:
               range: false
               refId: A
               useBackend: false
-          - refId: B
+            refId: A
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -1075,11 +1135,11 @@ groups:
               reducer: last
               refId: B
               type: reduce
-          - refId: C
+            refId: B
             relativeTimeRange:
               from: 600
               to: 0
-            datasourceUid: __expr__
+          - datasourceUid: __expr__
             model:
               conditions:
                 - evaluator:
@@ -1103,54 +1163,43 @@ groups:
               maxDataPoints: 43200
               refId: C
               type: threshold
-        noDataState: NoData
+            refId: C
+            relativeTimeRange:
+              from: 600
+              to: 0
         execErrState: Error
         for: 5m
-        annotations:
-          description: "Checks to see /pgdata filesystem is more than 50% full.
-
-            Go to the Runbook URL to follow the troubleshooting steps."
-          runbook_url: https://sas-institute.atlassian.net/wiki/spaces/ITSSA/pages/1247543297/When+Crunchy+database+disk+space+is+full
-          summary:
-            /pgdata storage > 50% full.  This typically happens when the WAL logs
-            are increasing and not being cleared.
-        labels: {}
         isPaused: false
-      - uid: catalog_db_connections
-        title: Catalog DB Connections
-        condition: A
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
+        labels: {}
+        noDataState: NoData
+        title: crunchy-pgdata
+        uid: fb411e28-b2e5-43d0-a413-e6dedbf154c4
+      - annotations:
           description: Checks the in-use catalog database connections > 21.
           summary: The active catalog database connections > 21. May impact RabbitMQ queues.
+        condition: A
         data:
-          - refId: A
-            datasourceUid: prometheus
-            relativeTimeRange:
-              from: 300
-              to: 0
+          - datasourceUid: prometheus
             model:
               expr:
                 sas_db_pool_connections{container="sas-catalog-services", state="inUse"}
                 > 21
               instant: true
-      - uid: pgdata_usage
-        title: Crunchy PGData Usage
-        condition: A
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
-          description: Checks if /pgdata is more than 50% full.
-          summary: /pgdata storage > 50% full. Often due to WAL logs not being cleared.
-        data:
-          - refId: A
-            datasourceUid: prometheus
+            refId: A
             relativeTimeRange:
               from: 300
               to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: Catalog DB Connections
+        uid: catalog_db_connections
+      - annotations:
+          description: Checks if /pgdata is more than 50% full.
+          summary: /pgdata storage > 50% full. Often due to WAL logs not being cleared.
+        condition: A
+        data:
+          - datasourceUid: prometheus
             model:
               expr:
                 "((kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~\"sas-crunchy-platform-postgres-00-.*\"\
@@ -1158,3 +1207,30 @@ groups:
                 })\n / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~\"sas-crunchy-platform-postgres-00-.*\"\
                 }) * 100 > 50"
               instant: true
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: Crunchy PGData Usage
+        uid: pgdata_usage
+      - annotations:
+          description: PostgreSQL database connection usage is above 85% of max connections.
+          summary: Database is nearing connection limit.
+        condition: A
+        data:
+          - datasourceUid: prometheus
+            model:
+              expr: (pg_stat_activity_count / pg_settings_max_connections) * 100 > 85
+              instant: true
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: PostgreSQL Connection Utilization High
+        uid: postgres_connection_utilization
