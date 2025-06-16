@@ -493,8 +493,6 @@ for f in monitoring/rules/viya/rules-*.yaml; do
     kubectl apply -n "$MON_NS" -f "$f"
 done
 
-# ConfigMaps for Grafana alerting were already created before the Helm deployment
-
 # Elasticsearch Datasource for Grafana
 LOGGING_DATASOURCE="${LOGGING_DATASOURCE:-false}"
 if [ "$LOGGING_DATASOURCE" == "true" ]; then
