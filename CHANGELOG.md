@@ -1,7 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
-## unreleased
+## Unreleased
 * **Logging**
+  * [CHANGE] The Fluent Bit Deployment used for Kubernetes Event collection can now be integrated into the
+SAS Viya Workload node placement strategy.
+  * [CHANGE] An obsolete configuration file related to the Event Router has been removed from the repo.
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.19.1 to 2.19.2.
   * [UPGRADE] OpenSearch Helm chart upgraded from 2.32.0 to 2.34.0.
   * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 2.28.0 to 2.30.0
