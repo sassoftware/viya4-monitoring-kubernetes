@@ -370,16 +370,29 @@ versionstring="$(get_helm_versionstring "$KUBE_PROM_STACK_CHART_VERSION")"
 
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
-# Create Grafana alert rules and notifiers configmaps BEFORE Helm deployment
-if [ -f "monitoring/alerting/alert-rules.yaml" ]; then
+# Alerts
+INCLUDED_ALERT_FILE="monitoring/alerting/alert-rules.yaml"
+if [ -f "$INCLUDED_ALERT_FILE" ]; then
     log_verbose "Creating Grafana alert rules ConfigMap"
-    # This uses apply so it will do an update if it already exists
+
+    # Start with required file
+    CM_ARGS=(--from-file="alert-rules.yaml=$INCLUDED_ALERT_FILE")
+
+    # Add optional custom directory if it exists
+    if [ -d "$CUSTOM_ALERTS_DIR" ]; then
+        log_debug "Including additional alert rules from '$CUSTOM_ALERTS_DIR'"
+        CM_ARGS+=(--from-file="$CUSTOM_ALERTS_DIR")
+    else
+        log_debug "No custom alert directory found at '$CUSTOM_ALERTS_DIR'. Skipping."
+    fi
+
+    # Run the kubectl command with all arguments
     kubectl create configmap grafana-alert-rules \
-        --from-file=alert-rules.yaml=monitoring/alerting/alert-rules.yaml \
+        "${CM_ARGS[@]}" \
         -n "$MON_NS" \
         --dry-run=client -o yaml | kubectl apply -f -
 else
-    log_debug "No alert rules file found at monitoring/alerting/alert-rules.yaml"
+    log_debug "No alert rules file found at '$INCLUDED_ALERT_FILE'"
 fi
 
 if [ -f "monitoring/alerting/notifiers.yaml" ]; then
