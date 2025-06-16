@@ -9,7 +9,6 @@
 # Default Values
 # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
 
-
 ## NOTE: All image.*, imagePullSecrets and related keys now derived from environment variables and generated at run-time (DO NOT SET HERE)
 ##       See monitoring/prom-operator_container_image.template for complete list
 ###global:
@@ -22,7 +21,6 @@
 ###    tag: foo
 ###    pullPolicy: foo
 
-
 commonLabels:
   sas.com/monitoring-base: kube-viya-monitoring
 
@@ -31,7 +29,7 @@ commonLabels:
 # ===================
 # https://github.com/coreos/prometheus-operator
 prometheusOperator:
-###  image:   # See NOTE at top of file
+  ###  image:   # See NOTE at top of file
   logFormat: json
   logLevel: info
   createCustomResource: false
@@ -79,9 +77,9 @@ kube-state-metrics:
       cpu: "25m"
       memory: "50Mi"
   # kube-state-metrics 2.0 requires explicitly defining which labels are
-  # collected for each resource type 
+  # collected for each resource type
   extraArgs:
-  - --metric-labels-allowlist=nodes=[*],namespaces=[*],pods=[*],deployments=[*],statefulsets=[*],daemonsets=[*],jobs=[*]
+    - --metric-labels-allowlist=nodes=[*],namespaces=[*],pods=[*],deployments=[*],statefulsets=[*],daemonsets=[*],jobs=[*]
 
   # Available collectors for kube-state-metrics.
   # By default, all available resources are enabled, comment out to disable.
@@ -109,7 +107,7 @@ kube-state-metrics:
     - replicationcontrollers
     - resourcequotas
     ## Metrics on Secrets disabled to
-    ## eliminate need for granting 
+    ## eliminate need for granting
     ## 'list' permission to ClusterRole
     #- secrets
     - services
@@ -117,7 +115,6 @@ kube-state-metrics:
     - storageclasses
     - validatingwebhookconfigurations
     - volumeattachments
-
 
 # ==========
 # Prometheus
@@ -127,7 +124,7 @@ prometheus:
     name: sas-ops-acct
   service:
     type: ClusterIP
-    nodePort: null  
+    nodePort: null
   prometheusSpec:
     #image:   # See NOTE at top of file
     logLevel: info
@@ -151,13 +148,13 @@ prometheus:
         spec:
           # storageClassName:
           accessModes:
-          - ReadWriteOnce
+            - ReadWriteOnce
           resources:
             requests:
-              storage: 25Gi    
+              storage: 25Gi
           volumeMode: Filesystem
     alertingEndpoints:
-      - name: v4m-alertmanager 
+      - name: v4m-alertmanager
         port: http-web
 
 # =======================
@@ -181,7 +178,7 @@ alertmanager:
         spec:
           # storageClassName:
           accessModes:
-          - ReadWriteOnce
+            - ReadWriteOnce
           resources:
             requests:
               storage: 10Gi
@@ -214,16 +211,16 @@ prometheus-node-exporter:
       memory: "100Mi"
   # Be very tolerant
   tolerations:
-  - operator: "Exists"
+    - operator: "Exists"
   prometheus:
     monitor:
       relabelings:
-      - sourceLabels: [__meta_kubernetes_pod_node_name]
-        separator: ;
-        regex: ^(.*)$
-        targetLabel: nodename
-        replacement: $1
-        action: replace
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          separator: ;
+          regex: ^(.*)$
+          targetLabel: nodename
+          replacement: $1
+          action: replace
 
 # =======
 # Grafana
@@ -236,12 +233,10 @@ grafana:
   "grafana.ini":
     analytics:
       check_for_updates: false
-    # dashboards:
-    #   default_home_dashboard_path: 
     log:
       mode: console
     "log.console":
-        format: json
+      format: json
     dashboards:
       default_home_dashboard_path: /tmp/dashboards/viya-welcome-dashboard.json
     feature_toggles:
@@ -264,7 +259,6 @@ grafana:
     datasources:
       enabled: true
       label: grafana_datasource
-      resources:
     resources:
       requests:
         cpu: "50m"
@@ -285,4 +279,15 @@ grafana:
       - kubernetes.io/pvc-protection
     # subPath: ""
     # existingClaim:
-
+  extraVolumes:
+    - name: grafana-alert-rules
+      configMap:
+        name: grafana-alert-rules
+    - name: grafana-notifiers
+      configMap:
+        name: grafana-notifiers
+  extraVolumeMounts:
+    - name: grafana-alert-rules
+      mountPath: /etc/grafana/provisioning/alerting
+    - name: grafana-notifiers
+      mountPath: /etc/grafana/provisioning/notifiers

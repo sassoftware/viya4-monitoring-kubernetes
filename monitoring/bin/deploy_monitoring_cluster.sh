@@ -370,6 +370,29 @@ versionstring="$(get_helm_versionstring "$KUBE_PROM_STACK_CHART_VERSION")"
 
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
+# Create Grafana alert rules and notifiers configmaps BEFORE Helm deployment
+if [ -f "monitoring/alerting/alert-rules.yaml" ]; then
+    log_verbose "Creating Grafana alert rules ConfigMap"
+    # This uses apply so it will do an update if it already exists
+    kubectl create configmap grafana-alert-rules \
+        --from-file=alert-rules.yaml=monitoring/alerting/alert-rules.yaml \
+        -n "$MON_NS" \
+        --dry-run=client -o yaml | kubectl apply -f -
+else
+    log_debug "No alert rules file found at monitoring/alerting/alert-rules.yaml"
+fi
+
+if [ -f "monitoring/alerting/notifiers.yaml" ]; then
+    log_verbose "Creating Grafana notifiers ConfigMap"
+    # This uses apply so it will do an update if it already exists
+    kubectl create configmap grafana-notifiers \
+        --from-file=notifiers.yaml=monitoring/alerting/notifiers.yaml \
+        -n "$MON_NS" \
+        --dry-run=client -o yaml | kubectl apply -f -
+else
+    log_debug "No notifiers file found at monitoring/alerting/notifiers.yaml"
+fi
+
 # shellcheck disable=SC2086
 helm $helmDebug upgrade --install "$promRelease" \
     --namespace "$MON_NS" \
@@ -467,6 +490,8 @@ log_verbose "Adding Prometheus recording rules"
 for f in monitoring/rules/viya/rules-*.yaml; do
     kubectl apply -n "$MON_NS" -f "$f"
 done
+
+# ConfigMaps for Grafana alerting were already created before the Helm deployment
 
 # Elasticsearch Datasource for Grafana
 LOGGING_DATASOURCE="${LOGGING_DATASOURCE:-false}"
