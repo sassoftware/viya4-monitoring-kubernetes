@@ -283,11 +283,6 @@ grafana:
     - name: grafana-alert-rules
       configMap:
         name: grafana-alert-rules
-    - name: grafana-notifiers
-      configMap:
-        name: grafana-notifiers
   extraVolumeMounts:
     - name: grafana-alert-rules
       mountPath: /etc/grafana/provisioning/alerting
-    - name: grafana-notifiers
-      mountPath: /etc/grafana/provisioning/notifiers

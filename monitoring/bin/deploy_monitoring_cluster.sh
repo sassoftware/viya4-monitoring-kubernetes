@@ -379,11 +379,11 @@ if [ -d "$INCLUDED_ALERTS_DIR" ]; then
     CM_ARGS=(--from-file="$INCLUDED_ALERTS_DIR")
 
     # Add optional custom directory if it exists
-    if [ -d "$CUSTOM_ALERTS_DIR" ]; then
-        log_debug "Including additional alert rules from '$CUSTOM_ALERTS_DIR'"
-        CM_ARGS+=(--from-file="$CUSTOM_ALERTS_DIR")
+    if [ -d "$CUSTOM_ALERT_CONFIG_DIR" ]; then
+        log_debug "Including notifiers and additional alert rules from '$CUSTOM_ALERT_CONFIG_DIR'"
+        CM_ARGS+=(--from-file="$CUSTOM_ALERT_CONFIG_DIR")
     else
-        log_debug "No custom alert directory found at '$CUSTOM_ALERTS_DIR'. Skipping."
+        log_debug "No custom alert config directory found at '$CUSTOM_ALERT_CONFIG_DIR'. Skipping."
     fi
 
     # Run the kubectl command with all arguments
@@ -393,17 +393,6 @@ if [ -d "$INCLUDED_ALERTS_DIR" ]; then
         --dry-run=client -o yaml | kubectl apply -f -
 else
     log_debug "No alert rules file found at '$INCLUDED_ALERTS_DIR'"
-fi
-
-if [ -f "monitoring/alerting/notifiers.yaml" ]; then
-    log_verbose "Creating Grafana notifiers ConfigMap"
-    # This uses apply so it will do an update if it already exists
-    kubectl create configmap grafana-notifiers \
-        --from-file=notifiers.yaml=monitoring/alerting/notifiers.yaml \
-        -n "$MON_NS" \
-        --dry-run=client -o yaml | kubectl apply -f -
-else
-    log_debug "No notifiers file found at monitoring/alerting/notifiers.yaml"
 fi
 
 # shellcheck disable=SC2086
