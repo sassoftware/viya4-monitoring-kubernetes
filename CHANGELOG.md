@@ -37,6 +37,8 @@ SAS Viya Workload node placement strategy.
   * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.23.1 to 2.24.0
   * [UPGRADE] Admission Webhook upgraded from v1.5.1 to v1.5.2
   * [CHANGE] Enable Grafana feature flag: prometheusSpecialCharsInLabelValues to improve handling of special characters in metric labels (addresses #699)
+  * [FEATURE] A set of SAS Viya specific alerts is now deployed with Grafana.  Administrators can configure notifiers (which trigger messages via e-mail, Slack, SMS, etc. based on these alerts) and additional alerts via the Grafana web application after deployment.  Or, alternatively, notifiers and/or additional alerts can be defined prior to running the monitoring deployment script ( `deploy_monitoring_cluster.sh` ) by placing yaml files in `$USER_DIR/monitoring/alerting/` Note: Due to Grafana's use of a single folder namespace, the folders used to organize these new Alerts will also appear when viewing Dashboards and will appear to be empty.  When working with Dashboards, these folders can be ignored.
+
 
 * **Logging**
   * [FIX] Resolved issue causing deploy_esexporter.sh to fail when doing an upgrade-in-place and serviceMonitor CRD is not installed.
