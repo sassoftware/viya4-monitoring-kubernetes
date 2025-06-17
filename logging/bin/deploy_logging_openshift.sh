@@ -7,12 +7,6 @@ cd "$(dirname $BASH_SOURCE)/../.."
 source logging/bin/common.sh
 
 ##################################
-# Confirm using OpenSearch       #
-##################################
-require_opensearch
-
-
-##################################
 # Confirm on OpenShift           #
 ##################################
 

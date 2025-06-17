@@ -33,9 +33,6 @@ else
     wnpValuesFile="$TMP_DIR/empty.yaml"
 fi
 
-#Fail if not using OpenSearch back-end
-require_opensearch
-
 log_info "Deploying Fluent Bit for collecting Kubernetes Events..."
 
 #TO DO: Check that OpenSearch is actually deployed and running?

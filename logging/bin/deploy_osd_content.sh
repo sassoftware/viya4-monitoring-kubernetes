@@ -21,9 +21,6 @@ if [ "$KIBANA_CONTENT_DEPLOY" != "true" ]; then
   exit 0
 fi
 
-#Fail if not using OpenSearch back-end
-require_opensearch
-
 # temp file used to capture command output
 tmpfile=$TMP_DIR/output.txt
 
@@ -99,41 +96,6 @@ if ! kibana_tenant_exists "cluster_admins"; then
    fi
 else
    log_debug "The OpenSearch Dashboards tenant space [cluster_admins] exists."
-fi
-
-#Migrating from ODFE 1.7.0 (file should only exist during migration)
-if [ -f "$KB_GLOBAL_EXPORT_FILE" ]; then
-
-   # delete 'demo' Kibana tenant space created (but not used) prior to V4m version 1.1.0
-   if kibana_tenant_exists "admin_tenant"; then
-
-      delete_kibana_tenant "admin_tenant"
-
-      rc=$?
-      if [ "$rc" == "0" ]; then
-         log_debug "The tenant space [admin_tenant] was deleted."
-      else
-         log_debug "Problems were encountered while attempting to delete tenant space [admin_tenant]."
-      fi
-   fi
-
-   log_verbose "Will attempt to migrate content from previous deployment."
-
-   kb_migrate_response="$TMP_DIR/kb_migrate_response.json"
-
-   #import previously exported content from global tenant
-   response=$(curl -s -o $kb_migrate_response  -w  "%{http_code}" -XPOST "${kb_api_url}/api/saved_objects/_import?overwrite=false" -H "$LOG_XSRF_HEADER"  -H 'securitytenant: cluster_admins'  --form file="@$KB_GLOBAL_EXPORT_FILE"  -u $ES_ADMIN_USER:$ES_ADMIN_PASSWD -k)
-
-   if [[ $response != 2* ]]; then
-      log_warn "There was an issue importing the cached existing content into the OpenSearch Dashboards tenant space [cluster_admins]. [$response]"
-      log_warn "Some of your existing content may need to be recreated or restored from your backup files."
-      log_debug "Failed response details: $(tail -n1 $kb_migrate_response)"
-   else
-      log_info "Existing content imported to [cluster_admins] OpenSearh Dashboards tenant space. [$response]"
-      log_debug "Import details: $(tail -n1 $kb_migrate_response)"
-   fi
-else
-   log_debug "Migration from ODFE 1.7.0 *NOT* detected"
 fi
 
 # Import OSD Searches, Visualizations and Dashboard Objects using curl
