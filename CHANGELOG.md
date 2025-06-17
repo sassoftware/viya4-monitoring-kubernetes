@@ -1,10 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.38 (17JUN2025)
 * **Logging**
   * [ANNOUNCEMENT] The [OpenDistro for Elasticsearch (ODFE) project](https://opendistro.github.io/for-elasticsearch/) reached end-of-line in May of 2022 and our project moved to
   OpenSearch shorly thereafter.  This release removes all remaining support for ODFE; including support for migration from ODFE
-  and ability to use utility scripts (e.g. change_internal_password.sh) with ealier ODFE-backed deployments.  
+  and ability to use utility scripts (e.g. change_internal_password.sh) with ealier ODFE-backed deployments.
   * [REMOVAL] Remove support for migrating from an earlier deployment which included ODFE.
   * [REMOVAL] Remove support for the `LOG_SEARCH_BACKEND` environment variable.  Scripts will terminate with an ERROR message if
   this environment variable is detected.
