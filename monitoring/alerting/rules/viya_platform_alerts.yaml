@@ -99,10 +99,8 @@ groups:
       - title: RabbitMQ Ready Queue Backlog
         annotations:
           description:
-            Checks for accumulation of Rabbitmq ready messages > 10,000. It
-            could impact Model Studio pipelines. Follow the steps in the  url to help
-            troubleshoot. The  covers potential orphan queues and/or bottlenecking of
-            queues due to catalog service.
+            Checks for accumulation of Rabbitmq ready messages > 10,000. The  covers potential orphan
+            queues and/or bottlenecking of queues due to catalog service.
           summary:
             Rabbitmq ready messages > 10,000. This means there is a large backlog
             of messages due to high activity (which can be temporary) or something has
