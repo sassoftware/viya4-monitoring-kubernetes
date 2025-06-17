@@ -1,0 +1,208 @@
+apiVersion: 1
+groups:
+  - interval: 5m
+    folder: CAS Alerts
+    name: SAS Viya Alerts
+    orgId: 1
+    rules:
+      - title: CAS Restart Detected
+        annotations:
+          description:
+            Check to see that the CAS pod existed for a short time. This implies
+            that CAS pod has restarted for whatever the reason. Will need to further investigate
+            the cause.
+          summary:
+            The current CAS (sas-cas-server-default-controller) pod < 15 minutes
+            in existence. Mostly likely it is due to restart of the CAS pod.
+        condition: C
+        data:
+          - datasourceUid: prometheus
+            model:
+              disableTextWrap: false
+              editorMode: code
+              expr: cas_grid_uptime_seconds_total
+              fullMetaSearch: false
+              includeNullMetadata: true
+              instant: true
+              intervalMs: 1000
+              legendFormat: __auto
+              maxDataPoints: 43200
+              range: false
+              refId: A
+              useBackend: false
+            refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+            refId: B
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 900
+                    type: lt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+            refId: C
+            relativeTimeRange:
+              from: 600
+              to: 0
+        execErrState: Error
+        for: 5m
+        isPaused: false
+        labels: {}
+        noDataState: NoData
+        uid: fc41d560-9a18-4168-8a6a-615e60dc70de
+      - title: CAS Memory Usage High
+        annotations:
+          description:
+            Checks the CAS memory usage. If it is > 300GB, it will alert. Currently,
+            max. memory is 512GB. The expectation is that this alert will be an early
+            warning sign to investigate large memory usage as typical usage is less than
+            the threshold. Want to prevent OOMkill of CAS.
+          summary:
+            CAS memory > 300GB. This can be due to a program or pipeline taking
+            all the available memory.
+        condition: C
+        data:
+          - datasourceUid: prometheus
+            model:
+              editorMode: code
+              exemplar: false
+              expr: (cas_node_mem_size_bytes{type="physical"} - cas_node_mem_free_bytes{type="physical"})/1073741824
+              instant: true
+              interval: ""
+              intervalMs: 1000
+              legendFormat: __auto
+              maxDataPoints: 43200
+              range: false
+              refId: A
+            refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+            refId: B
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 300
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+            refId: C
+            relativeTimeRange:
+              from: 600
+              to: 0
+        execErrState: Error
+        for: 5m
+        isPaused: false
+        labels: {}
+        noDataState: NoData
+        uid: ca744a08-e4e9-49b7-85a1-79e9fe05d4c1
+      - title: CAS Thread Count High
+        annotations:
+          description:
+            CAS thread count is higher than 400. May indicate overloaded CAS
+            server.
+          summary: CAS is using more than 400 threads.
+        condition: A
+        data:
+          - datasourceUid: prometheus
+            model:
+              expr: cas_thread_count > 400
+              instant: true
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+        for: 5m
+        labels:
+          severity: warning
+        uid: cas_thread_count
