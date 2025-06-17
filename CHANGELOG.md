@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## unreleased
+## Unreleased
 * **Logging**
   * [ANNOUNCEMENT] The [OpenDistro for Elasticsearch (ODFE) project](https://opendistro.github.io/for-elasticsearch/) reached end-of-line in May of 2022 and our project moved to
   OpenSearch shorly thereafter.  This release removes all remaining support for ODFE; including support for migration from ODFE
@@ -8,6 +8,9 @@
   * [REMOVAL] Remove support for migrating from an earlier deployment which included ODFE.
   * [REMOVAL] Remove support for the `LOG_SEARCH_BACKEND` environment variable.  Scripts will terminate with an ERROR message if
   this environment variable is detected.
+  * [CHANGE] The Fluent Bit Deployment used for Kubernetes Event collection can now be integrated into the
+SAS Viya Workload node placement strategy.
+  * [CHANGE] An obsolete configuration file related to the Event Router has been removed from the repo.
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.19.1 to 2.19.2.
   * [UPGRADE] OpenSearch Helm chart upgraded from 2.32.0 to 2.34.0.
   * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 2.28.0 to 2.30.0
