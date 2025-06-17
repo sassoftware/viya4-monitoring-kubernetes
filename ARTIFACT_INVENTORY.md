@@ -16,11 +16,11 @@ registry/repository/image_name:version
 
 | Subsystem| Component | Fully Qualified Container-Image Name (registry/repository/image_name:version)|
 |----|----|----|
-| Logging | Fluent Bit | cr.fluentbit.io/fluent/fluent-bit:3.2.10 |
-| Logging | Elasticsearch Exporter | quay.io/prometheuscommunity/elasticsearch-exporter:v1.8.0 |
+| Logging | Fluent Bit | cr.fluentbit.io/fluent/fluent-bit:4.0.2 |
+| Logging | Elasticsearch Exporter | quay.io/prometheuscommunity/elasticsearch-exporter:v1.9.0 |
 | Logging | initContainer (Fluent Bit, OpenSearch) | docker.io/library/busybox:latest |
-| Logging | OpenSearch | docker.io/opensearchproject/opensearch:2.19.1 |
-| Logging | OpenSearch Dashboards| docker.io/opensearchproject/opensearch-dashboards:2.19.1 |
+| Logging | OpenSearch | docker.io/opensearchproject/opensearch:2.19.2 |
+| Logging | OpenSearch Dashboards| docker.io/opensearchproject/opensearch-dashboards:2.19.2 |
 | Metrics | Alertmanager | quay.io/prometheus/alertmanager:v0.28.1 |
 | Metrics | Grafana | docker.io/grafana/grafana:11.6.1 |
 | Metrics | Admission Webhook | registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2 |
@@ -50,10 +50,10 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 
 | Subsystem | Component | Helm Chart Repository | Helm Chart Name |Helm Chart Version | Helm Archive File Name|
 |--|--|--|--|--|--|
-| Logging | Elasticsearch Exporter| prometheus-community | prometheus-elasticsearch-exporter | 6.6.1 | prometheus-community/prometheus-elasticsearch-exporter-6.6.1.tgz |
-| Logging | Fluent Bit| fluent | fluent-bit | 0.48.9 | fluent/fluent-bit-0.48.9.tgz |
-| Logging | OpenSearch| opensearch | opensearch | 2.32.0 | opensearch/opensearch-2.32.0.tgz |
-| Logging | OpenSearch Dashboard| opensearch | opensearch-dashboards | 2.28.0 | opensearch/opensearch-dashboards-2.28.0.tgz |
+| Logging | Elasticsearch Exporter| prometheus-community | prometheus-elasticsearch-exporter | 6.7.2 | prometheus-community/prometheus-elasticsearch-exporter-6.7.2.tgz |
+| Logging | Fluent Bit| fluent | fluent-bit | 0.49.0 | fluent/fluent-bit-0.49.0.tgz |
+| Logging | OpenSearch| opensearch | opensearch | 2.34.0 | opensearch/opensearch-2.34.0.tgz |
+| Logging | OpenSearch Dashboard| opensearch | opensearch-dashboards | 2.30.0 | opensearch/opensearch-dashboards-2.30.0.tgz |
 | Metrics | Grafana (on OpenShift)| grafana | grafana | 8.13.1 | grafana/grafana-8.13.1.tgz |
 | Metrics | Kube Prometheus Stack| prometheus-community | kube-prometheus-stack | 70.8.0 | prometheus-community/kube-prometheus-stack-70.8.0.tgz |
 | Metrics | Prometheus Pushgateway| prometheus-community | prometheus-pushgateway | 3.1.0 | prometheus-community/prometheus-pushgateway-3.1.0.tgz |
@@ -64,5 +64,5 @@ This table provides version information for some miscellaneous components deploy
 
 | Component | Version | Project Repository | Notes |
 |--|--|--|--|
-| OpenSearch Datasource Plugin (Grafana) | 2.24.0 | https://github.com/grafana/opensearch-datasource/releases |Allows Grafana to surface log messages stored in OpenSearch |
+| OpenSearch Datasource Plugin (Grafana) | 2.26.1 | https://github.com/grafana/opensearch-datasource/releases |Allows Grafana to surface log messages stored in OpenSearch |
 
