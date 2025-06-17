@@ -1,3 +1,5 @@
+#! /bin/bash
+
 # Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -8,21 +10,23 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     source bin/common.sh
 
     if [ -f "$USER_DIR/logging/user.env" ]; then
-        userEnv=$(grep -v '^[[:blank:]]*$' $USER_DIR/logging/user.env | grep -v '^#' | xargs)
+        userEnv=$(grep -v '^[[:blank:]]*$' "$USER_DIR/logging/user.env" | grep -v '^#' | xargs)
+
         log_verbose "Loading user environment file: $USER_DIR/logging/user.env"
         if [ "$userEnv" ]; then
-          export $userEnv
+            # shellcheck disable=SC2086,SC2163
+            export $userEnv
         fi
     fi
 
     #Check for obsolete env var
-    if [  -n "$LOG_SEARCH_BACKEND" ]; then
+    if [ -n "$LOG_SEARCH_BACKEND" ]; then
         log_error "Support for the LOG_SEARCH_BACKEND environment variable has been removed."
         log_error "This script is only appropriate for use with OpenSearch as the search back-end."
         log_error "The LOG_SEARCH_BACKEND environment variable is currently set to [$LOG_SEARCH_BACKEND]"
         exit 1
     fi
-    
+
     export LOG_NS="${LOG_NS:-logging}"
 
     #if TLS (w/in cluster; for all monitoring components) is requested, require TLS into OSD pod, too
@@ -47,7 +51,7 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     export V4M_NS=$LOG_NS
 
     if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
-       source bin/airgap-include.sh
+        source bin/airgap-include.sh
     fi
 
     source bin/version-include.sh
@@ -56,4 +60,3 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
 
 fi
 echo ""
-
