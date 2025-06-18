@@ -22,6 +22,8 @@ Vulnerabilities in these underlying components should be reported to their respe
 * Prometheus - Report via [Prometheus Security](https://github.com/prometheus/prometheus/security)
 * OpenSearch - Report via [OpenSearch Security](https://github.com/opensearch-project/OpenSearch/security)
 
+Vulnerabilities identified through container image scanning (e.g., DAST, SAST, or vulnerability scanners) should be reported directly to the project that maintains the container image. For example, if a scan of the OpenSearch container image reveals vulnerabilities, these should be reported to the OpenSearch project, not to SAS Viya Monitoring.
+
 If you're unsure whether a vulnerability belongs to our project's code or an underlying component, please submit the report through our process and we will help direct it to the appropriate team.
 
 ## Reporting Guidelines
