@@ -18,9 +18,9 @@ This project deploys and configures various third-party open-source monitoring t
 
 Vulnerabilities in these underlying components should be reported to their respective projects. For example:
 
-* Grafana - Report via [Grafana Security](https://grafana.com/security/)
-* Prometheus - Report via [Prometheus Security](https://prometheus.io/docs/operating/security/)
-* OpenSearch - Report via [OpenSearch Security](https://github.com/opensearch-project/OpenSearch/security/policy)
+* Grafana - Report via [Grafana Security](https://github.com/grafana/grafana/security)
+* Prometheus - Report via [Prometheus Security](https://github.com/prometheus/prometheus/security)
+* OpenSearch - Report via [OpenSearch Security](https://github.com/opensearch-project/OpenSearch/security)
 
 If you're unsure whether a vulnerability belongs to our project's code or an underlying component, please submit the report through our process and we will help direct it to the appropriate team.
 
