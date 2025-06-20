@@ -28,7 +28,7 @@ registry/repository/image_name:version
 | Metrics | [Node Exporter](https://github.com/prometheus/node_exporter) | __NODEXPORT_FULL_IMAGE__ |
 | Metrics | [Prometheus](https://github.com/prometheus/prometheus) | __PROMETHEUS_FULL_IMAGE__ |
 | Metrics | [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator) | __PROMOP_FULL_IMAGE__ |
-| Metrics | [Configuration Reloader](https://github.com/jimmidyson/configmap-reload) | __CONFIGRELOAD_FULL_IMAGE__ |
+| Metrics | [Configuration Reloader](https://github.com/prometheus-operator/prometheus-operator/tree/main/cmd/prometheus-config-reloader) | __CONFIGRELOAD_FULL_IMAGE__ |
 | Metrics | [Prometheus Pushgateway](https://github.com/prometheus/pushgateway) | __PUSHGATEWAY_FULL_IMAGE__ |
 | Metrics | [Auto-load Sidecars](https://github.com/kiwigrid/k8s-sidecar) | __GRAFANA_SIDECAR_FULL_IMAGE__ |
 | Metrics | OpenShift OAUTH Proxy (Grafana, OpenShift only) | __OPENSHIFT_OAUTHPROXY_FULL_IMAGE__ |
