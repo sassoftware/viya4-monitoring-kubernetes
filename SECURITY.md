@@ -1,6 +1,6 @@
 # SAS® Viya® Monitoring for Kubernetes Security Policy
 
-Project maintainers and community contributors take security issues seriously. We appreciate efforts to disclose potential issues responsibly and will acknowledge viable contributions. To aid in the investigation of reported vulnerabilities, please follow the [reporting guidelines](#reporting-guidelines) outlined below.
+The project maintainers and community contributors take security issues seriously. We appreciate efforts to disclose potential issues responsibly and will acknowledge viable contributions. To aid in the investigation of reported vulnerabilities, please follow the [reporting guidelines](#reporting-guidelines) outlined below.
 
 ## Scope of Security Reports
 
@@ -11,7 +11,7 @@ The following components are directly maintained by this project and should be r
 * Project-specific configuration files and templates
 * Custom Kubernetes manifests and Helm charts
 * Project documentation and guidance
-* Any other artifacts created and maintained specifically by the SAS Viya Monitoring project
+* Any other artifacts created and maintained specifically by the SAS Viya Monitoring for Kubernetes project
 
 ### Out of Scope
 This project deploys and configures various third-party open-source monitoring tools. For a complete inventory of third-party components used by this project, please refer to [ARTIFACT_INVENTORY.md](ARTIFACT_INVENTORY.md).
@@ -22,7 +22,7 @@ Vulnerabilities in these underlying components should be reported to their respe
 * Prometheus - Report via [Prometheus Security](https://github.com/prometheus/prometheus/security)
 * OpenSearch - Report via [OpenSearch Security](https://github.com/opensearch-project/OpenSearch/security)
 
-Vulnerabilities identified through container image scanning (e.g., DAST, SAST, or vulnerability scanners) should be reported directly to the project that maintains the container image. For example, if a scan of the OpenSearch container image reveals vulnerabilities, these should be reported to the OpenSearch project, not to SAS Viya Monitoring.
+Vulnerabilities identified through container image scanning should be reported directly to the project that maintains the container image. For example, if a scan of the OpenSearch container image reveals vulnerabilities, these should be reported to the OpenSearch project, not to SAS Viya Monitoring for Kubernetes.
 
 If you're unsure whether a vulnerability belongs to our project's code or an underlying component, please submit the report through our process and we will help direct it to the appropriate team.
 
@@ -36,7 +36,7 @@ To report a suspected security issue that is in scope for this project, use GitH
 Please provide the following information with your security report:
 
 * Your name and affiliation (if applicable)
-* Version/build-date of the SAS Viya Monitoring project
+* Version/build-date of the SAS Viya Monitoring for Kubernetes project
 * Detailed description of the security issue
 * Steps to reproduce the issue
 * Impact of the vulnerability
