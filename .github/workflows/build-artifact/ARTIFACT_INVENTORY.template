@@ -5,34 +5,34 @@ The following tables provide information about the container images and Helm cha
 * pre-pull container images
 * deploy into an air-gapped Kubernetes cluster
 
-**Note:** For more information about deploying in an air-gapped environment, refer to 
+**Note:** For more information about deploying in an air-gapped environment, refer to
 [Configure SAS Viya Monitoring for Kubernetes for an Air-Gapped Environment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0grd8g2pkfglin12bzm3g1oik2p).
 
 ## Table 1. Container Images
 
 This table provides the fully qualified container-image names for the components of SAS Viya Monitoring for Kubernetes.
-These names use the following format: 
+These names use the following format:
 registry/repository/image_name:version
 
 | Subsystem| Component | Fully Qualified Container-Image Name (registry/repository/image_name:version)|
 |----|----|----|
-| Logging | Fluent Bit | __FB_FULL_IMAGE__ |
-| Logging | Elasticsearch Exporter | __ES_EXPORTER_FULL_IMAGE__ |
+| Logging | [Fluent Bit](https://github.com/fluent/fluent-bit) | __FB_FULL_IMAGE__ |
+| Logging | [Elasticsearch Exporter](https://github.com/prometheus-community/elasticsearch_exporter) | __ES_EXPORTER_FULL_IMAGE__ |
 | Logging | initContainer (Fluent Bit, OpenSearch) | __OS_SYSCTL_FULL_IMAGE__ |
-| Logging | OpenSearch | __OS_FULL_IMAGE__ |
-| Logging | OpenSearch Dashboards| __OSD_FULL_IMAGE__ |
-| Metrics | Alertmanager | __ALERTMANAGER_FULL_IMAGE__ |
-| Metrics | Grafana | __GRAFANA_FULL_IMAGE__ |
-| Metrics | Admission Webhook | __ADMWEBHOOK_FULL_IMAGE__ |
-| Metrics | Kube State Metrics | __KSM_FULL_IMAGE__ |
-| Metrics | Node Exporter | __NODEXPORT_FULL_IMAGE__ |
-| Metrics | Prometheus | __PROMETHEUS_FULL_IMAGE__ |
-| Metrics | Prometheus Operator | __PROMOP_FULL_IMAGE__ |
-| Metrics | Configuration Reloader (Alertmanager, Prometheus) | __CONFIGRELOAD_FULL_IMAGE__ |
-| Metrics | Prometheus Pushgateway | __PUSHGATEWAY_FULL_IMAGE__ |
-| Metrics | Auto-load Sidecars (Grafana) | __GRAFANA_SIDECAR_FULL_IMAGE__ |
+| Logging | [OpenSearch](https://github.com/opensearch-project/OpenSearch) | __OS_FULL_IMAGE__ |
+| Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/OpenSearch-Dashboards) | __OSD_FULL_IMAGE__ |
+| Metrics | [Alertmanager](https://github.com/prometheus/alertmanager) | __ALERTMANAGER_FULL_IMAGE__ |
+| Metrics | [Grafana](https://github.com/grafana/grafana) | __GRAFANA_FULL_IMAGE__ |
+| Metrics | [Admission Webhook](https://github.com/kubernetes/ingress-nginx) | __ADMWEBHOOK_FULL_IMAGE__ |
+| Metrics | [Kube State Metrics](https://github.com/kubernetes/kube-state-metrics) | __KSM_FULL_IMAGE__ |
+| Metrics | [Node Exporter](https://github.com/prometheus/node_exporter) | __NODEXPORT_FULL_IMAGE__ |
+| Metrics | [Prometheus](https://github.com/prometheus/prometheus) | __PROMETHEUS_FULL_IMAGE__ |
+| Metrics | [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator) | __PROMOP_FULL_IMAGE__ |
+| Metrics | [Configuration Reloader](https://github.com/prometheus-operator/prometheus-operator/tree/main/cmd/prometheus-config-reloader) | __CONFIGRELOAD_FULL_IMAGE__ |
+| Metrics | [Prometheus Pushgateway](https://github.com/prometheus/pushgateway) | __PUSHGATEWAY_FULL_IMAGE__ |
+| Metrics | [Auto-load Sidecars](https://github.com/kiwigrid/k8s-sidecar) | __GRAFANA_SIDECAR_FULL_IMAGE__ |
 | Metrics | OpenShift OAUTH Proxy (Grafana, OpenShift only) | __OPENSHIFT_OAUTHPROXY_FULL_IMAGE__ |
-| Metrics | Tempo | __TEMPO_FULL_IMAGE__ |
+| Metrics | [Tempo](https://github.com/grafana/tempo) | __TEMPO_FULL_IMAGE__ |
 
 ## Table 2. Helm Chart Repositories
 This table identifies the Helm repositories that contain the Helm charts used by SAS Viya Monitoring for Kubernetes.
@@ -40,24 +40,24 @@ These repositories must be made available to Helm in your environment. Use the `
 
 | Subsystem | Component | Helm Repository | Helm Repository URL |
 |--|--|--|--|
-| Logging | Fluent Bit | fluent | https://fluent.github.io/helm-charts |
-| Logging | OpenSearch and OpenSearch Dashboards | opensearch | https://opensearch-project.github.io/helm-charts |
-| Metrics | Grafana | grafana | https://grafana.github.io/helm-charts |
-| Both | Several (including Prometheus, Kube Prometheus Stack, Prometheus Pushgateway and Elasticsearch Exporter) | prometheus-community | https://prometheus-community.github.io/helm-charts |
+| Logging | [Fluent Bit](https://github.com/fluent/helm-charts) | fluent | https://fluent.github.io/helm-charts |
+| Logging | [OpenSearch and OpenSearch Dashboards](https://github.com/opensearch-project/helm-charts) | opensearch | https://opensearch-project.github.io/helm-charts |
+| Metrics | [Grafana](https://github.com/grafana/helm-charts) | grafana | https://grafana.github.io/helm-charts |
+| Both | [Prometheus Community](https://github.com/prometheus-community/helm-charts) | prometheus-community | https://prometheus-community.github.io/helm-charts |
 
 ## Table 3. Helm Chart Information
 This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes.
 
 | Subsystem | Component | Helm Chart Repository | Helm Chart Name |Helm Chart Version | Helm Archive File Name|
 |--|--|--|--|--|--|
-| Logging | Elasticsearch Exporter| __ESEXPORTER_HELM_CHART_REPO__ | __ESEXPORTER_HELM_CHART_NAME__ | __ESEXPORTER_HELM_CHART_VERSION__ | __ESEXPORTER_HELM_CHART_ARCHIVE__ |
-| Logging | Fluent Bit| __FLUENTBIT_HELM_CHART_REPO__ | __FLUENTBIT_HELM_CHART_NAME__ | __FLUENTBIT_HELM_CHART_VERSION__ | __FLUENTBIT_HELM_CHART_ARCHIVE__ |
-| Logging | OpenSearch| __OPENSEARCH_HELM_CHART_REPO__ | __OPENSEARCH_HELM_CHART_NAME__ | __OPENSEARCH_HELM_CHART_VERSION__ | __OPENSEARCH_HELM_CHART_ARCHIVE__ |
-| Logging | OpenSearch Dashboard| __OSD_HELM_CHART_REPO__ | __OSD_HELM_CHART_NAME__ | __OSD_HELM_CHART_VERSION__ | __OSD_HELM_CHART_ARCHIVE__ |
-| Metrics | Grafana (on OpenShift)| __OPENSHIFT_GRAFANA_CHART_REPO__ | __OPENSHIFT_GRAFANA_CHART_NAME__ | __OPENSHIFT_GRAFANA_CHART_VERSION__ | __OPENSHIFT_GRAFANA_CHART_ARCHIVE__ |
-| Metrics | Kube Prometheus Stack| __KUBE_PROM_STACK_CHART_REPO__ | __KUBE_PROM_STACK_CHART_NAME__ | __KUBE_PROM_STACK_CHART_VERSION__ | __KUBE_PROM_STACK_CHART_ARCHIVE__ |
-| Metrics | Prometheus Pushgateway| __PUSHGATEWAY_CHART_REPO__ | __PUSHGATEWAY_CHART_NAME__ | __PUSHGATEWAY_CHART_VERSION__ | __PUSHGATEWAY_CHART_ARCHIVE__ |
-| Metrics | Tempo | __TEMPO_CHART_REPO__ | __TEMPO_CHART_NAME__ | __TEMPO_CHART_VERSION__ | __TEMPO_CHART_ARCHIVE__ |
+| Logging | [Elasticsearch Exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-elasticsearch-exporter)| __ESEXPORTER_HELM_CHART_REPO__ | __ESEXPORTER_HELM_CHART_NAME__ | __ESEXPORTER_HELM_CHART_VERSION__ | __ESEXPORTER_HELM_CHART_ARCHIVE__ |
+| Logging | [Fluent Bit](https://github.com/fluent/helm-charts/tree/main/charts/fluent-bit)| __FLUENTBIT_HELM_CHART_REPO__ | __FLUENTBIT_HELM_CHART_NAME__ | __FLUENTBIT_HELM_CHART_VERSION__ | __FLUENTBIT_HELM_CHART_ARCHIVE__ |
+| Logging | [OpenSearch](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch)| __OPENSEARCH_HELM_CHART_REPO__ | __OPENSEARCH_HELM_CHART_NAME__ | __OPENSEARCH_HELM_CHART_VERSION__ | __OPENSEARCH_HELM_CHART_ARCHIVE__ |
+| Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch-dashboards)| __OSD_HELM_CHART_REPO__ | __OSD_HELM_CHART_NAME__ | __OSD_HELM_CHART_VERSION__ | __OSD_HELM_CHART_ARCHIVE__ |
+| Metrics | [Grafana (on OpenShift)](https://github.com/grafana/helm-charts/tree/main/charts/grafana)| __OPENSHIFT_GRAFANA_CHART_REPO__ | __OPENSHIFT_GRAFANA_CHART_NAME__ | __OPENSHIFT_GRAFANA_CHART_VERSION__ | __OPENSHIFT_GRAFANA_CHART_ARCHIVE__ |
+| Metrics | [Kube Prometheus Stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)| __KUBE_PROM_STACK_CHART_REPO__ | __KUBE_PROM_STACK_CHART_NAME__ | __KUBE_PROM_STACK_CHART_VERSION__ | __KUBE_PROM_STACK_CHART_ARCHIVE__ |
+| Metrics | [Prometheus Pushgateway](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway)| __PUSHGATEWAY_CHART_REPO__ | __PUSHGATEWAY_CHART_NAME__ | __PUSHGATEWAY_CHART_VERSION__ | __PUSHGATEWAY_CHART_ARCHIVE__ |
+| Metrics | [Tempo](https://github.com/grafana/helm-charts/tree/main/charts/tempo)| __TEMPO_CHART_REPO__ | __TEMPO_CHART_NAME__ | __TEMPO_CHART_VERSION__ | __TEMPO_CHART_ARCHIVE__ |
 
 ## Table 4. Miscellaneous Component Version Information
 This table provides version information for some miscellaneous components deployed by SAS Viya Monitoring for Kubernetes.
@@ -65,4 +65,3 @@ This table provides version information for some miscellaneous components deploy
 | Component | Version | Project Repository | Notes |
 |--|--|--|--|
 | OpenSearch Datasource Plugin (Grafana) | __GRAFANA_DATASOURCE_PLUGIN_VERSION__ | https://github.com/grafana/opensearch-datasource/releases |Allows Grafana to surface log messages stored in OpenSearch |
-

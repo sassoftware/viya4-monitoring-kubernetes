@@ -1,9 +1,8 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.39 (20JUN2025)
 * **Metrics**
-  * [FIX] Resolved issue causing "missing datasource" errors on a number of Grafana dashboards.
-
+  * [FIX] Resolved an issue where some Grafana dashboards failed to load due to hardcoded Prometheus datasource references. In the previous release, the Prometheus datasource UID was standardized to `prometheus` to support the Grafana alerting system and provisioned alerts. However, some dashboards still contained hardcoded UIDs pointing to the old datasource configuration. This fix updates those references to use the correct UID, ensuring all dashboards now load and function as expected.
 
 ## Version 1.2.38 (17JUN2025)
 * **Logging**
