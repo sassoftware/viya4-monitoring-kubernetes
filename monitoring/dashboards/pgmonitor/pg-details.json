@@ -2092,6 +2092,19 @@
   "templating": {
     "list": [
       {
+        "allowCustomValue": false,
+        "current": {
+          "text": "Prometheus",
+          "value": "prometheus"
+        },
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
         "current": {
           "isNone": true,
           "selected": false,
@@ -2100,7 +2113,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
+          "uid": "$datasource"
         },
         "definition": "query_result( up{ exp_type = 'pg' } )",
         "hide": 0,
@@ -2131,7 +2144,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
+          "uid": "$datasource"
         },
         "definition": "query_result( ccp_backrest_last_info_backup_runtime_seconds{job=~\"$pgnodes\"} )",
         "hide": 0,
@@ -2161,7 +2174,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
+          "uid": "$datasource"
         },
         "definition": "query_result(pg_exporter_last_scrape_duration_seconds)",
         "hide": 0,

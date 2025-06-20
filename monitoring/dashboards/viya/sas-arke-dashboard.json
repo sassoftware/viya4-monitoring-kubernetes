@@ -315,6 +315,19 @@
   "templating": {
     "list": [
       {
+        "allowCustomValue": false,
+        "current": {
+          "text": "Prometheus",
+          "value": "prometheus"
+        },
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
         "current": {
           "selected": false,
           "text": "d81257",
@@ -322,7 +335,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
+          "uid": "$datasource"
         },
         "definition": "label_values(arke_request_total,namespace)",
         "hide": 0,

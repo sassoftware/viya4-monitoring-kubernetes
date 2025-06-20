@@ -32,7 +32,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "$datasource"
       },
       "gridPos": {
         "h": 1,
@@ -46,7 +46,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "$datasource"
           },
           "refId": "A"
         }
@@ -511,7 +511,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "$datasource"
       },
       "gridPos": {
         "h": 1,
@@ -525,7 +525,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "$datasource"
           },
           "refId": "A"
         }
@@ -1068,7 +1068,7 @@
       "collapsed": true,
       "datasource": {
         "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
+        "uid": "$datasource"
       },
       "gridPos": {
         "h": 1,
@@ -1511,7 +1511,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "$datasource"
           },
           "refId": "A"
         }
@@ -1671,7 +1671,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
+          "uid": "$datasource"
         },
         "definition": "label_values(:sas_launcher_pod_info:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\"},job_name)",
         "hide": 0,
@@ -1706,7 +1706,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
+          "uid": "$datasource"
         },
         "definition": "label_values(:sas_launcher_pod_info:{namespace=~\"$namespace\", label_launcher_sas_com_job_type=~\"$jobType\",label_launcher_sas_com_username=~\"$user\",job_name=~\"$jobName\"}, queue_name)",
         "hide": 0,
