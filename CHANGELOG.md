@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Metrics**
+  * [FIX] Resolved issue causing "missing datasource" errors on a number of Grafana dashboards.
+
+
 ## Version 1.2.38 (17JUN2025)
 * **Logging**
   * [ANNOUNCEMENT] The [OpenDistro for Elasticsearch (ODFE) project](https://opendistro.github.io/for-elasticsearch/) reached end-of-line in May of 2022 and our project moved to
