@@ -18,7 +18,7 @@ each deployment file.
 
 You customize your logging deployment by specifying values in `user.env` and
 `*.yaml` files. These files are stored in a local directory outside of your
-repository that is identified by the `USER_DIR` environment variable. 
+repository that is identified by the `USER_DIR` environment variable.
 For information about the customization process, see [Create the Deployment Directory](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=p15fe8611w9njkn1fucwbvlz8tyg.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
 
 The customization files in each sample provide a starting point for the
@@ -61,8 +61,7 @@ from SAS Viya components.
 * [ingress](ingress) - Deploys using host-based or path-based ingress.
 * [namespace-monitoring](namespace-monitoring) - Separates cluster monitoring
 from SAS Viya monitoring.
-* [tls](tls) - Enables TLS encryption for both in-cluster and ingress. Options
-  for either host-based and path-based ingress are included.
+
 
 ## Other Samples
 
