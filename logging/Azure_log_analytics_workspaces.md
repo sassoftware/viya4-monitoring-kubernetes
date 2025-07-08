@@ -5,7 +5,7 @@
 If you use Microsoft Azure and want to use Azure Monitor *instead* of OpenSearch
 to explore, filter, and report on log messages from a SAS Viya environment, you
 can deploy the alternate logging solution described in this document. This solution
-uses acombination of Fluent Bit and an Azure Log Analytics workspace to handle log
+uses a combination of Fluent Bit and an Azure Log Analytics workspace to handle log
 messages so that they can be accessed by Azure Monitor. Please note that the
 development work in this solution has been limited, and is primarily a proof of
 concept.
@@ -79,7 +79,7 @@ To remove all logging components for this solution, issue this command:
 /logging/bin/remove_logging_azmonitor.sh
 ```
 By default, this script does not delete the namespace, but it does delete configmaps and secrets that were created by the deployment script.  If you would like to delete the namespace as part
-of this script's execution, set the evnironment variable `LOG_DELETE_NAMESPACE_ON_REMOVE` to
+of this script's execution, set the environment variable `LOG_DELETE_NAMESPACE_ON_REMOVE` to
 *'true'* prior to running the script.
 
 ## Using Connection Information From a Kubernetes Secret
