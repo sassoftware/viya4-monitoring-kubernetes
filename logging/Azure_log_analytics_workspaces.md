@@ -78,8 +78,7 @@ To remove all logging components for this solution, issue this command:
 ```bash
 /logging/bin/remove_logging_azmonitor.sh
 ```
-By default, this script does not delete the namespace, but it does delete configmaps and secrets that were created by the deployment script.  If you would like to delete the namespace as part
-of this script's execution, set the environment variable `LOG_DELETE_NAMESPACE_ON_REMOVE` to
+By default, this script does not delete the namespace, but it does delete configmaps and secrets that were created by the deployment script.  If you would like to delete the namespace as well, set the environment variable `LOG_DELETE_NAMESPACE_ON_REMOVE` to
 *'true'* prior to running the script.
 
 ## Using Connection Information From a Kubernetes Secret
