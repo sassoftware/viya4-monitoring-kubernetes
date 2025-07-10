@@ -1,4 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Overall**
+  * [REMOVAL] Removed the previously deprecated TLS sample.  Deploying with TLS enabled has been the default since version
+1.2.15 (18JUL23).
+
 
 ## Version 1.2.39 (20JUN2025)
 * **Metrics**

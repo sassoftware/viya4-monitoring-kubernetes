@@ -4,10 +4,10 @@ To learn how to deploy the logging component, see [Getting Started](https://docu
 
 ## Important Information about OpenSearch and OpenSearch Dashboards
 
->As of release 1.2.0, this project uses OpenSearch and OpenSearch Dashboards.
-
-**Notes:**
-
-* OpenSearch replaces Elasticsearch.
-* OpenSearch Dashboards replaces Kibana.
-* Some configuration options, environment variables, and other aspects of this project might still include references to the prior product names. This is intentional. Doing so supports backward compatibility and continuity for users of this project. These references might change at a later date.
+This project uses OpenSearch and OpenSearch Dashboards and this has been
+true since version 1.2.0 released in June of 2022.  Prior to that, the
+project used Elasticsearch and Kibana.  To support backward compitibility,
+some configuration options, environment variables, and other aspects of
+this project still include references to those product names.  References
+to Elasticsearch and Kibana should be understood to refer to OpenSearch
+and OpenSearch Dashboards respectively.
