@@ -1,5 +1,19 @@
 # SAS Viya Monitoring for Kubernetes
 
+## unreleased
+* **Metrics**
+ * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 70.8.0 to 75.12.0.
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded fom 8.13.1 to 9.2.10.
+  * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 3.1.0 to 3.4.0.
+  * [UPGRADE] The config-reloader has been upgraded from 0.81.0 to 0.83.0.
+  * [UPGRADE] Grafana has been upgraded from 11.6.1 to 12.0.2.
+  * [UPGRADE] The k8s-sidecar has been upgraded from 1.30.0 to 1.30.3.
+  * [UPGRADE] Kube-State-Metrics has been upgraded from 2.15.0 to 2.16.0.
+  * [UPGRADE] Prometheus has been upgraded from 3.2.1 to 3.5.0.
+  * [UPGRADE] Prometheus Operator has been upgraded from 0.81.0 to 0.83.0.
+  * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.26.1 to 2.28.0
+
+
 ## Version 1.2.40 (15JULY2025)
 * **Overall**
   * [REMOVAL] Removed the previously deprecated TLS sample.  Deploying with TLS enabled has been the default since version
@@ -9,6 +23,7 @@
 ## Version 1.2.39 (20JUN2025)
 * **Metrics**
   * [FIX] Resolved an issue where some Grafana dashboards failed to load due to hardcoded Prometheus datasource references. In the previous release, the Prometheus datasource UID was standardized to `prometheus` to support the Grafana alerting system and provisioned alerts. However, some dashboards still contained hardcoded UIDs pointing to the old datasource configuration. This fix updates those references to use the correct UID, ensuring all dashboards now load and function as expected.
+
 
 ## Version 1.2.38 (17JUN2025)
 * **Logging**
@@ -32,6 +47,7 @@ SAS Viya Workload node placement strategy.
 
 * **Metrics**
   * [FEATURE] A set of SAS Viya specific alerts is now deployed with Grafana.  Administrators can configure notifiers (which trigger messages via e-mail, Slack, SMS, etc. based on these alerts) and additional alerts via the Grafana web application after deployment.  Or, alternatively, notifiers and/or additional alerts can be defined prior to running the monitoring deployment script ( `deploy_monitoring_cluster.sh` ) by placing yaml files in `$USER_DIR/monitoring/alerting/` Note: Due to Grafana's use of a single folder namespace, the folders used to organize these new Alerts will also appear when viewing Dashboards and will appear to be empty.  When working with Dashboards, these folders can be ignored.
+
 
 ## Version 1.2.37 (13MAY2025)
 * **Metrics**
