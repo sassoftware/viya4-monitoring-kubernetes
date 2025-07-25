@@ -2,11 +2,11 @@
 
 ## unreleased
 * **Metrics**
- * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 70.8.0 to 75.12.0.
-  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded fom 8.13.1 to 9.2.10.
-  * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 3.1.0 to 3.4.0.
+ * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 70.8.0 to 75.15.0.
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded fom 8.13.1 to 9.3.0.
+  * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 3.1.0 to 3.4.1.
   * [UPGRADE] The config-reloader has been upgraded from 0.81.0 to 0.83.0.
-  * [UPGRADE] Grafana has been upgraded from 11.6.1 to 12.0.2.
+  * [UPGRADE] Grafana has been upgraded from 11.6.1 to 12.1.0.
   * [UPGRADE] The k8s-sidecar has been upgraded from 1.30.0 to 1.30.3.
   * [UPGRADE] Kube-State-Metrics has been upgraded from 2.15.0 to 2.16.0.
   * [UPGRADE] Prometheus has been upgraded from 3.2.1 to 3.5.0.
