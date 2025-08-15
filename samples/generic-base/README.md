@@ -29,4 +29,4 @@ log-monitoring components. See [Deploy](https://documentation.sas.com/?cdcId=obs
 
 In addition to customizing the deployment, this sample show how you can add
 your own Grafana dashboards, alerts, contact points and notifications policies. See [Add More Grafana Dashboards](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n1sg9bc44ow616n1sw7l3dlsbmgz.htm) and
-[Provision Contact Points, Notification Policies and Alert Rules](https://documentation.sas.com/doc/en/obsrvcdc/v_003/obsrvdply/n0auhd4hutsf7xn169hfvriysz4e.htm#n1o8xp9s4wiflun1bdm4zhlfoyip) for details.
+[Provision Contact Points, Notification Policies and Alert Rules](https://documentation.sas.com/doc/en/obsrvcdc/v_003/obsrvdply/n0auhd4hutsf7xn169hfvriysz4e.htm#p1cb39v8tr2379n1c4posre4v8wx) for details.
