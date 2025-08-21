@@ -22,9 +22,9 @@
 #       backend role: 'V4MCLUSTER_ADMIN_kibana_users'  roles: 'tenant_cluster_admins' and 'search_index_-ALL-'
 #
 
-cd "$(dirname $BASH_SOURCE)/../.."
+cd "$(dirname "$BASH_SOURCE")/../.." || exit
 source logging/bin/common.sh
-this_script=`basename "$0"`
+this_script=$(basename "$0")
 
 source logging/bin/rbac-include.sh
 source logging/bin/apiaccess-include.sh
@@ -70,7 +70,7 @@ else
    validateNamespace "$namespace"
 
    if [ -n "$tenant" ]; then
-      validateTenantID $tenant
+      validateTenantID "$tenant"
 
       NST="${namespace}_${tenant}"
 
@@ -89,8 +89,10 @@ else
 fi
 
 # get admin credentials
-export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
-export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
+# shellcheck disable=SC2155
+export ES_ADMIN_USER=$(kubectl -n "$LOG_NS" get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
+# shellcheck disable=SC2155
+export ES_ADMIN_PASSWD=$(kubectl -n "$LOG_NS" get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
 
 # Get Security API URL
 get_sec_api_url
@@ -101,23 +103,23 @@ if [ -z "$sec_api_url" ]; then
 fi
 
 # handle $ROLENAME
-if role_exists $ROLENAME; then
-   delete_rolemappings $ROLENAME
-   delete_role $ROLENAME
+if role_exists "$ROLENAME"; then
+   delete_rolemappings "$ROLENAME"
+   delete_role "$ROLENAME"
 
    # handle tenant_$NST
-   delete_rolemappings tenant_${NST}
-   delete_role tenant_${NST}
+   delete_rolemappings tenant_"${NST}"
+   delete_role tenant_"${NST}"
 else
   log_verbose "The role [$ROLENAME] does not exist; nothing to delete"
 fi
 
 # handle KIBANA_USER
-remove_rolemapping kibana_user     $BACKENDROLE    # Needed for RBACs created prior to MT support (should be no-op for post MT RBACs)
-remove_rolemapping v4m_kibana_user $BACKENDROLE
+remove_rolemapping kibana_user     "$BACKENDROLE"    # Needed for RBACs created prior to MT support (should be no-op for post MT RBACs)
+remove_rolemapping v4m_kibana_user "$BACKENDROLE"
 
 # handle Grafana Data Source user
-remove_rolemapping v4m_grafana_dsuser $GFDS_BACKENDROLE
+remove_rolemapping v4m_grafana_dsuser "$GFDS_BACKENDROLE"
 
 log_notice "Access controls deleted [$(date)]"
 echo ""

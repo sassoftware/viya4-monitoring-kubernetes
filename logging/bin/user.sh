@@ -5,9 +5,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-cd "$(dirname $BASH_SOURCE)/../.."
+cd "$(dirname "$BASH_SOURCE")/../.."
 source logging/bin/common.sh
-this_script=`basename "$0"`
+this_script=$(basename "$0")
 
 source logging/bin/rbac-include.sh
 source logging/bin/apiaccess-include.sh
@@ -55,7 +55,7 @@ POS_PARMS=""
 while (( "$#" )); do
   case "$1" in
     -ns|--namespace)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         namespace=$2
         shift 2
       else
@@ -65,7 +65,7 @@ while (( "$#" )); do
       fi
       ;;
     -t|--tenant)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         tenant=$2
         shift 2
       else
@@ -75,7 +75,7 @@ while (( "$#" )); do
       fi
       ;;
     -u|--user|--username)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         username=$2
         shift 2
       else
@@ -85,7 +85,7 @@ while (( "$#" )); do
       fi
       ;;
     -p|--password)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         password=$2
         shift 2
       else
@@ -122,7 +122,7 @@ if [ "$#" -lt 1 ]; then
     show_usage
     exit 1
 else
-   action=$(echo $1|tr '[a-z]' '[A-Z]')
+   action=$(echo "$1"|tr '[a-z]' '[A-Z]')
    shift
 
    if [ "$action" != "CREATE" ] &&  [ "$action" != "DELETE" ] ; then
@@ -135,7 +135,7 @@ fi
 log_debug "Action: $action"
 
 if [ "$show_usage" == "1" ]; then
-   show_usage $action
+   show_usage "$action"
    exit
 fi
 
@@ -157,7 +157,7 @@ tenant=$(echo "$tenant"| tr '[:upper:]' '[:lower:]')
 if [ "$namespace" == "_all_" ] && [ "$tenant" == "_all_" ]; then
    if [ -z "$username"  ] && [ "$grafanads_user" != "true" ]; then
      log_error "Required parameter USERNAME not specified"
-     show_usage $action
+     show_usage "$action"
      exit 4
    fi
    cluster="true"
@@ -168,7 +168,7 @@ else
 
    if [ -z "$username"  ] && [ -z "$namespace" ]; then
      log_error "Required parameter(s) NAMESPACE and/or USERNAME not specified"
-     show_usage $action
+     show_usage "$action"
      exit 4
    fi
 fi
@@ -176,8 +176,10 @@ fi
 log_debug "CLUSTER: $cluster NAMESPACE: $namespace TENANT: $tenant NST: $nst USERNAME: $username"
 
 # get admin credentials
-export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
-export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
+# shellcheck disable=SC2155
+export ES_ADMIN_USER=$(kubectl -n "$LOG_NS" get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
+# shellcheck disable=SC2155
+export ES_ADMIN_PASSWD=$(kubectl -n "$LOG_NS" get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
 
 
 # Get Security API URL
@@ -233,13 +235,13 @@ case "$action" in
       log_info "Attempting to create user [$username] and grant them access to log messages from $scope [$(date)]"
 
       # Check if user exists
-      if user_exists $username; then
+      if user_exists "$username"; then
          log_error "A user with this name [$username] already exists."
          exit 1
       fi
 
       #Check if role exists
-      if ! role_exists $rolename; then
+      if ! role_exists "$rolename"; then
          log_error "The expected access control role [$rolename] does NOT exist."
          if [ "$cluster" != "true" ]; then
             log_error "You must on-oboard $scope to create required the access control role."
@@ -265,31 +267,31 @@ case "$action" in
       fi
 
       exitnow="false"
-      weakpass="false"
+      weakpassword="false"
       loopcounter=1
       until [ "$exitnow" == "true" ]
       do
 
-         cp logging/opensearch/rbac/user.json $TMP_DIR/user.json
+         cp logging/opensearch/rbac/user.json "$TMP_DIR"/user.json
          # Replace PLACEHOLDERS
-         sed -i'.bak' "s/xxBEROLExx/$berole/g"             $TMP_DIR/user.json      # (NAMESPACE|NAMESPACE_TENANT|'V4MCLUSTER_ADMIN') + '_kibana_users'
-         sed -i'.bak' "s/xxNSCONSTRAINTxx/$nsconstraint/g" $TMP_DIR/user.json      # NAMESPACE|'-none-'
-         sed -i'.bak' "s/xxTCONSTRAINTxx/$tconstraint/g"   $TMP_DIR/user.json      # TENANT|'-none-'
-         sed -i'.bak' "s/xxPASSWORDxx/$password/g"         $TMP_DIR/user.json      # PASSWORD
-         sed -i'.bak' "s/xxCREATEDBYxx/$this_script/g"     $TMP_DIR/user.json      # CREATEDBY
-         sed -i'.bak' "s/xxPWDCHANGEXX/$pwdchangetxt/g"    $TMP_DIR/user.json      # PASSWORD CHANGE MECHANISM (OSD|change_internal_password.sh script)
-         sed -i'.bak' "s/xxDATETIMExx/$(date)/g"           $TMP_DIR/user.json      # DATE
+         sed -i'.bak' "s/xxBEROLExx/$berole/g"             "$TMP_DIR"/user.json      # (NAMESPACE|NAMESPACE_TENANT|'V4MCLUSTER_ADMIN') + '_kibana_users'
+         sed -i'.bak' "s/xxNSCONSTRAINTxx/$nsconstraint/g" "$TMP_DIR"/user.json      # NAMESPACE|'-none-'
+         sed -i'.bak' "s/xxTCONSTRAINTxx/$tconstraint/g"   "$TMP_DIR"/user.json      # TENANT|'-none-'
+         sed -i'.bak' "s/xxPASSWORDxx/$password/g"         "$TMP_DIR"/user.json      # PASSWORD
+         sed -i'.bak' "s/xxCREATEDBYxx/$this_script/g"     "$TMP_DIR"/user.json      # CREATEDBY
+         sed -i'.bak' "s/xxPWDCHANGEXX/$pwdchangetxt/g"    "$TMP_DIR"/user.json      # PASSWORD CHANGE MECHANISM (OSD|change_internal_password.sh script)
+         sed -i'.bak' "s/xxDATETIMExx/$(date)/g"           "$TMP_DIR"/user.json      # DATE
 
-         log_debug "Contents of user.json template file after substitutions: \n $(cat $TMP_DIR/user.json)"
+         log_debug "Contents of user.json template file after substitutions: \n $(cat "$TMP_DIR"/user.json)"
 
 
          #remove any existing instance of this file
-         rm -f $TMP_DIR/user_create.txt
+         rm -f "$TMP_DIR"/user_create.txt
 
          # Create user
-         response=$(curl -s -o $TMP_DIR/user_create.txt -w "%{http_code}" -XPUT "$sec_api_url/internalusers/$username"  -H 'Content-Type: application/json' -d @$TMP_DIR/user.json  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+         response=$(curl -s -o "$TMP_DIR"/user_create.txt -w "%{http_code}" -XPUT "$sec_api_url/internalusers/$username"  -H 'Content-Type: application/json' -d @"$TMP_DIR"/user.json  --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
 
-         if grep -i 'weak password' $TMP_DIR/user_create.txt >/dev/null 2>&1; then
+         if grep -i 'weak password' "$TMP_DIR"/user_create.txt >/dev/null 2>&1; then
             log_warn "The password specified for user [$username] did not meet complexity requirements of OpenSearch."
             log_warn "A randomly generated password will be used instead."
             log_warn "Check notices below for additional details."
@@ -342,7 +344,7 @@ case "$action" in
       log_info "Attempting to remove user [$username] from the internal user database [$(date)]"
 
       # Check if user exists
-      if ! user_exists $username; then
+      if ! user_exists "$username"; then
          log_error "There was an issue deleting the user [$username]; the user does NOT exists."
          exit 1
       else
@@ -350,7 +352,7 @@ case "$action" in
       fi
 
       # Delete user
-      response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "$sec_api_url/internalusers/$username"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+      response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "$sec_api_url/internalusers/$username"  --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
       if [[ $response != 2* ]]; then
          log_error "There was an issue deleting the user [$username]. [$response]"
          exit 1

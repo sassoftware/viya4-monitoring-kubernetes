@@ -23,9 +23,9 @@
 #       backend role: 'V4MCLUSTER_ADMIN_kibana_users' roles: 'tenant_cluster_admins' and 'search_index_-ALL-'
 #
 
-cd "$(dirname $BASH_SOURCE)/../.."
+cd "$(dirname "$BASH_SOURCE")/../.." || exit
 source logging/bin/common.sh
-this_script=`basename "$0"`
+this_script=$(basename "$0")
 
 source logging/bin/rbac-include.sh
 source logging/bin/apiaccess-include.sh
@@ -92,7 +92,7 @@ else
       exit
    elif [ -n "$tenant" ]; then
 
-      validateTenantID $tenant
+      validateTenantID "$tenant"
 
       NST="${namespace}_${tenant}"
       INDEX_NST="${namespace}-__${tenant}__"
@@ -119,19 +119,21 @@ else
 fi
 
 # Copy RBAC templates
-cp logging/opensearch/rbac $TMP_DIR -r
+cp logging/opensearch/rbac "$TMP_DIR" -r
 
 # Replace PLACEHOLDERS
-sed -i'.bak' "s/xxIDXPREFIXxx/$INDEX_PREFIX/g"  $TMP_DIR/rbac/*.json     # IDXPREFIX
-sed -i'.bak' "s/xxNAMESPACExx/$namespace/g"     $TMP_DIR/rbac/*.json     # NAMESPACE
-sed -i'.bak' "s/xxTENANTxx/$tenant/g"           $TMP_DIR/rbac/*.json     # TENANT
-sed -i'.bak' "s/xxIDXNSTxx/$INDEX_NST/g"        $TMP_DIR/rbac/*.json     # NAMESPACE|NAMESPACE-__TENANT__    (used in index names)
-sed -i'.bak' "s/xxNSTxx/$NST/g"                 $TMP_DIR/rbac/*.json     # NAMESPACE|NAMESPACE_TENANT        (used in RBAC names)
+sed -i'.bak' "s/xxIDXPREFIXxx/$INDEX_PREFIX/g"  "$TMP_DIR"/rbac/*.json     # IDXPREFIX
+sed -i'.bak' "s/xxNAMESPACExx/$namespace/g"     "$TMP_DIR"/rbac/*.json     # NAMESPACE
+sed -i'.bak' "s/xxTENANTxx/$tenant/g"           "$TMP_DIR"/rbac/*.json     # TENANT
+sed -i'.bak' "s/xxIDXNSTxx/$INDEX_NST/g"        "$TMP_DIR"/rbac/*.json     # NAMESPACE|NAMESPACE-__TENANT__    (used in index names)
+sed -i'.bak' "s/xxNSTxx/$NST/g"                 "$TMP_DIR"/rbac/*.json     # NAMESPACE|NAMESPACE_TENANT        (used in RBAC names)
 
 
 # get admin credentials
-export ES_ADMIN_USER=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
-export ES_ADMIN_PASSWD=$(kubectl -n $LOG_NS get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
+# shellcheck disable=SC2155
+export ES_ADMIN_USER=$(kubectl -n "$LOG_NS" get secret internal-user-admin -o=jsonpath="{.data.username}" |base64 --decode)
+# shellcheck disable=SC2155
+export ES_ADMIN_PASSWD=$(kubectl -n "$LOG_NS" get secret internal-user-admin -o=jsonpath="{.data.password}" |base64 --decode)
 
 
 # Get Security API URL
@@ -144,26 +146,26 @@ fi
 
 
 #index user (controls access to indexes)
-ensure_role_exists $ROLENAME $TMP_DIR/rbac/$index_role_template
-add_rolemapping $ROLENAME $BE_ROLENAME
+ensure_role_exists "$ROLENAME" "$TMP_DIR"/rbac/$index_role_template
+add_rolemapping "$ROLENAME" "$BE_ROLENAME"
 
 #grafana_ds_user (used by Grafana datasource)
-ensure_role_exists v4m_grafana_dsuser $TMP_DIR/rbac/v4m_grafana_dsuser_role.json
-add_rolemapping v4m_grafana_dsuser $BE_GFDS_ROLENAME null
-add_rolemapping $ROLENAME $BE_GFDS_ROLENAME
+ensure_role_exists v4m_grafana_dsuser "$TMP_DIR"/rbac/v4m_grafana_dsuser_role.json
+add_rolemapping v4m_grafana_dsuser "$BE_GFDS_ROLENAME" null
+add_rolemapping "$ROLENAME" "$BE_GFDS_ROLENAME"
 
 
 #tenant role (controls access to Kibanas tenant spaces)
 if [ "$create_ktenant_roles" == "true" ]; then
 
-   ensure_role_exists tenant_${NST} $TMP_DIR/rbac/$kibana_tenant_role_template
-   add_rolemapping  tenant_${NST} $BE_ROLENAME
+   ensure_role_exists tenant_"${NST}" "$TMP_DIR"/rbac/$kibana_tenant_role_template
+   add_rolemapping  tenant_"${NST}" "$BE_ROLENAME"
 
 fi
 
 #kibana_user
-ensure_role_exists v4m_kibana_user $TMP_DIR/rbac/v4m_kibana_user_role.json
-add_rolemapping v4m_kibana_user $BE_ROLENAME null
+ensure_role_exists v4m_kibana_user "$TMP_DIR"/rbac/v4m_kibana_user_role.json
+add_rolemapping v4m_kibana_user "$BE_ROLENAME" null
 
 log_notice "Access controls created [$(date)]"
 echo ""

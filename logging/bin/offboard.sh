@@ -3,14 +3,14 @@
 # Copyright Ã‚Â© 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-cd "$(dirname $BASH_SOURCE)/../.."
+cd "$(dirname "$BASH_SOURCE")/../.." || exit
 source logging/bin/common.sh
 
 source logging/bin/apiaccess-include.sh
 source logging/bin/secrets-include.sh
 source logging/bin/rbac-include.sh
 
-this_script=`basename "$0"`
+this_script=$(basename "$0")
 
 
 function show_usage {
@@ -40,7 +40,7 @@ POS_PARMS=""
 while (( "$#" )); do
   case "$1" in
     -ns|--namespace)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         namespace=$2
         shift 2
       else
@@ -50,7 +50,7 @@ while (( "$#" )); do
       fi
       ;;
     -t|--tenant)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         tenant=$2
         shift 2
       else
@@ -63,7 +63,7 @@ while (( "$#" )); do
       show_usage
       exit
       ;;
-    -*|--*=) # unsupported flags
+    --*=|-*) # unsupported flags
       log_error "Unsupported flag $1" >&2
       show_usage
       exit 1
@@ -96,15 +96,16 @@ if [ "$namespace" == "global" ]; then
    exit 1
 fi
 
-validateNamespace $namespace
+validateNamespace "$namespace"
 
 if [ -n "$tenant" ]; then
-   validateTenantID $tenant
+   validateTenantID "$tenant"
 
    nst="${namespace}_${tenant}"
    index_nst="${namespace}-__${tenant}__"
 else
    nst="$namespace"
+   # shellcheck disable=SC2034
    index_nst="${namespace}"
 fi
 
@@ -115,6 +116,7 @@ if [ -n "$tenant" ]; then
    tenant_description="An OpenSearch Dashboards tenant space for tenant [$tenant] within SAS Viya deployment (namespace) [$namespace]."
    log_notice "Offboarding tenant [$tenant] within namespace [$namespace] [$(date)]"
 else
+   # shellcheck disable=SC2034
    tenant_description="An OpenSearch Dashboards tenant space for SAS Viya deployment (namespace) [$namespace]."
    log_notice "Offboarding namespace [$namespace] [$(date)]"
 fi
@@ -150,14 +152,14 @@ fi
 
 # Delete ES index containing tenant content
 kibana_index_name=".kibana_*_$(echo "$ktenant"|tr -d _)"
-response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "${es_api_url}/$kibana_index_name"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "${es_api_url}/$kibana_index_name"  --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
 if [[ $response == 2* ]]; then
    log_info "Deleted index [$kibana_index_name]. [$response]"
 else
    log_warn "There was an issue deleting the index [$kibana_index_name] holding content related to OpenSearch Dashboards tenant space [$ktenant]. You may need to manually delete this index. [$response]"
 fi
 
-response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "${es_api_url}/${kibana_index_name}_*"  --user $ES_ADMIN_USER:$ES_ADMIN_PASSWD --insecure)
+response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "${es_api_url}/${kibana_index_name}_*"  --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
 if [[ $response == 2* ]]; then
    log_info "Deleted index [${kibana_index_name}_*]. [$response]"
 else
@@ -166,13 +168,13 @@ fi
 
 
 # Delete access controls
-./logging/bin/security_delete_rbac.sh $namespace $tenant
+./logging/bin/security_delete_rbac.sh "$namespace" "$tenant"
 
 # Delete Grafana Datasource utility user (if exists)
 grfds_user="${nst}_grafana_ds"
-if user_exists $grfds_user; then
+if user_exists "$grfds_user"; then
    log_verbose "Removing the [$grfds_user] utility account."
-   delete_user $grfds_user
+   delete_user "$grfds_user"
 fi
 
 # Reminder that users are not deleted

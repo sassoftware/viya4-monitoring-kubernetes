@@ -1,16 +1,16 @@
 #! /bin/bash
 
-# Copyright Ã‚Â© 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-cd "$(dirname $BASH_SOURCE)/../.."
+cd "$(dirname "$BASH_SOURCE")/../.." || exit
 source logging/bin/common.sh
 
 source logging/bin/apiaccess-include.sh
 source logging/bin/secrets-include.sh
 source logging/bin/rbac-include.sh
 
-this_script=`basename "$0"`
+this_script=$(basename "$0")
 
 
 function show_usage {
@@ -44,7 +44,7 @@ POS_PARMS=""
 while (( "$#" )); do
   case "$1" in
     -ns|--namespace)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         namespace=$2
         shift 2
       else
@@ -54,7 +54,7 @@ while (( "$#" )); do
       fi
       ;;
     -t|--tenant)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         tenant=$2
         shift 2
       else
@@ -64,7 +64,7 @@ while (( "$#" )); do
       fi
       ;;
     -u|--user)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         createuser=true
         inituser=$2
         shift 2
@@ -75,7 +75,7 @@ while (( "$#" )); do
       fi
       ;;
     -p|--password)
-      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
         initpasswd=$2
         shift 2
       else
@@ -124,12 +124,13 @@ fi
 validateNamespace "$namespace"
 
 if [ -n "$tenant" ]; then
-   validateTenantID $tenant
+   validateTenantID "$tenant"
 
    nst="${namespace}_${tenant}"
    index_nst="${namespace}-__${tenant}__"
 else
    nst="$namespace"
+   # shellcheck disable=SC2034
    index_nst="${namespace}"
 fi
 
@@ -175,29 +176,29 @@ fi
 get_kb_api_url
 
 # Import appropriate content into OpenSearch Dashboards tenant space
-./logging/bin/import_osd_content.sh logging/osd/common $ktenant
+./logging/bin/import_osd_content.sh logging/osd/common "$ktenant"
 
 if [ -z "$tenant" ]; then
-   ./logging/bin/import_osd_content.sh logging/osd/namespace $ktenant
+   ./logging/bin/import_osd_content.sh logging/osd/namespace "$ktenant"
 else
-   ./logging/bin/import_osd_content.sh logging/osd/tenant    $ktenant
+   ./logging/bin/import_osd_content.sh logging/osd/tenant    "$ktenant"
 fi
 
 if [ -d "$USER_DIR/logging/osd" ] && [ "$USER_DIR" != "$(pwd)" ]; then
 
    export IGNORE_NOT_FOUND="true"
-   ./logging/bin/import_osd_content.sh $USER_DIR/logging/osd/common $ktenant
+   ./logging/bin/import_osd_content.sh "$USER_DIR"/logging/osd/common "$ktenant"
 
    if [ -z "$tenant" ]; then
-      ./logging/bin/import_osd_content.sh $USER_DIR/logging/osd/namespace $ktenant
+      ./logging/bin/import_osd_content.sh "$USER_DIR"/logging/osd/namespace "$ktenant"
    else
-      ./logging/bin/import_osd_content.sh $USER_DIR/logging/osd/tenant    $ktenant
+      ./logging/bin/import_osd_content.sh "$USER_DIR"/logging/osd/tenant    "$ktenant"
    fi
    unset IGNORE_NOT_FOUND
 fi
 
 # Create access controls
-./logging/bin/security_create_rbac.sh $namespace $tenant
+./logging/bin/security_create_rbac.sh "$namespace" "$tenant"
 
 # Create an initial user
 if [ "$createuser" == "true" ]; then
@@ -215,15 +216,15 @@ if [ "$createuser" == "true" ]; then
       passwdarg=""
    fi
 
-   if user_exists $inituser; then
+   if user_exists "$inituser"; then
       log_warn "A user with the requested user name of  [$inituser] already exists; the initial user account you requested was NOT created."
       log_warn "This existing user may have completely different access controls than you intended for the initial user."
       log_warn "You can create a new user with the appropriate access controls by calling the logging/bin/user.sh script directly."
    else
       if [ -z "$tenant" ]; then
-         ./logging/bin/user.sh CREATE -ns $namespace -u $inituser $passwdarg
+         ./logging/bin/user.sh CREATE -ns "$namespace" -u "$inituser" "$passwdarg"
       else
-         ./logging/bin/user.sh CREATE -ns $namespace -t $tenant -u $inituser $passwdarg
+         ./logging/bin/user.sh CREATE -ns "$namespace" -t "$tenant" -u "$inituser" "$passwdarg"
       fi
    fi
 else
