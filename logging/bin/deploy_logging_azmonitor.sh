@@ -6,11 +6,6 @@
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
 source logging/bin/common.sh
 
-# temp file used to capture command output
-# shellcheck disable=SC2034
-tmpfile=$TMP_DIR/output.txt
-rm -f tmpfile
-
 if [ "$(kubectl get ns "$LOG_NS" -o name 2> /dev/null)" == "" ]; then
     kubectl create ns "$LOG_NS"
 fi
