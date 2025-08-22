@@ -13,17 +13,17 @@ source logging/bin/rbac-include.sh
 this_script=$(basename "$0")
 
 function show_usage {
-    log_message  "Usage: $this_script --namespace NAMESPACE [--tenant TENANT] [OPTIONS]"
-    log_message  ""
-    log_message  "'Offboards' either the specified SAS Viya deployment (namespace) or the specified tenant within that deployment.  This removes the ability to limit admins to the SAS Viya deployment (or a single tenant within a given deployment)."
-    log_message  "The offboarding process deletes the security access controls and the associated OpenSearch Dashboards tenant space (including any saved OpenSearch Dashboards content (e.g. visualizations, dashboards, etc.)."
-    log_message  ""
-    log_message  "    Arguments:"
-    log_message  "     -ns, --namespace   NAMESPACE - (Required) The SAS Viya deployment/Kubernetes Namespace to which access should be removed."
-    log_message  "     -t,  --tenant      TENANT    - (Optional) The tenant within the specific SAS Viya deployment/Kubernetes Namespace to which access should be removed."
-    log_message  ""
-    #log_message  "    Options:"
-    #log_message  ""
+    log_message "Usage: $this_script --namespace NAMESPACE [--tenant TENANT] [OPTIONS]"
+    log_message ""
+    log_message "'Offboards' either the specified SAS Viya deployment (namespace) or the specified tenant within that deployment.  This removes the ability to limit admins to the SAS Viya deployment (or a single tenant within a given deployment)."
+    log_message "The offboarding process deletes the security access controls and the associated OpenSearch Dashboards tenant space (including any saved OpenSearch Dashboards content (e.g. visualizations, dashboards, etc.)."
+    log_message ""
+    log_message "    Arguments:"
+    log_message "     -ns, --namespace   NAMESPACE - (Required) The SAS Viya deployment/Kubernetes Namespace to which access should be removed."
+    log_message "     -t,  --tenant      TENANT    - (Optional) The tenant within the specific SAS Viya deployment/Kubernetes Namespace to which access should be removed."
+    log_message ""
+    #log_message "    Options:"
+    #log_message ""
 }
 
 # set flag indicating wrapper/driver script being run
@@ -34,41 +34,41 @@ export LOGGING_DRIVER=true
 #
 POS_PARMS=""
 
-while (( "$#" )); do
+while (("$#")); do
     case "$1" in
-        -ns | --namespace)
-            if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
-                    namespace=$2
-                    shift 2
-            else
-                    log_error "A value for parameter [NAMESPACE] has not been provided." >&2
-                    show_usage
-                    exit 2
-            fi
-            ;;
-        -t | --tenant)
-            if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
-                    tenant=$2
-                    shift 2
-            else
-                    log_error "A value for parameter [TENANT] has not been provided." >&2
-                    show_usage
-                    exit 2
-            fi
-            ;;
-        -h | --help)
+    -ns | --namespace)
+        if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+            namespace=$2
+            shift 2
+        else
+            log_error "A value for parameter [NAMESPACE] has not been provided." >&2
             show_usage
-            exit
-            ;;
-        --*= | -*) # unsupported flags
-            log_error "Unsupported flag $1" >&2
+            exit 2
+        fi
+        ;;
+    -t | --tenant)
+        if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+            tenant=$2
+            shift 2
+        else
+            log_error "A value for parameter [TENANT] has not been provided." >&2
             show_usage
-            exit 1
-            ;;
-        *) # preserve positional arguments
-            POS_PARMS="$POS_PARMS $1"
-            shift
-            ;;
+            exit 2
+        fi
+        ;;
+    -h | --help)
+        show_usage
+        exit
+        ;;
+    --*= | -*) # unsupported flags
+        log_error "Unsupported flag $1" >&2
+        show_usage
+        exit 1
+        ;;
+    *) # preserve positional arguments
+        POS_PARMS="$POS_PARMS $1"
+        shift
+        ;;
     esac
 done
 
@@ -161,7 +161,6 @@ if [[ $response == 2* ]]; then
 else
     log_warn "There was an issue deleting the index [${kibana_index_name}_*] holding content related to OpenSearch Dashboards tenant space [$ktenant]. You may need to manually delete this index. [$response]"
 fi
-
 
 # Delete access controls
 ./logging/bin/security_delete_rbac.sh "$namespace" "$tenant"

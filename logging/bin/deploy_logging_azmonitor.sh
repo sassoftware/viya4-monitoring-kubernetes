@@ -11,7 +11,7 @@ source logging/bin/common.sh
 tmpfile=$TMP_DIR/output.txt
 rm -f tmpfile
 
-if [ "$(kubectl get ns "$LOG_NS" -o name 2>/dev/null)" == "" ]; then
+if [ "$(kubectl get ns "$LOG_NS" -o name 2> /dev/null)" == "" ]; then
     kubectl create ns "$LOG_NS"
 fi
 
