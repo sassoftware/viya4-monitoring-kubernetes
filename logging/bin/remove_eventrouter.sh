@@ -17,7 +17,7 @@ cp -R logging/eventrouter/eventrouter.yaml "$logDir"/eventrouter.yaml
 
 # Replace placeholders
 log_debug "Replacing logging namespace for files in [$logDir]"
-v4m_replace  "__LOG_NS__" "$LOG_NS" "$logDir"/eventrouter.yaml
+v4m_replace "__LOG_NS__" "$LOG_NS" "$logDir"/eventrouter.yaml
 
 log_info "Removing Event Router [$(date)]"
 # Remove existing instance of Event Router in the kube-system namespace (if present).
