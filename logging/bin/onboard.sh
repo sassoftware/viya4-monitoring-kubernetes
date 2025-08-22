@@ -219,9 +219,7 @@ if [ "$createuser" == "true" ]; then
         log_warn "You can create a new user with the appropriate access controls by calling the logging/bin/user.sh script directly."
     else
         if [ -z "$tenant" ]; then
-            set -x
             ./logging/bin/user.sh CREATE -ns "$namespace" -u "$inituser" "$passwdarg"
-            set +x
         else
             ./logging/bin/user.sh CREATE -ns "$namespace" -t "$tenant" -u "$inituser" "$passwdarg"
         fi
