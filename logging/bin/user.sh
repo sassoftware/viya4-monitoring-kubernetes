@@ -121,7 +121,7 @@ if [ "$#" -lt 1 ]; then
     show_usage
     exit 1
 else
-    action=$(echo "$1" | tr 'a-z' 'A-Z')
+    action=$(echo "$1" | tr "[:lower:]" "[:upper:]")
     shift
 
     if [ "$action" != "CREATE" ] && [ "$action" != "DELETE" ]; then
