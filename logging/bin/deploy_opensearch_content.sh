@@ -23,6 +23,7 @@ fi
 log_info "Loading Content into OpenSearch"
 
 # temp file used to capture command output
+# shellcheck disable=SC2034
 tmpfile=$TMP_DIR/output.txt
 
 # check for pre-reqs
