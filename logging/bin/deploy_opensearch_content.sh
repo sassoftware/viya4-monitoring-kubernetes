@@ -25,8 +25,6 @@ log_info "Loading Content into OpenSearch"
 # temp file used to capture command output
 tmpfile=$TMP_DIR/output.txt
 
-set -e
-
 # check for pre-reqs
 
 # Confirm namespace exists
@@ -168,6 +166,8 @@ function add_ism_template {
         return
     fi
 }
+
+set -e
 
 LOG_RETENTION_PERIOD="${LOG_RETENTION_PERIOD:-3}"
 set_retention_period viya_logs_idxmgmt_policy LOG_RETENTION_PERIOD

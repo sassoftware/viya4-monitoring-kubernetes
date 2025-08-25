@@ -1,4 +1,8 @@
 # SAS Viya Monitoring for Kubernetes
+## unreleased
+* **Logging**
+  * [FIX] Corrected handling of unavailable API endpoint in deploy_opensearch_content.sh
+
 
 ## Version 1.2.41 (19AUG2025)
 * **Metrics**
