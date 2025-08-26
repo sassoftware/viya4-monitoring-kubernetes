@@ -1,5 +1,5 @@
 # SAS Viya Monitoring for Kubernetes
-## unreleased
+## Unreleased
 * **Logging**
   * [FIX] Corrected handling of unavailable API endpoint in deploy_opensearch_content.sh
 
