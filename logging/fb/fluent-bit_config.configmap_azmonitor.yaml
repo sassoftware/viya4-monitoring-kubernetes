@@ -6,7 +6,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.27
+       Set  fb_configMap_version 0.2.28candidate
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -975,7 +975,7 @@ data:
        Name             tail
        Alias            tail4logs
        Path             /var/log/containers/*.log
-       Exclude_Path     /var/log/containers/v4m-*.log
+       Exclude_Path     /var/log/containers/v4m-*.log, /var/log/containers/prometheus-v4m-*.log
        Parser           ${KUBERNETES_RUNTIME_LOGFMT}
        Tag              kube.*
        Multiline.parser    ${LOG_MULTILINE_PARSER}
@@ -991,7 +991,7 @@ data:
        # NOTE: ** METALOGGING **
        Name             tail
        Alias            tail4ops
-       Path             /var/log/containers/v4m-*.log
+       Path             /var/log/containers/v4m-*.log, /var/log/containers/prometheus-v4m-*.log
        Parser           ${KUBERNETES_RUNTIME_LOGFMT}
        Tag              opsK.*
        Refresh_Interval    5
