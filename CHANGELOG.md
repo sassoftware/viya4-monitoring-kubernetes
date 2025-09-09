@@ -1,4 +1,14 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Logging**
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.19.2 to 2.19.3
+  * [UPGRADE] OpenSearch Helm chart upgraded from 2.34.0 to 2.35.0.
+  * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 2.30.0 to 2.31.0
+  * [UPGRADE] Fluent Bit upgraded from 4.0.2 to 4.0.8
+  * [UPGRADE] Fluent Bit Helm chart upgraded from 0.49.0 to 0.52.0
+  * [UPGRADE] Elasticsearch Exporer Helm chart upgraded from 6.7.2 to 7.0.0
+  * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.28.0 to 2.29.1
+
 
 ## Version 1.2.41 (19AUG2025)
 * **Metrics**
