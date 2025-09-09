@@ -1,6 +1,7 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Logging**
+  * [FIX] Corrected handling of unavailable API endpoint in deploy_opensearch_content.sh
   * [FIX] Log messages from Prometheus Operator pod redirected to OpenSearch viya_ops-* (rather than viya_logs-*) index
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.19.2 to 2.19.3
   * [UPGRADE] OpenSearch Helm chart upgraded from 2.34.0 to 2.35.0.
