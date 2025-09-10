@@ -46,8 +46,9 @@ export -f create_ingress_certs
 
 AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
 AUTOGENERATE_STORAGECLASS="${AUTOGENERATE_STORAGECLASS:-false}"
+AUTOGENERATE_SMTP="${AUTOGENERATE_SMTP:-false}"
 
-if [ "$AUTOGENERATE_INGRESS" != "true" ] && [ "$AUTOGENERATE_STORAGECLASS" != "true" ]; then
+if [ "$AUTOGENERATE_INGRESS" != "true" ] && [ "$AUTOGENERATE_STORAGECLASS" != "true" ] && [ "$AUTOGENERATE_SMTP" != "true" ]; then
     log_debug "No autogeneration of YAML enabled"
     export AUTOGENERATE_SOURCED="NotNeeded"
 fi
@@ -68,7 +69,6 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             export AUTOGENERATE_INGRESS="false"
             exit 1
         fi
-
 
         #validate required inputs
         BASE_DOMAIN="${BASE_DOMAIN}"
@@ -107,8 +107,66 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
     fi
 
     if [ "$AUTOGENERATE_STORAGECLASS" == "true" ]; then
-
         log_info "Autogeneration of StorageClass specfication has been enabled"
+    fi
+
+    if [ "$AUTOGENERATE_SMTP" == "true" ]; then
+
+        #required
+        # shellcheck disable=SC2269
+        SMTP_HOST="${SMTP_HOST}"
+        # shellcheck disable=SC2269
+        SMTP_PORT="${SMTP_PORT}"
+        # shellcheck disable=SC2269
+        SMTP_FROM_ADDRESS="${SMTP_FROM_ADDRESS}"
+        # shellcheck disable=SC2269
+        SMTP_FROM_NAME="${SMTP_FROM_NAME}"
+
+        #optional
+        # shellcheck disable=SC2269
+        SMTP_USER="${SMTP_USER}"
+        # shellcheck disable=SC2269
+        SMTP_PASSWORD="${SMTP_PASSWORD}"
+        SMTP_USER_SECRET="${SMTP_USER_SECRET:-grafana-smtp-user}"
+        SMTP_SKIP_VERIFY="${SMTP_SKIP_VERIFY:-false}"
+        SMTP_TLS_CERT_FILE="${SMTP_TLS_CERT_FILE:-/cert/tls.crt}"
+        SMTP_TLS_KEY_FILE="${SMTP_TLS_KEY_FILE:-/cert/tls.key}"
+
+        log_info "Autogeneration of SMTP Configuration has been enabled"
+
+        if [ -z "$SMTP_HOST" ]; then
+            log_error "Required parameter [SMTP_HOST] not provided"
+            exit 1
+        fi
+
+        if [ -z "$SMTP_PORT" ]; then
+            log_error "Required parameter [SMTP_PORT] not provided"
+            exit 1
+        fi
+
+        if [ -z "$SMTP_FROM_ADDRESS" ]; then
+            log_error "Required parameter [SMTP_FROM_ADDRESS] not provided"
+            exit 1
+        fi
+
+        if [ -z "$SMTP_FROM_NAME" ]; then
+            log_error "Required parameter [SMTP_FROM_NAME] not provided"
+            exit 1
+        fi
+
+        # Handle SMTP user credentials
+        if [ -n "$(kubectl get secret -n "$MON_NS" "$SMTP_USER_SECRET" --ignore-not-found -o name 2> /dev/null)" ]; then
+            log_debug "Secret [$SMTP_USER_SECRET] exists; will use it for SMTP user credentials"
+        elif [ -z "$SMTP_USER" ] && [ -z "$SMTP_PASSWORD" ]; then
+            log_debug "Neither SMTP_USER nor SMTP_PASSWORD are set; skipping creation of secret [$SMTP_USER_SECRET]"
+        elif  [ -z "$SMTP_USER" ] || [ -z "$SMTP_PASSWORD" ]; then
+            log_error "Complete SMTP Credentials NOT provided; MUST provide BOTH [SMTP_USER] and [SMTP_PASSWORD]"
+            log_info "SMTP_USER is set to [$SMTP_USER] and SMTP_PASSWORD is set to [$SMTP_PASSWORD]"
+            exit 1
+        else
+            log_debug "Creating secret [$MON_NS/$SMTP_USER_SECRET] from supplied user [$SMTP_USER] and password."
+            kubectl create secret generic "$SMTP_USER_SECRET" -n "$MON_NS" --from-literal=user="$SMTP_USER" --from-literal=password="$SMTP_PASSWORD"
+        fi
 
     fi
 
