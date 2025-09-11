@@ -374,9 +374,8 @@ log_debug "Installing Helm chart from artifact [$chart2install]"
 log_verbose "Creating Grafana alert rules ConfigMap"
 CUSTOM_ALERT_CONFIG_DIR="$USER_DIR/monitoring/alerting/"
 
-# Add optional custom directory if it exists
-if [ -d "$CUSTOM_ALERT_CONFIG_DIR" ]; then
-    log_debug "Including notifiers and additional alert rules from '$CUSTOM_ALERT_CONFIG_DIR'"
+if [ -d "$CUSTOM_ALERT_CONFIG_DIR" ] && [ "$(ls -A "$CUSTOM_ALERT_CONFIG_DIR" 2>/dev/null)" ]; then
+    log_debug "Creating configmap for alert rules/notifiers/contact points defined in '$CUSTOM_ALERT_CONFIG_DIR'"
     CM_ARGS=(--from-file="$CUSTOM_ALERT_CONFIG_DIR")
 
     # Run the kubectl command with all arguments
@@ -385,7 +384,12 @@ if [ -d "$CUSTOM_ALERT_CONFIG_DIR" ]; then
         -n "$MON_NS" \
         --dry-run=client -o yaml | kubectl apply -f -
 else
-    log_debug "No custom alert config directory found at '$CUSTOM_ALERT_CONFIG_DIR'. Skipping."
+    log_debug "No custom alert files found at '$CUSTOM_ALERT_CONFIG_DIR'. Creating empty ConfigMap."
+    # Create an empty ConfigMap to satisfy the volume mount
+    kubectl create configmap grafana-alert-rules \
+        -n "$MON_NS" \
+        --from-literal=_README.txt="Copy alert rules from samples/alerts to $USER_DIR/monitoring/alerting/ to enable them." \
+        --dry-run=client -o yaml | kubectl apply -f -
 fi
 
 # shellcheck disable=SC2086
