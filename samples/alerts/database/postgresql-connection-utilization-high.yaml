@@ -1,25 +1,87 @@
 apiVersion: 1
 groups:
   - interval: 5m
-    name: SAS Viya Alerts
     folder: Database Alerts
+    name: SAS Viya Alerts
     orgId: 1
     rules:
       - title: PostgreSQL Connection Utilization High
         annotations:
-          description: PostgreSQL database connection usage is above 85% of max connections.
-          summary: Database is nearing connection limit.
-        condition: A
+          description: PostgreSQL connection utilization is high (>85%). May exhaust available connections.
+          summary: PostgreSQL connection utilization is high.
+        condition: C
         data:
           - datasourceUid: prometheus
             model:
-              expr: (pg_stat_activity_count / pg_settings_max_connections) * 100 > 85
+              expr: pg_stat_activity_count / pg_settings_max_connections * 100
               instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
             refId: A
             relativeTimeRange:
               from: 300
               to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+            refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 85
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+            refId: C
+            relativeTimeRange:
+              from: 300
+              to: 0
+        execErrState: Error
         for: 5m
+        isPaused: false
         labels:
           severity: warning
-        uid: postgres_connection_utilization
+        noDataState: NoData
+        uid: postgresql_connection_utilization

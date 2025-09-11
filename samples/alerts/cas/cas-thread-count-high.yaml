@@ -11,17 +11,77 @@ groups:
             CAS thread count is higher than 400. May indicate overloaded CAS
             server.
           summary: CAS is using more than 400 threads.
-        condition: A
+        condition: C
         data:
           - datasourceUid: prometheus
             model:
-              expr: cas_thread_count > 400
+              expr: cas_thread_count
               instant: true
+              refId: A
             refId: A
             relativeTimeRange:
               from: 300
               to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+            refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 400
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+            refId: C
+            relativeTimeRange:
+              from: 300
+              to: 0
+        execErrState: Error
         for: 5m
+        isPaused: false
         labels:
           severity: warning
+        noDataState: NoData
         uid: cas_thread_count

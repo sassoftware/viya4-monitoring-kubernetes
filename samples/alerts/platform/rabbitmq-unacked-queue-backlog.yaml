@@ -1,27 +1,91 @@
 apiVersion: 1
 groups:
   - interval: 5m
-    name: SAS Viya Alerts
     folder: Viya Platform Alerts
+    name: SAS Viya Alerts
     orgId: 1
     rules:
-      - title: RabbitMQ Unacked Queue Backlog
+      - title: RabbitMQ Unacknowledged Queue Backlog
         annotations:
           description:
-            RabbitMQ has a high number of unacknowledged messages. This may
-            indicate stuck consumers or performance issues.
-          summary: Unacked messages in RabbitMQ are greater than 5000.
-        condition: A
+            Checks for accumulation of Rabbitmq unacknowledged messages. This means
+            consumers are taking a long time to process messages or have failed.
+          summary:
+            Rabbitmq unacknowledged messages > 5000. Consumer services might be having
+            issues processing messages.
+        condition: C
         data:
           - datasourceUid: prometheus
             model:
-              expr: rabbitmq_queue_messages_unacknowledged > 5000
+              expr: rabbitmq_queue_messages_unacknowledged
               instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
             refId: A
             relativeTimeRange:
               from: 300
               to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+            refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 5000
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+            refId: C
+            relativeTimeRange:
+              from: 300
+              to: 0
+        execErrState: Error
         for: 5m
+        isPaused: false
         labels:
           severity: warning
-        uid: rabbitmq_unacked_messages
+        noDataState: NoData
+        uid: rabbitmq_unacked_queue
