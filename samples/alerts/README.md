@@ -47,13 +47,15 @@ groups:
 
 To customize an alert:
 
-1. Copy the alert file to your user directory
+1. Copy the alert file to your user directory at `$USER_DIR/monitoring/alerting/`
 2. Modify the alert parameters as needed (thresholds, evaluation intervals, etc.)
 3. Deploy the monitoring components to apply your custom alerts
 
-### Required Customizations
+> **Important**: To enable any of these sample alerts, you must copy them to your user directory at `$USER_DIR/monitoring/alerting/`. Alerts in the samples directory are not automatically deployed.
 
-The following elements need to be adjusted to match your specific environment:
+### Sample Customizations
+
+The following elements may need to be adjusted to match your specific environment:
 
 #### 1. Namespace Specifications
 - Change `namespace="viya"` to match your SAS Viya namespace in:
