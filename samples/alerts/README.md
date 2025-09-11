@@ -43,10 +43,6 @@ groups:
         uid: unique-alert-id  # Unique identifier for the alert
 ```
 
-## Legacy Alert Files
-
-The original monolithic alert files (cas_alerts.yaml, database_alerts.yaml, etc.) are still present for backward compatibility. These files will be deprecated in future releases, so we recommend using the individual alert files going forward.
-
 ## Customizing Alerts
 
 To customize an alert:
@@ -54,5 +50,19 @@ To customize an alert:
 1. Copy the alert file to your user directory
 2. Modify the alert parameters as needed (thresholds, evaluation intervals, etc.)
 3. Deploy the monitoring components to apply your custom alerts
+
+### Common Customizations Needed
+
+#### Namespace Adjustments
+Some alerts reference specific namespaces that need to be adjusted for your environment:
+- In several rules (like `viya-pod-restart-count-high.yaml`), the namespace is set to "viya" with `namespace="viya"`. Change this to match your SAS Viya namespace.
+
+#### Alert Expression Format
+Alert expressions in these samples use a multi-part approach for better compatibility with newer Grafana versions:
+- Part A: Fetches the raw metric
+- Part B: Reduces the result (using the "reduce" function)
+- Part C: Applies the threshold using a dedicated threshold component
+
+This approach addresses issues where direct threshold comparisons (e.g., `metric > threshold`) might not work properly in recent Grafana versions.
 
 For more detailed information on Grafana alerting, see the [Grafana documentation](https://grafana.com/docs/grafana/latest/alerting/).
