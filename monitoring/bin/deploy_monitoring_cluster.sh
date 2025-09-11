@@ -78,6 +78,12 @@ fi
 
 #Generate yaml file with all container-related keys
 generateImageKeysFile "$PROMOP_FULL_IMAGE" "monitoring/prom-operator_container_image.template"
+if [ -z "$PROM_OPERATOR_CRD_VERSION" ]; then
+    log_debug "Setting PROM_OPERATOR_CRD_VERSION based on version [$VERSION] extracted from PROMOP_FULL_IMAGE"
+    PROM_OPERATOR_CRD_VERSION="$VERSION"
+else
+    log_info "PROM_OPERATOR_CRD_VERSION has been explicitly set to [$PROM_OPERATOR_CRD_VERSION]"
+fi
 generateImageKeysFile "$ALERTMANAGER_FULL_IMAGE" "$imageKeysFile" "ALERTMANAGER_"
 generateImageKeysFile "$ADMWEBHOOK_FULL_IMAGE" "$imageKeysFile" "ADMWEBHOOK_"
 generateImageKeysFile "$KSM_FULL_IMAGE" "$imageKeysFile" "KSM_"
