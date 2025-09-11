@@ -1,0 +1,29 @@
+apiVersion: 1
+groups:
+  - interval: 5m
+    name: SAS Viya Alerts
+    folder: Viya Platform Alerts
+    orgId: 1
+    rules:
+      - title: High Viya API Latency
+        annotations:
+          description:
+            Viya service API response latency is high (95th percentile over
+            1s).
+          summary: Degraded performance on Viya APIs.
+        condition: A
+        data:
+          - datasourceUid: prometheus
+            model:
+              expr:
+                histogram_quantile(0.95, sum(rate(http_server_requests_duration_seconds_bucket{job=~"sas-.*"}[5m]))
+                by (le)) > 1
+              instant: true
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+        for: 5m
+        labels:
+          severity: warning
+        uid: viya_api_latency

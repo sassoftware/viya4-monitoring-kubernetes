@@ -1,0 +1,99 @@
+apiVersion: 1
+groups:
+  - interval: 5m
+    name: SAS Viya Alerts
+    folder: Viya Platform Alerts
+    orgId: 1
+    rules:
+      - title: RabbitMQ Ready Queue Backlog
+        annotations:
+          description:
+            Checks for accumulation of Rabbitmq ready messages > 10,000. The  covers potential orphan
+            queues and/or bottlenecking of queues due to catalog service.
+          summary:
+            Rabbitmq ready messages > 10,000. This means there is a large backlog
+            of messages due to high activity (which can be temporary) or something has
+            gone wrong.
+        condition: C
+        data:
+          - datasourceUid: prometheus
+            model:
+              disableTextWrap: false
+              editorMode: builder
+              expr: rabbitmq_queue_messages_ready
+              fullMetaSearch: false
+              includeNullMetadata: true
+              instant: true
+              intervalMs: 1000
+              legendFormat: __auto
+              maxDataPoints: 43200
+              range: false
+              refId: A
+              useBackend: false
+            refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+            refId: B
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 10000
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+            refId: C
+            relativeTimeRange:
+              from: 600
+              to: 0
+        execErrState: Error
+        for: 5m
+        isPaused: false
+        labels:
+          severity: warning
+        noDataState: NoData
+        uid: efb36686-4e44-4de8-80c4-7dde9130da90

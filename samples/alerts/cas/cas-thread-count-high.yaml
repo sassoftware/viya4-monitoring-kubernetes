@@ -1,0 +1,27 @@
+apiVersion: 1
+groups:
+  - interval: 5m
+    folder: CAS Alerts
+    name: SAS Viya Alerts
+    orgId: 1
+    rules:
+      - title: CAS Thread Count High
+        annotations:
+          description:
+            CAS thread count is higher than 400. May indicate overloaded CAS
+            server.
+          summary: CAS is using more than 400 threads.
+        condition: A
+        data:
+          - datasourceUid: prometheus
+            model:
+              expr: cas_thread_count > 400
+              instant: true
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+        for: 5m
+        labels:
+          severity: warning
+        uid: cas_thread_count

@@ -1,0 +1,27 @@
+apiVersion: 1
+groups:
+  - interval: 5m
+    name: SAS Viya Alerts
+    folder: Viya Platform Alerts
+    orgId: 1
+    rules:
+      - title: RabbitMQ Unacked Queue Backlog
+        annotations:
+          description:
+            RabbitMQ has a high number of unacknowledged messages. This may
+            indicate stuck consumers or performance issues.
+          summary: Unacked messages in RabbitMQ are greater than 5000.
+        condition: A
+        data:
+          - datasourceUid: prometheus
+            model:
+              expr: rabbitmq_queue_messages_unacknowledged > 5000
+              instant: true
+            refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+        for: 5m
+        labels:
+          severity: warning
+        uid: rabbitmq_unacked_messages
