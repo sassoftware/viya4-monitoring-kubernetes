@@ -164,8 +164,9 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             log_info "SMTP_USER is set to [$SMTP_USER] and SMTP_PASSWORD is set to [$SMTP_PASSWORD]"
             exit 1
         else
-            log_debug "Creating secret [$MON_NS/$SMTP_USER_SECRET] from supplied user [$SMTP_USER] and password."
-            kubectl create secret generic "$SMTP_USER_SECRET" -n "$MON_NS" --from-literal=user="$SMTP_USER" --from-literal=password="$SMTP_PASSWORD"
+            log_debug "Secret [$MON_NS/$SMTP_USER_SECRET] will need to be created later."
+            # shellcheck disable=SC2034
+            smtpCreateUserSecret="true"
         fi
 
     fi
