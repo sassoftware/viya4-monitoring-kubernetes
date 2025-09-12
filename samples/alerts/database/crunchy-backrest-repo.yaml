@@ -1,0 +1,97 @@
+apiVersion: 1
+groups:
+  - interval: 5m
+    name: SAS Viya Alerts
+    folder: Database Alerts
+    orgId: 1
+    rules:
+      - title: Crunchy Backrest Repo
+        annotations:
+          description: Checks to see /pgbackrest/repo1 filesystem is more than 50% full.
+          summary:
+            /pgbackrest/repo1 storage > 50% full in the pgbackrest repo. This typically
+            happens when the archived WAL logs are increasing and not being expired and
+            cleared.
+        condition: C
+        data:
+          - datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr:
+                ((kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~"sas-crunchy-platform-postgres-repo1"}
+                - kubelet_volume_stats_available_bytes{persistentvolumeclaim=~"sas-crunchy-platform-postgres-repo1"})
+                / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~"sas-crunchy-platform-postgres-repo1"})
+                * 100
+              instant: true
+              intervalMs: 1000
+              legendFormat: __auto
+              maxDataPoints: 43200
+              range: false
+              refId: A
+            refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+            refId: B
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 50
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+            refId: C
+            relativeTimeRange:
+              from: 600
+              to: 0
+        execErrState: Error
+        for: 5m
+        isPaused: false
+        labels:
+          severity: warning
+        noDataState: NoData
+        uid: abe80c6a-3add-477a-b228-f8283704570f

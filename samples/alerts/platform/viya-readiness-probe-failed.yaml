@@ -1,0 +1,99 @@
+apiVersion: 1
+groups:
+  - interval: 5m
+    name: SAS Viya Alerts
+    folder: Viya Platform Alerts
+    orgId: 1
+    rules:
+      - title: Viya Readiness Probe Failed
+        annotations:
+          description:
+            Checks for the Ready state of sas-readiness pod. Will need to check
+            the status of the Viya pods since sas-readiness pod reflects the health of
+            the Viya services.
+          summary:
+            sas-readiness pod is not in Ready state. This means that one or more
+            of the Viya services are not in a good state.
+        condition: C
+        data:
+          - datasourceUid: prometheus
+            model:
+              disableTextWrap: false
+              editorMode: builder
+              expr: kube_pod_container_status_ready{container="sas-readiness"}
+              fullMetaSearch: false
+              includeNullMetadata: true
+              instant: true
+              intervalMs: 1000
+              legendFormat: __auto
+              maxDataPoints: 43200
+              range: false
+              refId: A
+              useBackend: false
+            refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+            refId: B
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 1
+                    type: lt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+            refId: C
+            relativeTimeRange:
+              from: 600
+              to: 0
+        execErrState: Error
+        for: 5m
+        isPaused: false
+        labels:
+          severity: warning
+        noDataState: NoData
+        uid: e45e6d74-e396-40ce-a061-2a294295e61b
