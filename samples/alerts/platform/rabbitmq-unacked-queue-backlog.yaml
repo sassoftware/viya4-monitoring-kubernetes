@@ -17,7 +17,7 @@ groups:
         data:
           - datasourceUid: prometheus
             model:
-              expr: rabbitmq_queue_messages_unacknowledged
+              expr: rabbitmq_queue_messages_unacked
               instant: true
               intervalMs: 1000
               maxDataPoints: 43200
