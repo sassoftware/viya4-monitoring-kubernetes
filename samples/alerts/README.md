@@ -84,12 +84,11 @@ Adjust thresholds based on your environment size and requirements:
 
 #### 5. Verify Metric Availability
 Ensure the following metrics are available in your Prometheus instance:
-- CAS metrics: `cas_thread_count`, `cas_grid_uptime_seconds_total`
+- CAS metrics: `cas_grid_uptime_seconds_total`
 - Database metrics: `sas_db_pool_connections`, `pg_stat_activity_count`, `pg_settings_max_connections`
 - RabbitMQ metrics: `rabbitmq_queue_messages_ready`, `rabbitmq_queue_messages_unacked`
 - Kubernetes metrics: `kube_pod_container_status_restarts_total`, `kube_pod_container_status_ready`
 - HTTP metrics: `http_server_requests_duration_seconds_bucket`
-- SAS Job Launcher: `:sas_launcher_pod_status:` (recording rule)
 
 ### Alert Expression Format
 
