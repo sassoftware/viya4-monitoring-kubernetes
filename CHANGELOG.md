@@ -10,11 +10,12 @@
   * [UPGRADE] Fluent Bit Helm chart upgraded from 0.49.0 to 0.52.0
   * [UPGRADE] Elasticsearch Exporer Helm chart upgraded from 6.7.2 to 7.0.0
   * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.28.0 to 2.29.1
+
 * **Metrics**
   * [FEATURE] Automatically define the SMTP server configuration to permit Grafana to send e-mails.
 If enabled (by setting `AUTOGENERATE_SMTP` to 'true'), this optional feature allows admins to define
 email-based contact points for alerts. Users need to provide connection information via the environment 
-variables: `SMTP_SERVER, SMTP_PORT`, `SMTP_FROM_ADDRESS` and `SMTP_FROM_NAME`.  See Autogenerate SMTP Configuration
+variables: `SMTP_SERVER, SMTP_PORT`, `SMTP_FROM_ADDRESS` and `SMTP_FROM_NAME`.  See [Configure Email Settings for Grafana Alerts](documentation.sas.com/doc/en/obsrvcdc/v_003/obsrvdply/n0auhd4hutsf7xn169hfvriysz4e.htm#p1fql9ekyxckamn1jtlujeauhy72)
 for more information.
 
 
