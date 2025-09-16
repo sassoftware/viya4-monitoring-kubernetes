@@ -15,7 +15,7 @@
   * [FEATURE] Automatically define the SMTP server configuration to permit Grafana to send e-mails.
 If enabled (by setting `AUTOGENERATE_SMTP` to 'true'), this optional feature allows admins to define
 email-based contact points for alerts. Users need to provide connection information via the environment 
-variables: `SMTP_SERVER, SMTP_PORT`, `SMTP_FROM_ADDRESS` and `SMTP_FROM_NAME`.  See [Configure Email Settings for Grafana Alerts](documentation.sas.com/doc/en/obsrvcdc/v_003/obsrvdply/n0auhd4hutsf7xn169hfvriysz4e.htm#p1fql9ekyxckamn1jtlujeauhy72)
+variables: `SMTP_SERVER, SMTP_PORT`, `SMTP_FROM_ADDRESS` and `SMTP_FROM_NAME`.  See [Configure Email Settings for Grafana Alerts](https://documentation.sas.com/doc/en/obsrvcdc/v_003/obsrvdply/n0auhd4hutsf7xn169hfvriysz4e.htm#p1fql9ekyxckamn1jtlujeauhy72)
 for more information.
   * [CHANGE] The Grafana alerts targeting SAS Viya that previously were provided by default have been moved
 to the samples directory. Given the variability of SAS Viya environments, these alerts are now optional.
