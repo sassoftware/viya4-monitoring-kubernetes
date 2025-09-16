@@ -12,7 +12,7 @@
   * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.28.0 to 2.29.1
 
 * **Metrics**
-  * [CHANGE] The Grafana alerts targeting Viya that previously were provided by default have been moved to the samples directory. Given the variability of Viya environments, these alerts are now optional and can be copied to `USER_DIR/monitoring/alerting` for use. They have also been split into separate files for easier customization. See the [Alerting Samples README](samples/alerts/README.md) for more details.
+  * [CHANGE] The Grafana alerts targeting SAS Viya that previously were provided by default have been moved to the samples directory. Given the variability of SAS Viya environments, these alerts are now optional. They can be copied to USER_DIR/monitoring/alerting and customized to fit the SAS Viya environment prior to deployment. They have also been split into separate files for easier customization. See the [Alerting Samples README](samples/alerts/README.md) for more details.
 
 ## Version 1.2.41 (19AUG2025)
 * **Metrics**
