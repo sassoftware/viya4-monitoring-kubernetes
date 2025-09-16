@@ -1,0 +1,99 @@
+apiVersion: 1
+groups:
+  - interval: 5m
+    name: SAS Viya Alerts
+    folder: Viya Platform Alerts
+    orgId: 1
+    rules:
+      - title: Viya Pod Restart Count High
+        annotations:
+          description:
+            Checks the restart count of the pod(s). Will need to check why
+            the pod(s) have restarted so many times. One possible cause is OOMkill. This
+            means we will need to increase the memory limit.
+          summary:
+            The number of pod restarts > 20. The service pod(s) have restarted
+            many times due to issues.
+        condition: C
+        data:
+          - datasourceUid: prometheus
+            model:
+              disableTextWrap: false
+              editorMode: builder
+              expr: kube_pod_container_status_restarts_total{namespace="viya"} # namespace can be adjusted
+              fullMetaSearch: false
+              includeNullMetadata: true
+              instant: true
+              intervalMs: 1000
+              legendFormat: __auto
+              maxDataPoints: 43200
+              range: false
+              refId: A
+              useBackend: false
+            refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+            refId: B
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 20
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+            refId: C
+            relativeTimeRange:
+              from: 600
+              to: 0
+        execErrState: Error
+        for: 5m
+        isPaused: false
+        labels:
+          severity: warning
+        noDataState: NoData
+        uid: e7ecb843-f1bd-48b7-8c8c-58571d1642ad

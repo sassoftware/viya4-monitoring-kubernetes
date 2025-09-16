@@ -124,6 +124,12 @@ fi
 
 #Generate yaml file with all container-related keys
 generateImageKeysFile "$PROMOP_FULL_IMAGE" "monitoring/prom-operator_container_image.template"
+if [ -z "$PROM_OPERATOR_CRD_VERSION" ]; then
+    log_debug "Setting PROM_OPERATOR_CRD_VERSION based on version [$VERSION] extracted from PROMOP_FULL_IMAGE"
+    PROM_OPERATOR_CRD_VERSION="$VERSION"
+else
+    log_info "PROM_OPERATOR_CRD_VERSION has been explicitly set to [$PROM_OPERATOR_CRD_VERSION]"
+fi
 generateImageKeysFile "$ALERTMANAGER_FULL_IMAGE" "$imageKeysFile" "ALERTMANAGER_"
 generateImageKeysFile "$ADMWEBHOOK_FULL_IMAGE" "$imageKeysFile" "ADMWEBHOOK_"
 generateImageKeysFile "$KSM_FULL_IMAGE" "$imageKeysFile" "KSM_"
@@ -417,21 +423,12 @@ versionstring="$(get_helm_versionstring "$KUBE_PROM_STACK_CHART_VERSION")"
 log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # Alerts
-if [ -d "monitoring/alerting/rules" ]; then
-    log_verbose "Creating Grafana alert rules ConfigMap"
+log_verbose "Creating Grafana alert rules ConfigMap"
+CUSTOM_ALERT_CONFIG_DIR="$USER_DIR/monitoring/alerting/"
 
-    # Start with required file
-    CM_ARGS=(--from-file="monitoring/alerting/rules")
-
-    CUSTOM_ALERT_CONFIG_DIR="$USER_DIR/monitoring/alerting/"
-
-    # Add optional custom directory if it exists
-    if [ -d "$CUSTOM_ALERT_CONFIG_DIR" ]; then
-        log_debug "Including notifiers and additional alert rules from '$CUSTOM_ALERT_CONFIG_DIR'"
-        CM_ARGS+=(--from-file="$CUSTOM_ALERT_CONFIG_DIR")
-    else
-        log_debug "No custom alert config directory found at '$CUSTOM_ALERT_CONFIG_DIR'. Skipping."
-    fi
+if [ -d "$CUSTOM_ALERT_CONFIG_DIR" ] && [ "$(ls -A "$CUSTOM_ALERT_CONFIG_DIR" 2> /dev/null)" ]; then
+    log_debug "Creating configmap for alert rules/notifiers/contact points defined in '$CUSTOM_ALERT_CONFIG_DIR'"
+    CM_ARGS=(--from-file="$CUSTOM_ALERT_CONFIG_DIR")
 
     # Run the kubectl command with all arguments
     kubectl create configmap grafana-alert-rules \
@@ -439,7 +436,12 @@ if [ -d "monitoring/alerting/rules" ]; then
         -n "$MON_NS" \
         --dry-run=client -o yaml | kubectl apply -f -
 else
-    log_debug "No alert rules file found at 'monitoring/alerting/rules'"
+    log_debug "No custom alert files found at '$CUSTOM_ALERT_CONFIG_DIR'. Creating empty ConfigMap."
+    # Create an empty ConfigMap to satisfy the volume mount
+    kubectl create configmap grafana-alert-rules \
+        -n "$MON_NS" \
+        --from-literal=_README.txt="Copy alert rules from samples/alerts to $USER_DIR/monitoring/alerting/ to enable them." \
+        --dry-run=client -o yaml | kubectl apply -f -
 fi
 
 # shellcheck disable=SC2086
