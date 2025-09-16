@@ -1,0 +1,98 @@
+apiVersion: 1
+groups:
+  - interval: 5m
+    folder: CAS Alerts
+    name: SAS Viya Alerts
+    orgId: 1
+    rules:
+      - title: CAS Restart Detected
+        annotations:
+          description:
+            Check to see that the CAS pod existed for a short time. This implies
+            that CAS pod has restarted for whatever the reason. Will need to further investigate
+            the cause.
+          summary:
+            The current CAS (sas-cas-server-default-controller) pod < 15 minutes
+            in existence. Mostly likely it is due to restart of the CAS pod.
+        condition: C
+        data:
+          - datasourceUid: prometheus
+            model:
+              disableTextWrap: false
+              editorMode: code
+              expr: cas_grid_uptime_seconds_total
+              fullMetaSearch: false
+              includeNullMetadata: true
+              instant: true
+              intervalMs: 1000
+              legendFormat: __auto
+              maxDataPoints: 43200
+              range: false
+              refId: A
+              useBackend: false
+            refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+            refId: B
+            relativeTimeRange:
+              from: 600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 900
+                    type: lt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+            refId: C
+            relativeTimeRange:
+              from: 600
+              to: 0
+        execErrState: Error
+        for: 5m
+        isPaused: false
+        labels: {}
+        noDataState: NoData
+        uid: fc41d560-9a18-4168-8a6a-615e60dc70de

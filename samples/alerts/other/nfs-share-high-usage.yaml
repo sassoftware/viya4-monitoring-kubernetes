@@ -1,0 +1,92 @@
+apiVersion: 1
+groups:
+  - interval: 5m
+    name: SAS Viya Alerts
+    folder: Other Alerts
+    orgId: 1
+    rules:
+      - title: NFS Share Usage High
+        annotations:
+          description: Checks if the NFS share attached to CAS is > 85% full.
+          summary:
+            NFS share > 85% full. Typically, it is due to users filling their home
+            directory or backups.
+        condition: C
+        data:
+          - datasourceUid: prometheus
+            model:
+              expr: |
+                (kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="cas-default-data"}
+                - kubelet_volume_stats_available_bytes{persistentvolumeclaim="cas-default-data"})
+                / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="cas-default-data"} * 100
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+            refId: A
+            relativeTimeRange:
+              from: 21600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+            refId: B
+            relativeTimeRange:
+              from: 21600
+              to: 0
+          - datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 85
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+            refId: C
+            relativeTimeRange:
+              from: 21600
+              to: 0
+        execErrState: Error
+        for: 5m
+        isPaused: false
+        labels:
+          severity: warning
+        noDataState: NoData
+        uid: nfs_share_usage
