@@ -1,3 +1,4 @@
+# shellcheck disable=SC2148
 # Copyright © 2023-2024, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -17,22 +18,22 @@ if [ "$AIRGAP_SOURCED" == "" ]; then
 
         # Check for the image pull secret for the air gap environment
         if [ -z "$(kubectl get secret -n $V4M_NS $AIRGAP_IMAGE_PULL_SECRET_NAME -o name --ignore-not-found)" ]; then
-           log_error "The image pull secret, [$AIRGAP_IMAGE_PULL_SECRET_NAME], was not detected"
-           log_error "Please add the image pull secret to the [$V4M_NS] namespace and run the deployment script again"
-           exit 1
+            log_error "The image pull secret, [$AIRGAP_IMAGE_PULL_SECRET_NAME], was not detected"
+            log_error "Please add the image pull secret to the [$V4M_NS] namespace and run the deployment script again"
+            exit 1
         fi
 
         AIRGAP_HELM_REPO=${AIRGAP_HELM_REPO:-"$AIRGAP_REGISTRY"}
         AIRGAP_HELM_FORMAT=${AIRGAP_HELM_FORMAT:-"oci"}
 
         if [ "$AIRGAP_HELM_FORMAT" == "tgz" ]; then
-           if [ ! -d "$AIRGAP_HELM_REPO" ]; then
-              log_error "When AIRGAP_HELM_FORMAT is 'tgz', AIRGAP_HELM_REPO is expected to be a directory."
-              log_error "The specified AIRGAP_HELM_REPO directory [$AIRGAP_HELM_REPO] does NOT exist."
-              exit 1
-           else
-              log_debug "Confirmed AIRGAP_HELM_REPO [$AIRGAP_HELM_REPO] exists"
-           fi
+            if [ ! -d "$AIRGAP_HELM_REPO" ]; then
+                log_error "When AIRGAP_HELM_FORMAT is 'tgz', AIRGAP_HELM_REPO is expected to be a directory."
+                log_error "The specified AIRGAP_HELM_REPO directory [$AIRGAP_HELM_REPO] does NOT exist."
+                exit 1
+            else
+                log_debug "Confirmed AIRGAP_HELM_REPO [$AIRGAP_HELM_REPO] exists"
+            fi
         fi
     fi
 
@@ -43,4 +44,3 @@ if [ "$AIRGAP_SOURCED" == "" ]; then
 
     export AIRGAP_SOURCED=true
 fi
-
