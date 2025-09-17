@@ -49,27 +49,15 @@ case "$app" in
       appname="OpenSearch"
       target_port="${target_port:-0}"
       ;;
-   "ELASTICSEARCH"|"ES")
-      namespace=$LOG_NS
-      servicename=$ES_SERVICENAME
-      appname="ELASTICSEARCH"
-      target_port="${target_port:-0}"
-      ;;
    "OPENSEARCHDASHBOARDS"|"DASHBOARDS"|"OSD")
       namespace=$LOG_NS
       servicename=$KB_SERVICENAME
       appname="OpenSearchDashboards"
       target_port="${target_port:-31033}"
       ;;
-   "KIBANA"|"KB")
-      namespace=$LOG_NS
-      servicename=$KB_SERVICENAME
-      appname="KIBANA"
-      target_port="${target_port:-31033}"
-      ;;
    "ALERTMANAGER"|"AM")
       namespace=$MON_NS
-      appname="AlertManager"
+      appname="Alertmanager"
       servicename="v4m-alertmanager"
       target_port="${target_port:-31091}"
       ;;
