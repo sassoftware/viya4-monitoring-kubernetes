@@ -29,10 +29,10 @@ function get_k8s_info {
     object=$2
     jsonpath=$3
 
-    info=$(kubectl -n "$namespace" get "$object" -o=jsonpath=$jsonpath 2>/dev/null)
+    info=$(kubectl -n "$namespace" get "$object" -o=jsonpath="$jsonpath" 2>/dev/null)
     rc=$?
 
-    if [ ! -z  "$info" ]; then
+    if [ -n  "$info" ]; then
         echo "$info"
     else
         v4m_rc=1
@@ -162,7 +162,7 @@ function get_nodeport_url {
         protocol=http
     fi
 
-    if [ ! -z "$port" ]; then
+    if [ -n "$port" ]; then
         porttxt=":$port"
     fi
 

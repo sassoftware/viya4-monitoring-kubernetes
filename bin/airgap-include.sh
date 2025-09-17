@@ -8,7 +8,7 @@
 
 if [ "$AIRGAP_SOURCED" == "" ]; then
     ## Check for AIRGAP_REGISTRY, if null/empty, error out.  Otherwise set and create HELM_URL_BASE.
-    if [ -z $AIRGAP_REGISTRY ]; then
+    if [ -z "$AIRGAP_REGISTRY" ]; then
         log_error "AIRGAP_REGISTRY has not been set"
         log_error "Please provide the URL for the private image registry and try again"
         exit 1
@@ -17,7 +17,7 @@ if [ "$AIRGAP_SOURCED" == "" ]; then
         AIRGAP_IMAGE_PULL_SECRET_NAME=${AIRGAP_IMAGE_PULL_SECRET_NAME:-"v4m-image-pull-secret"}
 
         # Check for the image pull secret for the air gap environment
-        if [ -z "$(kubectl get secret -n $V4M_NS $AIRGAP_IMAGE_PULL_SECRET_NAME -o name --ignore-not-found)" ]; then
+        if [ -z "$(kubectl get secret -n "$V4M_NS" "$AIRGAP_IMAGE_PULL_SECRET_NAME" -o name --ignore-not-found)" ]; then
             log_error "The image pull secret, [$AIRGAP_IMAGE_PULL_SECRET_NAME], was not detected"
             log_error "Please add the image pull secret to the [$V4M_NS] namespace and run the deployment script again"
             exit 1
@@ -40,7 +40,7 @@ if [ "$AIRGAP_SOURCED" == "" ]; then
     log_info "Deploying into an 'air-gapped' cluster from private registry [$AIRGAP_REGISTRY]"
 
     airgapDir="$TMP_DIR/airgap"
-    mkdir -p $airgapDir
+    mkdir -p "$airgapDir"
 
     export AIRGAP_SOURCED=true
 fi

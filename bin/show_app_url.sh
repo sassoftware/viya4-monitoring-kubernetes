@@ -3,7 +3,7 @@
 # Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-cd "$(dirname $BASH_SOURCE)/.." || exit
+cd "$(dirname "$BASH_SOURCE")/.." || exit
 source bin/common.sh
 source bin/service-url-include.sh
 
@@ -86,7 +86,7 @@ do
 
    # Print URLs
    # add_notice "*** $service ***"
-   if [ ! -z "$service_url" ]; then
+   if [ -n "$service_url" ]; then
         add_notice "  You can access $service via the following URL:"
         add_notice "    $service_url"
         add_notice ""

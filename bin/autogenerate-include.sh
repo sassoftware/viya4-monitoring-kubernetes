@@ -36,8 +36,8 @@ function create_ingress_certs {
     if [ -f "$certFile" ] && [ -f "$keyFile" ]; then
         kubectl delete secret "$secretName" --namespace "$namespace" --ignore-not-found
         kubectl create secret tls "$secretName" --namespace "$namespace" --key="$keyFile" --cert="$certFile"
-        kubectl -n $namespace label secret $secretName  managed-by="v4m-es-script"
-    elif [ ! -z "$certFile$keyFile" ]; then
+        kubectl -n "$namespace" label secret "$secretName"  managed-by="v4m-es-script"
+    elif [  -n "$certFile$keyFile" ]; then
         log_warn "Missing Ingress certificate file; specified Ingress cert [$certFile] and/or key [$keyFile] file is missing."
         log_warn "Create the missing Kubernetes secrets after deployment; use command: kubectl -create secret tls $secretName --namespace $namespace --key=cert_key_file --cert=cert_file"
     fi
@@ -71,8 +71,12 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             exit 1
         fi
 
-        #validate required inputs
-        BASE_DOMAIN="${BASE_DOMAIN}"
+        #validate required inputs:
+        #   BASE_DOMAIN
+        #   ROUTING
+        #   INGRESS_CERT
+        #   INGRESS_KEY
+
         if [ -z "$BASE_DOMAIN" ]; then
             log_error "Required parameter [BASE_DOMAIN] not provided"
             exit 1
@@ -88,8 +92,6 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             exit 1
         fi
 
-        INGRESS_CERT="${INGRESS_CERT}"
-        INGRESS_KEY="${INGRESS_KEY}"
         if [ "$INGRESS_CERT/$INGRESS_KEY" != "/" ]; then
             if [ ! -f "$INGRESS_CERT" ] || [ ! -f "$INGRESS_KEY" ]; then
                 # Only WARN b/c missing cert doesn't prevent deployment and it can be created afterwards

@@ -36,18 +36,18 @@ function populateValuesYAML() {
 
         # Top-level user.env contents
         if [ -f "$USER_DIR/user.env" ]; then
-        echo '  "user.env": |' >> "$v4mValuesYAML"
-        cat "$USER_DIR/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
+            echo '  "user.env": |' >> "$v4mValuesYAML"
+            sed 's/^/      /' "$USER_DIR/user.env" >> "$v4mValuesYAML"
         fi
         # Monitoring user.env contents
         if [ -f "$USER_DIR/monitoring/user.env" ]; then
-        echo '  "monitoring_user.env": |' >> "$v4mValuesYAML"
-        cat "$USER_DIR/monitoring/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
+            echo '  "monitoring_user.env": |' >> "$v4mValuesYAML"
+            sed 's/^/      /' "$USER_DIR/monitoring/user.env" >> "$v4mValuesYAML"
         fi
         # Logging user.env contents
         if [ -f "$USER_DIR/logging/user.env" ]; then
-        echo '  "logging_user.env": |' >> "$v4mValuesYAML"
-        cat "$USER_DIR/logging/user.env" | sed 's/^/      /' >> "$v4mValuesYAML"
+            echo '  "logging_user.env": |' >> "$v4mValuesYAML"
+            sed 's/^/      /' "$USER_DIR/logging/user.env" >> "$v4mValuesYAML"
         fi
     fi
 
@@ -92,7 +92,7 @@ function removeV4MInfo() {
         return 1
     fi
 
-    if [ ! -z "$(helm list -n "$NS" --filter "^$releaseName\$" -q)" ]; then
+    if [ -n "$(helm list -n "$NS" --filter "^$releaseName\$" -q)" ]; then
         log_info "Removing SAS Viya Monitoring for Kubernetes version information"
         helm uninstall -n "$NS" "$releaseName"
     fi

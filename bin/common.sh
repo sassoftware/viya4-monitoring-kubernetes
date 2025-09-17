@@ -18,7 +18,7 @@ function trap_add() {
          printf '%s\n' "${cmd_to_add}"
          # helper fn to get existing trap command from output
          # of trap -p
-         # shellcheck disable=SC2329
+         # shellcheck disable=SC2329,SC2317
          extract_trap_cmd() { printf '%s\n' "$3"; }
          # print existing trap command with newline
          eval "extract_trap_cmd $(trap -p "${signal}")"

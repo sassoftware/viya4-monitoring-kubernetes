@@ -37,11 +37,7 @@ function add_notice {
 
 function display_notices {
   if [ -f "$TMP_DIR/notices.txt" ]; then
-     local IFS=''
-     cat "$TMP_DIR"/notices.txt | while read -r line || [[ -n "$line" ]];
-     do
-       log_notice "$line"
-     done
+     while IFS= read -r line || [[ -n "$line" ]]; do log_notice "$line"; done <"$TMP_DIR"/notices.txt
  fi
 }
 
