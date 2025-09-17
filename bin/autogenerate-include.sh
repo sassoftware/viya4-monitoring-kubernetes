@@ -1,3 +1,4 @@
+# shellcheck disable=SC2148
 # Copyright © 2025, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -193,6 +194,7 @@ function checkStorageClass {
         log_error "Required parameter not provided.  Either [$storageClassEnvVar] or [STORAGECLASS] MUST be provided."
         exit 1
     else
+        # shellcheck disable=SC2091
         if $(kubectl get storageClass "$storageClass" -o name &>/dev/null); then
             log_debug "The specified StorageClass [$storageClass] exists"
         else

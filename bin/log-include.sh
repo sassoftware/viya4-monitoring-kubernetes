@@ -1,3 +1,4 @@
+# shellcheck disable=SC2148
 # Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -31,13 +32,13 @@ if [ "$LOG_VERBOSE_ENABLE" != "true" ]; then
 fi
 
 function add_notice {
-  echo $* >> $TMP_DIR/notices.txt
+  echo "$*" >> "$TMP_DIR"/notices.txt
 }
 
 function display_notices {
   if [ -f "$TMP_DIR/notices.txt" ]; then
      local IFS=''
-     cat $TMP_DIR/notices.txt | while read line || [[ -n "$line" ]];
+     cat "$TMP_DIR"/notices.txt | while read -r line || [[ -n "$line" ]];
      do
        log_notice "$line"
      done
@@ -45,12 +46,16 @@ function display_notices {
 }
 
 function log_notice {
+  local msg
+  msg=$1
   width=$noticeColWidth
-  n=$(($width - $(echo "$1" | wc -c)))
+
+  n=$((width - ${#msg}))
   if [ $n -lt 0 ]; then
      n=0
   fi
   # Fill remaining characters with spaces
+  # shellcheck disable=SC2046
   text="$*$(printf %$(eval 'echo $n')s |tr ' ' ' ')"
 
   if [ "$LOG_COLOR_ENABLE" = "true" ]; then
@@ -96,7 +101,7 @@ function log_info {
 # The value of LOG_VERBOSE_ENABLE determines whether they are displayed
 function log_verbose {
   if [ "$LOG_VERBOSE_ENABLE" == "true" ]; then
-		log_info $* >&3
+		log_info "$*" >&3
   fi
 }
 
