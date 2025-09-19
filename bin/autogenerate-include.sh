@@ -1,9 +1,9 @@
+# shellcheck disable=SC2148
 # Copyright © 2025, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # This file is not marked as executable as it is intended to be sourced
 # Current directory must be the root directory of the repo
-
 
 function checkYqVersion {
     # confirm yq installed and correct version
@@ -35,8 +35,8 @@ function create_ingress_certs {
     if [ -f "$certFile" ] && [ -f "$keyFile" ]; then
         kubectl delete secret "$secretName" --namespace "$namespace" --ignore-not-found
         kubectl create secret tls "$secretName" --namespace "$namespace" --key="$keyFile" --cert="$certFile"
-        kubectl -n $namespace label secret $secretName  managed-by="v4m-es-script"
-    elif [ ! -z "$certFile$keyFile" ]; then
+        kubectl -n "$namespace" label secret "$secretName" managed-by="v4m-es-script"
+    elif [ -n "$certFile$keyFile" ]; then
         log_warn "Missing Ingress certificate file; specified Ingress cert [$certFile] and/or key [$keyFile] file is missing."
         log_warn "Create the missing Kubernetes secrets after deployment; use command: kubectl -create secret tls $secretName --namespace $namespace --key=cert_key_file --cert=cert_file"
     fi
@@ -70,8 +70,12 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             exit 1
         fi
 
-        #validate required inputs
-        BASE_DOMAIN="${BASE_DOMAIN}"
+        #validate required inputs:
+        #   BASE_DOMAIN
+        #   ROUTING
+        #   INGRESS_CERT
+        #   INGRESS_KEY
+
         if [ -z "$BASE_DOMAIN" ]; then
             log_error "Required parameter [BASE_DOMAIN] not provided"
             exit 1
@@ -87,8 +91,6 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             exit 1
         fi
 
-        INGRESS_CERT="${INGRESS_CERT}"
-        INGRESS_KEY="${INGRESS_KEY}"
         if [ "$INGRESS_CERT/$INGRESS_KEY" != "/" ]; then
             if [ ! -f "$INGRESS_CERT" ] || [ ! -f "$INGRESS_KEY" ]; then
                 # Only WARN b/c missing cert doesn't prevent deployment and it can be created afterwards
@@ -159,7 +161,7 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             log_debug "Secret [$SMTP_USER_SECRET] exists; will use it for SMTP user credentials"
         elif [ -z "$SMTP_USER" ] && [ -z "$SMTP_PASSWORD" ]; then
             log_debug "Neither SMTP_USER nor SMTP_PASSWORD are set; skipping creation of secret [$SMTP_USER_SECRET]"
-        elif  [ -z "$SMTP_USER" ] || [ -z "$SMTP_PASSWORD" ]; then
+        elif [ -z "$SMTP_USER" ] || [ -z "$SMTP_PASSWORD" ]; then
             log_error "Complete SMTP Credentials NOT provided; MUST provide BOTH [SMTP_USER] and [SMTP_PASSWORD]"
             log_info "SMTP_USER is set to [$SMTP_USER] and SMTP_PASSWORD is set to [$SMTP_PASSWORD]"
             exit 1
@@ -173,12 +175,11 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
 
     export AUTOGENERATE_SOURCED="true"
 
-    elif [ "$AUTOGENERATE_SOURCED" == "NotNeeded" ]; then
-        log_debug "autogenerate-include.sh not needed"
-    else
-        log_debug "autogenerate-include.sh was already sourced [$AUTOGENERATE_SOURCED]"
+elif [ "$AUTOGENERATE_SOURCED" == "NotNeeded" ]; then
+    log_debug "autogenerate-include.sh not needed"
+else
+    log_debug "autogenerate-include.sh was already sourced [$AUTOGENERATE_SOURCED]"
 fi
-
 
 function checkStorageClass {
     # input parms: $1  *Name of env var* identifying storageClass
@@ -193,7 +194,8 @@ function checkStorageClass {
         log_error "Required parameter not provided.  Either [$storageClassEnvVar] or [STORAGECLASS] MUST be provided."
         exit 1
     else
-        if $(kubectl get storageClass "$storageClass" -o name &>/dev/null); then
+        # shellcheck disable=SC2091
+        if $(kubectl get storageClass "$storageClass" -o name &> /dev/null); then
             log_debug "The specified StorageClass [$storageClass] exists"
         else
             log_error "The specified StorageClass [$storageClass] does NOT exist"
