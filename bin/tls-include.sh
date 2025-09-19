@@ -242,7 +242,7 @@ function create_cert_secret {
     #kubectl -n "$namespace" create secret tls $secretName --cert $TMP_DIR/${app}.pem --key $TMP_DIR/${app}-key.pem
 
     # Secret Type: GENERIC (3 sub-parts: cert + key + CACert)
-    kubectl -n "$namespace" create secret generic "$secretName" --from-file=tls.crt="$TMP_DIR"/"${app}".pem --from-file=tls.key=$TMP_DIR/${app}-key.pem --from-file=ca.crt=$TMP_DIR/root-ca.pem
+    kubectl -n "$namespace" create secret generic "$secretName" --from-file=tls.crt="$TMP_DIR"/"${app}".pem --from-file=tls.key="$TMP_DIR"/"${app}"-key.pem --from-file=ca.crt="$TMP_DIR"/root-ca.pem
     kubectl -n "$namespace" annotate secret "$secretName" expiration="$expiration_date"
     kubectl -n "$namespace" label secret "$secretName" managed-by="v4m" cert-generator="openssl"
 

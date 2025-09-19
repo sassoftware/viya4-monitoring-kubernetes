@@ -46,7 +46,7 @@ function log_notice {
     msg=$1
     width=$noticeColWidth
 
-    n=$((width - ${#msg} -1))
+    n=$((width - ${#msg} - 1))
     if [ $n -lt 0 ]; then
         n=0
     fi
