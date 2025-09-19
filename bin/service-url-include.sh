@@ -29,10 +29,10 @@ function get_k8s_info {
     object=$2
     jsonpath=$3
 
-    info=$(kubectl -n "$namespace" get "$object" -o=jsonpath="$jsonpath" 2>/dev/null)
+    info=$(kubectl -n "$namespace" get "$object" -o=jsonpath="$jsonpath" 2> /dev/null)
     rc=$?
 
-    if [ -n  "$info" ]; then
+    if [ -n "$info" ]; then
         echo "$info"
     else
         v4m_rc=1
@@ -66,7 +66,7 @@ function get_ingress_url {
     namespace=$1
     name=$2
 
-    if [ ! "$(kubectl -n "$namespace"  get ingress/"$name" 2>/dev/null)" ]; then
+    if [ ! "$(kubectl -n "$namespace" get ingress/"$name" 2> /dev/null)" ]; then
         # ingress object does not exist
         v4m_rc=1
         echo ""
@@ -102,7 +102,7 @@ function get_ingress_url {
 
     url="$protocol://${host}${porttxt}${path}"
 
-    url="${url%/}"   # strip any trailing "/"
+    url="${url%/}" # strip any trailing "/"
     echo "$url"
 }
 
@@ -130,7 +130,7 @@ function get_route_url {
     fi
 
     url="$protocol://$host$path"
-    url="${url%/}"   # strip any trailing "/"
+    url="${url%/}" # strip any trailing "/"
 
     echo "$url"
 }
@@ -142,7 +142,7 @@ function get_nodeport_url {
     service=$2
     tls_enabled=$3
 
-    if [ ! "$(kubectl -n "$namespace" get service/"$service" 2>/dev/null)" ]; then
+    if [ ! "$(kubectl -n "$namespace" get service/"$service" 2> /dev/null)" ]; then
         # ingress object does not exist
         v4m_rc=1
         echo ""
@@ -151,7 +151,7 @@ function get_nodeport_url {
 
     host="$(kubectl get node --selector='node-role.kubernetes.io/master' | awk 'NR==2 { print $1 }')"
     if [ -z "$host" ]; then
-        host=$(kubectl get nodes | awk 'NR==2 { print $1 }')  # use first node
+        host=$(kubectl get nodes | awk 'NR==2 { print $1 }') # use first node
     fi
 
     port=$(get_k8s_info "$namespace" "service/$service" "$json_service_nodeport")
@@ -174,12 +174,12 @@ function get_service_url {
     local namespace service use_tls ingress service_type url
 
     namespace=$1
-    service=$2                 # name of service
-    use_tls=$3                 # (optional - NodePort only) use http or https (ingress properties over-ride)
-    ingress=${4:-${service}}   # (optional) name of ingress/route object (default: $service)
+    service=$2               # name of service
+    use_tls=$3               # (optional - NodePort only) use http or https (ingress properties over-ride)
+    ingress=${4:-${service}} # (optional) name of ingress/route object (default: $service)
 
     # is a route defined for this service?
-    if [ "$OPENSHIFT_CLUSTER" == "true" ] && [ "$(kubectl -n "$namespace" get route/"$service" 2>/dev/null)" ]; then
+    if [ "$OPENSHIFT_CLUSTER" == "true" ] && [ "$(kubectl -n "$namespace" get route/"$service" 2> /dev/null)" ]; then
         url=$(get_route_url "$namespace" "$service")
 
         if [ -z "$url" ]; then

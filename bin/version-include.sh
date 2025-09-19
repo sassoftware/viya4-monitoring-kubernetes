@@ -8,30 +8,30 @@ function populateValuesYAML() {
     touch "$v4mValuesYAML"
 
     # Attempt to obtain current git commit hash
-    gitCommit=$(git rev-parse --short HEAD 2>/dev/null)
+    gitCommit=$(git rev-parse --short HEAD 2> /dev/null)
     if [ -n "$gitCommit" ]; then
         echo "gitCommit: $gitCommit" >> "$v4mValuesYAML"
         gitStatus=$(git status -s | sed 's/^ M/M/' | sed 's/^/  /')
         if [ -n "$gitStatus" ]; then
-        echo "gitStatus: |" >> "$v4mValuesYAML"
-        echo "$gitStatus" >> "$v4mValuesYAML"
+            echo "gitStatus: |" >> "$v4mValuesYAML"
+            echo "$gitStatus" >> "$v4mValuesYAML"
         fi
     fi
 
     # List contents of USER_DIR
-    if ! [[ "$USER_DIR" -ef "$(pwd)" ]]; then
+    if ! [[ $USER_DIR -ef "$(pwd)" ]]; then
         if [ -d "$USER_DIR" ]; then
-        # shellcheck disable=SC2129
-        echo '"user_dir":' >> "$v4mValuesYAML"
-        echo "  path: $USER_DIR" >> "$v4mValuesYAML"
-        echo '  files: |' >> "$v4mValuesYAML"
-        # shellcheck disable=SC2207
-        l=($(find "$USER_DIR" -type f|sort))
-        for (( i=0; i<${#l[@]}; i++ )); do
-            fullPath=${l[i]}
-            path=${fullPath#"$USER_DIR/"}
-            echo "      $path" >> "$v4mValuesYAML"
-        done
+            # shellcheck disable=SC2129
+            echo '"user_dir":' >> "$v4mValuesYAML"
+            echo "  path: $USER_DIR" >> "$v4mValuesYAML"
+            echo '  files: |' >> "$v4mValuesYAML"
+            # shellcheck disable=SC2207
+            l=($(find "$USER_DIR" -type f | sort))
+            for ((i = 0; i < ${#l[@]}; i++)); do
+                fullPath=${l[i]}
+                path=${fullPath#"$USER_DIR/"}
+                echo "      $path" >> "$v4mValuesYAML"
+            done
         fi
 
         # Top-level user.env contents
@@ -115,19 +115,19 @@ function getHelmReleaseVersion() {
     if [ -z "$v4mHelmVersionLines" ]; then
         log_debug "No [$releaseName] release found in [$NS]"
     else
-        for (( i=0; i<${#v4mHelmVersionLines[@]}; i++ )); do
-        line=${v4mHelmVersionLines[$i]}
-        vre='app_version: (([0-9]+).([[0-9]+).([0-9]+)\.?(-.+)?)'
-        sre='status: (.+)'
-        if [[ $line =~ $vre ]]; then
-            # Set
-            releaseVersionFull=${BASH_REMATCH[1]}
-            releaseVersionMajor=${BASH_REMATCH[2]}
-            releaseVersionMinor=${BASH_REMATCH[3]}
-            releaseVersionPatch=${BASH_REMATCH[4]}
-        elif [[ "$line" =~ $sre ]]; then
-            releaseStatus=${BASH_REMATCH[1]}
-        fi
+        for ((i = 0; i < ${#v4mHelmVersionLines[@]}; i++)); do
+            line=${v4mHelmVersionLines[$i]}
+            vre='app_version: (([0-9]+).([[0-9]+).([0-9]+)\.?(-.+)?)'
+            sre='status: (.+)'
+            if [[ $line =~ $vre ]]; then
+                # Set
+                releaseVersionFull=${BASH_REMATCH[1]}
+                releaseVersionMajor=${BASH_REMATCH[2]}
+                releaseVersionMinor=${BASH_REMATCH[3]}
+                releaseVersionPatch=${BASH_REMATCH[4]}
+            elif [[ $line =~ $sre ]]; then
+                releaseStatus=${BASH_REMATCH[1]}
+            fi
         done
 
     fi
@@ -156,4 +156,3 @@ if [ -z "$V4M_VERSION_INCLUDE" ]; then
     export -f deployV4MInfo removeV4MInfo getHelmReleaseVersion
     export V4M_VERSION_INCLUDE=true
 fi
-

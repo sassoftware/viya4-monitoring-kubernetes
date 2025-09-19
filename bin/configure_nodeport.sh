@@ -3,7 +3,7 @@
 # Copyright ©2022, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-cd "$(dirname "$BASH_SOURCE")/.."  || exit
+cd "$(dirname "$BASH_SOURCE")/.." || exit
 source logging/bin/common.sh
 
 #TO DO: Should be done in bin/common?
@@ -22,12 +22,12 @@ fi
 set -e
 
 app=${1}
-arg1=$(echo "$arg1"| tr '[:lower:]' '[:upper:]')
+arg1=$(echo "$arg1" | tr '[:lower:]' '[:upper:]')
 
 arg2=${2}
-arg2=$(echo "$arg2"| tr '[:lower:]' '[:upper:]')
+arg2=$(echo "$arg2" | tr '[:lower:]' '[:upper:]')
 
-if [[ "$arg2" -ge 30000 ]] && [[ "$arg2" -le 32767 ]]; then
+if [[ $arg2 -ge 30000 ]] && [[ $arg2 -le 32767 ]]; then
     log_debug "Requested port [$target_port] is within valid range"
     target_port="$arg2"
 elif [ "$arg2" == "0" ]; then
@@ -41,47 +41,47 @@ else
     exit 1
 fi
 
-app=$(echo "$app"| tr '[:lower:]' '[:upper:]')
+app=$(echo "$app" | tr '[:lower:]' '[:upper:]')
 case "$app" in
-   "OPENSEARCH"|"OS")
-      namespace=$LOG_NS
-      servicename=$ES_SERVICENAME
-      appname="OpenSearch"
-      target_port="${target_port:-0}"
-      ;;
-   "OPENSEARCHDASHBOARDS"|"DASHBOARDS"|"OSD")
-      namespace=$LOG_NS
-      servicename=$KB_SERVICENAME
-      appname="OpenSearchDashboards"
-      target_port="${target_port:-31033}"
-      ;;
-   "ALERTMANAGER"|"AM")
-      namespace=$MON_NS
-      appname="Alertmanager"
-      servicename="v4m-alertmanager"
-      target_port="${target_port:-31091}"
-      ;;
-   "PROMETHEUS"|"PROM"|"PRO"|"PR")
-      namespace=$MON_NS
-      appname="Prometheus"
-      servicename="v4m-prometheus"
-      target_port="${target_port:-31090}"
-      ;;
-   "GRAFANA"|"GRAF"|"GR")
-      namespace=$MON_NS
-      appname="Grafana"
-      servicename="v4m-grafana"
-      target_port="${target_port:-31100}"
-      ;;
-  ""|*)
-      log_error "Application name is invalid or missing."
-      log_error "The APPLICATION NAME is required; valid values are:"
-      log_error "OPENSEARCH, OPENSEARCHDASHBOARDS, GRAFANA, PROMETHEUS or ALERTMANAGER"
-      exit 1
-      ;;
+"OPENSEARCH" | "OS")
+    namespace=$LOG_NS
+    servicename=$ES_SERVICENAME
+    appname="OpenSearch"
+    target_port="${target_port:-0}"
+    ;;
+"OPENSEARCHDASHBOARDS" | "DASHBOARDS" | "OSD")
+    namespace=$LOG_NS
+    servicename=$KB_SERVICENAME
+    appname="OpenSearchDashboards"
+    target_port="${target_port:-31033}"
+    ;;
+"ALERTMANAGER" | "AM")
+    namespace=$MON_NS
+    appname="Alertmanager"
+    servicename="v4m-alertmanager"
+    target_port="${target_port:-31091}"
+    ;;
+"PROMETHEUS" | "PROM" | "PRO" | "PR")
+    namespace=$MON_NS
+    appname="Prometheus"
+    servicename="v4m-prometheus"
+    target_port="${target_port:-31090}"
+    ;;
+"GRAFANA" | "GRAF" | "GR")
+    namespace=$MON_NS
+    appname="Grafana"
+    servicename="v4m-grafana"
+    target_port="${target_port:-31100}"
+    ;;
+"" | *)
+    log_error "Application name is invalid or missing."
+    log_error "The APPLICATION NAME is required; valid values are:"
+    log_error "OPENSEARCH, OPENSEARCHDASHBOARDS, GRAFANA, PROMETHEUS or ALERTMANAGER"
+    exit 1
+    ;;
 esac
 
-if [ "$arg2" == "DISABLE" ];then
+if [ "$arg2" == "DISABLE" ]; then
     log_info "Removing NodePort for [$servicename] in [$LOG_NS]"
     kubectl -n "$namespace" patch svc "$servicename" --type='json' -p '[{"op":"replace","path":"/spec/type","value":"ClusterIP"}]'
     exit

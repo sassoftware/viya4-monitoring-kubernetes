@@ -5,7 +5,6 @@
 # This file is not marked as executable as it is intended to be sourced
 # Current directory must be the root directory of the repo
 
-
 if [ "$AIRGAP_SOURCED" == "" ]; then
     ## Check for AIRGAP_REGISTRY, if null/empty, error out.  Otherwise set and create HELM_URL_BASE.
     if [ -z "$AIRGAP_REGISTRY" ]; then

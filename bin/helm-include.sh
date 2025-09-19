@@ -11,9 +11,9 @@ if [ ! "$(which helm)" ]; then
     exit 1
 fi
 
-helmVer=$(helm version --short 2>/dev/null)
+helmVer=$(helm version --short 2> /dev/null)
 # shellcheck disable=SC2116,SC2086,SC2207
-hver=( $(echo ${helmVer//[^0-9]/ }) )
+hver=($(echo ${helmVer//[^0-9]/ }))
 HELM_VER_MAJOR=${hver[0]}
 HELM_VER_MINOR=${hver[1]}
 HELM_VER_PATCH=${hver[2]}
@@ -25,7 +25,7 @@ if [ "$HELM_VER_MAJOR" == "2" ]; then
     exit 1
 fi
 
-if [ "$V4M_HELM_USE_LATEST"  == "true" ]; then
+if [ "$V4M_HELM_USE_LATEST" == "true" ]; then
     log_warn "******This feature is NOT intended for use outside the project maintainers*******"
     log_warn "Environment variable V4M_HELM_USE_LATEST set; deploying *latest* version of all Helm charts"
 fi
@@ -59,9 +59,9 @@ function helm2ReleaseCheck {
     if [ "$HELM_RELEASE_CHECK" != "false" ]; then
         release=$1
         if helm2ReleaseExists "$release"; then
-        log_error "A Helm 2.x release of [$release] already exists"
-        log_error "Helm [$HELM_VER_FULL] cannot manage the Helm 2.x release of [$release]"
-        exit 1
+            log_error "A Helm 2.x release of [$release] already exists"
+            log_error "Helm [$HELM_VER_FULL] cannot manage the Helm 2.x release of [$release]"
+            exit 1
         fi
     fi
 }
@@ -77,7 +77,7 @@ function helmRepoAdd {
 
     HELM_FORCE_REPO_UPDATE=${HELM_FORCE_REPO_UPDATE:-true}
     # shellcheck disable=SC1087
-    if [[ ! $(helm repo list 2>/dev/null) =~ $repo[[:space:]] ]]; then
+    if [[ ! $(helm repo list 2> /dev/null) =~ $repo[[:space:]] ]]; then
         log_info "Adding [$repo] helm repository"
         helm repo add "$repo" "$repoURL"
     else
@@ -87,7 +87,7 @@ function helmRepoAdd {
 
             # Helm 3.3.2 changed 'repo add' behavior and added the --force-update flag
             # https://github.com/helm/helm/releases/tag/v3.3.2
-            if [[  $HELM_VER_MINOR -lt 3 || ( $HELM_VER_MINOR -eq 3 &&  $HELM_VER_PATCH -lt 2) ]]; then
+            if [[ $HELM_VER_MINOR -lt 3 || ($HELM_VER_MINOR -eq 3 && $HELM_VER_PATCH -lt 2) ]]; then
                 helm repo add "$repo" "$repoURL"
             else
                 helm repo add --force-update "$repo" "$repoURL"
@@ -117,17 +117,17 @@ function get_helmchart_reference {
         :
     fi
 
-    if [ "$AIRGAP_HELM_FORMAT"  == "tgz" ]; then
+    if [ "$AIRGAP_HELM_FORMAT" == "tgz" ]; then
         echo "${AIRGAP_HELM_REPO}/${chart_name}-${chart_version}.tgz"
-    elif [ "$AIRGAP_HELM_FORMAT"  == "oci" ]; then
+    elif [ "$AIRGAP_HELM_FORMAT" == "oci" ]; then
         echo "oci://${AIRGAP_HELM_REPO}/${chart_repository}/${chart_name}"
     else
         echo "${chart_repository}/${chart_name}"
     fi
 }
 function get_helm_versionstring {
-    if [ "$V4M_HELM_USE_LATEST"  == "true" ]; then
-        :  # return null string
+    if [ "$V4M_HELM_USE_LATEST" == "true" ]; then
+        : # return null string
     else
         # Explicitly use printf instead of echo to avoid quote issues
         printf -- "--version %s" "$1"

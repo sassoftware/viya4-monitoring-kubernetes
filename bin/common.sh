@@ -6,24 +6,25 @@
 # Current directory must be the root directory of the repo
 
 function trap_add() {
- # based on https://stackoverflow.com/questions/3338030/multiple-bash-traps-for-the-same-signal
- # but: prepends new cmd rather than append it, changed var names and eliminated messages
+    # based on https://stackoverflow.com/questions/3338030/multiple-bash-traps-for-the-same-signal
+    # but: prepends new cmd rather than append it, changed var names and eliminated messages
 
-   local cmd_to_add signal
+    local cmd_to_add signal
 
-   cmd_to_add=$1; shift
-   for signal in "$@"; do
-      trap -- "$(
-         # print the new trap command
-         printf '%s\n' "${cmd_to_add}"
-         # helper fn to get existing trap command from output
-         # of trap -p
-         # shellcheck disable=SC2329,SC2317
-         extract_trap_cmd() { printf '%s\n' "$3"; }
-         # print existing trap command with newline
-         eval "extract_trap_cmd $(trap -p "${signal}")"
-      )" "${signal}"
-   done
+    cmd_to_add=$1
+    shift
+    for signal in "$@"; do
+        trap -- "$(
+            # print the new trap command
+            printf '%s\n' "${cmd_to_add}"
+            # helper fn to get existing trap command from output
+            # of trap -p
+            # shellcheck disable=SC2329,SC2317
+            extract_trap_cmd() { printf '%s\n' "$3"; }
+            # print existing trap command with newline
+            eval "extract_trap_cmd $(trap -p "${signal}")"
+        )" "${signal}"
+    done
 }
 
 function errexit_msg {
@@ -72,7 +73,10 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     export USER_DIR=${USER_DIR:-$(pwd)}
     if [ -d "$USER_DIR" ]; then
         # Resolve full path
-        USER_DIR=$(cd "$(dirname "$USER_DIR")" || exit; pwd)/$(basename "$USER_DIR")
+        USER_DIR=$(
+            cd "$(dirname "$USER_DIR")" || exit
+            pwd
+        )/$(basename "$USER_DIR")
         export USER_DIR
     fi
     if [ -f "$USER_DIR/user.env" ]; then
@@ -122,7 +126,6 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     # set TLS Cert Generator (cert-manager|openssl)
     export CERT_GENERATOR="${CERT_GENERATOR:-openssl}"
 
-
     # Set default timeout for kubectl namespace delete command
     export KUBE_NAMESPACE_DELETE_TIMEOUT=${KUBE_NAMESPACE_DELETE_TIMEOUT:-5m}
 
@@ -154,7 +157,7 @@ fi
 
 function checkDefaultStorageClass {
     if [ -z "$defaultStorageClass" ]; then
-    # Check for kubernetes environment conflicts/requirements
+        # Check for kubernetes environment conflicts/requirements
         defaultStorageClass=$(kubectl get storageclass -o jsonpath="{range .items[*]}{.metadata.name}{'\t'}{.metadata.annotations..storageclass\.kubernetes\.io/is-default-class}{'\n'}{end}" | grep true | awk '{print $1}')
         if [ "$defaultStorageClass" ]; then
             log_debug "Found default storageClass: [$defaultStorageClass]"
@@ -198,11 +201,10 @@ function validateTenantID {
     fi
 }
 
-
 function validateNamespace {
     local namespace
     namespace="$1"
-    if [[ "$namespace" =~ ^[a-z0-9]([\-a-z0-9]*[a-z0-9])?$ ]]; then
+    if [[ $namespace =~ ^[a-z0-9]([\-a-z0-9]*[a-z0-9])?$ ]]; then
         log_debug "Namespace [$namespace] passes validation"
     else
         log_error "[$namespace] is not a valid namespace name"
@@ -210,9 +212,9 @@ function validateNamespace {
     fi
 }
 
-
 function randomPassword {
-  date +%s | sha256sum | base64 | head -c 32 ; echo
+    date +%s | sha256sum | base64 | head -c 32
+    echo
 }
 
 function disable_sa_token_automount {
@@ -222,7 +224,7 @@ function disable_sa_token_automount {
     should_disable=${SEC_DISABLE_SA_TOKEN_AUTOMOUNT:-true}
 
     if [ "$should_disable" == "true" ]; then
-        if [ -n "$(kubectl -n "$ns" get serviceAccount "$sa_name" -o name 2>/dev/null)" ]; then
+        if [ -n "$(kubectl -n "$ns" get serviceAccount "$sa_name" -o name 2> /dev/null)" ]; then
             log_debug "Disabling automount of API tokens for serviceAccount [$ns/$sa_name]"
             kubectl -n "$ns" patch serviceAccount "$sa_name" -p '{"automountServiceAccountToken":false}'
         else
@@ -244,7 +246,7 @@ function enable_pod_token_automount {
         log_debug "Enabling automount of API tokens for pods deployed via [$resource_type/$resource_name]"
 
         if [ "$resource_type" == "daemonset" ] || [ "$resource_type" == "deployment" ]; then
-            kubectl -n "$ns" patch "$resource_type"  "$resource_name" -p '{"spec": {"template": {"spec": {"automountServiceAccountToken":true}}}}'
+            kubectl -n "$ns" patch "$resource_type" "$resource_name" -p '{"spec": {"template": {"spec": {"automountServiceAccountToken":true}}}}'
         else
             log_error "Invalid request to function [${FUNCNAME[0]}]; unsupported resource_type [$resource_type]"
             return 1
@@ -264,11 +266,11 @@ export -f disable_sa_token_automount
 export -f enable_pod_token_automount
 
 function parseFullImage {
-   # shellcheck disable=SC2034
-   fullImage="$1"
-   unset REGISTRY REPOS IMAGE VERSION FULL_IMAGE_ESCAPED
+    # shellcheck disable=SC2034
+    fullImage="$1"
+    unset REGISTRY REPOS IMAGE VERSION FULL_IMAGE_ESCAPED
 
-   if [[ "$1" =~ (.*)\/(.*)\/(.*)\:(.*) ]]; then
+    if [[ $1 =~ (.*)\/(.*)\/(.*)\:(.*) ]]; then
         REGISTRY="${BASH_REMATCH[1]}"
         REPOS="${BASH_REMATCH[2]}"
         IMAGE="${BASH_REMATCH[3]}"
@@ -276,19 +278,18 @@ function parseFullImage {
         # shellcheck disable=SC2034
         FULL_IMAGE_ESCAPED="$REGISTRY\/$REPOS\/$IMAGE\:$VERSION"
         return 0
-   else
+    else
         log_warn "Invalid value for full container image; does not fit expected pattern [$1]."
         return 1
-   fi
+    fi
 }
-
 
 function v4m_replace {
 
     if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-        sed -i '' "s;$1;$2;g"  "$3"
+        sed -i '' "s;$1;$2;g" "$3"
     else
-        sed -i  "s;$1;$2;g"  "$3"
+        sed -i "s;$1;$2;g" "$3"
     fi
 }
 
@@ -304,7 +305,7 @@ function generateImageKeysFile {
 
     local pullsecret_text
 
-    if ! parseFullImage "$1";  then
+    if ! parseFullImage "$1"; then
         log_error "Unable to parse full image [$1]"
         return 1
     fi
@@ -316,8 +317,8 @@ function generateImageKeysFile {
     template_file=$2
 
     if [ "$template_file" != "$imageKeysFile" ]; then
-        rm -f  "$imageKeysFile"
-        cp "$template_file"  "$imageKeysFile"
+        rm -f "$imageKeysFile"
+        cp "$template_file" "$imageKeysFile"
     else
         log_debug "Modifying an existing imageKeysFile"
     fi
@@ -349,19 +350,18 @@ function generateImageKeysFile {
     v4m_pullPolicy=${V4M_PULL_POLICY:-"IfNotPresent"}
 
     v4m_replace "__${prefix}GLOBAL_REGISTRY_OSBUG__" "$GLOBAL_REGISTRY_OSBUG" "$imageKeysFile"
-    v4m_replace "__${prefix}GLOBAL_REGISTRY__" "$GLOBAL_REGISTRY"          "$imageKeysFile"
+    v4m_replace "__${prefix}GLOBAL_REGISTRY__" "$GLOBAL_REGISTRY" "$imageKeysFile"
     v4m_replace "__${prefix}IMAGE_REGISTRY__" "$REGISTRY" "$imageKeysFile"
-    v4m_replace "__${prefix}IMAGE_REPO_3LEVEL__"  "$REGISTRY\/$REPOS\/$IMAGE" "$imageKeysFile"
-    v4m_replace "__${prefix}IMAGE_REPO_2LEVEL__"  "$REPOS\/$IMAGE"            "$imageKeysFile"
-    v4m_replace "__${prefix}IMAGE__"              "$IMAGE"                    "$imageKeysFile"
-    v4m_replace "__${prefix}IMAGE_TAG__"          "$VERSION"                  "$imageKeysFile"
-    v4m_replace "__${prefix}IMAGE_PULL_POLICY__"  "$v4m_pullPolicy"           "$imageKeysFile"
-    v4m_replace "__${prefix}IMAGE_PULL_SECRET__"  "$pullsecret_text"          "$imageKeysFile"       #Handle Charts Accepting a Single Image Pull Secret
-    v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" "$pullsecrets_text"         "$imageKeysFile"       #Handle Charts Accepting Multiple Image Pull Secrets
+    v4m_replace "__${prefix}IMAGE_REPO_3LEVEL__" "$REGISTRY\/$REPOS\/$IMAGE" "$imageKeysFile"
+    v4m_replace "__${prefix}IMAGE_REPO_2LEVEL__" "$REPOS\/$IMAGE" "$imageKeysFile"
+    v4m_replace "__${prefix}IMAGE__" "$IMAGE" "$imageKeysFile"
+    v4m_replace "__${prefix}IMAGE_TAG__" "$VERSION" "$imageKeysFile"
+    v4m_replace "__${prefix}IMAGE_PULL_POLICY__" "$v4m_pullPolicy" "$imageKeysFile"
+    v4m_replace "__${prefix}IMAGE_PULL_SECRET__" "$pullsecret_text" "$imageKeysFile"   #Handle Charts Accepting a Single Image Pull Secret
+    v4m_replace "__${prefix}IMAGE_PULL_SECRETS__" "$pullsecrets_text" "$imageKeysFile" #Handle Charts Accepting Multiple Image Pull Secrets
 
     return 0
 }
-
 
 export -f parseFullImage
 export -f v4m_replace
