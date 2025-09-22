@@ -65,7 +65,7 @@ for service in $servicelist; do
         ;;
     ALERTMANAGER | AM)
         namespace=${MON_NS:-"monitoring"}
-        service="AlertManager"
+        service="Alertmanager"
         servicename="v4m-alertmanager"
         ingressname="v4m-alertmanager"
         tls_flag="$TLS_ENABLE"
