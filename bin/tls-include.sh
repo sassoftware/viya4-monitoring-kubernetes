@@ -270,7 +270,7 @@ function tls_cert_expired() {
 # Return 1: TLS cert is not managed by V4M
 function tls_cert_managed_by_v4m() {
     namespace="$1"
-    secretName="$3"
+    secretName="$2"
 
     if [[ "$(kubectl get secret -n "$namespace" "$secretName" --show-labels)" == *"managed-by=v4m"* ]]; then
         log_debug "TLS Certs are managed by SAS Viya Monitoring"
