@@ -1,6 +1,8 @@
-# shellcheck disable=SC2148
 # Copyright © 2023-2024, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
+
+# shellcheck disable=SC2148
+# This script is not intended to be run directly
 
 # This file is not marked as executable as it is intended to be sourced
 # Current directory must be the root directory of the repo
