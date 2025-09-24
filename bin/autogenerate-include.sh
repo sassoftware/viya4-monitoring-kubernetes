@@ -114,21 +114,15 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
 
     if [ "$AUTOGENERATE_SMTP" == "true" ]; then
 
-        #required
-        # shellcheck disable=SC2269
-        SMTP_HOST="${SMTP_HOST}"
-        # shellcheck disable=SC2269
-        SMTP_PORT="${SMTP_PORT}"
-        # shellcheck disable=SC2269
-        SMTP_FROM_ADDRESS="${SMTP_FROM_ADDRESS}"
-        # shellcheck disable=SC2269
-        SMTP_FROM_NAME="${SMTP_FROM_NAME}"
+        #required settings
+        # SMTP_HOST - no default
+        # SMTP_PORT - no default
+        # SMTP_FROM_ADDRESS - no default
+        # SMTP_FROM_NAME - no default
 
-        #optional
-        # shellcheck disable=SC2269
-        SMTP_USER="${SMTP_USER}"
-        # shellcheck disable=SC2269
-        SMTP_PASSWORD="${SMTP_PASSWORD}"
+        #optional settings
+        # SMTP_USER - no default
+        # SMTP_PASSWORD - no default
         SMTP_USER_SECRET="${SMTP_USER_SECRET:-grafana-smtp-user}"
         SMTP_SKIP_VERIFY="${SMTP_SKIP_VERIFY:-false}"
         SMTP_TLS_CERT_FILE="${SMTP_TLS_CERT_FILE:-/cert/tls.crt}"
