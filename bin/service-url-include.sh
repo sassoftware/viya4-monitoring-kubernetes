@@ -23,14 +23,13 @@ json_route_path='{.spec.path}'
 json_route_tls='{.spec.tls.termination}'
 
 function get_k8s_info {
-    local namespace object jsonpath info rc
+    local namespace object jsonpath info
 
     namespace=$1
     object=$2
     jsonpath=$3
 
     info=$(kubectl -n "$namespace" get "$object" -o=jsonpath="$jsonpath" 2> /dev/null)
-    rc=$?
 
     if [ -n "$info" ]; then
         echo "$info"
@@ -60,8 +59,7 @@ function get_ingress_ports {
 }
 
 function get_ingress_url {
-    # shellcheck disable=SC2034
-    local namespace name host path tls_info rc port porttxt protocol
+    local namespace name host path tls_info port porttxt protocol
 
     namespace=$1
     name=$2
