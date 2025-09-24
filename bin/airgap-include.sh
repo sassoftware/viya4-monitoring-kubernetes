@@ -40,8 +40,5 @@ if [ "$AIRGAP_SOURCED" == "" ]; then
 
     log_info "Deploying into an 'air-gapped' cluster from private registry [$AIRGAP_REGISTRY]"
 
-    airgapDir="$TMP_DIR/airgap"
-    mkdir -p "$airgapDir"
-
     export AIRGAP_SOURCED=true
 fi
