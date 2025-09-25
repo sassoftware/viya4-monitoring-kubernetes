@@ -8,8 +8,6 @@ groups:
       - title: Crunchy PGData Usage High
         annotations:
           description: "Checks to see /pgdata filesystem is more than 50% full.
-
-            Go to the URL to follow the troubleshooting steps."
           summary:
             /pgdata storage > 50% full. This typically happens when the WAL logs
             are increasing and not being cleared.
