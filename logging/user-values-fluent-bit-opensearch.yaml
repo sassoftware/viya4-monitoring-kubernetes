@@ -1,12 +1,18 @@
-# Chart:  https://github.com/fluent/helm-charts/blob/fluent-bit-0.40.0/charts/fluent-bit
-# Default values: https://github.com/fluent/helm-charts/blob/fluent-bit-0.40.0/charts/fluent-bit/values.yaml
+# Refer to https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/stable/ARTIFACT_INVENTORY.md
+# to identify the current Helm chart version in use by this project.  The links below point to
+# the 'main' branch as a general reference and the contents will likely differ to some degree.
+
+# Chart: https://github.com/fluent/helm-charts/tree/main/charts/fluent-bit
+# Default values: https://github.com/fluent/helm-charts/blob/main/charts/fluent-bit/values.yaml
+
 
 # NOTE: Customizations intended to alter the contents of the Fluent Bit Configuration Files
 #       should be made by altering contents of the fluent-bit_config.configmap_open.yaml files.
 #       Use this file to customize other Helm chart settings.
 
+
 #image:
-#  tag: 2.1.10
+#  tag: 4.0.9
 
 # ***** extraVolumeMounts/extraVolumes - START *****
 #
@@ -26,23 +32,13 @@
 # directory cannot be resolved, Fluent Bit
 # will run without ERRORs but NO log messages
 # will be collected.
-#
-# NOTE: The extraVolumeMounts and extraVolumes entries
-# related to parsers-config need to be uncommented as
-# well but should not be edited beyond that.
+
 
 #extraVolumeMounts:
-#- mountPath: /fluent-bit/etc/viya-parsers.conf
-#  name: parsers-config
-#  subPath: viya-parsers.conf
 #- mountPath: /data01/var/lib/docker/containers
 #  name: path2dockercontainers
 #  readOnly: true
 #extraVolumes:
-#- configMap:
-#    defaultMode: 420
-#    name: fb-viya-parsers
-#  name: parsers-config
 #- hostPath:
 #    path: /data01/var/lib/docker/containers
 #    type: ""
