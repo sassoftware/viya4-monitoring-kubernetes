@@ -4,8 +4,9 @@
   * [CHANGE] We have changed how we handle defining extra volumes for the Fluent Bit log collecting pods.
 This change should be transparent to virtually all users.  However, if you define additional volumes for
 these pods, you may need to update your configuration.  Refer to the
-(samples/generic-base/logging/user-values-fluent-bit-opensearch.yaml) for details and adjust the contents
-of your `$USER_DIR/logging/user-values-fluent-bit-opensearch.yaml` file accordingly.
+[samples/generic-base/logging/user-values-fluent-bit-opensearch.yaml](samples/generic-base/logging/user-values-fluent-bit-opensearch.yaml)
+for details and adjust the contents of your `$USER_DIR/logging/user-values-fluent-bit-opensearch.yaml` 
+file accordingly.
 
 
 ## Version 1.2.42 (16SEP2025)
