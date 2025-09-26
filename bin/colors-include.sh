@@ -1,6 +1,9 @@
 # Copyright © 2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+# shellcheck disable=SC2148
+# This script is not intended to be run directly
+
 # Added background colors and functions
 
 # Colors
@@ -34,67 +37,67 @@ lightbluebg="\033[46m"
 
 # Foregrounds
 function black {
-  echo -e "${black}${1}${end}" >&3
+    echo -e "${black}${1}${end}" >&3
 }
 
 function blackb {
-  echo -e "${blackb}${1}${end}" >&3
+    echo -e "${blackb}${1}${end}" >&3
 }
 
 function white {
-  echo -e "${white}${1}${end}" >&3
+    echo -e "${white}${1}${end}" >&3
 }
 
 function whiteb {
-  echo -e "${whiteb}${1}${end}" >&3
+    echo -e "${whiteb}${1}${end}" >&3
 }
 
 function red {
-  echo -e "${red}${1}${end}" >&3
+    echo -e "${red}${1}${end}" >&3
 }
 
 function redb {
-  echo -e "${redb}${1}${end}" >&3
+    echo -e "${redb}${1}${end}" >&3
 }
 
 function green {
-  echo -e "${green}${1}${end}" >&3
+    echo -e "${green}${1}${end}" >&3
 }
 
 function greenb {
-  echo -e "${greenb}${1}${end}" >&3
+    echo -e "${greenb}${1}${end}" >&3
 }
 
 function yellow {
-  echo -e "${yellow}${1}${end}" >&3
+    echo -e "${yellow}${1}${end}" >&3
 }
 
 function yellowb {
-  echo -e "${yellowb}${1}${end}" >&3
+    echo -e "${yellowb}${1}${end}" >&3
 }
 
 function blue {
-  echo -e "${blue}${1}${end}" >&3
+    echo -e "${blue}${1}${end}" >&3
 }
 
 function blueb {
-  echo -e "${blueb}${1}${end}" >&3
+    echo -e "${blueb}${1}${end}" >&3
 }
 
 function purple {
-  echo -e "${purple}${1}${end}" >&3
+    echo -e "${purple}${1}${end}" >&3
 }
 
 function purpleb {
-  echo -e "${purpleb}${1}${end}" >&3
+    echo -e "${purpleb}${1}${end}" >&3
 }
 
 function lightblue {
-  echo -e "${lightblue}${1}${end}" >&3
+    echo -e "${lightblue}${1}${end}" >&3
 }
 
 function lightblueb {
-  echo -e "${lightblueb}${1}${end}" >&3
+    echo -e "${lightblueb}${1}${end}" >&3
 }
 
 # Export all the things
