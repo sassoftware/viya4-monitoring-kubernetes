@@ -15,7 +15,8 @@ function ocVersionCheck {
 
     for ((i = 0; i < ${#allArr[@]}; i++)); do
         # Split the line into an array
-        verArr=("${allArr[$i]}")
+        # shellcheck disable=SC2206
+        verArr=(${allArr[$i]})
         if [ ${#verArr[@]} -eq 3 ]; then
             verType="${verArr[0]}"
             ver="${verArr[2]}"
