@@ -3,7 +3,7 @@ apiVersion: 1
 datasources:
   - name: monitoring
     type: mysql
-    url: svc-sas-singlestore-cluster-ddl.viya.svc.cluster.local:3306
+    url: svc-sas-singlestore-cluster-ddl.VIYA_NS.svc.cluster.local:3306
     database: metrics
     user: S2MonitorUser
     secureJsonData:
