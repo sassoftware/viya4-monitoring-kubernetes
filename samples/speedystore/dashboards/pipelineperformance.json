@@ -1,0 +1,1508 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 266,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Documentation",
+      "tooltip": "",
+      "type": "link",
+      "url": "https://docs.singlestore.com/managed-service/en/reference/troubleshooting-reference/pipeline-errors/detect-and-address-slow-performance-and-high-memory-usage-of-pipelines.html"
+    },
+    {
+      "asDropdown": true,
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Dashboards",
+      "tooltip": "",
+      "type": "dashboards",
+      "url": ""
+    }
+  ],
+  "panels": [
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "dataset": "metrics",
+          "datasource": {
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\nSELECT  *,\n        lag(ts) OVER w ts_l,\n        lag(total) OVER w total_l\nFROM (\n        select  ts,\n                cluster,\n                activity_name name,\n                database_name db,\n                max(IFNULL(run_count,0)+IFNULL(success_count,0)+IFNULL(failure_count,0)) total\n        from `act_samples` act\n        where $__timeFilter(ts)\n        and (cluster = '$cluster')\n        and activity_name like '%RunPipeline%'  \n        and (activity_name like '%${pipeline_name:raw}%' or '%' in ($pipeline_name))\n        and (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null))\n        and (activity_name = aggregator_activity_name or aggregator_activity_name is NULL)\n        group by cluster, database_name, activity_type, activity_name, ts) q\nWINDOW w AS(partition by cluster, db, name order by ts) )\nselect  $__timeGroup(time_sec,$interval) time_sec,\n        sum(exec_cnt) execution_count\nFROM (select a.cluster,\n             a.db,\n             a.name,\n             a.ts time_sec,\n             sum(if(a.total>a.total_l, a.total- a.total_l, 0)) exec_cnt\n    from t a\n    group by 1, 2, 3, 4) subq\nwhere exec_cnt > 0\ngroup by 1\norder by 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "avg_cpu_time_ms",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "avg_memory_mb",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "ts",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pipeline_perfmetrics",
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\nSELECT  *,\n        lag(ts) OVER w ts_l,\n        lag(total) OVER w total_l\nFROM (\n        select  ts,\n                cluster,\n                activity_name name,\n                database_name db,\n                max(IFNULL(failure_count,0)) total\n        from `act_samples` act\n        where $__timeFilter(ts)\n        and (cluster = '$cluster')\n        and activity_name like '%RunPipeline%'  \n        and (activity_name like '%${pipeline_name:raw}%' or '%' in ($pipeline_name))\n        and (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null))\n        and (activity_name = aggregator_activity_name or aggregator_activity_name is NULL)\n        group by cluster, database_name, activity_type, activity_name, ts) q\nWINDOW w AS(partition by cluster, db, name order by ts) )\nselect  $__timeGroup(time_sec,$interval) time_sec,\n        sum(exec_cnt) as failure_count\nFROM (select a.cluster,\n             a.db,\n             a.name,\n             a.ts time_sec,\n             sum(if(a.total>a.total_l, a.total- a.total_l, 0)) exec_cnt\n    from t a\n    group by 1, 2, 3, 4) subq\ngroup by 1\norder by 1",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "cpu_time_ms"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "08c783c1c927b993824179b6d7a31908_act_samples",
+          "timeColumn": "ts",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Execution Count",
+      "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "time",
+                "targetField": "time_sec"
+              }
+            ],
+            "fields": {}
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "dataset": "metrics",
+          "datasource": {
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\nSELECT  *,\n        lag(ts) OVER w ts_l,\n        lag(cpu) OVER w cpu_l,\n        lag(total) OVER w total_l\nFROM (\n        select  ts,\n                cluster,\n                activity_name name,\n                database_name db,\n                max(cpu_time_ms) cpu,\n                max(IFNULL(run_count,0)+IFNULL(success_count,0)+IFNULL(failure_count,0)) total\n        from `act_samples` act\n        where $__timeFilter(ts) and \n              (cluster = '$cluster') and \n              activity_name like '%RunPipeline%' and   \n              (activity_name like '%${pipeline_name:raw}%' or '%' in ($pipeline_name)) and\n              (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null)) and\n              (activity_name = aggregator_activity_name or aggregator_activity_name is NULL)\n        group by cluster, database_name, activity_type, activity_name, ts) q\nWINDOW w AS(partition by cluster, db, name order by ts) )\nselect  $__timeGroup(time_sec,$interval) time_sec,\n        sum(cpu)/sum(total) as 'Avg CPU Time per Execution'\nFROM (select a.cluster,\n             a.db,\n             a.name,\n             a.ts time_sec,\n             sum(if(a.cpu>a.cpu_l, a.cpu- a.cpu_l, 0)) cpu,\n             sum(if(a.total>a.total_l, a.total- a.total_l, 0)) total\n    from t a\n    group by 1, 2, 3, 4) subq\nwhere cpu > 0\ngroup by 1\norder by 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "avg_cpu_time_ms",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "avg_memory_mb",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "ts",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pipeline_perfmetrics",
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Avg CPU Time per Execution",
+      "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "time",
+                "targetField": "time_sec"
+              }
+            ],
+            "fields": {}
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 0
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "dataset": "metrics",
+          "datasource": {
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\nSELECT  *,\n        lag(ts) OVER w ts_l,\n        lag(elp) OVER w elp_l,\n        lag(total) OVER w total_l\nFROM (\n        select  ts,\n                cluster,\n                activity_name name,\n                database_name db,\n                max(elapsed_time_ms) elp,\n                max(IFNULL(run_count,0)+IFNULL(success_count,0)+IFNULL(failure_count,0)) total\n        from `act_samples` act\n        where $__timeFilter(ts) and \n              (cluster = '$cluster') and \n              activity_name like '%RunPipeline%' and \n              (activity_name like '%${pipeline_name:raw}%' or '%' in ($pipeline_name)) and\n              (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null)) and\n              (activity_name = aggregator_activity_name or aggregator_activity_name is NULL)\n        group by cluster, database_name, activity_type, activity_name, ts) q\nWINDOW w AS(partition by cluster, db, name order by ts) )\nselect  $__timeGroup(time_sec,$interval) time_sec,\n        sum(elp)/sum(total) as 'Avg Elapsed Time per Execution'\nFROM (select a.cluster,\n             a.db,\n             a.name,\n             a.ts time_sec,\n             sum(if(a.elp>a.elp_l, a.elp- a.elp_l, 0)) elp,\n             sum(if(a.total>a.total_l, a.total- a.total_l, 0)) total\n    from t a\n    group by 1, 2, 3, 4) subq\nwhere elp > 0\ngroup by 1\norder by 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "avg_cpu_time_ms",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "avg_memory_mb",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "ts",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pipeline_perfmetrics",
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Avg Elapsed Time per Execution",
+      "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "time",
+                "targetField": "time_sec"
+              }
+            ],
+            "fields": {}
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 8
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "dataset": "metrics",
+          "datasource": {
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\nSELECT  *,\n        lag(ts) OVER w ts_l,\n        lag(disk_b) OVER w disk_b_l,\n        lag(total) OVER w total_l\nFROM (\n        select  ts,\n                cluster,\n                activity_name name,\n                database_name db,\n                max(disk_b) disk_b,\n                max(IFNULL(run_count,0)+IFNULL(success_count,0)+IFNULL(failure_count,0)) total\n        from `act_samples` act\n        where $__timeFilter(ts) and \n              (cluster = '$cluster') and \n              activity_name like '%RunPipeline%' and \n              (activity_name like '%${pipeline_name:raw}%' or '%' in ($pipeline_name)) and\n              (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null)) and\n              (activity_name = aggregator_activity_name or aggregator_activity_name is NULL)\n        group by cluster, database_name, activity_type, activity_name, ts) q\nWINDOW w AS(partition by cluster, db, name order by ts) )\nselect  $__timeGroup(time_sec,$interval) time_sec,\n        sum(disk_b)/sum(total) as 'Avg IO per Execution'\nFROM (select a.cluster,\n             a.db,\n             a.name,\n             a.ts time_sec,\n             sum(if(a.disk_b>a.disk_b_l, a.disk_b- a.disk_b_l, 0)) disk_b,\n             sum(if(a.total>a.total_l, a.total- a.total_l, 0)) total\n    from t a\n    group by 1, 2, 3, 4) subq\ngroup by 1\norder by 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "avg_cpu_time_ms",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "avg_memory_mb",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "ts",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pipeline_perfmetrics",
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Avg IO per Execution",
+      "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "time",
+                "targetField": "time_sec"
+              }
+            ],
+            "fields": {}
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 8
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "dataset": "metrics",
+          "datasource": {
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\nSELECT  *,\n        lag(ts) OVER w ts_l,\n        lag(elp) OVER w elp_l,\n        lag(memory_b) OVER w memory_b_l\nFROM (\n        select  ts,\n                cluster,\n                activity_name name,\n                database_name db,\n                max(elapsed_time_ms) elp,\n                max(1000*memory_bs) memory_b\n        from `act_samples` act\n        where $__timeFilter(ts) and \n              (cluster = '$cluster') and \n              activity_name like '%RunPipeline%' and \n              (activity_name like '%${pipeline_name:raw}%' or '%' in ($pipeline_name)) and\n              (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null)) and\n              (activity_name = aggregator_activity_name or aggregator_activity_name is NULL)\n        group by cluster, database_name, activity_type, activity_name, ts) q\nWINDOW w AS(partition by cluster, db, name order by ts) )\nselect  $__timeGroup(time_sec,$interval) time_sec,\n        sum(memory_b)/sum(elp) as 'Avg Memory Used per Execution'\nFROM (select a.cluster,\n             a.db,\n             a.name,\n             a.ts time_sec,\n             sum(if(a.elp>a.elp_l, a.elp- a.elp_l, 0)) elp,\n             sum(if(a.memory_b>a.memory_b_l, a.memory_b- a.memory_b_l, 0)) memory_b\n    from t a\n    group by 1, 2, 3, 4) subq\nwhere elp > 0\ngroup by 1\norder by 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "avg_cpu_time_ms",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "avg_memory_mb",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "ts",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pipeline_perfmetrics",
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Avg Memory Used per Execution",
+      "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "time",
+                "targetField": "time_sec"
+              }
+            ],
+            "fields": {}
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 8
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "dataset": "metrics",
+          "datasource": {
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\nSELECT  *,\n        lag(ts) OVER w ts_l,\n        lag(network_b) OVER w network_b_l,\n        lag(total) OVER w total_l\nFROM (\n        select  ts,\n                cluster,\n                activity_name name,\n                database_name db,\n                max(network_b) network_b,\n                max(IFNULL(run_count,0)+IFNULL(success_count,0)+IFNULL(failure_count,0)) total\n        from `act_samples` act\n        where $__timeFilter(ts) and \n              (cluster = '$cluster') and \n              activity_name like '%RunPipeline%' and \n              (activity_name like '%${pipeline_name:raw}%' or '%' in ($pipeline_name)) and\n              (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null)) and\n              (activity_name = aggregator_activity_name or aggregator_activity_name is NULL)\n        group by cluster, database_name, activity_type, activity_name, ts) q\nWINDOW w AS(partition by cluster, db, name order by ts) )\nselect  $__timeGroup(time_sec,$interval) time_sec,\n        sum(network_b)/sum(total) as 'Avg Network Bytes per Execution'\nFROM (select a.cluster,\n             a.db,\n             a.name,\n             a.ts time_sec,\n             sum(if(a.network_b>a.network_b_l, a.network_b- a.network_b_l, 0)) network_b,\n             sum(if(a.total>a.total_l, a.total- a.total_l, 0)) total\n    from t a\n    group by 1, 2, 3, 4) subq\nwhere network_b > 0\ngroup by 1\norder by 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "avg_cpu_time_ms",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "avg_memory_mb",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "ts",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pipeline_perfmetrics",
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Avg Network Bytes per Execution",
+      "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "time",
+                "targetField": "time_sec"
+              }
+            ],
+            "fields": {}
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "error_id"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 113
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "error_code"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 102
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "error_message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 496
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "database_name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 194
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 6,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "PipelineName"
+          }
+        ]
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "dataset": "metrics",
+          "datasource": {
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT pipeline_name as PipelineName, \n       database_name, \n       error_id, \n       error_code,\n       error_message,\n       from_unixtime(error_unix_time) as error_time\nFROM `pipeline_errors`\nwhere (pipeline_name in ($pipeline_name) or '%' in ($pipeline_name) or ('-' in ($pipeline_name) and pipeline_name is null)) and\n      cluster = '$cluster' and\n      $__unixEpochFilter(error_unix_time) and\n      (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null))",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "pipeline_name",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "database_name",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "error_id",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "error_unix_time",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "pipeline_errors",
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Pipeline Errors",
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "memsql_cluster",
+          "value": "memsql_cluster"
+        },
+        "datasource": {
+          "type": "mysql",
+          "uid": "monitoring"
+        },
+        "definition": "select distinct(cluster) from pipeline_metrics where $__timeFilter(ts)",
+        "includeAll": false,
+        "name": "cluster",
+        "options": [],
+        "query": "select distinct(cluster) from pipeline_metrics where $__timeFilter(ts)",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allValue": "'%'",
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "uid": "monitoring"
+        },
+        "definition": "SELECT distinct pipeline_name FROM `pipeline_metrics` where $__timeFilter(ts)  and cluster = '$cluster'",
+        "includeAll": true,
+        "label": "Pipeline",
+        "multi": true,
+        "name": "pipeline_name",
+        "options": [],
+        "query": "SELECT distinct pipeline_name FROM `pipeline_metrics` where $__timeFilter(ts)  and cluster = '$cluster'",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allValue": "'%'",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "uid": "monitoring"
+        },
+        "definition": "SELECT distinct database_name FROM `pipeline_metrics` where $__timeFilter(ts)  and cluster = '$cluster'",
+        "includeAll": true,
+        "label": "Database",
+        "multi": true,
+        "name": "database_name",
+        "options": [],
+        "query": "SELECT distinct database_name FROM `pipeline_metrics` where $__timeFilter(ts)  and cluster = '$cluster'",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "auto": true,
+        "auto_count": 30,
+        "auto_min": "10s",
+        "current": {
+          "text": "1m",
+          "value": "1m"
+        },
+        "hide": 2,
+        "name": "interval",
+        "options": [
+          {
+            "selected": true,
+            "text": "1m",
+            "value": "1m"
+          },
+          {
+            "selected": false,
+            "text": "5m",
+            "value": "5m"
+          },
+          {
+            "selected": false,
+            "text": "10m",
+            "value": "10m"
+          },
+          {
+            "selected": false,
+            "text": "15m",
+            "value": "15m"
+          },
+          {
+            "selected": false,
+            "text": "30m",
+            "value": "30m"
+          },
+          {
+            "selected": false,
+            "text": "1h",
+            "value": "1h"
+          },
+          {
+            "selected": false,
+            "text": "6h",
+            "value": "6h"
+          },
+          {
+            "selected": false,
+            "text": "12h",
+            "value": "12h"
+          },
+          {
+            "selected": false,
+            "text": "1d",
+            "value": "1d"
+          },
+          {
+            "selected": false,
+            "text": "7d",
+            "value": "7d"
+          }
+        ],
+        "query": "1m,5m,10m,15m,30m,1h,6h,12h,1d,7d",
+        "refresh": 2,
+        "type": "interval"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Pipeline Performance",
+  "uid": "pipeline-performance",
+  "version": 1
+}

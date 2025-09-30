@@ -1,0 +1,812 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 265,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "description": "Total_Server_Memory used, out of Maximum_Memory limit.\nUsed memory is broken into data, queries, or internal.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 35,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "mbytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/MAXIMUM_MEMORY/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "rgb(202, 199, 199)",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 5
+              },
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "A",
+                  "mode": "none"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/Total Memory Used/"
+            },
+            "properties": [
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "A",
+                  "mode": "none"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT\n  time_sec,\n  concat(\n  case when name = 'memsql_variables_maximum_memory' then 'MAXIMUM_MEMORY'\n       when name = 'memsql_status_total_server_memory' then 'Total Memory Used'\n       when name = 'memsql_status_buffer_manager_cached_memory' then 'Cached Memory'\n       when name = 'memsql_status_alloc_table_memory' then 'Data'\n       when name in ('memsql_status_alloc_query_execution',\n                    'memsql_status_alloc_aggregator_query_execution',\n                    'memsql_status_alloc_columnar_query_execution',\n                    'memsql_status_alloc_query_background_tasks',\n                    'memsql_status_alloc_query_execution_temp_table',\n                    'memsql_status_alloc_query_ingest',\n                    'memsql_status_alloc_plan_cache',\n                    'memsql_status_alloc_unit_images',\n                    'memsql_status_alloc_object_code_images',\n                    'memsql_status_alloc_compiled_unit_sections',\n                    'memsql_status_alloc_analyze',\n                    'memsql_status_alloc_arena',\n                    'memsql_status_alloc_autostats',\n                    'memsql_status_alloc_backup_restore',\n                    'memsql_status_alloc_column_store',\n                    'memsql_status_alloc_columnstore_blob_cache',\n                    'memsql_status_alloc_distributed_transaction',\n                    'memsql_status_alloc_dqo_cache',\n                    'memsql_status_alloc_external_formatter',\n                    'memsql_status_alloc_external_functions',\n                    'memsql_status_alloc_fulltext_search',\n                    'memsql_status_alloc_json',\n                    'memsql_status_alloc_mmap_memory',\n                    'memsql_status_alloc_mmap_wasm',\n                    'memsql_status_alloc_parametrizer',\n                    'memsql_status_alloc_pipelines',\n                    'memsql_status_alloc_profile_stats',\n                    'memsql_status_alloc_shared_memory',\n                    'memsql_status_alloc_spatial',\n                    'memsql_status_alloc_spill',\n                    'memsql_status_alloc_stack_first_segmented_array',\n                    'memsql_status_alloc_warnings') then 'Query' else 'Other' end\n  , ' ', trim_host(host), ':', port, ' (', role, ')') as metric,\n  sum(intval) as value\nFROM metrics\nWHERE cluster = '$cluster'\nand extractor = 'memsql'\nand host = '$host'\nand port = '$port'\nand name in ('memsql_variables_maximum_memory',\n            'memsql_status_total_server_memory',\n            'memsql_status_buffer_manager_cached_memory',\n            'memsql_status_alloc_aggregator_query_execution',\n            'memsql_status_alloc_columnar_query_execution',\n            'memsql_status_alloc_query_background_tasks',\n            'memsql_status_alloc_query_execution_temp_table',\n            'memsql_status_alloc_query_ingest',\n            'memsql_status_alloc_column_store',\n            'memsql_status_alloc_analyze',\n            'memsql_status_alloc_arena',\n            'memsql_status_alloc_autostats',\n            'memsql_status_alloc_background_tasks',\n            'memsql_status_alloc_backup_restore',\n            'memsql_status_alloc_client_connection',\n            'memsql_status_alloc_code_generator',\n            'memsql_status_alloc_columnstore_blob_cache',\n            'memsql_status_alloc_databases_list_entry',\n            'memsql_status_alloc_db_tasks',\n            'memsql_status_alloc_distributed_transaction',\n            'memsql_status_alloc_dqo_cache',\n            'memsql_status_alloc_external_formatter',\n            'memsql_status_alloc_fulltext_search',\n            'memsql_status_alloc_global_func',\n            'memsql_status_alloc_json',\n            'memsql_status_alloc_none',\n            'memsql_status_alloc_parametrizer',\n            'memsql_status_alloc_pipelines',\n            'memsql_status_alloc_profile_stats',\n            'memsql_status_alloc_protocol_packet',\n            'memsql_status_alloc_replication',\n            'memsql_status_alloc_security',\n            'memsql_status_alloc_segmented_list',\n            'memsql_status_alloc_sharding_partitions',\n            'memsql_status_alloc_sharding_tables',\n            'memsql_status_alloc_show_statement',\n            'memsql_status_alloc_skynet_consensus',\n            'memsql_status_alloc_snapshot',\n            'memsql_status_alloc_spatial',\n            'memsql_status_alloc_stack_first_segmented_array',\n            'memsql_status_alloc_system_tasks',\n            'memsql_status_alloc_table_metadata_cache',\n            'memsql_status_alloc_transaction',\n            'memsql_status_alloc_warnings',\n            'memsql_status_buffer_manager_unrecycled_memory',\n            'memsql_status_alloc_table_memory',\n            'memsql_status_malloc_active_memory',\n            'memsql_status_alloc_replication_large',\n            'memsql_status_alloc_thread_stacks',\n            'memsql_status_alloc_durability_large',\n            'memsql_status_alloc_external_functions',\n            'memsql_status_alloc_mmap_memory',\n            'memsql_status_alloc_mmap_wasm',\n            'memsql_status_alloc_shared_memory',\n            'memsql_status_alloc_spill',\n            'memsql_status_alloc_thread_signal_handler_altstack',\n            'memsql_status_alloc_unit_ifn_thunks',\n            'memsql_status_total_io_pool_memory',\n            'memsql_status_alloc_compiled_unit_sections',\n            'memsql_status_alloc_object_code_images',\n            'memsql_status_alloc_plan_cache',\n            'memsql_status_alloc_query_execution',\n            'memsql_status_alloc_unit_images')\nand $__unixEpochFilter(time_sec)\ngroup by 1,2\nORDER BY 1,2\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Total Memory Used vs Total Limit",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "description": "Memory used for query execution, code gen, and plancaching, out of Maximum_Memory limit. Query execution can consume the cache, as well as any available memory less than the total limit.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "mbytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/MAXIMUM_MEMORY/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "rgb(202, 199, 199)",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 5
+              },
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "A",
+                  "mode": "none"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT\n  time_sec,\n  concat(\n  case \n    when name like 'memsql_status_alloc%' then trim_metric(name, 'memsql_status_alloc_')\n    when name like 'memsql_variables_%' then 'MAXIMUM_MEMORY'\n  end\n  , ' ', trim_host(host), ':', port, ' (', role, ')') as metric,\n  sum(intval) as value\nFROM metrics\nWHERE cluster = '$cluster'\nand extractor = 'memsql'\nand host = '$host'\nand port = '$port'\nand name in ('memsql_variables_maximum_memory',\n            'memsql_status_alloc_query_execution',\n            'memsql_status_alloc_aggregator_query_execution',\n            'memsql_status_alloc_columnar_query_execution',\n            'memsql_status_alloc_query_background_tasks',\n            'memsql_status_alloc_query_execution_temp_table',\n            'memsql_status_alloc_query_ingest',\n            'memsql_status_alloc_plan_cache',\n            'memsql_status_alloc_unit_images',\n            'memsql_status_alloc_object_code_images',\n            'memsql_status_alloc_compiled_unit_sections',\n            'memsql_status_alloc_analyze',\n            'memsql_status_alloc_arena',\n            'memsql_status_alloc_autostats',\n            'memsql_status_alloc_backup_restore',\n            'memsql_status_alloc_column_store',\n            'memsql_status_alloc_columnstore_blob_cache',\n            'memsql_status_alloc_distributed_transaction',\n            'memsql_status_alloc_dqo_cache',\n            'memsql_status_alloc_external_formatter',\n            'memsql_status_alloc_external_functions',\n            'memsql_status_alloc_fulltext_search',\n            'memsql_status_alloc_json',\n            'memsql_status_alloc_mmap_memory',\n            'memsql_status_alloc_mmap_wasm',\n            'memsql_status_alloc_parametrizer',\n            'memsql_status_alloc_pipelines',\n            'memsql_status_alloc_profile_stats',\n            'memsql_status_alloc_shared_memory',\n            'memsql_status_alloc_spatial',\n            'memsql_status_alloc_spill',\n            'memsql_status_alloc_stack_first_segmented_array',\n            'memsql_status_alloc_warnings')\nand $__unixEpochFilter(time_sec)\ngroup by 1,2\nORDER BY 1,2\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Query Memory Used vs Total Limit",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "description": "Table_Memory used, out of Maximum_Table_Memory limit.\nTable_primary and Variable should be the greatest allocators. The others should be small.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "mbytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/TABLE_MEMORY/"
+            },
+            "properties": [
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 5
+              },
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "A",
+                  "mode": "normal"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/MAXIMUM_TABLE_MEMORY/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "rgb(202, 199, 199)",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 5
+              },
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "B",
+                  "mode": "normal"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT\n  time_sec,\n  intval as value,\n  concat(\n  case \n    when name like 'memsql_status_alloc_%' then trim_metric(name, 'memsql_status_alloc_')\n    when name like 'memsql_variables_%' then trim_metric(name, 'memsql_variables_')\n  end\n  , ' ', trim_host(host), ':', port, ' (', role, ')') as metric\nFROM metrics\nWHERE cluster = '$cluster'\nand extractor = 'memsql'\nand host = '$host'\nand port = '$port'\nand name in ( 'memsql_variables_maximum_table_memory',\n              'memsql_status_alloc_variable',\n              'memsql_status_alloc_table_primary',\n              'memsql_status_alloc_deleted_version',\n              'memsql_status_alloc_skiplist_tower',\n              'memsql_status_alloc_large_variable',\n              'memsql_status_alloc_hash_buckets',\n              'memsql_status_alloc_internal_key_node',\n              'memsql_status_alloc_table_autostats',\n              'memsql_status_alloc_varbuffer_cache')\nand $__unixEpochFilter(time_sec)\nORDER BY time_sec ASC, value ASC\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Data Memory Used vs Data Limit",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "description": "Memory used for internal MemSQL allocations, out of Maximum_Memory limit.\nThe cache holds memory in MemSQL for faster internal allocation (eg for executing queries quickly).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "mbytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/MAXIMUM_MEMORY/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "rgb(202, 199, 199)",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 5
+              },
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "A",
+                  "mode": "none"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT\n  time_sec,\n  intval as value,\n  concat(\n  case \n    when name like 'memsql_status_alloc%' then trim_metric(name, 'memsql_status_alloc_')\n    when name like 'memsql_status_buffer_manager_%' then trim_metric(name, 'memsql_status_buffer_manager_')\n    when name like 'memsql_status_%' then trim_metric(name, 'memsql_status_')\n    when name like 'memsql_variables_%' then trim_metric(name, 'memsql_variables_')\n  end\n  , ' ', trim_host(host), ':', port, ' (', role, ')') as metric\nFROM metrics\nWHERE cluster = '$cluster'\nand extractor = 'memsql'\nand host = '$host'\nand port = '$port'\nand name in ('memsql_variables_maximum_memory',\n            'memsql_status_alloc_background_tasks',\n                       'memsql_status_alloc_client_connection',\n                       'memsql_status_alloc_code_generator',\n                       'memsql_status_alloc_databases_list_entry',\n                      'memsql_status_alloc_db_tasks',\n                      'memsql_status_alloc_global_func',\n                      'memsql_status_alloc_none',\n                      'memsql_status_alloc_protocol_packet',\n                      'memsql_status_alloc_replication',\n                      'memsql_status_alloc_security',\n                      'memsql_status_alloc_segmented_list',\n                      'memsql_status_alloc_sharding_partitions',\n                      'memsql_status_alloc_sharding_tables',\n                      'memsql_status_alloc_show_statement',\n                      'memsql_status_alloc_skynet_consensus',\n                      'memsql_status_alloc_snapshot',\n                      'memsql_status_alloc_system_tasks',\n                      'memsql_status_alloc_table_metadata_cache',\n                      'memsql_status_alloc_transaction',\n                      'memsql_status_buffer_manager_unrecycled_memory',\n                      'memsql_status_malloc_active_memory',\n                      'memsql_status_alloc_replication_large',\n                      'memsql_status_alloc_thread_stacks',\n                      'memsql_status_alloc_durability_large',\n                      'memsql_status_alloc_thread_signal_handler_altstack',\n                      'memsql_status_alloc_unit_ifn_thunks',\n                      'memsql_status_total_io_pool_memory')\nand $__unixEpochFilter(time_sec)\nORDER BY time_sec ASC, value ASC\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Internal Memory Allocators vs Total Limit",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "support"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "memsql_cluster",
+          "value": "memsql_cluster"
+        },
+        "datasource": {
+          "type": "mysql",
+          "uid": "monitoring"
+        },
+        "definition": "",
+        "includeAll": false,
+        "name": "cluster",
+        "options": [],
+        "query": "select distinct(cluster) from metrics where $__unixEpochFilter(time_sec)",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "127.0.0.1",
+          "value": "127.0.0.1"
+        },
+        "datasource": {
+          "type": "mysql",
+          "uid": "monitoring"
+        },
+        "definition": "select distinct(host) from metrics where cluster = '$cluster' and $__unixEpochFilter(time_sec) and host is not NULL and host != \"\"",
+        "includeAll": false,
+        "name": "host",
+        "options": [],
+        "query": "select distinct(host) from metrics where cluster = '$cluster' and $__unixEpochFilter(time_sec) and host is not NULL and host != \"\"",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "3307",
+          "value": "3307"
+        },
+        "datasource": {
+          "type": "mysql",
+          "uid": "monitoring"
+        },
+        "definition": "",
+        "includeAll": false,
+        "name": "port",
+        "options": [],
+        "query": "select distinct(port) from metrics where cluster = '$cluster' and $__unixEpochFilter(time_sec) and port is not NULL",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": []
+  },
+  "timezone": "",
+  "title": "Memory Usage",
+  "uid": "memory-usage",
+  "version": 1
+}

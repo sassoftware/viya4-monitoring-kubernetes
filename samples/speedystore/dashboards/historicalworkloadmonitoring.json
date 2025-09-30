@@ -1,0 +1,1715 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": 264,
+  "links": [
+    {
+      "asDropdown": true,
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Dashboards",
+      "tooltip": "",
+      "type": "dashboards",
+      "url": ""
+    }
+  ],
+  "panels": [
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 22,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\nSELECT  *,\n        lag(ts) OVER w ts_l,\n        lag(total) OVER w total_l,\n        lag(elp) OVER w elp_l\nFROM (\n        select  ts,\n                cluster,\n                activity_name name,\n                ifnull(aggregator_activity_name, activity_name) agg_name,\n                database_name db,\n                sum(elapsed_time_ms) as elp,\n                sum(IFNULL(memory_major_faults,0)+IFNULL(success_count,0)+IFNULL(failure_count,0)) total\n        from `act_samples` act\n        where $__timeFilter(ts)\n        and (cluster = '$cluster')\n        and (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null))\n        and (activity_type = 'Query')\n        and ('All' in ('$hidden_activity_name') OR 'Select a query in the table below' in ('$hidden_activity_name') OR activity_name = '$hidden_activity_name')\n        and activity_name = agg_name\n        group by 1,2,3,4,5\n      ) q\nWINDOW w AS(partition by cluster, db, name order by ts) )\nselect $__timeGroup(ts,$interval) time_sec,\n       a.db,\n       sum(a.elp - a.elp_l)/sum(a.total- a.total_l) ' '\nfrom t a\nwhere a.total >a.total_l and\n      a.elp >a.elp_l\ngroup by 1,2\norder by 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Elapsed Time per Execution by Database",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "description": "Number of query executions",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Query Execution Count",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 21,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max",
+            "min",
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\nSELECT  *,\n        lag(ts) OVER w ts_l,\n        lag(total) OVER w total_l\nFROM (\n        select  ts,\n                cluster,\n                activity_name name,\n                ifnull(aggregator_activity_name, activity_name) agg_name,\n                database_name db,\n                sum(IFNULL(memory_major_faults,0)+IFNULL(success_count,0)+IFNULL(failure_count,0)) total\n        from `act_samples` act\n        where $__timeFilter(ts)\n        and (cluster = '$cluster')\n        and (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null))\n        and (activity_type = 'Query')\n        and ('All' in ('$hidden_activity_name') OR 'Select a query in the table below' in ('$hidden_activity_name') OR activity_name = '$hidden_activity_name')\n        and activity_name = agg_name\n        group by 1,2,3,4,5\n      ) q\nWINDOW w AS(partition by cluster, db, name order by ts))\nselect $__timeGroup(ts,$interval) time_sec,\n       sum(a.total- a.total_l) execution_count\nfrom t a\nwhere a.total>a.total_l\ngroup by 1\norder by 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Execution Count",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 19,
+      "panels": [
+        {
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "description": "Time spent running on all the CPUs across the workspace reported by database",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "CPU time (core ms)",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "ms"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 6,
+            "x": 0,
+            "y": 10
+          },
+          "id": 5,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "lastNotNull"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "12.1.0",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "monitoring"
+              },
+              "editorMode": "code",
+              "format": "time_series",
+              "group": [],
+              "metricColumn": "none",
+              "rawQuery": true,
+              "rawSql": "WITH t AS (\nSELECT  *,\n        lag(ts) OVER w ts_l,\n        lag(total) OVER w total_l,\n        lag(cpu) OVER w cpu_l\nFROM (\n        select  ts,\n                cluster,\n                ifnull(act.aggregator_activity_name, act.activity_name) name,\n                database_name db,\n                sum(cpu_time_ms) as cpu,\n                sum(if(activity_name = name, IFNULL(memory_major_faults,0), 0) +\n                    if(activity_name = name, IFNULL(success_count,0), 0) +\n                    if(activity_name = name, IFNULL(failure_count,0), 0)) total\n        from `act_samples` act\n        where $__timeFilter(ts)\n        and (cluster = '$cluster')\n        and (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null))\n        and (activity_type = 'Query')\n        and ('All' in ('$hidden_activity_name') OR 'Select a query in the table below' in ('$hidden_activity_name') OR name = '$hidden_activity_name')\n        group by 1,2,3,4\n      ) q\nWINDOW w AS(partition by cluster, db, name order by ts) )\nselect $__timeGroup(ts,$interval) time_sec,\n       a.db,\n       sum(a.cpu - a.cpu_l)/sum(a.total- a.total_l) ' '\nfrom t a\nwhere a.total > 0 and\n      a.total >a.total_l and\n      a.cpu >a.cpu_l\ngroup by 1,2\norder by 1",
+              "refId": "A",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              },
+              "timeColumn": "time",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                }
+              ]
+            }
+          ],
+          "title": "CPU Time per Execution by Database",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 6,
+            "x": 6,
+            "y": 10
+          },
+          "id": 14,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "lastNotNull"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "12.1.0",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "monitoring"
+              },
+              "editorMode": "code",
+              "format": "time_series",
+              "group": [],
+              "metricColumn": "none",
+              "rawQuery": true,
+              "rawSql": "WITH t AS (\nSELECT  *,\n        lag(ts) OVER w ts_l,\n        lag(elp) OVER w elp_l,\n        lag(memory_bs) OVER w memory_bs_l\nFROM (\n        select  ts,\n                cluster,\n                ifnull(act.aggregator_activity_name, act.activity_name) name,\n                database_name db,\n                sum(if(activity_name = name, elapsed_time_ms,0)) as elp,\n                sum(memory_bs) as memory_bs\n        from `act_samples` act\n        where $__timeFilter(ts)\n        and (cluster = '$cluster')\n        and (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null))\n        and (activity_type = 'Query')\n        and ('All' in ('$hidden_activity_name') OR 'Select a query in the table below' in ('$hidden_activity_name') OR name = '$hidden_activity_name')\n        group by 1,2,3,4\n      ) q\nWINDOW w AS(partition by cluster, db, name order by ts) )\nselect $__timeGroup(ts,$interval) time_sec,\n       a.db,\n       sum(1000*(a.memory_bs - a.memory_bs_l))/sum(a.elp- a.elp_l) ' '\nfrom t a\nwhere a.elp > 0 and\n      a.memory_bs >a.memory_bs_l and\n      a.elp >a.elp_l\ngroup by 1,2\norder by 1",
+              "refId": "A",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              },
+              "timeColumn": "time",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                }
+              ]
+            }
+          ],
+          "title": "Memory Bytes per Execution by Database",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 6,
+            "x": 12,
+            "y": 10
+          },
+          "id": 23,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "lastNotNull"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "12.1.0",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "monitoring"
+              },
+              "editorMode": "code",
+              "format": "time_series",
+              "group": [],
+              "metricColumn": "none",
+              "rawQuery": true,
+              "rawSql": "WITH t AS (\nSELECT  *,\n        lag(ts) OVER w ts_l,\n        lag(total) OVER w total_l,\n        lag(disk_b) OVER w disk_b_l\nFROM (\n        select  ts,\n                cluster,\n                ifnull(act.aggregator_activity_name, act.activity_name) name,\n                database_name db,\n                sum(disk_b) as disk_b,\n                sum(if(activity_name = name, IFNULL(memory_major_faults,0), 0) +\n                    if(activity_name = name, IFNULL(success_count,0), 0) +\n                    if(activity_name = name, IFNULL(failure_count,0), 0)) total\n        from `act_samples` act\n        where $__timeFilter(ts)\n        and (cluster = '$cluster')\n        and (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null))\n        and (activity_type = 'Query')\n        and ('All' in ('$hidden_activity_name') OR 'Select a query in the table below' in ('$hidden_activity_name') OR name = '$hidden_activity_name')\n        group by 1,2,3,4\n      ) q\nWINDOW w AS(partition by cluster, db, name order by ts) )\nselect $__timeGroup(ts,$interval) time_sec,\n       a.db,\n       sum(a.disk_b - a.disk_b_l)/sum(a.total- a.total_l) ' '\nfrom t a\nwhere a.total > 0 and\n      a.total >a.total_l and\n      a.disk_b >a.disk_b_l\ngroup by 1,2\norder by 1",
+              "refId": "A",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              },
+              "timeColumn": "time",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                }
+              ]
+            }
+          ],
+          "title": "Disk Bytes per Execution by Database",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 6,
+            "x": 18,
+            "y": 10
+          },
+          "id": 17,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "lastNotNull"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "12.1.0",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "monitoring"
+              },
+              "editorMode": "code",
+              "format": "time_series",
+              "group": [],
+              "metricColumn": "none",
+              "rawQuery": true,
+              "rawSql": "WITH t AS (\nSELECT  *,\n        lag(ts) OVER w ts_l,\n        lag(total) OVER w total_l,\n        lag(network_b) OVER w network_b_l\nFROM (\n        select  ts,\n                cluster,\n                ifnull(act.aggregator_activity_name, act.activity_name) name,\n                database_name db,\n                sum(network_b) as network_b,\n                sum(if(activity_name = name, IFNULL(memory_major_faults,0), 0) +\n                    if(activity_name = name, IFNULL(success_count,0), 0) +\n                    if(activity_name = name, IFNULL(failure_count,0), 0)) total\n        from `act_samples` act\n        where $__timeFilter(ts)\n        and (cluster = '$cluster')\n        and (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null))\n        and (activity_type = 'Query')\n        and ('All' in ('$hidden_activity_name') OR 'Select a query in the table below' in ('$hidden_activity_name') OR name = '$hidden_activity_name')\n        group by 1,2,3,4\n      ) q\nWINDOW w AS(partition by cluster, db, name order by ts) )\nselect $__timeGroup(ts,$interval) time_sec,\n       a.db,\n       sum(a.network_b - a.network_b_l)/sum(a.total- a.total_l) ' '\nfrom t a\nwhere a.total > 0 and\n      a.total >a.total_l and\n      a.network_b >a.network_b_l\ngroup by 1,2\norder by 1",
+              "refId": "A",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              },
+              "timeColumn": "time",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                }
+              ]
+            }
+          ],
+          "title": "Network Bytes per Execution by Database",
+          "type": "timeseries"
+        }
+      ],
+      "title": "Resource Usage",
+      "type": "row"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 20,
+      "panels": [],
+      "title": "Metrics by Query Plan",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "description": "Elapsed Time - Wall clock milliseconds elapsed during execution;                          CPU Time - Milliseconds spent running on all the CPUs across the workspace. This is likely to exceed the observed elapsed time because the tasks are likely to have executed concurrently",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "total_time": {
+                  "index": 0,
+                  "text": "Total Elapsed Time"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "uniq_act"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": false
+              },
+              {
+                "id": "custom.inspect",
+                "value": true
+              },
+              {
+                "id": "custom.filterable",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "type"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/Time/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "query_plan"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 545
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "",
+                    "url": "/d/1xNFf_iSk/historical-workload-monitoring?var-cluster=[[cluster]]&var-hidden_activity_name=${__data.fields.uniq_act}&${__url_time_range}"
+                  }
+                ]
+              },
+              {
+                "id": "custom.inspect",
+                "value": true
+              },
+              {
+                "id": "custom.filterable",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Failure Rate"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.width",
+                "value": 98
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Elapsed Time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 149
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg. Elapsed Time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 145
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Execution Count"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 130
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Failure Count"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 106
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "db"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 151
+              },
+              {
+                "id": "custom.filterable",
+                "value": true
+              },
+              {
+                "id": "custom.inspect",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Query_plan_id"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 158
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/Bytes/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg. Disk Bytes"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 127
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total CPU Time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 124
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg. CPU Time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 119
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg. Disk Read Bytes (logical)"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 224
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg. Disk Write Bytes (logical)"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 225
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg. Network Recieved Bytes (logical)"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 281
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg. Network Send Bytes (logical)"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 252
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg. Network Received Bytes (logical)"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 275
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 11
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": true,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select res.*, q.query_text as query_plan from ( \nWITH t AS (\n\nSELECT *,\nlag(cpu) OVER w cpu_l,\nlag(disk_b) OVER w disk_b_l,\nlag(disk_logical_read_b) OVER w disk_logical_read_b_l,\nlag(disk_logical_write_b) OVER w disk_logical_write_b_l,\nlag(network_b) OVER w network_b_l,\nlag(network_logical_recv_b) OVER w network_logical_recv_b_l,\nlag(network_logical_send_b) OVER w network_logical_send_b_l,\nlag(memory_bs) OVER w memory_bs_l,\nlag(elp) OVER w elp_l,\nlag(fail) OVER w fail_l,\nlag(total) OVER w total_l\nFROM\n(\nselect\nact.cluster,\nact.ts,\nifnull(database_name,'-') db,\nifnull(act.aggregator_activity_name, act.activity_name) uniq_act,\nsum(cpu_time_ms) cpu,\nsum(disk_b) disk_b,\nsum(disk_logical_read_b) disk_logical_read_b,\nsum(disk_logical_write_b) disk_logical_write_b,\nsum(network_b) network_b,\nsum(network_logical_recv_b) network_logical_recv_b,\nsum(network_logical_send_b) network_logical_send_b,\nsum(memory_bs) memory_bs,\nsum(if (activity_name = uniq_act, elapsed_time_ms, 0)) elp,\nsum(if(activity_name = uniq_act, IFNULL(failure_count,0), 0)) fail,\nsum(if(activity_name = uniq_act, IFNULL(memory_major_faults,0), 0) +\n    if(activity_name = uniq_act, IFNULL(success_count,0), 0) +\n    if(activity_name = uniq_act, IFNULL(failure_count,0), 0)) total\nfrom `act_samples` act\nwhere $__timeFilter(act.ts)\nand (cluster = '$cluster')\nand (database_name in ($database_name) or '%' in ($database_name) or ('-' in ($database_name) and database_name is null))\nand ('All' in ('$hidden_activity_name') OR 'Select a query in the table below' in ('$hidden_activity_name') \n    OR (uniq_act in ('$hidden_activity_name'))\n    )\nand (act.activity_type = 'Query')\ngroup by 1,2,3,4\n) q\nWINDOW w AS(partition by cluster, db, uniq_act order by ts) \n)\nselect \ndb, \nelp as 'Total Elapsed Time', \nelp/total 'Avg. Elapsed Time', \ncpu as 'Total CPU Time', \ncpu/total as 'Avg. CPU Time',\ndisk_b/total as 'Avg. Disk Bytes',\ndisk_logical_read_b/total as 'Avg. Disk Read Bytes (logical)',\ndisk_logical_write_b/total as 'Avg. Disk Write Bytes (logical)',\nnetwork_logical_recv_b/total as 'Avg. Network Received Bytes (logical)',\nnetwork_logical_send_b/total as 'Avg. Network Send Bytes (logical)',\nnetwork_b/total as 'Avg. Network Bytes',\n(1000*memory_bs)/elp as 'Avg. Memory Bytes',\ntotal as 'Execution Count', \nfail as 'Failure Count',\nfail/total as 'Failure Rate', \nuniq_act\nFROM (select \na.cluster, a.db,\nsum(if(a.cpu>a.cpu_l, a.cpu- a.cpu_l,0)) cpu, \nsum(if(a.disk_b>a.disk_b_l, a.disk_b- a.disk_b_l,0)) disk_b, \nsum(if(a.disk_logical_read_b>a.disk_logical_read_b_l, a.disk_logical_read_b- a.disk_logical_read_b_l,0)) disk_logical_read_b, \nsum(if(a.disk_logical_write_b>a.disk_logical_write_b_l, a.disk_logical_write_b- a.disk_logical_write_b_l,0)) disk_logical_write_b, \nsum(if(a.network_b>a.network_b_l, a.network_b- a.network_b_l,0)) network_b, \nsum(if(a.network_logical_recv_b>a.network_logical_recv_b_l, a.network_logical_recv_b- a.network_logical_recv_b_l,0)) network_logical_recv_b, \nsum(if(a.network_logical_send_b>a.network_logical_send_b_l, a.network_logical_send_b- a.network_logical_send_b_l,0)) network_logical_send_b,\nsum(if(a.memory_bs>a.memory_bs_l, a.memory_bs- a.memory_bs_l,0)) memory_bs,\nsum(if(a.elp>a.elp_l, a.elp- a.elp_l,0)) elp, \nsum(if(a.fail>a.fail_l, a.fail- a.fail_l,0)) fail, \nsum(if(a.total>a.total_l, a.total- a.total_l,0)) total,\na.uniq_act\nfrom t a\nwhere total > 0 and elp > 0\ngroup by uniq_act) subq\nWHERE (subq.total > 0)\n) res,  `mv_queries` q\nwhere res.uniq_act = q.activity_name\norder by `$sortby` desc\nlimit $topn",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Metrics by Query Plan",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "Avg. CPU Time": 7,
+              "Avg. Disk Bytes": 9,
+              "Avg. Disk Read Bytes (logical)": 10,
+              "Avg. Disk Write Bytes (logical)": 11,
+              "Avg. Elapsed Time": 5,
+              "Avg. Memory Bytes": 8,
+              "Avg. Network Bytes": 12,
+              "Avg. Network Received Bytes (logical)": 13,
+              "Avg. Network Send Bytes (logical)": 14,
+              "Execution Count": 3,
+              "Failure Count": 15,
+              "Failure Rate": 16,
+              "Total CPU Time": 6,
+              "Total Elapsed Time": 4,
+              "db": 0,
+              "query_plan": 2,
+              "uniq_act": 1
+            },
+            "renameByName": {
+              "uniq_act": "Query_plan_id"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 25
+      },
+      "id": 7,
+      "options": {
+        "code": {
+          "language": "sql",
+          "showLineNumbers": true,
+          "showMiniMap": true
+        },
+        "content": "${activity_name}",
+        "mode": "code"
+      },
+      "pluginVersion": "12.1.0",
+      "title": "select a query in the table above to view its text",
+      "type": "text"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 25
+      },
+      "id": 9,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "**Elapsed Time** - Wall clock milliseconds elapsed during execution    \n\n**CPU Time** - The units of CPU Time are 'core ms' because it's the time spent running on each CPU core across the workspace.  This is likely to exceed the observed elapsed time because the tasks are likely to have executed concurrently\n\n**query_plan** - Query plans are compiled to machine code from the query by parameterizing the values and cached to expedite subsequent executions.<br />\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For Instance: Let's say you execute the below 2 queries,<br />\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Select * from table_a where colum_a = \"Value_A\"<br />\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Select * from table_a where column_a = \"Value_B\"<br />\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Query Plan for the above two queries would look something like the below,<br />\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Select * from table_a where column_a = ^<br />",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.1.0",
+      "title": "Notes",
+      "type": "text"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "0cda4387b1a7",
+          "value": "0cda4387b1a7"
+        },
+        "hide": 2,
+        "name": "viewName",
+        "options": [
+          {
+            "selected": true,
+            "text": "0cda4387b1a7",
+            "value": "0cda4387b1a7"
+          }
+        ],
+        "query": "0cda4387b1a7",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "memsql_cluster",
+          "value": "memsql_cluster"
+        },
+        "datasource": {
+          "type": "mysql",
+          "uid": "monitoring"
+        },
+        "definition": "select distinct(cluster) from `act_samples` where $__timeFilter(ts)",
+        "includeAll": false,
+        "name": "cluster",
+        "options": [],
+        "query": "select distinct(cluster) from `act_samples` where $__timeFilter(ts)",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allValue": "'%'",
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "uid": "monitoring"
+        },
+        "definition": "select distinct(ifnull(database_name,'-')) from `act_samples` where (cluster = '$cluster') and $__timeFilter(ts)",
+        "includeAll": true,
+        "multi": true,
+        "name": "database_name",
+        "options": [],
+        "query": "select distinct(ifnull(database_name,'-')) from `act_samples` where (cluster = '$cluster') and $__timeFilter(ts)",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "auto": true,
+        "auto_count": 100,
+        "auto_min": "30s",
+        "current": {
+          "text": "1m",
+          "value": "1m"
+        },
+        "name": "interval",
+        "options": [
+          {
+            "selected": true,
+            "text": "1m",
+            "value": "1m"
+          },
+          {
+            "selected": false,
+            "text": "5m",
+            "value": "5m"
+          },
+          {
+            "selected": false,
+            "text": "10m",
+            "value": "10m"
+          },
+          {
+            "selected": false,
+            "text": "30m",
+            "value": "30m"
+          },
+          {
+            "selected": false,
+            "text": "1h",
+            "value": "1h"
+          },
+          {
+            "selected": false,
+            "text": "3h",
+            "value": "3h"
+          },
+          {
+            "selected": false,
+            "text": "6h",
+            "value": "6h"
+          },
+          {
+            "selected": false,
+            "text": "12h",
+            "value": "12h"
+          },
+          {
+            "selected": false,
+            "text": "1d",
+            "value": "1d"
+          }
+        ],
+        "query": "1m,5m,10m,30m,1h,3h,6h,12h,1d",
+        "refresh": 2,
+        "type": "interval"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "All"
+        },
+        "description": "Hidden activity name to get query",
+        "includeAll": false,
+        "label": "Query Plan ID",
+        "name": "hidden_activity_name",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "All"
+          },
+          {
+            "selected": false,
+            "text": "Select a query in the table below",
+            "value": "Select a query in the table below"
+          }
+        ],
+        "query": "All, Select a query in the table below",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "All"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "label": "Query Plan",
+        "name": "query_plan_hidden",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "All"
+          },
+          {
+            "selected": false,
+            "text": "Select a query in the table below",
+            "value": "Select a query in the table below"
+          }
+        ],
+        "query": "All, Select a query in the table below",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "None",
+          "value": ""
+        },
+        "datasource": {
+          "uid": "monitoring"
+        },
+        "definition": "select case when '$hidden_activity_name' = 'All' then 'All' else query_text end \nfrom `mv_queries`  \nwhere  (cluster = '$cluster') and \nactivity_name in ('$hidden_activity_name')",
+        "hide": 2,
+        "includeAll": false,
+        "name": "activity_name",
+        "options": [],
+        "query": "select case when '$hidden_activity_name' = 'All' then 'All' else query_text end \nfrom `mv_queries`  \nwhere  (cluster = '$cluster') and \nactivity_name in ('$hidden_activity_name')",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "100",
+          "value": "100"
+        },
+        "includeAll": false,
+        "label": "Top N (Query Plan)",
+        "name": "topn",
+        "options": [
+          {
+            "selected": true,
+            "text": "100",
+            "value": "100"
+          },
+          {
+            "selected": false,
+            "text": "250",
+            "value": "250"
+          },
+          {
+            "selected": false,
+            "text": "500",
+            "value": "500"
+          },
+          {
+            "selected": false,
+            "text": "1000",
+            "value": "1000"
+          }
+        ],
+        "query": "100,250,500,1000",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "Execution Count",
+          "value": "Execution Count"
+        },
+        "includeAll": false,
+        "label": "Sort By",
+        "name": "sortby",
+        "options": [
+          {
+            "selected": false,
+            "text": "Avg. Elapsed Time",
+            "value": "Avg. Elapsed Time"
+          },
+          {
+            "selected": false,
+            "text": "Total Elapsed Time",
+            "value": "Total Elapsed Time"
+          },
+          {
+            "selected": false,
+            "text": "Avg. CPU Time",
+            "value": "Avg. CPU Time"
+          },
+          {
+            "selected": false,
+            "text": "Total CPU Time",
+            "value": "Total CPU Time"
+          },
+          {
+            "selected": false,
+            "text": "Avg. Memory Bytes",
+            "value": "Avg. Memory Bytes"
+          },
+          {
+            "selected": false,
+            "text": "Avg. Disk Bytes",
+            "value": "Avg. Disk Bytes"
+          },
+          {
+            "selected": false,
+            "text": "Avg. Disk Read Bytes (logical)",
+            "value": "Avg. Disk Read Bytes (logical)"
+          },
+          {
+            "selected": false,
+            "text": "Avg. Disk Write Bytes (logical)",
+            "value": "Avg. Disk Write Bytes (logical)"
+          },
+          {
+            "selected": false,
+            "text": "Avg. Network Bytes",
+            "value": "Avg. Network Bytes"
+          },
+          {
+            "selected": false,
+            "text": "Avg. Network Received Bytes (logical)",
+            "value": "Avg. Network Received Bytes (logical)"
+          },
+          {
+            "selected": false,
+            "text": "Avg. Network Send Bytes (logical)",
+            "value": "Avg. Network Send Bytes (logical)"
+          },
+          {
+            "selected": true,
+            "text": "Execution Count",
+            "value": "Execution Count"
+          },
+          {
+            "selected": false,
+            "text": "Failure Count",
+            "value": "Failure Count"
+          },
+          {
+            "selected": false,
+            "text": "Failure Rate",
+            "value": "Failure Rate"
+          }
+        ],
+        "query": "Avg. Elapsed Time,Total Elapsed Time,Avg. CPU Time,Total CPU Time,Avg. Memory Bytes, Avg. Disk Bytes, Avg. Disk Read Bytes (logical), Avg. Disk Write Bytes (logical), Avg. Network Bytes,Avg. Network Received Bytes (logical), Avg. Network Send Bytes (logical), Execution Count,Failure Count,Failure Rate",
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Historical Workload Monitoring",
+  "uid": "1xNFf_iSk",
+  "version": 1
+}

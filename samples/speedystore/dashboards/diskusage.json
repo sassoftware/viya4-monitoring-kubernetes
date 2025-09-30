@@ -1,0 +1,1254 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 263,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Disk Utilization",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select * from (\nselect time_sec,\nhost,\nmemsql_sysinfo_disk_used_b / memsql_sysinfo_disk_total_b as 'Disk:'\nFROM\n(SELECT\n  max(time_sec) time_sec,\n  avg(value) value,\n  metric,\n  host\n  FROM\n  (SELECT\n    time_sec,\n    $__unixEpochGroup(time_sec,$interval) tg,\n    intval as value,\n    name as metric,\n    trim_host(host) as host\n    FROM metrics\n    WHERE cluster='$cluster'\n    and (host in ('$host') or concat('$host') = '%')\n    and extractor = 'memsql'\n    and subsystem = 'sysinfo'\n    and name in ('memsql_sysinfo_disk_used_b','memsql_sysinfo_disk_total_b')\n    and $__unixEpochFilter(time_sec)\n  ) X\n  GROUP BY tg, metric, host\n) as pvt_data\nPIVOT (\n        AVG(value) \n        FOR metric \n        IN ('memsql_sysinfo_disk_used_b','memsql_sysinfo_disk_total_b')\n) as pvt_table) a\norder by time_sec",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Disk Utilization per Host",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Disk Size"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Used"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "A",
+                  "mode": "normal"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 30
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 0
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select sum(used_c) as 'Total Used',\n       sum(total_c) as 'Total Disk Size', \n       tg as time\nfrom (SELECT $__unixEpochGroup(time_sec, $interval) as tg,\n             max(case when name = 'memsql_sysinfo_disk_total_b' then value else 0 end) as total_c,\n             max(case when name = 'memsql_sysinfo_disk_used_b' then value else 0 end) as used_c,\n             host\n     FROM metrics\n     WHERE cluster='$cluster'\n     and (host in ('$host') or concat('$host') = '%')\n     and extractor = 'memsql'\n     and subsystem = 'sysinfo'\n     and name in ('memsql_sysinfo_disk_used_b','memsql_sysinfo_disk_total_b')\n     and $__unixEpochFilter(time_sec)\n     group by tg, host)\nwhere used_c > 0 & total_c > 0\ngroup by tg\norder by tg;",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "select tg as time,\n       sum(memsql_disk_usage_tracelogs_b) tracelogs,\n       sum(memsql_disk_usage_plancache_b) plancache,\n       sum(memsql_disk_usage_auditlogs_b) auditlogs,\n       sum(memsql_disk_usage_user_data_b + memsql_disk_usage_other_data_b) data\nfrom \n  (\n    SELECT $__unixEpochGroup(time_sec, $interval) AS tg, \n           max(case when name = 'memsql_disk_usage_tracelogs_b' then value else 0 end) as memsql_disk_usage_tracelogs_b,\n           max(case when name = 'memsql_disk_usage_plancache_b' then value else 0 end) as memsql_disk_usage_plancache_b,\n           max(case when name = 'memsql_disk_usage_auditlogs_b' then value else 0 end) as memsql_disk_usage_auditlogs_b,\n           max(case when name = 'memsql_disk_usage_other_data_b' then value else 0 end) as memsql_disk_usage_other_data_b,\n           max(case when name = 'memsql_disk_usage_user_data_b' then value else 0 end) as memsql_disk_usage_user_data_b,\n           host AS host\n    FROM metrics\n    WHERE cluster='$cluster'\n     and (host in ('$host') or concat('$host') = '%')\n     and $__unixEpochFilter(time_sec)\n     and NAME in ('memsql_disk_usage_tracelogs_b','memsql_disk_usage_plancache_b', 'memsql_disk_usage_auditlogs_b', 'memsql_disk_usage_other_data_b', 'memsql_disk_usage_user_data_b')\n    group by tg, host\n      ) as used\ngroup by \n  time \norder by \n  time",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Distribution of Components using Disk",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "description": "Breaksdown consumption of disk by \"Data\" category (in the left graph), adding utilization across all components will be equal to disk utilized by \"Data\"",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Available Cache"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Cache Used"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "A",
+                  "mode": "normal"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 30
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 0
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "select tg as time,\n       sum(memsql_data_disk_usage_tempblobs_b) 'data/tempblobs',\n       sum(memsql_data_disk_usage_snapshots_b) 'data/snapshots',\n       sum(memsql_data_disk_usage_blobs_b) 'data/blobs',\n       sum(memsql_data_disk_usage_logs_b) 'data/transaction logs',\n       sum(memsql_data_disk_usage_other_b + memsql_disk_usage_other_data_b) 'data/other'\nfrom \n  (\n    SELECT $__unixEpochGroup(time_sec, $interval) AS tg, \n           labels::$database_name as db,\n           host AS host, \n               max(case when name = 'memsql_data_disk_usage_tempblobs_b' then value else 0 end) as memsql_data_disk_usage_tempblobs_b,\n               max(case when name = 'memsql_data_disk_usage_snapshots_b' then value else 0 end) as memsql_data_disk_usage_snapshots_b,\n               max(case when name = 'memsql_data_disk_usage_blobs_b' then value else 0 end) as memsql_data_disk_usage_blobs_b,\n               max(case when name = 'memsql_data_disk_usage_logs_b' then value else 0 end) as memsql_data_disk_usage_logs_b,\n               max(case when name = 'memsql_data_disk_usage_other_b' then value else 0 end) as memsql_data_disk_usage_other_b,\n               max(case when name = 'memsql_disk_usage_other_data_b' then value else 0 end) as memsql_disk_usage_other_data_b\n        FROM metrics\n        WHERE $__unixEpochFilter(time_sec) AND\n              cluster='$cluster' and \n              (host in ('$host') or concat('$host') = '%') and\n              NAME in ('memsql_disk_usage_other_data_b','memsql_data_disk_usage_tempblobs_b','memsql_data_disk_usage_snapshots_b', 'memsql_data_disk_usage_blobs_b', 'memsql_data_disk_usage_logs_b', 'memsql_data_disk_usage_other_b')\n        group by 1,2,3\n      ) as used\ngroup by \n  time \norder by \n  time",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Breakdown of Disk Utilization by Data",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "description": "Breaksdown consumption of disk by databases, adding utilization across all databases will be equal to disk utilized by \"Data\"",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Available Cache"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Cache Used"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "A",
+                  "mode": "normal"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 30
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 8
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "select tg as time,\n    db,\n    sum(value) as ' '\nfrom (\n    SELECT  $__unixEpochGroup(time_sec, $interval) AS tg,\n            name,\n            labels::$database_name as db,\n            host AS host,                    \n            max(value) as value\n    FROM metrics\n    WHERE $__unixEpochFilter(time_sec) and\n          cluster='$cluster' and \n          (host in ('$host') or concat('$host') = '%') and\n          value > 0 and\n          name in ('memsql_data_disk_usage_tempblobs_b','memsql_data_disk_usage_snapshots_b', 'memsql_data_disk_usage_blobs_b', 'memsql_data_disk_usage_logs_b', 'memsql_data_disk_usage_other_b')\n    GROUP by 1,2,3,4\n    ) as pvt_data\ngroup by 1,2\norder by 1,2",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Distribution of Databases using Disk",
+      "transformations": [
+        {
+          "id": "prepareTimeSeries",
+          "options": {
+            "format": "multi"
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "description": "It provides insights into the performance of your SingleStoreDB's blob cache activity. By understanding and monitoring the rate at which the blob cache is downloading files from remote storage, you can identify potential performance bottlenecks or issues related to blob cache activity. \nFor instance: if you observe high download rates given the size of your database and scale of your hardware, you might consider increasing the local cache size.\nBy keeping an eye on this metric, you can make well-informed decisions regarding your cluster's performance and resource allocation to ensure optimal system operation.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "MiBs"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Available Cache"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Cache Used"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "A",
+                  "mode": "normal"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 30
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 8
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "select tg as time,\n    db,\n    sum(value) as ' '\n    from (\n    SELECT  $__unixEpochGroup(time_sec, $interval) AS tg,\n            name,\n            labels::$database_name as db,\n            host AS host,                    \n            max(value) as value\n    FROM metrics\n    WHERE $__unixEpochFilter(time_sec) and\n          cluster='$cluster' and\n          (host in ('$host') or concat('$host') = '%') and\n          name in ('memsql_bottomless_status_blob_cache_download_mb_per_sec')\n    GROUP by 1,2,3,4\n    ) as pvt_data\ngroup by 1,2\norder by time",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Blob Cache Downloaded per Second (by database)",
+      "transformations": [
+        {
+          "id": "prepareTimeSeries",
+          "options": {
+            "format": "multi"
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "monitoring"
+      },
+      "description": "It provides insights into the performance of your SingleStoreDB's blob cache activity. By tracking this metric, you can optimize system resource utilization based on your data management needs. If evictions occur at a high rate, it may indicate that the cache size is too small or that the workload is causing a lot of cache turnover. In such cases, you can take appropriate measures, such as adjusting cache size or reviewing data access patterns, to improve overall cluster performance.\nMonitoring this metric, helps you identify potential performance bottlenecks related to the blob cache and make well-informed decisions for optimizing your SingleStore cluster's performance.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "MiBs"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Available Cache"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Cache Used"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "A",
+                  "mode": "normal"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 30
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 8
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Last *",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "mysql",
+            "uid": "monitoring"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "select tg as time,\n    db,\n    sum(value) as ' '\n    from (\n    SELECT  $__unixEpochGroup(time_sec, $interval) AS tg,\n            name,\n            labels::$database_name as db,\n            host AS host,                    \n            max(value) as value\n    FROM metrics\n    WHERE $__unixEpochFilter(time_sec) and\n          cluster='$cluster' and\n          (host in ('$host') or concat('$host') = '%') and\n          name in ('memsql_bottomless_status_blob_cache_eviction_mb_per_sec')\n    GROUP by 1,2,3,4\n    ) as pvt_data\ngroup by 1,2\norder by time",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Blob Cache Evicted per Second (by database)",
+      "transformations": [
+        {
+          "id": "prepareTimeSeries",
+          "options": {
+            "format": "multi"
+          }
+        }
+      ],
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "memsql_cluster",
+          "value": "memsql_cluster"
+        },
+        "datasource": {
+          "type": "mysql",
+          "uid": "monitoring"
+        },
+        "definition": "",
+        "includeAll": false,
+        "name": "cluster",
+        "options": [],
+        "query": "select distinct(cluster) from metrics where $__unixEpochFilter(time_sec)",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "127.0.0.1",
+          "value": "127.0.0.1"
+        },
+        "datasource": {
+          "type": "mysql",
+          "uid": "monitoring"
+        },
+        "definition": "select distinct(host) from metrics where cluster = '$cluster' and $__unixEpochFilter(time_sec) and host is not NULL and host != \"\"",
+        "includeAll": false,
+        "name": "host",
+        "options": [],
+        "query": "select distinct(host) from metrics where cluster = '$cluster' and $__unixEpochFilter(time_sec) and host is not NULL and host != \"\"",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "3307",
+          "value": "3307"
+        },
+        "datasource": {
+          "type": "mysql",
+          "uid": "monitoring"
+        },
+        "definition": "",
+        "hide": 2,
+        "includeAll": false,
+        "name": "port",
+        "options": [],
+        "query": "select distinct(port) from metrics where cluster = '$cluster' and $__unixEpochFilter(time_sec) and port is not NULL",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "auto": true,
+        "auto_count": 50,
+        "auto_min": "1m",
+        "current": {
+          "text": "1m",
+          "value": "1m"
+        },
+        "name": "interval",
+        "options": [
+          {
+            "selected": true,
+            "text": "1m",
+            "value": "1m"
+          },
+          {
+            "selected": false,
+            "text": "10m",
+            "value": "10m"
+          },
+          {
+            "selected": false,
+            "text": "30m",
+            "value": "30m"
+          },
+          {
+            "selected": false,
+            "text": "1h",
+            "value": "1h"
+          },
+          {
+            "selected": false,
+            "text": "6h",
+            "value": "6h"
+          },
+          {
+            "selected": false,
+            "text": "12h",
+            "value": "12h"
+          },
+          {
+            "selected": false,
+            "text": "1d",
+            "value": "1d"
+          },
+          {
+            "selected": false,
+            "text": "7d",
+            "value": "7d"
+          },
+          {
+            "selected": false,
+            "text": "14d",
+            "value": "14d"
+          },
+          {
+            "selected": false,
+            "text": "30d",
+            "value": "30d"
+          }
+        ],
+        "query": "1m,10m,30m,1h,6h,12h,1d,7d,14d,30d",
+        "refresh": 2,
+        "type": "interval"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": []
+  },
+  "timezone": "",
+  "title": "Disk Usage",
+  "uid": "ccd894b4-7e3b-43e0-966b-579ac7eb3714",
+  "version": 1
+}
