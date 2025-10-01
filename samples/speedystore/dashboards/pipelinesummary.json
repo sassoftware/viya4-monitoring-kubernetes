@@ -505,7 +505,7 @@
   "preload": false,
   "refresh": "15m",
   "schemaVersion": 41,
-  "tags": [],
+  "tags": ["singlestore","sas-speedystore"],
   "templating": {
     "list": [
       {
