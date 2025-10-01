@@ -29,7 +29,7 @@ The SingleStore Toolbox is used to deploy, administer, and manage a SingleStore 
 
 To configure and start the monitoring, including the metrics database, we will (eventually) submit the following command:
 
-`sdb-admin start-monitoring-kube --cluster-name sas-singlestore-cluster --namespace {VIYA_NS} --user root --password {ROOT_PWD} --exporter-host {CLUSTER_MASTER_IP}`
+`sdb-admin start-monitoring-kube --cluster-name sas-singlestore-cluster --namespace $VIYA_NS --user root --password $ROOT_PWD --exporter-host $CLUSTER_MASTER_IP`
 
 But, before submitting the command, we will review the various parameters being passed to the command and how to determine their proper values.
 
@@ -62,7 +62,7 @@ As shown in the diagram above, the export process runs on the Master Aggregator.
 
 You can obtain the IP address for the Master node by submitting the following command:
 
-`CLUSTER_MASTER_IP=$(kubectl -n ${NS} get pods -o wide | grep 'node-sas-singlestore-cluster-master-0' | awk '{print $6}')`
+`CLUSTER_MASTER_IP=$(kubectl -n ${VIYA_NS} get pods -o wide | grep 'node-sas-singlestore-cluster-master-0' | awk '{print $6}')`
 
 #### Accessing the Kubernetess Cluster
 The `sb-admin` command needs to access the Kubernetes cluster on which SAS Viya and SingleStore are running.  It does this through a Kubernetes configuration file.  By default, the command will use the file identified in the `KUBECONFIG` environment variable or the `~/.kube/config` file are used to discover the cluster. Alternatively, the `--config-file` option can be used to specify the kube config.
@@ -70,7 +70,7 @@ The `sb-admin` command needs to access the Kubernetes cluster on which SAS Viya 
 #### Run the `sb-admin start-monitoring-kube` command
 After setting all of the required parameters, submit the following command to configure and start the monitoring, including the metrics database:
 
-`sdb-admin start-monitoring-kube --cluster-name sas-singlestore-cluster --namespace {VIYA_NS} --user root --password {ROOT_PWD} --exporter-host {CLUSTER_MASTER_IP}`
+`sdb-admin start-monitoring-kube --cluster-name sas-singlestore-cluster --namespace $VIYA_NS --user root --password $ROOT_PWD --exporter-host $CLUSTER_MASTER_IP`
 
 After running the command, the exporter process, the pipeline and the metrics database are created. To confirm this, you can use the SingleStore Studio. For example, in the screenshot below, you can see the newly created **'metrics'** database:
 ![Screenshot showing SingleStore Studio with the 'metrics' database highlighted](images/02_MG_202508_metrics-database.png)
