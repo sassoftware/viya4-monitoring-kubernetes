@@ -26,7 +26,7 @@ The diagram below, taken from the [SingleStore documentation](https://docs.singl
 
 The SingleStore Toolbox is used to deploy, administer, and manage a SingleStore cluster. The `sdb-admin start-monitoring-kube` command is used to configure and start the monitoring. It has a number of flags to control its operations.  See the [SingleStore documentation](https://docs.singlestore.com/db/v8.9/reference/singlestore-tools-reference/sdb-admin-commands/start-monitoring-kube/) for more information.
 
->**NOTE: The SingleStore Toolbox must be installed on a host that can access the SingleStore cluster pods using the internal cluster hostnames and IP addresses.  This can be a jump box (bastion) host or, if necessary, one of the Kubernetes cluster nodes.  In addition to the SingleStore Toolbox, you must be able to submit `kubectl` commands from this host.**
+>**NOTE: The SingleStore Toolbox must be installed on a host that can access the SingleStore cluster pods using the internal cluster hostnames and IP addresses.  This can be a jump box (bastion) host or, if necessary, one of the Kubernetes cluster nodes.  In addition to the SingleStore Toolbox, you must be able to submit `kubectl` commands from this host as well.**
 
 To configure and start the monitoring, including the metrics database, the following command will (eventually) be submitted:
 

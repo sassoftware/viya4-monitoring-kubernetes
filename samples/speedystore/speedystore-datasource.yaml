@@ -1,7 +1,9 @@
 apiVersion: 1
-
+deleteDatasources:
+- name: s2monitoring
+prune: true
 datasources:
-  - name: monitoring
+  - name: s2monitoring
     type: mysql
     url: svc-sas-singlestore-cluster-ddl.VIYA_NS.svc.cluster.local:3306
     database: metrics
