@@ -26,6 +26,8 @@ The diagram below, taken from the [SingleStore documentation](https://docs.singl
 
 The SingleStore Toolbox is used to deploy, administer, and manage a SingleStore cluster. The `sdb-admin start-monitoring-kube` command is used to configure and start the monitoring. It has a number of flags to control its operations.  See the [SingleStore documentation](https://docs.singlestore.com/db/v8.9/reference/singlestore-tools-reference/sdb-admin-commands/start-monitoring-kube/) for more information.
 
+>**NOTE: The SingleStore Toolbox must be installed on a host that can access the SingleStore cluster pods using the internal cluster hostnames and IP addresses.  This can be a jump box (bastion) host or, if necessary, one of the Kubernetes cluster nodes.  In addition to the SingleStore Toolbox, you must be able to submit `kubectl` commands from this host.**
+
 To configure and start the monitoring, including the metrics database, the following command will (eventually) be submitted:
 
 `sdb-admin start-monitoring-kube --cluster-name sas-singlestore-cluster --namespace $VIYA_NS --user root --password $ROOT_PWD --exporter-host $CLUSTER_MASTER_IP`
@@ -59,7 +61,7 @@ You will need the password for the SingleStore 'root' user.  You can use the fol
 `ROOT_PWD=$(kubectl -n ${VIYA_NS} get secret sas-singlestore-cluster -o yaml | grep "ROOT_PASSWORD"|awk '{print $2}'|base64 -d --wrap=0)`
 
 #### The `exporter-host` parameter
-As shown in the diagram above, the export process runs on the Master Aggregator. Therefore, you need to target the SingleStore Master node; i.e. the **node-sas-singlestore-cluster-master-0** node (pod) in a SAS SpeedyStore deployment.  You will need to provide the fully-qualified host name or IP address for the exporter host. And the name needs to be resolvable by the host running the `sdb-admin` command.  Since the fully-qualified host name may not be resolvable, we will use the IP address for the `exporter-host` parameter instead.
+As shown in the diagram above, the export process runs on the Master Aggregator. Therefore, you need to target the SingleStore Master node; i.e. the **node-sas-singlestore-cluster-master-0** node (pod) in a SAS SpeedyStore deployment.  You will need to provide the fully-qualified host name or IP address for the exporter host. And, as noted above, the IP address or host name needs to be resolvable by the host running the `sdb-admin` command.  This example uses an IP address for the `exporter-host` parameter.
 
 You can obtain the IP address for the Master node and stored it in the `CLUSTER_MASTER_IP` environment variable by submitting the following command:
 
@@ -96,7 +98,7 @@ Once completed, the exporter process, the pipeline and the metrics database have
 ![Screenshot showing SingleStore Studio with the 'metrics' database highlighted](images/02_MG_202508_metrics-database.png)
 
 ### Create the "S2MonitorUser"
-You need to create a specific user that Grafana can use to connect to the ***'metrics'*** database.  While the permissions required by this user to pull metrics from the database are fairly limited, it can be helpful to grant additional permissions so this same user can be used to manage the metrics database, pipelines and the exporter process.
+You need to create a specific user that Grafana can use to connect to the ***'metrics'*** database.
 
 After logging into SingleStore with the admin user, you can submit `CREATE USER` and `GRANT` commands to create the user and grant the user the desired permissions.
 
@@ -104,17 +106,19 @@ For example, the following command creates a user called `S2MonitorUser` and set
 
 `CREATE USER S2MonitorUser IDENTIFIED BY 'password123' REQUIRE NONE;`
 
-Then you can grant the desired permissions by submitting the following commands:
+The following command grants a minimal set of permissions that allows the newly created user to access the collected metrics and populate the Grafana dashboards:
+
+`GRANT SELECT, SHOW VIEW ON metrics.* to 'S2MonitorUser'@'%';`
+
+Alternatively, while the limited permissions above are sufficient to pull metrics from the database, it can be helpful to grant additional permissions so this same user can be used to manage the metrics database, pipelines and the exporter process.
+
+The following commands grant a broader set of permissions to allow the monitoring user to perform these administrator duties:
 
 `GRANT CLUSTER, SHOW METADATA, SELECT, PROCESS ON *.* to 'S2MonitorUser'@'%';`
 
 `GRANT SELECT, CREATE, INSERT, UPDATE, DELETE, EXECUTE, INDEX, ALTER, DROP, CREATE DATABASE, LOCK TABLES, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, CREATE PIPELINE, DROP PIPELINE, ALTER PIPELINE, START PIPELINE, SHOW PIPELINE ON metrics.* to 'S2MonitorUser'@'%';`
 
-Alternatively, you could GRANT the "monitoring user" minimal permissions, and create a second user ("monitoring administrator") to manage the metrics database, pipelines and the exporter process.
-
-|**TO DO: Does the first GRANT statement  only grant the _minimal_ permissions needed to pull metirics?  And the 2nd grants the extended permissions needed to be an administrator?**
-
-|**TO DO: Is the user name *S2MonitorUser*?**
+You should consider your organization's specific needs before deciding whether to grant the more limited or broader set of permissions to this user.
 
 ### Configure the Grafana Datasource
 Grafana datasources provide connection information allowing Grafana to access metric information in response to user queries and to populate dashboards.
@@ -128,8 +132,6 @@ For example, if SAS Viya is deployed into the ***myviya*** namespace, you would 
 to:
 
 `url: svc-sas-singlestore-cluster-ddl.myviya.svc.cluster.local:3306`
-
-|**TO DO**: Is the service-name always _name_of_singlestore_cluster_ + "-dll"
 
  If the name of the SingleStore cluster is not ***sas-singlestore-cluster***, you will need to update that portion of the  ***url*** field in the file as well.
 
