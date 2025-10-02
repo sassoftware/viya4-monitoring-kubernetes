@@ -1,4 +1,14 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Logging**
+  * [CHANGE] We have changed how we handle defining extra volumes for the Fluent Bit log collecting pods.
+This change should be transparent to virtually all users.  However, if you define additional volumes for
+these pods, you will need to update your configuration to eliminate references to certain default volumes.
+Refer to the updated [samples/generic-base/logging/user-values-fluent-bit-opensearch.yaml](samples/generic-base/logging/user-values-fluent-bit-opensearch.yaml)
+file for details and adjust the contents of your `$USER_DIR/logging/user-values-fluent-bit-opensearch.yaml` 
+file accordingly.
+
+
 ## Version 1.2.42 (16SEP2025)
 * **Logging**
   * [FIX] Corrected handling of unavailable API endpoint in deploy_opensearch_content.sh

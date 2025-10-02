@@ -17,7 +17,15 @@ podLabels:
   fbout: es
 serviceMonitor:
   enabled: false
-extraVolumeMounts:
+daemonSetVolumeMounts:
+- name: varlog
+  mountPath: /var/log
+- name: varlibdockercontainers
+  mountPath: /var/lib/docker/containers
+  readOnly: true
+- name: etcmachineid
+  mountPath: /etc/machine-id
+  readOnly: true
 - mountPath: /fluent-bit/etc/viya-parsers.conf
   name: parsers-config
   subPath: viya-parsers.conf
@@ -27,7 +35,17 @@ extraVolumeMounts:
 - mountPath: /var/log/v4m-fb-storage
   name: v4m-fb-storage
   readOnly: false
-extraVolumes:
+daemonSetVolumes:
+- name: varlog
+  hostPath:
+    path: /var/log
+- name: varlibdockercontainers
+  hostPath:
+    path: /var/lib/docker/containers
+- name: etcmachineid
+  hostPath:
+    path: /etc/machine-id
+    type: File
 - hostPath:
     path: /var/log/v4m-fb-storage
     type: DirectoryOrCreate
