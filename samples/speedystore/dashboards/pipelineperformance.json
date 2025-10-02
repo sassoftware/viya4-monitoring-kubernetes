@@ -55,7 +55,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -140,7 +140,7 @@
         {
           "dataset": "metrics",
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -212,7 +212,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -281,7 +281,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -368,7 +368,7 @@
         {
           "dataset": "metrics",
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -458,7 +458,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -545,7 +545,7 @@
         {
           "dataset": "metrics",
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -635,7 +635,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -722,7 +722,7 @@
         {
           "dataset": "metrics",
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -812,7 +812,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -899,7 +899,7 @@
         {
           "dataset": "metrics",
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -989,7 +989,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -1076,7 +1076,7 @@
         {
           "dataset": "metrics",
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -1166,7 +1166,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -1276,7 +1276,7 @@
         {
           "dataset": "metrics",
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -1372,7 +1372,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "select distinct(cluster) from pipeline_metrics where $__timeFilter(ts)",
         "includeAll": false,
@@ -1394,7 +1394,7 @@
           ]
         },
         "datasource": {
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "SELECT distinct pipeline_name FROM `pipeline_metrics` where $__timeFilter(ts)  and cluster = '$cluster'",
         "includeAll": true,
@@ -1414,7 +1414,7 @@
           "value": "$__all"
         },
         "datasource": {
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "SELECT distinct database_name FROM `pipeline_metrics` where $__timeFilter(ts)  and cluster = '$cluster'",
         "includeAll": true,

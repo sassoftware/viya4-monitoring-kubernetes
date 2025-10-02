@@ -43,7 +43,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -99,7 +99,7 @@
         {
           "dataset": "metrics",
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -158,7 +158,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -276,7 +276,7 @@
       "targets": [
         {
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -330,7 +330,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -410,7 +410,7 @@
         {
           "dataset": "metrics",
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -515,7 +515,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "select distinct(cluster) from pipeline_metrics where $__timeFilter(ts)",
         "includeAll": false,
@@ -532,7 +532,7 @@
           "value": "1693284241"
         },
         "datasource": {
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "select UNIX_TIMESTAMP(max(ts)) from pipeline_metrics  where $__timeFilter(ts)",
         "hide": 2,

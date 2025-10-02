@@ -55,7 +55,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -142,7 +142,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -182,7 +182,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -269,7 +269,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -309,7 +309,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -396,7 +396,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -436,7 +436,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -523,7 +523,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -575,7 +575,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "",
         "includeAll": false,
@@ -594,7 +594,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "select distinct labels::$pool_name\nfrom metrics\nwhere name = 'memsql_resource_pool_status_finished_queries' and\n      $__unixEpochFilter(time_sec) and (cluster='$cluster')",
         "includeAll": true,
@@ -616,7 +616,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "",
         "hide": 2,

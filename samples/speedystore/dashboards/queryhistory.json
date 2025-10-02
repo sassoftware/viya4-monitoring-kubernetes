@@ -43,7 +43,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "description": "",
       "fieldConfig": {
@@ -276,7 +276,7 @@
       "targets": [
         {
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -369,7 +369,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "select distinct(cluster) from `query_event_history` where $__timeFilter(ts)",
         "includeAll": false,

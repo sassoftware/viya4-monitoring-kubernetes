@@ -43,7 +43,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "description": "",
       "fieldConfig": {
@@ -133,7 +133,7 @@
       "targets": [
         {
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -185,7 +185,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "description": "Number of query executions",
       "fieldConfig": {
@@ -274,7 +274,7 @@
       "targets": [
         {
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -336,7 +336,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "description": "Time spent running on all the CPUs across the workspace reported by database",
           "fieldConfig": {
@@ -424,7 +424,7 @@
           "targets": [
             {
               "datasource": {
-                "uid": "monitoring"
+                "uid": "s2monitoring"
               },
               "editorMode": "code",
               "format": "time_series",
@@ -476,7 +476,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "description": "",
           "fieldConfig": {
@@ -564,7 +564,7 @@
           "targets": [
             {
               "datasource": {
-                "uid": "monitoring"
+                "uid": "s2monitoring"
               },
               "editorMode": "code",
               "format": "time_series",
@@ -616,7 +616,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "description": "",
           "fieldConfig": {
@@ -704,7 +704,7 @@
           "targets": [
             {
               "datasource": {
-                "uid": "monitoring"
+                "uid": "s2monitoring"
               },
               "editorMode": "code",
               "format": "time_series",
@@ -756,7 +756,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "description": "",
           "fieldConfig": {
@@ -844,7 +844,7 @@
           "targets": [
             {
               "datasource": {
-                "uid": "monitoring"
+                "uid": "s2monitoring"
               },
               "editorMode": "code",
               "format": "time_series",
@@ -913,7 +913,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "description": "Elapsed Time - Wall clock milliseconds elapsed during execution;                          CPU Time - Milliseconds spent running on all the CPUs across the workspace. This is likely to exceed the observed elapsed time because the tasks are likely to have executed concurrently",
       "fieldConfig": {
@@ -1264,7 +1264,7 @@
       "targets": [
         {
           "datasource": {
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -1424,7 +1424,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "select distinct(cluster) from `act_samples` where $__timeFilter(ts)",
         "includeAll": false,
@@ -1446,7 +1446,7 @@
           ]
         },
         "datasource": {
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "select distinct(ifnull(database_name,'-')) from `act_samples` where (cluster = '$cluster') and $__timeFilter(ts)",
         "includeAll": true,
@@ -1573,7 +1573,7 @@
           "value": ""
         },
         "datasource": {
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "select case when '$hidden_activity_name' = 'All' then 'All' else query_text end \nfrom `mv_queries`  \nwhere  (cluster = '$cluster') and \nactivity_name in ('$hidden_activity_name')",
         "hide": 2,

@@ -68,7 +68,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -190,7 +190,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -243,7 +243,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -333,7 +333,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -385,7 +385,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -475,7 +475,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -540,7 +540,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "description": "Number of open connections (threads_connected) to the database relative to the maximum limit (max_connections). If the utilization is near 100%, it means DB is approaching the maximum allowed connections; this can potentially lead to performance issues, as queries may need to wait in a queue until a thread becomes available to process them.",
       "fieldConfig": {
@@ -663,7 +663,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -716,7 +716,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "description": "Number of threads actively running queries (threads_running) relative to the maximum limit (max_connection_threads). If the utilization is near 100%, it suggests that the system might be reaching its capacity in terms of how many queries can be executed in parallel. This situation can lead to resource pressure, unresponsiveness, latency spikes, and even failures",
       "fieldConfig": {
@@ -839,7 +839,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -905,7 +905,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -994,7 +994,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -1049,7 +1049,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -1138,7 +1138,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -1193,7 +1193,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -1277,7 +1277,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -1332,7 +1332,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "description": "Changes in the pattern of execution time per write query from the historical norm may indicate an issue with your application or changes in your workload.",
       "fieldConfig": {
@@ -1418,7 +1418,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -1473,7 +1473,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -1557,7 +1557,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -1612,7 +1612,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -1696,7 +1696,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -1751,7 +1751,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -1835,7 +1835,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -1890,7 +1890,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "description": "Changes in the pattern of execution time per read query from the historical norm may indicate an issue with your application or changes in your workload.",
       "fieldConfig": {
@@ -1976,7 +1976,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -2031,7 +2031,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -2115,7 +2115,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -2170,7 +2170,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -2254,7 +2254,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -2321,7 +2321,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "",
         "includeAll": false,
@@ -2340,7 +2340,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "select distinct(database_name) from act_samples where $__timeFilter(ts) and (cluster = '$cluster')",
         "hide": 2,
@@ -2362,7 +2362,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "",
         "includeAll": true,
@@ -2382,7 +2382,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "select distinct(port) from metrics where host is not NULL and $__unixEpochFilter(time_sec) and (cluster='$cluster') and (host in ($host) or concat($host) = '%') and port is not null",
         "includeAll": true,

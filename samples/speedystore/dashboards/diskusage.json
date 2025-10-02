@@ -30,7 +30,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -120,7 +120,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -172,7 +172,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "fieldConfig": {
         "defaults": {
@@ -313,7 +313,7 @@
           "alias": "",
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -361,7 +361,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -394,7 +394,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "description": "Breaksdown consumption of disk by \"Data\" category (in the left graph), adding utilization across all components will be equal to disk utilized by \"Data\"",
       "fieldConfig": {
@@ -535,7 +535,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -568,7 +568,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "description": "Breaksdown consumption of disk by databases, adding utilization across all databases will be equal to disk utilized by \"Data\"",
       "fieldConfig": {
@@ -709,7 +709,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -750,7 +750,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "description": "It provides insights into the performance of your SingleStoreDB's blob cache activity. By understanding and monitoring the rate at which the blob cache is downloading files from remote storage, you can identify potential performance bottlenecks or issues related to blob cache activity. \nFor instance: if you observe high download rates given the size of your database and scale of your hardware, you might consider increasing the local cache size.\nBy keeping an eye on this metric, you can make well-informed decisions regarding your cluster's performance and resource allocation to ensure optimal system operation.",
       "fieldConfig": {
@@ -891,7 +891,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -932,7 +932,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "monitoring"
+        "uid": "s2monitoring"
       },
       "description": "It provides insights into the performance of your SingleStoreDB's blob cache activity. By tracking this metric, you can optimize system resource utilization based on your data management needs. If evictions occur at a high rate, it may indicate that the cache size is too small or that the workload is causing a lot of cache turnover. In such cases, you can take appropriate measures, such as adjusting cache size or reviewing data access patterns, to improve overall cluster performance.\nMonitoring this metric, helps you identify potential performance bottlenecks related to the blob cache and make well-informed decisions for optimizing your SingleStore cluster's performance.",
       "fieldConfig": {
@@ -1073,7 +1073,7 @@
         {
           "datasource": {
             "type": "mysql",
-            "uid": "monitoring"
+            "uid": "s2monitoring"
           },
           "editorMode": "code",
           "format": "table",
@@ -1125,7 +1125,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "",
         "includeAll": false,
@@ -1143,7 +1143,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "select distinct(host) from metrics where cluster = '$cluster' and $__unixEpochFilter(time_sec) and host is not NULL and host != \"\"",
         "includeAll": false,
@@ -1161,7 +1161,7 @@
         },
         "datasource": {
           "type": "mysql",
-          "uid": "monitoring"
+          "uid": "s2monitoring"
         },
         "definition": "",
         "hide": 2,
