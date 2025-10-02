@@ -711,7 +711,7 @@
     ]
   },
   "timezone": "",
-  "title": "Resource Pool Monitoring",
+  "title": "SingleStore: Resource Pool Monitoring",
   "uid": "b706aab4-2dc9-41f0-89c1-2418f8da5005",
   "version": 1
 }

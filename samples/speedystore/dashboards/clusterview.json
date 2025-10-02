@@ -2443,7 +2443,7 @@
     ]
   },
   "timezone": "",
-  "title": "Cluster View",
+  "title": "SingleStore: Cluster View",
   "uid": "detailed-cluster-view2",
   "version": 1
 }

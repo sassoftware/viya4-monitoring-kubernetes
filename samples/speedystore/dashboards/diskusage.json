@@ -1248,7 +1248,7 @@
     "refresh_intervals": []
   },
   "timezone": "",
-  "title": "Disk Usage",
+  "title": "SingleStore: Disk Usage",
   "uid": "ccd894b4-7e3b-43e0-966b-579ac7eb3714",
   "version": 1
 }

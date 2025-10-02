@@ -613,7 +613,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Pipeline Summary",
+  "title": "SingleStore: Pipeline Summary",
   "uid": "pipeline-summary",
   "version": 1
 }

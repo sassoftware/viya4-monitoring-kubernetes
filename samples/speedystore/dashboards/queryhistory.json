@@ -388,7 +388,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Query History",
+  "title": "SingleStore: Query History",
   "uid": "efacc80e-2e33-4bfb-99fe-223b45e4197a",
   "version": 1
 }

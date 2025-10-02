@@ -1502,7 +1502,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Pipeline Performance",
+  "title": "SingleStore: Pipeline Performance",
   "uid": "pipeline-performance",
   "version": 1
 }

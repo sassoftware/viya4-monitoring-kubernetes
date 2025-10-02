@@ -804,7 +804,7 @@
     "refresh_intervals": []
   },
   "timezone": "",
-  "title": "Memory Usage",
+  "title": "SingleStore: Memory Usage",
   "uid": "memory-usage",
   "version": 1
 }
