@@ -151,11 +151,11 @@ To import the SingleStore dashboards into Grafana, you can use the `deploy_dashb
 
 You can use the following command to import all of the SingleStore dashboards:
 
-`./monitoring/bin/deploy_dashboards.sh samples/speedy/dashboards`
+`./monitoring/bin/deploy_dashboards.sh samples/speedystore/dashboards`
 
 Or, you can import specific dashboards individually using the same script.  For example, following command imports the ***Cluster View*** dashboard into Grafana:
 
-`./monitoring/bin/deploy_dashboards.sh samples/speedy/dashboards/clusterview.yaml`
+`./monitoring/bin/deploy_dashboards.sh samples/speedystore/dashboards/clusterview.yaml`
 
 ### Validate
 Once the dashboards have been imported into Grafana, you should  be ready to monitor the SingleStore instance embedded in SAS SpeedyStore.
