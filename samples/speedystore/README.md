@@ -137,13 +137,15 @@ Copy the file to some location, update the necessary information and save your c
 
 Then submit the following command to create the datasource:
 
-`kubectl -n $VIYA_NS create secret generic grafana-metrics-connection --from-file=$USER_DIR/monitoring/speedystore-datasource.yaml`
+`kubectl -n monitoring create secret generic grafana-metrics-connection --from-file=$USER_DIR/monitoring/speedystore-datasource.yaml`
+
+NOTE: This command assumes the metric monitoring components (including Grafana) have been deployed into the `monitoring` namespace.  If they are deployed in a different namespace, update the command to reference to correct namespace.
 
 After secret has been created, you need to apply a specific label to the secret to trigger the automatic provisioning (Ioading) of the datasource into Grafana.
 
 You can use the following command to apply the necessary label:
 
-`kubectl -n $VIYA_NS label secret grafana-metrics-connection "grafana_datasource=1"`
+`kubectl -n monitoring label secret grafana-metrics-connection "grafana_datasource=1"`
 
 
 ### Import the SingleStore Dashboards into Grafana
