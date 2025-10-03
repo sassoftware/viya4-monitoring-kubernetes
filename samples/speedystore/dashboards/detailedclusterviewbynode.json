@@ -1,0 +1,2483 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "limit": 100,
+        "name": "Annotations & Alerts",
+        "showIn": 0,
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": 262,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Documentation",
+      "tooltip": "",
+      "type": "link",
+      "url": "https://docs.singlestore.com/db/v8.1/en/user-and-cluster-administration/cluster-health-and-performance/configure-monitoring/view-the-dashboards.html#cluster-view-793226"
+    },
+    {
+      "asDropdown": true,
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 47,
+      "panels": [],
+      "title": "Resource Utilization",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "CPU",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max single-core load"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "min single-core load"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 1
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t1 AS (WITH t AS (\n    SELECT *, lag(value) OVER w value_l, lag(time_sec) OVER w time_sec_l\n    FROM\n        (SELECT\n-- take the last datapoint in the interval\ntime_sec as time_sec,\nmemsql_sysinfo_cpu_used_ms/memsql_sysinfo_cpu_num_cpus value,\nhost\n         FROM\n             (SELECT\n             max(time_sec) time_sec,\n             -- this is the last counter in the time group\n             max(intval) as value,\n             name as metric,\n             trim_host(host) host,\n             $__unixEpochGroup(time_sec, $interval) as tg\n             FROM metrics\n             WHERE\n             (cluster = '$cluster')\n             and (host in ($host) or concat($host) = '%')\n             and (extractor = 'memsql')\n             and (subsystem = 'sysinfo')\n             and (name = 'memsql_sysinfo_cpu_used_ms' or name = 'memsql_sysinfo_cpu_num_cpus')\n             and $__unixEpochFilter(time_sec)\n             group by metric, host, tg\n             ) as pvt_data\n             PIVOT\n             (\n                AVG(value)\n                FOR metric\n                IN ('memsql_sysinfo_cpu_used_ms', 'memsql_sysinfo_cpu_num_cpus')\n             ) as pvt_table\n        ) X\n        WINDOW w AS (partition by host order by time_sec desc)\n)\nselect a.time_sec, (value - value_l)/(1000*(time_sec - time_sec_l)) * 100 value, a.host from t a\nWHERE time_sec_l is not null and value_l is not null\norder by 1, 2 desc, 3)\nSELECT time_sec, host, max(value) 'CPU:' from t1\ngroup by time_sec, host\norder by time_sec, host\n",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "CPU Utilization per Host",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Memory",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 1
+      },
+      "id": 22,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select * from (\nselect time_sec,\nhost,\nmemsql_sysinfo_mem_used_b / memsql_sysinfo_mem_total_b as 'Memory:'\nFROM\n(SELECT\n  max(time_sec) time_sec,\n  avg(value) value,\n  metric,\n  host\n  FROM\n  (SELECT\n    time_sec,\n    $__unixEpochGroup(time_sec,$interval) tg,\n    intval as value,\n    name as metric,\n    trim_host(host) as host\n    FROM metrics\n    WHERE cluster='$cluster'\n    and (host in ($host) or concat($host) = '%')\n    and extractor = 'memsql'\n    and subsystem = 'sysinfo'\n    and name in ('memsql_sysinfo_mem_used_b','memsql_sysinfo_mem_total_b')\n    and $__unixEpochFilter(time_sec)\n  ) X\n  GROUP BY tg, metric, host\n) as pvt_data\nPIVOT (\n        AVG(value) \n        FOR metric \n        IN ('memsql_sysinfo_mem_used_b','memsql_sysinfo_mem_total_b')\n) as pvt_table) a\norder by time_sec",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Memory Utilization per Host",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Disk Utilization",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 1
+      },
+      "id": 58,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select * from (\nselect time_sec,\nhost,\nmemsql_sysinfo_disk_used_b / memsql_sysinfo_disk_total_b as 'Disk:'\nFROM\n(SELECT\n  max(time_sec) time_sec,\n  avg(value) value,\n  metric,\n  host\n  FROM\n  (SELECT\n    time_sec,\n    $__unixEpochGroup(time_sec,$interval) tg,\n    intval as value,\n    name as metric,\n    trim_host(host) as host\n    FROM metrics\n    WHERE cluster='$cluster'\n    and (host in ($host) or concat($host) = '%')\n    and extractor = 'memsql'\n    and subsystem = 'sysinfo'\n    and name in ('memsql_sysinfo_disk_used_b','memsql_sysinfo_disk_total_b')\n    and $__unixEpochFilter(time_sec)\n  ) X\n  GROUP BY tg, metric, host\n) as pvt_data\nPIVOT (\n        AVG(value) \n        FOR metric \n        IN ('memsql_sysinfo_disk_used_b','memsql_sysinfo_disk_total_b')\n) as pvt_table) a\norder by time_sec",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Disk Utilization per Host",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 46,
+      "panels": [],
+      "title": "Connections & Threads",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "description": "Number of open connections (threads_connected) to the database relative to the maximum limit (max_connections). If the utilization is near 100%, it means DB is approaching the maximum allowed connections; this can potentially lead to performance issues, as queries may need to wait in a queue until a thread becomes available to process them.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Threads - Connected",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max single-core load"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "min single-core load"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 10
+      },
+      "id": 55,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select tg as time,\n       concat(host,':',port,' {',role,'}') as node,\n        max(used_c / total_C) * 100 as 'Threads - Connected:'\nfrom (SELECT time_sec as time, \n             $__unixEpochGroup(time_sec, $interval) as tg, \n             sum(case when name = 'memsql_variables_max_connections' then value else 0 end) as total_c,\n             sum(case when name = 'memsql_status_threads_connected' then value else 0 end) as used_c,\n             host, port, role\n     FROM metrics\n     WHERE $__unixEpochFilter(time_sec) AND\n           (cluster = '$cluster') AND\n           (host in ($host) or concat($host) = '%') AND\n           (port in ($port) or concat($port) = '%') AND\n           NAME in ('memsql_variables_max_connections','memsql_status_threads_connected') \n     group by time, tg, host, port, role)\ngroup by tg, node\norder by tg, node;",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Threads - Connected",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "description": "Number of threads actively running queries (threads_running) relative to the maximum limit (max_connection_threads). If the utilization is near 100%, it suggests that the system might be reaching its capacity in terms of how many queries can be executed in parallel. This situation can lead to resource pressure, unresponsiveness, latency spikes, and even failures",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Threads - Running",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max single-core load"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "min single-core load"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      },
+      "id": 56,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select tg as time,\n       concat(host,':',port,' {',role,'}') as node,\n       max(used_c / total_C) * 100 as 'Threads - Running:' \nfrom (SELECT time_sec as time, \n             $__unixEpochGroup(time_sec, $interval) as tg, \n             sum(case when name = 'memsql_variables_max_connection_threads' then value else 0 end) as total_c,\n             sum(case when name = 'memsql_status_threads_running' then value else 0 end) as used_c,\n             host, port, role\n     FROM metrics\n     WHERE $__unixEpochFilter(time_sec) AND\n           (cluster = '$cluster') AND\n           (host in ($host) or concat($host) = '%') AND\n           (port in ($port) or concat($port) = '%') AND\n           NAME in ('memsql_variables_max_connection_threads','memsql_status_threads_running') \n     group by time, tg, host, port, role)\ngroup by tg, node\norder by tg, node;",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Threads - Running",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "id": 45,
+      "panels": [],
+      "title": "Throughput",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "wps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 19
+      },
+      "id": 36,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\n  SELECT \n    *, \n    lag(value) OVER w value_l, \n    lag(time_sec) OVER w time_sec_l \n  FROM \n    (\n      SELECT \n        max(time_sec) as time_sec, \n        avg(value) as value, \n        host , port, name, role\n      FROM \n        (\n          SELECT \n            time_sec, \n            $__unixEpochGroup(time_sec, $interval) as tg, \n            intval as value, \n            host , port, name, role\n          FROM \n            `metrics` \n          WHERE \n            $__unixEpochFilter(time_sec) \n            and (cluster = '$cluster') \n            and (host in ($host) or concat($host) = '%')\n            and (port in ($port) or concat($port) = '%')\n            and extractor = 'memsql' \n            and subsystem = 'status' \n            and name like 'memsql_status_%_write_queries'\n            and role <> 'LEAF') subq \n      GROUP BY \n        host, port, name, role,\n        tg\n    ) X WINDOW w AS (\n      partition by host, port , name\n      order by \n        time_sec\n    )\n) \nSELECT \n  time_sec, \n  concat(host,':',port,' {',role,'}') as node,\n  sum((value - value_l)/(time_sec - time_sec_l)) as 'Write queries per second:'\nFROM \n  t a \nwhere \n  time_sec_l is not null \n  and value_l is not null \n and value >= value_l \ngroup by\n  1,2\norder by \n  1,2",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "CPU_TIME_MS"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "act_samples",
+          "timeColumn": "ts",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Write Queries per Second",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "wps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 19
+      },
+      "id": 34,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\n  SELECT \n    *, \n    lag(value) OVER w value_l, \n    lag(time_sec) OVER w time_sec_l \n  FROM \n    (\n      SELECT \n        max(time_sec) as time_sec, \n        max(value) as value, \n        host, port, role\n      FROM \n        (\n          SELECT \n            time_sec, \n            $__unixEpochGroup(time_sec, $interval) as tg, \n            intval as value, \n            host, port , role\n          FROM \n            `metrics` \n          WHERE \n            $__unixEpochFilter(time_sec) \n            and (cluster = '$cluster') \n            and (host in ($host) or concat($host) = '%')\n            and (port in ($port) or concat($port) = '%')\n            and extractor = 'memsql' \n            and subsystem = 'status' \n            and name = 'memsql_status_rows_affected_by_writes'\n            and role <> 'LEAF') subq \n      GROUP BY \n        host, port, role,\n        tg\n    ) X WINDOW w AS (\n      partition by host, port \n      order by \n        time_sec\n    )\n) \nSELECT \n  time_sec, \n  concat(host,':',port,' {',role,'}') as node,\n  sum((value - value_l)/(time_sec - time_sec_l)) as 'Rows written per second:'\nFROM \n  t a \nwhere \n  time_sec_l is not null \n  and value_l is not null \n and value >= value_l \ngroup by 1,2\norder by \n  1,2",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "CPU_TIME_MS"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "act_samples",
+          "timeColumn": "ts",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Rows Written per Second",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "wps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 27
+      },
+      "id": 43,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\n  SELECT \n    *, \n    lag(value) OVER w value_l, \n    lag(time_sec) OVER w time_sec_l \n  FROM \n    (\n      SELECT \n        max(time_sec) as time_sec, \n        avg(value) as value, \n        host , port, role\n      FROM \n        (\n          SELECT \n            time_sec, \n            $__unixEpochGroup(time_sec, $interval) as tg, \n            intval as value, \n            host , port, role\n          FROM \n            `metrics` \n          WHERE \n            $__unixEpochFilter(time_sec) \n            and (cluster = '$cluster') \n            and (host in ($host) or concat($host) = '%')\n            and (port in ($port) or concat($port) = '%')\n            and extractor = 'memsql' \n            and subsystem = 'status' \n            and name like 'memsql_status_failed_write_queries'\n            and role <> 'LEAF') subq \n      GROUP BY \n        host, port, role,\n        tg\n    ) X WINDOW w AS (\n      partition by host, port \n      order by \n        time_sec\n    )\n) \nSELECT \n  time_sec, \n  concat(host,':',port,' {',role,'}') as node,\n  sum((value - value_l)/(time_sec - time_sec_l)) as 'Failed Write queries per second:'\nFROM \n  t a \nwhere \n  time_sec_l is not null \n  and value_l is not null \n and value >= value_l \ngroup by\n  1,2\norder by \n  1,2",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "CPU_TIME_MS"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "act_samples",
+          "timeColumn": "ts",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Failed Write Queries per Second",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "description": "Changes in the pattern of execution time per write query from the historical norm may indicate an issue with your application or changes in your workload.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 27
+      },
+      "id": 53,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\n            SELECT \n                *, \n                lag(value) OVER w value_l, \n                lag(time) OVER w time_l\n            from (\n                  select max(tg) as time,\n                         max(value) as value,\n                         host,port, name, role\n                  from (\n                        SELECT  time_sec,\n                                $__unixEpochGroup(time_sec, $interval) as tg, \n                                host,\n                                port,role,\n                                name,\n                                value\n                        FROM metrics\n                        WHERE $__unixEpochFilter(time_sec) AND\n                              cluster = '$cluster' AND\n                              (host in ($host) or concat($host) = '%') AND\n                              (port in ($port) or concat($port) = '%') AND\n                              role <> 'LEAF' AND\n                              name in ('memsql_status_failed_write_queries','memsql_status_successful_write_queries','memsql_status_execution_time_of_write')\n                        )\n                  group by name, host, port, role, tg) X \n            WINDOW w AS (partition by host,port,name order by time))\nselect time, \n       concat(host,':',port,' {',role,'}') as node,\n       sum(case when name = 'memsql_status_execution_time_of_write' then (value - value_l) end) /\n       sum(case when name in ('memsql_status_failed_write_queries','memsql_status_successful_write_queries') then (value - value_l) end) as 'Execution Time per Write Query:'\nfrom t\nwhere time_l is not null \n  and value_l is not null \n  and value >= value_l\ngroup by time, node\norder by time, node",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "CPU_TIME_MS"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "act_samples",
+          "timeColumn": "ts",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Execution Time per Write Query",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "rps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 35
+      },
+      "id": 33,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\n  SELECT \n    *, \n    lag(value) OVER w value_l, \n    lag(time_sec) OVER w time_sec_l \n  FROM \n    (\n      SELECT \n        max(time_sec) as time_sec, \n        avg(value) as value, \n        host , port, name, role\n      FROM \n        (\n          SELECT \n            time_sec, \n            $__unixEpochGroup(time_sec, $interval) as tg, \n            intval as value, \n            host , port, name, role\n          FROM \n            `metrics` \n          WHERE \n            $__unixEpochFilter(time_sec) \n            and (cluster = '$cluster') \n            and (host in ($host) or concat($host) = '%')\n            and (port in ($port) or concat($port) = '%')\n            and extractor = 'memsql' \n            and subsystem = 'status' \n            and name like 'memsql_status_%_read_queries'\n            and role <> 'LEAF') subq \n      GROUP BY \n        host, port, name, role,\n        tg\n    ) X WINDOW w AS (\n      partition by host, port , name\n      order by \n        time_sec\n    )\n) \nSELECT \n  time_sec, concat(host,':',port,' {',role,'}') as node,\n  sum((value - value_l)/(time_sec - time_sec_l)) as 'Read queries per second:'\nFROM \n  t a \nwhere \n  time_sec_l is not null \n  and value_l is not null \n and value >= value_l \ngroup by\n  1,2\norder by \n  1,2",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "CPU_TIME_MS"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "act_samples",
+          "timeColumn": "ts",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Read Queries per Second",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "rps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 35
+      },
+      "id": 35,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\n    SELECT\n        *,\n        lag(value) OVER w value_l,\n            lag(time_sec) OVER w time_sec_l\n    FROM\n        (\n            SELECT\n                max(time_sec) as time_sec,\n                max(value) as value, \n        host, port, role\n            FROM\n                (\n                SELECT\n                time_sec,\n                $__unixEpochGroup(time_sec, $interval) as tg,\n                intval as value,\n                host, port, role\n                FROM\n                `metrics`\n                WHERE\n                $__unixEpochFilter(time_sec)\n                and (cluster = '$cluster')\n                and (host in ($host) or concat($host) = '%')\n                and (port in ($port) or concat($port) = '%')\n                and extractor = 'memsql'\n                and subsystem = 'status'\n                and name = 'memsql_status_rows_returned_by_reads'\n                and role <> 'LEAF') subq\n            GROUP BY\n                host, port, role,\n                tg\n        ) X WINDOW w AS (\n        partition by host, port\n        order by\n            time_sec\n        )\n)\nSELECT\n    time_sec,\n    concat(host,':',port,' {',role,'}') as node,\n    sum((value - value_l)/(time_sec - time_sec_l)) as 'Rows Read per second:'\nFROM\n    t a\nwhere\n    time_sec_l is not null\n  and value_l is not null\n  and value >= value_l\ngroup by 1,2\norder by\n    1,2",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "CPU_TIME_MS"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "act_samples",
+          "timeColumn": "ts",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Rows Read per Second",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "rps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 43
+      },
+      "id": 44,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\n  SELECT \n    *, \n    lag(value) OVER w value_l, \n    lag(time_sec) OVER w time_sec_l \n  FROM \n    (\n      SELECT \n        max(time_sec) as time_sec, \n        avg(value) as value, \n        host , port, role\n      FROM \n        (\n          SELECT \n            time_sec, \n            $__unixEpochGroup(time_sec, $interval) as tg, \n            intval as value, \n            host , port, role\n          FROM \n            `metrics` \n          WHERE \n            $__unixEpochFilter(time_sec) \n            and (cluster = '$cluster') \n            and (host in ($host) or concat($host) = '%')\n            and (port in ($port) or concat($port) = '%')\n            and extractor = 'memsql' \n            and subsystem = 'status' \n            and name like 'memsql_status_failed_read_queries'\n            and role <> 'LEAF') subq \n      GROUP BY \n        host, port, role,\n        tg\n    ) X WINDOW w AS (\n      partition by host, port \n      order by \n        time_sec\n    )\n) \nSELECT \n  time_sec, concat(host,':',port,' {',role,'}') as node,\n  sum((value - value_l)/(time_sec - time_sec_l)) as 'Failed Read queries per second:'\nFROM \n  t a \nwhere \n  time_sec_l is not null \n  and value_l is not null \n and value >= value_l \ngroup by\n  1,2\norder by \n  1,2",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "CPU_TIME_MS"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "act_samples",
+          "timeColumn": "ts",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Failed Read Queries per Second",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "description": "Changes in the pattern of execution time per read query from the historical norm may indicate an issue with your application or changes in your workload.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 43
+      },
+      "id": 54,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\n            SELECT \n                *, \n                lag(value) OVER w value_l, \n                lag(time) OVER w time_l\n            from (\n                  select max(tg) as time,\n                         max(value) as value,\n                         host,port, name, role\n                  from (\n                        SELECT  time_sec,\n                                $__unixEpochGroup(time_sec, $interval) as tg, \n                                host,\n                                port, role,\n                                name,\n                                value\n                        FROM metrics\n                        WHERE $__unixEpochFilter(time_sec) AND\n                              cluster = '$cluster' AND\n                              (host in ($host) or concat($host) = '%') AND\n                              (port in ($port) or concat($port) = '%') AND\n                              role <> 'LEAF' AND\n                              name in ('memsql_status_failed_read_queries','memsql_status_successful_read_queries','memsql_status_execution_time_of_reads')\n                        )\n                  group by name, host, port,role, tg) X \n            WINDOW w AS (partition by host,port,name order by time))\nselect time, \n       concat(host,':',port,' {',role,'}') as node,\n       sum(case when name = 'memsql_status_execution_time_of_reads' then (value - value_l) end) /\n       sum(case when name in ('memsql_status_failed_read_queries','memsql_status_successful_read_queries') then (value - value_l) end) as 'Execution Time per read Query:'\nfrom t\nwhere time_l is not null \n  and value_l is not null \n  and value >= value_l\ngroup by time, node\norder by time, node",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "CPU_TIME_MS"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "act_samples",
+          "timeColumn": "ts",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Execution Time per Read Query",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 51
+      },
+      "id": 39,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\nSELECT *, lag(value) OVER w value_l, lag(time_sec) OVER w time_sec_l\nFROM \n(SELECT\n  max(time_sec) time_sec,\n  $__unixEpochGroup(time_sec,$interval) tg,\n  avg(intval) as value,\n  trim_metric(name, 'memsql_status_bytes_') as metric,\n  trim_host(host) host,\n  port, role\nFROM metrics\nWHERE (cluster = '$cluster')\nand (extractor = 'memsql')\nand (subsystem = 'status')\nand name in ('memsql_status_bytes_received')\nand (host in ($host) or concat($host) = '%')\nand (port in ($port) or concat($port) = '%')\nand $__unixEpochFilter(time_sec)\nGROUP BY metric, host, port, role, tg\n) X\nWINDOW w AS (partition by metric, host, port order by time_sec desc)\n)\nselect time_sec, concat(host,':',port,' {',role,'}') as node, sum((value - value_l)/(time_sec - time_sec_l)) 'Network Received bytes:'\nfrom t a\nwhere time_sec_l is not null and value_l is not null\ngroup by 1,2\norder by 1,2",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "CPU_TIME_MS"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "act_samples",
+          "timeColumn": "ts",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Network Received Bytes",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "s2monitoring"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 51
+      },
+      "id": 40,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "mysql",
+            "uid": "s2monitoring"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "WITH t AS (\nSELECT *, lag(value) OVER w value_l, lag(time_sec) OVER w time_sec_l\nFROM \n(SELECT\n  max(time_sec) time_sec,\n  $__unixEpochGroup(time_sec,$interval) tg,\n  avg(intval) as value,\n  trim_metric(name, 'memsql_status_bytes_') as metric,\n  trim_host(host) host,\n  port, role\nFROM metrics\nWHERE (cluster = '$cluster')\nand (extractor = 'memsql')\nand (subsystem = 'status')\nand name in ('memsql_status_bytes_sent')\nand (host in ($host) or concat($host) = '%')\nand (port in ($port) or concat($port) = '%')\nand $__unixEpochFilter(time_sec)\nGROUP BY metric, host, port, role, tg\n) X\nWINDOW w AS (partition by metric, host, port order by time_sec desc)\n)\nselect time_sec, concat(host,':',port,' {',role,'}') as node, sum((value - value_l)/(time_sec - time_sec_l)) 'Network Sent bytes:' \nfrom t a\nwhere time_sec_l is not null and value_l is not null\ngroup by 1,2\norder by 1,2",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "CPU_TIME_MS"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "act_samples",
+          "timeColumn": "ts",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Network Sent Bytes",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": ["singlestore","sas-speedystore"],
+  "templating": {
+    "list": [
+      {
+        "allValue": "'%'",
+        "current": {
+          "text": "memsql_cluster",
+          "value": "memsql_cluster"
+        },
+        "datasource": {
+          "type": "mysql",
+          "uid": "s2monitoring"
+        },
+        "definition": "",
+        "includeAll": false,
+        "name": "cluster",
+        "options": [],
+        "query": "select distinct(cluster) from metrics where $__unixEpochFilter(time_sec)",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allValue": "'%'",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "mysql",
+          "uid": "s2monitoring"
+        },
+        "definition": "select distinct(database_name) from act_samples where $__timeFilter(ts) and (cluster = '$cluster')",
+        "hide": 2,
+        "includeAll": true,
+        "multi": true,
+        "name": "database_name",
+        "options": [],
+        "query": "select distinct(database_name) from act_samples where $__timeFilter(ts) and (cluster = '$cluster')",
+        "refresh": 2,
+        "regex": "",
+        "sort": 5,
+        "type": "query"
+      },
+      {
+        "allValue": "'%'",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "mysql",
+          "uid": "s2monitoring"
+        },
+        "definition": "",
+        "includeAll": true,
+        "multi": true,
+        "name": "host",
+        "options": [],
+        "query": "select distinct(host) from metrics where host is not NULL and $__unixEpochFilter(time_sec) and (cluster='$cluster')",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allValue": "'%'",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "mysql",
+          "uid": "s2monitoring"
+        },
+        "definition": "select distinct(port) from metrics where host is not NULL and $__unixEpochFilter(time_sec) and (cluster='$cluster') and (host in ($host) or concat($host) = '%') and port is not null",
+        "includeAll": true,
+        "multi": true,
+        "name": "port",
+        "options": [],
+        "query": "select distinct(port) from metrics where host is not NULL and $__unixEpochFilter(time_sec) and (cluster='$cluster') and (host in ($host) or concat($host) = '%') and port is not null",
+        "refresh": 1,
+        "regex": "",
+        "sort": 3,
+        "type": "query"
+      },
+      {
+        "auto": true,
+        "auto_count": 50,
+        "auto_min": "1m",
+        "current": {
+          "text": "$__auto",
+          "value": "$__auto"
+        },
+        "name": "interval",
+        "options": [
+          {
+            "selected": false,
+            "text": "1m",
+            "value": "1m"
+          },
+          {
+            "selected": false,
+            "text": "10m",
+            "value": "10m"
+          },
+          {
+            "selected": false,
+            "text": "30m",
+            "value": "30m"
+          },
+          {
+            "selected": false,
+            "text": "1h",
+            "value": "1h"
+          },
+          {
+            "selected": false,
+            "text": "6h",
+            "value": "6h"
+          },
+          {
+            "selected": false,
+            "text": "12h",
+            "value": "12h"
+          },
+          {
+            "selected": false,
+            "text": "1d",
+            "value": "1d"
+          },
+          {
+            "selected": false,
+            "text": "7d",
+            "value": "7d"
+          },
+          {
+            "selected": false,
+            "text": "14d",
+            "value": "14d"
+          },
+          {
+            "selected": false,
+            "text": "30d",
+            "value": "30d"
+          }
+        ],
+        "query": "1m,10m,30m,1h,6h,12h,1d,7d,14d,30d",
+        "refresh": 2,
+        "type": "interval"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "SingleStore: Detailed Cluster View By Node",
+  "uid": "TVggJLbVk",
+  "version": 1
+}
