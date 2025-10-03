@@ -5,10 +5,10 @@ prune: true
 datasources:
   - name: s2monitoring
     type: mysql
-    url: svc-sas-singlestore-cluster-ddl.VIYA_NS.svc.cluster.local:3306
+    url: svc-sas-singlestore-cluster-ddl.{**Replace with SAS VIYA Namespace**}.svc.cluster.local:3306
     database: metrics
     user: S2MonitorUser
     secureJsonData:
-      password: {Monitoring_User_Password}
+      password: {**Replace with S2MonitorUser Password**}
     isDefault: false
     version: 1

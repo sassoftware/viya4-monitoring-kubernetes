@@ -15,6 +15,7 @@ The diagram below, taken from the [SingleStore documentation](https://docs.singl
 ![Overview of SingleStore Monitoring Process ](images/cluster_monitoring_hl_architecture-mfjdOm.webp)
 
 ### Overview of Process
+* Prerequisites and Set-Up
 * Configure SingleStore
   * Create the SingleStore pipeline and metrics database
   * Create the "S2MonitorUser" user
@@ -22,17 +23,20 @@ The diagram below, taken from the [SingleStore documentation](https://docs.singl
   * Create the datasource
   * Import the SingleStore dashboards
 
-### Create the SingleStore pipeline and metrics database
+### Prerequisites and Set-Up
+#### Prerequisites
+* SingleStore Toolbox
 
-The SingleStore Toolbox is used to deploy, administer, and manage a SingleStore cluster. The `sdb-admin start-monitoring-kube` command is used to configure and start the monitoring. It has a number of flags to control its operations.  See the [SingleStore documentation](https://docs.singlestore.com/db/v8.9/reference/singlestore-tools-reference/sdb-admin-commands/start-monitoring-kube/) for more information.
+You will need to use the SingleStore Toolbox package to deploy, administer, and manage a SingleStore cluster. [Installation instructions for SingleStore Toolbox](https://docs.singlestore.com/db/v8.9/user-and-cluster-administration/cluster-management-with-tools/singlestore-tools-installation/singlestore-toolbox-installation/) are available on the SingleStore website.
 
->**NOTE: The SingleStore Toolbox must be installed on a host that can access the SingleStore cluster pods using the internal cluster hostnames and IP addresses.  This can be a jump box (bastion) host or, if necessary, one of the Kubernetes cluster nodes.  In addition to the SingleStore Toolbox, you must be able to submit `kubectl` commands from this host as well.**
+* SingleStore CLI or SingleStore Studio
 
-To configure and start the monitoring, including the metrics database, the following command will (eventually) be submitted:
+You will need to use submit database commands via the SingleStore CLI to create a database user and grant them the appropriate permissions.  [Installation instructions for SingleStore CLI](https://docs.singlestore.com/db/v8.9/user-and-cluster-administration/cluster-management-with-tools/singlestore-tools-installation/singlestore-client-installation/) are available on the SingleStore website.
 
-`sdb-admin start-monitoring-kube --cluster-name sas-singlestore-cluster --namespace $VIYA_NS --user root --password $ROOT_PWD --exporter-host $CLUSTER_MASTER_IP`
+Or, alternatively, you can submit the necessary commands via the SingleStore Studio SQL Editor panel.
+* `kubectl`
 
-But, before submitting the command, the various parameters being passed to the command and how to determine their proper values will be reviewed.
+You will need to use `kubectl` commands to obtain information about the your SAS Viya and SingleStore deployments.
 
 #### Set the VIYA_NS environent variable
 
@@ -40,7 +44,18 @@ Since you will need to refer repeatedly to the namespace in which SAS Viya (and 
 
 In the following command, the `VIYA_NS` environment variable is defined and assigned the value identifying the namespace containing our SAS Viya deployment (i.e. ***myviya*** ):
 
- `export VIYA_NS=myviya`
+ `VIYA_NS=myviya`
+
+### Configure SingleStore
+#### Create the SingleStore pipeline and metrics database
+The `sdb-admin start-monitoring-kube` command is used to configure and start the monitoring. It has a number of flags to control its operations.  See the [SingleStore documentation](https://docs.singlestore.com/db/v8.9/reference/singlestore-tools-reference/sdb-admin-commands/start-monitoring-kube/) for more information.
+
+To configure and start the monitoring, including the metrics database, the following command will (eventually) be submitted:
+
+`sdb-admin start-monitoring-kube --cluster-name sas-singlestore-cluster --namespace $VIYA_NS --user root --password $ROOT_PWD --exporter-host $CLUSTER_MASTER_IP`
+
+But, before submitting the command, the various parameters being passed to the command and how to determine their proper values will be reviewed.
+
 
 #### The `cluster-name` parameter
 The default name for the SingleStore cluster in a SAS SpeedyStore deployment is: ***sas-singlestore-cluster***.  However, since it is possible to change this name, it is important to confirm the actual cluster name before configuring the monitoring.
@@ -54,14 +69,14 @@ If the cluster name is different than the default, be sure to use the correct va
 #### The `user` and `password` parameters
 A core part of the monitoring is the exporter process which collects the metric data from the cluster. The exporter process is typically run as the SingleStore 'root' user due to the permissions required.
 
-NOTE: It is possible to run the process as another user but the user must have the low level permissions needed to create and control the metrics database and pipelines.  Setting up an alternate user is out-of-scope for this sample and we will use the 'root' user.
+NOTE: It is possible to run the process as another user but the user must have the low level permissions needed to create and control the metrics database and pipelines.  Setting up an alternate user for this is out-of-scope for this sample and we will use the 'root' user.
 
 You will need the password for the SingleStore 'root' user.  You can use the following command to get the password for the 'root' user and store it in the `ROOT_PWD` environment variable:
 
 `ROOT_PWD=$(kubectl -n ${VIYA_NS} get secret sas-singlestore-cluster -o yaml | grep "ROOT_PASSWORD"|awk '{print $2}'|base64 -d --wrap=0)`
 
 #### The `exporter-host` parameter
-As shown in the diagram above, the export process runs on the Master Aggregator. Therefore, you need to target the SingleStore Master node; i.e. the **node-sas-singlestore-cluster-master-0** node (pod) in a SAS SpeedyStore deployment.  You will need to provide the fully-qualified host name or IP address for the exporter host. And, as noted above, the IP address or host name needs to be resolvable by the host running the `sdb-admin` command.  This example uses an IP address for the `exporter-host` parameter.
+As shown in the diagram above, the export process runs on the Master Aggregator. Therefore, you need to target the SingleStore Master node; i.e. the **node-sas-singlestore-cluster-master-0** node (pod) in a SAS SpeedyStore deployment.  This example you will use that pod's IP address for the `exporter-host` parameter.
 
 You can obtain the IP address for the Master node and stored it in the `CLUSTER_MASTER_IP` environment variable by submitting the following command:
 
@@ -94,13 +109,11 @@ Automatically selected yes, non-interactive mode enabled
 Operation completed successfully
 ```
 
-Once completed, the exporter process, the pipeline and the metrics database have been created. You can use the SingleStore Studio, to confirm this. For example, in the screenshot below, you can see the newly created **'metrics'** database:
+Once completed, the exporter process, the pipeline and the '**metrics**' database have been created. You can use the SingleStore Studio, to confirm this. For example, in the screenshot below, you can see the newly created `**metrics**' database:
 ![Screenshot showing SingleStore Studio with the 'metrics' database highlighted](images/02_MG_202508_metrics-database.png)
 
 ### Create the "S2MonitorUser"
-You need to create a specific user that Grafana can use to connect to the ***'metrics'*** database.
-
-After logging into SingleStore with the admin user, you can submit `CREATE USER` and `GRANT` commands to create the user and grant the user the desired permissions.
+Next, you need to create a specific user that Grafana can use to connect to the '**metrics**' database.  After logging into SingleStore with the admin user, you can submit the `CREATE USER` and `GRANT` commands via the SingleStore CLI (or, from the SQL Editor within SingleStore Studio) to create the user and grant the user the desired permissions.
 
 For example, the following command creates a user called `S2MonitorUser` and sets its password:
 
@@ -108,7 +121,7 @@ For example, the following command creates a user called `S2MonitorUser` and set
 
 The following command grants a minimal set of permissions that allows the newly created user to access the collected metrics and populate the Grafana dashboards:
 
-`GRANT SELECT, SHOW VIEW ON metrics.* to 'S2MonitorUser'@'%';`
+`GRANT SELECT, SHOW VIEW, EXECUTE ON metrics.* TO 'S2MonitorUser'@'%'`
 
 Alternatively, while the limited permissions above are sufficient to pull metrics from the database, it can be helpful to grant additional permissions so this same user can be used to manage the metrics database, pipelines and the exporter process.
 
@@ -118,16 +131,16 @@ The following commands grant a broader set of permissions to allow the monitorin
 
 `GRANT SELECT, CREATE, INSERT, UPDATE, DELETE, EXECUTE, INDEX, ALTER, DROP, CREATE DATABASE, LOCK TABLES, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, CREATE PIPELINE, DROP PIPELINE, ALTER PIPELINE, START PIPELINE, SHOW PIPELINE ON metrics.* to 'S2MonitorUser'@'%';`
 
-You should consider your organization's specific needs before deciding whether to grant the more limited or broader set of permissions to this user.
-
-### Configure the Grafana Datasource
+You should consider your organization's specific needs before deciding whether to grant the more limited or the broader set of permissions to this user.
+### Configure Grafana
+#### Configure the Grafana Datasource
 Grafana datasources provide connection information allowing Grafana to access metric information in response to user queries and to populate dashboards.
 
-The file [speedystore-datasource.yaml](speedystore-datasource.yaml) in this directory defines the datasource that will allow Grafana to access the ***'metrics'*** database created above.  However, before it can be used, it needs to be edited to provide the proper credentials (i.e. the ***user*** and ***password*** fields in the file).  You will also need to update the ***url*** field to reflect the namespace in which SAS Viya deployment is deployed.
+The file [speedystore-datasource.yaml](speedystore-datasource.yaml) in this directory defines the datasource that will allow Grafana to access the '**metrics**' database created above.  However, before it can be used, it needs to be edited to provide the proper credentials (i.e. the ***user*** and ***password*** fields in the file).  You will also need to update the ***url*** field to reflect the namespace in which SAS Viya deployment is deployed.
 
 For example, if SAS Viya is deployed into the ***myviya*** namespace, you would revise the ***url*** value from:
 
-`url: svc-sas-singlestore-cluster-ddl.VIYA_NS.svc.cluster.local:3306`
+`svc-sas-singlestore-cluster-ddl.{**Replace with SAS VIYA Namespace**}.svc.cluster.local:3306`
 
 to:
 
@@ -139,18 +152,18 @@ Copy the file to some location, update the necessary information and save your c
 
 Then submit the following command to create the datasource:
 
-`kubectl -n monitoring create secret generic grafana-metrics-connection --from-file=$USER_DIR/monitoring/speedystore-datasource.yaml`
+`kubectl -n monitoring create secret generic grafana-speedystore-connection --from-file=$USER_DIR/monitoring/speedystore-datasource.yaml`
 
 NOTE: This command assumes the metric monitoring components (including Grafana) have been deployed into the `monitoring` namespace.  If they are deployed in a different namespace, update the command to reference to correct namespace.
 
-After secret has been created, you need to apply a specific label to the secret to trigger the automatic provisioning (Ioading) of the datasource into Grafana.
+After secret has been created, you need to apply a specific label to the secret to trigger the automatic provisioning (loading) of the datasource into Grafana.
 
 You can use the following command to apply the necessary label:
 
-`kubectl -n monitoring label secret grafana-metrics-connection "grafana_datasource=1"`
+`kubectl -n monitoring label secret grafana-speedystore-connection "grafana_datasource=1"`
 
 
-### Import the SingleStore Dashboards into Grafana
+#### Import the SingleStore Dashboards into Grafana
 To import the SingleStore dashboards into Grafana, you can use the `deploy_dashboards.sh` script found in the `monitoring/bin` sub-directory of this repository.
 
 You can use the following command to import all of the SingleStore dashboards:
@@ -162,9 +175,9 @@ Or, you can import specific dashboards individually using the same script.  For 
 `./monitoring/bin/deploy_dashboards.sh samples/speedystore/dashboards/clusterview.yaml`
 
 ### Validate
-Once the dashboards have been imported into Grafana, you should  be ready to monitor the SingleStore instance embedded in SAS SpeedyStore.
+Once the dashboards have been imported into Grafana, you should be all set to monitor the SingleStore instance embedded in SAS SpeedyStore.
 
-To validate the configuration, sign into Grafana and review each of the SingleStore dashboards you've imported.  All of the imported dashboards have the ***"sas-speedystore"*** and ***"singlestore"*** tags.  While the data shown will vary based on user activity, all of the dashboards should be available with no errors or warning icons or messages.
+To validate the configuration, sign into Grafana and review the SingleStore dashboards you've imported.  All of the imported dashboards have the ***"sas-speedystore"*** and ***"singlestore"*** tags.  While the data shown will vary based on user activity, all of the dashboards should be available with no errors or warning icons or messages.
 
 ## The Grafana Dashboards
 This is a list of the SingleStore dashboards included in this sample.   Each dashboard name in the list is a link to more information about the dashboard in the SingleStore documentation including the metrics depicted and the types of questions they address.
@@ -182,8 +195,11 @@ This is a list of the SingleStore dashboards included in this sample.   Each das
 Thank you to Michael Goddard (SAS Education) for all of his work sorting this out and allowing us to share it here.
 
 ## References
+[Blog Post: Using Grafana dashboards for monitoring SAS SpeedyStore](https://communities.sas.com/t5/SAS-Communities-Library/Using-Grafana-dashboards-for-monitoring-SAS-SpeedyStore/ta-p/973178)
+
+[Workshop: SAS® SpeedyStore: Architect and Deploy the SAS® Viya® Platform with SingleStore](https://learn.sas.com/course/view.php?id=6393)
+
 [SingleStore Documentation: Configure Monitoring](https://docs.singlestore.com/db/v8.9/user-and-cluster-administration/cluster-health-and-performance/configure-monitoring/)
 
 [SingleStore Documentation: Detailed Discussion of each dashboard including metrics shown and when to use them](https://docs.singlestore.com/db/v8.9/user-and-cluster-administration/cluster-health-and-performance/configure-monitoring/view-the-dashboards/)
-
 
