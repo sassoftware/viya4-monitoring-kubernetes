@@ -112,7 +112,7 @@ Operation completed successfully
 Once completed, the exporter process, the pipeline and the '**metrics**' database have been created. You can use the SingleStore Studio, to confirm this. For example, in the screenshot below, you can see the newly created `**metrics**' database:
 ![Screenshot showing SingleStore Studio with the 'metrics' database highlighted](images/02_MG_202508_metrics-database.png)
 
-### Create the "S2MonitorUser"
+### Create the "S2MonitorUser" user
 Next, you need to create a specific user that Grafana can use to connect to the '**metrics**' database.  After logging into SingleStore with the admin user, you can submit the `CREATE USER` and `GRANT` commands via the SingleStore CLI (or, from the SQL Editor within SingleStore Studio) to create the user and grant the user the desired permissions.
 
 For example, the following command creates a user called `S2MonitorUser` and sets its password:
@@ -174,13 +174,14 @@ Or, you can import specific dashboards individually using the same script.  For 
 
 `./monitoring/bin/deploy_dashboards.sh samples/speedystore/dashboards/clusterview.yaml`
 
-### Validate
+### Validate everything is working
 Once the dashboards have been imported into Grafana, you should be all set to monitor the SingleStore instance embedded in SAS SpeedyStore.
 
 To validate the configuration, sign into Grafana and review the SingleStore dashboards you've imported.  All of the imported dashboards have the ***"sas-speedystore"*** and ***"singlestore"*** tags.  While the data shown will vary based on user activity, all of the dashboards should be available with no errors or warning icons or messages.
 
 ## The Grafana Dashboards
 This is a list of the SingleStore dashboards included in this sample.   Each dashboard name in the list is a link to more information about the dashboard in the SingleStore documentation including the metrics depicted and the types of questions they address.
+
 * [Cluster View](https://docs.singlestore.com/db/v8.9/user-and-cluster-administration/cluster-health-and-performance/configure-monitoring/view-the-dashboards/#cluster-view)
 * [Detailed Cluster View by Node](https://docs.singlestore.com/db/v8.9/user-and-cluster-administration/cluster-health-and-performance/configure-monitoring/view-the-dashboards/#detailed-cluster-view-by-node)
 * [Disk Usage](https://docs.singlestore.com/db/v8.9/user-and-cluster-administration/cluster-health-and-performance/configure-monitoring/view-the-dashboards/#disk-usage)
@@ -191,6 +192,10 @@ This is a list of the SingleStore dashboards included in this sample.   Each das
 * [Query History](https://docs.singlestore.com/db/v8.9/user-and-cluster-administration/cluster-health-and-performance/configure-monitoring/view-the-dashboards/#query-history)
 * [Resource Pool Monitoring](https://docs.singlestore.com/db/v8.9/user-and-cluster-administration/cluster-health-and-performance/configure-monitoring/view-the-dashboards/#resource-pool-monitoring)
 
+NOTE: The following modifications have been made to the original SingleStore dashboards definitions:
+* the json files were renamed to use all lowercase and remove spaces;
+* the name of the datasource was changed from `monitoring` to `s2monitoring`; and,
+* the tags `sas-speedystore` and `singlestore` were added to the dashboards.
 ## Acknowledgements
 Thank you to Michael Goddard (SAS Education) for all of his work sorting this out and allowing us to share it here.
 
