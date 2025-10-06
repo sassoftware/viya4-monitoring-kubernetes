@@ -5,10 +5,10 @@ This sample demonstrates how to extend SAS Viya Monitoring for Kubernetes to mon
 
 This sample is primarily derived from the blog post [Using Grafana dashboards for monitoring SAS SpeedyStore](https://communities.sas.com/t5/SAS-Communities-Library/Using-Grafana-dashboards-for-monitoring-SAS-SpeedyStore/ta-p/973178) written by Michael Goddard from SAS Education.  The blog post was, in turn, based on work Michael did in preparing to cover the topic as part of the [SAS® SpeedyStore: Architect and Deploy the SAS® Viya® Platform with SingleStore](https://learn.sas.com/course/view.php?id=6393) workshop available in [learn.sas.com](https://learn.sas.com/).  This sample includes Grafana dashboards developed and made available by SingleStore.
 
-**Note: There may be other ways to achieve these same objectives, this sample documents one possible approach.**
+**Note: This sample documents one possible approach, there might be other ways to achieve the same objectives.**
 
 ## Using this Sample
-Enabling this monitoring will required configuring components in both SingleStore and Grafana.  While this sample describes how to configure the SingleStore components, you are strongly encouraged to review the official SingleStore documentation for a more comprehensive discussion of how to monitor SingleStore effectively, the options for doing so and additional implementation details.  After configuring the SingleStore components, this sample covers defining the datasource within Grafana and deploying the SingleStore-specific Grafana dashboards.
+Enabling this monitoring will required configuring components in both SingleStore and Grafana.  While this sample describes how to configure the SingleStore components, you are strongly encouraged to review the official SingleStore documentation for a more comprehensive discussion of how to monitor SingleStore effectively, the options for doing so, and additional implementation details.  After configuring the SingleStore components, this sample covers defining the datasource within Grafana and deploying the SingleStore-specific Grafana dashboards.
 
 The diagram below, taken from the [SingleStore documentation](https://docs.singlestore.com/db/v8.9/user-and-cluster-administration/cluster-health-and-performance/configure-monitoring/), provides a high-level overview of metric collection and reporting process.  As shown, the SingleStore pipeline extracts metrics from the SingleStore cluster and stores them within a metrics database.  Grafana pulls metric data directly from this metrics database to populate the dashboards administrators view.
 
@@ -36,7 +36,7 @@ You will need to use submit database commands via the SingleStore CLI to create 
 Or, alternatively, you can submit the necessary commands via the SingleStore Studio SQL Editor panel.
 * `kubectl`
 
-You will need to use `kubectl` commands to obtain information about the your SAS Viya and SingleStore deployments.
+You will need to use `kubectl` commands to obtain information about your SAS Viya and SingleStore deployments.
 
 #### Set the VIYA_NS environent variable
 
@@ -50,11 +50,11 @@ In the following command, the `VIYA_NS` environment variable is defined and assi
 #### Create the SingleStore pipeline and metrics database
 The `sdb-admin start-monitoring-kube` command is used to configure and start the monitoring. It has a number of flags to control its operations.  See the [SingleStore documentation](https://docs.singlestore.com/db/v8.9/reference/singlestore-tools-reference/sdb-admin-commands/start-monitoring-kube/) for more information.
 
-To configure and start the monitoring, including the metrics database, the following command will (eventually) be submitted:
+To configure and start the monitoring, including the metrics database, the following command will be used:
 
 `sdb-admin start-monitoring-kube --cluster-name sas-singlestore-cluster --namespace $VIYA_NS --user root --password $ROOT_PWD --exporter-host $CLUSTER_MASTER_IP`
 
-But, before submitting the command, the various parameters being passed to the command and how to determine their proper values will be reviewed.
+Before submitting the command, the various parameters being passed to the command and how to determine their proper values will be reviewed.
 
 
 #### The `cluster-name` parameter
@@ -76,9 +76,9 @@ You will need the password for the SingleStore 'root' user.  You can use the fol
 `ROOT_PWD=$(kubectl -n ${VIYA_NS} get secret sas-singlestore-cluster -o yaml | grep "ROOT_PASSWORD"|awk '{print $2}'|base64 -d --wrap=0)`
 
 #### The `exporter-host` parameter
-As shown in the diagram above, the export process runs on the Master Aggregator. Therefore, you need to target the SingleStore Master node; i.e. the **node-sas-singlestore-cluster-master-0** node (pod) in a SAS SpeedyStore deployment.  This example you will use that pod's IP address for the `exporter-host` parameter.
+As shown in the diagram above, the export process runs on the Master Aggregator. Therefore, you need to target the SingleStore Master node; i.e. the **node-sas-singlestore-cluster-master-0** node (pod) in a SAS SpeedyStore deployment.  In this example you will use that pod's IP address for the `exporter-host` parameter.
 
-You can obtain the IP address for the Master node and stored it in the `CLUSTER_MASTER_IP` environment variable by submitting the following command:
+You can obtain the IP address for the Master node and store it in the `CLUSTER_MASTER_IP` environment variable by submitting the following command:
 
 `CLUSTER_MASTER_IP=$(kubectl -n ${VIYA_NS} get pods -o wide | grep 'node-sas-singlestore-cluster-master-0' | awk '{print $6}')`
 
@@ -86,7 +86,7 @@ You can obtain the IP address for the Master node and stored it in the `CLUSTER_
 By default, the `sdb-admin start-monitoring-kube` command will display some information and ask the user if they would like to continue.  To skip this prompt and have the configuration continue automatically, include the `--yes` parameter.
 
 #### Accessing the Kubernetess Cluster
-The `sb-admin` command needs to access the Kubernetes cluster on which SAS Viya and SingleStore are running.  It does this through a Kubernetes configuration file.  By default, the command will use the file identified in the `KUBECONFIG` environment variable or the `~/.kube/config` file are used to discover the cluster. Alternatively, the `--config-file` option can be used to specify the kube config file.
+The `sb-admin` command needs to access the Kubernetes cluster on which SAS Viya and SingleStore are running.  It does this through a Kubernetes configuration file.  By default, the command will attempt to use the file identified in the `KUBECONFIG` environment variable, if defined, or the `~/.kube/config` file, if it exists, to discover the cluster. Alternatively, the `--config-file` option can be used to specify the kube config file to use.
 
 #### Run the `sb-admin start-monitoring-kube` command
 After setting all of the required parameters, submit the following command to configure and start the monitoring, including the metrics database:
@@ -109,7 +109,7 @@ Automatically selected yes, non-interactive mode enabled
 Operation completed successfully
 ```
 
-Once completed, the exporter process, the pipeline and the '**metrics**' database have been created. You can use the SingleStore Studio, to confirm this. For example, in the screenshot below, you can see the newly created `**metrics**' database:
+Once completed, the exporter process, the pipeline, and the '**metrics**' database have been created. You can use the SingleStore Studio, to confirm this. For example, in the screenshot below, you can see the newly created `**metrics**' database:
 ![Screenshot showing SingleStore Studio with the 'metrics' database highlighted](images/02_MG_202508_metrics-database.png)
 
 ### Create the "S2MonitorUser" user
@@ -123,7 +123,7 @@ The following command grants a minimal set of permissions that allows the newly 
 
 `GRANT SELECT, SHOW VIEW, EXECUTE ON metrics.* TO 'S2MonitorUser'@'%'`
 
-Alternatively, while the limited permissions above are sufficient to pull metrics from the database, it can be helpful to grant additional permissions so this same user can be used to manage the metrics database, pipelines and the exporter process.
+Alternatively, while the limited permissions above are sufficient to pull metrics from the database, it can be helpful to grant additional permissions so this same user can be used to manage the metrics database, pipelines, and the exporter process.
 
 The following commands grant a broader set of permissions to allow the monitoring user to perform these administrator duties:
 
@@ -148,15 +148,15 @@ to:
 
  If the name of the SingleStore cluster is not ***sas-singlestore-cluster***, you will need to update that portion of the  ***url*** field in the file as well.
 
-Copy the file to some location, update the necessary information and save your changes.  We suggest copying the file into your `$USER_DIR/monitoring` sub-directory, i.e. the same directory used for any other customizations related to the metric monitoring components you have made to your deployment of SAS Viya Monitoring.  This will ensure all of the files related to this deployment of SAS Viya Monitoring are in one place.
+Copy the file to some location, update the necessary information, and save your changes.  We suggest copying the file into your `$USER_DIR/monitoring` sub-directory, i.e. the same directory used for any other customizations related to the metric monitoring components you have made to your deployment of SAS Viya Monitoring.  This will ensure all of the files related to this deployment of SAS Viya Monitoring are in one place.
 
 Then submit the following command to create the datasource:
 
 `kubectl -n monitoring create secret generic grafana-speedystore-connection --from-file=$USER_DIR/monitoring/speedystore-datasource.yaml`
 
-NOTE: This command assumes the metric monitoring components (including Grafana) have been deployed into the `monitoring` namespace.  If they are deployed in a different namespace, update the command to reference to correct namespace.
+NOTE: This command assumes the metric monitoring components (including Grafana) have been deployed into the `monitoring` namespace.  If they are deployed in a different namespace, update the command to reference the correct namespace.
 
-After secret has been created, you need to apply a specific label to the secret to trigger the automatic provisioning (loading) of the datasource into Grafana.
+After the secret has been created, you need to apply a specific label to the secret to trigger the automatic provisioning (loading) of the datasource into Grafana.
 
 You can use the following command to apply the necessary label:
 
