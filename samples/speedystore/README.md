@@ -50,12 +50,7 @@ In the following command, the `VIYA_NS` environment variable is defined and assi
 #### Create the SingleStore pipeline and metrics database
 The `sdb-admin start-monitoring-kube` command is used to configure and start the monitoring. It has a number of flags to control its operations.  See the [SingleStore documentation](https://docs.singlestore.com/db/v8.9/reference/singlestore-tools-reference/sdb-admin-commands/start-monitoring-kube/) for more information.
 
-To configure and start the monitoring, including the metrics database, the following command will be used:
-
-`sdb-admin start-monitoring-kube --cluster-name sas-singlestore-cluster --namespace $VIYA_NS --user root --password $ROOT_PWD --exporter-host $CLUSTER_MASTER_IP`
-
-Before submitting the command, the various parameters being passed to the command and how to determine their proper values will be reviewed.
-
+Before submitting the `sdb-admin start-monitoring-kube` command, the various parameters being passed to the command and how to determine their proper values will be reviewed.
 
 #### The `cluster-name` parameter
 The default name for the SingleStore cluster in a SAS SpeedyStore deployment is: ***sas-singlestore-cluster***.  However, since it is possible to change this name, it is important to confirm the actual cluster name before configuring the monitoring.
@@ -71,22 +66,22 @@ A core part of the monitoring is the exporter process which collects the metric 
 
 NOTE: It is possible to run the process as another user but the user must have the low level permissions needed to create and control the metrics database and pipelines.  Setting up an alternate user for this is out-of-scope for this sample and we will use the 'root' user.
 
-You will need the password for the SingleStore 'root' user.  You can use the following command to get the password for the 'root' user and store it in the `ROOT_PWD` environment variable:
+You need the password for the SingleStore 'root' user.  You can use the following command to get the password for the 'root' user and store it in the `ROOT_PWD` environment variable:
 
 `ROOT_PWD=$(kubectl -n ${VIYA_NS} get secret sas-singlestore-cluster -o yaml | grep "ROOT_PASSWORD"|awk '{print $2}'|base64 -d --wrap=0)`
 
 #### The `exporter-host` parameter
-As shown in the diagram above, the export process runs on the Master Aggregator. Therefore, you need to target the SingleStore Master node; i.e. the **node-sas-singlestore-cluster-master-0** node (pod) in a SAS SpeedyStore deployment.  In this example you will use that pod's IP address for the `exporter-host` parameter.
+As shown in the diagram above, the export process runs on the Master Aggregator. Therefore, you need to target the SingleStore Master node; i.e. the **node-sas-singlestore-cluster-master-0** node (pod) in a SAS SpeedyStore deployment.  In this example, that pod's IP address will be used for the `exporter-host` parameter.
 
 You can obtain the IP address for the Master node and store it in the `CLUSTER_MASTER_IP` environment variable by submitting the following command:
 
 `CLUSTER_MASTER_IP=$(kubectl -n ${VIYA_NS} get pods -o wide | grep 'node-sas-singlestore-cluster-master-0' | awk '{print $6}')`
 
 #### Disabling interactive mode
-By default, the `sdb-admin start-monitoring-kube` command will display some information and ask the user if they would like to continue.  To skip this prompt and have the configuration continue automatically, include the `--yes` parameter.
+By default, the `sdb-admin start-monitoring-kube` command displays some information and asks the user if they would like to continue.  To skip this prompt and have the configuration continue automatically, this example includes the `--yes` parameter.
 
 #### Accessing the Kubernetess Cluster
-The `sb-admin` command needs to access the Kubernetes cluster on which SAS Viya and SingleStore are running.  It does this through a Kubernetes configuration file.  By default, the command will attempt to use the file identified in the `KUBECONFIG` environment variable, if defined, or the `~/.kube/config` file, if it exists, to discover the cluster. Alternatively, the `--config-file` option can be used to specify the kube config file to use.
+The `sb-admin` command needs to access the Kubernetes cluster on which SAS Viya and SingleStore are running.  It does this through a Kubernetes configuration file.  By default, the command uses the file identified in the `KUBECONFIG` environment variable (if defined), or the `~/.kube/config` file (if it exists) to discover the cluster. Alternatively, the `--config-file` option can be used to specify the kube config file to use.
 
 #### Run the `sb-admin start-monitoring-kube` command
 After setting all of the required parameters, submit the following command to configure and start the monitoring, including the metrics database:
@@ -136,7 +131,7 @@ You should consider your organization's specific needs before deciding whether t
 #### Configure the Grafana Datasource
 Grafana datasources provide connection information allowing Grafana to access metric information in response to user queries and to populate dashboards.
 
-The file [speedystore-datasource.yaml](speedystore-datasource.yaml) in this directory defines the datasource that will allow Grafana to access the '**metrics**' database created above.  However, before it can be used, it needs to be edited to provide the proper credentials (i.e. the ***user*** and ***password*** fields in the file).  You will also need to update the ***url*** field to reflect the namespace in which SAS Viya deployment is deployed.
+The file [speedystore-datasource.yaml](speedystore-datasource.yaml) in this directory defines the datasource that will allow Grafana to access the '**metrics**' database created above.  However, before it can be used, it needs to be edited to provide the proper credentials (i.e. the ***user*** and ***password*** fields in the file).  You also need to update the ***url*** field to reflect the namespace in which SAS Viya deployment is deployed.
 
 For example, if SAS Viya is deployed into the ***myviya*** namespace, you would revise the ***url*** value from:
 
@@ -146,7 +141,7 @@ to:
 
 `url: svc-sas-singlestore-cluster-ddl.myviya.svc.cluster.local:3306`
 
- If the name of the SingleStore cluster is not ***sas-singlestore-cluster***, you will need to update that portion of the  ***url*** field in the file as well.
+ If the name of the SingleStore cluster is not ***sas-singlestore-cluster***, you need to update that portion of the  ***url*** field in the file as well.
 
 Copy the file to some location, update the necessary information, and save your changes.  We suggest copying the file into your `$USER_DIR/monitoring` sub-directory, i.e. the same directory used for any other customizations related to the metric monitoring components you have made to your deployment of SAS Viya Monitoring.  This will ensure all of the files related to this deployment of SAS Viya Monitoring are in one place.
 
