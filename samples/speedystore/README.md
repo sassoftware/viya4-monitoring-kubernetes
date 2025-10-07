@@ -73,7 +73,7 @@ You need the password for the SingleStore 'root' user.  You can use the followin
 #### The `exporter-host` parameter
 As shown in the diagram above, the export process runs on the Master Aggregator. Therefore, you need to target the SingleStore Master node; i.e. the **node-sas-singlestore-cluster-master-0** pod in a SAS SpeedyStore deployment.
 
->NOTE: The wording here can be a bit confusing: the _SingleStore Master node_ is a specific Kubernetes <ins>pod</ins>, it is <ins>__not__</ins> a _Kubernetes cluster master node_, which is a <ins>node</ins> (host) in the Kubernetes control plane.
+>NOTE: The wording here can be a bit confusing: the SingleStore _Master node_ is a specific Kubernetes <ins>pod</ins>, it is <ins>__not__</ins> a Kubernetes _cluster master node_, which is a <ins>node</ins> (host) in the Kubernetes control plane.
 
 In this example, the SingleStore Master node (pod) IP address will be used for the `exporter-host` parameter.  You can obtain the pod's IP address and store it in the `CLUSTER_MASTER_IP` environment variable by submitting the following command:
 
@@ -108,11 +108,11 @@ Operation completed successfully
 
 Once completed, the exporter process, the pipeline, and the '**metrics**' database have been created. You can use the SingleStore Studio, to confirm this.
 
-For example, in the screenshots below, you can see the newly created piplelines are up and the `**metrics**' database exists:
+For example, in the screenshots below, the newly created piplelines are up and the `**metrics**' database exists:
 
-![Screenshot showing SingleStore Studio with the pipelines highlighted](images/singlestore_studio-pipelines.png)
+![Screenshot showing SingleStore Studio with arrow pointing to the new pipelines](images/singlestore_studio-pipelines.png)
 
-![Screenshot showing SingleStore Studio with the 'metrics' database highlighted](images/singlestore_studio-database.png)
+![Screenshot showing SingleStore Studio with arrow pointing to the new 'metrics' database](images/singlestore_studio-database.png)
 
 ### Create the "S2MonitorUser" user
 Next, you need to create a specific user that Grafana can use to connect to the '**metrics**' database.  After logging into SingleStore with the admin user, you can submit the `CREATE USER` and `GRANT` commands via the SingleStore CLI (or, from the SQL Editor within SingleStore Studio) to create the user and grant the user the desired permissions.
