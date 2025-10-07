@@ -71,9 +71,11 @@ You need the password for the SingleStore 'root' user.  You can use the followin
 `ROOT_PWD=$(kubectl -n ${VIYA_NS} get secret sas-singlestore-cluster -o yaml | grep "ROOT_PASSWORD"|awk '{print $2}'|base64 -d --wrap=0)`
 
 #### The `exporter-host` parameter
-As shown in the diagram above, the export process runs on the Master Aggregator. Therefore, you need to target the SingleStore Master node; i.e. the **node-sas-singlestore-cluster-master-0** node (pod) in a SAS SpeedyStore deployment.  In this example, that pod's IP address will be used for the `exporter-host` parameter.
+As shown in the diagram above, the export process runs on the Master Aggregator. Therefore, you need to target the SingleStore Master node; i.e. the **node-sas-singlestore-cluster-master-0** pod in a SAS SpeedyStore deployment.
 
-You can obtain the IP address for the Master node and store it in the `CLUSTER_MASTER_IP` environment variable by submitting the following command:
+>NOTE: The wording here can be a bit confusing: the _SingleStore Master node_ is a specific Kubernetes <ins>pod</ins>, it is <ins>__not__</ins> a _Kubernetes cluster master node_, which is a <ins>node</ins> (host) in the Kubernetes control plane.
+
+In this example, the SingleStore Master node (pod) IP address will be used for the `exporter-host` parameter.  You can obtain the pod's IP address and store it in the `CLUSTER_MASTER_IP` environment variable by submitting the following command:
 
 `CLUSTER_MASTER_IP=$(kubectl -n ${VIYA_NS} get pods -o wide | grep 'node-sas-singlestore-cluster-master-0' | awk '{print $6}')`
 
@@ -104,8 +106,13 @@ Automatically selected yes, non-interactive mode enabled
 Operation completed successfully
 ```
 
-Once completed, the exporter process, the pipeline, and the '**metrics**' database have been created. You can use the SingleStore Studio, to confirm this. For example, in the screenshot below, you can see the newly created `**metrics**' database:
-![Screenshot showing SingleStore Studio with the 'metrics' database highlighted](images/02_MG_202508_metrics-database.png)
+Once completed, the exporter process, the pipeline, and the '**metrics**' database have been created. You can use the SingleStore Studio, to confirm this.
+
+For example, in the screenshots below, you can see the newly created piplelines are up and the `**metrics**' database exists:
+
+![Screenshot showing SingleStore Studio with the pipelines highlighted](images/singlestore_studio-pipelines.png)
+
+![Screenshot showing SingleStore Studio with the 'metrics' database highlighted](images/singlestore_studio-database.png)
 
 ### Create the "S2MonitorUser" user
 Next, you need to create a specific user that Grafana can use to connect to the '**metrics**' database.  After logging into SingleStore with the admin user, you can submit the `CREATE USER` and `GRANT` commands via the SingleStore CLI (or, from the SQL Editor within SingleStore Studio) to create the user and grant the user the desired permissions.
