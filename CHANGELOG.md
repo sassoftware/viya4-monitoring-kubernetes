@@ -1,4 +1,14 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Metrics**
+  * [FEATURE] A new sample demonstrates how to extend SAS Viya Monitoring
+for Kubernetes to monitor the SingleStore instance that is embedded within
+SAS SpeedyStore.  This allows administrators to monitor their SingleStore 
+cluster using the same Grafana instance that they use to monitor the rest 
+of their SAS Viya deployment.  Refer to the [SAS SpeedyStore Sample README](samples/speedystore)
+for more information.
+
+
 ## Version 1.2.42 (16SEP2025)
 * **Logging**
   * [FIX] Corrected handling of unavailable API endpoint in deploy_opensearch_content.sh
