@@ -18,6 +18,14 @@ if [ "$OPENSHIFT_ARTIFACTS_REMOVE" != "true" ]; then
     exit
 fi
 
+if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
+    if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+        log_error "This script should only be run on OpenShift clusters"
+        exit 1
+    fi
+fi
+
+
 # remove custom OpenShift SCC
 oc delete scc v4mlogging --ignore-not-found
 oc delete scc v4m-logging-v2 --ignore-not-found

@@ -18,6 +18,13 @@ if [ "$OPENSHIFT_PREREQS_ENABLE" != "true" ]; then
     exit
 fi
 
+if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
+    if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+        log_error "This script should only be run on OpenShift clusters"
+        exit 1
+    fi
+fi
+
 # link OpenSearch serviceAccounts to 'privileged' scc
 oc adm policy add-scc-to-user privileged -z v4m-os -n "$LOG_NS"
 

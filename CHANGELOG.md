@@ -1,4 +1,8 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Logging**
+  * [CHANGE] All OpenShift-specific scripts now fail when run on non-OpenShift clusters
+
 ## Version 1.2.43 (10OCT2025)
 * **Metrics**
   * [FEATURE] A new sample demonstrates how to extend SAS Viya Monitoring
