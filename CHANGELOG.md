@@ -1,5 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 ## **Unreleased**
+* **Metrics**
   * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 75.15.0 to 78.4.0
   * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded fom 9.3.0 to 9.4.5.
   * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 3.4.0 to 3.4.1.
@@ -10,7 +11,8 @@
   * [UPGRADE] Prometheus has been upgraded from 3.5.0 to 3.7.1.
   * [UPGRADE] Prometheus Operator has been upgraded from 0.83.0 to 0.86.1.
   * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.29.1 to 2.31.1
-
+* **Logging**
+  * [FIX] Log messages from Alertmanger pod redirected to OpenSearch viya_ops-* (rather than viya_logs-*) index
 
 ## Version 1.2.43 (10OCT2025)
 * **Metrics**
