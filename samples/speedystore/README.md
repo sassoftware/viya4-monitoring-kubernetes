@@ -83,9 +83,9 @@ In this example, the SingleStore Master node (pod) IP address will be used for t
 By default, the `sdb-admin start-monitoring-kube` command displays some information and asks the user if they would like to continue.  To skip this prompt and have the configuration continue automatically, this example includes the `--yes` parameter.
 
 #### Accessing the Kubernetess Cluster
-The `sb-admin` command needs to access the Kubernetes cluster on which SAS Viya and SingleStore are running.  It does this through a Kubernetes configuration file.  By default, the command uses the file identified in the `KUBECONFIG` environment variable (if defined), or the `~/.kube/config` file (if it exists) to discover the cluster. Alternatively, the `--config-file` option can be used to specify the kube config file to use.
+The `sdb-admin` command needs to access the Kubernetes cluster on which SAS Viya and SingleStore are running.  It does this through a Kubernetes configuration file.  By default, the command uses the file identified in the `KUBECONFIG` environment variable (if defined), or the `~/.kube/config` file (if it exists) to discover the cluster. Alternatively, the `--config-file` option can be used to specify the kube config file to use.
 
-#### Run the `sb-admin start-monitoring-kube` command
+#### Run the `sdb-admin start-monitoring-kube` command
 After setting all of the required parameters, submit the following command to configure and start the monitoring, including the metrics database:
 
 `sdb-admin start-monitoring-kube --cluster-name sas-singlestore-cluster --namespace $VIYA_NS --user root --password $ROOT_PWD --exporter-host $CLUSTER_MASTER_IP --yes`
