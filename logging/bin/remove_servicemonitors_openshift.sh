@@ -18,6 +18,13 @@ if [ "$DEPLOY_SERVICEMONITORS" != "true" ]; then
     exit
 fi
 
+if [ "$OPENSHIFT_CLUSTER" != "true" ]; then
+    if [ "${CHECK_OPENSHIFT_CLUSTER:-true}" == "true" ]; then
+        log_error "This script should only be run on OpenShift clusters"
+        exit 1
+    fi
+fi
+
 EVENTROUTER_ENABLE=${EVENTROUTER_ENABLE:-true}
 if [ "$EVENTROUTER_ENABLE" == "true" ]; then
     # Eventrouter ServiceMonitor

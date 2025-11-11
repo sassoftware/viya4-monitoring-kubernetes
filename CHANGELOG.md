@@ -13,6 +13,8 @@
   * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.29.1 to 2.31.1
 * **Logging**
   * [FIX] Log messages from Alertmanger pod redirected to OpenSearch viya_ops-* (rather than viya_logs-*) index
+  * [CHANGE] All OpenShift-specific scripts now fail when run on non-OpenShift clusters
+
 
 ## Version 1.2.43 (10OCT2025)
 * **Metrics**
