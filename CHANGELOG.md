@@ -1,5 +1,5 @@
 # SAS Viya Monitoring for Kubernetes
-## **Unreleased**
+## Version 1.2.44 (18NOV2025)
 * **Metrics**
   * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 75.15.0 to 78.4.0
   * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded fom 9.3.0 to 9.4.5.
