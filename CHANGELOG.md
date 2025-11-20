@@ -1,4 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Overall**
+  * [CHANGE] Drop support for OpenShift 4.12; the minimum supported version of OpenShift is now 4.14.
+
+
 ## Version 1.2.44 (18NOV2025)
 * **Metrics**
   * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 75.15.0 to 78.4.0
