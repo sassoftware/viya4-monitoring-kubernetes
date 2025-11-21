@@ -34,25 +34,25 @@ fi
 
 # SAS Viya 4 versions
 # supported by SAS Tech Support
-# Updated: 23OCT25
-# 2023.10 LTS 1.25 1.27   (EOL: 1.26)
+# Updated: 20NOV25
 # 2024.03 LTS 1.26 1.28   (EOL: 1.26)
 # 2024.09 LTS 1.28 1.30
 # 2025.03 LTS 1.29 1.31
-# 2025.07     1.30 1.32
+# 2025.09 LTS 1.31 1.33
 # 2025.08     1.30 1.32
 # 2025.09     1.31 1.33
 # 2025.10     1.31 1.33
+# 2025.11     1.31 1.33
 
 # Client version allowed to be one minor version earlier than minimum server version
-if [ "$KUBE_CLIENT_MAJOR" -eq "1" ] && [ "$KUBE_CLIENT_MINOR" -gt "24" ]; then
+if [ "$KUBE_CLIENT_MAJOR" -eq "1" ] && [ "$KUBE_CLIENT_MINOR" -gt "25" ]; then
     :
 else
     log_warn "Unsupported kubectl version: [$KUBE_CLIENT_VER]."
     log_warn "This script might not work as expected. Support might not be available until kubectl is upgraded to a supported version."
 fi
 
-if [ "$KUBE_SERVER_MAJOR" -eq "1" ] && [ "$KUBE_SERVER_MINOR" -gt "25" ]; then
+if [ "$KUBE_SERVER_MAJOR" -eq "1" ] && [ "$KUBE_SERVER_MINOR" -gt "26" ]; then
     :
 else
     log_warn "The detected version of Kubernetes [$KUBE_SERVER_VER] is not supported by any of the currently supported releases of SAS Viya."
