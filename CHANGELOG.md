@@ -3,6 +3,14 @@
 * **Overall**
   * [CHANGE] Use with Kubernetes versions prior to 1.26 produce WARNING message
   * [CHANGE] Drop support for OpenShift 4.12; the minimum supported version of OpenShift is now 4.14
+* **Logging**
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.19.3 to 3.3.2
+  * [UPGRADE] OpenSearch Helm chart upgraded from 2.35.0 to 3.3.2
+  * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 2.31.0 to 3.3.0
+  * [UPGRADE] Fluent Bit upgraded from 4.0.8 to 4.2.0
+  * [UPGRADE] Fluent Bit Helm chart upgraded from 0.52.0 to 0.54.0
+  * [UPGRADE] Elasticsearch Exporer Helm chart upgraded from 6.7.2 to 7.0.0
+  * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.31.1 to 2.32.1
 
 
 ## Version 1.2.44 (18NOV2025)
