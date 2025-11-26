@@ -66,6 +66,13 @@ config:
 
     opensearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
 
+    # Disable OpenSearch Dashboards 3.x
+    # features we are not currently
+    # using and suppress splash screen
+    ##data_source.enabled: false
+    ##workspace.enabled: false
+    ##explore.enabled: false
+
 securityContext:
   readOnlyRootFilesystem: true
   allowPrivilegeEscalation: false
@@ -75,3 +82,9 @@ podSecurityContext:
   seccompProfile: 
     type: RuntimeDefault
 
+startupProbe:
+  # OSD can take 2+ minutes
+  # to start on slow clusters
+  initialDelaySeconds: 60
+  periodSeconds: 20
+  failureThreshold: 30
