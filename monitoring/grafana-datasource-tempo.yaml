@@ -8,7 +8,7 @@ grafana:
      datasources:
       - name: Tempo
         type: tempo
-        url: http://v4m-tempo:3100
+        url: http://v4m-tempo:3200
         isDefault: false
         editable: true
         jsonData:

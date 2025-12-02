@@ -33,7 +33,7 @@ tempo:
   # Refers to https://grafana.com/docs/tempo/latest/configuration/#server
   server:
     # -- HTTP server listen port
-    http_listen_port: 3100
+    http_listen_port: 3200
     grpc_server_max_recv_msg_size: 500000000
     grpc_server_max_send_msg_size: 500000000
 
