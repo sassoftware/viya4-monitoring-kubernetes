@@ -22,7 +22,7 @@ tempo:
   # Refers to https://grafana.com/docs/tempo/latest/configuration/#server
   server:
     # -- HTTP server listen port
-    http_listen_port: 3100
+    http_listen_port: 3200
   storage:
     trace:
       # tempo storage backend

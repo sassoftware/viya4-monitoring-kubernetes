@@ -1,5 +1,6 @@
 tempo:
- repository: __IMAGE_REPO_3LEVEL__
+ registry: __IMAGE_REGISTRY__
+ repository: __IMAGE_REPO_2LEVEL__
  tag: __IMAGE_TAG__
  pullPolicy: __IMAGE_PULL_POLICY__
  pullSecrets: __IMAGE_PULL_SECRETS__           
