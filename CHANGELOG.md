@@ -3,6 +3,9 @@
 * **Overall**
   * [CHANGE] Use with Kubernetes versions prior to 1.26 produce WARNING message
   * [CHANGE] Drop support for OpenShift 4.12; the minimum supported version of OpenShift is now 4.14
+* **Tracing**
+  * [UPGRADE] Upgraded Tempo from 2.7.0 to 2.9.0
+  * [UPGRADE] Upgraded Tempo Helm chart from 1.18.1 to 1.24.1
 
 
 ## Version 1.2.44 (18NOV2025)
