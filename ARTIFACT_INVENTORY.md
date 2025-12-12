@@ -16,11 +16,11 @@ registry/repository/image_name:version
 
 | Subsystem| Component | Fully Qualified Container-Image Name (registry/repository/image_name:version)|
 |----|----|----|
-| Logging | [Fluent Bit](https://github.com/fluent/fluent-bit) | cr.fluentbit.io/fluent/fluent-bit:4.0.8 |
+| Logging | [Fluent Bit](https://github.com/fluent/fluent-bit) | cr.fluentbit.io/fluent/fluent-bit:4.2.0 |
 | Logging | [Elasticsearch Exporter](https://github.com/prometheus-community/elasticsearch_exporter) | quay.io/prometheuscommunity/elasticsearch-exporter:v1.9.0 |
 | Logging | initContainer (Fluent Bit, OpenSearch) | docker.io/library/busybox:latest |
-| Logging | [OpenSearch](https://github.com/opensearch-project/OpenSearch) | docker.io/opensearchproject/opensearch:2.19.3 |
-| Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/OpenSearch-Dashboards) | docker.io/opensearchproject/opensearch-dashboards:2.19.3 |
+| Logging | [OpenSearch](https://github.com/opensearch-project/OpenSearch) | docker.io/opensearchproject/opensearch:2.19.4 |
+| Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/OpenSearch-Dashboards) | docker.io/opensearchproject/opensearch-dashboards:2.19.4 |
 | Metrics | [Alertmanager](https://github.com/prometheus/alertmanager) | quay.io/prometheus/alertmanager:v0.28.1 |
 | Metrics | [Grafana](https://github.com/grafana/grafana) | docker.io/grafana/grafana:12.2.0 |
 | Metrics | [Admission Webhook](https://github.com/kubernetes/ingress-nginx) | registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.3 |
@@ -51,9 +51,9 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 | Subsystem | Component | Helm Chart Repository | Helm Chart Name |Helm Chart Version | Helm Archive File Name|
 |--|--|--|--|--|--|
 | Logging | [Elasticsearch Exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-elasticsearch-exporter)| prometheus-community | prometheus-elasticsearch-exporter | 7.0.0 | prometheus-community/prometheus-elasticsearch-exporter-7.0.0.tgz |
-| Logging | [Fluent Bit](https://github.com/fluent/helm-charts/tree/main/charts/fluent-bit)| fluent | fluent-bit | 0.52.0 | fluent/fluent-bit-0.52.0.tgz |
-| Logging | [OpenSearch](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch)| opensearch | opensearch | 2.35.0 | opensearch/opensearch-2.35.0.tgz |
-| Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch-dashboards)| opensearch | opensearch-dashboards | 2.31.0 | opensearch/opensearch-dashboards-2.31.0.tgz |
+| Logging | [Fluent Bit](https://github.com/fluent/helm-charts/tree/main/charts/fluent-bit)| fluent | fluent-bit | 0.54.0 | fluent/fluent-bit-0.54.0.tgz |
+| Logging | [OpenSearch](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch)| opensearch | opensearch | 2.36.0 | opensearch/opensearch-2.36.0.tgz |
+| Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch-dashboards)| opensearch | opensearch-dashboards | 2.32.0 | opensearch/opensearch-dashboards-2.32.0.tgz |
 | Metrics | [Grafana (on OpenShift)](https://github.com/grafana/helm-charts/tree/main/charts/grafana)| grafana | grafana | 9.4.5 | grafana/grafana-9.4.5.tgz |
 | Metrics | [Kube Prometheus Stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)| prometheus-community | kube-prometheus-stack | 78.4.0 | prometheus-community/kube-prometheus-stack-78.4.0.tgz |
 | Metrics | [Prometheus Pushgateway](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway)| prometheus-community | prometheus-pushgateway | 3.4.1 | prometheus-community/prometheus-pushgateway-3.4.1.tgz |
@@ -64,4 +64,4 @@ This table provides version information for some miscellaneous components deploy
 
 | Component | Version | Project Repository | Notes |
 |--|--|--|--|
-| OpenSearch Datasource Plugin (Grafana) | 2.31.1 | https://github.com/grafana/opensearch-datasource/releases |Allows Grafana to surface log messages stored in OpenSearch |
+| OpenSearch Datasource Plugin (Grafana) | 2.32.1 | https://github.com/grafana/opensearch-datasource/releases |Allows Grafana to surface log messages stored in OpenSearch |
