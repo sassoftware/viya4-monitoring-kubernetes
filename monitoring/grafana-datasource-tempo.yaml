@@ -5,24 +5,26 @@ grafana:
   datasources:
     datasources.yaml:
      apiVersion: 1
+     prune: true
+     deleteDatasources:
+       - name: Tempo
      datasources:
-      - name: Tempo
-        type: tempo
-        url: http://v4m-tempo:3100
-        isDefault: false
-        editable: true
-        jsonData:
-          tracesToLogsV2:
-            datasourceUid: 'ViyaLogs'
-            filterByTraceID: true
-            # spanStartTimeShift: '1h'
-            # spanEndTimeShift: '-1h'
-            # tags: ['job', 'instance', 'pod', 'namespace']
-            # filterBySpanID: false
-            # customQuery: true
-            # query: 'method="${__span.tags.method}"'
-          serviceMap:
-            datasourceUid: prometheus
-          nodeGraph:
-            enabled: true
-        apiVersion: 1
+       - name: Tempo
+         type: tempo
+         url: http://v4m-tempo:3200
+         isDefault: false
+         editable: true
+         jsonData:
+           tracesToLogsV2:
+             datasourceUid: 'ViyaLogs'
+             filterByTraceID: true
+             # spanStartTimeShift: '1h'
+             # spanEndTimeShift: '-1h'
+             # tags: ['job', 'instance', 'pod', 'namespace']
+             # filterBySpanID: false
+             # customQuery: true
+             # query: 'method="${__span.tags.method}"'
+           serviceMap:
+             datasourceUid: prometheus
+           nodeGraph:
+             enabled: true

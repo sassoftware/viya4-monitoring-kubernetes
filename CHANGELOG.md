@@ -11,6 +11,9 @@
   * [UPGRADE] Fluent Bit Helm chart upgraded from 0.52.0 to 0.54.0
   * [UPGRADE] Elasticsearch Exporer Helm chart upgraded from 6.7.2 to 7.0.0
   * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.31.1 to 2.32.1
+* **Tracing**
+  * [UPGRADE] Upgraded Tempo from 2.7.0 to 2.9.0
+  * [UPGRADE] Upgraded Tempo Helm chart from 1.18.1 to 1.24.1
 
 
 ## Version 1.2.44 (18NOV2025)
