@@ -32,7 +32,7 @@ registry/repository/image_name:version
 | Metrics | [Prometheus Pushgateway](https://github.com/prometheus/pushgateway) | quay.io/prometheus/pushgateway:v1.11.1 |
 | Metrics | [Auto-load Sidecars](https://github.com/kiwigrid/k8s-sidecar) | quay.io/kiwigrid/k8s-sidecar:1.30.9 |
 | Metrics | OpenShift OAUTH Proxy (Grafana, OpenShift only) | registry.redhat.io/openshift4/ose-oauth-proxy:latest |
-| Metrics | [Tempo](https://github.com/grafana/tempo) | docker.io/grafana/tempo:2.7.0 |
+| Metrics | [Tempo](https://github.com/grafana/tempo) | docker.io/grafana/tempo:2.9.0 |
 
 ## Table 2. Helm Chart Repositories
 This table identifies the Helm repositories that contain the Helm charts used by SAS Viya Monitoring for Kubernetes.
@@ -57,7 +57,7 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 | Metrics | [Grafana (on OpenShift)](https://github.com/grafana/helm-charts/tree/main/charts/grafana)| grafana | grafana | 9.4.5 | grafana/grafana-9.4.5.tgz |
 | Metrics | [Kube Prometheus Stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)| prometheus-community | kube-prometheus-stack | 78.4.0 | prometheus-community/kube-prometheus-stack-78.4.0.tgz |
 | Metrics | [Prometheus Pushgateway](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway)| prometheus-community | prometheus-pushgateway | 3.4.1 | prometheus-community/prometheus-pushgateway-3.4.1.tgz |
-| Metrics | [Tempo](https://github.com/grafana/helm-charts/tree/main/charts/tempo)| grafana | tempo | 1.18.1 | grafana/tempo-1.18.1.tgz |
+| Metrics | [Tempo](https://github.com/grafana/helm-charts/tree/main/charts/tempo)| grafana | tempo | 1.24.1 | grafana/tempo-1.24.1.tgz |
 
 ## Table 4. Miscellaneous Component Version Information
 This table provides version information for some miscellaneous components deployed by SAS Viya Monitoring for Kubernetes.
