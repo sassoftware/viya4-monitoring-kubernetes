@@ -45,6 +45,7 @@ for var in $(compgen -A variable | grep '_FULL_IMAGE$'); do
 
     parseFullImage "$full_image"
 
+    # shellcheck disable=2153
     repo_image="$REPOS/$IMAGE:$VERSION"
 
     log_verbose "docker pull ""${full_image}"""
