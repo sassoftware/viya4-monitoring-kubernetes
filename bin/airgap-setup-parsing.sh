@@ -17,7 +17,7 @@ for var in "${required_vars[@]}"; do
     fi
 done
 
-if [[ -n "$AIRGAP_HELM_REPO" && "$AIRGAP_HELM_REPO" != "$AIRGAP_REGISTRY" ]]; then
+if [[ -n $AIRGAP_HELM_REPO && $AIRGAP_HELM_REPO != "$AIRGAP_REGISTRY" ]]; then
     log_warn "AIRGAP_HELM_REPO ($AIRGAP_HELM_REPO) does not match AIRGAP_REGISTRY ($AIRGAP_REGISTRY)."
     log_warn "This script currently does not support the storing of two types of different artifacts in different locations."
     echo
