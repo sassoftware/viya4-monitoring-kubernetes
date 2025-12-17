@@ -1,54 +1,40 @@
-#!/usr/bin/env bash
+#! /bin/bash
 
 source bin/common.sh
 
-TMP_DIR=$(mktemp -d -t sas.mon.XXXXXXXX)
+required_vars=(
+    "AIRGAP_REGISTRY"
+    "AIRGAP_REGISTRY_USERNAME"
+    "AIRGAP_REGISTRY_PASSWORD"
+)
 
-required_vars=("AIRGAP_REGISTRY" "CR_USERNAME" "CR_PASSWORD")
 for var in "${required_vars[@]}"; do
     if [ -z "${!var}" ]; then
-        log_error "ERROR: Environment variable $var is not set."
-        log_error "Please set it using: export $var=VALUE"
+        log_error "Environment variable $var is not set."
+        log_error "Please set it using: export $var=VALUE OR..."
+        log_error "...Set it in USER_DIR/user.env file."
         exit 1
     fi
 done
 
-COMPONENT_FILE=$(find "$HOME" -type f -name "component_versions.env" | head -n 1)
-ARTIFACT_FILE=$(find "$HOME" -type f -name "ARTIFACT_INVENTORY.md" | head -n 1)
-
-if [[ ! -f $COMPONENT_FILE ]]; then
-    log_error "ERROR: component_versions.env not found: $COMPONENT_FILE"
-    exit 1
+if [[ -n "$AIRGAP_HELM_REPO" && "$AIRGAP_HELM_REPO" != "$AIRGAP_REGISTRY" ]]; then
+    log_warn "AIRGAP_HELM_REPO ($AIRGAP_HELM_REPO) does not match AIRGAP_REGISTRY ($AIRGAP_REGISTRY)."
+    log_warn "This script currently does not support the storing of two types of different artifacts in different locations."
+    echo
 fi
 
-if [[ ! -f $ARTIFACT_FILE ]]; then
-    log_error "ERROR: ARTIFACT_INVENTORY.md not found: $ARTIFACT_FILE"
-    exit 1
-fi
-
-log_info "docker login ""$AIRGAP_REGISTRY"" -u ""$CR_USERNAME"" -p ___"
-docker login "$AIRGAP_REGISTRY" -u "$CR_USERNAME" -p "$CR_PASSWORD"
+log_info "docker login ""$AIRGAP_REGISTRY"" -u ""$AIRGAP_REGISTRY_USERNAME"" -p ___"
+docker login "$AIRGAP_REGISTRY" -u "$AIRGAP_REGISTRY_USERNAME" -p "$AIRGAP_REGISTRY_PASSWORD"
 
 log_info "Parsing $COMPONENT_FILE"
 echo
 
-log_notice "# Step 1 - Import Images"
+log_notice "Step 1 - Import Images"
 echo
 
-TABLE1_CONTENTS=$(awk '
-    /Table 1\./ {found=1}
-    found && /Fully Qualified Container-Image Name/ {start=1; next}
-    start && /^\|/ {
-        if ($0 ~ /^[[:space:]]*\|[[:space:]\-|:]*\|[[:space:]\-|:]*\|/) next
-        print
-    }
-    start && NF==0 { exit }
-' "$ARTIFACT_FILE")
+for var in $(compgen -A variable | grep '_FULL_IMAGE$'); do
+    full_image="${!var}"
 
-while IFS='|' read -r _ _ _ fullimage _; do
-    full_image=$(echo "$fullimage" | xargs)
-
-    [[ $full_image == "Full Qualified Container-Image Name"* ]] && continue
     [[ -z $full_image ]] && continue
 
     if [[ $full_image == "registry.redhat.io/openshift4/ose-oauth-proxy:latest" ]]; then
@@ -57,7 +43,9 @@ while IFS='|' read -r _ _ _ fullimage _; do
         continue
     fi
 
-    repo_image="${full_image#*/}"
+    parseFullImage "$full_image"
+
+    repo_image="$REPOS/$IMAGE:$VERSION"
 
     log_verbose "docker pull ""${full_image}"""
     docker pull "${full_image}"
@@ -68,35 +56,22 @@ while IFS='|' read -r _ _ _ fullimage _; do
     log_verbose "docker push ""$AIRGAP_REGISTRY""/""${repo_image}"""
     docker push "$AIRGAP_REGISTRY"/"${repo_image}"
     echo
-done <<< "$TABLE1_CONTENTS"
+done
 echo
 
-log_notice "# Step 2 - Helm Repo Add Commands"
+log_notice "Step 2 - Helm Repo Add Commands"
 echo
 
-declare -A REPO_URLS
+declare -A REPO_URLS=(
+    ["prometheus-community"]="https://prometheus-community.github.io/helm-charts"
+    ["grafana"]="https://grafana.github.io/helm-charts"
+    ["fluent"]="https://fluent.github.io/helm-charts"
+    ["opensearch"]="https://opensearch-project.github.io/helm-charts"
+)
 
-TABLE2_CONTENTS=$(awk '
-    /Table 2\./ {found=1}
-    found && /^\| Subsystem \| Component \| Helm Repository \| Helm Repository URL \|/ {start=1; next}
-    start && NF==0 {exit}
-    start
-' "$ARTIFACT_FILE")
-
-while IFS='|' read -r _ _ _ repo url _; do
-    repo=$(echo "$repo" | xargs)
-    url=$(echo "$url" | xargs)
-
-    [[ $repo == "Helm Repository" ]] && continue
-    [[ -z $repo || -z $url ]] && continue
-
-    REPO_URLS["$repo"]="$url"
-done <<< "$TABLE2_CONTENTS"
-echo
-
-grep -E "_CHART_REPO" "$COMPONENT_FILE" | while IFS='=' read -r _ val; do
-    repo_name="${val%%|*}"
-    repo_url="${REPO_URLS[$repo_name]}"
+for var in $(compgen -A variable | grep '_CHART_REPO'); do
+    repo_name="${!var}"
+    repo_url=${REPO_URLS[$repo_name]:-}
 
     if [[ -z $repo_url ]]; then
         log_warn "No URL for repo '$repo_name'. Skipping."
@@ -109,56 +84,58 @@ grep -E "_CHART_REPO" "$COMPONENT_FILE" | while IFS='=' read -r _ val; do
 done
 echo
 
-log_notice "# Step 3 - Helm Pull Commands"
+log_notice "Step 3 - Helm Pull Commands"
 echo
-
-TABLE3_CONTENTS=$(awk '
-    /Table 3\./ {found=1}
-    found && /Helm Chart Repository/ && /Helm Chart Name/ {start=1; next}
-    start && /^\|/ {
-        if ($0 ~ /^[[:space:]]*\|[[:space:]\-|:]*\|[[:space:]\-|:]*\|/) next
-        print
-    }
-    start && NF==0 { exit }
-' "$ARTIFACT_FILE")
 
 log_info "helm repo update"
 helm repo update
 echo
 
-while IFS='|' read -r _ _ _ repo chart version archive _; do
-    repo_name=$(echo "$repo" | xargs)
-    chart_name=$(echo "$chart" | xargs)
-    version=$(echo "$version" | xargs)
+for var in $(compgen -A variable | grep '_CHART_NAME'); do
+    prefix=${var%_CHART_NAME}
+    chart_name="${!var}"
+    repo_name_var="${prefix}_CHART_REPO"
+    version_var="${prefix}_CHART_VERSION"
 
-    [[ $repo_name == "Helm Chart Repository" ]] && continue
+    repo_name="${!repo_name_var:-}"
+    version="${!version_var:-}"
+
     [[ -z $repo_name || -z $chart_name || -z $version ]] && continue
 
     log_verbose "helm pull --destination ""$TMP_DIR"" --version ""${version}"" ""${repo_name}""/""${chart_name}"""
     helm pull --destination "$TMP_DIR" --version "${version}" "${repo_name}"/"${chart_name}"
-done <<< "$TABLE3_CONTENTS"
+done
 echo
 
-log_notice "# Step 4 - Helm Chart Push"
+log_notice "Step 4 - Helm Chart Push"
 echo
 
-log_info "helm registry login ""$AIRGAP_REGISTRY"" -u ""$CR_USERNAME"" -p ___"
-helm registry login "$AIRGAP_REGISTRY" -u "$CR_USERNAME" -p "$CR_PASSWORD"
+log_info "helm registry login ""$AIRGAP_REGISTRY"" -u ""$AIRGAP_REGISTRY_USERNAME"" -p ___"
+helm registry login "$AIRGAP_REGISTRY" -u "$AIRGAP_REGISTRY_USERNAME" -p "$AIRGAP_REGISTRY_PASSWORD"
 echo
 
-while IFS='|' read -r _ _ _ repo chart version archive _; do
-    repo_name=$(echo "$repo" | xargs)
-    archive_name=$(basename "$(echo "$archive" | xargs)")
+for archive_path in "$TMP_DIR"/*.tgz; do
+    [[ -f $archive_path ]] || continue
 
-    [[ $repo_name == "Helm Chart Repository" ]] && continue
-    [[ -z $repo_name || -z $archive_name ]] && continue
+    archive_name=$(basename "$archive_path")
 
-    log_verbose "helm push ""$TMP_DIR""/""${archive_name}"" oci://""$AIRGAP_REGISTRY""/""${repo_name}"""
-    helm push "$TMP_DIR"/"${archive_name}" oci://"$AIRGAP_REGISTRY"/"${repo_name}"
-done <<< "$TABLE3_CONTENTS"
+    if [[ $archive_name == *prometheus* ]]; then
+        repo_name="prometheus-community"
+    elif [[ $archive_name == *fluent* ]]; then
+        repo_name="fluent"
+    elif [[ $archive_name == *grafana* || $archive_name == *tempo* ]]; then
+        repo_name="grafana"
+    elif [[ $archive_name == *opensearch* ]]; then
+        repo_name="opensearch"
+    else
+        log_error "Unknown helm repo for archive: ${archive_name}"
+        exit 1
+    fi
+
+    log_info "helm push \"${archive_path}\" oci://$AIRGAP_REGISTRY/${repo_name}"
+    helm push "${archive_path}" "oci://$AIRGAP_REGISTRY/${repo_name}"
+done
 echo
-
-cleanup
 
 echo
 log_notice "Script Complete."
