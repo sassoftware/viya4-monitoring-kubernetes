@@ -1,4 +1,8 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Logging**
+  * [FIX] The `logging/bin/onboard.sh` script no longer fails when the `-p` parameter is set
+
 ## Version 1.2.45 (16DEC2025)
 * **Overall**
   * [CHANGE] Use with Kubernetes versions prior to 1.26 produces a WARNING message
