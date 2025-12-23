@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# Copyright ©2025, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 source bin/common.sh
 
 required_vars=(
@@ -10,53 +13,47 @@ required_vars=(
 
 for var in "${required_vars[@]}"; do
     if [ -z "${!var}" ]; then
-        log_error "Environment variable $var is not set."
-        log_error "Please set it using: export $var=VALUE OR..."
+        log_error "Environment variable ""${var}"" is not set."
+        log_error "Please set it using: export ""${var}""=VALUE OR..."
         log_error "...Set it in USER_DIR/user.env file."
         exit 1
     fi
 done
 
-if [[ -n $AIRGAP_HELM_REPO && $AIRGAP_HELM_REPO != "$AIRGAP_REGISTRY" ]]; then
-    log_warn "AIRGAP_HELM_REPO ($AIRGAP_HELM_REPO) does not match AIRGAP_REGISTRY ($AIRGAP_REGISTRY)."
+AIRGAP_HELM_REPO="${AIRGAP_HELM_REPO:-$AIRGAP_REGISTRY}"
+AIRGAP_HELM_USERNAME="${AIRGAP_HELM_USERNAME:-$AIRGAP_REGISTRY_USERNAME}"
+AIRGAP_HELM_PASSWORD="${AIRGAP_HELM_PASSWORD:-$AIRGAP_REGISTRY_PASSWORD}"
+
+if [[ $AIRGAP_HELM_REPO != "$AIRGAP_REGISTRY" ]] \
+    || [[ $AIRGAP_HELM_USERNAME != "$AIRGAP_REGISTRY_USERNAME" ]] \
+    || [[ $AIRGAP_HELM_PASSWORD != "$AIRGAP_REGISTRY_PASSWORD" ]]; then
+    log_warn "At least one of the values below do not match:"
+    log_warn "Airgap Helm repository [""${AIRGAP_HELM_REPO}""] ?= [""${AIRGAP_REGISTRY}""] Airap registry"
+    log_warn "Airgap Helm username [""${AIRGAP_HELM_USERNAME}""] ?= [""${AIRGAP_REGISTRY_USERNAME}""] Airap registry username"
+    log_warn "If the values above match, then the Airgap Helm password is different from the Airgap registry password."
     log_warn "This script currently does not support the storing of two types of different artifacts in different locations."
 fi
 
-get_chart_info() {
-    local chart_name_var="$1"
-
-    prefix=${chart_name_var%_CHART_NAME}
-    chart_name="${!chart_name_var}"
-    repo_name_var="${prefix}_CHART_REPO"
-    version_var="${prefix}_CHART_VERSION"
-
-    repo_name="${!repo_name_var:-}"
-    version="${!version_var:-}"
-
-    if [[ -z $repo_name || -z $chart_name || -z $version ]]; then
-        log_error "Missing at least one of the following values:"
-        log_error "Repo's Name: ${repo_name}"
-        log_error "Chart's Name: ${chart_name}"
-        log_error "Version number: ${version}"
-        exit 1
-    fi
-}
-
-log_info "docker login ""$AIRGAP_REGISTRY"" -u ""$AIRGAP_REGISTRY_USERNAME"" -p ___"
+log_info "Logging into the private registry ""$AIRGAP_REGISTRY"", with ""$AIRGAP_REGISTRY_USERNAME"" as the username"
 docker login "$AIRGAP_REGISTRY" -u "$AIRGAP_REGISTRY_USERNAME" -p "$AIRGAP_REGISTRY_PASSWORD"
 
 log_notice "Step 1 - Import Images"
+
+if [[ ${LOG_VERBOSE_ENABLE} == "false" ]]; then
+    log_info "This step may take a few minutes to complete."
+    log_info "If you want to see detailed progress of Step 1, set LOG_VERBOSE_ENABLE to true."
+fi
 
 while IFS='=' read -r var _; do
     full_image="${!var}"
 
     if [[ -z $full_image ]]; then
-        log_error "Failure when getting full image value: ${full_image}"
+        log_error "Failure when getting full image value: ""${full_image}"""
         exit 1
     fi
 
     if [[ $full_image == "registry.redhat.io/openshift4/ose-oauth-proxy:latest" ]]; then
-        log_warn "Skipping image: $full_image"
+        log_warn "Skipping image: ""${full_image}"""
         continue
     fi
 
@@ -65,15 +62,19 @@ while IFS='=' read -r var _; do
     # shellcheck disable=2153
     repo_image="$REPOS/$IMAGE:$VERSION"
 
-    log_verbose "docker pull ""${full_image}"""
+    log_verbose "Downloading image found in ""${full_image}"""
     docker pull "${full_image}"
-    log_verbose "docker tag ""${full_image}"" ""$AIRGAP_REGISTRY""/""${repo_image}"""
+    log_verbose "Giving ""${full_image}"" a new tag of ""$AIRGAP_REGISTRY""/""${repo_image}"""
     docker tag "${full_image}" "$AIRGAP_REGISTRY"/"${repo_image}"
-    log_verbose "docker push ""$AIRGAP_REGISTRY""/""${repo_image}"""
+    log_verbose "Uploading ""$AIRGAP_REGISTRY""/""${repo_image}"" to registry"
     docker push "$AIRGAP_REGISTRY"/"${repo_image}"
 done < <(env | grep '_FULL_IMAGE=')
 
 log_notice "Step 2 - Helm Repo Add Commands"
+
+if [[ ${LOG_VERBOSE_ENABLE} == "false" ]]; then
+    log_info "If you want to see detailed progress of Step 2, set LOG_VERBOSE_ENABLE to true."
+fi
 
 declare -A REPO_URLS=(
     ["prometheus-community"]="https://prometheus-community.github.io/helm-charts"
@@ -87,42 +88,49 @@ while IFS='=' read -r var _; do
     repo_url=${REPO_URLS[$repo_name]:-}
 
     if [[ -z $repo_url ]]; then
-        log_error "No URL for repo '$repo_name'"
+        log_error "No URL for repo ""${repo_name}"""
         exit 1
     fi
 
-    log_info "helm repo add ""${repo_name}"" ""${repo_url}"""
+    log_verbose "Adding Helm repo ""${repo_name}"" from ""${repo_url}"""
     helm repo add "${repo_name}" "${repo_url}"
 done < <(env | grep '_CHART_REPO=')
 
-log_notice "Step 3 - Helm Pull Commands"
+log_notice "Step 3 - Helm Pull and Push Commands"
 
-log_info "helm repo update"
+log_info "Updating Helm chart repos"
 helm repo update
 
-while IFS='=' read -r var _; do
-    get_chart_info "$var"
+log_info "Logging into the private repository, ""$AIRGAP_HELM_REPO"", with ""$AIRGAP_HELM_USERNAME"" as the username"
+helm registry login "$AIRGAP_HELM_REPO" -u "$AIRGAP_HELM_USERNAME" -p "$AIRGAP_HELM_PASSWORD"
 
-    log_verbose "helm pull --destination ""$TMP_DIR"" --version ""${version}"" ""${repo_name}""/""${chart_name}"""
+while IFS='=' read -r var _; do
+    prefix=${var%_CHART_NAME}
+    chart_name="${!var}"
+    repo_name_var="${prefix}_CHART_REPO"
+    version_var="${prefix}_CHART_VERSION"
+
+    repo_name="${!repo_name_var:-}"
+    version="${!version_var:-}"
+
+    if [[ -z $repo_name || -z $chart_name || -z $version ]]; then
+        log_error "Missing at least one of the following values:"
+        log_error "Repo's Name: ""${repo_name}"""
+        log_error "Chart's Name: ""${chart_name}"""
+        log_error "Version number: ""${version}"""
+        exit 1
+    fi
+
+    log_verbose "Writing Helm chart ""${chart_name}"" version ""${version}"" from repository ""${repo_name}"" to ""$TMP_DIR"""
     helm pull --destination "$TMP_DIR" --version "${version}" "${repo_name}"/"${chart_name}"
-done < <(env | grep '_CHART_NAME=')
-
-log_notice "Step 4 - Helm Chart Push"
-
-log_info "Logging into the private registry, ""$AIRGAP_REGISTRY"", with ""$AIRGAP_REGISTRY_USERNAME"" as the username"
-helm registry login "$AIRGAP_REGISTRY" -u "$AIRGAP_REGISTRY_USERNAME" -p "$AIRGAP_REGISTRY_PASSWORD"
-
-while IFS='=' read -r var _; do
-    get_chart_info "$var"
 
     archive_path="${TMP_DIR}/${chart_name}-${version}.tgz"
-
     if [[ -z $archive_path ]]; then
         log_error "Chart archive not found: ${archive_path}"
         exit 1
     fi
 
-    log_info "helm push \"${archive_path}\" oci://$AIRGAP_REGISTRY/${repo_name}"
+    log_verbose "Uploading Helm chart archive ""${chart_name}""-""${version}"".tgz found in ""$TMP_DIR"" to the ""${repo_name}"" repository in [""$AIRGAP_REGISTRY""]"
     helm push "${archive_path}" "oci://$AIRGAP_REGISTRY/${repo_name}"
 done < <(env | grep '_CHART_NAME=')
 
