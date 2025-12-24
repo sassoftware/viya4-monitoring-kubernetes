@@ -24,14 +24,8 @@ AIRGAP_HELM_REPO="${AIRGAP_HELM_REPO:-$AIRGAP_REGISTRY}"
 AIRGAP_HELM_USERNAME="${AIRGAP_HELM_USERNAME:-$AIRGAP_REGISTRY_USERNAME}"
 AIRGAP_HELM_PASSWORD="${AIRGAP_HELM_PASSWORD:-$AIRGAP_REGISTRY_PASSWORD}"
 
-if [[ $AIRGAP_HELM_REPO != "$AIRGAP_REGISTRY" ]] \
-    || [[ $AIRGAP_HELM_USERNAME != "$AIRGAP_REGISTRY_USERNAME" ]] \
-    || [[ $AIRGAP_HELM_PASSWORD != "$AIRGAP_REGISTRY_PASSWORD" ]]; then
-    log_warn "At least one of the values below do not match:"
-    log_warn "Airgap Helm repository [""${AIRGAP_HELM_REPO}""] ?= [""${AIRGAP_REGISTRY}""] Airap registry"
-    log_warn "Airgap Helm username [""${AIRGAP_HELM_USERNAME}""] ?= [""${AIRGAP_REGISTRY_USERNAME}""] Airap registry username"
-    log_warn "If the values above match, then the Airgap Helm password is different from the Airgap registry password."
-    log_warn "This script currently does not support the storing of two types of different artifacts in different locations."
+if [[ ${LOG_VERBOSE_ENABLE} == "false" ]]; then
+    log_info "The script may take a few minutes to complete. Thank you for your patience."
 fi
 
 log_info "Logging into the private registry ""$AIRGAP_REGISTRY"", with ""$AIRGAP_REGISTRY_USERNAME"" as the username"
@@ -39,21 +33,16 @@ docker login "$AIRGAP_REGISTRY" -u "$AIRGAP_REGISTRY_USERNAME" -p "$AIRGAP_REGIS
 
 log_notice "Step 1 - Import Images"
 
-if [[ ${LOG_VERBOSE_ENABLE} == "false" ]]; then
-    log_info "This step may take a few minutes to complete."
-    log_info "If you want to see detailed progress of Step 1, set LOG_VERBOSE_ENABLE to true."
-fi
-
 while IFS='=' read -r var _; do
     full_image="${!var}"
 
     if [[ -z $full_image ]]; then
-        log_error "Failure when getting full image value: ""${full_image}"""
+        log_error "Unable to extract container image from vlaue [""${full_image}""]"
         exit 1
     fi
 
     if [[ $full_image == "registry.redhat.io/openshift4/ose-oauth-proxy:latest" ]]; then
-        log_warn "Skipping image: ""${full_image}"""
+        log_info "Skipping image: ""${full_image}"""
         continue
     fi
 
@@ -62,19 +51,13 @@ while IFS='=' read -r var _; do
     # shellcheck disable=2153
     repo_image="$REPOS/$IMAGE:$VERSION"
 
-    log_verbose "Downloading image found in ""${full_image}"""
+    log_verbose "Importing image ""${full_image}"" into ""$AIRGAP_REGISTRY""/""${repo_image}"""
     docker pull "${full_image}"
-    log_verbose "Giving ""${full_image}"" a new tag of ""$AIRGAP_REGISTRY""/""${repo_image}"""
     docker tag "${full_image}" "$AIRGAP_REGISTRY"/"${repo_image}"
-    log_verbose "Uploading ""$AIRGAP_REGISTRY""/""${repo_image}"" to registry"
     docker push "$AIRGAP_REGISTRY"/"${repo_image}"
 done < <(env | grep '_FULL_IMAGE=')
 
 log_notice "Step 2 - Helm Repo Add Commands"
-
-if [[ ${LOG_VERBOSE_ENABLE} == "false" ]]; then
-    log_info "If you want to see detailed progress of Step 2, set LOG_VERBOSE_ENABLE to true."
-fi
 
 declare -A REPO_URLS=(
     ["prometheus-community"]="https://prometheus-community.github.io/helm-charts"
@@ -98,7 +81,6 @@ done < <(env | grep '_CHART_REPO=')
 
 log_notice "Step 3 - Helm Pull and Push Commands"
 
-log_info "Updating Helm chart repos"
 helm repo update
 
 log_info "Logging into the private repository, ""$AIRGAP_HELM_REPO"", with ""$AIRGAP_HELM_USERNAME"" as the username"
