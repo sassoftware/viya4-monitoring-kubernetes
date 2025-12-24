@@ -38,7 +38,7 @@ while IFS='=' read -r var _; do
     full_image="${!var}"
 
     if [[ -z $full_image ]]; then
-        log_error "Unable to extract container image from value [""${var}""]"
+        log_error "Unable to extract container image from [""${var}""]"
         exit 1
     fi
 
@@ -49,7 +49,6 @@ while IFS='=' read -r var _; do
 
     parseFullImage "$full_image"
 
-    # shellcheck disable=2153
     repo_image="$REPOS/$IMAGE:$VERSION"
 
     log_verbose "Importing image ""${full_image}"" into ""$AIRGAP_REGISTRY""/""${repo_image}"""
@@ -94,26 +93,26 @@ while IFS='=' read -r var _; do
     version_var="${prefix}_CHART_VERSION"
 
     repo_name="${!repo_name_var:-}"
-    version="${!version_var:-}"
+    version_number="${!version_var:-}"
 
-    if [[ -z $repo_name || -z $chart_name || -z $version ]]; then
+    if [[ -z $repo_name || -z $chart_name || -z $version_number ]]; then
         log_error "Missing at least one of the following values:"
         log_error "Repo's Name: ""${repo_name}"""
         log_error "Chart's Name: ""${chart_name}"""
-        log_error "Version number: ""${version}"""
+        log_error "Version number: ""${version_number}"""
         exit 1
     fi
 
-    log_verbose "Writing Helm chart ""${chart_name}"" version ""${version}"" from repository ""${repo_name}"" to ""$TMP_DIR"""
-    helm pull --destination "$TMP_DIR" --version "${version}" "${repo_name}"/"${chart_name}"
+    log_verbose "Writing Helm chart ""${chart_name}"" version ""${version_number}"" from repository ""${repo_name}"" to ""$TMP_DIR"""
+    helm pull --destination "$TMP_DIR" --version "${version_number}" "${repo_name}"/"${chart_name}"
 
-    archive_path="${TMP_DIR}/${chart_name}-${version}.tgz"
+    archive_path="${TMP_DIR}/${chart_name}-${version_number}.tgz"
     if [[ -z $archive_path ]]; then
         log_error "Chart archive not found: ${archive_path}"
         exit 1
     fi
 
-    log_verbose "Uploading Helm chart archive ""${chart_name}""-""${version}"".tgz found in ""$TMP_DIR"" to the ""${repo_name}"" repository in [""$AIRGAP_REGISTRY""]"
+    log_verbose "Uploading Helm chart archive ""${chart_name}""-""${version_number}"".tgz found in ""$TMP_DIR"" to the ""${repo_name}"" repository in [""$AIRGAP_REGISTRY""]"
     helm push "${archive_path}" "oci://$AIRGAP_REGISTRY/${repo_name}"
 done < <(env | grep '_CHART_NAME=')
 
