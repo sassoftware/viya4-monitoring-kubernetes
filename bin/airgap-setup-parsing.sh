@@ -26,6 +26,7 @@ AIRGAP_HELM_PASSWORD="${AIRGAP_HELM_PASSWORD:-$AIRGAP_REGISTRY_PASSWORD}"
 
 if [[ ${LOG_VERBOSE_ENABLE} == "false" ]]; then
     log_info "The script may take a few minutes to complete. Thank you for your patience."
+    log_info "If you want to see detailed progress of Step 1, set LOG_VERBOSE_ENABLE to true."
 fi
 
 log_info "Logging into the private registry ""$AIRGAP_REGISTRY"", with ""$AIRGAP_REGISTRY_USERNAME"" as the username"
@@ -37,7 +38,7 @@ while IFS='=' read -r var _; do
     full_image="${!var}"
 
     if [[ -z $full_image ]]; then
-        log_error "Unable to extract container image from vlaue [""${full_image}""]"
+        log_error "Unable to extract container image from value [""${full_image}""]"
         exit 1
     fi
 
