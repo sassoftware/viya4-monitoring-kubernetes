@@ -38,7 +38,7 @@ while IFS='=' read -r var _; do
     full_image="${!var}"
 
     if [[ -z $full_image ]]; then
-        log_error "Unable to extract container image from value [""${full_image}""]"
+        log_error "Unable to extract container image from value [""${var}""]"
         exit 1
     fi
 
