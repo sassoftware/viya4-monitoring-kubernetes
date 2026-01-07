@@ -38,7 +38,7 @@ if [[ ${LOG_VERBOSE_ENABLE} == "false" ]]; then
 fi
 
 log_info "Logging into the private registry ""$AIRGAP_REGISTRY"", with ""$AIRGAP_REGISTRY_USERNAME"" as the username"
-docker login "$AIRGAP_REGISTRY" -u "$AIRGAP_REGISTRY_USERNAME" -p "$AIRGAP_REGISTRY_PASSWORD"
+printf '%s\n' "$AIRGAP_REGISTRY_PASSWORD" | docker login "$AIRGAP_REGISTRY" -u "$AIRGAP_REGISTRY_USERNAME" --password-stdin
 
 log_notice "Step 1 - Import Images"
 
@@ -92,7 +92,7 @@ log_notice "Step 3 - Helm Pull and Push Commands"
 helm repo update
 
 log_info "Logging into the private repository, ""$AIRGAP_HELM_REPO"", with ""$AIRGAP_HELM_USERNAME"" as the username"
-helm registry login "$AIRGAP_HELM_REPO" -u "$AIRGAP_HELM_USERNAME" -p "$AIRGAP_HELM_PASSWORD"
+printf '%s\n' "$AIRGAP_HELM_PASSWORD" | helm registry login "$AIRGAP_HELM_REPO" -u "$AIRGAP_HELM_USERNAME" --password-stdin
 
 while IFS='=' read -r var _; do
     prefix=${var%_CHART_NAME}
