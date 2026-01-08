@@ -3,15 +3,15 @@
 # Copyright ©2025, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+export CHECK_KUBERNETES=FALSE
+export OPENSHIFT_VERSION_CHECK=FALSE
+
 source bin/common.sh
 
 if ! command -v docker > /dev/null 2>&1; then
     log_error "Docker not found on the current PATH."
     exit 1
 fi
-
-export CHECK_KUBERNETES=FALSE
-export OPENSHIFT_VERSION_CHECK=FALSE
 
 required_vars=(
     "AIRGAP_REGISTRY"
