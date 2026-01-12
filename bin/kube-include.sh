@@ -45,14 +45,14 @@ fi
 # 2025.12     1.31 1.33
 
 # Client version allowed to be one minor version earlier than minimum server version
-if [ "$KUBE_CLIENT_MAJOR" -eq "1" ] && [ "$KUBE_CLIENT_MINOR" -gt "26" ]; then
+if [ "$KUBE_CLIENT_MAJOR" -eq "1" ] && [ "$KUBE_CLIENT_MINOR" -gt "25" ]; then
     :
 else
     log_warn "Unsupported kubectl version: [$KUBE_CLIENT_VER]."
     log_warn "This script might not work as expected. Support might not be available until kubectl is upgraded to a supported version."
 fi
 
-if [ "$KUBE_SERVER_MAJOR" -eq "1" ] && [ "$KUBE_SERVER_MINOR" -gt "27" ]; then
+if [ "$KUBE_SERVER_MAJOR" -eq "1" ] && [ "$KUBE_SERVER_MINOR" -gt "26" ]; then
     :
 else
     log_warn "The detected version of Kubernetes [$KUBE_SERVER_VER] is not supported by any of the currently supported releases of SAS Viya."
