@@ -180,7 +180,7 @@ if [ "$AUTOGENERATE_SMTP" == "true" ]; then
     smtpTLSKeyFile="${SMTP_TLS_KEY_FILE:-/cert/tls.key}"
 
     # Create secret to hold SMTP user credentials
-    if [ "$smtpCreateUserSecret" == "true" ] ; then
+    if [ "$smtpCreateUserSecret" == "true" ]; then
         log_debug "Creating secret [$MON_NS/$SMTP_USER_SECRET] from supplied user [$SMTP_USER] and password."
         kubectl create secret generic "$SMTP_USER_SECRET" -n "$MON_NS" --from-literal=user="$SMTP_USER" --from-literal=password="$SMTP_PASSWORD"
     fi

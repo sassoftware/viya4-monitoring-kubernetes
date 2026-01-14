@@ -163,8 +163,8 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             fi
 
             if [ -n "$(kubectl get secret -n "$MON_NS" "$SMTP_USER_SECRET" --ignore-not-found -o name 2> /dev/null)" ]; then
-	            log_debug "Secret [$SMTP_USER_SECRET] exists; will use it for SMTP user credentials"
-	            # shellcheck disable=SC2034
+                log_debug "Secret [$SMTP_USER_SECRET] exists; will use it for SMTP user credentials"
+                # shellcheck disable=SC2034
                 smtpCreateUserSecret="false"
             elif [ -n "$SMTP_USER_SECRET" ] && [ -n "$SMTP_USER" ] && [ -n "$SMTP_PASSWORD" ]; then
                 log_debug "Secret [$MON_NS/$SMTP_USER_SECRET] will need to be created later."
