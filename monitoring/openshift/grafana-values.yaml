@@ -50,6 +50,7 @@ datasources:
         timeInterval: 5s
         tlsSkipVerify: true
       name: Prometheus
+      uid: prometheus
       secureJsonData:
         # This BEARER_TOKEN will be replaced with a token for grafana-serviceaccount
         httpHeaderValue1: 'Bearer __BEARER_TOKEN__'
@@ -80,3 +81,10 @@ testFramework:
       format: json
   "auth.basic":
     enabled: true
+extraVolumes:
+ - name: grafana-alert-rules
+   configMap:
+     name: grafana-alert-rules
+extraVolumeMounts:
+  - name: grafana-alert-rules
+    mountPath: /etc/grafana/provisioning/alerting

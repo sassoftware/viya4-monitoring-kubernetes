@@ -59,6 +59,9 @@ log_info "Removing components from the [$MON_NS] namespace..."
 log_info "Removing CA bundle..."
 kubectl delete --ignore-not-found cm grafana-trusted-ca-bundle
 
+log_info "Removing Grafana Alert Rules ConfigMap..."
+kubectl delete --ignore-not-found cm grafana-alert-rules
+
 log_info "Removing dashboards..."
 monitoring/bin/remove_dashboards.sh
 
