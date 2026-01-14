@@ -38,6 +38,9 @@ if [ -n "$promRelease" ]; then
     fi
 fi
 
+log_verbose "Removing Grafana Alert Rules ConfigMap"
+kubectl delete --ignore-not-found cm grafana-alert-rules
+
 log_verbose "Removing v4m-kubelet service"
 kubectl delete service --ignore-not-found -n kube-system v4m-kubelet
 
