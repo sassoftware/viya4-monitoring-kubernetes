@@ -7,6 +7,8 @@
 to send e-mails) has been extended to OpenShift clusters
   * [FEATURE] Support for deploying Grafana alerts defined in files from the $USER_DIR/monitoring/alerting
 sub-directory has been extended to OpenShift clusters
+  * [FIX] Corrected behavior on non-OpenShift clusters which had inappropriately required a Kubernetes
+Secret resource be created when automatically defining the SMTP server configuration
 
 ## Version 1.2.45 (16DEC2025)
 * **Overall**
