@@ -38,9 +38,6 @@ if [ -n "$promRelease" ]; then
     fi
 fi
 
-log_verbose "Removing Grafana Alert Rules ConfigMap"
-kubectl delete --ignore-not-found cm grafana-alert-rules
-
 log_verbose "Removing v4m-kubelet service"
 kubectl delete service --ignore-not-found -n kube-system v4m-kubelet
 
@@ -71,6 +68,7 @@ done
 log_verbose "Removing configmaps and secrets"
 kubectl delete cm --ignore-not-found -n "$MON_NS" -l sas.com/monitoring-base=kube-viya-monitoring
 kubectl delete secret --ignore-not-found -n "$MON_NS" -l sas.com/monitoring-base=kube-viya-monitoring
+kubectl delete cm --ignore-not-found -n "$MON_NS" grafana-alert-rules
 
 if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
     log_verbose "Removing known monitoring PVCs"
