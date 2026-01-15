@@ -20,13 +20,13 @@ def validate_input(checkInput):
     MAX_ROWS = 10000
     if checkInput['maxInt'] > MAX_ROWS:
         print("Error: Maxrows limit of 10000 exceeded.")
-        sys.exit()
+        sys.exit(1)
 
     #Check whether user provided kubeconfig for port-forwarding
     if checkInput['portforward']:
         if os.environ.get('KUBECONFIG') is None:
             print("Error: Port forwarding argument selected but no KUBECONFIG env variable set.")
-            sys.exit()
+            sys.exit(1)
         else: ##Set default values
             checkInput['host'] = 'port forwarded'
             checkInput['port'] = 'port forwarded'
@@ -35,7 +35,7 @@ def validate_input(checkInput):
     if(not checkInput['userName'] or not checkInput['password'] or not checkInput['host'] or not checkInput['port']):
         print('\nError: Missing required connection settings. Please specify username, password, host, and port. \nDefault values can be manually exported as environment variables OSHOST, OSPORT, OSUSER, OSPASSWD \nTo port-forward and skip OSHOST and OSPORT, use -pf')
         print("Username:", checkInput['userName'], " Password:", checkInput['password'], " Host:", checkInput['host'], " Port:", checkInput['port'])
-        sys.exit()
+        sys.exit(1)
 
     if checkInput['out-filename']: ##Check for supported file-types and existence of file
 
@@ -45,19 +45,19 @@ def validate_input(checkInput):
         if os.path.isfile(checkInput['out-filename']): ##Check if file already exists
             if (checkInput['force'] == False):
                 print("\nUser specified output file already exists. Use -f to overwrite the file.\n")
-                sys.exit()
+                sys.exit(1)
 
         safe_dir = os.getcwd() ## Check for path traversal attack
         if os.path.commonprefix((os.path.realpath(checkInput['out-filename']),safe_dir)) != safe_dir:
             print("Error: Out-file path must be in the current working directory.")
-            sys.exit()
+            sys.exit(1)
 
         try:
             x = open(checkInput['out-filename'], 'w')
             x.close()
         except FileNotFoundError as e:
             print("Error: Output file path not found. Please verify output file path. ")
-            sys.exit()
+            sys.exit(1)
 
     if checkInput['savequery']: ##Find saved query path location
         if(type(checkInput['savequery']) == list):
@@ -66,17 +66,17 @@ def validate_input(checkInput):
             checkInput['savequery'] = checkInput['savequery'] + ".json"
         if ((not ".json" in checkInput['savequery'])):
             print('Error: Not a supported filetype for the saved query file. Supported type is .json')
-            sys.exit()
+            sys.exit(1)
 
     if checkInput['query-filename']: ##Use for plugging in queries
         safe_dir = os.getcwd() ## Check for path traversal attack
         if os.path.commonprefix((os.path.realpath(checkInput['query-filename']),safe_dir)) != safe_dir:
             print("Error: Query file must be from the current working directory.")
-            sys.exit()
+            sys.exit(1)
 
         if (not os.path.isfile(checkInput['query-filename'])):
             print("Error: Invalid query file path.")
-            sys.exit()
+            sys.exit(1)
 
     ##Time Validator - Verifies input, and converts it to UTC
     if (type(checkInput['dateTimeStart']) ==list):
@@ -87,14 +87,14 @@ def validate_input(checkInput):
         checkInput['dateTimeStart'] = (time.strptime(checkInput.get('dateTimeStart'), "%Y-%m-%d %H:%M:%S"))
         checkInput['dateTimeEnd'] = (time.strptime(checkInput.get('dateTimeEnd'), "%Y-%m-%d %H:%M:%S"))
         if (calendar.timegm(checkInput['dateTimeStart']) > calendar.timegm(checkInput['dateTimeEnd'])):
-            print("Given start date is after the end date.")
-            sys.exit()
+            print("Error: Given start date is after the end date.")
+            sys.exit(1)
         else:
             checkInput['dateTimeStart'] = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.mktime(checkInput['dateTimeStart'])))
             checkInput['dateTimeEnd'] = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.mktime(checkInput['dateTimeEnd'])))
     except ValueError:
-        print("One or more date(s) have been formatted incorrectly. Correct format is Y-M-D H:M:S. Ex: 1999-02-16 10:00:00")
-        sys.exit()
+        print("Error: One or more date(s) have been formatted incorrectly. Correct format is Y-M-D H:M:S. Ex: 1999-02-16 10:00:00")
+        sys.exit(1)
 
     if (checkInput['message']): ## Argument formatting for query builder
         checkInput['message'] = checkInput['message'].replace('"',"'")
@@ -115,7 +115,7 @@ def open_port():
     port_namespace = result.stdout.replace("'", "")
     if (not port_namespace):
         print("Error: The V4M OpenSearch service is not currently running on this cluster. Port forwarding failed.")
-        sys.exit()
+        sys.exit(1)
 
     cmd = (["kubectl", "-n", port_namespace, "port-forward", "svc/v4m-search", str(port) + ':9200', '&'])
     full_command = " ".join(cmd)
@@ -306,7 +306,7 @@ def main():
                 outfile.write(x)
         else:
             print("Error: Saved query must be written to current working directory.")
-            sys.exit()
+            sys.exit(1)
         print("\nQuery saved to " + args['savequery'])
 
     print('\nSearching index: ')
@@ -323,11 +323,11 @@ def main():
         else:
             print("Connection error. Please verify connection values. ")
             print("Username:", args['userName'], " Password:", args['password'], " Host:", args['host'], " Port:", args['port'])
-        sys.exit()
+        sys.exit(1)
 
     if response['hits']['total']['value'] == 0:
         print("No results found for submitted query.")
-        sys.exit()
+        sys.exit(0)
 
     stdout = False
     if (not args['out-filename']):
@@ -352,8 +352,8 @@ def main():
                 fieldDict[field] = ''.join(fieldDict[field])
 
     if (len(hitsList) == 0):
-        print("Error: No fields matched provided fieldnames. Please verify the field on OpenSearch Dashboards.\n")
-        sys.exit()
+        print("No fields matched provided fieldnames. Please verify the field on OpenSearch Dashboards.\n")
+        sys.exit(0)
 
     ##Output as proper filetype, JSON or CSV
     if("json" in args['format']): ##JSON formatter, uses json.dump to print to stdout or file
