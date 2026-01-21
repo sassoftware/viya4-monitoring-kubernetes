@@ -7,7 +7,7 @@ metadata:
   name: v4m-monitoring
 spec:
   virtualhost:
-    fqdn: host.cluster.example.com
+    fqdn: monitoring.host.cluster.example.com
     tls:
       secretName: alertmanager-ingress-tls-secret
   routes:

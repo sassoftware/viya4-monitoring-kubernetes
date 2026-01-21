@@ -13,7 +13,7 @@ grafana:
   "grafana.ini":
     server:
       domain: host.cluster.example.com
-      root_url: https://host.cluster.example.com/grafana
+      root_url: https://monitoring.host.cluster.example.com/grafana
       serve_from_sub_path: true
 
 
@@ -41,7 +41,7 @@ grafana:
 ##    nodePort: null
 ##  prometheusSpec:
 ##    routePrefix: /prometheus
-##    externalUrl: https://host.cluster.example.com/prometheus
+##    externalUrl: https://monitoring.host.cluster.example.com/prometheus
 ##    alertingEndpoints:
 ##      - name: v4m-alertmanager
 ##        port: http-web
@@ -62,4 +62,4 @@ grafana:
 ##    nodePort: null
 ##  alertmanagerSpec:
 ##    routePrefix: /alertmanager
-##    externalUrl: https://host.cluster.example.com/alertmanager
+##    externalUrl: https://monitoring.host.cluster.example.com/alertmanager
