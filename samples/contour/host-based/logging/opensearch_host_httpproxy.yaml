@@ -9,7 +9,7 @@ spec:
   virtualhost:
     fqdn: search.host.cluster.example.com
     tls:
-      secretName: kibana-ingress-tls-secret
+      secretName: v4m-ingress-tls-secret
   routes:
     - conditions:
       - prefix: /

@@ -9,7 +9,7 @@ spec:
   virtualhost:
     fqdn: grafana.host.cluster.example.com
     tls:
-      secretName: grafana-ingress-tls-secret
+      secretName: v4m-ingress-tls-secret
   routes:
     - conditions:
       - prefix: /

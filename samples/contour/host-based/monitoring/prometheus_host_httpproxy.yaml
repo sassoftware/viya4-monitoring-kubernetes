@@ -9,7 +9,7 @@ spec:
   virtualhost:
     fqdn: prometheus.host.cluster.example.com
     tls:
-      secretName: prometheus-ingress-tls-secret
+      secretName: v4m-ingress-tls-secret
   routes:
     - conditions:
       - prefix: /
