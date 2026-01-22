@@ -41,12 +41,10 @@ or `path-based` subdirectories to your local customization directory
    `host.cluster.example.com` with the applicable host name for your
    environment.
 3. (Optional) Modify the files further, as needed.
-
-After you finish modifying the customization files, you can deploy
+4. After you finish modifying the customization files, you can deploy
 SAS Viya Monitoring for Kubernetes.  For more information, see
 [Deploy](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n1rhzwx0mcnnnun17q11v85bspyk.htm).
-
-Once the deployment process completes, you can create the required HTTPProxy resources
+5. Once the deployment process completes, you can create the required HTTPProxy resources
 by using the `kubectl apply` command pointing to appropriate YAML file(s).
 
 NOTE: At some sites, the ability to create HTTPProxy resources and/or how they can be configured, may be restricted.  \
@@ -54,7 +52,7 @@ Those restrictions could make require additional modifications to make this samp
 
 ## Update the YAML Files
 
-Edit the .yaml files within your `$USER_DIR/monitoring` and `$USER_DIR/monitoring`
+Edit the .yaml files you copied into your `$USER_DIR/logging` and `$USER_DIR/monitoring`
 subdirectories. Replace any sample host names with the applicable host name
 for your deployment. Specifically, you must replace `host.cluster.example.com` with
 the appropriate host name.
@@ -65,8 +63,8 @@ As of release 1.2.15 (19JUL23), SAS Viya Monitoring for Kubernetes is deployed w
 intra-cluster communications. The deployment scripts now automatically generate a set of
 self-signed TLS certificates for this purpose if you do not specify your own. For details, see [Transport Layer Security (TLS): Digital Certificates and Kubernetes Secrets](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=p1tedn8lzgvhlyn1bzwgvqvv3p4j.htm#n1pnll5qjcigjvn15shfdhdhr0lz).
 
-This sample assumes that access to the web applications also should be secured using
-TLS (that is, the web applications should be accessed via HTTPS instead of HTTP). This requires a second set of TLS
+This sample assumes that access to the web applications should also be secured using
+TLS (that is, the web applications should be accessed via HTTPS instead of HTTP). This requires a **second** set of TLS
 certificates that differ from those used for intra-cluster communication.  However, these certificates are **not**
 created automatically for you.  You must obtain these certificates, create Kubernetes secrets with specific
 names, and make them available to SAS Viya Monitoring for Kubernetes.
@@ -79,11 +77,12 @@ key in the appropriate YAML file before creating the HTTPProxy resources.
 ## Create the HTTPProxy Resources
 After running the deployment script, you will need to create the required HTTPProxy resource(s)
 by running the `'kubectl apply` command and pointing to the appropriate YAML file(s).  The
-HTTPProxy resource definitions are contained in files with names ending in `_httpproxy.yaml`.
+HTTPProxy resource definitions are contained in files with names ending in `_httpproxy.yaml`
+which you copied into your  `$USER_DIR/logging` and `$USER_DIR/monitoring` subdirectories.
 
 For example, the following command would create the HTTPProxy resource needed to access
 Grafana via the host-based configuration:
-` kubectl -n monitoring apply -f $USER_DIR/grafana_host_httpproxy.yaml`
+` kubectl -n monitoring apply -f $USER_DIR/monitoring/grafana_host_httpproxy.yaml`
 
 In the host-based configuration, a separate HTTPProxy resource is created for each web application
 you make available.  In the path-based configuration, only a single HTTPProxy resource (per namespace) is used.
@@ -106,7 +105,7 @@ creating the missing secret (not shown), re-running the `kubectl get` command sh
 
 ```
 $ kubectl -n logging get HTTPProxy
-NAME         FQDN                                                       TLS SECRET               STATUS    STATUS DESCRIPTION
+NAME         FQDN                              TLS SECRET               STATUS    STATUS DESCRIPTION
 v4m-osd      dashboards.************.sas.com   v4m-ingress-tls-secret   invalid   At least one error present, see Errors for details
 
 $ kubectl -n logging describe HTTPProxy v4m-osd
