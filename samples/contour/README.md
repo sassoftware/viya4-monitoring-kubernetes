@@ -154,7 +154,7 @@ Status:
 Events:         <none>
 
 $ kubectl -n logging get HTTPProxy
-NAME         FQDN                                                       TLS SECRET               STATUS   STATUS DESCRIPTION
+NAME         FQDN                              TLS SECRET               STATUS   STATUS DESCRIPTION
 v4m-osd      dashboards.************.sas.com   v4m-ingress-tls-secret   valid    Valid HTTPProxy
 ```
 
