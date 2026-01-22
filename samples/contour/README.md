@@ -149,7 +149,7 @@ Status:
   Description:             At least one error present, see Errors for details
   Load Balancer:
     Ingress:
-      Ip:       20.81.120.246
+      Ip:       **.**.**.**
       Ip Mode:  VIP
 Events:         <none>
 
@@ -171,7 +171,7 @@ When you deploy using the host-based configuration, the following applications a
 * OpenSearch Dashboards - `https://dashboards.host.mycluster.example.com`
 
 If you have chosen to make the following applications available and you have used the host-based
-configuratin, the applications are available at these locations:
+configuration, the applications are available at these locations:
 
 * Prometheus - `https://prometheus.host.mycluster.example.com`
 * Alertmanager - `https://alertmanager.host.mycluster.example.com`
@@ -186,7 +186,8 @@ When you deploy using the path-based configuragtion, the following applications 
 * Grafana - `https://host.mycluster.example.com/grafana`
 * OpenSearch Dashboards - `https://host.mycluster.example.com/dashboards`
 
-If you have chosen to make the following applications available and you have used the path-based configuration, the applications are available at these locations:
+If you have chosen to make the following applications available and you have used the path-based configuration,
+the applications are available at these locations:
 
 * Prometheus - `https://host.mycluster.example.com/prometheus`
 * Alertmanager - `https://host.mycluster.example.com/alertmanager`
