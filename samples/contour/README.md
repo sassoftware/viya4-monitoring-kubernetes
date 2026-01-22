@@ -192,3 +192,13 @@ the applications are available at these locations:
 * Prometheus - `https://host.mycluster.example.com/prometheus`
 * Alertmanager - `https://host.mycluster.example.com/alertmanager`
 * OpenSearch - `https://host.mycluster.example.com/opensearch`
+
+## Known Issues
+### OpenSearch Dashboards Did Not Load Properly
+We often see a banner (as shown below) indicating that OpenSearch Dashboards did not load properly
+when OpenSearch Dashboards is first brought up in a web browser after deploying the HTTPProxy resources.
+However, we have consistently seen the issue resolve itself after a simple refresh (F5) of the browser window.
+
+![OpenSearch Dashboards Did Not Load Properly Banner Message](images/osd_did_not_load_properly_banner.png)
+
+
