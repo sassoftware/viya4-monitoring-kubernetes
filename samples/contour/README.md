@@ -7,13 +7,13 @@ web applications that are deployed as part of the SAS Viya Monitoring for Kubern
 
 This sample provides information about two scenarios:
 
-* host-based
-* path-based
+* host-based routing
+* path-based routing
 
 These scenarios differ because of the URL that is used to access the applications:
 
-* For host-based, the application name is part of the host name itself (for example, `https://grafana.host.cluster.example.com/`).
-* For path-based, the host name is fixed and the application name is appended as a path on the URL (for example, `https://host.cluster.example.com/grafana`).
+* In host-based routing, the application name is part of the host name itself (for example, `https://grafana.host.cluster.example.com/`).
+* In path-based routing, the host name is fixed and the application name is appended as a path on the URL (for example, `https://host.cluster.example.com/grafana`).
 
 **Note:**  The ability to automatically generate Contour HTTPProxy resource
 definitions to permit access to the web applications was added with version
@@ -49,24 +49,15 @@ SAS Viya Monitoring for Kubernetes.  For more information, see
 Once the deployment process completes, you can create the required HTTPProxy resources
 by using the `kubectl apply` command pointing to appropriate YAML file(s).
 
+NOTE: At some sites, the ability to create HTTPProxy resources and/or how they can be configured, may be restricted.  \
+Those restrictions could make require additional modifications to make this sample work or require an entirely different approach.
+
 ## Update the YAML Files
 
 Edit the .yaml files within your `$USER_DIR/monitoring` and `$USER_DIR/monitoring`
 subdirectories. Replace any sample host names with the applicable host name
 for your deployment. Specifically, you must replace `host.cluster.example.com` with
 the appropriate host name.
-
-## Create the HTTPProxy Resources
-After running the deployment script, you will need to create the required HTTPProxy resource(s)
-by running the `'kubectl apply` command and pointing to the appropriate YAML file(s).  The
-HTTPProxy resource definitions are contained in files with names ending in `_httpproxy.yaml`.
-
-For example, the following command would create the HTTPProxy resource needed to access
-Grafana via the host-based configuration:
-` kubectl -n monitoring apply -f $USER_DIR/grafana_host_httpproxy.yaml`
-
-In the host-based configuration, a separate HTTPProxy resource is created for each web application
-you make available.  In the path-based configuration, only a single HTTPProxy resource (per namespace) is needed.
 
 ## Specify TLS Certificates to Use
 
@@ -80,6 +71,94 @@ certificates that differ from those used for intra-cluster communication.  Howev
 created automatically for you.  You must obtain these certificates, create Kubernetes secrets with specific
 names, and make them available to SAS Viya Monitoring for Kubernetes.
 For details, see [Enable TLS for Ingress](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n13g4ybmjfxr2an1tuy6a20zpvw7).
+
+This sample shows a single set of TLS certs used to secure all of the HTTPProxy resources.  However, that is not required.
+You can use different TLS certs for one (or more) of the HTTPProxy resources; just update the `spec.virtualhost.tls.secretname`
+key in the appropriate YAML file before creating the HTTPProxy resources.
+
+## Create the HTTPProxy Resources
+After running the deployment script, you will need to create the required HTTPProxy resource(s)
+by running the `'kubectl apply` command and pointing to the appropriate YAML file(s).  The
+HTTPProxy resource definitions are contained in files with names ending in `_httpproxy.yaml`.
+
+For example, the following command would create the HTTPProxy resource needed to access
+Grafana via the host-based configuration:
+` kubectl -n monitoring apply -f $USER_DIR/grafana_host_httpproxy.yaml`
+
+In the host-based configuration, a separate HTTPProxy resource is created for each web application
+you make available.  In the path-based configuration, only a single HTTPProxy resource (per namespace) is used.
+Furthermore, note that in the path-based configuration, this example adds a prefix (matching the namespace) to
+the hostname used in FQDN specified.  While this is not strictly necessary, including this prefix allows the
+HTTPProxy resources to be independent of any other "root proxy" (i.e. other HTTPProxy resources referencing the
+same virtualhost) resources.  If you omit the prefix, you will likely need to incorporate the routes for these
+web applications into existing HTTPProxy resources deployed in your environment rather than deploying new
+HTTPProxy resources.
+
+## Confirm the Status of the HTTPProxy Resources
+
+Once you have deployed the HTTPProxy resources, you should check their status.  This can be done using `kubectl get HTTPProxy` and
+`kubectl describe HTTPProxy` commands.  The output of the `kubectl get` command will report whether the HTTPProxy resource configuration
+is valid or not.  If the configuration is not valid, running the `kubectl describe` command will return additional information
+which may help clarify how to resolve the issues.
+
+In this sample console excerpt, we see that there is some sort of issue with the `v4m-osd` HTTPProxy.  And, after running the `kubectl describe` command on the invalid HTTPProxy resource, we see that the problem is caused by a missing Kubernetes Secret resource.  After
+creating the missing secret (not shown), re-running the `kubectl get` command shows the HTTPProxy resource is now in a valid state.
+
+```
+$ kubectl -n logging get HTTPProxy
+NAME         FQDN                                                       TLS SECRET               STATUS    STATUS DESCRIPTION
+v4m-osd      dashboards.************.sas.com   v4m-ingress-tls-secret   invalid   At least one error present, see Errors for details
+
+$ kubectl -n logging describe HTTPProxy v4m-osd
+Name:         v4m-osd
+Namespace:    logging
+Labels:       <none>
+Annotations:  <none>
+API Version:  projectcontour.io/v1
+Kind:         HTTPProxy
+Metadata:
+  Creation Timestamp:  2026-01-21T23:00:25Z
+  Generation:          1
+  Resource Version:    247774
+  UID:                 4f78e921-1b3d-4946-92cd-d6bc34440059
+Spec:
+  Routes:
+    Conditions:
+      Prefix:  /
+    Services:
+      Name:      v4m-osd
+      Port:      5601
+      Protocol:  tls
+  Virtualhost:
+    Fqdn:  dashboards.************.sas.com
+    Tls:
+      Secret Name:  v4m-ingress-tls-secret
+Status:
+  Conditions:
+    Errors:
+      Message:             Spec.VirtualHost.TLS Secret "v4m-ingress-tls-secret" is invalid: Secret not found
+      Reason:              SecretNotValid
+      Status:              True
+      Type:                TLSError
+    Last Transition Time:  2026-01-21T23:00:25Z
+    Message:               At least one error present, see Errors for details
+    Observed Generation:   1
+    Reason:                ErrorPresent
+    Status:                False
+    Type:                  Valid
+  Current Status:          invalid
+  Description:             At least one error present, see Errors for details
+  Load Balancer:
+    Ingress:
+      Ip:       20.81.120.246
+      Ip Mode:  VIP
+Events:         <none>
+
+$ kubectl -n logging get HTTPProxy
+NAME         FQDN                                                       TLS SECRET               STATUS   STATUS DESCRIPTION
+v4m-osd      dashboards.************.sas.com   v4m-ingress-tls-secret   valid    Valid HTTPProxy
+```
+
 
 ## Access the Applications
 
