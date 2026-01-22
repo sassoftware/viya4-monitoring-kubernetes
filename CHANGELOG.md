@@ -2,6 +2,13 @@
 ## Unreleased
 * **Logging**
   * [FIX] The `logging/bin/onboard.sh` script no longer fails when the `-p` parameter is set
+* **Metrics**
+  * [FEATURE] Support for automatically defining SMTP server configuration (permitting Grafana
+to send e-mails) has been extended to OpenShift clusters
+  * [FEATURE] Support for deploying Grafana alerts defined in files from the $USER_DIR/monitoring/alerting
+sub-directory has been extended to OpenShift clusters
+  * [FIX] Corrected behavior on non-OpenShift clusters which had inappropriately required a Kubernetes
+Secret resource be created when automatically defining the SMTP server configuration
 
 ## Version 1.2.45 (16DEC2025)
 * **Overall**
