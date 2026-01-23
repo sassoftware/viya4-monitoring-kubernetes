@@ -1,0 +1,25 @@
+## Sample: contour/path-based-ingress Version: 0.0.1
+
+
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: v4m-search
+spec:
+  virtualhost:
+    fqdn: monitoring.host.cluster.example.com
+    tls:
+      secretName: v4m-ingress-tls-secret
+  routes:
+    - conditions:
+      - prefix: /opensearch
+      services:
+        - name: v4m-search
+          port: 9200
+          protocol: tls
+      pathRewritePolicy:
+        replacePrefix:
+        - prefix: /opensearch
+          replacement: /
+
+

@@ -1,0 +1,65 @@
+## Sample: contour/path-based-ingress Version: 0.0.1
+
+
+#
+# Grafana
+#
+
+grafana:
+  # Disable default configuration of NodePort
+  service:
+    type: ClusterIP
+    nodePort: null
+  "grafana.ini":
+    server:
+      domain: host.cluster.example.com
+      root_url: https://monitoring.host.cluster.example.com/grafana
+      serve_from_sub_path: true
+
+
+
+# This sample does NOT make the Prometheus and Alertmanager accessible by default.
+# However, you can make one or both of these web applications
+# accessible by uncommenting out the approprate section(s) below.
+# To do so, remove the double hash marks (##) from each line in the section.
+
+
+# Note that Prometheus and Alertmanager
+# do not have any authentication configured by default, and exposing
+# an unauthenticated applicaton without other restrictions in place
+# is insecure.
+
+
+#
+# Prometheus
+#
+
+##prometheus:
+##  # Disable default configuration of NodePort
+##  service:
+##    type: ClusterIP
+##    nodePort: null
+##  prometheusSpec:
+##    routePrefix: /prometheus
+##    externalUrl: https://monitoring.host.cluster.example.com/prometheus
+##    alertingEndpoints:
+##      - name: v4m-alertmanager
+##        port: http-web
+##        pathPrefix: "/alertmanager"
+##        scheme: https
+##        tlsConfig:
+##          insecureSkipVerify: true
+
+
+#
+# Alertmanager
+#
+
+##alertmanager:
+##  # Disable default configuration of NodePort
+##  service:
+##    type: ClusterIP
+##    nodePort: null
+##  alertmanagerSpec:
+##    routePrefix: /alertmanager
+##    externalUrl: https://monitoring.host.cluster.example.com/alertmanager
