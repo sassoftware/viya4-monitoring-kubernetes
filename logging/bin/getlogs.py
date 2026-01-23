@@ -16,12 +16,6 @@ from subprocess import run
 def validate_input(checkInput):
     """ Validate the arguments passed by the user to ensure script will function properly"""
 
-    ##Set maximum log limit for output
-    MAX_ROWS = 10000
-    if checkInput['maxInt'] > MAX_ROWS:
-        print("Error: Maxrows limit of 10000 exceeded.")
-        sys.exit(1)
-
     #Check whether user provided kubeconfig for port-forwarding
     if checkInput['portforward']:
         if os.environ.get('KUBECONFIG') is None:
@@ -221,7 +215,7 @@ def get_arguments():
     parser.add_argument('-se', '--search', required=False, dest= "message", metavar="MESSAGE",  help = "\nWord or phrase contained in log message. Use quotes to surround your message ('' or "")\n\n\n \t\t\t QUERY OUTPUT SETTINGS: \n\n")
 
     ##Query and Output Params
-    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=10,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
+    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=10,  help = "\nThe maximum number of log messsages to return.\n\n")
     parser.add_argument('-q', '--query-file ', required=False, dest="query-filename", metavar="FILENAME.*", help = "\n Filepath of existing saved query in current working directory. Program will submit query from file, ALL other query parmeters ignored. Supported filetypes: .txt, .json\n\n")
     parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Displays the actual query that will be submitted during execution.\n\n")
     parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (without filetype) in which to save the generated query. Query is saved as JSON file in current working directory.\n\n")
@@ -311,7 +305,8 @@ def main():
 
     print('\nSearching index: ')
     try:
-        response = client.search(body=x, index=index_name)
+        #scroll
+        response = client.search(body=x, index=index_name, scroll='1m')
     except Exception as e:
         print(e)
         if ("getaddrinfo" in str(e)):
@@ -334,15 +329,41 @@ def main():
         stdout = True
     else:
         # deepcode ignore PT: <Path traversal detection for out-filename already implemented on line 42>
-        x = open(args['out-filename'], 'w')
+        x = open(args['out-filename'], 'w', encoding='utf-8', newline='')
+    
+    MAX_ROWS=args['maxInt']
+    row_count=0
 
     hitsList = [] ##Check to see if any fields in response matched user provided fields, collect matching fields
+    pagination_id = response["_scroll_id"]
     for hit in response['hits']['hits']:
         try:
             hit['fields']['_id'] = hit['_id']
             hitsList.append(hit['fields'])
         except KeyError as e:
-            next
+            continue
+        row_count += 1
+        if row_count >= MAX_ROWS:
+            break
+    while len(response['hits']['hits']) != 0 and row_count < MAX_ROWS:
+        response = client.scroll(
+            scroll='1m',
+            scroll_id=pagination_id
+        )
+        pagination_id = response["_scroll_id"]
+        for hit in response['hits']['hits']:
+            try:
+                hit['fields']['_id'] = hit['_id']
+                hitsList.append(hit['fields'])
+            except KeyError as e:
+                continue
+            row_count += 1
+            if row_count >= MAX_ROWS:
+                break
+    try:
+        client.clear_scroll(scroll_id=pagination_id)
+    except Exception:
+        pass
 
     for fieldDict in hitsList:
         for field in args['fields']:
