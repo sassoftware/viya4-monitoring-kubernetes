@@ -129,8 +129,8 @@ def build_query(args):
     if (not args['query-filename']):
         tfile = tempfile.NamedTemporaryFile(delete = False)  ##If User has not specified query file, create temp file for one.
         temp = open(tfile.name, 'w')
-
-        temp.write('{"size": ' + str(args['maxInt']) + ',"sort": [{"@timestamp": {"order": "desc","unmapped_type": "boolean"} }]')     ## Establish size of query, remove scoring
+        
+        temp.write('{"size": ' + str(min(args['maxInt'],10000)) + ',"sort": [{"@timestamp": {"order": "desc","unmapped_type": "boolean"} }]')     ## Establish size of query, remove scoring
         temp.write(', "query": {"bool": {"must":[ {"range": {"@timestamp": {"gte": "' + args['dateTimeStart'] + '","lt": "' + args['dateTimeEnd'] + '"} } }], ')   ##Establish Query with Time Range Requirements
         temp.write('"should": [ ')     ## Should Clause, search results must inlcude at least one of each specified option
         for argname in args.keys():
