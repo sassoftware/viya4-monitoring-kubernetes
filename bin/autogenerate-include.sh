@@ -73,10 +73,26 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
         fi
 
         #validate required inputs:
+        #   INGRESS_TYPE
         #   BASE_DOMAIN
         #   ROUTING
         #   INGRESS_CERT
         #   INGRESS_KEY
+
+        INGRESS_TYPE="${INGRESS_TYPE:-ingress-nginx}"
+
+        if [ "$INGRESS_TYPE" != "ingress-nginx" ] && [ "$INGRESS_TYPE" != "contour" ]; then
+            log_error "Invalid INGRESS_TYPE value, valid values are 'ingress-nginx' or 'contour'"
+            exit 1
+        elif [ "$INGRESS_TYPE" != "contour" ]; then
+            # verify Contour HTTPProxy CRDs available
+            if kubectl get crd "httpproxies.projectcontour.io" 1> /dev/null 2>&1; then
+                log_debug "Contour HTTPProxy CRD installed"
+            else
+                log_error "Ingress type [contour] specified but required CRDs are not installed"
+                exit 1
+            fi
+        fi
 
         if [ -z "$BASE_DOMAIN" ]; then
             log_error "Required parameter [BASE_DOMAIN] not provided"
@@ -98,6 +114,7 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
                 # Only WARN b/c missing cert doesn't prevent deployment and it can be created afterwards
                 log_warn "Missing Ingress certificate file; specified Ingress cert [$INGRESS_CERT] and/or key [$INGRESS_KEY] file is missing."
                 log_warn "You can create the missing Kubernetes secrets after deployment. See Enable TLS for Ingress topic in Help Center documentation."
+
                 #unset variable values to prevent further attempted use
                 unset INGRESS_CERT
                 unset INGRESS_KEY
