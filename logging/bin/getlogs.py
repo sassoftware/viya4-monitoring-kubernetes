@@ -373,7 +373,7 @@ def main():
                 fieldDict[field] = ''.join(fieldDict[field])
 
     if (len(hitsList) == 0):
-        print("No fields matched provided fieldnames. Please verify the field on OpenSearch Dashboards.\n")
+        print("No fields in the results matched the provided field names. Please verify the correct field names in OpenSearch Dashboards and try again.\n")
         sys.exit(0)
 
     ##Output as proper filetype, JSON or CSV
