@@ -306,7 +306,7 @@ def main():
     print('\nSearching index: ')
     try:
         #scroll
-        response = client.search(body=x, index=index_name, scroll='1m')
+        response = client.search(body=x, index=index_name, scroll='3m')
     except Exception as e:
         print(e)
         if ("getaddrinfo" in str(e)):
@@ -347,7 +347,7 @@ def main():
             break
     while len(response['hits']['hits']) != 0 and row_count < MAX_ROWS:
         response = client.scroll(
-            scroll='1m',
+            scroll='3m',
             scroll_id=pagination_id
         )
         pagination_id = response["_scroll_id"]
