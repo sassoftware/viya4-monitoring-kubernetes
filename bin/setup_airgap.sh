@@ -6,14 +6,11 @@
 export CHECK_KUBERNETES=FALSE
 export OPENSHIFT_VERSION_CHECK=FALSE
 export CHECK_HELM=TRUE
-export MON_NS="${MON_NS:-monitoring}"
-export LOG_NS="${LOG_NS:-logging}"
-export AIRGAP_IMAGE_PULL_SECRET_NAME="${AIRGAP_IMAGE_PULL_SECRET_NAME:-v4m-image-pull-secret}"
 
 source bin/common.sh
 
 if ! command -v docker > /dev/null 2>&1; then
-    log_error "Docker not found on the current PATH."
+    log_error "Missing required utility: docker"
     exit 1
 fi
 
@@ -21,7 +18,6 @@ required_vars=(
     "AIRGAP_REGISTRY"
     "AIRGAP_REGISTRY_USERNAME"
     "AIRGAP_REGISTRY_PASSWORD"
-    "EMAIL_ORGANIZATION"
 )
 
 for var in "${required_vars[@]}"; do
@@ -131,13 +127,12 @@ done < <(env | grep '_CHART_NAME=')
 
 log_notice "Step 4 - Download Prometheus Operator CRDs"
 
-promop_image="$PROMOP_FULL_IMAGE"
-if [[ -z $promop_image ]]; then
-    log_error "Unable to extract prometheus operator image from PROMOP_FULL_IMAGE: [""${PROMOP_FULL_IMAGE}""]"
+if [[ -z $PROMOP_FULL_IMAGE ]]; then
+    log_error "Prometheus operator component is not set. PROMOP_FULL_IMAGE: [""${PROMOP_FULL_IMAGE}""]."
     exit 1
 fi
 
-promop_version="${promop_image##*:}"
+promop_version="${PROMOP_FULL_IMAGE##*:}"
 log_verbose "Promethues Operator version: ""${promop_version}"""
 promop_dir="$USER_DIR/monitoring/prometheus-operator-crd/${promop_version}"
 mkdir -p "${promop_dir}"
@@ -158,7 +153,7 @@ for crd in "${crds[@]}"; do
     crd_url="${base_url}/${crd_file}"
     log_verbose "Downloading CRD [$crd_file]"
     curl -fS "${crd_url}" -o "${promop_dir}/${crd_file}" || {
-        log_error "Failed to download CRD [$crd_file]"
+        log_error "Failed to download CRD [${crd_file}]"
         log_error "URL: ${crd_url}"
         exit 1
     }
@@ -166,42 +161,21 @@ done
 
 log_notice "Step 5 - Download OpenSearch Grafana Datasource Plugin"
 
-plugin_version="$GRAFANA_DATASOURCE_PLUGIN_VERSION"
-if [[ -z $plugin_version ]]; then
-    log_error "Unable to extract grafana plugin version from GRAFANA_DATASOURCE_PLUGIN_VERSION: [""${GRAFANA_DATASOURCE_PLUGIN_VERSION}""]"
+if [[ -z $GRAFANA_DATASOURCE_PLUGIN_VERSION ]]; then
+    log_error "No version found for OpenSearch Datasource Plugin (Grafana). GRAFANA_DATASOURCE_PLUGIN_VERSION: [""${GRAFANA_DATASOURCE_PLUGIN_VERSION}""]"
     exit 1
 fi
 
 plugin_dir="$USER_DIR/monitoring"
-plugin_file="grafana-opensearch-datasource-${plugin_version}.linux_amd64.zip"
-plugin_url="https://github.com/grafana/opensearch-datasource/releases/download/v${plugin_version}/${plugin_file}"
+plugin_file="grafana-opensearch-datasource-${GRAFANA_DATASOURCE_PLUGIN_VERSION}.linux_amd64.zip"
+plugin_url="https://github.com/grafana/opensearch-datasource/releases/download/v${GRAFANA_DATASOURCE_PLUGIN_VERSION}/${plugin_file}"
 
-log_verbose "Downloading Grafana Opensearch datasource plugin version ${plugin_version}"
+log_verbose "Downloading Grafana Opensearch datasource plugin version [""${GRAFANA_DATASOURCE_PLUGIN_VERSION}""]"
 mkdir -p "$plugin_dir"
 
 curl -fS "${plugin_url}" -o "${plugin_dir}/${plugin_file}" || {
     log_error "Failed to download Grafana datasource plugin"
     exit 1
 }
-
-log_notice "Step 6 - Prepare to Deploy"
-
-for ns in "$LOG_NS" "$MON_NS"; do
-    if ! kubectl get namespace "$ns" > /dev/null 2>&1; then
-        log_verbose "Creating namespace [$ns]"
-        kubectl create namespace "$ns"
-    else
-        log_debug "Namespace [$ns] already exists"
-    fi
-done
-
-for ns in "$LOG_NS" "$MON_NS"; do
-    if ! kubectl -n "$ns" get secret "$AIRGAP_IMAGE_PULL_SECRET_NAME" > /dev/null 2>&1; then
-        log_verbose "Creating secret [$AIRGAP_IMAGE_PULL_SECRET_NAME] in namespace [$ns]"
-        kubectl create secret docker-registry "$AIRGAP_IMAGE_PULL_SECRET_NAME" -n "$ns" --docker-server="$AIRGAP_REGISTRY" --docker-username="$AIRGAP_REGISTRY_USERNAME" --docker-password="$AIRGAP_REGISTRY_PASSWORD" --docker-email="$EMAIL_ORGANIZATION"
-    else
-        log_verbose "Secret [$AIRGAP_IMAGE_PULL_SECRET_NAME] already exists in [$ns]"
-    fi
-done
 
 log_notice "Script Complete."
