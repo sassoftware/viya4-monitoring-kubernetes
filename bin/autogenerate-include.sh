@@ -125,7 +125,7 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
         #optional settings
         # SMTP_USER - no default
         # SMTP_PASSWORD - no default
-        SMTP_USER_SECRET="${SMTP_USER_SECRET:-grafana-smtp-user}"
+        # SMTP_USER_SECRET - no default (default set in code below)
         SMTP_SKIP_VERIFY="${SMTP_SKIP_VERIFY:-false}"
         SMTP_TLS_CERT_FILE="${SMTP_TLS_CERT_FILE:-/cert/tls.crt}"
         SMTP_TLS_KEY_FILE="${SMTP_TLS_KEY_FILE:-/cert/tls.key}"
@@ -153,20 +153,32 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
         fi
 
         # Handle SMTP user credentials
-        if [ -n "$(kubectl get secret -n "$MON_NS" "$SMTP_USER_SECRET" --ignore-not-found -o name 2> /dev/null)" ]; then
-            log_debug "Secret [$SMTP_USER_SECRET] exists; will use it for SMTP user credentials"
-        elif [ -z "$SMTP_USER" ] && [ -z "$SMTP_PASSWORD" ]; then
-            log_debug "Neither SMTP_USER nor SMTP_PASSWORD are set; skipping creation of secret [$SMTP_USER_SECRET]"
-        elif [ -z "$SMTP_USER" ] || [ -z "$SMTP_PASSWORD" ]; then
-            log_error "Complete SMTP Credentials NOT provided; MUST provide BOTH [SMTP_USER] and [SMTP_PASSWORD]"
-            log_info "SMTP_USER is set to [$SMTP_USER] and SMTP_PASSWORD is set to [$SMTP_PASSWORD]"
-            exit 1
-        else
-            log_debug "Secret [$MON_NS/$SMTP_USER_SECRET] will need to be created later."
+        if [ -z "$SMTP_USER_SECRET" ] && [ -z "$SMTP_USER" ] && [ -z "$SMTP_PASSWORD" ]; then
+            log_debug "SMTP_USER_SECRET, SMTP_USER and SMTP_PASSWORD are NOT set; skipping creation of secret [$SMTP_USER_SECRET]"
             # shellcheck disable=SC2034
-            smtpCreateUserSecret="true"
-        fi
+            smtpCreateUserSecret="false"
+        else
+            if [ -z "$SMTP_USER_SECRET" ]; then
+                SMTP_USER_SECRET="grafana-smtp-user"
+            fi
 
+            if [ -n "$(kubectl get secret -n "$MON_NS" "$SMTP_USER_SECRET" --ignore-not-found -o name 2> /dev/null)" ]; then
+                log_debug "Secret [$SMTP_USER_SECRET] exists; will use it for SMTP user credentials"
+                # shellcheck disable=SC2034
+                smtpCreateUserSecret="false"
+            elif [ -n "$SMTP_USER_SECRET" ] && [ -n "$SMTP_USER" ] && [ -n "$SMTP_PASSWORD" ]; then
+                log_debug "Secret [$MON_NS/$SMTP_USER_SECRET] will need to be created later."
+                # shellcheck disable=SC2034
+                smtpCreateUserSecret="true"
+            elif [ -n "$SMTP_USER_SECRET" ] && [ -z "$SMTP_USER" ] && [ -z "$SMTP_PASSWORD" ]; then
+                log_error "The secret [$SMTP_USER_SECRET] specified in SMTP_USER_SECRET does NOT exist in [$MON_NS] namespace"
+                exit 1
+            else
+                log_error "Complete SMTP Credentials NOT provided; MUST provide BOTH [SMTP_USER] and [SMTP_PASSWORD]"
+                log_info "SMTP_USER is set to [$SMTP_USER] and SMTP_PASSWORD is set to [$SMTP_PASSWORD]"
+                exit 1
+            fi
+        fi
     fi
 
     export AUTOGENERATE_SOURCED="true"

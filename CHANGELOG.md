@@ -10,6 +10,13 @@ of the private container registry and the associated credentials need to be iden
 setting the environment variables `AIRGAP_REGISTRY`, `AIRGAP_REGISTRY_USERNAME`, and
 `AIRGAP_REGISTRY_PASSWORD` prior to running the script, preferably in the `$USER_DIR/user.env`
 file. Refer to ___ (the documentation link will be populated after it is created) for more info.
+* **Metrics**
+  * [FEATURE] Support for automatically defining SMTP server configuration (permitting Grafana
+to send e-mails) has been extended to OpenShift clusters
+  * [FEATURE] Support for deploying Grafana alerts defined in files from the $USER_DIR/monitoring/alerting
+sub-directory has been extended to OpenShift clusters
+  * [FIX] Corrected behavior on non-OpenShift clusters which had inappropriately required a Kubernetes
+Secret resource be created when automatically defining the SMTP server configuration
 
 ## Version 1.2.45 (16DEC2025)
 * **Overall**

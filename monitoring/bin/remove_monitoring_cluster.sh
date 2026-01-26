@@ -68,6 +68,7 @@ done
 log_verbose "Removing configmaps and secrets"
 kubectl delete cm --ignore-not-found -n "$MON_NS" -l sas.com/monitoring-base=kube-viya-monitoring
 kubectl delete secret --ignore-not-found -n "$MON_NS" -l sas.com/monitoring-base=kube-viya-monitoring
+kubectl delete cm --ignore-not-found -n "$MON_NS" grafana-alert-rules
 
 if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
     log_verbose "Removing known monitoring PVCs"
