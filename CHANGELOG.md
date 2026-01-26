@@ -2,6 +2,11 @@
 ## Unreleased
 * **Logging**
   * [FIX] The `logging/bin/onboard.sh` script no longer fails when the `-p` parameter is set
+  * [FEATURE] A new script called setup-airgap almost fully prepares for an airgap environemnt.
+This setup includes populating the container registry with images and helm charts and installing
+the necessary CRDs and Grafana plugin. Users will be required to export the airgap registry server's
+name, username, and password. Refer to ___ (the documentation link will be populated after it is
+created) for more info.
 
 ## Version 1.2.45 (16DEC2025)
 * **Overall**
