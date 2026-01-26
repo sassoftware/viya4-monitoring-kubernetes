@@ -1,0 +1,20 @@
+## Sample: contour/path-based-ingress Version: 0.0.2
+
+
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: v4m-monitoring
+spec:
+  virtualhost:
+    fqdn: monitoring.host.cluster.example.com
+    tls:
+      secretName: v4m-ingress-tls-secret
+  routes:
+    # Grafana
+    - conditions:
+      - prefix: /grafana
+      services:
+        - name: v4m-grafana
+          port: 3000
+          protocol: tls
