@@ -46,6 +46,25 @@ function create_ingress_certs {
 
 export -f create_ingress_certs
 
+function get_app_ingress_fqdn {
+    # Assumes ROUTING and BASE_DOMAIN set
+    local app_fqdn app_path
+
+    app_path=$1
+    app_fqdn=$2
+
+    if [ -z "$app_fqdn" ]; then
+        if [ "$ROUTING" == "host" ]; then
+            app_fqdn="$app_path.$BASE_DOMAIN"
+        else
+            app_fqdn="$BASE_DOMAIN"
+        fi
+    fi
+
+    echo "$app_fqdn"
+}
+export -f get_app_ingress_fqdn
+
 AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
 AUTOGENERATE_STORAGECLASS="${AUTOGENERATE_STORAGECLASS:-false}"
 AUTOGENERATE_SMTP="${AUTOGENERATE_SMTP:-false}"
@@ -84,7 +103,7 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
         if [ "$INGRESS_TYPE" != "ingress-nginx" ] && [ "$INGRESS_TYPE" != "contour" ]; then
             log_error "Invalid INGRESS_TYPE value, valid values are 'ingress-nginx' or 'contour'"
             exit 1
-        elif [ "$INGRESS_TYPE" != "contour" ]; then
+        elif [ "$INGRESS_TYPE" == "contour" ]; then
             # verify Contour HTTPProxy CRDs available
             if kubectl get crd "httpproxies.projectcontour.io" 1> /dev/null 2>&1; then
                 log_debug "Contour HTTPProxy CRD installed"
@@ -108,6 +127,8 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             log_error "Invalid ROUTING value, valid values are 'host' or 'path'"
             exit 1
         fi
+
+        INGRESS_CREATE_ROOT_PROXY="${INGRESS_CREATE_ROOT_PROXY:-false}"
 
         if [ "$INGRESS_CERT/$INGRESS_KEY" != "/" ]; then
             if [ ! -f "$INGRESS_CERT" ] || [ ! -f "$INGRESS_KEY" ]; then
