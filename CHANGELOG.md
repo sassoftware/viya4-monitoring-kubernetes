@@ -3,7 +3,7 @@
 * **Logging**
   * [FIX] The `logging/bin/onboard.sh` script no longer fails when the `-p` parameter is set
   * [FEATURE] A new script, `setup-airgap` automates many of the setup preparations needed prior
-to deploying into an airgap environment. This setup includes populating the container registry,
+to deploying into an airgap environment. This setup includes populating the container registry
 (with both images and helm charts) and downloading the necessary files (e.g. CRDs and Grafana
 plugin files) into the appropriate sub-directories in the `$USER_DIR` directory. The location
 of the private container registry and the associated credentials need to be identified by
