@@ -8,20 +8,19 @@ metadata:
 spec:
   routes:
 
+
 # This sample does NOT make the Prometheus and Alertmanager accessible by default.
-# However, you can make one or both of these web applications
-# accessible by uncommenting out the approprate section below.
-# To do so, remove the double hash marks (##) from each line in the section.
+# However, you can make one or both of these web applications accessible by
+# creating an HTTPProxy resource for it using this sample file.
 
-
-# Note that Prometheus and Alertmanager do not have any authentication
+# Note that neither Prometheus nor Alertmanager have any authentication
 # configured by default, and exposing an unauthenticated applicaton
 # without other restrictions in place is insecure.
 
-##    # Prometheus
-##    - conditions:
-##      - prefix: /prometheus
-##      services:
-##        - name: v4m-prometheus
-##          port: 9090
-##          protocol: tls
+    # Prometheus
+    - conditions:
+      - prefix: /prometheus
+      services:
+        - name: v4m-prometheus
+          port: 9090
+          protocol: tls
