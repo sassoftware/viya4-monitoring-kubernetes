@@ -50,8 +50,8 @@ function get_app_ingress_fqdn {
     # Assumes ROUTING and BASE_DOMAIN set
     local app_fqdn app_path
 
-    app_path=$1
-    app_fqdn=$2
+    app_fqdn=$1
+    app_path=$2
 
     if [ -z "$app_fqdn" ]; then
         if [ "$ROUTING" == "host" ]; then
