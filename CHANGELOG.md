@@ -1,7 +1,7 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Overall**
-  * [FEATURE] A new sample demonstrates how to use Contour (Envoy) HTTPProxy resources to
+  * [FEATURE] A new sample demonstrates how to use Contour HTTPProxy resources to
  provide access to the web applications, such as OpenSearch Dashboards and Grafana,
  deployed as part of this project.  Refer to the [Contour Sample README](samples/contour)
  for more information.

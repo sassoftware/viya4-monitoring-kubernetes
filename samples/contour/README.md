@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates how to configure Contour (Envoy) HTTPProxy resources for accessing the
+This sample demonstrates how to configure [Contour](https://projectcontour.io/) HTTPProxy resources for accessing the
 web applications that are deployed as part of the SAS Viya Monitoring for Kubernetes solution.
 
 This sample provides information about two scenarios:
@@ -89,11 +89,11 @@ If you omit the prefix, you will likely need to incorporate the routes for these
 into existing HTTPProxy resources deployed in your environment rather than deploying new
 HTTPProxy resources.
 
->**NOTE**: This sample does NOT make the Prometheus and Alertmanager accessible by
-default.  The Prometheus and Alertmanager applications do not include any
+>**NOTE**: This sample does NOT make Prometheus and Alertmanager accessible
+by default.  The Prometheus and Alertmanager applications do not include any
 native authentication mechanism by default, and exposing such an application
 without other restrictions in place is insecure.   In addition, this sample
-does NOT make OpenSearch API endpoint accessible by default.  Although the
+does NOT make the OpenSearch API endpoint accessible by default.  Although the
 OpenSearch API endpoint does require authentication, there are limited
 use-cases requiring it to be accessible.
 >
