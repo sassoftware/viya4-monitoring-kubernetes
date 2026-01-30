@@ -126,6 +126,53 @@ def open_port():
 
     return port
 
+def build_sort(args):
+    """
+    Returns a JSON string representing the OpenSearch `sort` array. Sorts by @timestamp desc if nothing provided.
+    Field Alisases map the user inputs to their index formats. If a user submits a field without a known alias, they will need to provide it in exact index format for it to resolve. 
+    Append .keyword at the end to resolve text based fields. 
+    """
+    FIELD_ALIASES = {
+        "pod": "kube.pod.keyword",
+        "namespace": "kube.namespace.keyword",
+        "container": "kube.container.keyword",
+        "timestamp": "@timestamp",
+        "level": "level.keyword",
+        "logsource": "logsource.keyword"
+    }
+
+    sort_fields = args.get("sort_fields") or ["@timestamp:desc"]
+
+    sort_arr = [] #Parse --sort for each field:order pair then add to sort_arr
+    for item in sort_fields:
+        if not isinstance(item, str):
+            print(f"Error: sort_fields items must be strings, got: {type(item)}")
+            sys.exit(1)
+        item = item.strip()
+        if not item:
+            continue
+        if ":" in item:
+            field, order = item.rsplit(":", 1)
+            field = field.strip()
+            order = order.strip().lower()
+        else:
+            field = item
+            order = "desc"
+        if order not in ("asc", "desc"):
+            print(f"Error: Invalid sort order '{order}' in '{item}' (use asc or desc)")
+            sys.exit(1)
+
+        #Map known aliases; otherwise keep user supplied field
+        field = FIELD_ALIASES.get(field, field)
+        sort_arr.append({field: {"order": order}})
+
+    #Final Deterministic tiebreaker using id
+    if not any(isinstance(s, dict) and "_id" in s for s in sort_arr): 
+        sort_arr.append({"_id": {"order": "asc"}})
+    
+    print("Sorting Options (Priority Order): " + str(sort_arr))
+    return json.dumps(sort_arr)
+
 def build_query(args):
     """Generates Query using Opensearch DSL"""
     """Takes arguments from user and returns a JSON-format query to pass to OpenSearch API"""
@@ -136,7 +183,7 @@ def build_query(args):
         tfile = tempfile.NamedTemporaryFile(delete = False)  ##If User has not specified query file, create temp file for one.
         temp = open(tfile.name, 'w')
 
-        temp.write('{"size": ' + str(args['maxInt']) + ',"sort": [{"@timestamp": {"order": "desc","unmapped_type": "boolean"} }]')     ## Establish size of query, remove scoring
+        temp.write('{"size": ' + str(args['maxInt']) + ',"sort": ' + build_sort(args))     ## Establish size of query, remove scoring
         temp.write(', "query": {"bool": {"must":[ {"range": {"@timestamp": {"gte": "' + args['dateTimeStart'] + '","lt": "' + args['dateTimeEnd'] + '"} } }], ')   ##Establish Query with Time Range Requirements
         temp.write('"should": [ ')     ## Should Clause, search results must inlcude at least one of each specified option
         for argname in args.keys():
@@ -214,11 +261,12 @@ def get_arguments():
     parser.add_argument('-px', '--pod-exclude', required=False, dest="kube.pod-ex", nargs='*', metavar="POD",  help='\nOne or more pods for which logs should be excluded from the output\n\n')
     parser.add_argument('-c', '--container', required=False, dest="kube.container", nargs='*', metavar="CONTAINER",  help = "\nOne or more containers for which logs are sought\n\n")
     parser.add_argument('-cx', '--container-exclude', required=False, dest="kube.container-ex", nargs='*', metavar="CONTAINER",  help = "\nOne or more containers from which logs should be excluded from the output\n\n")
-    parser.add_argument('-s', '--logsource', required=False, dest="logsource", nargs='*', metavar="LOGSOURCE",  help = "\nOne or more logsource for which logs are sought\n\n")
-    parser.add_argument('-sx', '--logsource-exclude', required=False, dest="logsource-ex",nargs='*', metavar="LOGSOURCE",  help = "\nOne or more logsource for which logs should be excluded from the output\n\n")
+    parser.add_argument('-ls', '--logsource', required=False, dest="logsource", nargs='*', metavar="LOGSOURCE",  help = "\nOne or more logsource for which logs are sought\n\n")
+    parser.add_argument('-lsx', '--logsource-exclude', required=False, dest="logsource-ex",nargs='*', metavar="LOGSOURCE",  help = "\nOne or more logsource for which logs should be excluded from the output\n\n")
     parser.add_argument('-l', '--level', required=False, dest='level', nargs='*', metavar="LEVEL",  help = "\nOne or more message levels for which logs are sought\n\n")
     parser.add_argument('-lx', '--level-exclude', required=False, dest = 'level-exclude', nargs='*', metavar="LEVEL", help = "\nOne or more message levels for which logs should be excluded from the output.\n\n")
     parser.add_argument('-se', '--search', required=False, dest= "message", metavar="MESSAGE",  help = "\nWord or phrase contained in log message. Use quotes to surround your message ('' or "")\n\n\n \t\t\t QUERY OUTPUT SETTINGS: \n\n")
+    parser.add_argument('-s','--sort', required=False, dest="sort_fields", nargs="+", help="Sort fields (space-separated). You can use the existing search fields (timestamp, pod, level, logsource, and namespace) or fields of your choosing (must be in the exact index format). Example: --sort timestamp:desc pod:asc")
 
     ##Query and Output Params
     parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=10,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
