@@ -1,4 +1,4 @@
-## Sample: contour/path-based-ingress Version: 0.0.2
+## Sample: contour/path-based-ingress Version: 0.2.1
 
 apiVersion: projectcontour.io/v1
 kind: HTTPProxy
@@ -6,7 +6,7 @@ metadata:
   name: v4m-logging-root-proxy
 spec:
   virtualhost:
-    fqdn: monitoring.host.cluster.example.com
+    fqdn: logging.host.cluster.example.com
     tls:
       secretName: v4m-ingress-tls-secret
   includes:
