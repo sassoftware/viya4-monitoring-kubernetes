@@ -40,7 +40,15 @@ function create_ingress_certs {
         kubectl -n "$namespace" label secret "$secretName" managed-by="v4m-es-script"
     elif [ -n "$certFile$keyFile" ]; then
         log_warn "Missing Ingress certificate file; specified Ingress cert [$certFile] and/or key [$keyFile] file is missing."
-        log_warn "Create the missing Kubernetes secrets after deployment; use command: kubectl -create secret tls $secretName --namespace $namespace --key=cert_key_file --cert=cert_file"
+        log_warn "Create the missing Kubernetes secrets after deployment; use command: kubectl create secret tls $secretName --namespace $namespace --key=cert_key_file --cert=cert_file"
+    else
+        # shellcheck disable=SC2091
+        if $(kubectl get secret "$secretName" --namespace "$namespace" -o name &> /dev/null); then
+            log_debug "Confirmed secret [$namespace/$secretName] exists"
+        else
+            log_warn "Unable to create Kubernetes secret [$namespace/$secretName]; no TLS certificate file information has been provided."
+            log_warn "Create the missing Kubernetes secrets after deployment; use command: kubectl create secret tls $secretName --namespace $namespace --key=cert_key_file --cert=cert_file"
+        fi
     fi
 }
 
@@ -129,6 +137,7 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
         fi
 
         INGRESS_CREATE_ROOT_PROXY="${INGRESS_CREATE_ROOT_PROXY:-false}"
+        INGRESS_USE_SEPARATE_CERTS="${INGRESS_USE_SEPARATE_CERTS:-true}"
 
         if [ "$INGRESS_CERT/$INGRESS_KEY" != "/" ]; then
             if [ ! -f "$INGRESS_CERT" ] || [ ! -f "$INGRESS_KEY" ]; then
@@ -143,6 +152,14 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
                 log_debug "Ingress cert [$INGRESS_CERT] and key [$INGRESS_KEY] files exist."
             fi
         fi
+
+        # Set enable/disable flags for apps
+        OSD_INGRESS_ENABLE="${OSD_INGRESS_ENABLE:-true}"
+        OPENSEARCH_INGRESS_ENABLE="${OPENSEARCH_INGRESS_ENABLE:-false}"
+
+        GRAFANA_ENABLE_INGRESS="${GRAFANA_ENABLE_INGRESS:-true}"
+        PROMETHEUS_INGRESS_ENABLE="${PROMETHEUS_INGRESS_ENABLE:-false}"
+        ALERTMANAGER_ENABLE_INGRESS="${ALERTMANAGER_ENABLE_INGRESS:-false}"
 
         log_info "Autogeneration of Ingress definitions has been enabled"
 
@@ -252,3 +269,102 @@ function checkStorageClass {
 }
 
 export -f checkStorageClass
+
+function create_httpproxy {
+
+    local app_group app_prefix fqdn path secretName targetFqdn resourceDefFile routing namespace
+
+    app_group="${1}"
+    app_prefix="${2}"
+    fqdn="${3}"
+    path="${4}"
+    secretName="${5:-v4m-ingress-tls-secret}"
+
+    routing="${ROUTING:-host}"
+
+    sampleFile="samples/contour/${routing}-based/$app_group/${app_prefix}_httpproxy.yaml"
+
+    # Construct host for application URL
+    targetFqdn="$(get_app_ingress_fqdn "$fqdn" "$path")"
+
+    resourceDefFile="$TMP_DIR/${app_prefix}_httpproxy_def_file.yaml"
+    touch "$resourceDefFile"
+
+    #### tested with contour version: 0.0.1
+
+    #intialized the yaml file w/appropriate contour sample
+    # shellcheck disable=SC2016
+    yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
+
+    if [ "$routing" == "host" ]; then
+
+        snippet="$targetFqdn" yq -i '.spec.virtualhost.fqdn=env(snippet)' "$resourceDefFile"
+
+        if [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
+            snippet="$secretName" yq -i '.spec.virtualhost.tls.secretName=env(snippet)' "$resourceDefFile"
+        else
+            log_debug "Using same ingress TLS certs [v4m-ingress-tls-secret] for all apps"
+        fi
+    else
+        snippet="/$path" yq -i '.spec.routes.[0].conditions.[0].prefix=env(snippet)' "$resourceDefFile"
+
+        if [ "$app_prefix" == "osd" ] || [ "$app_prefix" == "opensearch" ]; then
+            snippet="/$path" yq -i '.spec.routes.[0].pathRewritePolicy.replacePrefix.[0].prefix=env(snippet)' "$resourceDefFile"
+        fi
+    fi
+
+    cat "$resourceDefFile"  ## REMOVE
+
+    if [ "$app_group" == "logging" ]; then
+        namespace="${LOG_NS:-logging}"
+    else
+        namespace="${MON_NS:-monitoring}"
+    fi
+
+    kubectl apply -f "$resourceDefFile" -n "$namespace"
+}
+export -f create_httpproxy
+
+function create_root_httpproxy {
+
+    ### create_root_httpproxy  APP_GRP  SECRET NAMESPACE
+    ### create_root_httpproxy  LOGGING v4m-ingress-tls-secret logging
+
+    app_group="${1}"    # LOGGING|MONITORING
+    secretName="${2}"
+    namespace="${3}"
+
+    if [ "$ROUTING" != "path" ]; then
+        log_debug "Path-based routing not enabled; skipping 'root' HTTPProxy creation"
+        return
+    fi
+
+    sampleFile="samples/contour/path-based/$app_group/${app_group}_root_httpproxy.yaml"  #TO DO: rename template file, remove app_group
+
+    resourceDefFile="$TMP_DIR/${app_group}_root_httpproxy_def_file.yaml"
+    touch "$resourceDefFile"
+
+    BASE_DOMAIN="${BASE_DOMAIN:-notset}"
+
+    #### tested with contour version: 0.0.2
+
+    #intialized the yaml file w/appropriate contour sample
+    # shellcheck disable=SC2016
+    yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
+
+    snippet="$BASE_DOMAIN" yq -i '.spec.virtualhost.fqdn=env(snippet)' "$resourceDefFile"
+    snippet="$secretName" yq -i '.spec.virtualhost.tls.secretName=env(snippet)' "$resourceDefFile"
+
+    if [ "$OSD_INGRESS_ENABLE" != "true" ]; then
+      yq -i e 'del(.spec.includes[] |select(.name == "v4m-osd"))' "$resourceDefFile"
+    fi
+
+    if [ "$OPENSEARCH_INGRESS_ENABLE" == "true" ]; then
+      yq -i '.spec.includes += {"name": "v4m-opensearch"}' "$resourceDefFile"
+    fi
+
+    cat "$resourceDefFile"   #REMOVE
+
+    kubectl --namespace "$namespace" apply -f  "$resourceDefFile"
+}
+export -f create_root_httpproxy
