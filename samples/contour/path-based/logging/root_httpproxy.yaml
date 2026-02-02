@@ -1,4 +1,4 @@
-## Sample: contour/path-based-ingress Version: 0.2.1
+## Sample: contour/path-based-ingress Version: 0.2.2
 
 apiVersion: projectcontour.io/v1
 kind: HTTPProxy
@@ -12,6 +12,7 @@ spec:
   includes:
   # OpenSearch Dashboards
   - name: v4m-osd
+    namespace: logging
 
 # This sample does NOT make the OpenSearch accessible by default.
 # However, you can make it accessible by uncommenting out the approprate section below.
@@ -19,3 +20,4 @@ spec:
 
 ##  # OpenSearch
 ##  - name: v4m-search
+##    namespace: logging

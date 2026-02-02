@@ -1,4 +1,4 @@
-## Sample: contour/path-based-ingress Version: 0.2.1
+## Sample: contour/path-based-ingress Version: 0.2.2
 
 apiVersion: projectcontour.io/v1
 kind: HTTPProxy
@@ -11,6 +11,7 @@ spec:
       secretName: v4m-ingress-tls-secret
   includes:
   - name: v4m-grafana
+    namespace: monitoring
 
 # This sample does NOT make the Prometheus and Alertmanager accessible by default.
 # However, you can make one or both of these web applications
@@ -23,5 +24,7 @@ spec:
 # is insecure.
 
 ##  - name: v4m-alertmanager
+##    namespace: monitoring
 ##  - name: v4m-prometheus
+##    namespace: monitoring
 
