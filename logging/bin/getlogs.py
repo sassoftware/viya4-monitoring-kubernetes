@@ -7,9 +7,9 @@ import sys
 MIN_VERSION = (3, 7)
 if sys.version_info < MIN_VERSION:
     sys.stderr.write(
-        "ERROR: This script requires Python 3.7 or newer.\n"
+        "ERROR: This script requires Python 3.11 or newer.\n"
         "Detected Python {}.\n\n"
-        "Please upgrade Python or run with python 3.7+.\n".format(sys.version.split()[0])
+        "Please run this script with Python 3.11+.\n".format(sys.version.split()[0])
     )
     sys.exit(1)
 
