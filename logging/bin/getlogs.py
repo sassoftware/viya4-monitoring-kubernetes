@@ -2,11 +2,21 @@
 
 # Copyright Â© 2023, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
+import sys
 
+MIN_VERSION = (3, 7)
+if sys.version_info < MIN_VERSION:
+    sys.stderr.write(
+        "ERROR: This script requires Python 3.7 or newer.\n"
+        "Detected Python {}.\n\n"
+        "Please upgrade Python or run with python 3.7+.\n".format(sys.version.split()[0])
+    )
+    sys.exit(1)
+
+import os
 import time, calendar
 import argparse
 from opensearchpy import OpenSearch
-import os, sys
 import json, csv
 import tempfile
 import subprocess, socket
@@ -164,7 +174,6 @@ def build_sort(args):
     if not any(isinstance(s, dict) and "_id" in s for s in sort_arr): 
         sort_arr.append({"_id": {"order": "asc"}})
     
-    print("Sorting Options (Priority Order): " + str(sort_arr))
     return json.dumps(sort_arr)
 
 def build_query(args):
