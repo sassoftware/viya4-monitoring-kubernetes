@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import sys
 
-MIN_VERSION = (3, 7)
+MIN_VERSION = (3, 11)
 if sys.version_info < MIN_VERSION:
     sys.stderr.write(
         "ERROR: This script requires Python 3.11 or newer.\n"
