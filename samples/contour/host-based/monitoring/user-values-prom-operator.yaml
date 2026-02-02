@@ -1,4 +1,4 @@
-## Sample: contour/host-based-ingress Version: 0.0.1
+## Sample: contour/host-based-ingress Version: 0.2.1
 
 #
 # Grafana
@@ -21,10 +21,9 @@ grafana:
 # accessible by uncommenting out the approprate section below.
 # To do so, remove the double hash marks (##) from each line in the section.
 
-
-# Note that Prometheus and Alertmanager
-# do not have any authentication configured by default, and exposing
-# an unauthenticated applicaton without other restrictions in place
+# Note that Prometheus and Alertmanager applications
+# do not include any native authentication mechanism by default, and
+# exposing such an application without other restrictions in place
 # is insecure.
 
 

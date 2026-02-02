@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates how to configure Contour Envoy HTTPProxy resources for accessing the
+This sample demonstrates how to configure [Contour](https://projectcontour.io/) HTTPProxy resources for accessing the
 web applications that are deployed as part of the SAS Viya Monitoring for Kubernetes solution.
 
 This sample provides information about two scenarios:
@@ -10,17 +10,10 @@ This sample provides information about two scenarios:
 * host-based routing
 * path-based routing
 
-These scenarios differ because of the URL that is used to access the applications:
+These scenarios differ in how the URL used to access the applications is constructed:
 
 * In host-based routing, the application name is part of the host name itself (for example, `https://grafana.host.cluster.example.com/`).
 * In path-based routing, the host name is fixed and the application name is appended as a path on the URL (for example, `https://host.cluster.example.com/grafana`).
-
-**Note:**  The ability to automatically generate Contour HTTPProxy resource
-definitions to permit access to the web applications was added with version
-`1.2.?? (released ????26)`.  Depending on your requirements, this may
-eliminate the need to manually configure things as demonstrated in this
-sample.  See the [Configure Contour HTTPProxy to Access to Web Applications](LINK TBD)
-topic within the Help Center documentation for further information.
 
 ## Using This Sample
 
@@ -29,7 +22,7 @@ topic within the Help Center documentation for further information.
 
 The customization files in this sample provide a starting point for the
 customization files required by a deployment that uses Contour HTTPProxy
-for accessing the web applications.
+resources for accessing the web applications.
 
 To use the sample customization files in your
 deployment, complete these steps:
@@ -44,11 +37,11 @@ or `path-based` subdirectories to your local customization directory
 4. After you finish modifying the customization files, you can deploy
 SAS Viya Monitoring for Kubernetes.  For more information, see
 [Deploy](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n1rhzwx0mcnnnun17q11v85bspyk.htm).
-5. Once the deployment process completes, you can create the required HTTPProxy resources
-by using the `kubectl apply` command pointing to appropriate YAML file(s).
+5. Once the deployment process completes, you create the required HTTPProxy resources
+by using the `kubectl apply` command and pointing to appropriate YAML file(s).
 
-NOTE: At some sites, the ability to create HTTPProxy resources and/or how they can be configured, may be restricted.  \
-Those restrictions could make require additional modifications to make this sample work or require an entirely different approach.
+NOTE: At some sites, the ability to create HTTPProxy resources and/or how they can be configured, may be restricted.
+Those restrictions could require additional modifications to make this sample work or require an entirely different approach.
 
 ## Update the YAML Files
 
@@ -75,33 +68,55 @@ You can use different TLS certs for one (or more) of the HTTPProxy resources; ju
 key in the appropriate YAML file before creating the HTTPProxy resources.
 
 ## Create the HTTPProxy Resources
-After running the deployment script, you will need to create the required HTTPProxy resource(s)
-by running the `'kubectl apply` command and pointing to the appropriate YAML file(s).  The
+After running the deployment script, you need to create the required HTTPProxy resource(s)
+by running the `kubectl apply` command and pointing to the appropriate YAML file(s).  The
 HTTPProxy resource definitions are contained in files with names ending in `_httpproxy.yaml`
 which you copied into your  `$USER_DIR/logging` and `$USER_DIR/monitoring` subdirectories.
 
 For example, the following command would create the HTTPProxy resource needed to access
 Grafana via the host-based configuration:
-` kubectl -n monitoring apply -f $USER_DIR/monitoring/grafana_host_httpproxy.yaml`
+` kubectl -n monitoring apply -f $USER_DIR/monitoring/grafana_httpproxy.yaml`
 
-In the host-based configuration, a separate HTTPProxy resource is created for each web application
-you make available.  In the path-based configuration, only a single HTTPProxy resource (per namespace) is used.
-Furthermore, note that in the path-based configuration, this example adds a prefix (matching the namespace) to
-the hostname used in FQDN specified.  While this is not strictly necessary, including this prefix allows the
-HTTPProxy resources to be independent of any other "root proxy" (i.e. other HTTPProxy resources referencing the
-same virtualhost) resources.  If you omit the prefix, you will likely need to incorporate the routes for these
-web applications into existing HTTPProxy resources deployed in your environment rather than deploying new
+In both scenarios, a separate HTTPProxy resource is created for each web application
+you make available. In the path-based scenario, an additional HTTPProxy resource,
+referred to as the "root proxy", will be needed as well.  An additional yaml file, named `root_httpproxy.yaml`,
+defining this resource is provided and the same `kubectl apply` command is used to create
+the resource.  Furthermore, note that in the path-based configuration, this example adds
+a prefix (matching the namespace) to the hostname used in FQDN specified.  While this is
+not strictly necessary, including this prefix allows the HTTPProxy resources to be independent
+of any other "root proxy" (i.e. other HTTPProxy resources referencing the same virtualhost) resources.
+If you omit the prefix, you will likely need to incorporate the routes for these web applications
+into existing HTTPProxy resources deployed in your environment rather than deploying new
 HTTPProxy resources.
+
+>**NOTE**: This sample does NOT make Prometheus and Alertmanager accessible
+by default.  The Prometheus and Alertmanager applications do not include any
+native authentication mechanism by default, and exposing such an application
+without other restrictions in place is insecure.   In addition, this sample
+does NOT make the OpenSearch API endpoint accessible by default.  Although the
+OpenSearch API endpoint does require authentication, there are limited
+use-cases requiring it to be accessible.
+>
+>However, you can make one or more of these web applications accessible by
+uncommenting the appropriate lines in the yaml files as described in comments
+within those files.
+
 
 ## Confirm the Status of the HTTPProxy Resources
 
-Once you have deployed the HTTPProxy resources, you should check their status.  This can be done using `kubectl get HTTPProxy` and
-`kubectl describe HTTPProxy` commands.  The output of the `kubectl get` command will report whether the HTTPProxy resource configuration
-is valid or not.  If the configuration is not valid, running the `kubectl describe` command will return additional information
+Once you have deployed the HTTPProxy resources, you should check their status.
+This can be done using `kubectl get HTTPProxy` and `kubectl describe HTTPProxy`
+commands.  The output of the `kubectl get` command will report whether the
+HTTPProxy resource configuration is valid or not.  If the configuration is not
+valid, running the `kubectl describe` command will return additional information
 which may help clarify how to resolve the issues.
 
-In this sample console excerpt, we see that there is some sort of issue with the `v4m-osd` HTTPProxy.  And, after running the `kubectl describe` command on the invalid HTTPProxy resource, we see that the problem is caused by a missing Kubernetes Secret resource.  After
-creating the missing secret (not shown), re-running the `kubectl get` command shows the HTTPProxy resource is now in a valid state.
+In the following sample console excerpt, we see that there is some sort of issue
+with the `v4m-osd` HTTPProxy.  And, after running the `kubectl describe` command
+on the invalid HTTPProxy resource, we see that the problem is caused by a missing
+Kubernetes Secret resource.  After creating the missing secret (not shown),
+re-running the `kubectl get` command shows the HTTPProxy resource is now in a
+valid state.
 
 ```
 $ kubectl -n logging get HTTPProxy
@@ -200,5 +215,3 @@ when OpenSearch Dashboards is first brought up in a web browser after deploying 
 However, we have consistently seen the issue resolve itself after a simple refresh (F5) of the browser window.
 
 ![OpenSearch Dashboards Did Not Load Properly Banner Message](images/osd_did_not_load_properly_banner.png)
-
-
