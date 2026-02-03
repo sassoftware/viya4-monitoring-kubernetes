@@ -1,4 +1,4 @@
-## Sample: contour/path-based-ingress Version: 0.2.1
+## Sample: contour/host-based-ingress Version: 0.2.2
 
 apiVersion: projectcontour.io/v1
 kind: HTTPProxy

@@ -34,10 +34,14 @@ or `path-based` subdirectories to your local customization directory
    `host.cluster.example.com` with the applicable host name for your
    environment.
 3. (Optional) Modify the files further, as needed.
-4. After you finish modifying the customization files, you can deploy
+4. Create the Kubernetes Secret resource(s) containing the ingress
+TLS certificates referenced in the  HTTPProxy resource definition
+files you modified above.  In the sample files, this Secret is
+named `v4m-ingress-tls-secret`.
+5. After you finish modifying the customization files, you deploy
 SAS Viya Monitoring for Kubernetes.  For more information, see
 [Deploy](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n1rhzwx0mcnnnun17q11v85bspyk.htm).
-5. Once the deployment process completes, you create the required HTTPProxy resources
+6. Once the deployment process completes, you create the required HTTPProxy resources
 by using the `kubectl apply` command and pointing to appropriate YAML file(s).
 
 NOTE: At some sites, the ability to create HTTPProxy resources and/or how they can be configured, may be restricted.
@@ -52,26 +56,24 @@ the appropriate host name.
 
 ## Specify TLS Certificates to Use
 
-As of release 1.2.15 (19JUL23), SAS Viya Monitoring for Kubernetes is deployed with TLS enabled by default for
-intra-cluster communications. The deployment scripts now automatically generate a set of
-self-signed TLS certificates for this purpose if you do not specify your own. For details, see [Transport Layer Security (TLS): Digital Certificates and Kubernetes Secrets](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=p1tedn8lzgvhlyn1bzwgvqvv3p4j.htm#n1pnll5qjcigjvn15shfdhdhr0lz).
-
-This sample assumes that access to the web applications should also be secured using
-TLS (that is, the web applications should be accessed via HTTPS instead of HTTP). This requires a **second** set of TLS
-certificates that differ from those used for intra-cluster communication.  However, these certificates are **not**
-created automatically for you.  You must obtain these certificates, create Kubernetes secrets with specific
-names, and make them available to SAS Viya Monitoring for Kubernetes.
+This sample assumes that access to the web applications should be secured using
+TLS (that is, the web applications should be accessed via HTTPS instead of HTTP).
+**This requires a set of TLS certificates that are _not_ created automatically for you.**
+You must obtain these certificates, create Kubernetes secrets with specific names, and make
+them available to SAS Viya Monitoring for Kubernetes.
 For details, see [Enable TLS for Ingress](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n13g4ybmjfxr2an1tuy6a20zpvw7).
 
-This sample shows a single set of TLS certs used to secure all of the HTTPProxy resources.  However, that is not required.
-You can use different TLS certs for one (or more) of the HTTPProxy resources; just update the `spec.virtualhost.tls.secretname`
-key in the appropriate YAML file before creating the HTTPProxy resources.
+This sample shows a single set of TLS certificates (stored in the Kubernetes Secret
+`v4m-ingress-tls-secret`) used to secure all of the HTTPProxy resources.  However,
+that is not required.  You can use different TLS certificates for one (or more) of the
+HTTPProxy resources; just update the `spec.virtualhost.tls.secretname` key in the
+appropriate YAML file before creating the HTTPProxy resources.
 
 ## Create the HTTPProxy Resources
 After running the deployment script, you need to create the required HTTPProxy resource(s)
 by running the `kubectl apply` command and pointing to the appropriate YAML file(s).  The
 HTTPProxy resource definitions are contained in files with names ending in `_httpproxy.yaml`
-which you copied into your  `$USER_DIR/logging` and `$USER_DIR/monitoring` subdirectories.
+which you copied into your `$USER_DIR/logging` and `$USER_DIR/monitoring` subdirectories.
 
 For example, the following command would create the HTTPProxy resource needed to access
 Grafana via the host-based configuration:
