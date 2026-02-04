@@ -70,9 +70,10 @@ HTTPProxy resources; just update the `spec.virtualhost.tls.secretname` key in th
 appropriate YAML file before creating the HTTPProxy resources.
 
 ## Create the HTTPProxy Resources
-After running the deployment script, you need to create the required HTTPProxy resource(s)
-by running the `kubectl apply` command and pointing to the appropriate YAML file(s).  The
-HTTPProxy resource definitions are contained in files with names ending in `_httpproxy.yaml`
+After running the deployment script, you need to create additional Kubernetes resources for
+Grafana and/or OpenSearch Dashboards.  To create these required HTTPProxy resources, you
+run the `kubectl apply` command and pointing to the appropriate YAML file(s).  The HTTPProxy
+resource definitions are contained in files with names ending in `_httpproxy.yaml`
 which you copied into your `$USER_DIR/logging` and `$USER_DIR/monitoring` subdirectories.
 
 For example, the following command would create the HTTPProxy resource needed to access
@@ -92,7 +93,8 @@ the prefix, you will likely need to incorporate the routes for these web applica
 into existing HTTPProxy resources deployed in your environment rather than deploying new
 HTTPProxy resources.
 
-**NOTE: This sample does NOT recommend making Prometheus and Alertmanager accessible
+### Making secondary applications accessible
+**This sample does NOT recommend making Prometheus and Alertmanager accessible
 by default.  The Prometheus and Alertmanager applications do not include any
 native authentication mechanism by default, and exposing such an application
 without other restrictions in place is insecure.   In addition, this sample
