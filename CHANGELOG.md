@@ -9,7 +9,7 @@ plugin files) into the appropriate sub-directories in the `$USER_DIR` directory.
 of the private container registry and the associated credentials need to be identified by
 setting the environment variables `AIRGAP_REGISTRY`, `AIRGAP_REGISTRY_USERNAME`, and
 `AIRGAP_REGISTRY_PASSWORD` prior to running the script, preferably in the `$USER_DIR/user.env`
-file. Refer to ___ (the documentation link will be populated after it is created) for more info.
+file. Refer to the [Prepare to Deploy SAS Viya Monitoring for Kubernetes in an Air Gap Environment](https://helpcenter.unx.sas.com/test/doc/en/obsrvcdc/v_003/obsrvdply/n0auhd4hutsf7xn169hfvriysz4e.htm#n0grd8g2pkfglin12bzm3g1oik2p) documentation for more info.
 * **Metrics**
   * [FEATURE] Support for automatically defining SMTP server configuration (permitting Grafana
 to send e-mails) has been extended to OpenShift clusters
