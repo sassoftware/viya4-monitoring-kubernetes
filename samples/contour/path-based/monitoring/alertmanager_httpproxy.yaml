@@ -1,11 +1,5 @@
-## Sample: contour/path-based-ingress Version: 0.2.2
+# Sample: contour/path-based-ingress Version: 0.2.2
 
-apiVersion: projectcontour.io/v1
-kind: HTTPProxy
-metadata:
-  name: v4m-alerting
-spec:
-  routes:
 
 # This sample does NOT make the Prometheus and Alertmanager accessible by default.
 # However, you can make one or both of these web applications accessible by
@@ -15,7 +9,12 @@ spec:
 # configured by default, and exposing an unauthenticated applicaton
 # without other restrictions in place is insecure.
 
-    # Alertmanager
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: v4m-alerting
+spec:
+  routes:
     - conditions:
       - prefix: /alertmanager
       services:

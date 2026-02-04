@@ -79,28 +79,32 @@ For example, the following command would create the HTTPProxy resource needed to
 Grafana via the host-based configuration:
 ` kubectl -n monitoring apply -f $USER_DIR/monitoring/grafana_httpproxy.yaml`
 
-In both scenarios, a separate HTTPProxy resource is created for each web application
-you make available. In the path-based scenario, an additional HTTPProxy resource,
-referred to as the "root proxy", will be needed as well.  An additional yaml file, named `root_httpproxy.yaml`,
-defining this resource is provided and the same `kubectl apply` command is used to create
-the resource.  Furthermore, note that in the path-based configuration, this example adds
-a prefix (matching the namespace) to the hostname used in FQDN specified.  While this is
-not strictly necessary, including this prefix allows the HTTPProxy resources to be independent
-of any other "root proxy" (i.e. other HTTPProxy resources referencing the same virtualhost) resources.
-If you omit the prefix, you will likely need to incorporate the routes for these web applications
+In both the host-based and path-based scenarios, a separate HTTPProxy resource is created
+for each web application you make available. In the path-based scenario, an additional
+HTTPProxy resource, referred to as the "root proxy", will be needed as well.  An
+additional yaml file, named `root_httpproxy.yaml`, defining this resource is provided and
+the same `kubectl apply` command is used to create the resource.  Furthermore, note that
+in the path-based configuration, this example adds a prefix (matching the namespace)
+to the hostname used in FQDN specified.  While this is not strictly necessary, including
+this prefix allows the HTTPProxy resources to be independent of any other "root proxy"
+(i.e. other HTTPProxy resources referencing the same virtualhost) resources.  If you omit
+the prefix, you will likely need to incorporate the routes for these web applications
 into existing HTTPProxy resources deployed in your environment rather than deploying new
 HTTPProxy resources.
 
->**NOTE**: This sample does NOT make Prometheus and Alertmanager accessible
+**NOTE**: This sample does NOT recommend making Prometheus and Alertmanager accessible
 by default.  The Prometheus and Alertmanager applications do not include any
 native authentication mechanism by default, and exposing such an application
 without other restrictions in place is insecure.   In addition, this sample
-does NOT make the OpenSearch API endpoint accessible by default.  Although the
+does NOT recommend making the OpenSearch API endpoint accessible by default.  Although the
 OpenSearch API endpoint does require authentication, there are limited
 use-cases requiring it to be accessible.
->
->However, you can make one or more of these web applications accessible by
-uncommenting the appropriate lines in the yaml files as described in comments
+
+However, this sample includes file enabling you to make one or more of these web
+applications accessible if needed.  To do so, create the necessary HTTPProxy resources
+by using the  same `kubectl apply` command describe above and pointing to the appropriate
+YAML file.  In addition, for the path-based scenario, you will need to uncomment
+the appropriate lines in the `root_httpproxy.yaml` files as described in comments
 within those files.
 
 
@@ -200,15 +204,15 @@ configuration, the applications are available at these locations:
 
 When you deploy using the path-based configuragtion, the following applications are available at these locations.
 
-* Grafana - `https://host.mycluster.example.com/grafana`
-* OpenSearch Dashboards - `https://host.mycluster.example.com/dashboards`
+* Grafana - `https://logging.host.mycluster.example.com/grafana`
+* OpenSearch Dashboards - `https://logging.host.mycluster.example.com/dashboards`
 
 If you have chosen to make the following applications available and you have used the path-based configuration,
 the applications are available at these locations:
 
-* Prometheus - `https://host.mycluster.example.com/prometheus`
-* Alertmanager - `https://host.mycluster.example.com/alertmanager`
-* OpenSearch - `https://host.mycluster.example.com/opensearch`
+* Prometheus - `https://monitoring.host.mycluster.example.com/prometheus`
+* Alertmanager - `https://monitoring.host.mycluster.example.com/alertmanager`
+* OpenSearch - `https://monitoring.host.mycluster.example.com/opensearch`
 
 ## Known Issues
 ### OpenSearch Dashboards Did Not Load Properly
