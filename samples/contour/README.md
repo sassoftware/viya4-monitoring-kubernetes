@@ -92,13 +92,13 @@ the prefix, you will likely need to incorporate the routes for these web applica
 into existing HTTPProxy resources deployed in your environment rather than deploying new
 HTTPProxy resources.
 
-**NOTE**: This sample does NOT recommend making Prometheus and Alertmanager accessible
+**NOTE: This sample does NOT recommend making Prometheus and Alertmanager accessible
 by default.  The Prometheus and Alertmanager applications do not include any
 native authentication mechanism by default, and exposing such an application
 without other restrictions in place is insecure.   In addition, this sample
 does NOT recommend making the OpenSearch API endpoint accessible by default.  Although the
 OpenSearch API endpoint does require authentication, there are limited
-use-cases requiring it to be accessible.
+use-cases requiring it to be accessible.**
 
 However, this sample includes file enabling you to make one or more of these web
 applications accessible if needed.  To do so, create the necessary HTTPProxy resources
