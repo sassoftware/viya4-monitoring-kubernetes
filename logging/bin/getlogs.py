@@ -16,11 +16,17 @@ from subprocess import run
 def validate_input(checkInput):
     """ Validate the arguments passed by the user to ensure script will function properly"""
 
+    ##Set maximum log limit for output
+    MAX_ROWS = 10000
+    if checkInput['maxInt'] > MAX_ROWS:
+        print("Error: Maxrows limit of 10000 exceeded.")
+        sys.exit()
+
     #Check whether user provided kubeconfig for port-forwarding
     if checkInput['portforward']:
         if os.environ.get('KUBECONFIG') is None:
             print("Error: Port forwarding argument selected but no KUBECONFIG env variable set.")
-            sys.exit(1)
+            sys.exit()
         else: ##Set default values
             checkInput['host'] = 'port forwarded'
             checkInput['port'] = 'port forwarded'
@@ -29,7 +35,7 @@ def validate_input(checkInput):
     if(not checkInput['userName'] or not checkInput['password'] or not checkInput['host'] or not checkInput['port']):
         print('\nError: Missing required connection settings. Please specify username, password, host, and port. \nDefault values can be manually exported as environment variables OSHOST, OSPORT, OSUSER, OSPASSWD \nTo port-forward and skip OSHOST and OSPORT, use -pf')
         print("Username:", checkInput['userName'], " Password:", checkInput['password'], " Host:", checkInput['host'], " Port:", checkInput['port'])
-        sys.exit(1)
+        sys.exit()
 
     if checkInput['out-filename']: ##Check for supported file-types and existence of file
 
@@ -39,19 +45,19 @@ def validate_input(checkInput):
         if os.path.isfile(checkInput['out-filename']): ##Check if file already exists
             if (checkInput['force'] == False):
                 print("\nUser specified output file already exists. Use -f to overwrite the file.\n")
-                sys.exit(1)
+                sys.exit()
 
         safe_dir = os.getcwd() ## Check for path traversal attack
         if os.path.commonprefix((os.path.realpath(checkInput['out-filename']),safe_dir)) != safe_dir:
             print("Error: Out-file path must be in the current working directory.")
-            sys.exit(1)
+            sys.exit()
 
         try:
             x = open(checkInput['out-filename'], 'w')
             x.close()
         except FileNotFoundError as e:
             print("Error: Output file path not found. Please verify output file path. ")
-            sys.exit(1)
+            sys.exit()
 
     if checkInput['savequery']: ##Find saved query path location
         if(type(checkInput['savequery']) == list):
@@ -60,17 +66,17 @@ def validate_input(checkInput):
             checkInput['savequery'] = checkInput['savequery'] + ".json"
         if ((not ".json" in checkInput['savequery'])):
             print('Error: Not a supported filetype for the saved query file. Supported type is .json')
-            sys.exit(1)
+            sys.exit()
 
     if checkInput['query-filename']: ##Use for plugging in queries
         safe_dir = os.getcwd() ## Check for path traversal attack
         if os.path.commonprefix((os.path.realpath(checkInput['query-filename']),safe_dir)) != safe_dir:
             print("Error: Query file must be from the current working directory.")
-            sys.exit(1)
+            sys.exit()
 
         if (not os.path.isfile(checkInput['query-filename'])):
             print("Error: Invalid query file path.")
-            sys.exit(1)
+            sys.exit()
 
     ##Time Validator - Verifies input, and converts it to UTC
     if (type(checkInput['dateTimeStart']) ==list):
@@ -81,14 +87,14 @@ def validate_input(checkInput):
         checkInput['dateTimeStart'] = (time.strptime(checkInput.get('dateTimeStart'), "%Y-%m-%d %H:%M:%S"))
         checkInput['dateTimeEnd'] = (time.strptime(checkInput.get('dateTimeEnd'), "%Y-%m-%d %H:%M:%S"))
         if (calendar.timegm(checkInput['dateTimeStart']) > calendar.timegm(checkInput['dateTimeEnd'])):
-            print("Error: Given start date is after the end date.")
-            sys.exit(1)
+            print("Given start date is after the end date.")
+            sys.exit()
         else:
             checkInput['dateTimeStart'] = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.mktime(checkInput['dateTimeStart'])))
             checkInput['dateTimeEnd'] = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.mktime(checkInput['dateTimeEnd'])))
     except ValueError:
-        print("Error: One or more date(s) have been formatted incorrectly. Correct format is Y-M-D H:M:S. Ex: 1999-02-16 10:00:00")
-        sys.exit(1)
+        print("One or more date(s) have been formatted incorrectly. Correct format is Y-M-D H:M:S. Ex: 1999-02-16 10:00:00")
+        sys.exit()
 
     if (checkInput['message']): ## Argument formatting for query builder
         checkInput['message'] = checkInput['message'].replace('"',"'")
@@ -109,7 +115,7 @@ def open_port():
     port_namespace = result.stdout.replace("'", "")
     if (not port_namespace):
         print("Error: The V4M OpenSearch service is not currently running on this cluster. Port forwarding failed.")
-        sys.exit(1)
+        sys.exit()
 
     cmd = (["kubectl", "-n", port_namespace, "port-forward", "svc/v4m-search", str(port) + ':9200', '&'])
     full_command = " ".join(cmd)
@@ -129,8 +135,8 @@ def build_query(args):
     if (not args['query-filename']):
         tfile = tempfile.NamedTemporaryFile(delete = False)  ##If User has not specified query file, create temp file for one.
         temp = open(tfile.name, 'w')
-        
-        temp.write('{"size": ' + str(min(args['maxInt'],10000)) + ',"sort": [{"@timestamp": {"order": "desc","unmapped_type": "boolean"} }]')     ## Establish size of query, remove scoring
+
+        temp.write('{"size": ' + str(args['maxInt']) + ',"sort": [{"@timestamp": {"order": "desc","unmapped_type": "boolean"} }]')     ## Establish size of query, remove scoring
         temp.write(', "query": {"bool": {"must":[ {"range": {"@timestamp": {"gte": "' + args['dateTimeStart'] + '","lt": "' + args['dateTimeEnd'] + '"} } }], ')   ##Establish Query with Time Range Requirements
         temp.write('"should": [ ')     ## Should Clause, search results must inlcude at least one of each specified option
         for argname in args.keys():
@@ -215,7 +221,7 @@ def get_arguments():
     parser.add_argument('-se', '--search', required=False, dest= "message", metavar="MESSAGE",  help = "\nWord or phrase contained in log message. Use quotes to surround your message ('' or "")\n\n\n \t\t\t QUERY OUTPUT SETTINGS: \n\n")
 
     ##Query and Output Params
-    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=10,  help = "\nThe maximum number of log messsages to return.\n\n")
+    parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=10,  help = "\nThe maximum number of log messsages to return. Max possible rows is 10000\n\n")
     parser.add_argument('-q', '--query-file ', required=False, dest="query-filename", metavar="FILENAME.*", help = "\n Filepath of existing saved query in current working directory. Program will submit query from file, ALL other query parmeters ignored. Supported filetypes: .txt, .json\n\n")
     parser.add_argument('-sh', '--show-query', required=False, dest="showquery", action= "store_true", help = "\n Displays the actual query that will be submitted during execution.\n\n")
     parser.add_argument('-sq', '--save-query', required=False, dest="savequery",  nargs='*', metavar="FILENAME", help = "\n Specify a file name (without filetype) in which to save the generated query. Query is saved as JSON file in current working directory.\n\n")
@@ -300,13 +306,12 @@ def main():
                 outfile.write(x)
         else:
             print("Error: Saved query must be written to current working directory.")
-            sys.exit(1)
+            sys.exit()
         print("\nQuery saved to " + args['savequery'])
 
     print('\nSearching index: ')
     try:
-        #scroll
-        response = client.search(body=x, index=index_name, scroll='3m')
+        response = client.search(body=x, index=index_name)
     except Exception as e:
         print(e)
         if ("getaddrinfo" in str(e)):
@@ -318,52 +323,26 @@ def main():
         else:
             print("Connection error. Please verify connection values. ")
             print("Username:", args['userName'], " Password:", args['password'], " Host:", args['host'], " Port:", args['port'])
-        sys.exit(1)
+        sys.exit()
 
     if response['hits']['total']['value'] == 0:
         print("No results found for submitted query.")
-        sys.exit(0)
+        sys.exit()
 
     stdout = False
     if (not args['out-filename']):
         stdout = True
     else:
         # deepcode ignore PT: <Path traversal detection for out-filename already implemented on line 42>
-        x = open(args['out-filename'], 'w', encoding='utf-8', newline='')
-    
-    MAX_ROWS=args['maxInt']
-    row_count=0
+        x = open(args['out-filename'], 'w')
 
     hitsList = [] ##Check to see if any fields in response matched user provided fields, collect matching fields
-    pagination_id = response["_scroll_id"]
     for hit in response['hits']['hits']:
         try:
             hit['fields']['_id'] = hit['_id']
             hitsList.append(hit['fields'])
         except KeyError as e:
-            continue
-        row_count += 1
-        if row_count >= MAX_ROWS:
-            break
-    while len(response['hits']['hits']) != 0 and row_count < MAX_ROWS:
-        response = client.scroll(
-            scroll='3m',
-            scroll_id=pagination_id
-        )
-        pagination_id = response["_scroll_id"]
-        for hit in response['hits']['hits']:
-            try:
-                hit['fields']['_id'] = hit['_id']
-                hitsList.append(hit['fields'])
-            except KeyError as e:
-                continue
-            row_count += 1
-            if row_count >= MAX_ROWS:
-                break
-    try:
-        client.clear_scroll(scroll_id=pagination_id)
-    except Exception:
-        pass
+            next
 
     for fieldDict in hitsList:
         for field in args['fields']:
@@ -373,8 +352,8 @@ def main():
                 fieldDict[field] = ''.join(fieldDict[field])
 
     if (len(hitsList) == 0):
-        print("No fields in the results matched the provided field names. Please verify the correct field names in OpenSearch Dashboards and try again.\n")
-        sys.exit(0)
+        print("Error: No fields matched provided fieldnames. Please verify the field on OpenSearch Dashboards.\n")
+        sys.exit()
 
     ##Output as proper filetype, JSON or CSV
     if("json" in args['format']): ##JSON formatter, uses json.dump to print to stdout or file
