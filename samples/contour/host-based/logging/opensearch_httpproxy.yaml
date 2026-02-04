@@ -1,4 +1,11 @@
-## Sample: contour/path-based-ingress Version: 0.2.2
+# Sample: contour/host-based-ingress Version: 0.2.2
+
+
+# This sample does NOT make the OpenSearch API endpoint accessible
+# by default because there are limited use-cases for which this
+# would be required.  However, if needed, you can make the
+# OpenSearch API accessible by creating an HTTPProxy resource for
+# it using this sample file.
 
 apiVersion: projectcontour.io/v1
 kind: HTTPProxy

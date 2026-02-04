@@ -34,10 +34,14 @@ or `path-based` subdirectories to your local customization directory
    `host.cluster.example.com` with the applicable host name for your
    environment.
 3. (Optional) Modify the files further, as needed.
-4. After you finish modifying the customization files, you can deploy
+4. Create the Kubernetes Secret resource(s) containing the ingress
+TLS certificates referenced in the  HTTPProxy resource definition
+files you modified above.  In the sample files, this Secret is
+named `v4m-ingress-tls-secret`.
+5. After you finish modifying the customization files, you deploy
 SAS Viya Monitoring for Kubernetes.  For more information, see
 [Deploy](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n1rhzwx0mcnnnun17q11v85bspyk.htm).
-5. Once the deployment process completes, you create the required HTTPProxy resources
+6. Once the deployment process completes, you create the required HTTPProxy resources
 by using the `kubectl apply` command and pointing to appropriate YAML file(s).
 
 NOTE: At some sites, the ability to create HTTPProxy resources and/or how they can be configured, may be restricted.
@@ -52,53 +56,57 @@ the appropriate host name.
 
 ## Specify TLS Certificates to Use
 
-As of release 1.2.15 (19JUL23), SAS Viya Monitoring for Kubernetes is deployed with TLS enabled by default for
-intra-cluster communications. The deployment scripts now automatically generate a set of
-self-signed TLS certificates for this purpose if you do not specify your own. For details, see [Transport Layer Security (TLS): Digital Certificates and Kubernetes Secrets](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=p1tedn8lzgvhlyn1bzwgvqvv3p4j.htm#n1pnll5qjcigjvn15shfdhdhr0lz).
-
-This sample assumes that access to the web applications should also be secured using
-TLS (that is, the web applications should be accessed via HTTPS instead of HTTP). This requires a **second** set of TLS
-certificates that differ from those used for intra-cluster communication.  However, these certificates are **not**
-created automatically for you.  You must obtain these certificates, create Kubernetes secrets with specific
-names, and make them available to SAS Viya Monitoring for Kubernetes.
+This sample assumes that access to the web applications should be secured using
+TLS (that is, the web applications should be accessed via HTTPS instead of HTTP).
+**This requires a set of TLS certificates that are _not_ created automatically for you.**
+You must obtain these certificates, create Kubernetes secrets with specific names, and make
+them available to SAS Viya Monitoring for Kubernetes.
 For details, see [Enable TLS for Ingress](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n13g4ybmjfxr2an1tuy6a20zpvw7).
 
-This sample shows a single set of TLS certs used to secure all of the HTTPProxy resources.  However, that is not required.
-You can use different TLS certs for one (or more) of the HTTPProxy resources; just update the `spec.virtualhost.tls.secretname`
-key in the appropriate YAML file before creating the HTTPProxy resources.
+This sample shows a single set of TLS certificates (stored in the Kubernetes Secret
+`v4m-ingress-tls-secret`) used to secure all of the HTTPProxy resources.  However,
+that is not required.  You can use different TLS certificates for one (or more) of the
+HTTPProxy resources; just update the `spec.virtualhost.tls.secretname` key in the
+appropriate YAML file before creating the HTTPProxy resources.
 
 ## Create the HTTPProxy Resources
-After running the deployment script, you need to create the required HTTPProxy resource(s)
-by running the `kubectl apply` command and pointing to the appropriate YAML file(s).  The
-HTTPProxy resource definitions are contained in files with names ending in `_httpproxy.yaml`
-which you copied into your  `$USER_DIR/logging` and `$USER_DIR/monitoring` subdirectories.
+After running the deployment script, you need to create additional Kubernetes resources for
+Grafana and/or OpenSearch Dashboards.  To create these required HTTPProxy resources, you
+run the `kubectl apply` command and pointing to the appropriate YAML file(s).  The HTTPProxy
+resource definitions are contained in files with names ending in `_httpproxy.yaml`
+which you copied into your `$USER_DIR/logging` and `$USER_DIR/monitoring` subdirectories.
 
 For example, the following command would create the HTTPProxy resource needed to access
 Grafana via the host-based configuration:
 ` kubectl -n monitoring apply -f $USER_DIR/monitoring/grafana_httpproxy.yaml`
 
-In both scenarios, a separate HTTPProxy resource is created for each web application
-you make available. In the path-based scenario, an additional HTTPProxy resource,
-referred to as the "root proxy", will be needed as well.  An additional yaml file, named `root_httpproxy.yaml`,
-defining this resource is provided and the same `kubectl apply` command is used to create
-the resource.  Furthermore, note that in the path-based configuration, this example adds
-a prefix (matching the namespace) to the hostname used in FQDN specified.  While this is
-not strictly necessary, including this prefix allows the HTTPProxy resources to be independent
-of any other "root proxy" (i.e. other HTTPProxy resources referencing the same virtualhost) resources.
-If you omit the prefix, you will likely need to incorporate the routes for these web applications
+In both the host-based and path-based scenarios, a separate HTTPProxy resource is created
+for each web application you make available. In the path-based scenario, an additional
+HTTPProxy resource, referred to as the "root proxy", will be needed as well.  An
+additional yaml file, named `root_httpproxy.yaml`, defining this resource is provided and
+the same `kubectl apply` command is used to create the resource.  Furthermore, note that
+in the path-based configuration, this example adds a prefix (matching the namespace)
+to the hostname used in FQDN specified.  While this is not strictly necessary, including
+this prefix allows the HTTPProxy resources to be independent of any other "root proxy"
+(i.e. other HTTPProxy resources referencing the same virtualhost) resources.  If you omit
+the prefix, you will likely need to incorporate the routes for these web applications
 into existing HTTPProxy resources deployed in your environment rather than deploying new
 HTTPProxy resources.
 
->**NOTE**: This sample does NOT make Prometheus and Alertmanager accessible
+### Making secondary applications accessible
+**This sample does NOT recommend making Prometheus and Alertmanager accessible
 by default.  The Prometheus and Alertmanager applications do not include any
 native authentication mechanism by default, and exposing such an application
 without other restrictions in place is insecure.   In addition, this sample
-does NOT make the OpenSearch API endpoint accessible by default.  Although the
+does NOT recommend making the OpenSearch API endpoint accessible by default.  Although the
 OpenSearch API endpoint does require authentication, there are limited
-use-cases requiring it to be accessible.
->
->However, you can make one or more of these web applications accessible by
-uncommenting the appropriate lines in the yaml files as described in comments
+use-cases requiring it to be accessible.**
+
+However, this sample includes file enabling you to make one or more of these web
+applications accessible if needed.  To do so, create the necessary HTTPProxy resources
+by using the  same `kubectl apply` command describe above and pointing to the appropriate
+YAML file.  In addition, for the path-based scenario, you will need to uncomment
+the appropriate lines in the `root_httpproxy.yaml` files as described in comments
 within those files.
 
 
@@ -198,15 +206,15 @@ configuration, the applications are available at these locations:
 
 When you deploy using the path-based configuragtion, the following applications are available at these locations.
 
-* Grafana - `https://host.mycluster.example.com/grafana`
-* OpenSearch Dashboards - `https://host.mycluster.example.com/dashboards`
+* Grafana - `https://logging.host.mycluster.example.com/grafana`
+* OpenSearch Dashboards - `https://logging.host.mycluster.example.com/dashboards`
 
 If you have chosen to make the following applications available and you have used the path-based configuration,
 the applications are available at these locations:
 
-* Prometheus - `https://host.mycluster.example.com/prometheus`
-* Alertmanager - `https://host.mycluster.example.com/alertmanager`
-* OpenSearch - `https://host.mycluster.example.com/opensearch`
+* Prometheus - `https://monitoring.host.mycluster.example.com/prometheus`
+* Alertmanager - `https://monitoring.host.mycluster.example.com/alertmanager`
+* OpenSearch - `https://monitoring.host.mycluster.example.com/opensearch`
 
 ## Known Issues
 ### OpenSearch Dashboards Did Not Load Properly
