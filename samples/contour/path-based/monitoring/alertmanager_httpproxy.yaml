@@ -12,7 +12,7 @@
 apiVersion: projectcontour.io/v1
 kind: HTTPProxy
 metadata:
-  name: v4m-alerting
+  name: v4m-alertmanager
 spec:
   routes:
     - conditions:
