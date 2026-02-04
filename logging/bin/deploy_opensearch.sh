@@ -101,9 +101,9 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "tr
 
         ingress_tls_secret="elasticsearch-ingress-tls-secret"
 
-        create_httpproxy  "logging" "opensearch" "$targetFqdn" "$targetPath" "$ingress_tls_secret"
+        create_httpproxy  "logging" "opensearch" "$targetPath" "$targetFqdn" "$ingress_tls_secret"
 
-        create_root_httpproxy  logging v4m-ingress-tls-secret "$LOG_NS"   #TO DO: Move to 'proper' home
+        create_root_httpproxy  logging "$LOG_NS"   #TO DO: Move to 'proper' home
     fi
 else
     log_debug "Autogeneration of ingresss NOT enabled and/or ingress NOT enabled for OpenSearch"

@@ -115,10 +115,15 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             # verify Contour HTTPProxy CRDs available
             if kubectl get crd "httpproxies.projectcontour.io" 1> /dev/null 2>&1; then
                 log_debug "Contour HTTPProxy CRD installed"
+                INGRESS_CREATE_ROOT_PROXY="${INGRESS_CREATE_ROOT_PROXY:-true}"
+                INGRESS_USE_SEPARATE_CERTS="${INGRESS_USE_SEPARATE_CERTS:-false}"
             else
                 log_error "Ingress type [contour] specified but required CRDs are not installed"
                 exit 1
             fi
+        elif [ "$INGRESS_TYPE" == "ingress-nginx" ]; then
+            INGRESS_CREATE_ROOT_PROXY="${INGRESS_CREATE_ROOT_PROXY:-false}"
+            INGRESS_USE_SEPARATE_CERTS="${INGRESS_USE_SEPARATE_CERTS:-true}"
         fi
 
         if [ -z "$BASE_DOMAIN" ]; then
@@ -135,9 +140,6 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             log_error "Invalid ROUTING value, valid values are 'host' or 'path'"
             exit 1
         fi
-
-        INGRESS_CREATE_ROOT_PROXY="${INGRESS_CREATE_ROOT_PROXY:-false}"
-        INGRESS_USE_SEPARATE_CERTS="${INGRESS_USE_SEPARATE_CERTS:-true}"
 
         if [ "$INGRESS_CERT/$INGRESS_KEY" != "/" ]; then
             if [ ! -f "$INGRESS_CERT" ] || [ ! -f "$INGRESS_KEY" ]; then
@@ -272,12 +274,16 @@ export -f checkStorageClass
 
 function create_httpproxy {
 
+    # ################################################### #
+    # developed/tested with contour sample version: 0.2.2 #
+    # ################################################### #
+
     local app_group app_prefix fqdn path secretName targetFqdn resourceDefFile routing namespace
 
     app_group="${1}"
     app_prefix="${2}"
-    fqdn="${3}"
-    path="${4}"
+    path="${3}"
+    fqdn="${4}"
     secretName="${5:-v4m-ingress-tls-secret}"
 
     routing="${ROUTING:-host}"
@@ -289,8 +295,6 @@ function create_httpproxy {
 
     resourceDefFile="$TMP_DIR/${app_prefix}_httpproxy_def_file.yaml"
     touch "$resourceDefFile"
-
-    #### tested with contour version: 0.0.1
 
     #intialized the yaml file w/appropriate contour sample
     # shellcheck disable=SC2016
@@ -321,48 +325,73 @@ function create_httpproxy {
         namespace="${MON_NS:-monitoring}"
     fi
 
-    kubectl apply -f "$resourceDefFile" -n "$namespace"
+#    kubectl apply -f "$resourceDefFile" -n "$namespace"
 }
 export -f create_httpproxy
 
 function create_root_httpproxy {
 
+    # ################################################### #
+    # developed/tested with contour sample version: 0.2.2 #
+    # ################################################### #
+
     ### create_root_httpproxy  APP_GRP  SECRET NAMESPACE
     ### create_root_httpproxy  LOGGING v4m-ingress-tls-secret logging
 
-    app_group="${1}"    # LOGGING|MONITORING
-    secretName="${2}"
-    namespace="${3}"
+    ### Assumes set: BASE_DOMAIN
+    local app_group secretName namespace
+
+    app_group="${1}"    # logging|monitoring
+
+    if [ "$app_group" == "logging" ]; then
+        namespace="${LOG_NS:-logging}"
+    else
+        namespace="${MON_NS:-monitoring}"
+    fi
 
     if [ "$ROUTING" != "path" ]; then
         log_debug "Path-based routing not enabled; skipping 'root' HTTPProxy creation"
         return
     fi
 
-    sampleFile="samples/contour/path-based/$app_group/${app_group}_root_httpproxy.yaml"  #TO DO: rename template file, remove app_group
+    sampleFile="samples/contour/path-based/$app_group/root_httpproxy.yaml"
 
     resourceDefFile="$TMP_DIR/${app_group}_root_httpproxy_def_file.yaml"
     touch "$resourceDefFile"
 
     BASE_DOMAIN="${BASE_DOMAIN:-notset}"
 
-    #### tested with contour version: 0.0.2
-
     #intialized the yaml file w/appropriate contour sample
     # shellcheck disable=SC2016
     yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
 
-    snippet="$BASE_DOMAIN" yq -i '.spec.virtualhost.fqdn=env(snippet)' "$resourceDefFile"
-    snippet="$secretName" yq -i '.spec.virtualhost.tls.secretName=env(snippet)' "$resourceDefFile"
+    snippet="$app_group.$BASE_DOMAIN" yq -i '.spec.virtualhost.fqdn=env(snippet)' "$resourceDefFile"
+    ###snippet="$secretName" yq -i '.spec.virtualhost.tls.secretName=env(snippet)' "$resourceDefFile"
 
-    if [ "$OSD_INGRESS_ENABLE" != "true" ]; then
-      yq -i e 'del(.spec.includes[] |select(.name == "v4m-osd"))' "$resourceDefFile"
+    if [ "$app_group" == "logging" ]; then
+        if [ "$OSD_INGRESS_ENABLE" != "true" ]; then
+            yq -i e 'del(.spec.includes[] |select(.name == "v4m-osd"))' "$resourceDefFile"
+        fi
+
+        if [ "$OPENSEARCH_INGRESS_ENABLE" == "true" ]; then
+            yq -i '.spec.includes += [{"name": "v4m-search","namespace": "'"$namespace"'"}]' "$resourceDefFile"
+        fi
+    elif [ "$app_group" == "monitoring" ]; then
+        if [ "$GRAFANA_INGRESS_ENABLE" != "true" ]; then
+            yq -i e 'del(.spec.includes[] |select(.name == "v4m-grafana"))' "$resourceDefFile"
+        fi
+
+        if [ "$ALERTMANAGER_INGRESS_ENABLE" == "true" ]; then
+            yq -i '.spec.includes += [{"name": "v4m-alertmanager","namespace": "'"$namespace"'"}]' "$resourceDefFile"
+        fi
+
+        if [ "$PROMETHEUS_INGRESS_ENABLE" == "true" ]; then
+            yq -i '.spec.includes += [{"name": "v4m-prometheus","namespace": "'"$namespace"'"}]' "$resourceDefFile"
+        fi
+    else
+        log_error "Invalid application group [$app_group] passed to function [create_root_httpproxy]"
+        return 1
     fi
-
-    if [ "$OPENSEARCH_INGRESS_ENABLE" == "true" ]; then
-      yq -i '.spec.includes += {"name": "v4m-opensearch"}' "$resourceDefFile"
-    fi
-
     cat "$resourceDefFile"   #REMOVE
 
     kubectl --namespace "$namespace" apply -f  "$resourceDefFile"
