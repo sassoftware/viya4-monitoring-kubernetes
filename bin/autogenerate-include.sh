@@ -7,6 +7,31 @@
 # This file is not marked as executable as it is intended to be sourced
 # Current directory must be the root directory of the repo
 
+function checkStorageClass {
+    # input parms: $1  *Name of env var* identifying storageClass
+    # input parms: $2  storageClass
+    # NOTE: Using 2 vars b/c Mac doesn't support indirection (e.g. x="${!1}")
+
+    local storageClass storageClassEnvVar
+    storageClassEnvVar="$1"
+    storageClass="${2:-$STORAGECLASS}"
+
+    if [ -z "$storageClass" ]; then
+        log_error "Required parameter not provided.  Either [$storageClassEnvVar] or [STORAGECLASS] MUST be provided."
+        exit 1
+    else
+        # shellcheck disable=SC2091
+        if $(kubectl get storageClass "$storageClass" -o name &> /dev/null); then
+            log_debug "The specified StorageClass [$storageClass] exists"
+        else
+            log_error "The specified StorageClass [$storageClass] does NOT exist"
+            exit 1
+        fi
+    fi
+
+}
+export -f checkStorageClass
+
 function checkYqVersion {
     # confirm yq installed and correct version
     local goodver yq_version
@@ -23,7 +48,6 @@ function checkYqVersion {
         return 0
     fi
 }
-
 export -f checkYqVersion
 
 function create_ingress_certs {
@@ -51,7 +75,6 @@ function create_ingress_certs {
         fi
     fi
 }
-
 export -f create_ingress_certs
 
 function get_app_ingress_fqdn {
@@ -72,6 +95,136 @@ function get_app_ingress_fqdn {
     echo "$app_fqdn"
 }
 export -f get_app_ingress_fqdn
+
+function create_httpproxy {
+
+    # ################################################### #
+    # developed/tested with contour sample version: 0.2.2 #
+    # ################################################### #
+
+    local app_group app_prefix fqdn path secretName targetFqdn resourceDefFile routing namespace
+
+    app_group="${1}"
+    app_prefix="${2}"
+    path="${3}"
+    fqdn="${4}"
+    secretName="${5:-v4m-ingress-tls-secret}"
+
+    routing="${ROUTING:-host}"
+
+    sampleFile="samples/contour/${routing}-based/$app_group/${app_prefix}_httpproxy.yaml"
+
+    # Construct host for application URL
+    targetFqdn="$(get_app_ingress_fqdn "$fqdn" "$path")"
+
+    resourceDefFile="$TMP_DIR/${app_prefix}_httpproxy_def_file.yaml"
+    touch "$resourceDefFile"
+
+    #intialized the yaml file w/appropriate contour sample
+    # shellcheck disable=SC2016
+    yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
+
+    if [ "$routing" == "host" ]; then
+
+        snippet="$targetFqdn" yq -i '.spec.virtualhost.fqdn=env(snippet)' "$resourceDefFile"
+
+        if [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
+            snippet="$secretName" yq -i '.spec.virtualhost.tls.secretName=env(snippet)' "$resourceDefFile"
+        else
+            log_debug "Using same ingress TLS certs [v4m-ingress-tls-secret] for all apps"
+        fi
+    else
+        snippet="/$path" yq -i '.spec.routes.[0].conditions.[0].prefix=env(snippet)' "$resourceDefFile"
+
+        if [ "$app_prefix" == "osd" ] || [ "$app_prefix" == "opensearch" ]; then
+            snippet="/$path" yq -i '.spec.routes.[0].pathRewritePolicy.replacePrefix.[0].prefix=env(snippet)' "$resourceDefFile"
+        fi
+    fi
+
+    cat "$resourceDefFile"  ## REMOVE
+
+    if [ "$app_group" == "logging" ]; then
+        namespace="${LOG_NS:-logging}"
+    else
+        namespace="${MON_NS:-monitoring}"
+    fi
+
+    kubectl apply -f "$resourceDefFile" -n "$namespace"
+}
+export -f create_httpproxy
+
+function create_root_httpproxy {
+
+    # ################################################### #
+    # developed/tested with contour sample version: 0.2.2 #
+    # ################################################### #
+
+    ### create_root_httpproxy  APP_GRP  SECRET NAMESPACE
+    ### create_root_httpproxy  LOGGING v4m-ingress-tls-secret logging
+
+    ### Assumes set: BASE_DOMAIN
+    local app_group secretName namespace
+
+    app_group="${1}"    # logging|monitoring
+
+    if [ "$app_group" == "logging" ]; then
+        namespace="${LOG_NS:-logging}"
+    else
+        namespace="${MON_NS:-monitoring}"
+    fi
+
+    if [ "$ROUTING" != "path" ]; then
+        log_debug "Path-based routing not enabled; skipping 'root' HTTPProxy creation"
+        return
+    fi
+
+    sampleFile="samples/contour/path-based/$app_group/root_httpproxy.yaml"
+
+    resourceDefFile="$TMP_DIR/${app_group}_root_httpproxy_def_file.yaml"
+    touch "$resourceDefFile"
+
+    BASE_DOMAIN="${BASE_DOMAIN:-notset}"
+
+    #intialized the yaml file w/appropriate contour sample
+    # shellcheck disable=SC2016
+    yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
+
+    snippet="$app_group.$BASE_DOMAIN" yq -i '.spec.virtualhost.fqdn=env(snippet)' "$resourceDefFile"
+    ###snippet="$secretName" yq -i '.spec.virtualhost.tls.secretName=env(snippet)' "$resourceDefFile"
+
+    if [ "$app_group" == "logging" ]; then
+        if [ "$OSD_INGRESS_ENABLE" != "true" ]; then
+            yq -i e 'del(.spec.includes[] |select(.name == "v4m-osd"))' "$resourceDefFile"
+        fi
+
+        if [ "$OPENSEARCH_INGRESS_ENABLE" == "true" ]; then
+            yq -i '.spec.includes += [{"name": "v4m-search","namespace": "'"$namespace"'"}]' "$resourceDefFile"
+        fi
+    elif [ "$app_group" == "monitoring" ]; then
+        if [ "$GRAFANA_INGRESS_ENABLE" != "true" ]; then
+            yq -i e 'del(.spec.includes[] |select(.name == "v4m-grafana"))' "$resourceDefFile"
+        fi
+
+        if [ "$ALERTMANAGER_INGRESS_ENABLE" == "true" ]; then
+            yq -i '.spec.includes += [{"name": "v4m-alertmanager","namespace": "'"$namespace"'"}]' "$resourceDefFile"
+        fi
+
+        if [ "$PROMETHEUS_INGRESS_ENABLE" == "true" ]; then
+            yq -i '.spec.includes += [{"name": "v4m-prometheus","namespace": "'"$namespace"'"}]' "$resourceDefFile"
+        fi
+    else
+        log_error "Invalid application group [$app_group] passed to function [create_root_httpproxy]"
+        return 1
+    fi
+    cat "$resourceDefFile"   #REMOVE
+
+    kubectl --namespace "$namespace" apply -f  "$resourceDefFile"
+}
+export -f create_root_httpproxy
+
+#
+# Executing Script starts here
+#
 
 AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
 AUTOGENERATE_STORAGECLASS="${AUTOGENERATE_STORAGECLASS:-false}"
@@ -159,9 +312,13 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
         OSD_INGRESS_ENABLE="${OSD_INGRESS_ENABLE:-true}"
         OPENSEARCH_INGRESS_ENABLE="${OPENSEARCH_INGRESS_ENABLE:-false}"
 
-        GRAFANA_ENABLE_INGRESS="${GRAFANA_ENABLE_INGRESS:-true}"
+        GRAFANA_INGRESS_ENABLE="${GRAFANA_INGRESS_ENABLE:-true}"
         PROMETHEUS_INGRESS_ENABLE="${PROMETHEUS_INGRESS_ENABLE:-false}"
-        ALERTMANAGER_ENABLE_INGRESS="${ALERTMANAGER_ENABLE_INGRESS:-false}"
+        ALERTMANAGER_INGRESS_ENABLE="${ALERTMANAGER_INGRESS_ENABLE:-false}"
+
+        #export ingress enable flags to ensure they are accessible to downstream processing
+        export OSD_INGRESS_ENABLE OPENSEARCH_INGRESS_ENABLE
+        export ALERTMANAGER_INGRESS_ENABLE GRAFANA_INGRESS_ENABLE PROMETHEUS_INGRESS_ENABLE
 
         log_info "Autogeneration of Ingress definitions has been enabled"
 
@@ -245,155 +402,3 @@ elif [ "$AUTOGENERATE_SOURCED" == "NotNeeded" ]; then
 else
     log_debug "autogenerate-include.sh was already sourced [$AUTOGENERATE_SOURCED]"
 fi
-
-function checkStorageClass {
-    # input parms: $1  *Name of env var* identifying storageClass
-    # input parms: $2  storageClass
-    # NOTE: Using 2 vars b/c Mac doesn't support indirection (e.g. x="${!1}")
-
-    local storageClass storageClassEnvVar
-    storageClassEnvVar="$1"
-    storageClass="${2:-$STORAGECLASS}"
-
-    if [ -z "$storageClass" ]; then
-        log_error "Required parameter not provided.  Either [$storageClassEnvVar] or [STORAGECLASS] MUST be provided."
-        exit 1
-    else
-        # shellcheck disable=SC2091
-        if $(kubectl get storageClass "$storageClass" -o name &> /dev/null); then
-            log_debug "The specified StorageClass [$storageClass] exists"
-        else
-            log_error "The specified StorageClass [$storageClass] does NOT exist"
-            exit 1
-        fi
-    fi
-
-}
-
-export -f checkStorageClass
-
-function create_httpproxy {
-
-    # ################################################### #
-    # developed/tested with contour sample version: 0.2.2 #
-    # ################################################### #
-
-    local app_group app_prefix fqdn path secretName targetFqdn resourceDefFile routing namespace
-
-    app_group="${1}"
-    app_prefix="${2}"
-    path="${3}"
-    fqdn="${4}"
-    secretName="${5:-v4m-ingress-tls-secret}"
-
-    routing="${ROUTING:-host}"
-
-    sampleFile="samples/contour/${routing}-based/$app_group/${app_prefix}_httpproxy.yaml"
-
-    # Construct host for application URL
-    targetFqdn="$(get_app_ingress_fqdn "$fqdn" "$path")"
-
-    resourceDefFile="$TMP_DIR/${app_prefix}_httpproxy_def_file.yaml"
-    touch "$resourceDefFile"
-
-    #intialized the yaml file w/appropriate contour sample
-    # shellcheck disable=SC2016
-    yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
-
-    if [ "$routing" == "host" ]; then
-
-        snippet="$targetFqdn" yq -i '.spec.virtualhost.fqdn=env(snippet)' "$resourceDefFile"
-
-        if [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
-            snippet="$secretName" yq -i '.spec.virtualhost.tls.secretName=env(snippet)' "$resourceDefFile"
-        else
-            log_debug "Using same ingress TLS certs [v4m-ingress-tls-secret] for all apps"
-        fi
-    else
-        snippet="/$path" yq -i '.spec.routes.[0].conditions.[0].prefix=env(snippet)' "$resourceDefFile"
-
-        if [ "$app_prefix" == "osd" ] || [ "$app_prefix" == "opensearch" ]; then
-            snippet="/$path" yq -i '.spec.routes.[0].pathRewritePolicy.replacePrefix.[0].prefix=env(snippet)' "$resourceDefFile"
-        fi
-    fi
-
-    cat "$resourceDefFile"  ## REMOVE
-
-    if [ "$app_group" == "logging" ]; then
-        namespace="${LOG_NS:-logging}"
-    else
-        namespace="${MON_NS:-monitoring}"
-    fi
-
-#    kubectl apply -f "$resourceDefFile" -n "$namespace"
-}
-export -f create_httpproxy
-
-function create_root_httpproxy {
-
-    # ################################################### #
-    # developed/tested with contour sample version: 0.2.2 #
-    # ################################################### #
-
-    ### create_root_httpproxy  APP_GRP  SECRET NAMESPACE
-    ### create_root_httpproxy  LOGGING v4m-ingress-tls-secret logging
-
-    ### Assumes set: BASE_DOMAIN
-    local app_group secretName namespace
-
-    app_group="${1}"    # logging|monitoring
-
-    if [ "$app_group" == "logging" ]; then
-        namespace="${LOG_NS:-logging}"
-    else
-        namespace="${MON_NS:-monitoring}"
-    fi
-
-    if [ "$ROUTING" != "path" ]; then
-        log_debug "Path-based routing not enabled; skipping 'root' HTTPProxy creation"
-        return
-    fi
-
-    sampleFile="samples/contour/path-based/$app_group/root_httpproxy.yaml"
-
-    resourceDefFile="$TMP_DIR/${app_group}_root_httpproxy_def_file.yaml"
-    touch "$resourceDefFile"
-
-    BASE_DOMAIN="${BASE_DOMAIN:-notset}"
-
-    #intialized the yaml file w/appropriate contour sample
-    # shellcheck disable=SC2016
-    yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
-
-    snippet="$app_group.$BASE_DOMAIN" yq -i '.spec.virtualhost.fqdn=env(snippet)' "$resourceDefFile"
-    ###snippet="$secretName" yq -i '.spec.virtualhost.tls.secretName=env(snippet)' "$resourceDefFile"
-
-    if [ "$app_group" == "logging" ]; then
-        if [ "$OSD_INGRESS_ENABLE" != "true" ]; then
-            yq -i e 'del(.spec.includes[] |select(.name == "v4m-osd"))' "$resourceDefFile"
-        fi
-
-        if [ "$OPENSEARCH_INGRESS_ENABLE" == "true" ]; then
-            yq -i '.spec.includes += [{"name": "v4m-search","namespace": "'"$namespace"'"}]' "$resourceDefFile"
-        fi
-    elif [ "$app_group" == "monitoring" ]; then
-        if [ "$GRAFANA_INGRESS_ENABLE" != "true" ]; then
-            yq -i e 'del(.spec.includes[] |select(.name == "v4m-grafana"))' "$resourceDefFile"
-        fi
-
-        if [ "$ALERTMANAGER_INGRESS_ENABLE" == "true" ]; then
-            yq -i '.spec.includes += [{"name": "v4m-alertmanager","namespace": "'"$namespace"'"}]' "$resourceDefFile"
-        fi
-
-        if [ "$PROMETHEUS_INGRESS_ENABLE" == "true" ]; then
-            yq -i '.spec.includes += [{"name": "v4m-prometheus","namespace": "'"$namespace"'"}]' "$resourceDefFile"
-        fi
-    else
-        log_error "Invalid application group [$app_group] passed to function [create_root_httpproxy]"
-        return 1
-    fi
-    cat "$resourceDefFile"   #REMOVE
-
-    kubectl --namespace "$namespace" apply -f  "$resourceDefFile"
-}
-export -f create_root_httpproxy

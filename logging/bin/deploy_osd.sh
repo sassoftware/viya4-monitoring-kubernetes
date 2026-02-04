@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
+
 source logging/bin/common.sh
 source logging/bin/secrets-include.sh
 source bin/tls-include.sh
