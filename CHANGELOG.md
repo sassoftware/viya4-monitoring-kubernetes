@@ -1,5 +1,5 @@
 # SAS Viya Monitoring for Kubernetes
-## Version 1.2.46 (06FEB2025)
+## Version 1.2.46 (06FEB2026)
 * **Overall**
   * [FEATURE] A new sample demonstrates how to use Contour HTTPProxy resources to
  provide access to the web applications, such as OpenSearch Dashboards and Grafana,
