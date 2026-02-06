@@ -141,8 +141,6 @@ function create_httpproxy {
         fi
     fi
 
-    cat "$resourceDefFile"  ## REMOVE
-
     if [ "$app_group" == "logging" ]; then
         namespace="${LOG_NS:-logging}"
     else
@@ -216,7 +214,6 @@ function create_root_httpproxy {
         log_error "Invalid application group [$app_group] passed to function [create_root_httpproxy]"
         return 1
     fi
-    cat "$resourceDefFile"   #REMOVE
 
     kubectl --namespace "$namespace" apply -f  "$resourceDefFile"
 }

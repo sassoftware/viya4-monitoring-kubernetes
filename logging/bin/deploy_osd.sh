@@ -57,7 +57,7 @@ create_tls_certs "$LOG_NS" logging kibana
 AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
 
 if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OSD_INGRESS_ENABLE" == "true" ]; then
-    echo "GREG deploy_osd: INGRESS_USE_SEPARATE_CERTS: $INGRESS_USE_SEPARATE_CERTS]"    #REMOVE
+
     if [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
         ingress_tls_secret="kibana-ingress-tls-secret"
         create_ingress_certs "$LOG_NS" "$ingress_tls_secret" "$OSD_INGRESS_CERT" "$OSD_INGRESS_KEY"
