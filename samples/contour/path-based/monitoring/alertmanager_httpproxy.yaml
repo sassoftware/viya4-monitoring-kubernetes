@@ -1,0 +1,23 @@
+# Sample: contour/path-based-ingress Version: 0.2.2
+
+
+# This sample does NOT make the Prometheus and Alertmanager accessible by default.
+# However, you can make one or both of these web applications accessible by
+# creating an HTTPProxy resource for it using this sample file.
+
+# Note that neither Prometheus nor Alertmanager have any authentication
+# configured by default, and exposing an unauthenticated applicaton
+# without other restrictions in place is insecure.
+
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: v4m-alertmanager
+spec:
+  routes:
+    - conditions:
+      - prefix: /alertmanager
+      services:
+        - name: v4m-alertmanager
+          port: 9093
+          protocol: tls

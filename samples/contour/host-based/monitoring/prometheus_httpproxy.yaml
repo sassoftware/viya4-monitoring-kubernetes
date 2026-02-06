@@ -1,0 +1,28 @@
+# Sample: contour/host-based-ingress Version: 0.2.2
+
+
+# This sample does NOT make the Prometheus and Alertmanager accessible by default.
+# However, you can make one or both of these web applications accessible by
+# creating an HTTPProxy resource for it using this sample file.
+
+# Note that neither Prometheus nor Alertmanager have any authentication
+# configured by default, and exposing an unauthenticated applicaton
+# without other restrictions in place is insecure.
+
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: v4m-prometheus
+spec:
+  virtualhost:
+    fqdn: prometheus.host.cluster.example.com
+    tls:
+      secretName: v4m-ingress-tls-secret
+  routes:
+    - conditions:
+      - prefix: /
+      services:
+        - name: v4m-prometheus
+          port: 9090
+          protocol: tls
+

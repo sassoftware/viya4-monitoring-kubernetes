@@ -1,0 +1,19 @@
+# Sample: contour/host-based-ingress Version: 0.2.2
+
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: v4m-osd
+spec:
+  virtualhost:
+    fqdn: dashboards.host.cluster.example.com
+    tls:
+      secretName: v4m-ingress-tls-secret
+  routes:
+    - conditions:
+      - prefix: /
+      services:
+        - name: v4m-osd
+          port: 5601
+          protocol: tls
+
