@@ -120,7 +120,7 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OSD_INGRESS_ENABLE" == "true" ];
 
         if [ "$ROUTING" == "path" ]; then
 
-            ## tested with sample version: 0.2.1
+            ## tested with sample version: 0.2.2
             ingressSampleFile="samples/contour/path-based/logging/user-values-osd.yaml"
 
             #intialized the yaml file w/appropriate ingress sample
