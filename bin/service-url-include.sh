@@ -1,4 +1,4 @@
-# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021-2026, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # shellcheck disable=SC2148
@@ -298,39 +298,7 @@ function get_service_url {
     if [ "$service_type" == "ClusterIP" ]; then
 
         if [ -n "$(get_k8s_info "$namespace" "httpproxy/$service" "$metadata_name")" ]; then
-
-            # #HTTPProxy resource found, using it
-            # path=$(get_k8s_info "$namespace" "httpproxy/$service" "$json_contour_path")
-
-            # host=$(get_k8s_info "$namespace" "httpproxy/$service" "$json_contour_host")
-            # if [ -z "$host" ]; then
-
-            #     # path-based; need to get root HTTProxy
-            #     root_httpproxy="httpproxy/v4m-${app_group}-root-proxy"
-
-            #     if [ -n "$(get_k8s_info "$namespace" "$root_httpproxy" "$metadata_name")" ]; then
-            #         # "Our" root HTTPProxy was found!
-            #         #TO DO: confirm httproxy is actually included in the root HTTPProxy?
-            #         host=$(get_k8s_info "$namespace" "$root_httpproxy" "$json_contour_host")
-            #         tls=$(get_k8s_info "$namespace" "$root_httpproxy" "$json_contour_tls")
-            #     else
-            #         # "Our" root HTTPProxy not found; error out for now.
-            #         #TO DO: handle case where root HTTPProxy is not ours...go looking for it?
-            #         v4m_rc=1
-            #         echo ""
-            #         return
-            #     fi
-            # else
-            #     tls=$(get_k8s_info "$namespace" "httpproxy/$service" "$json_contour_tls")
-            # fi
-
-            # if [ -n "$tls" ]; then
-            #     scheme="https"
-            # else
-            #     scheme="http"
-            # fi
-
-            # url="$scheme://$host$path"
+            #If an HTTPProxy resource exists - assume it is being used
             url=$(get_contour_url "$namespace" "$ingress")
         else
             get_ingress_ports
