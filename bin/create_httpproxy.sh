@@ -17,6 +17,10 @@ if [ "$AUTOGENERATE_SOURCED" != "true" ]; then
     INGRESS_TYPE="ingress-nginx"
 else
     log_debug "Script [create_httpproxy.sh] running within another script execution"
+    if [ "$ROUTING" != "path" ] && [ "${1}" == "ROOT" ]; then
+        log_debug "ROOT HTTPProxy resources are only appropriate when path-based routing is used. Nothing to do; exiting."
+        exit
+    fi
 fi
 
 source bin/autogenerate-include.sh
@@ -50,7 +54,7 @@ case "$app" in
     if [ "$ROUTING" != "path" ]; then
         log_warn "Root HTTPProxy requested but ROUTING is currently set to [host]."
         log_warn "Root HTTPProxy resources are only appropriate when path-based routing is used. Nothing to do; exiting."
-        exit 1
+        exit 0
     fi
 
     case "$arg3" in
