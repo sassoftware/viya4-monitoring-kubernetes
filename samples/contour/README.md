@@ -206,7 +206,7 @@ configuration, the applications are available at these locations:
 
 When you deploy using the path-based configuragtion, the following applications are available at these locations.
 
-* Grafana - `https://logging.host.mycluster.example.com/grafana`
+* Grafana - `https://monitoring.host.mycluster.example.com/grafana`
 * OpenSearch Dashboards - `https://logging.host.mycluster.example.com/dashboards`
 
 If you have chosen to make the following applications available and you have used the path-based configuration,
@@ -214,7 +214,7 @@ the applications are available at these locations:
 
 * Prometheus - `https://monitoring.host.mycluster.example.com/prometheus`
 * Alertmanager - `https://monitoring.host.mycluster.example.com/alertmanager`
-* OpenSearch - `https://monitoring.host.mycluster.example.com/opensearch`
+* OpenSearch - `https://logging.host.mycluster.example.com/opensearch`
 
 ## Known Issues
 ### OpenSearch Dashboards Did Not Load Properly
