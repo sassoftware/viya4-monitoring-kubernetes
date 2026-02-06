@@ -308,6 +308,9 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             fi
         fi
 
+        # export ingress-related settings
+        export  ROUTING INGRESS_TYPE INGRESS_CERT INGRESS_KEY INGRESS_USE_SEPARATE_CERTS INGRESS_CREATE_ROOT_PROXY
+
         # Set enable/disable flags for apps
         OSD_INGRESS_ENABLE="${OSD_INGRESS_ENABLE:-true}"
         OPENSEARCH_INGRESS_ENABLE="${OPENSEARCH_INGRESS_ENABLE:-false}"
