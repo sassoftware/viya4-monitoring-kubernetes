@@ -278,7 +278,7 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             INGRESS_CREATE_ROOT_PROXY="${INGRESS_CREATE_ROOT_PROXY:-false}"
             INGRESS_USE_SEPARATE_CERTS="${INGRESS_USE_SEPARATE_CERTS:-true}"
         fi
-
+        echo "GREG autogenerate-include: INGRESS_USE_SEPARATE_CERTS: $INGRESS_USE_SEPARATE_CERTS]"    #REMOVE
         if [ -z "$BASE_DOMAIN" ]; then
             log_error "Required parameter [BASE_DOMAIN] not provided"
             exit 1
