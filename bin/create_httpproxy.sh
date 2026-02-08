@@ -25,12 +25,12 @@ fi
 
 source bin/autogenerate-include.sh
 
-app="${1}"   #AM|GR|OS|OSD|PR|ROOT|LOG|MON|ALL|ALL_LOG|ALL_MON|
+app="${1}"    #AM|GR|OS|OSD|PR|ROOT|LOG|MON|ALL|ALL_LOG|ALL_MON|
 app="$(echo "$app" | tr '[:lower:]' '[:upper:]')"
 
-arg2="${2}"   #ROOT: appgroup  All others: path
-arg3="${3}"   #ROOT: appgroup2 All others: fqdn
-arg4="${4}"   #ROOT: n/a       All others: secret
+arg2="${2}"   #ROOT: app_group  All others: path
+arg3="${3}"   #ROOT: namespace  All others: fqdn
+arg4="${4}"   #ROOT: which_apps All others: secret
 
 case "$app" in
 "ALERTMANAGER" | "AM")
@@ -49,40 +49,46 @@ case "$app" in
     enable_prometheus="true"
     ;;
 "ROOT")
-    ### create_root_httpproxy  "logging"
-    ### create_root_httpproxy  APP_GROUP
+
+    #### create_httpproxy.sh  ROOT APP_GROUP (NAMESPACE) (WHICH_APPS)
+    ####   APP_GROUP: logging|monitoring
+    ####   WHICH_APPS: ALL_MON|ALL_LOG|MON|LOG|ALL
+    ###    results in call: create_root_httpproxy  APP_GROUP (NAMESPACE)
+
     if [ "$ROUTING" != "path" ]; then
         log_warn "Root HTTPProxy requested but ROUTING is currently set to [host]."
         log_warn "Root HTTPProxy resources are only appropriate when path-based routing is used. Nothing to do; exiting."
         exit 0
     fi
 
-    case "$arg3" in
-    ALL_MON)
+    case "$arg4" in
+    ALL_MON | MON)
         if [ "$arg2" == "logging" ]; then
-            log_error "Invalid argument [$arg3] included in request to generate ROOT HTTPProxy resource for 'logging' resources."
+            log_error "Invalid argument [$arg4] included in request to generate ROOT HTTPProxy resource for 'logging' resources."
             exit 1
         fi
         ;;
-    ALL_LOG)
+    ALL_LOG | LOG)
         if [ "$arg2" == "monitoring" ] ; then
-            log_error "Invalid argument [$arg3] included in request to generate ROOT HTTPProxy resource for 'monitoring' resources."
+            log_error "Invalid argument [$arg4] included in request to generate ROOT HTTPProxy resource for 'monitoring' resources."
             exit 1
         fi
         ;;
     ALL)
-        :  #do nothing, "ALL"is a valid value for arg3
+        #TO DO: Implement in a future release
+        log_error "Invalid request; generating a single ROOT HTTPProxy resource for 'all' resources is not supported at this time"
+        exit 1
         ;;
     "" )
-        :  #do nothing, arg3 NOT required
+        :  #do nothing, arg4 NOT required
         ;;
     *)
-        log_error "Unrecognized argument [$arg3] included in request to generate ROOT HTTPProxy resource."
+        log_error "Unrecognized argument [$arg4] included in request to generate ROOT HTTPProxy resource."
         exit 1
         ;;
     esac
 
-    if [ "$arg3" == "ALL_MON" ] || [ "$arg3" == "ALL" ]; then
+    if [ "$arg4" == "ALL_MON" ] || [ "$arg4" == "ALL" ]; then
         # shellcheck disable=SC2034
         GRAFANA_INGRESS_ENABLE=true
         # shellcheck disable=SC2034
@@ -91,14 +97,14 @@ case "$app" in
         PROMETHEUS_INGRESS_ENABLE=true
     fi
 
-    if [ "$arg3" == "ALL_LOG" ] || [ "$arg3" == "ALL" ]; then
+    if [ "$arg4" == "ALL_LOG" ] || [ "$arg4" == "ALL" ]; then
         # shellcheck disable=SC2034
         OPENSEARCH_INGRESS_ENABLE=true
         # shellcheck disable=SC2034
         OSD_INGRESS_ENABLE=true
     fi
 
-    create_root_httpproxy  "$arg2"
+    create_root_httpproxy  "$arg2"  "$arg3"
     ;;
 "ALL")
     log_debug "Creating HTTPProxy resources for *all* monitoring web applications"
@@ -210,24 +216,3 @@ if [ "$enable_prometheus" == "true" ]; then
     fi
     create_httpproxy  "monitoring" "prometheus" "$prPath" "$prFqdn" "$prSecret"
 fi
-
-    ### create_httpproxy       "monitoring" "prometheus" "$PROMETHEUS_FQDN" "$targetPath" "$ingress_tls_secret"
-    ### create_httpproxy       APP_GROUP    APP_PREFIX   FQDN               PATH           SECRETNAME
-
-    ### create_root_httpproxy  "logging"
-    ### create_root_httpproxy  APP_GROUP
-
-### 03FEB26
-##  Still *requires* following environment variables be set:
-##      no more: AUTOGENERATE_INGRESS
-##      no more: INGRESS_TYPE
-##      BASE_DOMAIN
-##      LOG_NS
-##      MON_NS
-##  Still reacts to the following environment variables:
-##      ROUTING
-##      INGRESS_USE_SEPARATE_CERTS
-##
-##  TO DO: HTTPProxy resources report as invalid when secret does not exist.
-##  TO DO: Feature-flag non-critical-path options?
-##  TO DO: Do status-check before exiting?  All HTTPProxy resources in namespace?  Only one created?

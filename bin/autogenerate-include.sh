@@ -79,6 +79,10 @@ export -f create_ingress_certs
 
 function get_app_ingress_fqdn {
     # Assumes ROUTING and BASE_DOMAIN set
+    #
+    # Inputs: fqdn, path
+    # Returns:  fqdn to applicaiton
+    #
     local app_fqdn app_path
 
     app_fqdn=$1
@@ -164,8 +168,11 @@ function create_root_httpproxy {
     local app_group secretName namespace
 
     app_group="${1}"    # logging|monitoring
+    namespace="${2}"    # Namespace for the ROOT HTTPProxy resource
 
-    if [ "$app_group" == "logging" ]; then
+    if [ -n "$namespace" ]; then
+        log_debug "Creating ROOT HTTPProxy resource for [$app_group] web apps in [$namespace] namespace"
+    elif [ "$app_group" == "logging" ]; then
         namespace="${LOG_NS:-logging}"
     else
         namespace="${MON_NS:-monitoring}"
@@ -249,12 +256,12 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             exit 1
         fi
 
-        #validate required inputs:
-        #   INGRESS_TYPE
-        #   BASE_DOMAIN
-        #   ROUTING
-        #   INGRESS_CERT
-        #   INGRESS_KEY
+        #Required inputs:
+        #   INGRESS_TYPE (default: ingress-nginx)
+        #   BASE_DOMAIN  (default: -none- )
+        #   ROUTING      (default: host)
+        #   INGRESS_CERT (default: -none- )
+        #   INGRESS_KEY  (default: -none- )
 
         INGRESS_TYPE="${INGRESS_TYPE:-ingress-nginx}"
 

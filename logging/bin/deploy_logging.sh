@@ -53,7 +53,10 @@ logging/bin/deploy_opensearch.sh
 ##################################
 # Create "root" HTTPProxy(if nec)#
 ##################################
-bin/create_httpproxy.sh ROOT logging
+
+if [ "$INGRESS_CREATE_ROOT_PROXY" == "true" ]; then
+    bin/create_httpproxy.sh ROOT logging
+fi
 
 ##################################
 # Elasticsearch Metric Exporter  #

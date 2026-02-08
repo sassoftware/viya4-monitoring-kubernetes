@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Copyright © 2022-2025, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2022-2026, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
@@ -100,8 +100,6 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "tr
 
         fi
     elif [ "$INGRESS_TYPE" == "contour" ]; then
-
-        ingress_tls_secret="elasticsearch-ingress-tls-secret"
 
         create_httpproxy  "logging" "opensearch" "$targetPath" "$targetFqdn" "$ingress_tls_secret"
     fi
