@@ -57,7 +57,7 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 | Metrics | [Grafana (on OpenShift)](https://github.com/grafana-community/helm-charts/tree/main/charts/grafana| __OPENSHIFT_GRAFANA_CHART_REPO__ | __OPENSHIFT_GRAFANA_CHART_NAME__ | __OPENSHIFT_GRAFANA_CHART_VERSION__ | __OPENSHIFT_GRAFANA_CHART_ARCHIVE__ |
 | Metrics | [Kube Prometheus Stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)| __KUBE_PROM_STACK_CHART_REPO__ | __KUBE_PROM_STACK_CHART_NAME__ | __KUBE_PROM_STACK_CHART_VERSION__ | __KUBE_PROM_STACK_CHART_ARCHIVE__ |
 | Metrics | [Prometheus Pushgateway](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway)| __PUSHGATEWAY_CHART_REPO__ | __PUSHGATEWAY_CHART_NAME__ | __PUSHGATEWAY_CHART_VERSION__ | __PUSHGATEWAY_CHART_ARCHIVE__ |
-| Metrics | [Tempo](https://github.com/grafana/helm-charts/tree/main/charts/tempo)| __TEMPO_CHART_REPO__ | __TEMPO_CHART_NAME__ | __TEMPO_CHART_VERSION__ | __TEMPO_CHART_ARCHIVE__ |
+| Metrics | [Tempo](https://github.com/grafana-community/helm-charts/tree/main/charts/tempo)| __TEMPO_CHART_REPO__ | __TEMPO_CHART_NAME__ | __TEMPO_CHART_VERSION__ | __TEMPO_CHART_ARCHIVE__ |
 
 ## Table 4. Miscellaneous Component Version Information
 This table provides version information for some miscellaneous components deployed by SAS Viya Monitoring for Kubernetes.
