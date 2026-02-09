@@ -1,6 +1,5 @@
 # Sample: contour/host-based-ingress Version: 0.2.2
 
-
 apiVersion: projectcontour.io/v1
 kind: HTTPProxy
 metadata:

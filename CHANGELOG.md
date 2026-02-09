@@ -1,11 +1,19 @@
 # SAS Viya Monitoring for Kubernetes
-## Unreleased
+## Version 1.2.46 (06FEB2026)
 * **Overall**
   * [FEATURE] A new sample demonstrates how to use Contour HTTPProxy resources to
  provide access to the web applications, such as OpenSearch Dashboards and Grafana,
  deployed as part of this project.  Refer to the [Contour Sample README](samples/contour)
  for more information.
 * **Logging**
+  * [FEATURE] A new script, `setup-airgap` automates many of the setup preparations needed prior 
+to deploying into an airgap environment. This setup includes populating the container registry
+(with both images and helm charts) and downloading the necessary files (e.g. CRDs and Grafana
+plugin files) into the appropriate sub-directories in the `$USER_DIR` directory. The location
+of the private container registry and the associated credentials need to be identified by
+setting the environment variables `AIRGAP_REGISTRY`, `AIRGAP_REGISTRY_USERNAME`, and
+`AIRGAP_REGISTRY_PASSWORD` prior to running the script, preferably in the `$USER_DIR/user.env`
+file. Refer to the [Prepare to Deploy SAS Viya Monitoring for Kubernetes in an Air Gap Environment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0grd8g2pkfglin12bzm3g1oik2p) documentation for more info.
   * [FIX] The `logging/bin/onboard.sh` script no longer fails when the `-p` parameter is set
 * **Metrics**
   * [FEATURE] Support for automatically defining SMTP server configuration (permitting Grafana
