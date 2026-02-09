@@ -134,6 +134,10 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OSD_INGRESS_ENABLE" == "true" ];
 
         create_httpproxy  "logging" "osd" "$targetPath" "$targetFqdn" "$ingress_tls_secret"
     fi
+elif  [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OSD_INGRESS_ENABLE" = "false" ] && [ "$INGRESS_TYPE" == "contour" ]; then
+    log_debug "Access to [OpenSearch Dashboards] disabled; removing HTTPProxy resource"
+    kubectl -n "$LOG_NS" delete httpproxy v4m-osd  --ignore-not-found
+
 else
     log_debug "Autogeneration of ingresss NOT enabled"
 fi
