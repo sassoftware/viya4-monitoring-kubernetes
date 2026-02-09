@@ -55,7 +55,7 @@ logging/bin/deploy_opensearch.sh
 ##################################
 
 if [ "$INGRESS_CREATE_ROOT_PROXY" == "true" ]; then
-    bin/create_httpproxy.sh ROOT logging
+    create_root_httpproxy logging "$LOG_NS"
 fi
 
 ##################################
