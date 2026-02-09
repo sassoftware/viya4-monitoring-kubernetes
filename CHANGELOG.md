@@ -1,4 +1,28 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Metrics**
+  * [CHANGE] Following the migration of the Grafana and Tempo Helm charts to the 
+[Grafana Community Kubernetes Helm Charts project](https://github.com/grafana-community/helm-charts),
+our project now deploys these charts from that project's repository.
+  * [CHANGE] Following the retirement of the ingress-nginx maintained variant of the 
+`kube-webhook-certgen`, the Prometheus Community Helm charts
+[moved to a new actively maintained replacement](https://github.com/prometheus-community/helm-charts/pull/6407).
+Therefore, our project, in turn, now deploys the component from this new source as well.
+  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 78.4.0 to  81.5.2
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded fom 9.4.5 to 11.0.1
+  * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 3.4.1 to 3.6.0
+  * [UPGRADE] Alertmanager has been upgraded from 0.28.1 to 0.31.0
+  * [UPGRADE] The config-reloader has been upgraded from 0.86.1 to 0.88.1
+  * [UPGRADE] Grafana has been upgraded from 12.2.0 to 12.3.2
+  * [UPGRADE] The k8s-sidecar has been upgraded from 1.30.9 to 2.5.0
+  * [UPGRADE] Kube-State-Metrics has been upgraded from 2.17.0 to 2.18.0
+  * [UPGRADE] Node-Exporter has been upgraded from 1.9.1 to 1.10.2
+  * [UPGRADE] Prometheus has been upgraded from 3.7.1 to 3.9.1
+  * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.11.1 to 1.11.2
+  * [UPGRADE] Prometheus Operator has been upgraded from 0.86.1 to 0.88.1
+  * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.31.1 to 2.32.4
+
+
 ## Version 1.2.46 (06FEB2026)
 * **Overall**
   * [FEATURE] A new sample demonstrates how to use Contour HTTPProxy resources to
