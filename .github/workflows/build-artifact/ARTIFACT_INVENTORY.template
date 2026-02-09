@@ -42,7 +42,7 @@ These repositories must be made available to Helm in your environment. Use the `
 |--|--|--|--|
 | Logging | [Fluent Bit](https://github.com/fluent/helm-charts) | fluent | https://fluent.github.io/helm-charts |
 | Logging | [OpenSearch and OpenSearch Dashboards](https://github.com/opensearch-project/helm-charts) | opensearch | https://opensearch-project.github.io/helm-charts |
-| Metrics | [Grafana](https://github.com/grafana-community/helm-charts) | grafana | https://grafana-community.github.io/helm-charts|
+| Metrics | [Grafana Community](https://github.com/grafana-community/helm-charts) | grafana-community | https://grafana-community.github.io/helm-charts|
 | Both | [Prometheus Community](https://github.com/prometheus-community/helm-charts) | prometheus-community | https://prometheus-community.github.io/helm-charts |
 
 ## Table 3. Helm Chart Information
