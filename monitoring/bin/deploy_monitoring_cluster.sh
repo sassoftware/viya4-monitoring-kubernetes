@@ -494,7 +494,7 @@ if [ "$TRACING_ENABLE" == "true" ]; then
     generateImageKeysFile "$TEMPO_FULL_IMAGE" "monitoring/tempo_container_image.template"
 
     # Add the grafana helm chart repo
-    helmRepoAdd grafana https://grafana.github.io/helm-charts
+    helmRepoAdd grafana https://grafana-community.github.io/helm-charts
     helm repo update
 
     # Get Helm Chart Name

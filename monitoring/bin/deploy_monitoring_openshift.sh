@@ -36,7 +36,7 @@ set -e
 log_notice "Deploying monitoring to the [$MON_NS] namespace..."
 
 # Add the grafana helm chart repo
-helmRepoAdd grafana https://grafana.github.io/helm-charts
+helmRepoAdd grafana https://grafana-community.github.io/helm-charts
 log_info "Updating helm repositories..."
 helm repo update
 

@@ -42,7 +42,7 @@ These repositories must be made available to Helm in your environment. Use the `
 |--|--|--|--|
 | Logging | [Fluent Bit](https://github.com/fluent/helm-charts) | fluent | https://fluent.github.io/helm-charts |
 | Logging | [OpenSearch and OpenSearch Dashboards](https://github.com/opensearch-project/helm-charts) | opensearch | https://opensearch-project.github.io/helm-charts |
-| Metrics | [Grafana](https://github.com/grafana/helm-charts) | grafana | https://grafana.github.io/helm-charts |
+| Metrics | [Grafana](https://github.com/grafana-community/helm-charts) | grafana | https://grafana-community.github.io/helm-charts|
 | Both | [Prometheus Community](https://github.com/prometheus-community/helm-charts) | prometheus-community | https://prometheus-community.github.io/helm-charts |
 
 ## Table 3. Helm Chart Information
@@ -54,7 +54,7 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 | Logging | [Fluent Bit](https://github.com/fluent/helm-charts/tree/main/charts/fluent-bit)| __FLUENTBIT_HELM_CHART_REPO__ | __FLUENTBIT_HELM_CHART_NAME__ | __FLUENTBIT_HELM_CHART_VERSION__ | __FLUENTBIT_HELM_CHART_ARCHIVE__ |
 | Logging | [OpenSearch](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch)| __OPENSEARCH_HELM_CHART_REPO__ | __OPENSEARCH_HELM_CHART_NAME__ | __OPENSEARCH_HELM_CHART_VERSION__ | __OPENSEARCH_HELM_CHART_ARCHIVE__ |
 | Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch-dashboards)| __OSD_HELM_CHART_REPO__ | __OSD_HELM_CHART_NAME__ | __OSD_HELM_CHART_VERSION__ | __OSD_HELM_CHART_ARCHIVE__ |
-| Metrics | [Grafana (on OpenShift)](https://github.com/grafana/helm-charts/tree/main/charts/grafana)| __OPENSHIFT_GRAFANA_CHART_REPO__ | __OPENSHIFT_GRAFANA_CHART_NAME__ | __OPENSHIFT_GRAFANA_CHART_VERSION__ | __OPENSHIFT_GRAFANA_CHART_ARCHIVE__ |
+| Metrics | [Grafana (on OpenShift)](https://github.com/grafana-community/helm-charts/tree/main/charts/grafana| __OPENSHIFT_GRAFANA_CHART_REPO__ | __OPENSHIFT_GRAFANA_CHART_NAME__ | __OPENSHIFT_GRAFANA_CHART_VERSION__ | __OPENSHIFT_GRAFANA_CHART_ARCHIVE__ |
 | Metrics | [Kube Prometheus Stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)| __KUBE_PROM_STACK_CHART_REPO__ | __KUBE_PROM_STACK_CHART_NAME__ | __KUBE_PROM_STACK_CHART_VERSION__ | __KUBE_PROM_STACK_CHART_ARCHIVE__ |
 | Metrics | [Prometheus Pushgateway](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway)| __PUSHGATEWAY_CHART_REPO__ | __PUSHGATEWAY_CHART_NAME__ | __PUSHGATEWAY_CHART_VERSION__ | __PUSHGATEWAY_CHART_ARCHIVE__ |
 | Metrics | [Tempo](https://github.com/grafana/helm-charts/tree/main/charts/tempo)| __TEMPO_CHART_REPO__ | __TEMPO_CHART_NAME__ | __TEMPO_CHART_VERSION__ | __TEMPO_CHART_ARCHIVE__ |
