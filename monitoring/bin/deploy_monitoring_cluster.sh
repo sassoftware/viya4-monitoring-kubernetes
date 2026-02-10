@@ -433,6 +433,7 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
             #      NOT calling create_httpproxy.sh *script*
             create_root_httpproxy monitoring
         else
+            kubectl -n $"MON_NS" delete httpproxy v4m-monitoring-root-proxy --ignore-not-found
             log_debug "Skipping creation of 'root' HTTPProxy resource for [monitoring] components because INGRESS_CREATE_ROOT_PROXY is set to [$INGRESS_CREATE_ROOT_PROXY]"
         fi
     fi
