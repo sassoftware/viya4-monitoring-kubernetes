@@ -400,6 +400,8 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
 
         if [ "$ALERTMANAGER_INGRESS_ENABLE" == "true" ]; then
             create_httpproxy  "monitoring" "alertmanager" "$ALERTMANAGER_PATH" "$ALERTMANAGER_FQDN" "alertmanager-ingress-tls-secret"
+            kubectl -n "$MON_NS" label httpproxy v4m-alertmanager managed-by="v4m-es-script"
+
         else
             log_debug "Access to [Alertmanager] disabled"
             kubectl -n "$MON_NS" delete httpproxy v4m-alertmanager --ignore-not-found
@@ -408,6 +410,8 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
 
         if [ "$GRAFANA_INGRESS_ENABLE" == "true" ]; then
             create_httpproxy  "monitoring" "grafana" "$GRAFANA_PATH" "$GRAFANA_FQDN" "grafana-ingress-tls-secret"
+            kubectl -n "$MON_NS" label httpproxy v4m-grafana managed-by="v4m-es-script"
+
         else
             log_debug "Access to [Grafana] disabled"
             kubectl -n "$MON_NS" delete httpproxy v4m-grafana --ignore-not-found
@@ -416,6 +420,8 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
 
         if [ "$PROMETHEUS_INGRESS_ENABLE" == "true" ]; then
             create_httpproxy  "monitoring" "prometheus" "$PROMETHEUS_PATH" "$PROMETHEUS_FQDN" "prometheus-ingress-tls-secret"
+            kubectl -n "$MON_NS" label httpproxy v4m-prometheus managed-by="v4m-es-script"
+
         else
             log_debug "Access to [Prometheus] disabled"
             kubectl -n "$MON_NS" delete httpproxy v4m-prometheus --ignore-not-found

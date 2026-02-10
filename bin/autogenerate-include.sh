@@ -1,4 +1,4 @@
-# Copyright © 2025, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2025-2026, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # shellcheck disable=SC2148
@@ -223,6 +223,7 @@ function create_root_httpproxy {
     fi
 
     kubectl --namespace "$namespace" apply -f  "$resourceDefFile"
+    kubectl -n "$LOG_NS" label httpproxy "v4m-${app_group}-root-proxy" managed-by="v4m-es-script"
 }
 export -f create_root_httpproxy
 

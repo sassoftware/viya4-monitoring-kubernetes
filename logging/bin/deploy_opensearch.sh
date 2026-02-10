@@ -102,6 +102,8 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "tr
     elif [ "$INGRESS_TYPE" == "contour" ]; then
 
         create_httpproxy  "logging" "opensearch" "$targetPath" "$targetFqdn" "$ingress_tls_secret"
+        kubectl -n "$LOG_NS" label httpproxy v4m-search managed-by="v4m-es-script"
+
     fi
 elif  [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "false" ] && [ "$INGRESS_TYPE" == "contour" ]; then
     log_debug "Access to [OpenSearch] disabled; removing HTTPProxy resource"
