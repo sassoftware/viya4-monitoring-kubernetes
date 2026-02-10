@@ -179,7 +179,8 @@ function create_root_httpproxy {
     fi
 
     if [ "$ROUTING" != "path" ]; then
-        log_debug "Path-based routing not enabled; skipping 'root' HTTPProxy creation"
+        log_debug "Path-based routing not enabled; skipping 'root' HTTPProxy creation and removing any existing one in namespace"
+        kubectl -n "$namespace" delete httpproxy v4m-"${app_group}"-root-proxy --ignore-not-found
         return
     fi
 
