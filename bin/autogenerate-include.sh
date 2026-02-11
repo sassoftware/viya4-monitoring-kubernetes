@@ -219,7 +219,6 @@ function create_root_httpproxy {
                 #need to update the namespace
                 yq -i '(.spec.includes[] | select(.name == "v4m-grafana") | .namespace) = "'"$namespace"'"' "$resourceDefFile"
 
-
             fi
         else
             #Access to Grafana is disabled, delete include block for it
