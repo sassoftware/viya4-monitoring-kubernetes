@@ -98,7 +98,7 @@ for service in $servicelist; do
 
         status="$(check_httpproxy_status "$namespace" "$servicename")"
         if [ "$status" != "valid" ]; then
-            msg="$(get_httpproxy_error  "$namespace" "$servicename")"
+            msg="$(get_httpproxy_error "$namespace" "$servicename")"
 
             add_noticew "--------------------------------------------------------------------------------------------------------"
             add_noticew "  WARNING: ***** Access to [$service] may not be available until the following issue is addressed. *****"

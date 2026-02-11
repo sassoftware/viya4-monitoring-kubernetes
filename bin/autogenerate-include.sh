@@ -167,8 +167,8 @@ function create_root_httpproxy {
     ### Assumes set: BASE_DOMAIN
     local app_group secretName namespace
 
-    app_group="${1}"    # logging|monitoring
-    namespace="${2}"    # Namespace for the ROOT HTTPProxy resource
+    app_group="${1}" # logging|monitoring
+    namespace="${2}" # Namespace for the ROOT HTTPProxy resource
 
     if [ -n "$namespace" ]; then
         log_debug "Creating ROOT HTTPProxy resource for [$app_group] web apps in [$namespace] namespace"
@@ -223,7 +223,7 @@ function create_root_httpproxy {
         return 1
     fi
 
-    kubectl --namespace "$namespace" apply -f  "$resourceDefFile"
+    kubectl --namespace "$namespace" apply -f "$resourceDefFile"
     kubectl -n "$namespace" label httpproxy "v4m-${app_group}-root-proxy" managed-by="v4m-es-script"
 }
 export -f create_root_httpproxy
@@ -315,7 +315,7 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
         fi
 
         # export ingress-related settings
-        export  ROUTING INGRESS_TYPE INGRESS_CERT INGRESS_KEY INGRESS_USE_SEPARATE_CERTS INGRESS_CREATE_ROOT_PROXY
+        export ROUTING INGRESS_TYPE INGRESS_CERT INGRESS_KEY INGRESS_USE_SEPARATE_CERTS INGRESS_CREATE_ROOT_PROXY
 
         # Set enable/disable flags for apps
         OSD_INGRESS_ENABLE="${OSD_INGRESS_ENABLE:-true}"

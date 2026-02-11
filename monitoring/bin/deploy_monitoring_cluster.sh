@@ -399,7 +399,7 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
         fi
 
         if [ "$ALERTMANAGER_INGRESS_ENABLE" == "true" ]; then
-            create_httpproxy  "monitoring" "alertmanager" "$ALERTMANAGER_PATH" "$ALERTMANAGER_FQDN" "alertmanager-ingress-tls-secret"
+            create_httpproxy "monitoring" "alertmanager" "$ALERTMANAGER_PATH" "$ALERTMANAGER_FQDN" "alertmanager-ingress-tls-secret"
             kubectl -n "$MON_NS" label httpproxy v4m-alertmanager managed-by="v4m-es-script"
 
         else
@@ -409,7 +409,7 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
         fi
 
         if [ "$GRAFANA_INGRESS_ENABLE" == "true" ]; then
-            create_httpproxy  "monitoring" "grafana" "$GRAFANA_PATH" "$GRAFANA_FQDN" "grafana-ingress-tls-secret"
+            create_httpproxy "monitoring" "grafana" "$GRAFANA_PATH" "$GRAFANA_FQDN" "grafana-ingress-tls-secret"
             kubectl -n "$MON_NS" label httpproxy v4m-grafana managed-by="v4m-es-script"
 
         else
@@ -419,7 +419,7 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
         fi
 
         if [ "$PROMETHEUS_INGRESS_ENABLE" == "true" ]; then
-            create_httpproxy  "monitoring" "prometheus" "$PROMETHEUS_PATH" "$PROMETHEUS_FQDN" "prometheus-ingress-tls-secret"
+            create_httpproxy "monitoring" "prometheus" "$PROMETHEUS_PATH" "$PROMETHEUS_FQDN" "prometheus-ingress-tls-secret"
             kubectl -n "$MON_NS" label httpproxy v4m-prometheus managed-by="v4m-es-script"
 
         else

@@ -54,7 +54,7 @@ function check_httpproxy_status {
     namespace=$1
     name=$2
 
-    status=$(get_k8s_info "$namespace" "httpproxy/$name" "$json_contour_currentStatus" )
+    status=$(get_k8s_info "$namespace" "httpproxy/$name" "$json_contour_currentStatus")
 
     echo "$status"
 }
@@ -65,7 +65,7 @@ function get_httpproxy_error {
     namespace=$1
     name=$2
 
-    msg=$(get_k8s_info "$namespace" "httpproxy/$name" "$json_contour_errorMessage" )
+    msg=$(get_k8s_info "$namespace" "httpproxy/$name" "$json_contour_errorMessage")
 
     echo "$msg"
 }
@@ -76,7 +76,7 @@ function get_root_httpproxy {
     name=$2
 
     # shellcheck disable=SC2016
-    root_httpproxy="$(kubectl get httpproxy -A  -o=yaml | yq  '.items[] | select(.spec.includes[] | select(.namespace=="'"$namespace"'" and .name=="'"$name"'")) | "\(.metadata.namespace)/\(.metadata.name)"')"
+    root_httpproxy="$(kubectl get httpproxy -A -o=yaml | yq '.items[] | select(.spec.includes[] | select(.namespace=="'"$namespace"'" and .name=="'"$name"'")) | "\(.metadata.namespace)/\(.metadata.name)"')"
 
     if [ -z "$root_httpproxy" ] || [ "$root_httpproxy" == "/" ]; then
         echo " "
@@ -88,7 +88,7 @@ function get_root_httpproxy {
 }
 
 function get_contour_url {
-   local namespace name host path scheme root_httpproxy root_namespace root_name url
+    local namespace name host path scheme root_httpproxy root_namespace root_name url
 
     namespace=$1
     name=$2
@@ -136,9 +136,6 @@ function get_contour_url {
         echo ""
         return
     fi
-
-
-    echo "$url"
 }
 
 function get_ingress_ports {
