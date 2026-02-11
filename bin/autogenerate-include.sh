@@ -202,7 +202,7 @@ function create_root_httpproxy {
         if [ "$OSD_INGRESS_ENABLE" == "true" ]; then
             if [ "$namespace" != "logging" ]; then
                 #need to update the namespace
-                yq -i '(.spec.includes[] | select(.name == "v4m-osd") | .namespace)= "'"$namespace"'"' "$resourceDefFile"
+                yq -i '(.spec.includes[] | select(.name == "v4m-osd") | .namespace) = "'"$namespace"'"' "$resourceDefFile"
             fi
         else
             #Access to OpenSearch Dashboards is disabled, delete include block for it
@@ -217,7 +217,9 @@ function create_root_httpproxy {
         if [ "$GRAFANA_INGRESS_ENABLE" == "true" ]; then
             if [ "$namespace" != "monitoring" ]; then
                 #need to update the namespace
-                yq -i '(.spec.includes[] | select(.name == "v4m-grafana") | .namespace) "'"$namespace"'"' "$resourceDefFile"
+                yq -i '(.spec.includes[] | select(.name == "v4m-grafana") | .namespace) = "'"$namespace"'"' "$resourceDefFile"
+
+
             fi
         else
             #Access to Grafana is disabled, delete include block for it
