@@ -1,4 +1,7 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Logging**
+  * [CHANGE] Improve handling of Envoy (Contour) log messages
 ## Version 1.2.46 (06FEB2026)
 * **Overall**
   * [FEATURE] A new sample demonstrates how to use Contour HTTPProxy resources to
