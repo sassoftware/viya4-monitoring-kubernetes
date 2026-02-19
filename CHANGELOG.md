@@ -1,4 +1,17 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Overall**
+  * [FEATURE] The auto-generation of ingress configurations now supports Contour (in addition to
+the existing support for ingress-nginx).  To enable ingress via Contour, set the environment
+variable `INGRESS_TYPE` to `contour`. To use ingress-nginx, set `INGRESS_TYPE` to `ingress-nginx`.
+Setting the environment variable `AUTOGENERATE_INGRESS` to 'true' and providing a value for
+the environment variable `BASE_DOMAIN` are also required.  As with ingress-nginx, support for
+both host-based and path-based routing are supported with Contour as well.  A new option for
+how the Kubernetes Secret resources, used to hold the ingress TLS certs, are handled is available.
+See the
+[Configure Ingress Access to Web Applications](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
+topic within the Help Center documentation for further information.
+
 ## Version 1.2.46 (06FEB2026)
 * **Overall**
   * [FEATURE] A new sample demonstrates how to use Contour HTTPProxy resources to

@@ -88,7 +88,7 @@ function get_root_httpproxy {
 }
 
 function get_contour_url {
-    local namespace name host path scheme root_httpproxy root_namespace root_name url
+    local namespace name host path tls scheme root_httpproxy root_namespace root_name url
 
     namespace=$1
     name=$2
@@ -117,7 +117,7 @@ function get_contour_url {
             return
         fi
     else
-        tls=$(get_k8s_info "$namespace" "httpproxy/$service" "$json_contour_tls")
+        tls=$(get_k8s_info "$namespace" "httpproxy/$name" "$json_contour_tls")
     fi
 
     if [ -n "$tls" ]; then
