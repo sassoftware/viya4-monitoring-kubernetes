@@ -1,12 +1,22 @@
 #! /usr/bin/python3
 
-# Copyright Â© 2023, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright Â© 2023-2026, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
+import sys
 
+MIN_VERSION = (3, 11)
+if sys.version_info < MIN_VERSION:
+    sys.stderr.write(
+        "ERROR: This script requires Python 3.11 or newer.\n"
+        "Detected Python {}.\n\n"
+        "Please run this script with Python 3.11+.\n".format(sys.version.split()[0])
+    )
+    sys.exit(1)
+
+import os
 import time, calendar
 import argparse
 from opensearchpy import OpenSearch
-import os, sys
 import json, csv
 import tempfile
 import subprocess, socket
@@ -120,6 +130,46 @@ def open_port():
 
     return port
 
+def build_sort(args):
+    """
+    Returns a JSON string representing the OpenSearch `sort` array. Sorts by @timestamp desc if nothing provided.
+    .keyword is automatically appended at the end of each field (except specified non text fields) to resolve text based fields. 
+    """
+    NON_TEXT_FIELDS = {"@timestamp", "_id"}
+    sort_fields = args.get("sort_fields") or ["@timestamp:desc"]
+
+    sort_arr = [] #Parse --sort for each field:order pair then add to sort_arr
+    for item in sort_fields:
+        if not isinstance(item, str):
+            print(f"Error: sort_fields items must be strings, got: {type(item)}")
+            sys.exit(1)
+        item = item.strip()
+        if not item:
+            continue
+        if ":" in item:
+            field, order = item.rsplit(":", 1)
+            field = field.strip()
+            order = order.strip().lower()
+        else:
+            field = item
+            order = "desc"
+        if order not in ("asc", "desc"):
+            print(f"Error: Invalid sort order '{order}' in '{item}' (use asc or desc)")
+            sys.exit(1)
+        if (
+            field not in NON_TEXT_FIELDS
+            and not field.endswith(".keyword")
+        ):
+            field = field + ".keyword"
+
+        sort_arr.append({field: {"order": order}})
+
+    #Final Deterministic tiebreaker using id
+    if not any(isinstance(s, dict) and "_id" in s for s in sort_arr): 
+        sort_arr.append({"_id": {"order": "asc"}})
+    
+    return json.dumps(sort_arr)
+
 def build_query(args):
     """Generates Query using Opensearch DSL"""
     """Takes arguments from user and returns a JSON-format query to pass to OpenSearch API"""
@@ -213,6 +263,7 @@ def get_arguments():
     parser.add_argument('-l', '--level', required=False, dest='level', nargs='*', metavar="LEVEL",  help = "\nOne or more message levels for which logs are sought\n\n")
     parser.add_argument('-lx', '--level-exclude', required=False, dest = 'level-exclude', nargs='*', metavar="LEVEL", help = "\nOne or more message levels for which logs should be excluded from the output.\n\n")
     parser.add_argument('-se', '--search', required=False, dest= "message", metavar="MESSAGE",  help = "\nWord or phrase contained in log message. Use quotes to surround your message ('' or "")\n\n\n \t\t\t QUERY OUTPUT SETTINGS: \n\n")
+    parser.add_argument('-so','--sort', required=False, dest="sort_fields", nargs="+", help="Sort fields (space-separated). You can use the existing search fields (@timestamp, kube.pod, level, logsource, and kube.namespace) or fields of your choosing (must be in the exact index format). Example: --sort timestamp:desc pod:asc")
 
     ##Query and Output Params
     parser.add_argument('-m', '--maxrows', required=False, dest ="maxInt", type=int, metavar="INTEGER", default=10,  help = "\nThe maximum number of log messsages to return.\n\n")
