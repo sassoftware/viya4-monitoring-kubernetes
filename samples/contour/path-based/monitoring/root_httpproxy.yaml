@@ -12,6 +12,7 @@ spec:
   includes:
   - name: v4m-grafana
     namespace: monitoring
+
 # This sample does NOT make the Prometheus and Alertmanager accessible by default.
 # However, you can make one or both of these web applications
 # accessible by uncommenting out the approprate line(s) below.

@@ -13,6 +13,7 @@ spec:
   # OpenSearch Dashboards
   - name: v4m-osd
     namespace: logging
+
 # This sample does NOT make the OpenSearch accessible by default.
 # However, you can make it accessible by uncommenting out the approprate section below.
 # To do so, remove the double hash marks (##) from each line in the section.

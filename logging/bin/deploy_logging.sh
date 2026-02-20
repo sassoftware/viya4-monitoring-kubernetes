@@ -51,6 +51,17 @@ logging/bin/deploy_osd.sh
 logging/bin/deploy_opensearch.sh
 
 ##################################
+# Create "root" HTTPProxy(if nec)#
+##################################
+
+if [ "$INGRESS_CREATE_ROOT_PROXY" == "true" ]; then
+    create_root_httpproxy logging "$LOG_NS"
+elif [ "$INGRESS_TYPE" == "contour" ]; then
+    log_debug "Deleting [httpproxy/v4m-logging-root-proxy] if it exists"
+    kubectl -n $"LOG_NS" delete httpproxy v4m-logging-root-proxy --ignore-not-found
+fi
+
+##################################
 # Elasticsearch Metric Exporter  #
 ##################################
 

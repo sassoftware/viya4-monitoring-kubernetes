@@ -1,4 +1,4 @@
-# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021-2026, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # shellcheck disable=SC2148
@@ -22,6 +22,16 @@ json_route_host='{.spec.host}'
 json_route_path='{.spec.path}'
 json_route_tls='{.spec.tls.termination}'
 
+# k8s object: contour HTTPProxy
+json_contour_host='{.spec.virtualhost.fqdn}'
+json_contour_path='{.spec.routes[0].conditions[0].prefix}'
+json_contour_tls='{.spec.virtualhost.tls}'
+json_contour_currentStatus='{.status.currentStatus}'
+json_contour_errorMessage='{.status.conditions[0].errors[0].message}'
+
+# misc k8s information
+metadata_name='{.metadata.name}'
+
 function get_k8s_info {
     local namespace object jsonpath info
 
@@ -36,6 +46,95 @@ function get_k8s_info {
     else
         v4m_rc=1
         echo ""
+    fi
+}
+function check_httpproxy_status {
+    local namespace name status
+
+    namespace=$1
+    name=$2
+
+    status=$(get_k8s_info "$namespace" "httpproxy/$name" "$json_contour_currentStatus")
+
+    echo "$status"
+}
+
+function get_httpproxy_error {
+    local namespace name msg
+
+    namespace=$1
+    name=$2
+
+    msg=$(get_k8s_info "$namespace" "httpproxy/$name" "$json_contour_errorMessage")
+
+    echo "$msg"
+}
+
+function get_root_httpproxy {
+    local namespace name root_httpproxy
+    namespace=$1
+    name=$2
+
+    # shellcheck disable=SC2016
+    root_httpproxy="$(kubectl get httpproxy -A -o=yaml | yq '.items[] | select(.spec.includes[] | select(.namespace=="'"$namespace"'" and .name=="'"$name"'")) | "\(.metadata.namespace)/\(.metadata.name)"')"
+
+    if [ -z "$root_httpproxy" ] || [ "$root_httpproxy" == "/" ]; then
+        echo " "
+        return
+    else
+        echo "$root_httpproxy"
+    fi
+
+}
+
+function get_contour_url {
+    local namespace name host path tls scheme root_httpproxy root_namespace root_name url
+
+    namespace=$1
+    name=$2
+
+    path=$(get_k8s_info "$namespace" "httpproxy/$name" "$json_contour_path")
+
+    host=$(get_k8s_info "$namespace" "httpproxy/$name" "$json_contour_host")
+
+    if [ -z "$host" ]; then
+
+        # potentially path-based; need to try and find the root HTTProxy
+        root_httpproxy="$(get_root_httpproxy "$namespace" "$name")"
+
+        if [ -n "$root_httpproxy" ]; then
+
+            # a  root HTTPProxy was found!
+
+            IFS="/" read -r root_namespace root_name <<< "$root_httpproxy"
+
+            host=$(get_k8s_info "$root_namespace" "httpproxy/$root_name" "$json_contour_host")
+            tls=$(get_k8s_info "$root_namespace" "httpproxy/$root_name" "$json_contour_tls")
+        else
+            # a root HTTPProxy not found; error out for now.
+            v4m_rc=1
+            echo ""
+            return
+        fi
+    else
+        tls=$(get_k8s_info "$namespace" "httpproxy/$name" "$json_contour_tls")
+    fi
+
+    if [ -n "$tls" ]; then
+        scheme="https"
+    else
+        scheme="http"
+    fi
+
+    if [ -n "$host" ]; then
+        url="$scheme://$host$path"
+        echo "$url"
+        return
+    else
+        # a root HTTPProxy not found; error out for now.
+        v4m_rc=1
+        echo ""
+        return
     fi
 }
 
@@ -190,13 +289,19 @@ function get_service_url {
         fi
     fi
 
-    # determine nodePort or clusterPort (ingress)
+    # determine nodePort or clusterPort (ingress|contour)
     service_type=$(get_k8s_info "$namespace" "service/$service" "$json_service_type")
 
     if [ "$service_type" == "ClusterIP" ]; then
-        get_ingress_ports
 
-        url=$(get_ingress_url "$namespace" "$ingress")
+        if [ -n "$(get_k8s_info "$namespace" "httpproxy/$service" "$metadata_name")" ]; then
+            #If an HTTPProxy resource exists - assume it is being used
+            url=$(get_contour_url "$namespace" "$ingress")
+        else
+            get_ingress_ports
+
+            url=$(get_ingress_url "$namespace" "$ingress")
+        fi
 
         if [ -z "$url" ]; then
             v4m_rc=1
