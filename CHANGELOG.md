@@ -22,8 +22,8 @@ to send e-mails) has been extended to OpenShift clusters
 sub-directory has been extended to OpenShift clusters
   * [FIX] Corrected behavior on non-OpenShift clusters which had inappropriately required a Kubernetes
 Secret resource be created when automatically defining the SMTP server configuration
-  * [FEATURE] Getlogs.py now supports returning more than 10000 logs from a single query
-  * [FEATURE] Log results from Getlogs.py can now be sorted by any text-based field value
+  * [FEATURE] The getlogs.py script now supports returning more than 10000 logs from a single query
+  * [FEATURE] Log results from getlogs.py can now be sorted by any text-based field value
 
 ## Version 1.2.45 (16DEC2025)
 * **Overall**
