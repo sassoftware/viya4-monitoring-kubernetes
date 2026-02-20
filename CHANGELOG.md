@@ -1,15 +1,20 @@
 # SAS Viya Monitoring for Kubernetes
-## Unreleased
+## Version 1.2.46 (06FEB2026)
+* **Overall**
+  * [FEATURE] A new sample demonstrates how to use Contour HTTPProxy resources to
+ provide access to the web applications, such as OpenSearch Dashboards and Grafana,
+ deployed as part of this project.  Refer to the [Contour Sample README](samples/contour)
+ for more information.
 * **Logging**
-  * [FIX] The `logging/bin/onboard.sh` script no longer fails when the `-p` parameter is set
-  * [FEATURE] A new script, `setup-airgap` automates many of the setup preparations needed prior
+  * [FEATURE] A new script, `setup-airgap` automates many of the setup preparations needed prior 
 to deploying into an airgap environment. This setup includes populating the container registry
 (with both images and helm charts) and downloading the necessary files (e.g. CRDs and Grafana
 plugin files) into the appropriate sub-directories in the `$USER_DIR` directory. The location
 of the private container registry and the associated credentials need to be identified by
 setting the environment variables `AIRGAP_REGISTRY`, `AIRGAP_REGISTRY_USERNAME`, and
 `AIRGAP_REGISTRY_PASSWORD` prior to running the script, preferably in the `$USER_DIR/user.env`
-file. Refer to ___ (the documentation link will be populated after it is created) for more info.
+file. Refer to the [Prepare to Deploy SAS Viya Monitoring for Kubernetes in an Air Gap Environment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0grd8g2pkfglin12bzm3g1oik2p) documentation for more info.
+  * [FIX] The `logging/bin/onboard.sh` script no longer fails when the `-p` parameter is set
 * **Metrics**
   * [FEATURE] Support for automatically defining SMTP server configuration (permitting Grafana
 to send e-mails) has been extended to OpenShift clusters
@@ -58,8 +63,8 @@ Secret resource be created when automatically defining the SMTP server configura
 * **Metrics**
   * [FEATURE] A new sample demonstrates how to extend SAS Viya Monitoring
 for Kubernetes to monitor the SingleStore instance that is embedded within
-SAS SpeedyStore.  This allows administrators to monitor their SingleStore 
-cluster using the same Grafana instance that they use to monitor the rest 
+SAS SpeedyStore.  This allows administrators to monitor their SingleStore
+cluster using the same Grafana instance that they use to monitor the rest
 of their SAS Viya deployment.  Refer to the [SAS SpeedyStore Sample README](samples/speedystore)
 for more information.
 * **Logging**
@@ -67,7 +72,7 @@ for more information.
 This change should be transparent to virtually all users.  However, if you define additional volumes for
 these pods, you will need to update your configuration to eliminate references to certain default volumes.
 Refer to the updated [samples/generic-base/logging/user-values-fluent-bit-opensearch.yaml](samples/generic-base/logging/user-values-fluent-bit-opensearch.yaml)
-file for details and adjust the contents of your `$USER_DIR/logging/user-values-fluent-bit-opensearch.yaml` 
+file for details and adjust the contents of your `$USER_DIR/logging/user-values-fluent-bit-opensearch.yaml`
 file accordingly.
 
 
@@ -86,7 +91,7 @@ file accordingly.
 * **Metrics**
   * [FEATURE] Automatically define the SMTP server configuration to permit Grafana to send e-mails.
 If enabled (by setting `AUTOGENERATE_SMTP` to 'true'), this optional feature allows admins to define
-email-based contact points for alerts. Users need to provide connection information via the environment 
+email-based contact points for alerts. Users need to provide connection information via the environment
 variables: `SMTP_SERVER, SMTP_PORT`, `SMTP_FROM_ADDRESS` and `SMTP_FROM_NAME`.  See [Configure Email Settings for Grafana Alerts](https://documentation.sas.com/doc/en/obsrvcdc/v_003/obsrvdply/n0auhd4hutsf7xn169hfvriysz4e.htm#p1fql9ekyxckamn1jtlujeauhy72)
 for more information.
   * [CHANGE] The Grafana alerts targeting SAS Viya that previously were provided by default have been moved

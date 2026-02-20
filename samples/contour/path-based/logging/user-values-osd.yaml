@@ -1,0 +1,26 @@
+# Sample: contour/path-based-ingress Version: 0.2.2
+
+extraEnvs:
+# SERVER_BASEPATH needed for path-based ingress
+- name: SERVER_BASEPATH
+  value: /dashboards
+# OSD_ENABLE_TLS, OPENSEARCH_USERNAME & OPENSEARCH_PASSWORD
+# need to be set here since helm *replaces* array values
+- name: OSD_ENABLE_TLS
+  valueFrom:
+    secretKeyRef:
+      name: v4m-osd-tls-enabled
+      key: enable_tls
+- name: OPENSEARCH_USERNAME
+  valueFrom:
+    secretKeyRef:
+      name: internal-user-kibanaserver
+      key: username
+- name: OPENSEARCH_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: internal-user-kibanaserver
+      key: password
+service:
+  type: ClusterIP
+  nodePort: null
