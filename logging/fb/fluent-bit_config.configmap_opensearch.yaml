@@ -6,7 +6,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.29
+       Set  fb_configMap_version 0.2.30contourlogs16
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -525,6 +525,33 @@ data:
        #Remove          time_ms
        #Remove          uname
        #Remove          userId
+
+    [FILTER]
+       #
+       # envoy (Contour) pods
+       #
+       Alias           flag_envoy_msgs
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_equals logsource envoy
+       Copy            message   envoy_message
+       Rename          message   unparsed_message
+       Add             flagged4parsing envoy
+    [FILTER]
+       Alias           parse_envoy_msgs
+       Name            parser
+       Match           kube.*
+       Key_name        envoy_message
+       Parser          envoy
+       Parser          envoy_misc
+       Reserve_Data    On
+    [FILTER]
+       Alias           post_envoy
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_equals  logsource envoy
+       Copy            unparsed_message message
+       Rename          code     PROPS__httpresponse
     [FILTER]
        Alias           flag_rabbit
        Name            modify
@@ -815,6 +842,39 @@ data:
        Condition       Key_value_equals   flagged4parsing misc
        Rename          caller   PROPS__caller
        Hard_rename     source logsource
+    [FILTER]
+       #
+       # Map HTTP response codes (5xx) to ERROR (LEVEL)
+       # if LEVEL not already set
+       #
+       Alias           fix_http_response_errors
+       Name            modify
+       Match           kube.*
+       Condition       Key_does_not_exist level
+       Condition       Key_value_matches PROPS__httpresponse (5)\d{2}
+       Set             level ERROR
+    [FILTER]
+       #
+       # Map HTTP response codes (1xx/2xx/3xx/4xx) to INFO (LEVEL)
+       # if LEVEL not already set
+       #
+       Alias           fix_http_response_info
+       Name            modify
+       Match           kube.*
+       Condition       Key_does_not_exist level
+       Condition       Key_value_matches PROPS__httpresponse (1|2|3|4)\d{2}
+       Set             level INFO
+    [FILTER]
+       #
+       # Map any other HTTP response codes to WARN (LEVEL)
+       # if LEVEL not already set
+       #
+       Alias           fix_http_response_info
+       Name            modify
+       Match           kube.*
+       Condition       Key_does_not_exist level
+       Condition       Key_value_matches PROPS__httpresponse \w+
+       Set             level WARN
     [FILTER]
        #
        # Use unparsed_msg if need be
