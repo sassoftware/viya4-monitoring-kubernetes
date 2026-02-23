@@ -37,6 +37,14 @@ function add_notice {
     echo "$*" >> "$TMP_DIR"/notices.txt
 }
 
+function add_noticew {
+    if [ "$LOG_COLOR_ENABLE" = "true" ]; then
+        echo "$black$yellowbg$*" >> "$TMP_DIR"/notices.txt
+    else
+        echo "$*" >> "$TMP_DIR"/notices.txt
+    fi
+}
+
 function display_notices {
     if [ -f "$TMP_DIR/notices.txt" ]; then
         while IFS= read -r line || [[ -n $line ]]; do log_notice "$line"; done < "$TMP_DIR"/notices.txt
@@ -129,5 +137,5 @@ function log_error {
     fi
 }
 
-export -f log_notice log_message log_debug log_info log_warn log_error add_notice display_notices log_verbose
+export -f log_notice log_message log_debug log_info log_warn log_error add_notice add_noticew display_notices log_verbose
 export LOG_COLOR_ENABLE LOG_LEVEL_ENABLE LOG_DEBUG_ENABLE noticeColWidth LOG_DEBUG_ENABLE
