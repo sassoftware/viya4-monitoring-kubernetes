@@ -592,6 +592,14 @@ if [ "$TRACING_ENABLE" == "true" ]; then
         "$chart2install"
 fi
 
+# Contour-related PodMonitors
+if kubectl get crd "httpproxies.projectcontour.io" 1> /dev/null 2>&1; then
+    log_debug "Contour HTTPProxy CRD detected; deploying PodMonitors"
+    kubectl apply -n "$MON_NS" -f monitoring/monitors/kube/podMonitor-contour.yaml 2> /dev/null
+    kubectl apply -n "$MON_NS" -f monitoring/monitors/kube/podMonitor-envoy.yaml 2> /dev/null
+    CONTOUR_DASH="${CONTOUR_DASH:-true}"
+fi
+
 # NGINX
 nginxFound=false
 if kubectl get ns "$NGINX_NS" 2> /dev/null; then

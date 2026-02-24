@@ -16,6 +16,7 @@ VIYA_DASH="${VIYA_DASH:-true}"
 VIYA_LOGS_DASH="${VIYA_LOGS_DASH:-${LOGGING_DATASOURCE:-false}}"
 PGMONITOR_DASH="${PGMONITOR_DASH:-$VIYA_DASH}"
 RABBITMQ_DASH="${RABBITMQ_DASH:-$VIYA_DASH}"
+CONTOUR_DASH="${CONTOUR_DASH:-false}"
 NGINX_DASH="${NGINX_DASH:-true}"
 LOGGING_DASH="${LOGGING_DASH:-true}"
 ISTIO_DASH="${ISTIO_DASH:-${ISTIO_ENABLED:-false}}"
@@ -114,6 +115,11 @@ fi
 if [ "$RABBITMQ_DASH" == "true" ]; then
     log_verbose "Deploying RabbitMQ dashboards"
     deploy_dashboards "rabbitmq"
+fi
+
+if [ "$CONTOUR_DASH" == "true" ]; then
+    log_verbose "Deploying Contour dashboards"
+    deploy_dashboards "contour"
 fi
 
 if [ "$NGINX_DASH" == "true" ]; then

@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: envoy
+spec:
+  selector:
+    matchLabels:
+      app: envoy
+  namespaceSelector:
+    matchNames:
+    - projectcontour
+  podMetricsEndpoints:
+  - port: metrics
+    path: /stats/prometheus

@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: contour
+spec:
+  selector:
+    matchLabels:
+      app: contour
+  namespaceSelector:
+    matchNames:
+    - projectcontour
+  podMetricsEndpoints:
+  - port: metrics
+    path: /metrics
