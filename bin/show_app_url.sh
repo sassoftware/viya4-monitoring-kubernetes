@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021-2026 SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname "$BASH_SOURCE")/.." || exit
@@ -92,6 +92,24 @@ for service in $servicelist; do
     else
         add_notice "  It was not possible to determine the URL needed to access $service"
         add_notice ""
+    fi
+
+    if [ -n "$(get_k8s_info "$namespace" "httpproxy/$servicename" "$metadata_name")" ]; then
+
+        status="$(check_httpproxy_status "$namespace" "$servicename")"
+        if [ "$status" != "valid" ]; then
+            msg="$(get_httpproxy_error "$namespace" "$servicename")"
+
+            add_noticew "--------------------------------------------------------------------------------------------------------"
+            add_noticew "  WARNING: ***** Access to [$service] may not be available until the following issue is addressed. *****"
+            add_noticew ""
+            add_noticew "  NOTE: The HTTPProxy resource [$namespace/$servicename] reports an [$status] status"
+            add_noticew "        The issue reported is [$msg]"
+            add_noticew "--------------------------------------------------------------------------------------------------------"
+            add_notice ""
+        else
+            log_debug "HTTPProxy [$namespace/$servicename] is valid"
+        fi
     fi
 done
 

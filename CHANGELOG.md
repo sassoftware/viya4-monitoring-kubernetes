@@ -1,7 +1,20 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
+* **Overall**
+  * [FEATURE] The auto-generation of ingress configurations now supports Contour (in addition to
+the existing support for ingress-nginx).  To enable ingress via Contour, set the environment
+variable `INGRESS_TYPE` to `contour`. To use ingress-nginx, set `INGRESS_TYPE` to `ingress-nginx`.
+Setting the environment variable `AUTOGENERATE_INGRESS` to 'true' and providing a value for
+the environment variable `BASE_DOMAIN` are also required.  As with ingress-nginx, support for
+both host-based and path-based routing are supported with Contour as well.  A new option for
+how the Kubernetes Secret resources, used to hold the ingress TLS certs, are handled is available.
+See the
+[Configure Ingress Access to Web Applications](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
+topic within the Help Center documentation for further information.
 * **Logging**
   * [CHANGE] Improve handling of Envoy (Contour) log messages
+
+
 ## Version 1.2.46 (06FEB2026)
 * **Overall**
   * [FEATURE] A new sample demonstrates how to use Contour HTTPProxy resources to
@@ -25,6 +38,8 @@ to send e-mails) has been extended to OpenShift clusters
 sub-directory has been extended to OpenShift clusters
   * [FIX] Corrected behavior on non-OpenShift clusters which had inappropriately required a Kubernetes
 Secret resource be created when automatically defining the SMTP server configuration
+  * [FEATURE] The getlogs.py script now supports returning more than 10000 logs from a single query
+  * [FEATURE] Log results from getlogs.py can now be sorted by any text-based field value
 
 ## Version 1.2.45 (16DEC2025)
 * **Overall**
