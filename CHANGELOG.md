@@ -11,6 +11,9 @@ how the Kubernetes Secret resources, used to hold the ingress TLS certs, are han
 See the
 [Configure Ingress Access to Web Applications](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
 topic within the Help Center documentation for further information.
+* **Logging**
+  * [CHANGE] Improve handling of Envoy (Contour) log messages
+
 
 ## Version 1.2.46 (06FEB2026)
 * **Overall**
