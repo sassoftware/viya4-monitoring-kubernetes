@@ -525,7 +525,6 @@ data:
        #Remove          time_ms
        #Remove          uname
        #Remove          userId
-
     [FILTER]
        #
        # envoy (Contour) pods
