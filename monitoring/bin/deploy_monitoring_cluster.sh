@@ -601,7 +601,7 @@ if kubectl get crd "httpproxies.projectcontour.io" 1> /dev/null 2>&1; then
     if [[ $(kubectl get pods -A -l  app.kubernetes.io/component=contour  -o name | wc -l) -gt 0 ]] ; then
         log_debug "Contour pods with expected label [app.kubernetes.io/component: contour] found; no need to patch PodMonitor"
     elif [[ $(kubectl get pods -A -l  app=contour  -o name | wc -l) -gt 0 ]] ; then
-        log_debug "Contour pods with label [app: contour] found; patching PodMonitor"
+        log_debug "Contour pods with alternate label [app: contour] found; patching PodMonitor"
         kubectl -n "$MON_NS" patch podMonitor contour --type='json' -p='[{"op": "replace","path": "/spec/selector/matchLabels", "value" : {"app":"contour"}}]'
     else
         log_debug "No running pods with known Contour labels found"
@@ -610,7 +610,7 @@ if kubectl get crd "httpproxies.projectcontour.io" 1> /dev/null 2>&1; then
     if [[ $(kubectl get pods -A -l  app.kubernetes.io/component=envoy  -o name | wc -l) -gt 0 ]] ; then
         log_debug "Contour pods with expected label [app.kubernetes.io/component: envoy] found; no need to patch PodMonitor"
     elif [[ $(kubectl get pods -A -l  app=envoy  -o name | wc -l) -gt 0 ]] ; then
-        log_debug "Contour pods with label [app: envoy] found; patching PodMonitor"
+        log_debug "Contour pods with alternate label [app: envoy] found; patching PodMonitor"
         kubectl -n "$MON_NS" patch podMonitor envoy --type='json' -p='[{"op": "replace","path": "/spec/selector/matchLabels", "value" : {"app":"envoy"}}]'
     else
         log_debug "No running pods with known Contour Envoy labels found"
