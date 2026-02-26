@@ -600,7 +600,7 @@ if kubectl get crd "httpproxies.projectcontour.io" 1> /dev/null 2>&1; then
 
     if [[ $(kubectl get pods -A -l  app.kubernetes.io/component=contour  -o name | wc -l) -gt 0 ]] ; then
         log_debug "Contour pods with expected label [app.kubernetes.io/component: contour] found; no need to patch PodMonitor"
-    elif [[ $(kubectl get pods -A -l  app: contour  -o name | wc -l) -gt 0 ]] ; then
+    elif [[ $(kubectl get pods -A -l  app=contour  -o name | wc -l) -gt 0 ]] ; then
         log_debug "Contour pods with label [app: contour] found; patching PodMonitor"
         kubectl -n "$MON_NS" patch podMonitor contour --type='json' -p='[{"op": "replace","path": "/spec/selector/matchLabels", "value" : {"app":"contour"}}]'
     else
