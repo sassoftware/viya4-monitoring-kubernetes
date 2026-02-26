@@ -5,7 +5,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: contour
+      app.kubernetes.io/component: contour
   namespaceSelector:
     matchNames:
     - projectcontour

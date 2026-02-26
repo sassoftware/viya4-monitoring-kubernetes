@@ -5,7 +5,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: envoy
+      app.kubernetes.io/component: envoy
   namespaceSelector:
     matchNames:
     - projectcontour
