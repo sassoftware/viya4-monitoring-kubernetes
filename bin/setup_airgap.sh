@@ -70,7 +70,7 @@ log_notice "Step 2 - Helm Repo Add Commands"
 
 declare -A REPO_URLS=(
     ["prometheus-community"]="https://prometheus-community.github.io/helm-charts"
-    ["grafana"]="https://grafana.github.io/helm-charts"
+    ["grafana-community"]="https://grafana-community.github.io/helm-charts"
     ["fluent"]="https://fluent.github.io/helm-charts"
     ["opensearch"]="https://opensearch-project.github.io/helm-charts"
 )
