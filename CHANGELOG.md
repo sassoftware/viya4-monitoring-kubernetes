@@ -32,6 +32,8 @@ Therefore, our project, in turn, now deploys the component from this new source 
   * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.11.1 to 1.11.2
   * [UPGRADE] Prometheus Operator has been upgraded from 0.86.1 to 0.88.1
   * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.31.1 to 2.32.4
+* **Logging**
+  * [CHANGE] Improve handling of Envoy (Contour) log messages
 
 
 ## Version 1.2.46 (06FEB2026)
