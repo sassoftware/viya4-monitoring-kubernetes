@@ -11,6 +11,12 @@ how the Kubernetes Secret resources, used to hold the ingress TLS certs, are han
 See the
 [Configure Ingress Access to Web Applications](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
 topic within the Help Center documentation for further information.
+* **Metrics**
+  * [FEATURE] New PodMonitor resources are deployed to enable the collection
+of metrics from Contour if it is detected on the Kubernetes cluster during the
+deployment process.  In addition, two Grafana dashboards focused on Contour
+and Envoy metrics are now deployed in this case as well.
+
 
 ## Version 1.2.46 (06FEB2026)
 * **Overall**
@@ -19,7 +25,7 @@ topic within the Help Center documentation for further information.
  deployed as part of this project.  Refer to the [Contour Sample README](samples/contour)
  for more information.
 * **Logging**
-  * [FEATURE] A new script, `setup-airgap` automates many of the setup preparations needed prior 
+  * [FEATURE] A new script, `setup-airgap` automates many of the setup preparations needed prior
 to deploying into an airgap environment. This setup includes populating the container registry
 (with both images and helm charts) and downloading the necessary files (e.g. CRDs and Grafana
 plugin files) into the appropriate sub-directories in the `$USER_DIR` directory. The location
