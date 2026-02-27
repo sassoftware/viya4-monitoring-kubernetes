@@ -10,7 +10,7 @@ controller will pose an increasing security risk.
 
 > [!IMPORTANT]
 > **SAS Viya Monitoring for
-Kubernetes recommends moving to Contour as the replacement ingress controller.**  Refer to [the Contour sample](../samples/contour/README.md)
+Kubernetes recommends moving to Contour as the replacement ingress controller.**  Refer to [the Contour sample](../contour/README.md)
 for information on configuring Contour as the ingress controller.
 
 ## Overview
