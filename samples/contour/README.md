@@ -15,7 +15,8 @@ These scenarios differ in how the URL used to access the applications is constru
 * In host-based routing, the application name is part of the host name itself (for example, `https://grafana.host.cluster.example.com/`).
 * In path-based routing, the host name is fixed and the application name is appended as a path on the URL (for example, `https://host.cluster.example.com/grafana`).
 
-> [!IMPORTANT] **Note:** The ability to automatically configure Contour as the
+> [!IMPORTANT]
+> **Note:** The ability to automatically configure Contour as the
 ingress controller to permit access to the web applications was added with version
 1.2.47 (released 06MAR26).  Depending on your requirements, this may
 eliminate the need to manually configure things as demonstrated in this
