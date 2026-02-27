@@ -1,6 +1,14 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Overall**
+  * [ANNOUNCEMENT] All development work on the Ingress NGINX project, *including bug fixes and
+security updates*, is expected to end by the end of March 2026.  While existing deployments will
+continue to function and new deployments are possible, continued use of the ingress-nginx ingress
+controller will pose an increasing security risk.  **SAS Viya Monitoring for
+Kubernetes recommends moving to Contour as the replacement ingress controller.**
+  * [DEPRECATION] The existing [ingress sample](samples/ingress/README.md) focused on using
+ingress-nginx is now **deprecated**.  Users can refer to [the Contour sample](samples/contour/README.md)
+for information on manually configuring Contour as the ingress controller.
   * [FEATURE] The auto-generation of ingress configurations now supports Contour (in addition to
 the existing support for ingress-nginx).  To enable ingress via Contour, set the environment
 variable `INGRESS_TYPE` to `contour`. To use ingress-nginx, set `INGRESS_TYPE` to `ingress-nginx`.
@@ -12,10 +20,10 @@ See the
 [Configure Ingress Access to Web Applications](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
 topic within the Help Center documentation for further information.
 * **Metrics**
-  * [CHANGE] Following the migration of the Grafana and Tempo Helm charts to the 
+  * [CHANGE] Following the migration of the Grafana and Tempo Helm charts to the
 [Grafana Community Kubernetes Helm Charts project](https://github.com/grafana-community/helm-charts),
 our project now deploys these charts from that project's repository.
-  * [CHANGE] Following the retirement of the ingress-nginx maintained variant of the 
+  * [CHANGE] Following the retirement of the ingress-nginx maintained variant of the
 `kube-webhook-certgen`, the Prometheus Community Helm charts
 [moved to a new actively maintained replacement](https://github.com/prometheus-community/helm-charts/pull/6407).
 Therefore, our project, in turn, now deploys the component from this new source as well.
@@ -43,7 +51,7 @@ Therefore, our project, in turn, now deploys the component from this new source 
  deployed as part of this project.  Refer to the [Contour Sample README](samples/contour)
  for more information.
 * **Logging**
-  * [FEATURE] A new script, `setup-airgap` automates many of the setup preparations needed prior 
+  * [FEATURE] A new script, `setup-airgap` automates many of the setup preparations needed prior
 to deploying into an airgap environment. This setup includes populating the container registry
 (with both images and helm charts) and downloading the necessary files (e.g. CRDs and Grafana
 plugin files) into the appropriate sub-directories in the `$USER_DIR` directory. The location
