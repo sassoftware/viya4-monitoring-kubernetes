@@ -15,11 +15,11 @@
       }
     ]
   },
-  "description": "A Dashboard that monitors general statistics for Contour Ingress Controller (Projectcontour)",
+  "description": "A Dashboard that monitors general statistics for Contour Ingress Controller (Projectcontour) \n\nBased on https://grafana.com/grafana/dashboards/21402-contour-global-metrics",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 73,
+  "id": 0,
   "links": [],
   "panels": [
     {
@@ -95,7 +95,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -176,7 +176,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -257,7 +257,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -327,7 +327,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -462,7 +462,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -592,7 +592,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -627,8 +627,7 @@
           "custom": {
             "align": "center",
             "cellOptions": {
-              "mode": "gradient",
-              "type": "color-background"
+              "type": "auto"
             },
             "filterable": false,
             "footer": {
@@ -636,37 +635,14 @@
             },
             "inspect": false
           },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "green",
-                  "index": 0,
-                  "text": "Valid"
-                }
-              },
-              "type": "value"
-            },
-            {
-              "options": {
-                "from": 1,
-                "result": {
-                  "color": "red",
-                  "index": 1,
-                  "text": "Invalid"
-                },
-                "to": 999
-              },
-              "type": "range"
-            }
-          ],
+          "mappings": [],
           "min": -1,
-          "noValue": "No Invalid HTTPProxy",
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "transparent",
+                "color": "green",
                 "value": 0
               },
               {
@@ -695,12 +671,19 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Virtual Host"
+              "id": "byType",
+              "options": "number"
             },
             "properties": [
               {
-                "id": "custom.width"
+                "id": "custom.width",
+                "value": 80
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
               }
             ]
           }
@@ -724,7 +707,7 @@
           }
         ]
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -733,29 +716,68 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(contour_httpproxy_invalid{namespace=~\"$namespace\"}) by (exported_namespace,vhost)",
+          "expr": "sum(contour_httpproxy_invalid{namespace=~\"$namespace\"}) by (exported_namespace)",
           "format": "table",
           "instant": true,
           "intervalFactor": 1,
           "legendFormat": "__auto",
           "range": false,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(contour_httpproxy_orphaned{namespace=~\"$namespace\"}) by (exported_namespace)",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "intervalFactor": 1,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(contour_httpproxy_valid{namespace=~\"$namespace\"}) by (exported_namespace)",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "intervalFactor": 1,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "C"
         }
       ],
-      "title": "Invalid HTTPProxy",
+      "title": "Invalid & Orphaned HTTPProxy",
       "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
         {
           "id": "organize",
           "options": {
             "excludeByName": {
               "Time": true,
               "Value": true,
+              "Value #C": true,
               "vhost": false
             },
             "includeByName": {},
             "indexByName": {},
             "renameByName": {
               "Value": "",
+              "Value #A": "Invalid",
+              "Value #B": "Orphaned",
               "exported_namespace": "Namespace",
               "vhost": "Virtual Host"
             }
@@ -838,7 +860,7 @@
         "textMode": "value_and_name",
         "wideLayout": false
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -921,7 +943,7 @@
         "textMode": "value_and_name",
         "wideLayout": false
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -1004,7 +1026,7 @@
         "textMode": "value_and_name",
         "wideLayout": false
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -1087,7 +1109,7 @@
         "textMode": "value_and_name",
         "wideLayout": false
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -1218,7 +1240,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -1344,7 +1366,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -1471,7 +1493,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -1596,7 +1618,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -3168,7 +3190,7 @@
           "text": "",
           "value": ""
         },
-        "description": "Greg: original value = contour-envoy-metrics",
+        "description": "Value in original source dashboard: contour-envoy-metrics",
         "hide": 2,
         "label": "Service",
         "name": "service",
@@ -3186,5 +3208,5 @@
   "timezone": "",
   "title": "Contour Global Metrics",
   "uid": "v4m-contour-global",
-  "version": 7
+  "version": 2
 }

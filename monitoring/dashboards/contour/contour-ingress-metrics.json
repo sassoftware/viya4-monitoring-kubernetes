@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "This Grafana dashboard comprehensively monitors the Project Contour Ingress Controller at the service and namespace level (Projectcontour)",
+  "description": "This Grafana dashboard comprehensively monitors the Project Contour Ingress Controller at the service and namespace level (Projectcontour) \n\nhttps://grafana.com/grafana/dashboards/21396-contour-ingress-metrics/",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
