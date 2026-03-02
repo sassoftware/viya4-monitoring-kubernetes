@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 0,
+  "id": 113,
   "links": [],
   "panels": [
     {
@@ -716,6 +716,22 @@
           },
           "editorMode": "code",
           "exemplar": false,
+          "expr": "sum(contour_httpproxy_valid{namespace=~\"$namespace\"}) by (exported_namespace)",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "intervalFactor": 1,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
           "expr": "sum(contour_httpproxy_invalid{namespace=~\"$namespace\"}) by (exported_namespace)",
           "format": "table",
           "instant": true,
@@ -739,22 +755,6 @@
           "legendFormat": "__auto",
           "range": false,
           "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "sum(contour_httpproxy_valid{namespace=~\"$namespace\"}) by (exported_namespace)",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "intervalFactor": 1,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "C"
         }
       ],
       "title": "Invalid & Orphaned HTTPProxy",
@@ -3208,5 +3208,5 @@
   "timezone": "",
   "title": "Contour Global Metrics",
   "uid": "v4m-contour-global",
-  "version": 2
+  "version": 1
 }
