@@ -6,7 +6,7 @@
 > All development work on the Ingress NGINX project, *including bug fixes and
 security updates*, is expected to end by the end of March 2026.  While existing deployments will
 continue to function and new deployments are possible, continued use of the ingress-nginx ingress
-controller will pose an increasing security risk.
+controller poses critical security risks.
 
 > [!IMPORTANT]
 > **SAS Viya Monitoring for
