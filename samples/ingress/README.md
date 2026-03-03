@@ -4,9 +4,10 @@
 
 > [!CAUTION]
 > All development work on the Ingress NGINX project, *including bug fixes and
-security updates*, is expected to end by the end of March 2026.  While existing deployments will
-continue to function and new deployments are possible, continued use of the ingress-nginx ingress
-controller poses critical security risks.
+security updates*, will end in March 2026.   For information,
+see [Ingress NGINX Retirement: What You Need to Know](https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/).
+While existing deployments will continue to function and new deployments are
+possible, continued use of the ingress-nginx ingress controller poses critical security risks.
 
 > [!IMPORTANT]
 > **SAS Viya Monitoring for
