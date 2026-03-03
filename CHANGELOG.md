@@ -14,8 +14,9 @@ topic within the Help Center documentation for further information.
 * **Metrics**
   * [FEATURE] New PodMonitor resources are deployed to enable the collection
 of metrics from Contour if it is detected on the Kubernetes cluster during the
-deployment process.  In addition, two Grafana dashboards focused on Contour
-and Envoy metrics are now deployed in this case as well.
+deployment process.
+  * [FEATURE] Two Grafana dashboards focused on Contour and Envoy metrics are now deployed
+if Contour is detected on the Kubernetes cluster during the deployment process.
 
 
 ## Version 1.2.46 (06FEB2026)
