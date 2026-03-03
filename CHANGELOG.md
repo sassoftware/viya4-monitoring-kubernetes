@@ -2,9 +2,10 @@
 ## Unreleased
 * **Overall**
   * [ANNOUNCEMENT] All development work on the Ingress NGINX project, *including bug fixes and
-security updates*, is expected to end by the end of March 2026.  While existing deployments will
-continue to function and new deployments are possible, continued use of the ingress-nginx ingress
-controller will pose an increasing security risk.  **SAS Viya Monitoring for
+security updates*, is expected to end by the end of March 2026.  For information,
+see [Ingress NGINX Retirement: What You Need to Know](https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/).
+While existing deployments will continue to function and new deployments are possible,
+continued use of the ingress-nginx ingress controller poses security risks.  **SAS Viya Monitoring for
 Kubernetes recommends moving to Contour as the replacement ingress controller.**
   * [DEPRECATION] The existing [ingress sample](samples/ingress/README.md) focused on using
 ingress-nginx is now **deprecated**.  Users can refer to [the Contour sample](samples/contour/README.md)
