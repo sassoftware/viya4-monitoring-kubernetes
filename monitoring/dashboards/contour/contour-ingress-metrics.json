@@ -19,7 +19,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 74,
   "links": [],
   "panels": [
     {
@@ -96,7 +95,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -178,7 +177,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -274,7 +273,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -357,7 +356,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -439,7 +438,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -521,7 +520,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -604,7 +603,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -701,7 +700,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -784,7 +783,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -866,7 +865,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -956,7 +955,7 @@
             "textMode": "value_and_name",
             "wideLayout": false
           },
-          "pluginVersion": "12.2.3",
+          "pluginVersion": "12.2.0",
           "repeat": "service",
           "repeatDirection": "h",
           "targets": [
@@ -1081,6 +1080,26 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsNull",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
           }
         ]
       },
@@ -1108,7 +1127,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -1215,6 +1234,26 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsNull",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
           }
         ]
       },
@@ -1242,7 +1281,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -1289,7 +1328,7 @@
             "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
-            "gradientMode": "scheme",
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -1352,6 +1391,26 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsNull",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
           }
         ]
       },
@@ -1381,7 +1440,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -1566,7 +1625,7 @@
           }
         ]
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -1823,7 +1882,7 @@
             "h": 9,
             "w": 24,
             "x": 0,
-            "y": 261
+            "y": 27
           },
           "id": 7,
           "options": {
@@ -1843,7 +1902,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.3",
+          "pluginVersion": "12.2.0",
           "targets": [
             {
               "datasource": {
@@ -1984,7 +2043,7 @@
             "h": 6,
             "w": 10,
             "x": 0,
-            "y": 262
+            "y": 37
           },
           "id": 8,
           "options": {
@@ -2004,7 +2063,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.3",
+          "pluginVersion": "12.2.0",
           "targets": [
             {
               "datasource": {
@@ -2114,7 +2173,7 @@
             "h": 12,
             "w": 14,
             "x": 10,
-            "y": 262
+            "y": 37
           },
           "id": 4,
           "options": {
@@ -2134,7 +2193,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.3",
+          "pluginVersion": "12.2.0",
           "targets": [
             {
               "datasource": {
@@ -2225,7 +2284,7 @@
             "h": 6,
             "w": 10,
             "x": 0,
-            "y": 268
+            "y": 43
           },
           "id": 32,
           "options": {
@@ -2245,7 +2304,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.3",
+          "pluginVersion": "12.2.0",
           "targets": [
             {
               "datasource": {
@@ -2345,7 +2404,7 @@
             "h": 6,
             "w": 10,
             "x": 0,
-            "y": 263
+            "y": 50
           },
           "id": 5,
           "options": {
@@ -2365,7 +2424,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.3",
+          "pluginVersion": "12.2.0",
           "targets": [
             {
               "datasource": {
@@ -2475,7 +2534,7 @@
             "h": 12,
             "w": 14,
             "x": 10,
-            "y": 263
+            "y": 50
           },
           "id": 31,
           "options": {
@@ -2495,7 +2554,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.3",
+          "pluginVersion": "12.2.0",
           "targets": [
             {
               "datasource": {
@@ -2586,7 +2645,7 @@
             "h": 6,
             "w": 10,
             "x": 0,
-            "y": 269
+            "y": 56
           },
           "id": 25,
           "options": {
@@ -2606,7 +2665,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.3",
+          "pluginVersion": "12.2.0",
           "targets": [
             {
               "datasource": {
@@ -2732,16 +2791,17 @@
         "refresh": 2,
         "regex": "[a-z0-9\\\\-]+_([a-z0-9\\\\-]+)_\\d+",
         "type": "query"
+
       }
     ]
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "America/New_York",
   "title": "Contour Ingress Metrics",
   "uid": "v4m-contour-ingress",
-  "version": 1
+  "version": 4
 }

@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 113,
+  "id": 115,
   "links": [],
   "panels": [
     {
@@ -1148,6 +1148,7 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
+            "axisSoftMin": 0,
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
@@ -1274,6 +1275,7 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
+            "axisSoftMin": 0,
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
@@ -1401,6 +1403,7 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
+            "axisSoftMin": 0,
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
@@ -1526,6 +1529,7 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
+            "axisSoftMin": 0,
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
@@ -1795,7 +1799,7 @@
           }
         ]
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -1996,7 +2000,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -2152,7 +2156,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -2258,7 +2262,7 @@
         "textMode": "value_and_name",
         "wideLayout": false
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -2341,7 +2345,7 @@
         "textMode": "value_and_name",
         "wideLayout": false
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -2424,7 +2428,7 @@
         "textMode": "value_and_name",
         "wideLayout": false
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -2507,7 +2511,7 @@
         "textMode": "value_and_name",
         "wideLayout": false
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -2545,6 +2549,7 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
+            "axisSoftMin": 0,
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
@@ -2641,7 +2646,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -2675,6 +2680,7 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
+            "axisSoftMin": 0,
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
@@ -2767,7 +2773,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -2801,6 +2807,7 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
+            "axisSoftMin": 0,
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
@@ -2872,7 +2879,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -2906,6 +2913,7 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
+            "axisSoftMin": 0,
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
@@ -2998,7 +3006,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
@@ -3104,7 +3112,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.2.3",
+      "pluginVersion": "12.2.0",
       "targets": [
         {
           "datasource": {
