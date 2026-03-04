@@ -7,8 +7,7 @@ spec:
     matchLabels:
       app.kubernetes.io/component: envoy
   namespaceSelector:
-    matchNames:
-    - projectcontour
+    any: true
   podMetricsEndpoints:
   - port: metrics
     path: /stats/prometheus
