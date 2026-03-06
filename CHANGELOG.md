@@ -1,6 +1,15 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Overall**
+  * [ANNOUNCEMENT] All development work on the Ingress NGINX project, *including bug fixes and
+security updates*, is expected to end by the end of March 2026.  For information,
+see [Ingress NGINX Retirement: What You Need to Know](https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/).
+While existing deployments will continue to function and new deployments are possible,
+continued use of the ingress-nginx ingress controller poses security risks.  **SAS Viya Monitoring for
+Kubernetes recommends moving to Contour as the replacement ingress controller.**
+  * [DEPRECATION] The existing [ingress sample](samples/ingress/README.md) focused on using
+ingress-nginx is now **deprecated**.  Users can refer to [the Contour sample](samples/contour/README.md)
+for information on manually configuring Contour as the ingress controller.
   * [FEATURE] The auto-generation of ingress configurations now supports Contour (in addition to
 the existing support for ingress-nginx).  To enable ingress via Contour, set the environment
 variable `INGRESS_TYPE` to `contour`. To use ingress-nginx, set `INGRESS_TYPE` to `ingress-nginx`.
@@ -17,6 +26,28 @@ of metrics from Contour if it is detected on the Kubernetes cluster during the
 deployment process.
   * [FEATURE] Two Grafana dashboards focused on Contour and Envoy metrics are now deployed
 if Contour is detected on the Kubernetes cluster during the deployment process.
+  * [CHANGE] Following the migration of the Grafana and Tempo Helm charts to the
+[Grafana Community Kubernetes Helm Charts project](https://github.com/grafana-community/helm-charts),
+our project now deploys these charts from that project's repository.
+  * [CHANGE] Following the retirement of the ingress-nginx maintained variant of the
+`kube-webhook-certgen`, the Prometheus Community Helm charts
+[moved to a new actively maintained replacement](https://github.com/prometheus-community/helm-charts/pull/6407).
+Therefore, our project, in turn, now deploys the component from this new source as well.
+  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 78.4.0 to  81.5.2
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded fom 9.4.5 to 11.0.1
+  * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 3.4.1 to 3.6.0
+  * [UPGRADE] Alertmanager has been upgraded from 0.28.1 to 0.31.0
+  * [UPGRADE] The config-reloader has been upgraded from 0.86.1 to 0.88.1
+  * [UPGRADE] Grafana has been upgraded from 12.2.0 to 12.3.2
+  * [UPGRADE] The k8s-sidecar has been upgraded from 1.30.9 to 2.5.0
+  * [UPGRADE] Kube-State-Metrics has been upgraded from 2.17.0 to 2.18.0
+  * [UPGRADE] Node-Exporter has been upgraded from 1.9.1 to 1.10.2
+  * [UPGRADE] Prometheus has been upgraded from 3.7.1 to 3.9.1
+  * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.11.1 to 1.11.2
+  * [UPGRADE] Prometheus Operator has been upgraded from 0.86.1 to 0.88.1
+  * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.31.1 to 2.32.4
+* **Logging**
+  * [CHANGE] Improve handling of Envoy (Contour) log messages
 
 
 ## Version 1.2.46 (06FEB2026)

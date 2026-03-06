@@ -1,4 +1,20 @@
 # Ingress
+> [!WARNING]
+> **THIS SAMPLE IS DEPRECATED**
+
+> [!CAUTION]
+> All development work on the Ingress NGINX project, *including bug fixes and
+security updates*, will end in March 2026.   For information,
+see [Ingress NGINX Retirement: What You Need to Know](https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/).
+While existing deployments will continue to function and new deployments are
+possible, continued use of the ingress-nginx ingress controller poses critical security risks.
+
+> [!IMPORTANT]
+> **SAS Viya Monitoring for
+Kubernetes recommends moving to Contour as the replacement ingress controller.**
+Refer to [the Contour sample](../contour/README.md) for information on configuring
+Contour as the ingress controller.  Information on migrating from using ingress-nginx
+to Contour is included in that sample.
 
 ## Overview
 

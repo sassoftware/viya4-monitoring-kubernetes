@@ -10,10 +10,64 @@ This sample provides information about two scenarios:
 * host-based routing
 * path-based routing
 
-These scenarios differ in how the URL used to access the applications is constructed:
+These scenarios differ in how the URL for the web applications is constructed:
 
 * In host-based routing, the application name is part of the host name itself (for example, `https://grafana.host.cluster.example.com/`).
 * In path-based routing, the host name is fixed and the application name is appended as a path on the URL (for example, `https://host.cluster.example.com/grafana`).
+
+> [!IMPORTANT]
+> **Note:** The ability to automatically configure Contour as the
+ingress controller to permit access to the web applications was added with version
+1.2.47 (released 06MAR26).  Depending on your requirements, this can
+eliminate the need to manually configure Contour ingress as demonstrated in this
+sample.  See the [Configure Ingress Access to Web Applications](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
+topic within the Help Center documentation for further information.
+
+## Migrating from ingress-nginx to Contour as ingress controller
+Migrating an existing deployment of SAS Viya Monitoring for Kubernetes from
+using ingress-nginx ingress controller to using Contour is straightforward
+and does not require a complete removal and redeployment.
+
+### Auto-generation of Ingress Configuration
+If you used the auto-generate of ingress feature to configure SAS Viya Monitoring
+for Kubernetes to use ingress-nginx as the ingress controller, migration can be
+accomplished with only the modification of two or three environment variables before
+re-running the deployment scripts.
+* You need to set the (new) environment variable `INGRESS_TYPE`
+to "*contour*".
+* You need to set the (new) environment variable `USE_SEPARATE_CERTS` to
+"*true*".  Refer to the [Automatically Generate Ingress Definitions and Kubernetes Secrets](https://documentation.sas.com/?docsetId=obsrvdply&docsetVersion=latest&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0l2cm52gqw0ntn19n01fanj1og2)
+topic in the documentation for more information
+about this environment variable and its possible values.
+* You will likely need to update the value of the environment variable `BASE_DOMAIN`
+to reflect the correct host portion of the URLs needed to access the web applications
+after the transition.  For example, at some sites, the host portion of the URLs might
+need to change from `ingress-nginx.myserver.example.com` to `contour.myserver.example.com`.
+* If you explicitly defined the fully-qualified domain name for any of the web applications
+via the corresponding environment variables (e.g. `GRAFANA_FQDN`, `OSD_FQDN`, etc.), you may
+need to adjust those values as well.
+* After updating the environment variables, re-run the deployment scripts.  The
+existing Ingress resources are removed and new HTTPProxy resources are generated.
+* The new URLs needed to access the web applications are shown in the notices genereated
+at the end of the deployment process.
+
+### Manual Configuration of Ingress
+If you manually defined the ingress configuration for SAS Viya Monitoring for Kubernetes
+using ingress-nginx and now you want to manually configure things for Contour, refer the rest
+of this sample for details.  Essential points to remember are:
+* Kubernetes Ingress resources are not used when using Contour.  Therefore, you need to
+disable the creation of these resources.  Depending on how you previously configured ingress,
+this can be done by simply setting the appropriate `ingress.enable` key to "*false*", or removing
+any Ingress-related settings from the user-values yaml files in your `USER_DIR` directory
+used during deployment.
+* Review the sample user-value yaml files in this sample carefully to ensure you have the
+correct set of files and that the keys within those files are set properly.  There are differences
+in what is required between the two ingress controllers technologies.
+* After updating the files and settings, re-run the deployment scripts.  The
+existing Ingress resources are removed and new HTTPProxy resources are generated.
+* The new URLs needed to access the web applications are shown in the notices generated
+at the end of the deployment process.
+
 
 ## Using This Sample
 
