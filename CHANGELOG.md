@@ -1,5 +1,5 @@
 # SAS Viya Monitoring for Kubernetes
-## Unreleased
+## Version 1.2.47 (06MAR2026)
 * **Overall**
   * [ANNOUNCEMENT] All development work on the Ingress NGINX project, *including bug fixes and
 security updates*, is expected to end by the end of March 2026.  For information,
