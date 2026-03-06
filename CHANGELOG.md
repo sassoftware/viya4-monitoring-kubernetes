@@ -21,6 +21,11 @@ See the
 [Configure Ingress Access to Web Applications](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
 topic within the Help Center documentation for further information.
 * **Metrics**
+  * [FEATURE] New PodMonitor resources are deployed to enable the collection
+of metrics from Contour if it is detected on the Kubernetes cluster during the
+deployment process.
+  * [FEATURE] Two Grafana dashboards focused on Contour and Envoy metrics are now deployed
+if Contour is detected on the Kubernetes cluster during the deployment process.
   * [CHANGE] Following the migration of the Grafana and Tempo Helm charts to the
 [Grafana Community Kubernetes Helm Charts project](https://github.com/grafana-community/helm-charts),
 our project now deploys these charts from that project's repository.
