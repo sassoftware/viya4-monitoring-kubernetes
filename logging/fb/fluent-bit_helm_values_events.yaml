@@ -7,7 +7,7 @@ kind: Deployment
 ###  tag: foo
 ###imagePullSecrets: foo
 
-replicaCount: 0
+replicaCount: 1
 
 rbac:
   eventsAccess: true
@@ -32,6 +32,9 @@ extraVolumeMounts:
 - name: fb-events-db
   mountPath: /tmp/v4m
   subPath: v4m_fb_events.db
+
+serviceAccount:
+  automountServiceAccountToken: false
 
 securityContext:
   privileged: false
