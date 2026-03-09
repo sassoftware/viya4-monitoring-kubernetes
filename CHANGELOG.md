@@ -1,4 +1,7 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Overall**
+  * [CHANGE] Support for Kubernetes 1.26 has been dropped
 ## Version 1.2.47 (06MAR2026)
 * **Overall**
   * [ANNOUNCEMENT] All development work on the Ingress NGINX project, *including bug fixes and
