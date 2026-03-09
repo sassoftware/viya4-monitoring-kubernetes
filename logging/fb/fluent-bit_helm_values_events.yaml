@@ -33,9 +33,6 @@ extraVolumeMounts:
   mountPath: /tmp/v4m
   subPath: v4m_fb_events.db
 
-serviceAccount:
-  automountServiceAccountToken: false
-
 securityContext:
   privileged: false
   allowPrivilegeEscalation: false

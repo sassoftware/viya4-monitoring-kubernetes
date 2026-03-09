@@ -115,9 +115,7 @@ helm $helmDebug upgrade --install --namespace "$LOG_NS" v4m-fb-events \
     "$chart2install"
 
 #Container Security: Disable Token Automounting at ServiceAccount; enable for Pod
-
-# 09MAR26 Replaced call to disable_sa_token_automount function with
-#         setting Helm chart key serviceAccount.automountServiceAccountToken
+disable_sa_token_automount "$LOG_NS" v4m-fb-events
 enable_pod_token_automount "$LOG_NS" deployment v4m-fb-events
 
 kubectl -n "$LOG_NS" scale deployment v4m-fb-events --replicas 1
