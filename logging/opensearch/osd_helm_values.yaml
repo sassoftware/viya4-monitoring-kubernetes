@@ -69,9 +69,9 @@ config:
     # Disable OpenSearch Dashboards 3.x
     # features we are not currently
     # using and suppress splash screen
-    ##data_source.enabled: false
-    ##workspace.enabled: false
-    ##explore.enabled: false
+    data_source.enabled: false
+    workspace.enabled: false
+    explore.enabled: false
 
 securityContext:
   readOnlyRootFilesystem: true
