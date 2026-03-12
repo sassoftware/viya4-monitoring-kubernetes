@@ -18,3 +18,4 @@
 * 30_dash_msg_vol_lvl.ndjson
 * 30_dash_msg_vol_lvl_pc.ndjson
 * 30_dash_top10_errors.ndjson
+* 99_suppress_explore_experience_notice.ndjson
