@@ -4,6 +4,6 @@
     "dls": "",
     "fls": [],
     "masked_fields": [],
-    "allowed_actions": ["indices:admin/mappings/get"]
+    "allowed_actions": ["indices:admin/mappings/get","indices:data/read/field_caps"]
  }]
 }
