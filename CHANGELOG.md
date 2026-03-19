@@ -8,6 +8,7 @@
   * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 2.32.0 to 3.4.0
   * [UPGRADE] Fluent Bit upgraded from 4.2.0 to 4.2.3
   * [UPGRADE] Fluent Bit Helm chart upgraded from 0.54.0 to 0.56.0
+  * [UPGRADE] Elasticsearch Exporer upgraded from 1.9.0 to 1.10.0
   * [UPGRADE] Elasticsearch Exporer Helm chart upgraded from 7.0.0 to 7.2.1
   * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.32.4 to 2.32.6
 
