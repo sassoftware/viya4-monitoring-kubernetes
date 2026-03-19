@@ -4,6 +4,17 @@
   * [CHANGE] The [Contributor Agreement](ContributorAgreement.txt) has been revised to clarify
 the need to sign-off on contributions and to disclose the use of generative AI in their creation.
   * [CHANGE] Support for Kubernetes 1.26 has been dropped
+* **Logging**
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 2.19.4 to 3.4.0
+  * [UPGRADE] OpenSearch Helm chart upgraded from 2.36.0 to 3.4.0
+  * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 2.32.0 to 3.4.0
+  * [UPGRADE] Fluent Bit upgraded from 4.2.0 to 4.2.3
+  * [UPGRADE] Fluent Bit Helm chart upgraded from 0.54.0 to 0.56.0
+  * [UPGRADE] Elasticsearch Exporer upgraded from 1.9.0 to 1.10.0
+  * [UPGRADE] Elasticsearch Exporer Helm chart upgraded from 7.0.0 to 7.2.1
+  * [UPGRADE] OpenSearch Data Source Plugin to Grafana upgraded from 2.32.4 to 2.32.6
+
+
 ## Version 1.2.47 (06MAR2026)
 * **Overall**
   * [ANNOUNCEMENT] All development work on the Ingress NGINX project, *including bug fixes and

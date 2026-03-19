@@ -341,7 +341,7 @@ function generateImageKeysFile {
             pullsecret_text="null"
         fi
     else
-        GLOBAL_REGISTRY_OSBUG='""'
+        GLOBAL_REGISTRY_OSBUG='docker.io'
         GLOBAL_REGISTRY="null"
         pullsecrets_text="[]"
         pullsecret_text="null"
