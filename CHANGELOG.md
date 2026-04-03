@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Version 1.2.47 (03APR2026)
+## Version 1.2.48 (03APR2026)
 * **Overall**
   * [CHANGE] The [Contributor Agreement](ContributorAgreement.txt) has been revised to clarify
 the need to sign-off on contributions and to disclose the use of generative AI in their creation.
