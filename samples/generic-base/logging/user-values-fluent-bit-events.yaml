@@ -1,5 +1,10 @@
-# Chart:  https://github.com/fluent/helm-charts/blob/fluent-bit-0.40.0/charts/fluent-bit
-# Default values: https://github.com/fluent/helm-charts/blob/fluent-bit-0.40.0/charts/fluent-bit/values.yaml
+# Chart:  https://github.com/fluent/helm-charts/tree/main/charts/fluent-bit
+# Default values: https://github.com/fluent/helm-charts/blob/main/charts/fluent-bit/values.yaml
+#
+# NOTE: Refer to the ARTIFACT_INVENTORY.md file in our project repo for information
+#       on the **specific** version of the Elasticsearch Exporter being deployed.
+#       Options available and default settings may vary by version.
+#
 
 #image:
 #  tag: 2.1.10

@@ -4,8 +4,8 @@
 ##        user-values-prom-operator.yaml within your USER_DIR directory.
 
 
-## Chart: https://github.com/grafana/helm-charts/tree/main/charts/grafana
-## Default values: https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
+## Chart: https://github.com/grafana-community/helm-charts/tree/main/charts/grafana
+## Default values: https://github.com/grafana-community/helm-charts/blob/main/charts/grafana/values.yaml
 ##
 ## NOTE: Refer to the ARTIFACT_INVENTORY.md file in the project repo for
 ##       information on the specific version of Grafana being deployed
