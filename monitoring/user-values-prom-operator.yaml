@@ -1,11 +1,15 @@
 # Place overrides for the Prometheus Operator Helm Chart Here
 
+# NOTE: Refer to https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/stable/ARTIFACT_INVENTORY.md
+#       to identify the current Helm chart version in use by this project.  The links below point to
+#       the 'main' branch as a general reference and the contents will likely differ to some degree.
+#
 # Chart: https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 # Default values: https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
 
-# Subcharts ued by the Prometheus Operator chart
+# Subcharts used by the Kube-Prometheus Stack Helm chart
 # Grafana
-# https://github.com/grafana/helm-charts/tree/main/charts/grafana
+# https://github.com/grafana-community/helm-charts/tree/main/charts/grafana
 # https://grafana.com/
 
 # Prometheus Node Exporter
@@ -52,7 +56,7 @@
 #               storage: 25Gi
 
 # alertmanager:
-#   enabled:true
+#   enabled: true
 #   alertmanagerSpec:
 #     externalUrl: http://host.mycluster.example.com:31091
 #     storage:

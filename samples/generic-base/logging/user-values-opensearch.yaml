@@ -1,8 +1,12 @@
-# Chart: https://github.com/opensearch-project/helm-charts/tree/opensearch-2.15.0/charts/opensearch
-# Default values: https://github.com/opensearch-project/helm-charts/blob/opensearch-2.15.0/charts/opensearch/values.yaml
+# NOTE: Refer to https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/stable/ARTIFACT_INVENTORY.md
+#       to identify the current Helm chart version in use by this project.  The links below point to
+#       the 'main' branch as a general reference and the contents will likely differ to some degree.
+#
+# Chart: https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch
+# Default values: https://github.com/opensearch-project/helm-charts/blob/main/charts/opensearch/values.yaml
 
 #image:
-#  tag: 2.10.0
+#  tag: 3.4.0
 #  repository: "opensearchproject/opensearch"
 #  pullPolicy: "IfNotPresent"
 

@@ -1,5 +1,10 @@
+# NOTE: Refer to https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/stable/ARTIFACT_INVENTORY.md
+#       to identify the current Helm chart version in use by this project.  The links below point to
+#       the 'main' branch as a general reference and the contents will likely differ to some degree.
+#
 # Chart: https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway
 # Default values: https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-pushgateway/values.yaml
+
 
 # persistentVolume:
 #   enabled: true

@@ -1,5 +1,10 @@
-## Helm Chart:     https://github.com/prometheus-community/helm-charts/tree/prometheus-elasticsearch-exporter-5.3.1/charts/prometheus-elasticsearch-exporter
-## Default values: https://github.com/prometheus-community/helm-charts/blob/prometheus-elasticsearch-exporter-5.3.1/charts/prometheus-elasticsearch-exporter/values.yaml
+# NOTE: Refer to https://github.com/sassoftware/viya4-monitoring-kubernetes/blob/stable/ARTIFACT_INVENTORY.md
+#       to identify the current Helm chart version in use by this project.  The links below point to
+#       the 'main' branch as a general reference and the contents will likely differ to some degree.
+#
+# Helm Chart: https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-elasticsearch-exporter/Chart.yaml
+# Default values: https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-elasticsearch-exporter/values.yaml
+#
 
 # image:
 #  repository: quay.io/prometheuscommunity/elasticsearch-exporter
