@@ -1,5 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Overall**
+  * [TASK] The various user-values yaml and user.env files included in the project repository, including
+those in the *samples* sub-directories, were reviewed and validated with obsolete values removed.
+
+
 ## Version 1.2.48 (03APR2026)
 * **Overall**
   * [CHANGE] The [Contributor Agreement](ContributorAgreement.txt) has been revised to clarify
