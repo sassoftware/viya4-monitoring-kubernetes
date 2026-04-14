@@ -3,10 +3,10 @@
 ## Unreleased
 * **Overall**
   * [CHANGE] Support for Helm 4.x has been added.  As part of this change, the `--force-conflicts` option
-  will be used when deploying using Helm 4.x.  During an update-in-place, this can overwrite some
-  post-deployment changes to Kubernetes resources implemented with `kubectl patch` commands.  If you have
-  made such changes, you should implement these changes via the appropriate Helm user-value yaml file *prior*
-  to the update (if possible) or re-apply the patches manually *after* the upgrade.
+will be used when deploying using Helm 4.x.  During an update-in-place, this can overwrite some
+post-deployment changes to Kubernetes resources implemented with `kubectl patch` commands.  If you have
+made such changes, you should implement these changes via the appropriate Helm user-values yaml file
+*prior* to the update (if possible) or re-apply the patches manually *after* the upgrade.
   * [TASK] The various user-values yaml and user.env files included in the project repository, including
 those in the *samples* sub-directories, were reviewed and validated with obsolete values removed.
 
