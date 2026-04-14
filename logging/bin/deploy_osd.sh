@@ -227,6 +227,7 @@ log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # shellcheck disable=SC2086
 helm $helmDebug upgrade --install v4m-osd \
+    $helm4opts  \
     $versionstring \
     --namespace "$LOG_NS" \
     --values "$imageKeysFile" \

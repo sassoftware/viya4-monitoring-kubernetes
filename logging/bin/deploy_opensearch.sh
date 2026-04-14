@@ -327,6 +327,7 @@ log_debug "Installing Helm chart from artifact [$chart2install]"
 # NOTE: nodeGroup needed to get resource names we want
 # shellcheck disable=SC2086
 helm $helmDebug upgrade --install opensearch \
+    $helm4opts  \
     --namespace "$LOG_NS" \
     --values "$TMP_DIR/opensearch_imagekeysfile.yaml" \
     --values "$imageKeysFile" \

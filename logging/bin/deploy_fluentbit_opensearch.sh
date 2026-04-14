@@ -183,6 +183,7 @@ log_debug "Installing Helm chart from artifact [$chart2install]"
 # Deploy Fluent Bit via Helm chart
 # shellcheck disable=SC2086
 helm $helmDebug upgrade --install --namespace "$LOG_NS" v4m-fb \
+    $helm4opts
     $versionstring \
     --values "$TMP_DIR/fb_imagekeysfile.yaml" \
     --values "$imageKeysFile" \
