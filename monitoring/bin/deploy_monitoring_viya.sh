@@ -103,7 +103,7 @@ if [ "$PUSHGATEWAY_ENABLED" == "true" ]; then
 
     # shellcheck disable=SC2086
     helm $helmDebug upgrade --install prometheus-pushgateway \
-        ${helm4opts} \
+        $helm4opts \
         --namespace "$VIYA_NS" \
         $versionstring \
         --set service.clusterIP="$svcClusterIP" \
