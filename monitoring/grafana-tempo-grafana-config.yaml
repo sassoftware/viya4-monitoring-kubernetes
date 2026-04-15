@@ -1,0 +1,4 @@
+grafana:
+  "grafana.ini":
+    feature_toggles:
+      enable: tempoSearch tempoBackendSearch
