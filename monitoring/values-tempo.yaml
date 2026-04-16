@@ -5,7 +5,6 @@
 ##  pullPolicy: foo
 ##  pullSecrets: foo
 
-
 # =======
 # Tempo
 # =======
@@ -20,7 +19,6 @@ tempo:
   metricsGenerator:
     # -- If true, enables Tempo's metrics generator (https://grafana.com/docs/tempo/next/metrics-generator/)
     enabled: true
-    remoteWriteUrl: "http://v4m-prometheus.monitoring:9090/api/v1/write"  # overridden at deploy time with MON_NS
 
   global_overrides:
     max_traces_per_user: 5000000
