@@ -588,8 +588,8 @@ if [ "$TRACING_ENABLE" == "true" ]; then
         -n "$MON_NS" \
         -f "$imageKeysFile" \
         -f monitoring/values-tempo.yaml \
+        --set "tempo.metricsGenerator.remoteWriteUrl=http://v4m-prometheus.wombat:9090/api/v1/write" \
         -f "$TEMPO_USER_YAML" \
-        --set "tempo.metricsGenerator.remoteWriteUrl=http://v4m-prometheus.${MON_NS}:9090/api/v1/write" \
         $versionstring \
         "$chart2install"
 fi
