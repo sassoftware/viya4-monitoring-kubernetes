@@ -131,7 +131,6 @@ else
         log_debug "[$TEMPO_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
         TEMPO_USER_YAML=$TMP_DIR/empty.yaml
     fi
-    tempoGrafanaConfigFile="monitoring/grafana-tempo-grafana-config.yaml"
     kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-tempo
     kubectl create cm -n "$MON_NS" grafana-datasource-tempo --from-file monitoring/grafana-datasource-tempo.yaml
     kubectl label cm -n "$MON_NS" grafana-datasource-tempo grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
