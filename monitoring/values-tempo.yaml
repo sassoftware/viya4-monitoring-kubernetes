@@ -37,6 +37,17 @@ tempo:
     grpc_server_max_recv_msg_size: 500000000
     grpc_server_max_send_msg_size: 500000000
 
+  ingester:
+    flush_all_on_shutdown: true
+    max_block_duration: 5m
+    lifecycler:
+      ring:
+        replication_factor: 1
+
+  compactor:
+    compaction:
+      block_retention: 24h
+
   querier:
     frontend_worker:
       grpc_client_config:

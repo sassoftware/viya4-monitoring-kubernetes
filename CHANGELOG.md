@@ -5,7 +5,15 @@
   * [TASK] The various user-values yaml and user.env files included in the project repository, including
 those in the *samples* sub-directories, were reviewed and validated with obsolete values removed.
 
-
+* **Tracing**
+  * [CHANGE] Fluent Bit tracing configuration updated to improve reliability and performance:
+    increased input buffer sizes, enabled gzip compression on output, set retry limit to 5,
+    added worker threads, and configured connection/IO timeouts
+  * [CHANGE] Tempo ingester configured with flush_all_on_shutdown to prevent trace data loss
+    on restart, reduced max_block_duration to 5m to lower memory pressure, and set
+    replication_factor to 1 for single-instance deployments; compactor block_retention
+    aligned to 24h to match retention setting
+  
 ## Version 1.2.48 (03APR2026)
 * **Overall**
   * [CHANGE] The [Contributor Agreement](ContributorAgreement.txt) has been revised to clarify
