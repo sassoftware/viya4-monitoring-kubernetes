@@ -14,7 +14,7 @@ tempo:
   metricsGenerator:
     # -- If true, enables Tempo's metrics generator (https://grafana.com/docs/tempo/next/metrics-generator/)
     enabled: false
-    remoteWriteUrl: "http://prometheus.monitoring:9090/api/v1/write"
+    remoteWriteUrl: "http://v4m-prometheus.monitoring:9090/api/v1/write"  # overridden at deploy time with MON_NS
 
   retention: 24h
 
