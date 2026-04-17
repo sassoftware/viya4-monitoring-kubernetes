@@ -6,7 +6,24 @@
 those in the *samples* sub-directories, were reviewed and validated with obsolete values removed.
   * [TASK] Documentation links in the various markdown files within the project reposistory were reviewed
 and revised to eliminate the use of version-specific pointers when not appropriate.
-
+* **Tracing**
+  * [CHANGE] Fluent Bit tracing configuration updated to improve reliability and performance:
+    increased input buffer sizes, enabled gzip compression on output, set retry limit to 5,
+    added worker threads, and configured connection/IO timeouts
+  * [CHANGE] Tempo ingester configured with flush_all_on_shutdown to prevent trace data loss
+    on restart, reduced max_block_duration to 5m to lower memory pressure, and set
+    replication_factor to 1 for single-instance deployments; compactor block_retention
+    aligned to 24h to match retention setting
+  * [CHANGE] Tempo datasource for Grafana is now provisioned via the datasource sidecar mechanism
+    (ConfigMap with grafana_datasource=1 label) consistent with how other datasources are handled,
+    rather than being passed as a Helm values overlay
+  * [CHANGE] Removed Grafana feature toggles tempoSearch and tempoBackendSearch as they are no
+    longer needed in the current Grafana version
+  * [CHANGE] OpenShift deployments now use the standard values-tempo.yaml instead of a separate
+    OpenShift-specific file
+  * [CHANGE] Tempo metricsGenerator remoteWriteUrl now resolved dynamically from MON_NS at
+    deploy time rather than being hardcoded to the monitoring namespace
+  
 ## Version 1.2.48 (03APR2026)
 * **Overall**
   * [CHANGE] The [Contributor Agreement](ContributorAgreement.txt) has been revised to clarify
