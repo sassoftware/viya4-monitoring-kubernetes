@@ -4,7 +4,8 @@
 * **Overall**
   * [TASK] The various user-values yaml and user.env files included in the project repository, including
 those in the *samples* sub-directories, were reviewed and validated with obsolete values removed.
-
+  * [TASK] Documentation links in the various markdown files within the project reposistory were reviewed
+and revised to eliminate the use of version-specific pointers when not appropriate.
 
 ## Version 1.2.48 (03APR2026)
 * **Overall**
@@ -41,7 +42,7 @@ the environment variable `BASE_DOMAIN` are also required.  As with ingress-nginx
 both host-based and path-based routing are supported with Contour as well.  A new option for
 how the Kubernetes Secret resources, used to hold the ingress TLS certs, are handled is available.
 See the
-[Configure Ingress Access to Web Applications](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
+[Configure Ingress Access to Web Applications](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
 topic within the Help Center documentation for further information.
 * **Metrics**
   * [FEATURE] New PodMonitor resources are deployed to enable the collection
@@ -87,7 +88,7 @@ plugin files) into the appropriate sub-directories in the `$USER_DIR` directory.
 of the private container registry and the associated credentials need to be identified by
 setting the environment variables `AIRGAP_REGISTRY`, `AIRGAP_REGISTRY_USERNAME`, and
 `AIRGAP_REGISTRY_PASSWORD` prior to running the script, preferably in the `$USER_DIR/user.env`
-file. Refer to the [Prepare to Deploy SAS Viya Monitoring for Kubernetes in an Air Gap Environment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0grd8g2pkfglin12bzm3g1oik2p) documentation for more info.
+file. Refer to the [Prepare to Deploy SAS Viya Monitoring for Kubernetes in an Air Gap Environment](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0grd8g2pkfglin12bzm3g1oik2p) documentation for more info.
   * [FIX] The `logging/bin/onboard.sh` script no longer fails when the `-p` parameter is set
 * **Metrics**
   * [FEATURE] Support for automatically defining SMTP server configuration (permitting Grafana
@@ -534,7 +535,7 @@ is no longer actively developed and was replaced with a Fluent Bit deployment fo
 * **Logging**
   * [FEATURE] The getlogs.py utility for exporting logs via the command line has been moved to "production"
 from "experimental" status.  Documentation for this optional Python-based tool is available in the
-[SAS Viya Monitoring for Kubernetes Help Center](https://documentation.sas.com/?docsetId=obsrvdply&docsetVersion=latest&docsetTarget=p1wdkgnu7dp791n1h9xfyh68ltnt.htm).
+[SAS Viya Monitoring for Kubernetes Help Center](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n0bzfdp3bn6p4vn1lj9pm2hy8t0q.htm).
 
 ## Version 1.2.20 (12DEC2023)
 
