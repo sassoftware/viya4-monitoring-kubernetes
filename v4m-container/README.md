@@ -13,8 +13,8 @@ _The Viya Monitoring for Kubernetes Docker Container allows you to work with the
 ## Prerequisites
 
 * Docker must be installed on your workstation.
-* A local copy of the repository must be created. See 
-[Create the Deployment Directory](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=p15fe8611w9njkn1fucwbvlz8tyg.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
+* A local copy of the repository must be created. See
+[Create the Deployment Directory](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=p15fe8611w9njkn1fucwbvlz8tyg.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
 
 ## Preparing the Docker Container
 
@@ -67,7 +67,7 @@ To connect to the Docker container, run the following command:
 docker run -it v4m
 ```
 
-From there, you are in a UNIX shell environment.  
+From there, you are in a UNIX shell environment.
 
 By default, the Docker container is expecting the kubeconfig file to be called `config`.  If you want to use a different file name, you must set the `KUBECONFIG` environment variable to point to the appropriate file name using the following command:
 
