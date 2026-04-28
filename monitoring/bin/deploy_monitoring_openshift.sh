@@ -284,6 +284,7 @@ fi
 
 # shellcheck disable=SC2086
 helm upgrade --install $helmDebug \
+    $helm4opts \
     -n "$MON_NS" \
     -f "$imageKeysFile" \
     -f "$wnpValuesFile" \
@@ -390,6 +391,7 @@ if [ "$TRACING_ENABLE" == "true" ]; then
     log_info "Installing tempo"
     # shellcheck disable=SC2086
     helm upgrade --install v4m-tempo \
+        $helm4opts \
         -n "$MON_NS" \
         -f "$imageKeysFile" \
         -f monitoring/values-tempo.yaml \
