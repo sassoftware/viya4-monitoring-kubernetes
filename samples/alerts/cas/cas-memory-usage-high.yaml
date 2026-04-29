@@ -8,9 +8,10 @@ groups:
       - title: CAS Memory Usage High
         annotations:
           description:
-            Checks the CAS memory usage. If it is > 300GB, it will alert. Currently,
-            max. memory is 512GB. The expectation is that this alert will be an early
-            warning sign to investigate large memory usage as typical usage is less than
+            Checks the CAS memory usage across all CAS server pods (controller,
+            backup controller, and workers). If total usage is > 300GB, it will
+            alert. The expectation is that this alert will be an early warning
+            sign to investigate large memory usage as typical usage is less than
             the threshold. Want to prevent OOMkill of CAS.
           summary:
             CAS memory > 300GB. This can be due to a program or pipeline taking
@@ -21,7 +22,7 @@ groups:
             model:
               editorMode: code
               exemplar: false
-              expr: (cas_node_mem_size_bytes{type="physical"} - cas_node_mem_free_bytes{type="physical"})/1073741824
+              expr: sum by (namespace) (container_memory_working_set_bytes{pod=~"sas-cas-server-.*", container!="", container!="POD"}) / 1073741824
               instant: true
               interval: ""
               intervalMs: 1000
