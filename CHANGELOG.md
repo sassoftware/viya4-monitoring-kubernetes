@@ -6,6 +6,11 @@
 those in the *samples* sub-directories, were reviewed and validated with obsolete values removed.
   * [TASK] Documentation links in the various markdown files within the project reposistory were reviewed
 and revised to eliminate the use of version-specific pointers when not appropriate.
+* **Metrics**
+  * [FIX] The `CAS Memory Usage High` sample alert now uses `container_memory_working_set_bytes`
+    summed across all CAS server pods (controller, backup controller, and workers) instead of
+    `cas_node_mem_size_bytes - cas_node_mem_free_bytes`, which reported node/VM physical memory
+    rather than actual CAS memory consumption
 * **Tracing**
   * [CHANGE] Fluent Bit tracing configuration updated to improve reliability and performance:
     increased input buffer sizes, enabled gzip compression on output, set retry limit to 5,
