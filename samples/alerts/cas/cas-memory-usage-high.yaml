@@ -22,7 +22,7 @@ groups:
             model:
               editorMode: code
               exemplar: false
-              expr: sum by (namespace) (container_memory_working_set_bytes{pod=~"sas-cas-server-.*", container!="", container!="POD"}) / 1073741824
+              expr: sum by (namespace, pod) (container_memory_working_set_bytes{pod=~"sas-cas-server-.*", container!="", container!="POD"}) / 1073741824
               instant: true
               interval: ""
               intervalMs: 1000
