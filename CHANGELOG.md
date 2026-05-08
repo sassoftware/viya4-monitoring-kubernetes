@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.49 (08MAY2026)
 * **Overall**
   * [CHANGE] Support for Helm 4.x has been added.  As part of this change, the `--force-conflicts` option
 will be used when deploying using Helm 4.x.  During an update-in-place, this can overwrite some
