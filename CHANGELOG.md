@@ -1,5 +1,12 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Unreleased
+* **Overall**
+  * [BREAKING CHANGE] The minimum required version of `yq` has been updated to version
+4.45.1 (released 11JAN2026) or newer of the
+[Golang-based (Mike Farah) version of `yq`](https://github.com/mikefarah/yq).
+
+
 ## Version 1.2.49 (08MAY2026)
 * **Overall**
   * [CHANGE] Support for Helm 4.x has been added.  As part of this change, the `--force-conflicts` option
@@ -33,7 +40,7 @@ and revised to eliminate the use of version-specific pointers when not appropria
     OpenShift-specific file
   * [CHANGE] Tempo metricsGenerator remoteWriteUrl now resolved dynamically from MON_NS at
     deploy time rather than being hardcoded to the monitoring namespace
-  
+
 ## Version 1.2.48 (03APR2026)
 * **Overall**
   * [CHANGE] The [Contributor Agreement](ContributorAgreement.txt) has been revised to clarify

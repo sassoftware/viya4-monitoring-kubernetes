@@ -35,13 +35,14 @@ export -f checkStorageClass
 function checkYqVersion {
     # confirm yq installed and correct version
     local goodver yq_version
-    goodver="yq \(.+mikefarah.+\) version (v)?(4\.(3[2-9]|[4-9][0-9])\..+)"
+    # "good version" == 4.45.xx -> 4.49.xx OR 4.50.xx -> 4.99.xx
+    goodver="yq \(.+mikefarah.+\) version (v)?(4\.(4[5-9]|[5-9][0-9])\..+)"
     yq_version=$(yq --version)
     if [ "$?" == "1" ]; then
         log_error "Required component [yq] not available."
         return 1
     elif [[ ! $yq_version =~ $goodver ]]; then
-        log_error "Incorrect version [$yq_version] found; version 4.32.2+ required."
+        log_error "Incorrect version [$yq_version] found; version 4.45.1+ required."
         return 1
     else
         log_debug "A valid version [$yq_version] of yq detected"
