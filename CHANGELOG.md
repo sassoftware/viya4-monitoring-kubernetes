@@ -2,7 +2,8 @@
 
 ## Unreleased
 * **Overall**
-  * [BREAKING CHANGE] The minimum required version of `yq` has been updated to version
+> [!IMPORTANT]
+>  * [BREAKING CHANGE] The minimum required version of `yq` has been updated to version
 4.45.1 (released 11JAN2026) or newer of the
 [Golang-based (Mike Farah) version of `yq`](https://github.com/mikefarah/yq).
 
