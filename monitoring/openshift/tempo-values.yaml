@@ -14,7 +14,38 @@ tempo:
   metricsGenerator:
     # -- If true, enables Tempo's metrics generator (https://grafana.com/docs/tempo/next/metrics-generator/)
     enabled: false
-    remoteWriteUrl: "http://prometheus.monitoring:9090/api/v1/write"
+    # NOTE: __MON_NS__ and __RELEASE_PREFIX__ are replaced at deploy time
+    remoteWriteUrl: "http://__RELEASE_PREFIX__-prometheus-server.__MON_NS__:80/api/v1/write"
+
+  # Processor activation and configuration — uses the new overrides format (Tempo >= 2.7)
+  overrides:
+    defaults:
+      ingestion:
+        max_traces_per_user: 5000000
+        burst_size_bytes: 500000000
+        rate_limit_bytes: 500000000
+      metrics_generator:
+        processors:
+          - service-graphs
+          - span-metrics
+          - local-blocks
+        processor:
+          service_graphs:
+            dimensions:
+              - k8s.namespace.name
+              - http.request.method
+            enable_client_server_prefix: true
+          span_metrics:
+            dimensions:
+              - http.request.method
+              - http.response.status_code
+              - http.route
+              - k8s.namespace.name
+              - server.address
+              - rpc.service
+              - rpc.method
+            enable_target_info: true
+            histogram_buckets: [0.002, 0.004, 0.008, 0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.02, 2.048, 4.096, 8.192, 16.384]
 
   retention: 24h
 
@@ -48,7 +79,7 @@ serviceAccount:
   create: true
   # -- The name of the ServiceAccount to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: v4m-tempo
+  name: __RELEASE_PREFIX__-tempo
   automountServiceAccountToken: false
 
 service:
