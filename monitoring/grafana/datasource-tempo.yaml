@@ -1,0 +1,65 @@
+# Grafana Tempo datasource with full correlation links
+# Deployed as a ConfigMap with grafana_datasource=1 label for sidecar auto-provisioning
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasource-tempo
+  labels:
+    grafana_datasource: "1"
+    sas.com/monitoring-base: kube-viya-monitoring
+data:
+  datasource-tempo.yaml: |
+    apiVersion: 1
+    deleteDatasources:
+      - name: Tempo
+    prune: true
+    datasources:
+      - name: Tempo
+        type: tempo
+        uid: tempo
+        url: http://__RELEASE_PREFIX__-tempo:3200
+        isDefault: false
+        editable: true
+        jsonData:
+          # Trace → Logs correlation: view a trace → "Logs" tab queries Loki
+          tracesToLogsV2:
+            datasourceUid: loki
+            filterByTraceID: true
+            filterBySpanID: true
+            mapTagNamesEnabled: true
+            tags:
+              - key: k8s.namespace.name
+                value: namespace
+              - key: k8s.pod.name
+                value: pod
+          # Trace → Metrics correlation: link to RED metrics from Tempo span_metrics
+          tracesToMetrics:
+            datasourceUid: prometheus
+            spanStartTimeShift: "-5m"
+            spanEndTimeShift: "5m"
+            tags:
+              - key: service.name
+                value: service
+            queries:
+              - name: "Request Rate"
+                query: "sum(rate(traces_spanmetrics_calls_total{$$__tags}[5m]))"
+              - name: "Error Rate"
+                query: "sum(rate(traces_spanmetrics_calls_total{$$__tags,status_code=\"STATUS_CODE_ERROR\"}[5m]))"
+              - name: "Duration (p95)"
+                query: "histogram_quantile(0.95, sum(rate(traces_spanmetrics_duration_milliseconds_bucket{$$__tags}[5m])) by (le))"
+          # Service Map: uses service_graphs metrics from Tempo metrics_generator
+          serviceMap:
+            datasourceUid: prometheus
+          nodeGraph:
+            enabled: true
+          search:
+            hide: false
+          lokiSearch:
+            datasourceUid: loki
+          # Trace → Profiles (future: uncomment when Pyroscope is deployed)
+          # tracesToProfiles:
+          #   datasourceUid: pyroscope
+          #   profileTypeId: "process_cpu:cpu:nanoseconds:cpu:nanoseconds"
+          #   tags:
+          #     - key: service.name
+          #       value: service_name

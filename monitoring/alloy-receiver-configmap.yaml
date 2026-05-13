@@ -1,0 +1,448 @@
+# Alloy Receiver ConfigMap — applied after k8s-monitoring helm install
+# to add service graph connector, span metrics connector, and HTTP route
+# normalization transforms that are not configurable via the helm chart.
+#
+# Placeholders replaced at deploy time:
+#   __RELEASE_PREFIX__  — Helm release prefix (e.g. v4m)
+#   __MON_NS__          — Monitoring namespace (e.g. monitoring)
+#   __CLUSTER_NAME__    — Cluster name for labels (e.g. v4m-cluster)
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: __RELEASE_PREFIX__-k8s-monitoring-alloy-receiver
+  namespace: __MON_NS__
+  annotations:
+    meta.helm.sh/release-name: __RELEASE_PREFIX__-k8s-monitoring
+    meta.helm.sh/release-namespace: __MON_NS__
+  labels:
+    app.kubernetes.io/managed-by: Helm
+data:
+  config.alloy: |
+    // Feature: Application Observability
+    declare "application_observability" {
+      argument "metrics_destinations" {
+        comment = "Must be a list of metrics destinations where collected metrics should be forwarded to"
+      }
+
+      argument "logs_destinations" {
+        comment = "Must be a list of log destinations where collected logs should be forwarded to"
+      }
+
+      argument "traces_destinations" {
+        comment = "Must be a list of trace destinations where collected trace should be forwarded to"
+      }
+
+      // OTLP Receiver
+      otelcol.receiver.otlp "receiver" {
+        grpc {
+          endpoint = "0.0.0.0:4317"
+          include_metadata = false
+          max_recv_msg_size = "4MiB"
+          read_buffer_size = "512KiB"
+          write_buffer_size = "32KiB"
+        }
+        http {
+          endpoint = "0.0.0.0:4318"
+          include_metadata = false
+          max_request_body_size = "20MiB"
+        }
+        debug_metrics {
+          disable_high_cardinality_metrics = true
+        }
+        output {
+          metrics = [otelcol.processor.resourcedetection.default.input]
+          logs = [otelcol.processor.resourcedetection.default.input]
+          traces = [otelcol.processor.resourcedetection.default.input]
+        }
+      }
+
+      // Resource Detection Processor
+      otelcol.processor.resourcedetection "default" {
+        detectors = ["env","system"]
+        override = true
+
+        system {
+          hostname_sources = ["os"]
+        }
+
+        output {
+          metrics = [otelcol.processor.k8sattributes.default.input]
+          logs = [otelcol.processor.k8sattributes.default.input]
+          traces = [otelcol.processor.k8sattributes.default.input]
+        }
+      }
+
+      // K8s Attributes Processor
+      otelcol.processor.k8sattributes "default" {
+        passthrough = false
+        extract {
+          metadata = ["k8s.namespace.name","k8s.pod.name","k8s.deployment.name","k8s.statefulset.name","k8s.daemonset.name","k8s.cronjob.name","k8s.job.name","k8s.node.name","k8s.pod.uid","k8s.pod.start_time"]
+        }
+        pod_association {
+          source {
+            from = "resource_attribute"
+            name = "k8s.pod.ip"
+          }
+        }
+        pod_association {
+          source {
+            from = "resource_attribute"
+            name = "k8s.pod.uid"
+          }
+        }
+        pod_association {
+          source {
+            from = "connection"
+          }
+        }
+
+        output {
+          metrics = [otelcol.processor.transform.default.input]
+          logs = [otelcol.processor.transform.default.input]
+          traces = [otelcol.processor.transform.default.input, otelcol.connector.host_info.default.input]
+        }
+      }
+
+      // Host Info Connector
+      otelcol.connector.host_info "default" {
+        host_identifiers = [ "k8s.node.name" ]
+
+        output {
+          metrics = [otelcol.processor.batch.default.input]
+        }
+      }
+
+      // Transform Processor
+      otelcol.processor.transform "default" {
+        error_mode = "ignore"
+        log_statements {
+          context = "resource"
+          statements = [
+            "set(attributes[\"pod\"], attributes[\"k8s.pod.name\"])",
+            "set(attributes[\"namespace\"], attributes[\"k8s.namespace.name\"])",
+            "set(attributes[\"loki.resource.labels\"], \"cluster, namespace, job, pod\")",
+          ]
+        }
+        trace_statements {
+          context = "span"
+          statements = [
+            // Normalize url.path: collapse UUIDs and numeric segments
+            "replace_pattern(attributes[\"url.path\"], \"[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\", \"{id}\")",
+            "replace_pattern(attributes[\"url.path\"], \"/[0-9]+(/|$)\", \"/{id}$1\")",
+            // Normalize url.full: collapse UUIDs (for CLIENT spans)
+            "replace_pattern(attributes[\"url.full\"], \"[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\", \"{id}\")",
+            "replace_pattern(attributes[\"url.full\"], \"/[0-9]+(/|$)\", \"/{id}$1\")",
+            // Fix wildcard routes: replace "/*" with normalized url.path
+            "set(attributes[\"http.route\"], attributes[\"url.path\"]) where attributes[\"http.route\"] == \"/*\" and attributes[\"url.path\"] != nil",
+            // Fix "/prefix/*" routes with normalized url.path
+            "set(attributes[\"http.route\"], attributes[\"url.path\"]) where IsMatch(attributes[\"http.route\"], \"^/.+/[*]$\") and attributes[\"url.path\"] != nil",
+            // Apply semantic convention span naming (uses fixed http.route)
+            "set_semconv_span_name(\"1.37.0\", \"original_span_name\")",
+            // CLIENT spans: extract path from url.full and use as span name
+            // e.g. "GET sas-consul-server" → "GET /v1/catalog/services"
+            "set(cache[\"url.path\"], attributes[\"url.full\"]) where kind == SPAN_KIND_CLIENT and attributes[\"url.full\"] != nil",
+            "replace_pattern(cache[\"url.path\"], \"^https?://[^/]+(/.*)$\", \"$1\")",
+            "replace_pattern(cache[\"url.path\"], \"\\\\?.*$\", \"\")",
+            "replace_pattern(cache[\"url.path\"], \"[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\", \"{id}\")",
+            "replace_pattern(cache[\"url.path\"], \"/[0-9]+(/|$)\", \"/{id}$1\")",
+            "set(name, Concat([attributes[\"http.request.method\"], cache[\"url.path\"]], \" \")) where kind == SPAN_KIND_CLIENT and cache[\"url.path\"] != nil and cache[\"url.path\"] != attributes[\"url.full\"]",
+          ]
+        }
+
+        output {
+          metrics = [otelcol.processor.batch.default.input]
+          logs = [otelcol.processor.batch.default.input]
+          traces = [otelcol.processor.filter.healthchecks.input]
+        }
+      }
+
+      // Filter Processor — drop liveness/readiness probes
+      // These Kubernetes health checks pollute the service graph with a noisy
+      // "user" virtual node and inflate span metrics with uninteresting traffic.
+      // All traces pass through here before reaching Tempo or the connectors.
+      otelcol.processor.filter "healthchecks" {
+        error_mode = "ignore"
+        traces {
+          // Drop spans for known SAS health-check endpoints
+          span = [
+            "attributes[\"http.route\"] == \"/internal/live\"",
+            "attributes[\"http.route\"] == \"/internal/ready\"",
+            "IsMatch(attributes[\"http.route\"], \".*/sas\\\\.readiness$\")",
+            "IsMatch(attributes[\"url.path\"], \"^/internal/live$\")",
+            "IsMatch(attributes[\"url.path\"], \"^/internal/ready$\")",
+          ]
+        }
+        output {
+          traces = [otelcol.processor.batch.default.input, otelcol.connector.spanmetrics.default.input, otelcol.connector.servicegraph.default.input]
+        }
+      }
+
+      // Batch Processor
+      otelcol.processor.batch "default" {
+        send_batch_size = 8192
+        send_batch_max_size = 0
+        timeout = "2s"
+
+        output {
+          metrics = argument.metrics_destinations.value
+          logs = argument.logs_destinations.value
+          traces = argument.traces_destinations.value
+        }
+      }
+
+      // Span Metrics Connector
+      // Generates RED metrics (rate, errors, duration) from spans with
+      // dimensions for http.route, method, status code, namespace, etc.
+      otelcol.connector.spanmetrics "default" {
+        namespace = "traces.span.metrics"
+
+        dimension {
+          name = "http.request.method"
+        }
+        dimension {
+          name = "http.response.status_code"
+        }
+        dimension {
+          name = "http.route"
+        }
+        dimension {
+          name = "k8s.namespace.name"
+        }
+        dimension {
+          name = "server.address"
+        }
+        dimension {
+          name = "rpc.service"
+        }
+        dimension {
+          name = "rpc.method"
+        }
+
+        exemplars {
+          enabled = true
+        }
+
+        histogram {
+          explicit {
+            buckets = ["2ms", "4ms", "8ms", "16ms", "32ms", "64ms", "128ms", "256ms", "512ms", "1s", "2s", "5s", "10s", "15s"]
+          }
+          unit = "s"
+        }
+
+        output {
+          metrics = [otelcol.processor.batch.spanmetrics.input]
+        }
+      }
+
+      // Batch processor for span-derived metrics
+      otelcol.processor.batch "spanmetrics" {
+        send_batch_size = 8192
+        send_batch_max_size = 0
+        timeout = "2s"
+
+        output {
+          metrics = argument.metrics_destinations.value
+        }
+      }
+
+      // Service Graph Connector
+      // Generates service-to-service dependency metrics from traces.
+      // Pairs client/server spans to build edges for the Grafana service map.
+      otelcol.connector.servicegraph "default" {
+        dimensions = ["k8s.namespace.name", "http.request.method"]
+        latency_histogram_buckets = ["2ms", "4ms", "8ms", "16ms", "32ms", "64ms", "128ms", "256ms", "512ms", "1s", "2s", "5s", "10s", "15s"]
+        virtual_node_peer_attributes = ["peer.service", "server.address", "db.name", "db.system"]
+        virtual_node_extra_label = true
+
+        store {
+          max_items = 10000
+          ttl = "10s"
+        }
+
+        output {
+          metrics = [otelcol.processor.filter.servicegraph_unknown.input]
+        }
+      }
+
+      // Filter out "unknown" nodes from service graph metrics.
+      // These appear when the service graph connector cannot find a matching
+      // server span (unmonitored external targets, in-process calls, etc.).
+      otelcol.processor.filter "servicegraph_unknown" {
+        error_mode = "ignore"
+        metrics {
+          datapoint = [
+            "attributes[\"server\"] == \"unknown\"",
+            "attributes[\"client\"] == \"unknown\"",
+          ]
+        }
+        output {
+          metrics = [otelcol.processor.batch.servicegraph.input]
+        }
+      }
+
+      // Batch processor for service graph metrics
+      otelcol.processor.batch "servicegraph" {
+        send_batch_size = 8192
+        send_batch_max_size = 0
+        timeout = "2s"
+
+        output {
+          metrics = argument.metrics_destinations.value
+        }
+      }
+    }
+    application_observability "feature" {
+      metrics_destinations = [
+        otelcol.exporter.prometheus.prometheus.input,
+      ]
+      logs_destinations = [
+        otelcol.exporter.loki.loki.input,
+      ]
+      traces_destinations = [
+        otelcol.processor.attributes.tempo.input,
+      ]
+    }
+
+
+
+
+    // Destination: prometheus (prometheus)
+    otelcol.exporter.prometheus "prometheus" {
+      add_metric_suffixes = true
+      resource_to_telemetry_conversion = false
+      forward_to = [prometheus.remote_write.prometheus.receiver]
+    }
+
+    prometheus.remote_write "prometheus" {
+      endpoint {
+        url = "http://__RELEASE_PREFIX__-prometheus-server.__MON_NS__:80/api/v1/write"
+        headers = {
+        }
+        tls_config {
+          insecure_skip_verify = false
+        }
+        send_native_histograms = false
+
+        queue_config {
+          capacity = 100000
+          min_shards = 1
+          max_shards = 500
+          max_samples_per_send = 4000
+          batch_send_deadline = "5s"
+          min_backoff = "30ms"
+          max_backoff = "5s"
+          retry_on_http_429 = true
+          sample_age_limit = "0s"
+        }
+
+        write_relabel_config {
+          source_labels = ["cluster"]
+          regex = ""
+          replacement = "__CLUSTER_NAME__"
+          target_label = "cluster"
+        }
+        write_relabel_config {
+          source_labels = ["k8s_cluster_name"]
+          regex = ""
+          replacement = "__CLUSTER_NAME__"
+          target_label = "k8s_cluster_name"
+        }
+      }
+
+      wal {
+        truncate_frequency = "2h"
+        min_keepalive_time = "5m"
+        max_keepalive_time = "8h"
+      }
+    }
+    // Destination: loki (loki)
+    otelcol.exporter.loki "loki" {
+      forward_to = [loki.write.loki.receiver]
+    }
+
+    loki.write "loki" {
+      endpoint {
+        url = "http://__RELEASE_PREFIX__-loki-gateway.__MON_NS__:80/loki/api/v1/push"
+        retry_on_http_429 = true
+        tls_config {
+          insecure_skip_verify = false
+        }
+        min_backoff_period = "500ms"
+        max_backoff_period = "5m"
+        max_backoff_retries = "10"
+      }
+      external_labels = {
+        "cluster" = "__CLUSTER_NAME__",
+        "k8s_cluster_name" = "__CLUSTER_NAME__",
+      }
+    }
+    // Destination: tempo (otlp)
+
+    otelcol.processor.attributes "tempo" {
+      output {
+        traces = [otelcol.processor.transform.tempo.input]
+      }
+    }
+
+    otelcol.processor.transform "tempo" {
+      error_mode = "ignore"
+
+      trace_statements {
+        context = "resource"
+        statements = [
+          `set(attributes["cluster"], "__CLUSTER_NAME__")`,
+          `set(attributes["k8s.cluster.name"], "__CLUSTER_NAME__")`,
+          `delete_key(attributes, "process.pid")`,
+          `delete_key(attributes, "process.parent_pid")`,
+          `delete_key(attributes, "process.executable.path")`,
+          `delete_key(attributes, "process.command_line")`,
+          `delete_key(attributes, "process.command_args")`,
+          `delete_key(attributes, "process.owner")`,
+          `delete_key(attributes, "process.runtime.version")`,
+          `delete_key(attributes, "process.runtime.description")`,
+          `delete_key(attributes, "host.ip")`,
+          `delete_key(attributes, "host.mac")`,
+          `delete_key(attributes, "k8s.pod.start_time")`,
+          `delete_key(attributes, "k8s.pod.uid")`,
+          `delete_key(attributes, "container.image.id")`,
+          `delete_key(attributes, "container.image.repo_digests")`,
+          `delete_key(attributes, "os.description")`,
+          `delete_key(attributes, "os.build_id")`,
+        ]
+      }
+
+      output {
+        traces = [otelcol.processor.batch.tempo.input]
+      }
+    }
+
+    otelcol.processor.batch "tempo" {
+      timeout = "2s"
+      send_batch_size = 8192
+      send_batch_max_size = 0
+
+      output {
+        traces = [otelcol.exporter.otlp.tempo.input]
+      }
+    }
+    otelcol.exporter.otlp "tempo" {
+      client {
+        endpoint = "http://__RELEASE_PREFIX__-tempo.__MON_NS__:4317"
+        tls {
+          insecure = true
+          insecure_skip_verify = false
+        }
+      }
+
+      retry_on_failure {
+        enabled = true
+        initial_interval = "5s"
+        max_interval = "30s"
+        max_elapsed_time = "5m"
+      }
+
+      sending_queue {
+        enabled = true
+      }
+    }

@@ -1,0 +1,451 @@
+# Override values for the Grafana k8s-monitoring Helm chart (v4)
+#
+# k8s-monitoring Helm Chart v4.x
+# https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring
+#
+# This chart deploys Grafana Alloy-based collectors (via the Alloy Operator)
+# that replace Fluent Bit, node-exporter, kube-state-metrics, and custom
+# scrape scripts. It provides unified collection of metrics, logs, traces,
+# and (future) profiles.
+#
+# Destinations are configured to send data to:
+#   - Prometheus (remote-write) for metrics
+#   - Loki for logs (with trace_id as structured metadata)
+#   - Tempo (OTLP) for traces
+#   - OpenSearch (via OTel gateway) for secondary log search
+#
+# Namespace labelling strategy:
+#   Every signal carries a namespace label/attribute so that queries can be
+#   scoped per-namespace across Prometheus, Loki, Tempo, and OpenSearch.
+#
+#   Metrics  – clusterMetrics and prometheusOperatorObjects scrape targets
+#              already expose a `namespace` label. OTLP-pushed metrics
+#              receive `k8s.namespace.name` via the k8sattributes processor.
+#   Logs     – podLogsViaLoki uses Loki-native labels (namespace, container,
+#              pod, job) discovered from the filesystem path. clusterEvents
+#              retains `namespace` from the event object. OTLP-pushed logs
+#              receive `k8s.namespace.name` via k8sattributes and promote
+#              `namespace` as a Loki stream label.
+#   Traces   – OTLP-pushed traces receive `k8s.namespace.name` via the
+#              k8sattributes processor (pod IP/UID → API lookup).
+
+cluster:
+  name: __RELEASE_PREFIX__-cluster
+
+# ========================
+# Destinations (v4 map format)
+# ========================
+# NOTE: __MON_NS__, __LOG_NS__ and __RELEASE_PREFIX__ are replaced at deploy time by deploy_monitoring_cluster.sh
+destinations:
+  prometheus:
+    type: prometheus
+    url: http://__RELEASE_PREFIX__-prometheus-server.__MON_NS__:80/api/v1/write
+
+  loki:
+    type: loki
+    url: http://__RELEASE_PREFIX__-loki-gateway.__MON_NS__:80/loki/api/v1/push
+
+  tempo:
+    type: otlp
+    url: http://__RELEASE_PREFIX__-tempo.__MON_NS__:4317
+    protocol: grpc
+    tls:
+      insecure: true
+    metrics: { enabled: false }
+    logs: { enabled: false }
+    traces: { enabled: true }
+
+  opensearchGateway:
+    type: otlp
+    url: http://__RELEASE_PREFIX__-otel-opensearch-gateway.__MON_NS__:4317
+    protocol: grpc
+    tls:
+      insecure: true
+    metrics: { enabled: false }
+    logs: { enabled: true }
+    traces: { enabled: false }
+
+# ========================
+# Cluster Metrics
+# ========================
+clusterMetrics:
+  enabled: true
+  destinations: [prometheus]
+  collector: alloy-metrics
+
+# ========================
+# Host Metrics (node-level via node-exporter)
+# ========================
+hostMetrics:
+  enabled: true
+  destinations: [prometheus]
+  collector: alloy-metrics
+
+# ========================
+# Cluster Events
+# ========================
+clusterEvents:
+  enabled: true
+  destinations: [loki, opensearchGateway]
+  collector: alloy-singleton
+
+# ========================
+# Pod Logs (Loki format via filesystem)
+# ========================
+# In v4, podLogs is split into podLogsViaLoki (Loki format, filesystem)
+# and podLogsViaOpenTelemetry (OTel format). We use Loki format for
+# efficient per-namespace querying with structured metadata support.
+podLogsViaLoki:
+  enabled: true
+  destinations: [loki, opensearchGateway]
+  collector: alloy-logs
+
+  # Read historical log lines (v4 defaults to true = new lines only)
+  onlyGatherNewLogLines: false
+
+  # Map Kubernetes pod labels to log stream labels
+  labels:
+    app_kubernetes_io_name: app.kubernetes.io/name
+
+  # Promote trace context as structured metadata for Loki correlation
+  structuredMetadata:
+    trace_id: trace_id
+    span_id: span_id
+    k8s.pod.name: k8s.pod.name
+
+  # ------------------------------------
+  # Trace context extraction pipeline
+  # ------------------------------------
+  # Extracts trace_id and span_id from structured JSON log bodies and promotes
+  # them to first-class log record labels. This enables:
+  #   - Loki: stores trace_id as structured metadata (queryable without indexing)
+  #   - OpenSearch: trace_id arrives as an indexed keyword field via the gateway
+  #   - Grafana: trace-to-log and log-to-trace correlation
+  #
+  # Handles both camelCase (traceId/spanId from OTel Java agent MDC) and
+  # snake_case (trace_id/span_id) naming conventions.
+  extraLogProcessingStages: |
+    // Parse JSON log body to extract trace context fields
+    stage.json {
+      expressions = {
+        trace_id_snake  = "trace_id",
+        span_id_snake   = "span_id",
+        trace_id_camel  = "traceId",
+        span_id_camel   = "spanId",
+      }
+    }
+    // Promote trace_id to label (will become structured metadata via Alloy)
+    stage.labels {
+      values = {
+        trace_id  = "trace_id_snake",
+        span_id   = "span_id_snake",
+      }
+    }
+    // Fall back to camelCase if snake_case was empty
+    stage.match {
+      selector = "{trace_id=\"\"}"
+      stage.labels {
+        values = {
+          trace_id = "trace_id_camel",
+          span_id  = "span_id_camel",
+        }
+      }
+    }
+
+# ========================
+# Application Observability (OTLP receivers)
+# ========================
+applicationObservability:
+  enabled: true
+  destinations: [prometheus, loki, tempo]
+  collector: alloy-receiver
+  receivers:
+    otlp:
+      grpc:
+        enabled: true
+        port: 4317
+      http:
+        enabled: true
+        port: 4318
+
+  # ------------------------------------
+  # K8s metadata enrichment (all signals)
+  # ------------------------------------
+  # Enriches all incoming OTLP signals (metrics, traces, logs) with
+  # Kubernetes metadata. Uses pod IP/UID or connection info to resolve
+  # the source pod and attach namespace, deployment, node, etc.
+  processors:
+    k8sattributes:
+      passthrough: false
+      metadata:
+        - k8s.namespace.name
+        - k8s.pod.name
+        - k8s.deployment.name
+        - k8s.statefulset.name
+        - k8s.daemonset.name
+        - k8s.cronjob.name
+        - k8s.job.name
+        - k8s.node.name
+        - k8s.pod.uid
+        - k8s.pod.start_time
+      podAssociation:
+        - from: resource_attribute
+          name: k8s.pod.ip
+        - from: resource_attribute
+          name: k8s.pod.uid
+        - from: connection
+
+  # Promote namespace as a Loki stream label for efficient log querying
+  logs:
+    labels: ["cluster", "namespace", "job", "pod"]
+
+  # ------------------------------------
+  # Connectors: Span Metrics (RED metrics from spans)
+  # ------------------------------------
+  # Generates Rate, Error, Duration (RED) metrics from incoming spans.
+  # These complement Tempo's built-in service-graphs metrics with
+  # additional dimensions (http.method, http.status_code, http.route).
+  connectors:
+    spanMetrics:
+      enabled: true
+      namespace: traces.span.metrics
+      dimensions:
+        - name: http.request.method
+        - name: http.response.status_code
+        - name: http.route
+        - name: k8s.namespace.name
+        - name: server.address
+        - name: rpc.service
+        - name: rpc.method
+      exemplars:
+        enabled: true
+      histogram:
+        enabled: true
+        type: explicit
+        unit: s
+        explicit:
+          buckets: ["2ms", "4ms", "8ms", "16ms", "32ms", "64ms", "128ms", "256ms", "512ms", "1s", "2s", "5s", "10s", "15s"]
+
+  # ------------------------------------
+  # Trace transforms: HTTP route normalization
+  # ------------------------------------
+  # Many Java Spring apps report overly generic servlet routes like "/*"
+  # or "/SASLogon/*" while the actual path is in url.path. These OTTL
+  # transforms:
+  #   1. Replace UUIDs in url.path with {id} for better grouping
+  #   2. Replace numeric IDs in url.path with {id}
+  #   3. When http.route is a bare wildcard, replace with url.path
+  #   4. Rebuild span name from the improved route
+  traces:
+    transforms:
+      span:
+        # ---- Normalize url.path: collapse UUIDs and numeric segments ----
+        - replace_pattern(attributes["url.path"], "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}", "{id}")
+        - replace_pattern(attributes["url.path"], "/[0-9]+(/|$$)", "/{id}$1")
+        # ---- Normalize url.full: collapse UUIDs (for CLIENT spans) ----
+        - replace_pattern(attributes["url.full"], "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}", "{id}")
+        - replace_pattern(attributes["url.full"], "/[0-9]+(/|$$)", "/{id}$1")
+        # ---- Fix generic wildcard routes ----
+        # When http.route is just "/*", use the normalized url.path instead
+        - set(attributes["http.route"], attributes["url.path"]) where attributes["http.route"] == "/*" and attributes["url.path"] != nil
+        # When http.route ends with "/*" like "/SASLogon/*", use url.path
+        - set(attributes["http.route"], attributes["url.path"]) where IsMatch(attributes["http.route"], "^/.+/\\*$$") and attributes["url.path"] != nil
+        # ---- Fix span name to reflect the improved route ----
+        # Only rewrite names that contained a wildcard (e.g. "GET /*", "POST /SASLogon/*")
+        - set(name, Concat([attributes["http.request.method"], attributes["http.route"]], " ")) where kind == SPAN_KIND_SERVER and IsMatch(name, ".*/\\*") and attributes["http.route"] != nil and attributes["http.request.method"] != nil
+        # For CLIENT spans where name is just the bare method (e.g. "GET"),
+        # add the target host for context
+        - set(name, Concat([attributes["http.request.method"], attributes["server.address"]], " ")) where kind == SPAN_KIND_CLIENT and name == attributes["http.request.method"] and attributes["server.address"] != nil
+
+# ========================
+# Prometheus Operator Objects
+# ========================
+# Discovers and scrapes ServiceMonitors, PodMonitors from all namespaces.
+# This includes SAS Viya monitors, Pushgateway ServiceMonitor, and any
+# user-defined monitors.
+# NOTE: v4 no longer bundles Prometheus Operator CRDs. Install them
+# separately: helm install prometheus-operator-crds prometheus-community/prometheus-operator-crds
+prometheusOperatorObjects:
+  enabled: true
+  destinations: [prometheus]
+  collector: alloy-metrics
+
+# ========================
+# Self-reporting (disabled — not using Grafana Cloud)
+# ========================
+selfReporting:
+  enabled: false
+
+# ========================
+# Collectors (Alloy instances via Alloy Operator)
+# ========================
+# In v4, named Alloy instances (alloy-metrics, alloy-logs, etc.) are
+# replaced by a collectors map with presets defining deployment shape.
+collectors:
+  alloy-metrics:
+    presets: [clustered, statefulset]
+    controller:
+      podAnnotations:
+        # Required on AKS for API server connectivity
+        kubernetes.azure.com/set-kube-service-host-fqdn: "true"
+  alloy-logs:
+    presets: [filesystem-log-reader, daemonset]
+    controller:
+      podAnnotations:
+        kubernetes.azure.com/set-kube-service-host-fqdn: "true"
+  alloy-singleton:
+    presets: [singleton]
+    controller:
+      podAnnotations:
+        kubernetes.azure.com/set-kube-service-host-fqdn: "true"
+  alloy-receiver:
+    presets: [daemonset]
+    controller:
+      podAnnotations:
+        kubernetes.azure.com/set-kube-service-host-fqdn: "true"
+
+# ========================
+# Telemetry Services
+# ========================
+# In v4, telemetry services (kube-state-metrics, node-exporter, etc.)
+# are extracted from feature charts into their own section.
+telemetryServices:
+  kube-state-metrics:
+    deploy: true
+    podAnnotations:
+      kubernetes.azure.com/set-kube-service-host-fqdn: "true"
+  node-exporter:
+    deploy: true
+
+# ========================
+# Alloy Operator
+# ========================
+alloy-operator:
+  deploy: true
+
+# ========================
+# Platform
+# ========================
+# Set to "openshift" for OpenShift clusters.
+# Controlled via OPENSHIFT_CLUSTER env var in deploy script.
+# global:
+#   platform: openshift
+
+# ========================
+# OTel Collector Gateway for OpenSearch Dual-Export
+# ========================
+# Deployed as extraObjects within the k8s-monitoring release.
+# Receives OTLP logs from Alloy and exports to OpenSearch with
+# field mapping from OTel semantic conventions to OpenSearch schema.
+# Controlled via OPENSEARCH_DUAL_EXPORT_ENABLE env var.
+extraObjects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: otel-opensearch-gateway-config
+      labels:
+        app: otel-opensearch-gateway
+        sas.com/monitoring-base: kube-viya-monitoring
+    data:
+      config.yaml: |
+        receivers:
+          otlp:
+            protocols:
+              grpc:
+                endpoint: 0.0.0.0:4317
+
+        processors:
+          batch:
+            send_batch_size: 1024
+            timeout: 5s
+
+          transform:
+            log_statements:
+              - context: log
+                statements:
+                  # Map OTel resource attributes to OpenSearch field names
+                  - set(attributes["kubernetes.namespace_name"], resource.attributes["k8s.namespace.name"])
+                  - set(attributes["kubernetes.pod_name"], resource.attributes["k8s.pod.name"])
+                  - set(attributes["kubernetes.container_name"], resource.attributes["k8s.container.name"])
+                  - set(attributes["kubernetes.host"], resource.attributes["k8s.node.name"])
+                  # Preserve trace context as indexed keyword fields
+                  - set(attributes["trace_id"], trace_id.string) where trace_id != TraceID(0x00000000000000000000000000000000)
+                  - set(attributes["span_id"], span_id.string) where span_id != SpanID(0x0000000000000000)
+                  # Map body to message
+                  - set(attributes["message"], body) where IsString(body)
+
+        exporters:
+          opensearch:
+            http:
+              endpoint: https://__RELEASE_PREFIX__-search.__LOG_NS__:9200
+              tls:
+                insecure_skip_verify: true
+            dataset: viya_logs
+            # Auth configured via OPENSEARCH_USER / OPENSEARCH_PASSWORD env vars
+            # on the gateway Deployment
+
+        service:
+          pipelines:
+            logs:
+              receivers: [otlp]
+              processors: [batch, transform]
+              exporters: [opensearch]
+
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: otel-opensearch-gateway
+      labels:
+        app: otel-opensearch-gateway
+        sas.com/monitoring-base: kube-viya-monitoring
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: otel-opensearch-gateway
+      template:
+        metadata:
+          labels:
+            app: otel-opensearch-gateway
+        spec:
+          containers:
+            - name: otel-collector
+              image: docker.io/otel/opentelemetry-collector-contrib:0.114.0
+              args:
+                - --config=/etc/otelcol/config.yaml
+              ports:
+                - containerPort: 4317
+                  name: otlp-grpc
+                  protocol: TCP
+              volumeMounts:
+                - name: config
+                  mountPath: /etc/otelcol
+                  readOnly: true
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+          volumes:
+            - name: config
+              configMap:
+                name: otel-opensearch-gateway-config
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: otel-opensearch-gateway
+      labels:
+        app: otel-opensearch-gateway
+        sas.com/monitoring-base: kube-viya-monitoring
+    spec:
+      selector:
+        app: otel-opensearch-gateway
+      ports:
+        - name: otlp-grpc
+          port: 4317
+          targetPort: 4317
+          protocol: TCP
+      type: ClusterIP

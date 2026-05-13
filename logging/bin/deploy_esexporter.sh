@@ -119,7 +119,6 @@ log_debug "Installing Helm chart from artifact [$chart2install]"
 
 # shellcheck disable=SC2086
 helm $helmDebug upgrade --install es-exporter \
-    $helm4opts \
     --namespace "$LOG_NS" \
     -f "$imageKeysFile" \
     -f "$primaryValuesFile" \

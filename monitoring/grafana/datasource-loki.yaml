@@ -1,0 +1,31 @@
+# Grafana Loki datasource with trace_id correlation
+# Deployed as a ConfigMap with grafana_datasource=1 label for sidecar auto-provisioning
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasource-loki
+  labels:
+    grafana_datasource: "1"
+    sas.com/monitoring-base: kube-viya-monitoring
+data:
+  datasource-loki.yaml: |
+    apiVersion: 1
+    deleteDatasources:
+      - name: Loki
+    prune: true
+    datasources:
+      - name: Loki
+        type: loki
+        uid: loki
+        url: http://__RELEASE_PREFIX__-loki-gateway:80
+        isDefault: false
+        editable: true
+        jsonData:
+          maxLines: 1000
+          derivedFields:
+            # Click trace_id in any log line → opens trace in Tempo
+            - name: TraceID
+              datasourceUid: tempo
+              matcherRegex: '"?trace_id"?\s*[:=]\s*"?(\w+)"?'
+              url: "$${__value.raw}"
+              urlDisplayLabel: "View Trace"

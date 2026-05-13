@@ -1,39 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Version 1.2.49 (08MAY2026)
+## Unreleased
 * **Overall**
-  * [CHANGE] Support for Helm 4.x has been added.  As part of this change, the `--force-conflicts` option
-will be used when deploying using Helm 4.x.  During an update-in-place, this can overwrite some
-post-deployment changes to Kubernetes resources implemented with `kubectl patch` commands.  If you have
-made such changes, you should implement these changes via the appropriate Helm user-values yaml file
-*prior* to the update (if possible) or re-apply the patches manually *after* the upgrade.
   * [TASK] The various user-values yaml and user.env files included in the project repository, including
 those in the *samples* sub-directories, were reviewed and validated with obsolete values removed.
-  * [TASK] Documentation links in the various markdown files within the project reposistory were reviewed
-and revised to eliminate the use of version-specific pointers when not appropriate.
-* **Metrics**
-  * [FIX] The `CAS Memory Usage High` sample alert now uses `container_memory_working_set_bytes`
-    summed across all CAS server pods (controller, backup controller, and workers) instead of
-    `cas_node_mem_size_bytes - cas_node_mem_free_bytes`, which reported node/VM physical memory
-    rather than actual CAS memory consumption
-* **Tracing**
-  * [CHANGE] Fluent Bit tracing configuration updated to improve reliability and performance:
-    increased input buffer sizes, enabled gzip compression on output, set retry limit to 5,
-    added worker threads, and configured connection/IO timeouts
-  * [CHANGE] Tempo ingester configured with flush_all_on_shutdown to prevent trace data loss
-    on restart, reduced max_block_duration to 5m to lower memory pressure, and set
-    replication_factor to 1 for single-instance deployments; compactor block_retention
-    aligned to 24h to match retention setting
-  * [CHANGE] Tempo datasource for Grafana is now provisioned via the datasource sidecar mechanism
-    (ConfigMap with grafana_datasource=1 label) consistent with how other datasources are handled,
-    rather than being passed as a Helm values overlay
-  * [CHANGE] Removed Grafana feature toggles tempoSearch and tempoBackendSearch as they are no
-    longer needed in the current Grafana version
-  * [CHANGE] OpenShift deployments now use the standard values-tempo.yaml instead of a separate
-    OpenShift-specific file
-  * [CHANGE] Tempo metricsGenerator remoteWriteUrl now resolved dynamically from MON_NS at
-    deploy time rather than being hardcoded to the monitoring namespace
-  
+
+
 ## Version 1.2.48 (03APR2026)
 * **Overall**
   * [CHANGE] The [Contributor Agreement](ContributorAgreement.txt) has been revised to clarify
@@ -69,7 +41,7 @@ the environment variable `BASE_DOMAIN` are also required.  As with ingress-nginx
 both host-based and path-based routing are supported with Contour as well.  A new option for
 how the Kubernetes Secret resources, used to hold the ingress TLS certs, are handled is available.
 See the
-[Configure Ingress Access to Web Applications](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
+[Configure Ingress Access to Web Applications](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
 topic within the Help Center documentation for further information.
 * **Metrics**
   * [FEATURE] New PodMonitor resources are deployed to enable the collection
@@ -115,7 +87,7 @@ plugin files) into the appropriate sub-directories in the `$USER_DIR` directory.
 of the private container registry and the associated credentials need to be identified by
 setting the environment variables `AIRGAP_REGISTRY`, `AIRGAP_REGISTRY_USERNAME`, and
 `AIRGAP_REGISTRY_PASSWORD` prior to running the script, preferably in the `$USER_DIR/user.env`
-file. Refer to the [Prepare to Deploy SAS Viya Monitoring for Kubernetes in an Air Gap Environment](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0grd8g2pkfglin12bzm3g1oik2p) documentation for more info.
+file. Refer to the [Prepare to Deploy SAS Viya Monitoring for Kubernetes in an Air Gap Environment](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0grd8g2pkfglin12bzm3g1oik2p) documentation for more info.
   * [FIX] The `logging/bin/onboard.sh` script no longer fails when the `-p` parameter is set
 * **Metrics**
   * [FEATURE] Support for automatically defining SMTP server configuration (permitting Grafana
@@ -562,7 +534,7 @@ is no longer actively developed and was replaced with a Fluent Bit deployment fo
 * **Logging**
   * [FEATURE] The getlogs.py utility for exporting logs via the command line has been moved to "production"
 from "experimental" status.  Documentation for this optional Python-based tool is available in the
-[SAS Viya Monitoring for Kubernetes Help Center](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n0bzfdp3bn6p4vn1lj9pm2hy8t0q.htm).
+[SAS Viya Monitoring for Kubernetes Help Center](https://documentation.sas.com/?docsetId=obsrvdply&docsetVersion=latest&docsetTarget=p1wdkgnu7dp791n1h9xfyh68ltnt.htm).
 
 ## Version 1.2.20 (12DEC2023)
 
