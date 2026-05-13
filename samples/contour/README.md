@@ -20,7 +20,7 @@ These scenarios differ in how the URL for the web applications is constructed:
 ingress controller to permit access to the web applications was added with version
 1.2.47 (released 06MAR26).  Depending on your requirements, this can
 eliminate the need to manually configure Contour ingress as demonstrated in this
-sample.  See the [Configure Ingress Access to Web Applications](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
+sample.  See the [Configure Access to Web Applications](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8)
 topic within the Help Center documentation for further information.
 
 ## Migrating from ingress-nginx to Contour as ingress controller
@@ -36,7 +36,7 @@ re-running the deployment scripts.
 * You need to set the (new) environment variable `INGRESS_TYPE`
 to "*contour*".
 * You need to set the (new) environment variable `USE_SEPARATE_CERTS` to
-"*true*".  Refer to the [Automatically Generate Ingress Definitions and Kubernetes Secrets](https://documentation.sas.com/?docsetId=obsrvdply&docsetVersion=latest&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0l2cm52gqw0ntn19n01fanj1og2)
+"*true*".  Refer to the [Automatically Generate Ingress Definitions and Kubernetes Secrets](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0l2cm52gqw0ntn19n01fanj1og2)
 topic in the documentation for more information
 about this environment variable and its possible values.
 * You will likely need to update the value of the environment variable `BASE_DOMAIN`
@@ -72,7 +72,7 @@ at the end of the deployment process.
 ## Using This Sample
 
 **Note:** For information about the customization process, see
-[Create the Deployment Directory](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=p15fe8611w9njkn1fucwbvlz8tyg.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
+[Create the Deployment Directory](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=p15fe8611w9njkn1fucwbvlz8tyg.htm) in the SAS Viya Monitoring for Kubernetes Help Center.
 
 The customization files in this sample provide a starting point for the
 customization files required by a deployment that uses Contour HTTPProxy
@@ -94,7 +94,7 @@ files you modified above.  In the sample files, this Secret is
 named `v4m-ingress-tls-secret`.
 5. After you finish modifying the customization files, you deploy
 SAS Viya Monitoring for Kubernetes.  For more information, see
-[Deploy](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n1rhzwx0mcnnnun17q11v85bspyk.htm).
+[Deploy](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n1rhzwx0mcnnnun17q11v85bspyk.htm).
 6. Once the deployment process completes, you create the required HTTPProxy resources
 by using the `kubectl apply` command and pointing to appropriate YAML file(s).
 
@@ -115,7 +115,7 @@ TLS (that is, the web applications should be accessed via HTTPS instead of HTTP)
 **This requires a set of TLS certificates that are _not_ created automatically for you.**
 You must obtain these certificates, create Kubernetes secrets with specific names, and make
 them available to SAS Viya Monitoring for Kubernetes.
-For details, see [Enable TLS for Ingress](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n13g4ybmjfxr2an1tuy6a20zpvw7).
+For details, see [Manually Configure Ingress Definitions and Enable TLS](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n13g4ybmjfxr2an1tuy6a20zpvw7).
 
 This sample shows a single set of TLS certificates (stored in the Kubernetes Secret
 `v4m-ingress-tls-secret`) used to secure all of the HTTPProxy resources.  However,

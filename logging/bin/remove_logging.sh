@@ -1,11 +1,7 @@
 #! /bin/bash
 
-# Copyright © 2022-2025, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2022, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
-
-# remove_logging.sh
-# Simplified removal — removes only OpenSearch and OpenSearch Dashboards.
-# Log collection (Alloy) is removed via remove_monitoring_cluster.sh.
 
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
 source logging/bin/common.sh
@@ -24,15 +20,24 @@ LOG_DELETE_SECRETS_ON_REMOVE=${LOG_DELETE_SECRETS_ON_REMOVE:-true}
 LOG_DELETE_PVCS_ON_REMOVE=${LOG_DELETE_PVCS_ON_REMOVE:-false}
 LOG_DELETE_NAMESPACE_ON_REMOVE=${LOG_DELETE_NAMESPACE_ON_REMOVE:-false}
 
+##29MAR22: TODO: Remove this section?
+# Check for existing incompatible helm releases up front
 helm2ReleaseCheck odfe-"$LOG_NS"
+helm2ReleaseCheck es-exporter-"$LOG_NS"
 
 log_notice "Removing logging components from the [$LOG_NS] namespace [$(date)]"
 
-# Remove OpenSearch Dashboards
+logging/bin/remove_fluentbit_opensearch.sh
+
+logging/bin/remove_esexporter.sh
+
 logging/bin/remove_osd.sh
 
-# Remove OpenSearch
 logging/bin/remove_opensearch.sh
+
+logging/bin/remove_eventrouter.sh
+
+logging/bin/remove_fluentbit_k8sevents_opensearch.sh
 
 if [ "$LOG_DELETE_PVCS_ON_REMOVE" == "true" ]; then
     log_verbose "Removing known logging PVCs..."
@@ -51,6 +56,7 @@ fi
 
 # Check for and remove any v4m deployments with old naming convention
 removeV4MInfo "$LOG_NS" "v4m"
+
 removeV4MInfo "$LOG_NS" "v4m-logs"
 
 if [ "$LOG_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then

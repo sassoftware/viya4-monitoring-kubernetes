@@ -1,12 +1,7 @@
 #! /bin/bash
 
-# Copyright © 2022-2025, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2022, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
-
-# deploy_logging.sh
-# Simplified logging deployment — deploys OpenSearch and OpenSearch Dashboards only.
-# Log collection is handled by k8s-monitoring (Alloy) deployed via deploy_monitoring_cluster.sh.
-# Fluent Bit and Elasticsearch Exporter are no longer needed.
 
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
 source logging/bin/common.sh
@@ -67,6 +62,12 @@ elif [ "$INGRESS_TYPE" == "contour" ]; then
 fi
 
 ##################################
+# Elasticsearch Metric Exporter  #
+##################################
+
+logging/bin/deploy_esexporter.sh
+
+##################################
 # OpenSearch Content             #
 ##################################
 
@@ -79,7 +80,19 @@ logging/bin/deploy_opensearch_content.sh
 logging/bin/deploy_osd_content.sh
 
 ##################################
-# Display OSD URL                #
+# Fluent Bit - Log Messages      #
+##################################
+
+logging/bin/deploy_fluentbit_opensearch.sh
+
+##################################
+# Fluent Bit - Kubernetes Events #
+##################################
+
+logging/bin/deploy_fluentbit_k8sevents_opensearch.sh
+
+##################################
+# Display Kibana URL             #
 ##################################
 set +e
 bin/show_app_url.sh OSD OS
@@ -105,4 +118,4 @@ display_notices
 
 log_message ""
 log_notice "The deployment of logging components has completed [$(date)]"
-log_notice "NOTE: Log collection is handled by k8s-monitoring (Alloy). Ensure deploy_monitoring_cluster.sh has been run."
+echo ""
