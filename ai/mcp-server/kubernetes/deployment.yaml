@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: v4m-mcp-server
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: v4m-mcp-server
+  template:
+    metadata:
+      labels:
+        app: v4m-mcp-server
+    spec:
+      imagePullSecrets:
+      - name: acr-secret
+      containers:
+      - name: mcp
+        image: viyamonitoring.azurecr.io/v4m-mcp-server:latest
+        ports:
+        - containerPort: 8000

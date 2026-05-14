@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: v4m-mcp-server
+  namespace: monitoring
+spec:
+  selector:
+    app: v4m-mcp-server
+  ports:
+  - port: 8000
+    targetPort: 8000

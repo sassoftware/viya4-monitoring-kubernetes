@@ -1,0 +1,4 @@
+fastmcp
+prometheus-api-client
+requests
+prometheus-api-client
