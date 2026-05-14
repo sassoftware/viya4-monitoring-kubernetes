@@ -6,7 +6,8 @@
 >  * [BREAKING CHANGE] The minimum required version of `yq` has been updated to version
 4.45.1 (released 11JAN2026) or newer of the
 [Golang-based (Mike Farah) version of `yq`](https://github.com/mikefarah/yq).
-
+  * [CHANGE] Provide additional debugging information in `show_app_url.sh` output
+for Contour-related problems
 
 ## Version 1.2.49 (08MAY2026)
 * **Overall**
