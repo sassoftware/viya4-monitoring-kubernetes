@@ -124,7 +124,7 @@ fi
 
 # Changes the admin password using the Grafana CLI
 log_info "Updating the admin password using Grafana CLI"
-if ! kubectl exec -n "$namespace" "$grafanaPod" -c grafana -- bin/grafana-cli admin reset-admin-password "$password"; then
+if ! kubectl exec -n "$namespace" "$grafanaPod" -c grafana -- bin/grafana cli admin reset-admin-password "$password"; then
     log_error "An error occurred when updating the password"
     exit 1
 fi
