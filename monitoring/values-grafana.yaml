@@ -1,0 +1,105 @@
+# Override values for the grafana/grafana Helm chart
+#
+# https://github.com/grafana/helm-charts/tree/main/charts/grafana
+#
+# Standalone Grafana deployment with sidecar-based provisioning
+# for dashboards and datasources via labelled ConfigMaps.
+
+labels:
+  sas.com/monitoring-base: kube-viya-monitoring
+
+# ==========
+# General
+# ==========
+initChownData:
+  enabled: false
+
+"grafana.ini":
+  analytics:
+    check_for_updates: false
+  log:
+    mode: console
+  "log.console":
+    format: json
+  dashboards:
+    default_home_dashboard_path: /tmp/dashboards/viya-welcome-dashboard.json
+  feature_toggles:
+    prometheusSpecialCharsInLabelValues: true
+    dashboardNewLayouts: true
+
+# ==========
+# Service (NodePort for dev/test access)
+# ==========
+service:
+  type: NodePort
+  nodePort: 31100
+
+# ==========
+# Resources
+# ==========
+testFramework:
+  enabled: false
+plugins: []
+resources:
+  requests:
+    cpu: "250m"
+    memory: "150Mi"
+
+# ==========
+# Sidecar — auto-provision dashboards + datasources from ConfigMaps
+# ==========
+sidecar:
+  dashboards:
+    enabled: true
+    label: grafana_dashboard
+  datasources:
+    enabled: true
+    label: grafana_datasource
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "100Mi"
+
+# ==========
+# Persistence
+# ==========
+deploymentStrategy:
+  type: Recreate
+persistence:
+  type: pvc
+  enabled: true
+  # storageClassName:
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi
+  finalizers:
+    - kubernetes.io/pvc-protection
+
+# ==========
+# Ingress
+# NOTE: __GRAFANA_HOST__ and __TLS_SECRET_NAME__ are replaced at deploy time
+# Set BASE_DOMAIN in user.env to enable ingress
+# ==========
+ingress:
+  enabled: __GRAFANA_INGRESS_ENABLED__
+  ingressClassName: __INGRESS_CLASS__
+  annotations: {}
+  path: /
+  pathType: Prefix
+  hosts:
+    - __GRAFANA_HOST__
+  tls:
+    - secretName: __TLS_SECRET_NAME__
+      hosts:
+        - __GRAFANA_HOST__
+
+# ==========
+# Alert rules volume
+# ==========
+extraVolumes:
+  - name: grafana-alert-rules
+    configMap:
+      name: grafana-alert-rules
+extraVolumeMounts:
+  - name: grafana-alert-rules
+    mountPath: /etc/grafana/provisioning/alerting

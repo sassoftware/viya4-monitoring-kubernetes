@@ -1,0 +1,89 @@
+# Override values for the prometheus-community/prometheus Helm chart
+#
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus
+#
+# Prometheus is deployed as a remote-write receiver only.
+# All scraping is handled by k8s-monitoring (Alloy).
+
+commonMetaLabels:
+  sas.com/monitoring-base: kube-viya-monitoring
+
+# ==========
+# Server
+# ==========
+server:
+  # Enable remote-write receiver so Alloy + Tempo can push metrics
+  extraFlags:
+    - web.enable-remote-write-receiver
+    - web.enable-lifecycle
+    - enable-feature=exemplar-storage
+
+  # Enable exemplar storage for metric → trace correlation
+  # Exemplars attach trace_id to metric samples, enabling:
+  # Grafana metric panel → exemplar dots → click → open trace in Tempo
+  exemplars:
+    max_exemplars: 100000
+
+  retention: "7d"
+
+  # No scraping — all collection is handled by k8s-monitoring Alloy
+  # The empty scrape_configs prevents any direct scraping
+  service:
+    type: ClusterIP
+
+  persistentVolume:
+    enabled: true
+    size: 50Gi
+    # storageClass:
+
+  resources:
+    requests:
+      cpu: "1000m"
+      memory: "2Gi"
+
+  # Point to our AlertManager instance
+  alertmanagers:
+    - scheme: http
+      static_configs:
+        - targets:
+            - "__RELEASE_PREFIX__-prometheus-alertmanager:9093"
+
+# Empty scrape config — Alloy handles all collection
+scrapeConfigs: []
+
+# Disable all bundled exporters/collectors — k8s-monitoring provides these
+kube-state-metrics:
+  enabled: false
+
+prometheus-node-exporter:
+  enabled: false
+
+prometheus-pushgateway:
+  enabled: false
+
+# ==========
+# AlertManager sub-chart
+# ==========
+alertmanager:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 10Gi
+    # storageClass:
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "50Mi"
+
+# Disable config-reload sidecar (uses inotify, lighter weight)
+configmapReload:
+  prometheus:
+    enabled: true
+  alertmanager:
+    enabled: true
+
+# Empty server files — no scrape configs, no recording rules in Prometheus config
+# Recording rules are deployed as separate ConfigMaps or PrometheusRules
+serverFiles:
+  prometheus.yml:
+    scrape_configs: []

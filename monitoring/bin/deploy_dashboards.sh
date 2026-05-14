@@ -19,6 +19,7 @@ RABBITMQ_DASH="${RABBITMQ_DASH:-$VIYA_DASH}"
 CONTOUR_DASH="${CONTOUR_DASH:-false}"
 NGINX_DASH="${NGINX_DASH:-true}"
 LOGGING_DASH="${LOGGING_DASH:-true}"
+CORRELATION_DASH="${CORRELATION_DASH:-${TRACING_ENABLE:-true}}"
 ISTIO_DASH="${ISTIO_DASH:-${ISTIO_ENABLED:-false}}"
 USER_DASH="${USER_DASH:-true}"
 TEST_DASH="${TEST_DASH:-false}"
@@ -125,6 +126,11 @@ fi
 if [ "$NGINX_DASH" == "true" ]; then
     log_verbose "Deploying NGINX dashboards"
     deploy_dashboards "nginx"
+fi
+
+if [ "$CORRELATION_DASH" == "true" ]; then
+    log_verbose "Deploying correlation dashboards (service health, traces, logs)"
+    deploy_dashboards "correlation"
 fi
 
 if [ "$USER_DASH" == "true" ]; then

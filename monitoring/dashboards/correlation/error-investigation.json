@@ -1,0 +1,134 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "datasource", "uid": "grafana" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Investigate errors by following the flow: metric exemplar → trace → correlated logs. Enter a trace_id or click an exemplar dot on any metric panel.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "title": "Step 1: Metric with Exemplars",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Error rate with exemplar dots. Click an exemplar to populate the trace_id variable and load the trace below.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "showPoints": "auto" },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 1 },
+      "id": 2,
+      "targets": [
+        {
+          "expr": "sum(rate(traces_spanmetrics_calls_total{k8s_namespace_name=~\"$namespace\", status_code=\"STATUS_CODE_ERROR\"}[$__rate_interval])) by (span_name)",
+          "legendFormat": "{{span_name}}",
+          "exemplar": true
+        }
+      ],
+      "title": "Error Rate (click exemplar dots to investigate)",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+      "id": 3,
+      "title": "Step 2: Trace",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "tempo", "uid": "tempo" },
+      "description": "Trace waterfall for the selected trace_id. Auto-populated from exemplar click or manual entry.",
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 10 },
+      "id": 4,
+      "targets": [
+        {
+          "queryType": "traceql",
+          "query": "$traceId"
+        }
+      ],
+      "title": "Trace Detail",
+      "type": "traces"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+      "id": 5,
+      "title": "Step 3: Correlated Logs",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
+      "description": "Logs filtered by the trace_id from the trace above.",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 23 },
+      "id": 6,
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Ascending"
+      },
+      "targets": [
+        {
+          "expr": "{namespace=~\"$namespace\"} | trace_id = `$traceId`",
+          "legendFormat": ""
+        }
+      ],
+      "title": "Logs for Trace",
+      "type": "logs"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["correlation", "lgtm", "sas-viya", "troubleshooting"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": false, "text": "All", "value": "$__all" },
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "definition": "label_values(kube_namespace_labels, namespace)",
+        "name": "namespace",
+        "query": { "query": "label_values(kube_namespace_labels, namespace)" },
+        "refresh": 2,
+        "type": "query",
+        "includeAll": true,
+        "multi": false
+      },
+      {
+        "current": { "selected": false, "text": "", "value": "" },
+        "description": "Enter a trace_id to investigate. Can be populated by clicking an exemplar dot on the metric panel above.",
+        "name": "traceId",
+        "type": "textbox",
+        "label": "Trace ID"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Error Investigation - Exemplar to Trace to Logs",
+  "uid": "v4m-error-investigation",
+  "version": 1
+}

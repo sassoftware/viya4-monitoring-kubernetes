@@ -1,0 +1,30 @@
+# Grafana Prometheus datasource with exemplar support
+# Deployed as a ConfigMap with grafana_datasource=1 label for sidecar auto-provisioning
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasource-prometheus
+  labels:
+    grafana_datasource: "1"
+    sas.com/monitoring-base: kube-viya-monitoring
+data:
+  datasource-prometheus.yaml: |
+    apiVersion: 1
+    deleteDatasources:
+      - name: Prometheus
+    prune: true
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        uid: prometheus
+        url: http://__RELEASE_PREFIX__-prometheus-server:80
+        isDefault: true
+        editable: true
+        jsonData:
+          httpMethod: POST
+          # Enable exemplar support in Grafana UI
+          # Metric panels will show exemplar dots (trace_id) that link to Tempo
+          exemplarTraceIdDestinations:
+            - name: trace_id
+              datasourceUid: tempo
+          prometheusType: Prometheus
