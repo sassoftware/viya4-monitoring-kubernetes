@@ -1,5 +1,18 @@
 # SAS Viya Monitoring for Kubernetes
 
+## Version 1.2.50 
+* **Metrics**
+  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 81.5.2 to 85.0.2
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded fom 11.0.1 to 12.3.1
+  * [UPGRADE] Alertmanager has been upgraded from 0.31.0 to 0.32.1
+  * [UPGRADE] The config-reloader has been upgraded from 0.88.1 to 0.90.1
+  * [UPGRADE] Grafana has been upgraded from 12.3.2 to 13.0.1
+  * [UPGRADE] The k8s-sidecar has been upgraded from 2.5.0 to 2.7.3
+  * [UPGRADE] Node-Exporter has been upgraded from 1.10.2 to 1.11.1 (now uses distroless image)
+  * [UPGRADE] Prometheus has been upgraded from 3.9.1 to 3.11.3 (now uses distroless image)
+  * [UPGRADE] Prometheus Operator has been upgraded from 0.88.1 to 0.90.1
+  * [UPGRADE] Admission Webhook upgraded from 1.7.4 to 1.8.2
+
 ## Version 1.2.49 (08MAY2026)
 * **Overall**
   * [CHANGE] Support for Helm 4.x has been added.  As part of this change, the `--force-conflicts` option
