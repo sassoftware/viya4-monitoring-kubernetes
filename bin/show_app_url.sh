@@ -16,6 +16,11 @@ TLS_ENABLE=${TLS_ENABLE:-true}
 
 set +e
 
+# confirm yq version (needed for path-based Contour ingress)
+if ! checkYqVersion; then
+    exit 1
+fi
+
 # call function to get HTTP/HTTPS ports from ingress controller
 get_ingress_ports
 
