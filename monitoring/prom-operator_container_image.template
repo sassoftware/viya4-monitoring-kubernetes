@@ -95,6 +95,10 @@ prometheus-node-exporter:
 ###  imageRegistry: __GLOBAL_REGISTRY__
 ###  imagePullSecrets: __IMAGE_PULL_SECRETS__
   image:
+    #NOTE: distroless set to 'false' to require 
+    # explicitly specifying distroless image via tag
+    distroless: false
+
     registry: __NODEXPORT_IMAGE_REGISTRY__
     repository: __NODEXPORT_IMAGE_REPO_2LEVEL__
     tag: __NODEXPORT_IMAGE_TAG__
