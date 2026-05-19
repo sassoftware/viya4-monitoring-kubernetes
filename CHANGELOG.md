@@ -9,11 +9,11 @@ implemented with `kubectl patch` commands.  Therefore, if you have made such cha
 (re)implement these changes via the appropriate Helm user-values yaml file *prior* to the update (if
 possible) or re-apply the patches manually *after* the upgrade.
 * **Metrics**
-  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 81.5.2 to 85.0.2
+  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 81.5.2 to 85.1.3
   * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded fom 11.0.1 to 12.3.1
   * [UPGRADE] Alertmanager has been upgraded from 0.31.0 to 0.32.1
   * [UPGRADE] The config-reloader has been upgraded from 0.88.1 to 0.90.1
-  * [UPGRADE] Grafana has been upgraded from 12.3.2 to 13.0.1
+  * [UPGRADE] Grafana has been upgraded from 12.3.2 to 13.0.1 (security patch)
   * [UPGRADE] The k8s-sidecar has been upgraded from 2.5.0 to 2.7.3
   * [UPGRADE] Node-Exporter has been upgraded from 1.10.2 to 1.11.1 (now uses distroless image)
   * [UPGRADE] Prometheus has been upgraded from 3.9.1 to 3.11.3 (now uses distroless image)
