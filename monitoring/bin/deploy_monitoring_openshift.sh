@@ -125,6 +125,7 @@ TRACING_ENABLE="${TRACING_ENABLE:-false}"
 if [ "$TRACING_ENABLE" == "false" ]; then
     kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-tempo
 else
+    log_info "WOMBAT: TEMPO ENABLED"
     TEMPO_USER_YAML="${TEMPO_USER_YAML:-$USER_DIR/monitoring/user-values-tempo.yaml}"
     if [ ! -f "$TEMPO_USER_YAML" ]; then
         log_debug "[$TEMPO_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
@@ -395,6 +396,7 @@ if [ "$TRACING_ENABLE" == "true" ]; then
         -n "$MON_NS" \
         -f "$imageKeysFile" \
         -f monitoring/values-tempo.yaml \
+        -f monitoring/openshift/tempo-values.yaml \
         --set "tempo.metricsGenerator.enabled=false" \
         --set "tempo.metricsGenerator.remoteWriteUrl=http://v4m-prometheus.${MON_NS}:9090/api/v1/write" \
         -f "$TEMPO_USER_YAML" \
