@@ -37,6 +37,7 @@ log_verbose "Removing tempo"
 if helm3ReleaseExists v4m-tempo "$MON_NS"; then
     helm uninstall --namespace "$MON_NS" v4m-tempo
 fi
+oc delete scc v4m-tempo --ignore-not-found
 
 # Removing traces of v4m (old naming convention) and v4m-metrics in namespace
 removeV4MInfo "$MON_NS" "v4m"
