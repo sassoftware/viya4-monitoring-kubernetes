@@ -1,6 +1,13 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Version 1.2.50 
+=======
+## Unreleased
+* **Overall**
+  * [FIX] Added `--server-side=true` to Helm 4 options to enable upgrades of Helm releases originally
+deployed using Helm 3.  As noted below, an upgrade-in-place will overwrite post-deployments changes
+implemented with `kubectl patch` commands.  Therefore, if you have made such changes, you should
+(re)implement these changes via the appropriate Helm user-values yaml file *prior* to the update (if
+possible) or re-apply the patches manually *after* the upgrade.
 * **Metrics**
   * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 81.5.2 to 85.0.2
   * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded fom 11.0.1 to 12.3.1
