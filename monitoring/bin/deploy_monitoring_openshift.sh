@@ -389,6 +389,14 @@ if [ "$TRACING_ENABLE" == "true" ]; then
     versionstring="$(get_helm_versionstring "$TEMPO_CHART_VERSION")"
     log_debug "Installing Helm chart from artifact [$chart2install]"
 
+    # Create Tempo SCC and bind it to the v4m-tempo service account
+    if oc get scc v4m-tempo > /dev/null 2>&1; then
+        log_info "Skipping scc creation; using existing scc [v4m-tempo]"
+    else
+        oc create -f monitoring/openshift/tempo_scc.yaml
+    fi
+    oc adm policy add-scc-to-user v4m-tempo -z v4m-tempo -n "$MON_NS"
+
     log_info "Installing tempo"
     # shellcheck disable=SC2086
     helm upgrade --install v4m-tempo \
