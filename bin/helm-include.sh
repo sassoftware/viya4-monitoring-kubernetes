@@ -27,7 +27,7 @@ elif [ "$HELM_VER_MAJOR" == "3" ]; then
     log_debug "Helm 3 detected; Helm 4 is the current version, consider upgrading."
 elif [ "$HELM_VER_MAJOR" == "4" ]; then
     log_debug "Helm 4 detected; setting Helm 4-specific options"
-    export helm4opts='--force-conflicts'
+    export helm4opts='--force-conflicts --server-side=true'
 fi
 
 if [ "$V4M_HELM_USE_LATEST" == "true" ]; then

@@ -284,7 +284,6 @@ export -f disable_sa_token_automount
 export -f enable_pod_token_automount
 export -f checkYqVersion
 
-
 function parseFullImage {
     # shellcheck disable=SC2034
     fullImage="$1"

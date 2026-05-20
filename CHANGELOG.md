@@ -8,6 +8,12 @@
 [Golang-based (Mike Farah) version of `yq`](https://github.com/mikefarah/yq).
   * [CHANGE] Provide additional debugging information in `show_app_url.sh` output
 for Contour-related problems
+  * [FIX] Added `--server-side=true` to Helm 4 options to enable upgrades of Helm releases originally
+deployed using Helm 3.  As noted below, an upgrade-in-place will overwrite post-deployments changes
+implemented with `kubectl patch` commands.  Therefore, if you have made such changes, you should
+(re)implement these changes via the appropriate Helm user-values yaml file *prior* to the update (if
+possible) or re-apply the patches manually *after* the upgrade.
+
 
 ## Version 1.2.49 (08MAY2026)
 * **Overall**
