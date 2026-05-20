@@ -35,6 +35,24 @@ function errexit_msg {
     fi
 }
 
+function checkYqVersion {
+    # confirm yq installed and correct version
+    local goodver yq_version
+    # "good version" == 4.45.xx -> 4.49.xx OR 4.50.xx -> 4.99.xx
+    goodver="yq \(.+mikefarah.+\) version (v)?(4\.(4[5-9]|[5-9][0-9])\..+)"
+    yq_version=$(yq --version)
+    if [ "$?" == "1" ]; then
+        log_error "Required component [yq] not available."
+        return 1
+    elif [[ ! $yq_version =~ $goodver ]]; then
+        log_error "Incorrect version [$yq_version] found; version 4.45.1+ required."
+        return 1
+    else
+        log_debug "A valid version [$yq_version] of yq detected"
+        return 0
+    fi
+}
+
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
     # Save standard out to a new descriptor
     exec 3>&1
@@ -264,6 +282,7 @@ export -f trap_add
 export -f errexit_msg
 export -f disable_sa_token_automount
 export -f enable_pod_token_automount
+export -f checkYqVersion
 
 function parseFullImage {
     # shellcheck disable=SC2034
