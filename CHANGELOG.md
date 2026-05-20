@@ -6,6 +6,8 @@
 >  * [BREAKING CHANGE] The minimum required version of `yq` has been updated to version
 4.45.1 (released 11JAN2026) or newer of the
 [Golang-based (Mike Farah) version of `yq`](https://github.com/mikefarah/yq).
+  * [CHANGE] Provide additional debugging information in `show_app_url.sh` output
+for Contour-related problems
   * [FIX] Added `--server-side=true` to Helm 4 options to enable upgrades of Helm releases originally
 deployed using Helm 3.  As noted below, an upgrade-in-place will overwrite post-deployments changes
 implemented with `kubectl patch` commands.  Therefore, if you have made such changes, you should
