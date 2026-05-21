@@ -1,6 +1,5 @@
 # SAS Viya Monitoring for Kubernetes
 
-=======
 ## Unreleased
 * **Overall**
 > [!IMPORTANT]
