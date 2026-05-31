@@ -7,6 +7,17 @@ deployed using Helm 3.  As noted below, an upgrade-in-place will overwrite post-
 implemented with `kubectl patch` commands.  Therefore, if you have made such changes, you should
 (re)implement these changes via the appropriate Helm user-values yaml file *prior* to the update (if
 possible) or re-apply the patches manually *after* the upgrade.
+* **Tracing**
+  * [FIX] Tempo now deploys correctly on OpenShift. A custom Security Context
+    Constraint (SCC) `v4m-tempo` is created and bound to the Tempo service account
+    during deployment, allowing Tempo to run as its image-defined user rather than
+    the random namespace UID assigned by OpenShift's default `restricted` SCC. The
+    random UID lacked write access to `/var/tempo`, preventing Tempo from
+    initializing its trace store and WAL.
+  * [FIX] The OpenShift-specific Tempo values file (`monitoring/openshift/tempo-values.yaml`)
+    is applied during deployment for OpenShift specific overrides. It is now included in the Helm install
+    and sets `securityContext: null` to prevent the chart from injecting a fixed
+    `runAsUser` that OpenShift's admission controller would reject.
 
 
 ## Version 1.2.49 (08MAY2026)
