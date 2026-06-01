@@ -2,6 +2,12 @@
 
 ## Unreleased
 * **Overall**
+> [!IMPORTANT]
+>  * [BREAKING CHANGE] The minimum required version of `yq` has been updated to version
+4.45.1 (released 11JAN2026) or newer of the
+[Golang-based (Mike Farah) version of `yq`](https://github.com/mikefarah/yq).
+  * [CHANGE] Provide additional debugging information in `show_app_url.sh` output
+for Contour-related problems
   * [FIX] Added `--server-side=true` to Helm 4 options to enable upgrades of Helm releases originally
 deployed using Helm 3.  As noted below, an upgrade-in-place will overwrite post-deployments changes
 implemented with `kubectl patch` commands.  Therefore, if you have made such changes, you should
@@ -18,7 +24,17 @@ possible) or re-apply the patches manually *after* the upgrade.
     is applied during deployment for OpenShift specific overrides. It is now included in the Helm install
     and sets `securityContext: null` to prevent the chart from injecting a fixed
     `runAsUser` that OpenShift's admission controller would reject.
-
+* **Metrics**
+  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 81.5.2 to 85.1.3
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded fom 11.0.1 to 12.3.3
+  * [UPGRADE] Alertmanager has been upgraded from 0.31.0 to 0.32.1
+  * [UPGRADE] The config-reloader has been upgraded from 0.88.1 to 0.90.1
+  * [UPGRADE] Grafana has been upgraded from 12.3.2 to 13.0.1 (security patch)
+  * [UPGRADE] The k8s-sidecar has been upgraded from 2.5.0 to 2.7.3
+  * [UPGRADE] Node-Exporter has been upgraded from 1.10.2 to 1.11.1 (now uses distroless image)
+  * [UPGRADE] Prometheus has been upgraded from 3.9.1 to 3.11.3 (now uses distroless image)
+  * [UPGRADE] Prometheus Operator has been upgraded from 0.88.1 to 0.90.1
+  * [UPGRADE] Admission Webhook upgraded from 1.7.4 to 1.8.2
 
 ## Version 1.2.49 (08MAY2026)
 * **Overall**
@@ -53,7 +69,7 @@ and revised to eliminate the use of version-specific pointers when not appropria
     OpenShift-specific file
   * [CHANGE] Tempo metricsGenerator remoteWriteUrl now resolved dynamically from MON_NS at
     deploy time rather than being hardcoded to the monitoring namespace
-  
+
 ## Version 1.2.48 (03APR2026)
 * **Overall**
   * [CHANGE] The [Contributor Agreement](ContributorAgreement.txt) has been revised to clarify
