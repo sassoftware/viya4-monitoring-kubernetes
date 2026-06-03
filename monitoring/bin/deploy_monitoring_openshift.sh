@@ -125,6 +125,7 @@ TRACING_ENABLE="${TRACING_ENABLE:-false}"
 if [ "$TRACING_ENABLE" == "false" ]; then
     kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-tempo
 else
+    log_info "WOMBAT: TEMPO ENABLED"
     TEMPO_USER_YAML="${TEMPO_USER_YAML:-$USER_DIR/monitoring/user-values-tempo.yaml}"
     if [ ! -f "$TEMPO_USER_YAML" ]; then
         log_debug "[$TEMPO_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
@@ -388,6 +389,10 @@ if [ "$TRACING_ENABLE" == "true" ]; then
     versionstring="$(get_helm_versionstring "$TEMPO_CHART_VERSION")"
     log_debug "Installing Helm chart from artifact [$chart2install]"
 
+    # Create/update Tempo SCC and bind it to the v4m-tempo service account
+    oc apply -f monitoring/openshift/tempo_scc.yaml
+    oc adm policy add-scc-to-user v4m-tempo -z v4m-tempo -n "$MON_NS"
+
     log_info "Installing tempo"
     # shellcheck disable=SC2086
     helm upgrade --install v4m-tempo \
@@ -395,6 +400,7 @@ if [ "$TRACING_ENABLE" == "true" ]; then
         -n "$MON_NS" \
         -f "$imageKeysFile" \
         -f monitoring/values-tempo.yaml \
+        -f monitoring/openshift/tempo-values.yaml \
         --set "tempo.metricsGenerator.enabled=false" \
         --set "tempo.metricsGenerator.remoteWriteUrl=http://v4m-prometheus.${MON_NS}:9090/api/v1/write" \
         -f "$TEMPO_USER_YAML" \
