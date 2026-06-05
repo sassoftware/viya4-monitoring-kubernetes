@@ -1,6 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 
-## Unreleased
+## Version 1.2.50 (05JUNE2026)
 * **Overall**
 > [!IMPORTANT]
 >  * [BREAKING CHANGE] The minimum required version of `yq` has been updated to version
