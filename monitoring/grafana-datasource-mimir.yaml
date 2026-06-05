@@ -1,0 +1,14 @@
+apiVersion: 1
+prune: true
+deleteDatasources:
+  - name: Mimir
+datasources:
+  - name: Mimir
+    type: prometheus
+    url: http://v4m-mimir-nginx.mimir:80/prometheus
+    isDefault: false
+    editable: true
+    jsonData:
+      httpHeaderName1: X-Scope-OrgID
+    secureJsonData:
+      httpHeaderValue1: anonymous
