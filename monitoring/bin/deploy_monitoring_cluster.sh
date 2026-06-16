@@ -594,6 +594,34 @@ if [ "$TRACING_ENABLE" == "true" ]; then
         -f "$TEMPO_USER_YAML" \
         $versionstring \
         "$chart2install"
+
+    # Deploy OpenTelemetry Collector as the OTLP trace gateway (replaces FluentBit tracing)
+    OTELCOL_CHART_REPO="${OTELCOL_CHART_REPO:-open-telemetry}"
+    OTELCOL_CHART_NAME="${OTELCOL_CHART_NAME:-opentelemetry-collector}"
+    OTELCOL_CHART_VERSION="${OTELCOL_CHART_VERSION:-0.108.0}"
+
+    OTELCOL_USER_YAML="${OTELCOL_USER_YAML:-$USER_DIR/monitoring/user-values-otel-collector.yaml}"
+    if [ ! -f "$OTELCOL_USER_YAML" ]; then
+        log_debug "[$OTELCOL_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
+        OTELCOL_USER_YAML=$TMP_DIR/empty.yaml
+    fi
+
+    helmRepoAdd open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
+
+    log_debug "OTel Collector Helm Chart: repo [$OTELCOL_CHART_REPO] name [$OTELCOL_CHART_NAME] version [$OTELCOL_CHART_VERSION]"
+    chart2install="$(get_helmchart_reference "$OTELCOL_CHART_REPO" "$OTELCOL_CHART_NAME" "$OTELCOL_CHART_VERSION")"
+    versionstring="$(get_helm_versionstring "$OTELCOL_CHART_VERSION")"
+    log_debug "Installing Helm chart from artifact [$chart2install]"
+
+    log_info "Installing OpenTelemetry Collector"
+    # shellcheck disable=SC2086
+    helm upgrade --install v4m-otel-collector \
+        $helm4opts \
+        -n "$MON_NS" \
+        -f monitoring/values-otel-collector.yaml \
+        -f "$OTELCOL_USER_YAML" \
+        $versionstring \
+        "$chart2install"
 fi
 
 # Contour-related PodMonitors

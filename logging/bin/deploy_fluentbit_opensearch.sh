@@ -115,20 +115,9 @@ kubectl -n "$LOG_NS" apply -f "$FB_CONFIGMAP"
 kubectl -n "$LOG_NS" delete configmap fb-viya-parsers --ignore-not-found
 kubectl -n "$LOG_NS" create configmap fb-viya-parsers --from-file=logging/fb/viya-parsers.conf
 
-TRACING_ENABLE="${TRACING_ENABLE:-false}"
-if [ "$TRACING_ENABLE" == "true" ]; then
-    # Create ConfigMap containing tracing config
-    kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
-    kubectl -n "$LOG_NS" create configmap fb-viya-tracing --from-file=logging/fb/viya-tracing.conf
+# Remove legacy tracing ConfigMap if present from a previous deployment
+kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
 
-    tracingValuesFile="logging/fb/fluent-bit_helm_values_tracing.yaml"
-else
-    # Create empty ConfigMap for tracing since it is expected to exist in main config
-    kubectl -n "$LOG_NS" delete configmap fb-viya-tracing --ignore-not-found
-    kubectl -n "$LOG_NS" create configmap fb-viya-tracing --from-file="$TMP_DIR"/empty.yaml
-
-    tracingValuesFile="$TMP_DIR/empty.yaml"
-fi
 
 # Check for Kubernetes container runtime log format info
 KUBERNETES_RUNTIME_LOGFMT="${KUBERNETES_RUNTIME_LOGFMT:-}"
@@ -189,7 +178,6 @@ helm $helmDebug upgrade --install --namespace "$LOG_NS" v4m-fb \
     --values "$imageKeysFile" \
     --values logging/fb/fluent-bit_helm_values_opensearch.yaml \
     --values "$openshiftValuesFile" \
-    --values "$tracingValuesFile" \
     --values "$FB_OPENSEARCH_USER_YAML" \
     --set fullnameOverride=v4m-fb \
     "$chart2install"
