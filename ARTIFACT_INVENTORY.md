@@ -16,11 +16,11 @@ registry/repository/image_name:version
 
 | Subsystem| Component | Fully Qualified Container-Image Name (registry/repository/image_name:version)|
 |----|----|----|
-| Logging | [Fluent Bit](https://github.com/fluent/fluent-bit) | cr.fluentbit.io/fluent/fluent-bit:4.2.3 |
+| Logging | [Fluent Bit](https://github.com/fluent/fluent-bit) | cr.fluentbit.io/fluent/fluent-bit:5.0.7 |
 | Logging | [Elasticsearch Exporter](https://github.com/prometheus-community/elasticsearch_exporter) | quay.io/prometheuscommunity/elasticsearch-exporter:v1.10.0 |
 | Logging | initContainer (Fluent Bit, OpenSearch) | docker.io/library/busybox:latest |
-| Logging | [OpenSearch](https://github.com/opensearch-project/OpenSearch) | docker.io/opensearchproject/opensearch:3.4.0 |
-| Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/OpenSearch-Dashboards) | docker.io/opensearchproject/opensearch-dashboards:3.4.0 |
+| Logging | [OpenSearch](https://github.com/opensearch-project/OpenSearch) | docker.io/opensearchproject/opensearch:3.6.0 |
+| Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/OpenSearch-Dashboards) | docker.io/opensearchproject/opensearch-dashboards:3.6.0 |
 | Metrics | [Alertmanager](https://github.com/prometheus/alertmanager) | quay.io/prometheus/alertmanager:v0.32.1 |
 | Metrics | [Grafana](https://github.com/grafana/grafana) | docker.io/grafana/grafana:13.0.1-security-01 |
 | Metrics | [Admission Webhook](https://github.com/kubernetes/ingress-nginx) | ghcr.io/jkroepke/kube-webhook-certgen:1.8.2 |
@@ -51,9 +51,9 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 | Subsystem | Component | Helm Chart Repository | Helm Chart Name |Helm Chart Version | Helm Archive File Name|
 |--|--|--|--|--|--|
 | Logging | [Elasticsearch Exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-elasticsearch-exporter)| prometheus-community | prometheus-elasticsearch-exporter | 7.2.1 | prometheus-community/prometheus-elasticsearch-exporter-7.2.1.tgz |
-| Logging | [Fluent Bit](https://github.com/fluent/helm-charts/tree/main/charts/fluent-bit)| fluent | fluent-bit | 0.56.0 | fluent/fluent-bit-0.56.0.tgz |
-| Logging | [OpenSearch](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch)| opensearch | opensearch | 3.4.0 | opensearch/opensearch-3.4.0.tgz |
-| Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch-dashboards)| opensearch | opensearch-dashboards | 3.4.0 | opensearch/opensearch-dashboards-3.4.0.tgz |
+| Logging | [Fluent Bit](https://github.com/fluent/helm-charts/tree/main/charts/fluent-bit)| fluent | fluent-bit | 0.57.7 | fluent/fluent-bit-0.57.7.tgz |
+| Logging | [OpenSearch](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch)| opensearch | opensearch | 3.6.0 | opensearch/opensearch-3.6.0.tgz |
+| Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch-dashboards)| opensearch | opensearch-dashboards | 3.6.0 | opensearch/opensearch-dashboards-3.6.0.tgz |
 | Metrics | [Grafana (on OpenShift)](https://github.com/grafana-community/helm-charts/tree/main/charts/grafana)| grafana-community | grafana | 12.3.3 | grafana-community/grafana-12.3.3.tgz |
 | Metrics | [Kube Prometheus Stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)| prometheus-community | kube-prometheus-stack | 85.1.3 | prometheus-community/kube-prometheus-stack-85.1.3.tgz |
 | Metrics | [Prometheus Pushgateway](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway)| prometheus-community | prometheus-pushgateway | 3.6.0 | prometheus-community/prometheus-pushgateway-3.6.0.tgz |
