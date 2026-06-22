@@ -30,10 +30,10 @@ function import_file {
 
         if [[ $response == 2* ]]; then
             if grep -q '"success":true' "$TMP_DIR"/curl.response; then
-                log_debug "Deployed content from file [$file] - Success! [$response]"
+                log_verbose "Deployed content from file [$file] - Success! [$response]"
             else
                 log_warn "Unable to deploy content from file [$file]. [$response]"
-                log_debug "  Response received was: $(cat "$TMP_DIR"/curl.response)"
+                log_verbose "  Response received was: $(cat "$TMP_DIR"/curl.response)"
                 #log_message "" # null line since response file may not contain LF
             fi
             return 0
