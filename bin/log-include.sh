@@ -138,4 +138,4 @@ function log_error {
 }
 
 export -f log_notice log_message log_debug log_info log_warn log_error add_notice add_noticew display_notices log_verbose
-export LOG_COLOR_ENABLE LOG_LEVEL_ENABLE LOG_DEBUG_ENABLE noticeColWidth LOG_DEBUG_ENABLE
+export LOG_COLOR_ENABLE LOG_LEVEL_ENABLE LOG_DEBUG_ENABLE noticeColWidth LOG_VERBOSE_ENABLE
