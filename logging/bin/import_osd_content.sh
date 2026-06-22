@@ -30,10 +30,10 @@ function import_file {
 
         if [[ $response == 2* ]]; then
             if grep -q '"success":true' "$TMP_DIR"/curl.response; then
-                log_verbose "Deployed content from file [$file] - Success! [$response]"
+                log_debug "Deployed content from file [$file] - Success! [$response]"
             else
                 log_warn "Unable to deploy content from file [$file]. [$response]"
-                log_verbose "  Response received was: $(cat "$TMP_DIR"/curl.response)"
+                log_debug "  Response received was: $(cat "$TMP_DIR"/curl.response)"
                 #log_message "" # null line since response file may not contain LF
             fi
             return 0
@@ -54,6 +54,10 @@ function import_content_batch {
     dir=$1
 
     tmpfile=$TMP_DIR/batched.ndjson
+
+    # Delete any previous instance of this file
+    rm -f "$tmpfile"
+
     touch "$tmpfile"
 
     rc=0
