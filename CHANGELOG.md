@@ -1,6 +1,7 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Logging**
+  * [FIX] (Re-)Initialized temporary response files between API calls
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 3.4.0 to 3.6.0
   * [UPGRADE] OpenSearch Helm chart upgraded from 3.4.0 to 3.6.0
   * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 3.4.0 to 3.6.0
