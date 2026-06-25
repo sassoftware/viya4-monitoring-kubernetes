@@ -6,7 +6,10 @@
   * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 3.4.0 to 3.6.0
   * [UPGRADE] Fluent Bit upgraded from 4.2.3 to 5.0.7
   * [UPGRADE] Fluent Bit Helm chart upgraded from 0.56.0 to 0.57.7
-
+* **Metrics**
+  * [CHANGE] As part of validating support for deploying onto IPv6-only Kubernetes clusters, the
+PodMonitor resource definitions were reviewed and, in three cases, updated to ensure metrics are
+properly scrapped when pods are assigned either IPv4 or IPv6 addresses.
 
 ## Version 1.2.50 (05JUNE2026)
 * **Overall**
