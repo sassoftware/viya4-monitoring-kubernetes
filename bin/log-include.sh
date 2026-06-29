@@ -137,5 +137,18 @@ function log_error {
     fi
 }
 
+function log_fatal {
+    if [ "$LOG_LEVEL_ENABLE" = "true" ]; then
+        level="FATAL "
+    else
+        level=""
+    fi
+    if [ "$LOG_COLOR_ENABLE" = "true" ]; then
+        echo -e "${whiteb}${redbg}${level}$*${end}" >&2
+    else
+        echo "${level}$*"
+    fi
+}
+
 export -f log_notice log_message log_debug log_info log_warn log_error add_notice add_noticew display_notices log_verbose
 export LOG_COLOR_ENABLE LOG_LEVEL_ENABLE LOG_DEBUG_ENABLE noticeColWidth LOG_DEBUG_ENABLE

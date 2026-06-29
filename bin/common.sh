@@ -53,6 +53,34 @@ function checkYqVersion {
     fi
 }
 
+function checkKubectlVersion {
+    local min_major min_minor kubectl_output
+    min_major=1
+    min_minor=24
+
+    if ! command -v kubectl &> /dev/null; then
+        log_error "Required component [kubectl] not available."
+        return 1
+    fi
+
+    kubectl_output=$(kubectl version --client --output=json 2>/dev/null)
+    if [ "$?" != "0" ]; then
+        log_error "Unable to determine kubectl version."
+        return 1
+    fi
+
+    client_major=$(echo "$kubectl_output" | grep -o '"major":"[0-9]*"' | grep -o '[0-9]*')
+    client_minor=$(echo "$kubectl_output" | grep -o '"minor":"[0-9]*"' | grep -o '[0-9]*')
+
+    if [[ "$client_major" < "$min_major" ]] || [[ "$client_major" == "$min_major" && "$client_minor" < "$min_minor" ]]; then
+        log_error "kubectl version [$client_major.$client_minor] is below the minimum required version [$min_major.$min_minor]"
+        return 1
+    fi
+
+    log_debug "kubectl client version [$client_major.$client_minor] meets minimum requirements"
+    return 0
+}
+
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
     # Save standard out to a new descriptor
     exec 3>&1
@@ -283,6 +311,7 @@ export -f errexit_msg
 export -f disable_sa_token_automount
 export -f enable_pod_token_automount
 export -f checkYqVersion
+export -f checkKubectlVersion
 
 function parseFullImage {
     # shellcheck disable=SC2034

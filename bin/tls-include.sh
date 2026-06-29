@@ -344,5 +344,27 @@ function create_tls_certs_openssl {
 
 }
 
+function get_cert_expiry_days {
+    local namespace secretName expiry_date today expiry_epoch diff_days
+    namespace="$1"
+    secretName="$2"
+
+    expiry_date=$(kubectl get secret -n "$namespace" "$secretName" \
+        -o "jsonpath={.data['tls\.crt']}" | base64 -d | \
+        openssl x509 -enddate -noout | cut -d= -f2)
+
+    if [ -z "$expiry_date" ]; then
+        log_error "Could not retrieve expiry date for secret [$namespace/$secretName]"
+        return 1
+    fi
+
+    today=$(date +%s)
+    expiry_epoch=$(date -d "$expiry_date" +%s)
+    diff_days=$(( (today - expiry_epoch) / 86400 ))
+
+    echo "$diff_days"
+}
+
 export -f verify_cert_manager deploy_issuers deploy_app_cert create_tls_certs_cm
 export -f do_all_secrets_already_exist verify_cert_generator verify_openssl create_cert_secret create_tls_certs_openssl create_tls_certs
+export -f get_cert_expiry_days
