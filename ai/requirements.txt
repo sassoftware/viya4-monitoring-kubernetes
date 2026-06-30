@@ -1,0 +1,6 @@
+fastmcp
+prometheus-api-client
+httpx>=0.27
+numpy>=1.26
+beautifulsoup4>=4.12   # for .html files / URL ingestion
+pypdf>=4.0             # for ingesting SAS doc-set PDFs
