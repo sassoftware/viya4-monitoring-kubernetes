@@ -118,6 +118,9 @@ function add_rolemapping {
 
     log_debug "Parms passed to add_rolemapping function  targetrole=$targetrole  berole=$berole"
 
+    #remove any existing instance of this file
+    rm -f "$TMP_DIR"/rolemapping.json
+
     # get existing rolemappings for $targetrole
     response=$(curl -s -o "$TMP_DIR"/rolemapping.json -w "%{http_code}" -XGET "$sec_api_url/rolesmapping/$targetrole" --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
 
@@ -199,6 +202,9 @@ function remove_rolemapping {
     targetrole=$1
     berole2remove=$2
     log_debug "remove_rolemapping targetrole:$targetrole berole2remove:$berole2remove"
+
+    #remove any existing instance of this file
+    rm -f "$TMP_DIR"/rolemapping.json
 
     if role_exists "$targetrole"; then
 

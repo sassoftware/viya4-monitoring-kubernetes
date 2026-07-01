@@ -122,6 +122,9 @@ function add_ism_template {
     pattern=$2
     priority=${3:-100}
 
+    #remove any existing instance of this file
+    rm -f "$TMP_DIR"/ism_policy_patch.json
+
     response=$(curl -s -o "$TMP_DIR"/ism_policy_patch.json -w "%{http_code}" -XGET "$ism_api_url/policies/$policy_name" --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
     if [[ $response != 2* ]]; then
         log_debug "No ISM policy [$policy_name] found to patch; moving on.[$response]"
