@@ -1,5 +1,5 @@
 # SAS Viya Monitoring for Kubernetes
-## Unreleased
+## Version 1.2.51 (02JULY2026)
 * **Logging**
   * [FIX] (Re-)Initialized temporary response files between API calls
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 3.4.0 to 3.6.0
