@@ -1,4 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
+## unreleased
+* **Metrics**
+  * [SECURITY] Upgraded to Kube-State Metrics 2.19.1 to address several security
+vulnerabilities scored as high or critical.
+
+
 ## Version 1.2.51 (02JULY2026)
 * **Logging**
   * [FIX] (Re-)Initialized temporary response files between API calls
