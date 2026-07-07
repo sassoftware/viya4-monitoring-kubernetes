@@ -1,11 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
-## unreleased
+## Version 1.2.52 (072JUL2026)
 * **Metrics**
   * [SECURITY] Upgraded to Kube-State Metrics 2.19.1 to address several security
 vulnerabilities scored as high or critical.
 
 
-## Version 1.2.51 (02JULY2026)
+## Version 1.2.51 (02JUL2026)
 * **Logging**
   * [FIX] (Re-)Initialized temporary response files between API calls
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 3.4.0 to 3.6.0
@@ -15,7 +15,7 @@ vulnerabilities scored as high or critical.
   * [UPGRADE] Fluent Bit Helm chart upgraded from 0.56.0 to 0.57.7
 
 
-## Version 1.2.50 (05JUNE2026)
+## Version 1.2.50 (05JUN2026)
 * **Overall**
 > [!IMPORTANT]
 >  * [BREAKING CHANGE] The minimum required version of `yq` has been updated to version
