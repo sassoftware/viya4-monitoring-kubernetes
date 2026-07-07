@@ -1,5 +1,5 @@
 # SAS Viya Monitoring for Kubernetes
-## Version 1.2.52 (072JUL2026)
+## Version 1.2.52 (07JUL2026)
 * **Metrics**
   * [SECURITY] Upgraded to Kube-State Metrics 2.19.1 to address several security
 vulnerabilities scored as high or critical.
