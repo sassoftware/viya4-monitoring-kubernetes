@@ -12,12 +12,11 @@ if [ ! "$(which helm)" ]; then
 fi
 
 helmVer=$(helm version --short 2> /dev/null)
-# shellcheck disable=SC2116,SC2086,SC2207
-hver=($(echo ${helmVer//[^0-9]/ }))
-HELM_VER_MAJOR=${hver[0]}
-HELM_VER_MINOR=${hver[1]}
-HELM_VER_PATCH=${hver[2]}
-HELM_VER_FULL=$HELM_VER_MAJOR.$HELM_VER_MINOR.$HELM_VER_PATCH
+HELM_VER_MAJOR=$(semver_parse "$helmVer" MAJOR)
+HELM_VER_MINOR=$(semver_parse "$helmVer" MINOR)  #TODO: Not used, remove?
+HELM_VER_PATCH=$(semver_parse "$helmVer" PATCH)  #TODO: Not used, remove?
+HELM_VER_FULL=$(semver_parse "$helmVer" FULL)
+
 if [ "$HELM_VER_MAJOR" == "2" ]; then
     log_error "Helm 2.x has reached end of life as of 11/13/2020 and is no longer supported"
     log_error "See: https://github.com/helm/helm/releases/tag/v2.17.0 for details"
@@ -92,7 +91,7 @@ function helmRepoAdd {
 
             # Helm 3.3.2 changed 'repo add' behavior and added the --force-update flag
             # https://github.com/helm/helm/releases/tag/v3.3.2
-            if [[ $HELM_VER_MINOR -lt 3 || ($HELM_VER_MINOR -eq 3 && $HELM_VER_PATCH -lt 2) ]]; then
+            if semver_check "$helmVer" LESS 3.3.2; then
                 helm repo add "$repo" "$repoURL"
             else
                 helm repo add --force-update "$repo" "$repoURL"
@@ -141,7 +140,7 @@ function get_helm_versionstring {
     return
 }
 
-export HELM_VER_FULL HELM_VER_MAJOR HELM_VER_MINOR HELM_VER_PATCH
+export HELM_VER_FULL HELM_VER_MAJOR HELM_VER_MINOR HELM_VER_PATCH  #TODO: Remove HELM_VER_MINOR HELM_VER_PATCH since not currently used?
 export -f helm2ReleaseExists
 export -f helm3ReleaseExists
 export -f helm2ReleaseCheck
