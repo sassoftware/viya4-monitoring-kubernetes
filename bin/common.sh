@@ -119,8 +119,6 @@ function semver_need_at_least {
 
 }
 
-
-
 function semver_check {
     ver2check=$1 #semver value to check
     checkType=${2:-VALID} #type of check: VALID, MIN, MINORSKEW, GREATER
@@ -145,6 +143,11 @@ function semver_check {
     local baseline val2check
     case "$checkType" in
         "MIN"|"GREATER")
+            #NOTE: MIN and GREATER are NOT synonyms!
+            # When baseline and val2check match...
+            # MIN: returns 0 (success)
+            # GREATER: returns 1 (failure)
+
             baseline=$(semver_parse "$baseline_ver" "MAJOR")
             val2check=$(semver_parse "$ver2check" "MAJOR")
 
@@ -164,6 +167,36 @@ function semver_check {
             ((val2check < baseline)) && return 1
 
             if [ "$checkType" == "GREATER" ]; then
+                return 1;
+            else
+                return 0
+            fi
+            ;;
+        "MAX"|"LESS")
+            #NOTE: MAX and LESS are NOT synonyms!
+            # When baseline and val2check match...
+            # MAX: returns 0 (success)
+            # LESS: returns 1 (failure)
+
+            baseline=$(semver_parse "$baseline_ver" "MAJOR")
+            val2check=$(semver_parse "$ver2check" "MAJOR")
+
+            ((val2check < baseline)) && return 0
+            ((val2check > baseline)) && return 1
+
+            baseline=$(semver_parse "$baseline_ver" "MINOR")
+            val2check=$(semver_parse "$ver2check" "MINOR")
+
+            ((val2check < baseline)) && return 0
+            ((val2check > baseline)) && return 1
+
+            baseline=$(semver_parse "$baseline_ver" "PATCH")
+            val2check=$(semver_parse "$ver2check" "PATCH")
+
+            ((val2check < baseline)) && return 0
+            ((val2check > baseline)) && return 1
+
+            if [ "$checkType" == "LESS" ]; then
                 return 1;
             else
                 return 0
