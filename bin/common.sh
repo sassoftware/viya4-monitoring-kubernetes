@@ -53,6 +53,155 @@ function checkYqVersion {
     fi
 }
 
+function semver_parse {
+    local string fragment
+    string=$1
+    fragment=$2
+
+    if [[ $string =~  v?([0-9]+)\.([0-9]+)\.([0-9]+)(-(([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
+        case "$fragment" in
+             major|MAJOR)
+                echo "${BASH_REMATCH[1]}"
+                ;;
+             minor|MINOR)
+                echo "${BASH_REMATCH[2]}"
+                ;;
+             patch|PATCH)
+                echo "${BASH_REMATCH[3]}"
+                ;;
+             prerelease|PRERELEASE)
+                # BASH_REMATCH[4] includes the leading "-"
+                echo "${BASH_REMATCH[5]}"
+                ;;
+             buildmeta|BUILDMETA)
+                # BASH_REMATCH[9] includes the leading "+"
+                echo "${BASH_REMATCH[10]}"
+                ;;
+             full|FULL)
+                echo "${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+                ;;
+
+              *)
+                echo "$string"
+                ;;
+        esac
+
+    else
+       echo " "
+       return 1
+    fi
+
+
+}
+
+function semver_need_at_least {
+    local this that
+
+    this=$(semver_parse "$1" "MAJOR")
+    that=$(semver_parse "$2" "MAJOR")
+
+    ((that > this)) && return 0
+    ((that < this)) && return 1
+
+    this=$(semver_parse "$1" "MINOR")
+    that=$(semver_parse "$2" "MINOR")
+
+    ((that > this)) && return 0
+    ((that < this)) && return 1
+
+    this=$(semver_parse "$1" "PATCH")
+    that=$(semver_parse "$2" "PATCH")
+
+    ((that > this)) && return 0
+    ((that < this)) && return 1
+
+    return 0
+
+}
+
+
+
+function semver_check {
+    ver2check=$1 #semver value to check
+    checkType=${2:-VALID} #type of check: VALID, MIN, MINORSKEW, GREATER
+    baseline_ver=$3 #semver#2
+    additional_value=${4:-0} #additional value
+
+    #when MIN: current semver_check (minimums:semver#2)
+    ## semver_check $KUBE_CLIENT_VER MIN 1.28.0
+
+    #when GREATER:current semver_check (minimums:semver#2) but matches return 1
+    ## semver_check $KUBE_CLIENT_VER GREATER 1.27.0
+
+    #when VALID: semver_parse "$1" and passthrough exit code
+    ## semver_check 1.2.23 VALID
+
+    #when NOT: semver_parse semver1 FULL != semvar_parse semver2 FULL
+    ## semver_check $HELM_VER NOT "3.1.2"
+
+    #when MINORSKEW abs(this_minor-that_minor)= additional_value
+    ## semver_check $KUBE_CLIENT_VER MINORSKEY $KUBE_SERVER_VER 1
+
+    local baseline val2check
+    case "$checkType" in
+        "MIN"|"GREATER")
+            baseline=$(semver_parse "$baseline_ver" "MAJOR")
+            val2check=$(semver_parse "$ver2check" "MAJOR")
+
+            ((val2check > baseline)) && return 0
+            ((val2check < baseline)) && return 1
+
+            baseline=$(semver_parse "$baseline_ver" "MINOR")
+            val2check=$(semver_parse "$ver2check" "MINOR")
+
+            ((val2check > baseline)) && return 0
+            ((val2check < baseline)) && return 1
+
+            baseline=$(semver_parse "$baseline_ver" "PATCH")
+            val2check=$(semver_parse "$ver2check" "PATCH")
+
+            ((val2check > baseline)) && return 0
+            ((val2check < baseline)) && return 1
+
+            if [ "$checkType" == "GREATER" ]; then
+                return 1;
+            else
+                return 0
+            fi
+            ;;
+        "MINORSKEW")
+            baseline=$(semver_parse "$baseline_ver" "MAJOR")
+            val2check=$(semver_parse "$ver2check" "MAJOR")
+
+            ((val2check < baseline)) && return 1
+
+            baseline=$(semver_parse "$baseline_ver" "MINOR")
+            val2check=$(semver_parse "$ver2check" "MINOR")
+
+            minordiff=$((baseline-val2check))
+            minorskew=${minordiff#-}
+
+            if [[ $minorskew > $additional_value ]]; then
+                return 1
+            else
+                return 0
+            fi
+            ;;
+        "NOT")
+            if [ "$(semver_parse "$ver2check" "FULL")" == "$(semver_parse "$baseline_ver" "FULL")" ]; then
+                return 1
+            else
+                return 0
+            fi
+            ;;
+        "VALID")
+            semver_parse "$ver2check"
+            return $?
+            ;;
+    esac
+}
+export -f semver_parse semver_need_at_least semver_check
+
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
     # Save standard out to a new descriptor
     exec 3>&1
@@ -385,3 +534,4 @@ function generateImageKeysFile {
 export -f parseFullImage
 export -f v4m_replace
 export -f generateImageKeysFile
+
