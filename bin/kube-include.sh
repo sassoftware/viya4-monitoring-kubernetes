@@ -44,7 +44,13 @@ else
 fi
 
 # Client version allowed to be one minor version earlier than minimum server version
-if semver_check "$KUBE_CLIENT_VER" MINORSKEW "$KUBE_SERVER_VER" 1; then
+##KUBE_MIN_MAJOR_VERSION=$(semver_parse "$KUBE_MIN_VER" MAJOR)
+##KUBE_MIN_MINOR_VERSION=$(semver_parse "$KUBE_MIN_VER" MINOR)
+##KUBE_MIN_PATCH_VERSION=$(semver_parse "$KUBE_MIN_VER" PATCH)
+##KUBE_CLIENT_MIN_VER="$KUBE_MIN_MAJOR_VERSION.$((KUBE_MIN_MINOR_VERSION-1)).$KUBE_MIN_PATCH_VERSION"
+
+KUBE_CLIENT_MIN_VER=$(semver_parse "$KUBE_MIN_VER" MAJOR).$(($(semver_parse "$KUBE_MIN_VER" MINOR)-1)).$(semver_parse "$KUBE_MIN_VER" PATCH)
+if semver_check "$KUBE_CLIENT_VER" MIN "$KUBE_CLIENT_MIN_VER"; then
     :
 else
     log_warn "Unsupported kubectl version: [$KUBE_CLIENT_VER]."
