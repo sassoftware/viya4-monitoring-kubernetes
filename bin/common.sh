@@ -1,5 +1,5 @@
 # shellcheck disable=SC2148
-# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021-2026, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # This file is not marked as executable as it is intended to be sourced
@@ -94,59 +94,21 @@ function semver_parse {
 
 }
 
-function semver_need_at_least {
-    local this that
-
-    this=$(semver_parse "$1" "MAJOR")
-    that=$(semver_parse "$2" "MAJOR")
-
-    ((that > this)) && return 0
-    ((that < this)) && return 1
-
-    this=$(semver_parse "$1" "MINOR")
-    that=$(semver_parse "$2" "MINOR")
-
-    ((that > this)) && return 0
-    ((that < this)) && return 1
-
-    this=$(semver_parse "$1" "PATCH")
-    that=$(semver_parse "$2" "PATCH")
-
-    ((that > this)) && return 0
-    ((that < this)) && return 1
-
-    return 0
-
-}
-
 function semver_check {
-    ver2check=$1 #semver value to check
-    checkType=${2:-VALID} #type of check: VALID, MIN, MINORSKEW, GREATER
-    baseline_ver=$3 #semver#2
-    additional_value=${4:-0} #additional value
+    local ver2check checkType baseline additional_value
+    ver2check=$1             #semver value to check
+    checkType=${2:-VALID}    #type of check: VALID, MAX,  MIN, MINORSKEW, GREATER, LESS
+    baseline_ver=$3          #"baseline" semver (ver2check is compared against this one)
+    additional_value=${4:-0} #additional value (used for some checkType)
 
-    #when MIN: current semver_check (minimums:semver#2)
-    ## semver_check $KUBE_CLIENT_VER MIN 1.28.0
+    local baseline_ver val2check minorskew minordiff
 
-    #when GREATER:current semver_check (minimums:semver#2) but matches return 1
-    ## semver_check $KUBE_CLIENT_VER GREATER 1.27.0
-
-    #when VALID: semver_parse "$1" and passthrough exit code
-    ## semver_check 1.2.23 VALID
-
-    #when NOT: semver_parse semver1 FULL != semvar_parse semver2 FULL
-    ## semver_check $HELM_VER NOT "3.1.2"
-
-    #when MINORSKEW abs(this_minor-that_minor)= additional_value
-    ## semver_check $KUBE_CLIENT_VER MINORSKEY $KUBE_SERVER_VER 1
-
-    local baseline val2check
     case "$checkType" in
         "MIN"|"GREATER")
             #NOTE: MIN and GREATER are NOT synonyms!
             # When baseline and val2check match...
-            # MIN: returns 0 (success)
-            # GREATER: returns 1 (failure)
+            #   MIN: returns 0 (success)
+            #   GREATER: returns 1 (failure)
 
             baseline=$(semver_parse "$baseline_ver" "MAJOR")
             val2check=$(semver_parse "$ver2check" "MAJOR")
@@ -175,8 +137,8 @@ function semver_check {
         "MAX"|"LESS")
             #NOTE: MAX and LESS are NOT synonyms!
             # When baseline and val2check match...
-            # MAX: returns 0 (success)
-            # LESS: returns 1 (failure)
+            #   MAX: returns 0 (success)
+            #   LESS: returns 1 (failure)
 
             baseline=$(semver_parse "$baseline_ver" "MAJOR")
             val2check=$(semver_parse "$ver2check" "MAJOR")
@@ -203,6 +165,8 @@ function semver_check {
             fi
             ;;
         "MINORSKEW")
+            #NOTE: MINORSKEY tests whether the MINOR version
+            #      is within the specified range of the baseline
             baseline=$(semver_parse "$baseline_ver" "MAJOR")
             val2check=$(semver_parse "$ver2check" "MAJOR")
 
@@ -221,6 +185,9 @@ function semver_check {
             fi
             ;;
         "NOT")
+            # NOTE: Tests that the specified value
+            #       does NOT match the baseline
+
             if [ "$(semver_parse "$ver2check" "FULL")" == "$(semver_parse "$baseline_ver" "FULL")" ]; then
                 return 1
             else
@@ -228,12 +195,15 @@ function semver_check {
             fi
             ;;
         "VALID")
+            # NOTE: Simply validates that the specified
+            #       value is a valid semanticVersion value
             semver_parse "$ver2check"
             return $?
             ;;
     esac
 }
-export -f semver_parse semver_need_at_least semver_check
+
+export -f semver_parse semver_check
 
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
     # Save standard out to a new descriptor

@@ -1,5 +1,5 @@
 # shellcheck disable=SC2148
-# Copyright © 2025,2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2026,2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # This script is not intended to be run directly
@@ -81,7 +81,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
         # shellcheck disable=SC2269
         OPENSHIFT_ROUTE_DOMAIN=${OPENSHIFT_ROUTE_DOMAIN}  #clarifies that this can be set externally
         if [ -z "$OPENSHIFT_ROUTE_DOMAIN" ]; then
-            OPENSHIFT_ROUTE_DOMAIN=$(oc get route -n openshift-console console -o 'jsonpath={.spec.host}' | cut -c 27-)}
+            OPENSHIFT_ROUTE_DOMAIN=$(oc get route -n openshift-console console -o 'jsonpath={.spec.host}' | cut -c 27-)
         fi
 
         #confirms OPENSHIFT_ROUTE_DOMAIN is set one way or another
