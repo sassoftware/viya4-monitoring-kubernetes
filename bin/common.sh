@@ -217,6 +217,7 @@ function semver_check {
     *)
         #invalid/unknown checkType
         return 2
+        ;;
     esac
 }
 
