@@ -43,13 +43,14 @@ else
     log_warn "This script might not work as expected. Support might not be available until Kubernetes is upgraded to a supported version."
 fi
 
-# Client version allowed to be one minor version earlier than minimum server version
+# Client version allowed to be one MINOR version earlier than
+# minimum server version (PATCH value does not matter, set to 0)
+
 ##KUBE_MIN_MAJOR_VERSION=$(semver_parse "$KUBE_MIN_VER" MAJOR)
 ##KUBE_MIN_MINOR_VERSION=$(semver_parse "$KUBE_MIN_VER" MINOR)
-##KUBE_MIN_PATCH_VERSION=$(semver_parse "$KUBE_MIN_VER" PATCH)
-##KUBE_CLIENT_MIN_VER="$KUBE_MIN_MAJOR_VERSION.$((KUBE_MIN_MINOR_VERSION-1)).$KUBE_MIN_PATCH_VERSION"
+##KUBE_CLIENT_MIN_VER="$KUBE_MIN_MAJOR_VERSION.$((KUBE_MIN_MINOR_VERSION-1)).0"
 
-KUBE_CLIENT_MIN_VER=$(semver_parse "$KUBE_MIN_VER" MAJOR).$(($(semver_parse "$KUBE_MIN_VER" MINOR) - 1)).$(semver_parse "$KUBE_MIN_VER" PATCH)
+KUBE_CLIENT_MIN_VER=$(semver_parse "$KUBE_MIN_VER" MAJOR).$(($(semver_parse "$KUBE_MIN_VER" MINOR) - 1)).0
 if semver_check "$KUBE_CLIENT_VER" MIN "$KUBE_CLIENT_MIN_VER"; then
     :
 else

@@ -209,11 +209,14 @@ function semver_check {
         fi
         ;;
     "VALID")
-        # NOTE: Simply validates that the specified
-        #       value is a valid semanticVersion value
+        # NOTE: Tests that the specified value
+        #       is a valid semVer value
         semver_parse "$ver2check"
         return $?
         ;;
+    *)
+        #invalid/unknown checkType
+        return 2
     esac
 }
 

@@ -67,7 +67,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
             fi
 
             ## Client Version
-            OC_MIN_VER="$OSHIFT_MAJOR_VERSION.$((OSHIFT_MINOR_VERSION - 1)).$OSHIFT_PATCH_VERSION"
+            OC_MIN_VER="$OSHIFT_MAJOR_VERSION.$((OSHIFT_MINOR_VERSION - 1)).0"
             if semver_check "$OC_FULL_VERSION" MIN "$OC_MIN_VER"; then
                 log_debug "OpenShift client version check OK"
             else
