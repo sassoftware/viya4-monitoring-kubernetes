@@ -125,8 +125,15 @@ function semver_check {
         #   MIN: returns 0 (success)
         #   GREATER: returns 1 (failure)
 
-        baseline=$(semver_parse "$baseline_ver" "MAJOR")
-        val2check=$(semver_parse "$ver2check" "MAJOR")
+        #validates baseline_ver as part of assignment
+        if ! baseline=$(semver_parse "$baseline_ver" "MAJOR"); then
+            return 1
+        fi
+
+        #validates val2check as part of assignment
+        if ! val2check=$(semver_parse "$ver2check" "MAJOR"); then
+            return 1
+        fi
 
         ((val2check > baseline)) && return 0
         ((val2check < baseline)) && return 1
@@ -155,8 +162,12 @@ function semver_check {
         #   MAX: returns 0 (success)
         #   LESS: returns 1 (failure)
 
-        baseline=$(semver_parse "$baseline_ver" "MAJOR")
-        val2check=$(semver_parse "$ver2check" "MAJOR")
+        if ! baseline=$(semver_parse "$baseline_ver" "MAJOR"); then
+            return 1
+        fi
+        if ! val2check=$(semver_parse "$ver2check" "MAJOR"); then
+            return 1
+        fi
 
         ((val2check < baseline)) && return 0
         ((val2check > baseline)) && return 1
@@ -182,8 +193,13 @@ function semver_check {
     "MINORSKEW")
         #NOTE: MINORSKEY tests whether the MINOR version
         #      is within the specified range of the baseline
-        baseline=$(semver_parse "$baseline_ver" "MAJOR")
-        val2check=$(semver_parse "$ver2check" "MAJOR")
+
+        if ! baseline=$(semver_parse "$baseline_ver" "MAJOR"); then
+            return 1
+        fi
+        if ! val2check=$(semver_parse "$ver2check" "MAJOR"); then
+            return 1
+        fi
 
         ((val2check < baseline)) && return 1
 
