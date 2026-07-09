@@ -11,8 +11,8 @@ if [ ! "$(which kubectl)" ]; then
     exit 1
 fi
 
-KUBE_CLIENT_VER=$(kubectl version |sed -n 's/^Client Version:[[:space:]]*//p')
-KUBE_SERVER_VER=$(kubectl version |sed -n 's/^Server Version:[[:space:]]*//p')
+KUBE_CLIENT_VER=$(kubectl version | sed -n 's/^Client Version:[[:space:]]*//p')
+KUBE_SERVER_VER=$(kubectl version | sed -n 's/^Server Version:[[:space:]]*//p')
 
 if [ "$KUBE_CLIENT_VER" != "$(semver_parse "$KUBE_CLIENT_VER")" ]; then
     log_error "Kubernetes Client Version does not match expected pattern."
@@ -34,7 +34,7 @@ fi
 # 2026.03     1.32 1.34
 # 2026.04     1.32 1.34
 
-KUBE_MIN_VER=${KUBE_MIN_VER:-"1.2.28"}  #TO DO: Keep this changeable via env var?
+KUBE_MIN_VER=${KUBE_MIN_VER:-"1.2.28"} #TO DO: Keep this changeable via env var?
 
 if semver_check "$KUBE_SERVER_VER" MIN "$KUBE_MIN_VER"; then
     :
@@ -49,7 +49,7 @@ fi
 ##KUBE_MIN_PATCH_VERSION=$(semver_parse "$KUBE_MIN_VER" PATCH)
 ##KUBE_CLIENT_MIN_VER="$KUBE_MIN_MAJOR_VERSION.$((KUBE_MIN_MINOR_VERSION-1)).$KUBE_MIN_PATCH_VERSION"
 
-KUBE_CLIENT_MIN_VER=$(semver_parse "$KUBE_MIN_VER" MAJOR).$(($(semver_parse "$KUBE_MIN_VER" MINOR)-1)).$(semver_parse "$KUBE_MIN_VER" PATCH)
+KUBE_CLIENT_MIN_VER=$(semver_parse "$KUBE_MIN_VER" MAJOR).$(($(semver_parse "$KUBE_MIN_VER" MINOR) - 1)).$(semver_parse "$KUBE_MIN_VER" PATCH)
 if semver_check "$KUBE_CLIENT_VER" MIN "$KUBE_CLIENT_MIN_VER"; then
     :
 else

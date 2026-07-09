@@ -27,7 +27,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
             exit 1
         fi
 
-        OSHIFT_VER=$(oc version |sed -n 's/^Server Version:[[:space:]]*//p')
+        OSHIFT_VER=$(oc version | sed -n 's/^Server Version:[[:space:]]*//p')
 
         if [ "$OSHIFT_VER" == "$(semver_parse "$OSHIFT_VER")" ]; then
             OSHIFT_FULL_VERSION="$(semver_parse "$OSHIFT_VER" FULL)"
@@ -39,7 +39,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
         fi
         log_info "OpenShift server version: $OSHIFT_FULL_VERSION"
 
-        OC_VER=$(oc version |sed -n 's/^Client Version:[[:space:]]*//p')
+        OC_VER=$(oc version | sed -n 's/^Client Version:[[:space:]]*//p')
 
         if [ "$OC_VER" == "$(semver_parse "$OC_VER")" ]; then
             OC_FULL_VERSION="$(semver_parse "$OC_VER" FULL)"
@@ -55,7 +55,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
         # OpenShift  Version enforcement
         if [ "$OPENSHIFT_VERSION_CHECK" == "true" ]; then
 
-            OPENSHIFT_MIN_VER=${OPENSHIFT_MIN_VER:-"4.14.0"}  #TO DO: Keep this changeable via env var?
+            OPENSHIFT_MIN_VER=${OPENSHIFT_MIN_VER:-"4.14.0"} #TO DO: Keep this changeable via env var?
 
             ## Server Version
             if semver_check "$OSHIFT_FULL_VERSION" MIN "$OPENSHIFT_MIN_VER"; then
@@ -67,7 +67,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
             fi
 
             ## Client Version
-            OC_MIN_VER="$OSHIFT_MAJOR_VERSION.$((OSHIFT_MINOR_VERSION-1)).$OSHIFT_PATCH_VERSION"
+            OC_MIN_VER="$OSHIFT_MAJOR_VERSION.$((OSHIFT_MINOR_VERSION - 1)).$OSHIFT_PATCH_VERSION"
             if semver_check "$OSHIFT_FULL_VERSION" MIN "$OC_MIN_VER"; then
                 log_debug "OpenShift client version check OK"
             else
@@ -79,7 +79,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
 
         # Get base OpenShift route hostname
         # shellcheck disable=SC2269
-        OPENSHIFT_ROUTE_DOMAIN=${OPENSHIFT_ROUTE_DOMAIN}  #clarifies that this can be set externally
+        OPENSHIFT_ROUTE_DOMAIN=${OPENSHIFT_ROUTE_DOMAIN} #clarifies that this can be set externally
         if [ -z "$OPENSHIFT_ROUTE_DOMAIN" ]; then
             OPENSHIFT_ROUTE_DOMAIN=$(oc get route -n openshift-console console -o 'jsonpath={.spec.host}' | cut -c 27-)
         fi

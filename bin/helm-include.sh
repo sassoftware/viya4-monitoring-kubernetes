@@ -13,8 +13,8 @@ fi
 
 helmVer=$(helm version --short 2> /dev/null)
 HELM_VER_MAJOR=$(semver_parse "$helmVer" MAJOR)
-HELM_VER_MINOR=$(semver_parse "$helmVer" MINOR)  #TODO: Not used, remove?
-HELM_VER_PATCH=$(semver_parse "$helmVer" PATCH)  #TODO: Not used, remove?
+HELM_VER_MINOR=$(semver_parse "$helmVer" MINOR) #TODO: Not used, remove?
+HELM_VER_PATCH=$(semver_parse "$helmVer" PATCH) #TODO: Not used, remove?
 HELM_VER_FULL=$(semver_parse "$helmVer" FULL)
 
 if [ "$HELM_VER_MAJOR" == "2" ]; then
@@ -140,7 +140,7 @@ function get_helm_versionstring {
     return
 }
 
-export HELM_VER_FULL HELM_VER_MAJOR HELM_VER_MINOR HELM_VER_PATCH  #TODO: Remove HELM_VER_MINOR HELM_VER_PATCH since not currently used?
+export HELM_VER_FULL HELM_VER_MAJOR HELM_VER_MINOR HELM_VER_PATCH #TODO: Remove HELM_VER_MINOR HELM_VER_PATCH since not currently used?
 export -f helm2ReleaseExists
 export -f helm3ReleaseExists
 export -f helm2ReleaseCheck

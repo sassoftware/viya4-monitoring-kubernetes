@@ -37,10 +37,10 @@ function errexit_msg {
 
 function checkYqVersion {
     # confirm yq installed and correct version
-    local  yq_version yq_required_version
+    local yq_version yq_required_version
     yq_required_version="4.45.1"
 
-    if which yq &>/dev/null ; then
+    if which yq &> /dev/null ; then
 
         yq_version=$(yq --version | sed -n 's!^yq (https://github.com/mikefarah/yq/) version!!p')
 
@@ -68,37 +68,35 @@ function semver_parse {
     string=$1
     fragment=$2
 
-    if [[ $string =~  v?([0-9]+)\.([0-9]+)\.([0-9]+)(-(([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
+    if [[ $string =~ v?([0-9]+)\.([0-9]+)\.([0-9]+)(-(([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
         case "$fragment" in
-             major|MAJOR)
-                echo "${BASH_REMATCH[1]}"
-                ;;
-             minor|MINOR)
-                echo "${BASH_REMATCH[2]}"
-                ;;
-             patch|PATCH)
-                echo "${BASH_REMATCH[3]}"
-                ;;
-             prerelease|PRERELEASE)
-                # BASH_REMATCH[4] includes the leading "-"
-                echo "${BASH_REMATCH[5]}"
-                ;;
-             buildmeta|BUILDMETA)
-                # BASH_REMATCH[9] includes the leading "+"
-                echo "${BASH_REMATCH[10]}"
-                ;;
-             full|FULL)
-                echo "${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
-                ;;
-
-              *)
-                echo "$string"
-                ;;
+        major|MAJOR)
+            echo "${BASH_REMATCH[1]}"
+            ;;
+        minor|MINOR)
+            echo "${BASH_REMATCH[2]}"
+            ;;
+        patch|PATCH)
+            echo "${BASH_REMATCH[3]}"
+            ;;
+        prerelease|PRERELEASE)
+            # BASH_REMATCH[4] includes the leading "-"
+            echo "${BASH_REMATCH[5]}"
+            ;;
+        buildmeta|BUILDMETA)
+            # BASH_REMATCH[9] includes the leading "+"
+            echo "${BASH_REMATCH[10]}"
+            ;;
+        full|FULL)
+            echo "${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+            ;;
+        *)
+            echo "$string"
+            ;;
         esac
-
     else
-       echo " "
-       return 1
+        echo " "
+        return 1
     fi
 
 
@@ -118,102 +116,101 @@ function semver_check {
     local baseline val2check minorskew minordiff
 
     case "$checkType" in
-        "MIN"|"GREATER")
-            #NOTE: MIN and GREATER are NOT synonyms!
-            # When baseline and val2check match...
-            #   MIN: returns 0 (success)
-            #   GREATER: returns 1 (failure)
+    "MIN"|"GREATER")
+        #NOTE: MIN and GREATER are NOT synonyms!
+        # When baseline and val2check match...
+        #   MIN: returns 0 (success)
+        #   GREATER: returns 1 (failure)
 
-            baseline=$(semver_parse "$baseline_ver" "MAJOR")
-            val2check=$(semver_parse "$ver2check" "MAJOR")
+        baseline=$(semver_parse "$baseline_ver" "MAJOR")
+        val2check=$(semver_parse "$ver2check" "MAJOR")
 
-            ((val2check > baseline)) && return 0
-            ((val2check < baseline)) && return 1
+        ((val2check > baseline)) && return 0
+        ((val2check < baseline)) && return 1
 
-            baseline=$(semver_parse "$baseline_ver" "MINOR")
-            val2check=$(semver_parse "$ver2check" "MINOR")
+        baseline=$(semver_parse "$baseline_ver" "MINOR")
+        val2check=$(semver_parse "$ver2check" "MINOR")
 
-            ((val2check > baseline)) && return 0
-            ((val2check < baseline)) && return 1
+        ((val2check > baseline)) && return 0
+        ((val2check < baseline)) && return 1
 
-            baseline=$(semver_parse "$baseline_ver" "PATCH")
-            val2check=$(semver_parse "$ver2check" "PATCH")
+        baseline=$(semver_parse "$baseline_ver" "PATCH")
+        val2check=$(semver_parse "$ver2check" "PATCH")
 
-            ((val2check > baseline)) && return 0
-            ((val2check < baseline)) && return 1
+        ((val2check > baseline)) && return 0
+        ((val2check < baseline)) && return 1
 
-            if [ "$checkType" == "GREATER" ]; then
-                return 1;
-            else
-                return 0
-            fi
-            ;;
-        "MAX"|"LESS")
-            #NOTE: MAX and LESS are NOT synonyms!
-            # When baseline and val2check match...
-            #   MAX: returns 0 (success)
-            #   LESS: returns 1 (failure)
+        if [ "$checkType" == "GREATER" ]; then
+            return 1;
+        else
+            return 0
+        fi
+        ;;
+    "MAX"|"LESS")
+        #NOTE: MAX and LESS are NOT synonyms!
+        # When baseline and val2check match...
+        #   MAX: returns 0 (success)
+        #   LESS: returns 1 (failure)
 
-            baseline=$(semver_parse "$baseline_ver" "MAJOR")
-            val2check=$(semver_parse "$ver2check" "MAJOR")
+        baseline=$(semver_parse "$baseline_ver" "MAJOR")
+        val2check=$(semver_parse "$ver2check" "MAJOR")
 
-            ((val2check < baseline)) && return 0
-            ((val2check > baseline)) && return 1
+        ((val2check < baseline)) && return 0
+        ((val2check > baseline)) && return 1
 
-            baseline=$(semver_parse "$baseline_ver" "MINOR")
-            val2check=$(semver_parse "$ver2check" "MINOR")
+        baseline=$(semver_parse "$baseline_ver" "MINOR")
+        val2check=$(semver_parse "$ver2check" "MINOR")
 
-            ((val2check < baseline)) && return 0
-            ((val2check > baseline)) && return 1
+        ((val2check < baseline)) && return 0
+        ((val2check > baseline)) && return 1
 
-            baseline=$(semver_parse "$baseline_ver" "PATCH")
-            val2check=$(semver_parse "$ver2check" "PATCH")
+        baseline=$(semver_parse "$baseline_ver" "PATCH")
+        val2check=$(semver_parse "$ver2check" "PATCH")
 
-            ((val2check < baseline)) && return 0
-            ((val2check > baseline)) && return 1
+        ((val2check < baseline)) && return 0
+        ((val2check > baseline)) && return 1
 
-            if [ "$checkType" == "LESS" ]; then
-                return 1;
-            else
-                return 0
-            fi
-            ;;
-        "MINORSKEW")
-            #NOTE: MINORSKEY tests whether the MINOR version
-            #      is within the specified range of the baseline
-            baseline=$(semver_parse "$baseline_ver" "MAJOR")
-            val2check=$(semver_parse "$ver2check" "MAJOR")
+        if [ "$checkType" == "LESS" ]; then
+            return 1;
+        else
+            return 0
+        fi
+        ;;
+    "MINORSKEW")
+        #NOTE: MINORSKEY tests whether the MINOR version
+        #      is within the specified range of the baseline
+        baseline=$(semver_parse "$baseline_ver" "MAJOR")
+        val2check=$(semver_parse "$ver2check" "MAJOR")
 
-            ((val2check < baseline)) && return 1
+        ((val2check < baseline)) && return 1
 
-            baseline=$(semver_parse "$baseline_ver" "MINOR")
-            val2check=$(semver_parse "$ver2check" "MINOR")
+        baseline=$(semver_parse "$baseline_ver" "MINOR")
+        val2check=$(semver_parse "$ver2check" "MINOR")
 
-            minordiff=$((baseline-val2check))
-            minorskew=${minordiff#-}
+        minordiff=$((baseline-val2check))
+        minorskew=${minordiff#-}
 
-            if [[ $minorskew > $additional_value ]]; then
-                return 1
-            else
-                return 0
-            fi
-            ;;
-        "NOT")
-            # NOTE: Tests that the specified value
-            #       does NOT match the baseline
-
-            if [ "$(semver_parse "$ver2check" "FULL")" == "$(semver_parse "$baseline_ver" "FULL")" ]; then
-                return 1
-            else
-                return 0
-            fi
-            ;;
-        "VALID")
-            # NOTE: Simply validates that the specified
-            #       value is a valid semanticVersion value
-            semver_parse "$ver2check"
-            return $?
-            ;;
+        if [[ $minorskew > $additional_value ]]; then
+            return 1
+        else
+            return 0
+        fi
+        ;;
+    "NOT")
+        # NOTE: Tests that the specified value
+        #       does NOT match the baseline
+        if [ "$(semver_parse "$ver2check" "FULL")" == "$(semver_parse "$baseline_ver" "FULL")" ]; then
+            return 1
+        else
+            return 0
+        fi
+        ;;
+    "VALID")
+        # NOTE: Simply validates that the specified
+        #       value is a valid semanticVersion value
+        semver_parse "$ver2check"
+        return $?
+        ;;
     esac
 }
 
