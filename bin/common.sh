@@ -58,6 +58,12 @@ function checkYqVersion {
 }
 
 function semver_parse {
+    ## This function returns string values containing the requested
+    ## portions of the semantic version string passed to it
+    ##
+    ## If the passed string is NOT a valid semantic version string,
+    ## this function returns nothing and sets a non-zero exit code
+
     local string fragment
     string=$1
     fragment=$2
@@ -99,6 +105,10 @@ function semver_parse {
 }
 
 function semver_check {
+    ## This function tests the passed version string to validate it
+    ## matches the specified criteria and sets its exit code to indicate
+    ## success (returns a 0) or failure (returns a 1)
+
     local ver2check checkType baseline_ver additional_value
     ver2check=$1             #semver value to check
     checkType=${2:-VALID}    #type of check: VALID, MAX,  MIN, MINORSKEW, GREATER, LESS
