@@ -66,7 +66,7 @@ function semver_parse {
 
     local string fragment
     string=$1
-    fragment=$2
+    fragment=${2:-ECHO}
 
     if [[ $string =~ v?([0-9]+)\.([0-9]+)\.([0-9]+)(-(([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
         case "$fragment" in
@@ -90,12 +90,16 @@ function semver_parse {
         full | FULL)
             echo "${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
             ;;
-        *)
+        ECHO)
             echo "$string"
+            ;;
+        *)
+            #invalid fragment specified
+            return 1
             ;;
         esac
     else
-        echo " "
+        #invalid string (i.e. NOT valid semVer)
         return 1
     fi
 
@@ -189,7 +193,7 @@ function semver_check {
         minordiff=$((baseline - val2check))
         minorskew=${minordiff#-}
 
-        if [[ $minorskew > $additional_value ]]; then
+        if (( minorskew > additional_value )); then
             return 1
         else
             return 0
