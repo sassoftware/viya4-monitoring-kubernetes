@@ -29,7 +29,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
 
         OSHIFT_VER=$(oc version |sed -n 's/^Server Version:[[:space:]]*//p')
 
-        if [ "$OSHIFT_VER" == "$(semver_parse "$OSHIFT")" ]; then
+        if [ "$OSHIFT_VER" == "$(semver_parse "$OSHIFT_VER")" ]; then
             OSHIFT_FULL_VERSION="$(semver_parse "$OSHIFT_VER" FULL)"
             OSHIFT_MAJOR_VERSION="$(semver_parse "$OSHIFT_VER" MAJOR)"
             OSHIFT_MINOR_VERSION="$(semver_parse "$OSHIFT_VER" MINOR)"
