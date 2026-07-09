@@ -193,7 +193,7 @@ function semver_check {
         minordiff=$((baseline - val2check))
         minorskew=${minordiff#-}
 
-        if (( minorskew > additional_value )); then
+        if ((minorskew > additional_value)); then
             return 1
         else
             return 0
