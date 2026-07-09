@@ -37,19 +37,23 @@ function errexit_msg {
 
 function checkYqVersion {
     # confirm yq installed and correct version
-    local goodver yq_version
-    # "good version" == 4.45.xx -> 4.49.xx OR 4.50.xx -> 4.99.xx
-    goodver="yq \(.+mikefarah.+\) version (v)?(4\.(4[5-9]|[5-9][0-9])\..+)"
-    yq_version=$(yq --version)
-    if [ "$?" == "1" ]; then
+    local  yq_version yq_required_version
+    yq_required_version="4.45.1"
+
+    if which yq &>/dev/null ; then
+
+        yq_version=$(yq --version | sed -n 's!^yq (https://github.com/mikefarah/yq/) version!!p')
+
+        if semver_check "$yq_version" LESS "$yq_required_version"; then
+            log_error "Incorrect version [$yq_version] found; version [$yq_required_version] or higher required."
+            return 1
+        else
+            log_debug "A valid version [$yq_version] of yq detected"
+            return 0
+        fi
+    else
         log_error "Required component [yq] not available."
         return 1
-    elif [[ ! $yq_version =~ $goodver ]]; then
-        log_error "Incorrect version [$yq_version] found; version 4.45.1+ required."
-        return 1
-    else
-        log_debug "A valid version [$yq_version] of yq detected"
-        return 0
     fi
 }
 
@@ -95,13 +99,13 @@ function semver_parse {
 }
 
 function semver_check {
-    local ver2check checkType baseline additional_value
+    local ver2check checkType baseline_ver additional_value
     ver2check=$1             #semver value to check
     checkType=${2:-VALID}    #type of check: VALID, MAX,  MIN, MINORSKEW, GREATER, LESS
     baseline_ver=$3          #"baseline" semver (ver2check is compared against this one)
     additional_value=${4:-0} #additional value (used for some checkType)
 
-    local baseline_ver val2check minorskew minordiff
+    local baseline val2check minorskew minordiff
 
     case "$checkType" in
         "MIN"|"GREATER")
