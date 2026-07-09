@@ -34,15 +34,16 @@ fi
 
 # SAS Viya 4 versions
 # supported by SAS Tech Support
-# Updated: 20MAY26
-# 2024.03 LTS 1.26 1.28   (EOL: 1.26)
-# 2024.09 LTS 1.28 1.30   (EOL: 1.28)
-# 2025.03 LTS 1.29 1.31
-# 2025.09 LTS 1.31 1.33
-# 2026.01     1.31 1.33
-# 2026.02     1.32 1.34
-# 2026.03     1.32 1.34
-# 2026.04     1.32 1.34
+# Updated: 06JUL26
+# 2024.09 LTS 1.28* 1.30
+# 2025.03 LTS 1.29% 1.31
+# 2025.09 LTS 1.31  1.33
+# 2026.03 LTS 1.32  1.35
+# 2026.03     1.32  1.34
+# 2026.05     1.33  1.35
+# 2026.06     1.33  1.35
+## * EOL: 1.28
+## % OCP Only: 1.29
 
 # Client version allowed to be one minor version earlier than minimum server version
 if [ "$KUBE_CLIENT_MAJOR" -eq "1" ] && [ "$KUBE_CLIENT_MINOR" -gt "26" ]; then

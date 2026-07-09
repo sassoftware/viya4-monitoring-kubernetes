@@ -24,7 +24,7 @@ registry/repository/image_name:version
 | Metrics | [Alertmanager](https://github.com/prometheus/alertmanager) | quay.io/prometheus/alertmanager:v0.32.1 |
 | Metrics | [Grafana](https://github.com/grafana/grafana) | docker.io/grafana/grafana:13.0.1-security-01 |
 | Metrics | [Admission Webhook](https://github.com/kubernetes/ingress-nginx) | ghcr.io/jkroepke/kube-webhook-certgen:1.8.2 |
-| Metrics | [Kube State Metrics](https://github.com/kubernetes/kube-state-metrics) | registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.18.0 |
+| Metrics | [Kube State Metrics](https://github.com/kubernetes/kube-state-metrics) | registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.19.1 |
 | Metrics | [Node Exporter](https://github.com/prometheus/node_exporter) | quay.io/prometheus/node-exporter:v1.11.1-distroless |
 | Metrics | [Prometheus](https://github.com/prometheus/prometheus) | quay.io/prometheus/prometheus:v3.11.3-distroless |
 | Metrics | [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator) | quay.io/prometheus-operator/prometheus-operator:v0.90.1 |
