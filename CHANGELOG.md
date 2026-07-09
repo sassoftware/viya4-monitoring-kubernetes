@@ -1,4 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Tracing**
+  * [UPGRADE] Tempo upgraded from 2.9.0 to 2.10.7
+  * [UPGRADE] Tempo Helm chart upgraded from 1.24.1 to 2.2.3
+
+
 ## Version 1.2.51 (02JULY2026)
 * **Logging**
   * [FIX] (Re-)Initialized temporary response files between API calls
