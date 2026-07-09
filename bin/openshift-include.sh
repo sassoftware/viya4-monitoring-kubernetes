@@ -93,7 +93,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
         fi
 
         export OPENSHIFT_ROUTE_DOMAIN
-        export OC_MAJOR_VERSION OC_MINOR_VERSION OC_PATCH_VERSION #TODO: Remove? Not used anywhere
+        export OC_MAJOR_VERSION OC_MINOR_VERSION OC_PATCH_VERSION             #TODO: Remove? Not used anywhere
         export OSHIFT_MAJOR_VERSION OSHIFT_MINOR_VERSION OSHIFT_PATCH_VERSION #TODO: Remove? Not used anywhere
         export OSHIFT_FULL_VERSION
 

@@ -40,7 +40,7 @@ function checkYqVersion {
     local yq_version yq_required_version
     yq_required_version="4.45.1"
 
-    if which yq &> /dev/null ; then
+    if which yq &> /dev/null; then
 
         yq_version=$(yq --version | sed -n 's!^yq (https://github.com/mikefarah/yq/) version!!p')
 
@@ -70,24 +70,24 @@ function semver_parse {
 
     if [[ $string =~ v?([0-9]+)\.([0-9]+)\.([0-9]+)(-(([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
         case "$fragment" in
-        major|MAJOR)
+        major | MAJOR)
             echo "${BASH_REMATCH[1]}"
             ;;
-        minor|MINOR)
+        minor | MINOR)
             echo "${BASH_REMATCH[2]}"
             ;;
-        patch|PATCH)
+        patch | PATCH)
             echo "${BASH_REMATCH[3]}"
             ;;
-        prerelease|PRERELEASE)
+        prerelease | PRERELEASE)
             # BASH_REMATCH[4] includes the leading "-"
             echo "${BASH_REMATCH[5]}"
             ;;
-        buildmeta|BUILDMETA)
+        buildmeta | BUILDMETA)
             # BASH_REMATCH[9] includes the leading "+"
             echo "${BASH_REMATCH[10]}"
             ;;
-        full|FULL)
+        full | FULL)
             echo "${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
             ;;
         *)
@@ -98,7 +98,6 @@ function semver_parse {
         echo " "
         return 1
     fi
-
 
 }
 
@@ -116,7 +115,7 @@ function semver_check {
     local baseline val2check minorskew minordiff
 
     case "$checkType" in
-    "MIN"|"GREATER")
+    "MIN" | "GREATER")
         #NOTE: MIN and GREATER are NOT synonyms!
         # When baseline and val2check match...
         #   MIN: returns 0 (success)
@@ -141,12 +140,12 @@ function semver_check {
         ((val2check < baseline)) && return 1
 
         if [ "$checkType" == "GREATER" ]; then
-            return 1;
+            return 1
         else
             return 0
         fi
         ;;
-    "MAX"|"LESS")
+    "MAX" | "LESS")
         #NOTE: MAX and LESS are NOT synonyms!
         # When baseline and val2check match...
         #   MAX: returns 0 (success)
@@ -171,7 +170,7 @@ function semver_check {
         ((val2check > baseline)) && return 1
 
         if [ "$checkType" == "LESS" ]; then
-            return 1;
+            return 1
         else
             return 0
         fi
@@ -187,7 +186,7 @@ function semver_check {
         baseline=$(semver_parse "$baseline_ver" "MINOR")
         val2check=$(semver_parse "$ver2check" "MINOR")
 
-        minordiff=$((baseline-val2check))
+        minordiff=$((baseline - val2check))
         minorskew=${minordiff#-}
 
         if [[ $minorskew > $additional_value ]]; then
@@ -548,4 +547,3 @@ function generateImageKeysFile {
 export -f parseFullImage
 export -f v4m_replace
 export -f generateImageKeysFile
-
