@@ -112,79 +112,92 @@ function semver_check {
 
     local ver2check checkType baseline_ver additional_value
     ver2check=$1             #semver value to check
-    checkType=${2:-VALID}    #type of check: VALID, MAX,  MIN, MINORSKEW, GREATER, LESS
+    checkType=${2:-VALID}    #type of check: VALID|EQ(IS)|NE(NOT)|GE(MIN)|LE(MAX)|GT|LT|MINORSKEW|PATTERN,
     baseline_ver=$3          #"baseline" semver (ver2check is compared against this one)
     additional_value=${4:-0} #additional value (used for some checkType)
 
-    local baseline val2check minorskew minordiff
+    local v1maj v1min v1pat v1full v2maj v2min v2pat v2full minordiff minorskew
+    local semver_re='^v?([0-9]+)\.([0-9]+)\.([0-9]+)(-(([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$'
+
+    # Parse ver2check once
+    if [[ $ver2check =~ $semver_re ]]; then
+        v1maj=${BASH_REMATCH[1]}
+        v1min=${BASH_REMATCH[2]}
+        v1pat=${BASH_REMATCH[3]}
+        v1full="$v1maj.$v1min.$v1pat"
+    else
+        return 1
+    fi
+
+    if [ -z "$baseline_ver" ] && [ "$checkType" != "PATTERN" ]; then
+        if [[ $baseline_ver =~ $semver_re ]]; then
+            v2maj=${BASH_REMATCH[1]}
+            v2min=${BASH_REMATCH[2]}
+            v2pat=${BASH_REMATCH[3]}
+            v2full="$v2maj.$v2min.$v2pat"
+        else
+            return 1
+        fi
+    fi
 
     case "$checkType" in
-    "MIN" | "GREATER")
-        #NOTE: MIN and GREATER are NOT synonyms!
+    "GE" | "MIN" | "GT" )
+        #NOTE: GE/MIN and GT are NOT synonyms!
         # When baseline and val2check match...
-        #   MIN: returns 0 (success)
-        #   GREATER: returns 1 (failure)
+        #   GE/MIN: returns 0 (success)
+        #   GT: returns 1 (failure)
 
-        #validates baseline_ver as part of assignment
-        if ! baseline=$(semver_parse "$baseline_ver" "MAJOR"); then
-            return 1
-        fi
+        ((v1maj > v2maj)) && return 0
+        ((v1maj < v2maj)) && return 1
 
-        #validates val2check as part of assignment
-        if ! val2check=$(semver_parse "$ver2check" "MAJOR"); then
-            return 1
-        fi
+        ((v1min > v2min)) && return 0
+        ((v1min < v2min)) && return 1
 
-        ((val2check > baseline)) && return 0
-        ((val2check < baseline)) && return 1
+        ((v1pat > v2pat)) && return 0
+        ((v1pat < v2pat)) && return 1
 
-        baseline=$(semver_parse "$baseline_ver" "MINOR")
-        val2check=$(semver_parse "$ver2check" "MINOR")
-
-        ((val2check > baseline)) && return 0
-        ((val2check < baseline)) && return 1
-
-        baseline=$(semver_parse "$baseline_ver" "PATCH")
-        val2check=$(semver_parse "$ver2check" "PATCH")
-
-        ((val2check > baseline)) && return 0
-        ((val2check < baseline)) && return 1
-
-        if [ "$checkType" == "GREATER" ]; then
+        if [ "$checkType" == "GT" ]; then
             return 1
         else
             return 0
         fi
         ;;
-    "MAX" | "LESS")
-        #NOTE: MAX and LESS are NOT synonyms!
+    "LE" | "MAX" | "LT")
+        #NOTE: LE/MAX and LESS are NOT synonyms!
         # When baseline and val2check match...
-        #   MAX: returns 0 (success)
-        #   LESS: returns 1 (failure)
+        #   LE/MAX: returns 0 (success)
+        #   LT: returns 1 (failure)
 
-        if ! baseline=$(semver_parse "$baseline_ver" "MAJOR"); then
+        ((v1maj < v2maj)) && return 0
+        ((v1maj > v2maj)) && return 1
+
+        ((v1min < v2min)) && return 0
+        ((v1min > v2min)) && return 1
+
+        ((v1pat < v2pat)) && return 0
+        ((v1pat > v2pat)) && return 1
+
+        if [ "$checkType" == "LT" ]; then
+            return 1
+        else
+            return 0
+        fi
+        ;;
+    "EQ" | "IS")
+        # NOTE: Tests that the specified value
+        #       matches the baseline
+
+        if [ "$v1full" == "$v2full" ]; then
+            return 0
+        else
             return 1
         fi
-        if ! val2check=$(semver_parse "$ver2check" "MAJOR"); then
-            return 1
-        fi
+        ;;
+    "NE" | "NOT")
+        # NOTE: Tests that the specified value
+        #       does NOT match the baseline
 
-        ((val2check < baseline)) && return 0
-        ((val2check > baseline)) && return 1
-
-        baseline=$(semver_parse "$baseline_ver" "MINOR")
-        val2check=$(semver_parse "$ver2check" "MINOR")
-
-        ((val2check < baseline)) && return 0
-        ((val2check > baseline)) && return 1
-
-        baseline=$(semver_parse "$baseline_ver" "PATCH")
-        val2check=$(semver_parse "$ver2check" "PATCH")
-
-        ((val2check < baseline)) && return 0
-        ((val2check > baseline)) && return 1
-
-        if [ "$checkType" == "LESS" ]; then
+        if [ "$v1full" == "$v2full" ]; then
             return 1
         else
             return 0
@@ -194,41 +207,51 @@ function semver_check {
         #NOTE: MINORSKEY tests whether the MINOR version
         #      is within the specified range of the baseline
 
-        if ! baseline=$(semver_parse "$baseline_ver" "MAJOR"); then
-            return 1
-        fi
-        if ! val2check=$(semver_parse "$ver2check" "MAJOR"); then
-            return 1
-        fi
-
-        ((val2check < baseline)) && return 1
-
-        baseline=$(semver_parse "$baseline_ver" "MINOR")
-        val2check=$(semver_parse "$ver2check" "MINOR")
-
-        minordiff=$((baseline - val2check))
+        ((v1maj < v2maj)) && return 1
+        minordiff=$((v2min - v1min))
         minorskew=${minordiff#-}
-
         if ((minorskew > additional_value)); then
             return 1
         else
             return 0
         fi
         ;;
-    "NOT")
-        # NOTE: Tests that the specified value
-        #       does NOT match the baseline
-        if [ "$(semver_parse "$ver2check" "FULL")" == "$(semver_parse "$baseline_ver" "FULL")" ]; then
-            return 1
+    "PATTERN" )
+        # Compares val2check against a pattern
+        #   Pattern MUST be 3-level semVer-like value
+        #   but can contain 'x' as placeholder for any
+        #   level.
+
+        local semver_re2='^v?([x0-9]+)\.([x0-9]+)\.([x0-9]+)$'
+        if [[ $baseline_ver =~ $semver_re2 ]]; then
+            v2maj=${BASH_REMATCH[1]}
+            v2min=${BASH_REMATCH[2]}
+            v2pat=${BASH_REMATCH[3]}
         else
-            return 0
+            #invalid pattern specified
+            return 2
         fi
+
+        if [ "$v2maj" != "x" ]; then
+            ((v1maj != v2maj)) && return 1
+        fi
+
+        if [ "$v2min" != "x" ]; then
+            ((v1min != v2min)) && return 1
+        fi
+
+        if [ "$v2pat" != "x" ]; then
+            ((v1pat != v2pat)) && return 1
+        fi
+
+        return 0
         ;;
+
     "VALID")
         # NOTE: Tests that the specified value
         #       is a valid semVer value
-        semver_parse "$ver2check"
-        return $?
+        # Basically, a no-op since invalid value would have failed above
+        return 0
         ;;
     *)
         #invalid/unknown checkType
