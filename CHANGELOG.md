@@ -1,4 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Overall**
+* [CHORE] Logic related to semantic versioning processing was refactored to
+handle things more consistently across the project
+
 ## Version 1.2.51 (02JULY2026)
 * **Logging**
   * [FIX] (Re-)Initialized temporary response files between API calls
