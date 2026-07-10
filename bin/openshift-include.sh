@@ -58,7 +58,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
             OPENSHIFT_MIN_VER=${OPENSHIFT_MIN_VER:-"4.14.0"} #TO DO: Keep this changeable via env var?
 
             ## Server Version
-            if semver_check "$OSHIFT_FULL_VERSION" MIN "$OPENSHIFT_MIN_VER"; then
+            if semver_check "$OSHIFT_FULL_VERSION" GE "$OPENSHIFT_MIN_VER"; then
                 log_debug "OpenShift server version check OK"
             else
                 log_error "Unsupported OpenShift server version: $OSHIFT_FULL_VERSION"
@@ -68,7 +68,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
 
             ## Client Version
             OC_MIN_VER="$OSHIFT_MAJOR_VERSION.$((OSHIFT_MINOR_VERSION - 1)).0"
-            if semver_check "$OC_FULL_VERSION" MIN "$OC_MIN_VER"; then
+            if semver_check "$OC_FULL_VERSION" GE "$OC_MIN_VER"; then
                 log_debug "OpenShift client version check OK"
             else
                 log_error "Unsupported OpenShift client version: $OC_FULL_VERSION"
@@ -93,8 +93,8 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
         fi
 
         export OPENSHIFT_ROUTE_DOMAIN
-        export OC_MAJOR_VERSION OC_MINOR_VERSION OC_PATCH_VERSION             #TODO: Remove? Not used anywhere
-        export OSHIFT_MAJOR_VERSION OSHIFT_MINOR_VERSION OSHIFT_PATCH_VERSION #TODO: Remove? Not used anywhere
+        export OC_MAJOR_VERSION OC_MINOR_VERSION OC_PATCH_VERSION             #TODO: Remove? Not used anywhere else
+        export OSHIFT_MAJOR_VERSION OSHIFT_MINOR_VERSION OSHIFT_PATCH_VERSION #TODO: Remove? Not used anywhere else
         export OSHIFT_FULL_VERSION
 
     else

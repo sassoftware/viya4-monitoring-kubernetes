@@ -36,9 +36,7 @@ fi
 
 KUBE_MIN_VER=${KUBE_MIN_VER:-"1.28.0"} #TO DO: Keep this changeable via env var?
 
-if semver_check "$KUBE_SERVER_VER" MIN "$KUBE_MIN_VER"; then
-    :
-else
+if semver_check "$KUBE_SERVER_VER" LT "$KUBE_MIN_VER"; then
     log_warn "The detected version of Kubernetes [$KUBE_SERVER_VER] is not supported by any of the currently supported releases of SAS Viya."
     log_warn "This script might not work as expected. Support might not be available until Kubernetes is upgraded to a supported version."
 fi
@@ -51,9 +49,7 @@ fi
 ##KUBE_CLIENT_MIN_VER="$KUBE_MIN_MAJOR_VERSION.$((KUBE_MIN_MINOR_VERSION-1)).0"
 
 KUBE_CLIENT_MIN_VER=$(semver_parse "$KUBE_MIN_VER" MAJOR).$(($(semver_parse "$KUBE_MIN_VER" MINOR) - 1)).0
-if semver_check "$KUBE_CLIENT_VER" MIN "$KUBE_CLIENT_MIN_VER"; then
-    :
-else
+if semver_check "$KUBE_CLIENT_VER" LT "$KUBE_CLIENT_MIN_VER"; then
     log_warn "Unsupported kubectl version: [$KUBE_CLIENT_VER]."
     log_warn "This script might not work as expected. Support might not be available until kubectl is upgraded to a supported version."
 fi

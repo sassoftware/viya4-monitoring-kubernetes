@@ -91,7 +91,7 @@ function helmRepoAdd {
 
             # Helm 3.3.2 changed 'repo add' behavior and added the --force-update flag
             # https://github.com/helm/helm/releases/tag/v3.3.2
-            if semver_check "$helmVer" LESS 3.3.2; then
+            if semver_check "$helmVer" LT 3.3.2; then
                 helm repo add "$repo" "$repoURL"
             else
                 helm repo add --force-update "$repo" "$repoURL"

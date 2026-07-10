@@ -75,7 +75,7 @@ disable_sa_token_automount "$MON_NS" grafana-serviceaccount
 log_debug "Adding cluster role..."
 oc adm policy add-cluster-role-to-user cluster-monitoring-view -z grafana-serviceaccount -n "$MON_NS"
 
-if semver_check "$OSHIFT_FULL_VERSION" MIN 4.11.0 && semver_check "$OSHIFT_FULL_VERSION" LESS 4.16.0; then
+if semver_check "$OSHIFT_FULL_VERSION" GE 4.11.0 && semver_check "$OSHIFT_FULL_VERSION" LT 4.16.0; then
 
     # OCP versions 4.11-4.15: We need to patch service account to add API Token
 
@@ -89,7 +89,7 @@ fi
 log_debug "Obtaining token..."
 # NOTE: $grafanaToken is an actual token and NOT the name of a k8s resouce
 
-if semver_check "$OSHIFT_FULL_VERSION" MIN 4.16.0; then
+if semver_check "$OSHIFT_FULL_VERSION" GE 4.16.0; then
 
     # OCP 4.16: removed deprecated oc serviceaccounts get-token command
     # NOTE: 12000 hours = 500 days although OpenShift *may* expire token after 12 months

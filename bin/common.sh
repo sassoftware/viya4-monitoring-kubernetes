@@ -44,7 +44,7 @@ function checkYqVersion {
 
         yq_version=$(yq --version | sed -n 's!^yq (https://github.com/mikefarah/yq/) version!!p')
 
-        if semver_check "$yq_version" LESS "$yq_required_version"; then
+        if semver_check "$yq_version" LT "$yq_required_version"; then
             log_error "Incorrect version [$yq_version] found; version [$yq_required_version] or higher required."
             return 1
         else
@@ -163,7 +163,7 @@ function semver_check {
         fi
         ;;
     "LE" | "MAX" | "LT")
-        #NOTE: LE/MAX and LESS are NOT synonyms!
+        #NOTE: LE/MAX and LT are NOT synonyms!
         # When baseline and val2check match...
         #   LE/MAX: returns 0 (success)
         #   LT: returns 1 (failure)
