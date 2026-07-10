@@ -14,11 +14,11 @@ fi
 KUBE_CLIENT_VER=$(kubectl version | sed -n 's/^Client Version:[[:space:]]*//p')
 KUBE_SERVER_VER=$(kubectl version | sed -n 's/^Server Version:[[:space:]]*//p')
 
-if [ "$KUBE_CLIENT_VER" != "$(semver_parse "$KUBE_CLIENT_VER")" ]; then
+if semver_check "$KUBE_CLIENT_VER" VALID; then
     log_error "Kubernetes Client Version does not match expected pattern."
 fi
 
-if [ "$KUBE_SERVER_VER" != "$(semver_parse "$KUBE_SERVER_VER")" ]; then
+if semver_check "$KUBE_SERVER_VER" VALID; then
     log_error "Kubernetes SERVER Version does not match expected pattern."
 fi
 
@@ -43,12 +43,8 @@ fi
 
 # Client version allowed to be one MINOR version earlier than
 # minimum server version (PATCH value does not matter, set to 0)
-
-##KUBE_MIN_MAJOR_VERSION=$(semver_parse "$KUBE_MIN_VER" MAJOR)
-##KUBE_MIN_MINOR_VERSION=$(semver_parse "$KUBE_MIN_VER" MINOR)
-##KUBE_CLIENT_MIN_VER="$KUBE_MIN_MAJOR_VERSION.$((KUBE_MIN_MINOR_VERSION-1)).0"
-
 KUBE_CLIENT_MIN_VER=$(semver_parse "$KUBE_MIN_VER" MAJOR).$(($(semver_parse "$KUBE_MIN_VER" MINOR) - 1)).0
+
 if semver_check "$KUBE_CLIENT_VER" LT "$KUBE_CLIENT_MIN_VER"; then
     log_warn "Unsupported kubectl version: [$KUBE_CLIENT_VER]."
     log_warn "This script might not work as expected. Support might not be available until kubectl is upgraded to a supported version."
