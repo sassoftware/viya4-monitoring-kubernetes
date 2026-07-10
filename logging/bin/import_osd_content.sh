@@ -20,6 +20,9 @@ function import_file {
     local file response
     file=$1
 
+    #remove any existing instance of this file
+    rm -f "$TMP_DIR"/curl.response
+
     if [ -f "$file" ]; then
         # ODFE 1.7.0: successful request returns: {"success":true,"successCount":20}
         # ODFE 1.13.x: successful request returns: {"successCount":1,"success":true,"successResults":[...content details...]}
@@ -51,6 +54,10 @@ function import_content_batch {
     dir=$1
 
     tmpfile=$TMP_DIR/batched.ndjson
+
+    # Delete any previous instance of this file
+    rm -f "$tmpfile"
+
     touch "$tmpfile"
 
     rc=0
