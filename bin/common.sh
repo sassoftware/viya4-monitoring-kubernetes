@@ -141,7 +141,7 @@ function semver_check {
     fi
 
     case "$checkType" in
-    "GE" | "MIN" | "GT" )
+    "GE" | "MIN" | "GT")
         #NOTE: GE/MIN and GT are NOT synonyms!
         # When baseline and val2check match...
         #   GE/MIN: returns 0 (success)
@@ -216,7 +216,7 @@ function semver_check {
             return 0
         fi
         ;;
-    "PATTERN" )
+    "PATTERN")
         # Compares val2check against a pattern
         #   Pattern MUST be 3-level semVer-like value
         #   but can contain 'x' as placeholder for any
