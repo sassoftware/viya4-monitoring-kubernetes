@@ -129,7 +129,7 @@ function semver_check {
         return 1
     fi
 
-    if [ -z "$baseline_ver" ] && [ "$checkType" != "PATTERN" ]; then
+    if [ -n "$baseline_ver" ] && [ "$checkType" != "PATTERN" ]; then
         if [[ $baseline_ver =~ $semver_re ]]; then
             v2maj=${BASH_REMATCH[1]}
             v2min=${BASH_REMATCH[2]}

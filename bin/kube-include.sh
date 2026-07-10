@@ -14,11 +14,11 @@ fi
 KUBE_CLIENT_VER=$(kubectl version | sed -n 's/^Client Version:[[:space:]]*//p')
 KUBE_SERVER_VER=$(kubectl version | sed -n 's/^Server Version:[[:space:]]*//p')
 
-if semver_check "$KUBE_CLIENT_VER" VALID; then
+if ! semver_check "$KUBE_CLIENT_VER" VALID; then
     log_error "Kubernetes Client Version does not match expected pattern."
 fi
 
-if semver_check "$KUBE_SERVER_VER" VALID; then
+if ! semver_check "$KUBE_SERVER_VER" VALID; then
     log_error "Kubernetes SERVER Version does not match expected pattern."
 fi
 
