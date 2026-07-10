@@ -1,5 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
+* **Overall**
+  * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernets clusters.  The changes
+  needed to enable this should be transparent and have no impact on deployments to clusters only configured for IPv4.
+* **Logging**
+  * [CHANGE] Various settings within Fluent Bit, OpenSearch and OpenSearch Dashboards were
+  adjusted to allow deployment on clusters using IPv6 as well as those using IPv4.
 * **Metrics**
   * [CHANGE] As part of validating support for deploying onto IPv6-only Kubernetes clusters, the
 PodMonitor resource definitions were reviewed and, in three cases, updated to ensure metrics are
