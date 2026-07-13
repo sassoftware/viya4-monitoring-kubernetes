@@ -37,15 +37,16 @@ function errexit_msg {
 
 function checkYqVersion {
     # confirm yq installed and correct version
-    local yq_version yq_required_version
-    yq_required_version="4.45.1"
+    local yq_version
+
+    YQ_MIN_VER=${YQ_MIN_VER:-"4.45.1"} #Set in component_versions.env
 
     if which yq &> /dev/null; then
 
-        yq_version=$(yq --version | sed -n 's!^yq (https://github.com/mikefarah/yq/) version!!p')
+        yq_version=$(yq --version | sed -n 's!^yq (https://github.com/mikefarah/yq/) version !!p')
 
-        if semver_check "$yq_version" LT "$yq_required_version"; then
-            log_error "Incorrect version [$yq_version] found; version [$yq_required_version] or higher required."
+        if semver_check "$yq_version" LT "$YQ_MIN_VER"; then
+            log_error "Incorrect version [$yq_version] found; version [$YQ_MIN_VER] or higher required."
             return 1
         else
             log_debug "A valid version [$yq_version] of yq detected"

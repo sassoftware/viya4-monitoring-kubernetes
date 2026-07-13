@@ -55,7 +55,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
         # OpenShift  Version enforcement
         if [ "$OPENSHIFT_VERSION_CHECK" == "true" ]; then
 
-            OPENSHIFT_MIN_VER=${OPENSHIFT_MIN_VER:-"4.14.0"} #TO DO: Keep this changeable via env var?
+            OPENSHIFT_MIN_VER=${OPENSHIFT_MIN_VER:-"4.14.0"} #Set in component_versions.env
 
             ## Server Version
             if semver_check "$OSHIFT_FULL_VERSION" GE "$OPENSHIFT_MIN_VER"; then

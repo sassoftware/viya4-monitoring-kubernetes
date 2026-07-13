@@ -34,7 +34,7 @@ fi
 # 2026.03     1.32 1.34
 # 2026.04     1.32 1.34
 
-KUBE_MIN_VER=${KUBE_MIN_VER:-"1.28.0"} #TO DO: Keep this changeable via env var?
+KUBE_MIN_VER=${KUBE_MIN_VER:-"1.28.0"} #Set in component_versions.env
 
 if semver_check "$KUBE_SERVER_VER" LT "$KUBE_MIN_VER"; then
     log_warn "The detected version of Kubernetes [$KUBE_SERVER_VER] is not supported by any of the currently supported releases of SAS Viya."
