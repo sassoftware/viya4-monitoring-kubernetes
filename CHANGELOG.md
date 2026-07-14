@@ -4,6 +4,10 @@
   * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernets clusters.  The changes
   needed to enable this should be transparent and have no impact on deployments to clusters only configured for IPv4.
 * **Logging**
+  * [FEATURE] A new OpenSearch Index Management policy is now deployed to roll-off audit information stored
+  in the `security-auditlog-*` indexes after 90 days.  Deploying this policy is ***optional*** (to disable set
+  the environment variable `OS_SECAUDIT_RETENTION_POLICY_ENABLE` to 'false' before deploying) and the
+  retention period can be changed from the default 90 days (via the `OS_SECAUDIT_RETENTION_PERIOD` environment variable).
   * [CHANGE] Various settings within Fluent Bit, OpenSearch and OpenSearch Dashboards were
   adjusted to allow deployment on clusters using IPv6 as well as those using IPv4.
 * **Metrics**

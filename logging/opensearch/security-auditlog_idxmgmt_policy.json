@@ -1,0 +1,37 @@
+{
+    "policy": {
+        "policy_id": "security_auditlog_idxmgmt_policy",
+        "description": "An index management policy for the Security Audit Log index.",
+        "error_notification": null,
+        "default_state": "hot",
+        "states": [
+            {
+                "name": "hot",
+                "actions": [],
+                "transitions": [
+                    {
+                        "state_name": "doomed",
+                        "conditions": {
+                            "min_index_age": "xxxRETENTION_PERIODxxx"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "doomed",
+                "actions": [
+                    {
+                        "delete": {}
+                    }
+                ],
+                "transitions": []
+            }
+        ],
+        "ism_template": {
+                "index_patterns": [
+                        "security-auditlog-*"
+                 ],
+                 "priority": 100
+        }
+    }
+}
