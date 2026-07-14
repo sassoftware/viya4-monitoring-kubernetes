@@ -58,6 +58,14 @@ function checkYqVersion {
     fi
 }
 
+# Following variables are used by the
+# semver_check and semver_parse functions
+semver_numeric='(0|[1-9][0-9]*)'
+semver_alphanumeric='[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*'
+semver_prerelease="($semver_numeric|$semver_alphanumeric)"
+semver_build='[0-9A-Za-z-]+'
+semver_regex="^v?${semver_numeric}\.${semver_numeric}\.${semver_numeric}(-(${semver_prerelease}(\.${semver_prerelease})*))?(\+(${semver_build}(\.${semver_build})*))?$"
+
 function semver_parse {
     ## This function returns string values containing the requested
     ## portions of the semantic version string passed to it
@@ -110,14 +118,6 @@ function semver_parse {
     fi
 
 }
-
-# Following variables are used by the
-# semver_check and semver_parse functions
-semver_numeric='(0|[1-9][0-9]*)'
-semver_alphanumeric='[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*'
-semver_prerelease="($semver_numeric|$semver_alphanumeric)"
-semver_build='[0-9A-Za-z-]+'
-semver_regex="^v?${semver_numeric}\.${semver_numeric}\.${semver_numeric}(-(${semver_prerelease}(\.${semver_prerelease})*))?(\+(${semver_build}(\.${semver_build})*))?$"
 
 function semver_check {
     ## This function tests the passed version string to validate it
