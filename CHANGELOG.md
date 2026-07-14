@@ -14,6 +14,9 @@
   spaced exponentially, over an ~18 hour window will be made.  This should help ensure obsolete data can be
   deleted even if OpenSearch experiences periods of very heavy activity that prevent the clean-up activity
   from being completed initially.
+  * [CHANGE] The OpenSearch Index Management policies included in the project are retroactively applied to all
+  **existing** indexes that match the policy's pattern that do **not** already have an policy applied.  This
+  ensures no matching indexes are left unmanaged.
   * [CHANGE] Various settings within Fluent Bit, OpenSearch and OpenSearch Dashboards were
   adjusted to allow deployment on clusters using IPv6 as well as those using IPv4.
 * **Metrics**
