@@ -69,7 +69,9 @@ function semver_parse {
     string=$1
     fragment=${2:-ECHO}
 
-    if [[ $string =~ v?([0-9]+)\.([0-9]+)\.([0-9]+)(-(([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
+    # NOTE: The semver_regex is defined outside of this function
+
+    if [[ $string =~ $semver_regex ]]; then
         case "$fragment" in
         major | MAJOR)
             echo "${BASH_REMATCH[1]}"
@@ -85,14 +87,17 @@ function semver_parse {
             echo "${BASH_REMATCH[5]}"
             ;;
         buildmeta | BUILDMETA)
-            # BASH_REMATCH[9] includes the leading "+"
-            echo "${BASH_REMATCH[10]}"
+            # BASH_REMATCH[11] includes the leading "+"
+            echo "${BASH_REMATCH[12]}"
             ;;
         full | FULL)
             echo "${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
             ;;
         ECHO)
             echo "$string"
+            ;;
+        test)
+            echo "${BASH_REMATCH[$3]}"
             ;;
         *)
             #invalid fragment specified
@@ -106,6 +111,14 @@ function semver_parse {
 
 }
 
+# Following variables are used by the
+# semver_check and semver_parse functions
+semver_numeric='(0|[1-9][0-9]*)'
+semver_alphanumeric='[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*'
+semver_prerelease="($semver_numeric|$semver_alphanumeric)"
+semver_build='[0-9A-Za-z-]+'
+semver_regex="^v?${semver_numeric}\.${semver_numeric}\.${semver_numeric}(-(${semver_prerelease}(\.${semver_prerelease})*))?(\+(${semver_build}(\.${semver_build})*))?$"
+
 function semver_check {
     ## This function tests the passed version string to validate it
     ## matches the specified criteria and sets its exit code to indicate
@@ -118,10 +131,11 @@ function semver_check {
     additional_value=${4:-0} #additional value (used for some checkType)
 
     local v1maj v1min v1pat v1full v2maj v2min v2pat v2full minordiff minorskew
-    local semver_re='^v?([0-9]+)\.([0-9]+)\.([0-9]+)(-(([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.([0-9]+|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$'
+
+    # NOTE: The semver_regex is defined outside of this function
 
     # Parse ver2check once
-    if [[ $ver2check =~ $semver_re ]]; then
+    if [[ $ver2check =~ $semver_regex ]]; then
         v1maj=${BASH_REMATCH[1]}
         v1min=${BASH_REMATCH[2]}
         v1pat=${BASH_REMATCH[3]}
@@ -131,7 +145,7 @@ function semver_check {
     fi
 
     if [ -n "$baseline_ver" ] && [ "$checkType" != "PATTERN" ]; then
-        if [[ $baseline_ver =~ $semver_re ]]; then
+        if [[ $baseline_ver =~ $semver_regex ]]; then
             v2maj=${BASH_REMATCH[1]}
             v2min=${BASH_REMATCH[2]}
             v2pat=${BASH_REMATCH[3]}
