@@ -93,7 +93,7 @@ function set_retention_period {
     fi
 
     #Update retention period in json file prior to loading it
-    sed -i'.bak' "s/\"min_index_age\": \"xxxRETENTION_PERIODxxx\"/\"min_index_age\": \"${retention_period}d\"/g" "$TMP_DIR"/"$policy_name".json
+    v4m_replace "xxxRETENTION_PERIODxxx" "${retention_period}d" "$TMP_DIR"/"$policy_name".json
 
     log_debug "Contents of $policy_name.json after substitution:"
     log_debug "$(cat "$TMP_DIR"/"${policy_name}".json)"
@@ -147,10 +147,10 @@ function add_ism_template {
         log_debug "No ISM Template on policy [$policy_name]; adding one."
 
         #remove crud returned but not needed
-        sed -i'.bak' "s/\"_id\":\"${policy_name}\",//;s/\"_version\":[0-9]*,//;s/\"_seq_no\":[0-9]*,//;s/\"_primary_term\":[0-9]*,//" "$TMP_DIR"/ism_policy_patch.json
+        v4m_replace "s/\"_id\":\"${policy_name}\",//;s/\"_version\":[0-9]*,//;s/\"_seq_no\":[0-9]*,//;s/\"_primary_term\":[0-9]*,//" "$TMP_DIR"/ism_policy_patch.json
 
         #add ISM_Template to existing ISM policy
-        sed -i'.bak' "s/\"ism_template\":null/\"ism_template\": {\"index_patterns\": \[\"${pattern}\"\],\"priority\":${priority}}/g" "$TMP_DIR"/ism_policy_patch.json
+        v4m_replace "s/\"ism_template\":null/\"ism_template\": {\"index_patterns\": \[\"${pattern}\"\],\"priority\":${priority}}/g" "$TMP_DIR"/ism_policy_patch.json
 
         #delete exisiting policy
         response=$(curl -s -o /dev/null -w "%{http_code}" -XDELETE "$ism_api_url/policies/$policy_name" --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
@@ -164,7 +164,7 @@ function add_ism_template {
 
         #handle change in policy name w/ our 1.1.0 release
         if [ "$policy_name" == "viya_infra_idxmgmt_policy" ]; then
-            sed -i'.bak' "s/viya_infra_idxmgmt_policy/viya-infra-idxmgmt-policy/g" "$TMP_DIR"/ism_policy_patch.json
+            v4m_replace "s/viya_infra_idxmgmt_policy/viya-infra-idxmgmt-policy/g" "$TMP_DIR"/ism_policy_patch.json
             policy_name="viya-infra-idxmgmt-policy"
         fi
 
