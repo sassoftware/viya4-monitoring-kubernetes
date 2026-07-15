@@ -14,6 +14,9 @@
   spaced exponentially, over an ~18 hour window will be made.  This should help ensure obsolete data can be
   deleted even if OpenSearch experiences periods of very heavy activity that prevent the clean-up activity
   from being completed initially.
+    * NOTE: For *existing* deployments, you will need to delete the existing Index
+  Management Policies (via OpenSearch Dashboards) prior to re-deploying (upgrade-in-place) the log monitoring
+  stack to pick up this change.  Existing policy definitions are *not* updated during an upgrade/update in-place.
   * [CHANGE] The OpenSearch Index Management policies included in the project are now retroactively applied
   during the deployment process to all *existing* indexes that match the policy's pattern that do *not*
   already have an policy applied.  This ensures no matching indexes are left unmanaged.
