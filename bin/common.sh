@@ -284,7 +284,6 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     # Includes
     source bin/colors-include.sh
     source bin/log-include.sh
-    source bin/openshift-include.sh
 
     if [ ! "$(which sha256sum)" ]; then
         log_error "Missing required utility: sha256sum"
@@ -306,6 +305,9 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     else
         log_debug "No component_versions.env file found"
     fi
+
+    #Additional includes (depend on values set in component_versions.env)
+    source bin/openshift-include.sh
 
     if [ "$V4M_OMIT_IMAGE_KEYS" == "true" ]; then
         log_warn "******This feature is NOT intended for use outside the project maintainers*******"

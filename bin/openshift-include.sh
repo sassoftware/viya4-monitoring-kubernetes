@@ -98,7 +98,7 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
         export OSHIFT_FULL_VERSION
 
     else
-        log_debug "OpenShift not detected. Skipping 'oc' checks."
+        log_debug "OpenShift not detected. Skipping 'oc' and version checks."
     fi
     export OPENSHIFT_CLUSTER
     export SAS_OPENSHIFT_SOURCED="true"
