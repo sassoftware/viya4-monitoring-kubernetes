@@ -103,7 +103,6 @@ function set_retention_period {
     response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$ism_api_url/policies/$policy_name" -H 'Content-Type: application/json' -d @"$TMP_DIR"/"$policy_name".json --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
     if [[ $response == 409 ]]; then
         log_info "The index management policy [$policy_name] already exist in OpenSearch; skipping load and using existing policy."
-        return 0
     elif [[ $response != 2* ]]; then
         log_error "There was an issue loading index management policy [$policy_name] into OpenSearch [$response]"
         exit 1
