@@ -92,7 +92,6 @@ function set_retention_period {
         exit 1
     fi
 
-
     #Update retention period in json file prior to loading it
     sed -i'.bak' "s/\"min_index_age\": \"xxxRETENTION_PERIODxxx\"/\"min_index_age\": \"${retention_period}d\"/g" "$TMP_DIR"/"$policy_name".json
 
