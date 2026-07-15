@@ -162,9 +162,9 @@ function add_ism_template {
             log_debug "Index policy [$policy_name] deleted [$response]."
         fi
 
-        #handle change in policy name w/ our 1.1.0 release
+        #handle change in policy name w/ our 1.1.0 release (underscores=>dashes)
         if [ "$policy_name" == "viya_infra_idxmgmt_policy" ]; then
-            v4m_replace "s/viya_infra_idxmgmt_policy/viya-infra-idxmgmt-policy/g" "$TMP_DIR"/ism_policy_patch.json
+            v4m_replace "viya_infra_idxmgmt_policy" "viya-infra-idxmgmt-policy" "$TMP_DIR"/ism_policy_patch.json
             policy_name="viya-infra-idxmgmt-policy"
         fi
 
