@@ -1,5 +1,8 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
+* **Tracing**
+  * [UPGRADE] Tempo upgraded from 2.9.0 to 2.10.7
+  * [UPGRADE] Tempo Helm chart upgraded from 1.24.1 to 2.2.3
 * **Overall**
   * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernets clusters.  The changes
   needed to enable this should be transparent and have no impact on deployments to clusters only configured for IPv4.
