@@ -1,18 +1,20 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
-* **Tracing**
-  * [UPGRADE] Tempo upgraded from 2.9.0 to 2.10.7
-  * [UPGRADE] Tempo Helm chart upgraded from 1.24.1 to 2.2.3
 * **Overall**
   * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernets clusters.  The changes
-  needed to enable this should be transparent and have no impact on deployments to clusters only configured for IPv4.
+needed to enable this should be transparent and have no impact on deployments to clusters only configured for IPv4.
+  * [CHORE] Logic related to semantic versioning processing was refactored to
+handle things more consistently across the project
 * **Logging**
   * [CHANGE] Various settings within Fluent Bit, OpenSearch and OpenSearch Dashboards were
-  adjusted to allow deployment on clusters using IPv6 as well as those using IPv4.
+adjusted to allow deployment on clusters using IPv6 as well as those using IPv4.
 * **Metrics**
   * [CHANGE] As part of validating support for deploying onto IPv6-only Kubernetes clusters, the
 PodMonitor resource definitions were reviewed and, in three cases, updated to ensure metrics are
 properly scrapped when pods are assigned either IPv4 or IPv6 addresses.
+* **Tracing**
+  * [UPGRADE] Tempo upgraded from 2.9.0 to 2.10.7
+  * [UPGRADE] Tempo Helm chart upgraded from 1.24.1 to 2.2.3
 
 ## Version 1.2.52 (07JUL2026)
 * **Metrics**

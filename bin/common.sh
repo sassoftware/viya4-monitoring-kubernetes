@@ -1,5 +1,5 @@
 # shellcheck disable=SC2148
-# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021-2026, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # This file is not marked as executable as it is intended to be sourced
@@ -37,21 +37,245 @@ function errexit_msg {
 
 function checkYqVersion {
     # confirm yq installed and correct version
-    local goodver yq_version
-    # "good version" == 4.45.xx -> 4.49.xx OR 4.50.xx -> 4.99.xx
-    goodver="yq \(.+mikefarah.+\) version (v)?(4\.(4[5-9]|[5-9][0-9])\..+)"
-    yq_version=$(yq --version)
-    if [ "$?" == "1" ]; then
+    local yq_version
+
+    YQ_MIN_VER=${YQ_MIN_VER:-"4.45.1"} #Set in component_versions.env
+
+    if which yq &> /dev/null; then
+
+        yq_version=$(yq --version | sed -n 's!^yq (https://github.com/mikefarah/yq/) version !!p')
+
+        if semver_check "$yq_version" LT "$YQ_MIN_VER"; then
+            log_error "Incorrect version [$yq_version] found; version [$YQ_MIN_VER] or higher required."
+            return 1
+        else
+            log_debug "A valid version [$yq_version] of yq detected"
+            return 0
+        fi
+    else
         log_error "Required component [yq] not available."
         return 1
-    elif [[ ! $yq_version =~ $goodver ]]; then
-        log_error "Incorrect version [$yq_version] found; version 4.45.1+ required."
-        return 1
-    else
-        log_debug "A valid version [$yq_version] of yq detected"
-        return 0
     fi
 }
+
+# Following variables are used by the
+# semver_check and semver_parse functions
+semver_numeric='(0|[1-9][0-9]*)'
+semver_alphanumeric='[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*'
+semver_prerelease="($semver_numeric|$semver_alphanumeric)"
+semver_build='[0-9A-Za-z-]+'
+semver_regex="^v?${semver_numeric}\.${semver_numeric}\.${semver_numeric}(-(${semver_prerelease}(\.${semver_prerelease})*))?(\+(${semver_build}(\.${semver_build})*))?$"
+
+function semver_parse {
+    ## This function returns string values containing the requested
+    ## portions of the semantic version string passed to it
+    ##
+    ## If the passed string is NOT a valid semantic version string,
+    ## this function returns nothing and sets a non-zero exit code
+
+    local string fragment
+    string=$1
+    fragment=${2:-ECHO}
+
+    # NOTE: The semver_regex is defined outside of this function
+
+    if [[ $string =~ $semver_regex ]]; then
+        case "$fragment" in
+        major | MAJOR)
+            echo "${BASH_REMATCH[1]}"
+            ;;
+        minor | MINOR)
+            echo "${BASH_REMATCH[2]}"
+            ;;
+        patch | PATCH)
+            echo "${BASH_REMATCH[3]}"
+            ;;
+        prerelease | PRERELEASE)
+            # BASH_REMATCH[4] includes the leading "-"
+            echo "${BASH_REMATCH[5]}"
+            ;;
+        buildmeta | BUILDMETA)
+            # BASH_REMATCH[11] includes the leading "+"
+            echo "${BASH_REMATCH[12]}"
+            ;;
+        full | FULL)
+            echo "${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+            ;;
+        ECHO)
+            echo "$string"
+            ;;
+        test)
+            echo "${BASH_REMATCH[$3]}"
+            ;;
+        *)
+            #invalid fragment specified
+            return 1
+            ;;
+        esac
+    else
+        #invalid string (i.e. NOT valid semVer)
+        return 1
+    fi
+
+}
+
+function semver_check {
+    ## This function tests the passed version string to validate it
+    ## matches the specified criteria and sets its exit code to indicate
+    ## success (returns a 0) or failure (returns a 1)
+
+    local ver2check checkType baseline_ver additional_value
+    ver2check=$1             #semver value to check
+    checkType=${2:-VALID}    #type of check: VALID|EQ(IS)|NE(NOT)|GE(MIN)|LE(MAX)|GT|LT|MINORSKEW|PATTERN,
+    baseline_ver=$3          #"baseline" semver (ver2check is compared against this one)
+    additional_value=${4:-0} #additional value (used for some checkType)
+
+    local v1maj v1min v1pat v1full v2maj v2min v2pat v2full minordiff minorskew
+
+    # NOTE: The semver_regex is defined outside of this function
+
+    # Parse ver2check once
+    if [[ $ver2check =~ $semver_regex ]]; then
+        v1maj=${BASH_REMATCH[1]}
+        v1min=${BASH_REMATCH[2]}
+        v1pat=${BASH_REMATCH[3]}
+        v1full="$v1maj.$v1min.$v1pat"
+    else
+        return 1
+    fi
+
+    if [ -n "$baseline_ver" ] && [ "$checkType" != "PATTERN" ]; then
+        if [[ $baseline_ver =~ $semver_regex ]]; then
+            v2maj=${BASH_REMATCH[1]}
+            v2min=${BASH_REMATCH[2]}
+            v2pat=${BASH_REMATCH[3]}
+            v2full="$v2maj.$v2min.$v2pat"
+        else
+            return 1
+        fi
+    fi
+
+    case "$checkType" in
+    "GE" | "MIN" | "GT")
+        #NOTE: GE/MIN and GT are NOT synonyms!
+        # When baseline and val2check match...
+        #   GE/MIN: returns 0 (success)
+        #   GT: returns 1 (failure)
+
+        ((v1maj > v2maj)) && return 0
+        ((v1maj < v2maj)) && return 1
+
+        ((v1min > v2min)) && return 0
+        ((v1min < v2min)) && return 1
+
+        ((v1pat > v2pat)) && return 0
+        ((v1pat < v2pat)) && return 1
+
+        if [ "$checkType" == "GT" ]; then
+            return 1
+        else
+            return 0
+        fi
+        ;;
+    "LE" | "MAX" | "LT")
+        #NOTE: LE/MAX and LT are NOT synonyms!
+        # When baseline and val2check match...
+        #   LE/MAX: returns 0 (success)
+        #   LT: returns 1 (failure)
+
+        ((v1maj < v2maj)) && return 0
+        ((v1maj > v2maj)) && return 1
+
+        ((v1min < v2min)) && return 0
+        ((v1min > v2min)) && return 1
+
+        ((v1pat < v2pat)) && return 0
+        ((v1pat > v2pat)) && return 1
+
+        if [ "$checkType" == "LT" ]; then
+            return 1
+        else
+            return 0
+        fi
+        ;;
+    "EQ" | "IS")
+        # NOTE: Tests that the specified value
+        #       matches the baseline
+
+        if [ "$v1full" == "$v2full" ]; then
+            return 0
+        else
+            return 1
+        fi
+        ;;
+    "NE" | "NOT")
+        # NOTE: Tests that the specified value
+        #       does NOT match the baseline
+
+        if [ "$v1full" == "$v2full" ]; then
+            return 1
+        else
+            return 0
+        fi
+        ;;
+    "MINORSKEW")
+        #NOTE: MINORSKEY tests whether the MINOR version
+        #      is within the specified range of the baseline
+
+        ((v1maj < v2maj)) && return 1
+        minordiff=$((v2min - v1min))
+        minorskew=${minordiff#-}
+        if ((minorskew > additional_value)); then
+            return 1
+        else
+            return 0
+        fi
+        ;;
+    "PATTERN")
+        # Compares val2check against a pattern
+        #   Pattern MUST be 3-level semVer-like value
+        #   but can contain 'x' as placeholder for any
+        #   level.
+
+        local semver_re2='^v?([x0-9]+)\.([x0-9]+)\.([x0-9]+)$'
+        if [[ $baseline_ver =~ $semver_re2 ]]; then
+            v2maj=${BASH_REMATCH[1]}
+            v2min=${BASH_REMATCH[2]}
+            v2pat=${BASH_REMATCH[3]}
+        else
+            #invalid pattern specified
+            return 2
+        fi
+
+        if [ "$v2maj" != "x" ]; then
+            ((v1maj != v2maj)) && return 1
+        fi
+
+        if [ "$v2min" != "x" ]; then
+            ((v1min != v2min)) && return 1
+        fi
+
+        if [ "$v2pat" != "x" ]; then
+            ((v1pat != v2pat)) && return 1
+        fi
+
+        return 0
+        ;;
+
+    "VALID")
+        # NOTE: Tests that the specified value
+        #       is a valid semVer value
+        # Basically, a no-op since invalid value would have failed above
+        return 0
+        ;;
+    *)
+        #invalid/unknown checkType
+        return 2
+        ;;
+    esac
+}
+
+export -f semver_parse semver_check
 
 if [ "$SAS_COMMON_SOURCED" = "" ]; then
     # Save standard out to a new descriptor
@@ -60,7 +284,6 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     # Includes
     source bin/colors-include.sh
     source bin/log-include.sh
-    source bin/openshift-include.sh
 
     if [ ! "$(which sha256sum)" ]; then
         log_error "Missing required utility: sha256sum"
@@ -82,6 +305,9 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
     else
         log_debug "No component_versions.env file found"
     fi
+
+    #Additional includes (depend on values set in component_versions.env)
+    source bin/openshift-include.sh
 
     if [ "$V4M_OMIT_IMAGE_KEYS" == "true" ]; then
         log_warn "******This feature is NOT intended for use outside the project maintainers*******"
