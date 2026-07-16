@@ -1,10 +1,27 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Overall**
-* [CHORE] Logic related to semantic versioning processing was refactored to
+  * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernets clusters.  The changes
+needed to enable this should be transparent and have no impact on deployments to clusters only configured for IPv4.
+  * [CHORE] Logic related to semantic versioning processing was refactored to
 handle things more consistently across the project
+* **Logging**
+  * [CHANGE] Various settings within Fluent Bit, OpenSearch and OpenSearch Dashboards were
+adjusted to allow deployment on clusters using IPv6 as well as those using IPv4.
+* **Metrics**
+  * [CHANGE] As part of validating support for deploying onto IPv6-only Kubernetes clusters, the
+PodMonitor resource definitions were reviewed and, in three cases, updated to ensure metrics are
+properly scrapped when pods are assigned either IPv4 or IPv6 addresses.
+* **Tracing**
+  * [UPGRADE] Tempo upgraded from 2.9.0 to 2.10.7
+  * [UPGRADE] Tempo Helm chart upgraded from 1.24.1 to 2.2.3
 
-## Version 1.2.51 (02JULY2026)
+## Version 1.2.52 (07JUL2026)
+* **Metrics**
+  * [SECURITY] Upgraded to Kube-State Metrics 2.19.1 to address several security
+vulnerabilities scored as high or critical.
+
+## Version 1.2.51 (02JUL2026)
 * **Logging**
   * [FIX] (Re-)Initialized temporary response files between API calls
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 3.4.0 to 3.6.0
@@ -13,8 +30,7 @@ handle things more consistently across the project
   * [UPGRADE] Fluent Bit upgraded from 4.2.3 to 5.0.7
   * [UPGRADE] Fluent Bit Helm chart upgraded from 0.56.0 to 0.57.7
 
-
-## Version 1.2.50 (05JUNE2026)
+## Version 1.2.50 (05JUN2026)
 * **Overall**
 > [!IMPORTANT]
 >  * [BREAKING CHANGE] The minimum required version of `yq` has been updated to version
