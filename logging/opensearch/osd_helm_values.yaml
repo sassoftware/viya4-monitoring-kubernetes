@@ -10,7 +10,7 @@ opensearchHosts: "https://v4m-search:9200"
 extraEnvs:
 - name: OSD_ENABLE_TLS
   valueFrom:
-    secretKeyRef: 
+    secretKeyRef:
       name: v4m-osd-tls-enabled
       key: enable_tls
 - name: OPENSEARCH_USERNAME
@@ -47,7 +47,6 @@ extraVolumeMounts:
 config:
   opensearch_dashboards.yml: |
     server.name: kibana
-    server.host: 0.0.0.0
     server.ssl.enabled: ${OSD_ENABLE_TLS}
     server.ssl.key: /usr/share/opensearchdashboards/certs/kibana-key.pem
     server.ssl.certificate: /usr/share/opensearchdashboards/certs/kibana-crt.pem
@@ -79,8 +78,10 @@ securityContext:
   privileged: false
 
 podSecurityContext:
-  seccompProfile: 
+  seccompProfile:
     type: RuntimeDefault
+
+serverHost: "::"
 
 startupProbe:
   # OSD can take 2+ minutes

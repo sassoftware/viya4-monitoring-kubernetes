@@ -62,7 +62,7 @@ config:
         Daemon       Off
         Log_Level    info
         HTTP_Server  On
-        HTTP_Listen  0.0.0.0
+        HTTP_Listen  ${FB_HTTP_LISTEN:-::}
         HTTP_Port    2020
         storage.path /tmp/v4m/fb_buffer/
         storage.checksum off
