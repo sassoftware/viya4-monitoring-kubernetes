@@ -1,7 +1,7 @@
 {
     "policy": {
-        "policy_id": "viya_logs_idxmgmt_policy",
-        "description": "An index management policy for log messages from SAS Viya deployments.",
+        "policy_id": "security_auditlog_idxmgmt_policy",
+        "description": "An index management policy for the Security Audit Log index.",
         "error_notification": null,
         "default_state": "hot",
         "states": [
@@ -34,7 +34,7 @@
         ],
         "ism_template": {
                 "index_patterns": [
-                        "viya_logs-*"
+                        "security-auditlog-*"
                  ],
                  "priority": 100
         }

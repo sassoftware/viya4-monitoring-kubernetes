@@ -6,6 +6,22 @@ needed to enable this should be transparent and have no impact on deployments to
   * [CHORE] Logic related to semantic versioning processing was refactored to
 handle things more consistently across the project
 * **Logging**
+  * [FEATURE] A new OpenSearch Index Management policy is now deployed to roll-off audit information stored
+  in the `security-auditlog-*` indexes after 90 days.  Deploying this policy is ***optional*** (to disable set
+  the environment variable `OS_SECAUDIT_RETENTION_POLICY_ENABLE` to 'false' before deploying) and the
+  retention period can be changed from the default 90 days (via the `OS_SECAUDIT_RETENTION_PERIOD` environment variable).
+  * [CHANGE] The configuration of all of the OpenSearch Index Management policies included in the project have
+  been adjusted to increase the reliability of the data roll-off process.  Prior to this change, three attempts
+  within a narrow ~15 minute window were attempted to delete obsolete data.  With this change, nine attempts,
+  spaced exponentially, over an ~18 hour window will be made.  This should help ensure obsolete data can be
+  deleted even if OpenSearch experiences periods of very heavy activity that prevent the clean-up activity
+  from being completed initially.
+    * NOTE: For *existing* deployments, you will need to delete the existing Index Management policies
+  (via OpenSearch Dashboards) prior to re-deploying the log monitoring stack to pick up this change.
+  Existing policy definitions are *never* updated during an upgrade-in-place.
+  * [CHANGE] The OpenSearch Index Management policies included in the project are now retroactively applied
+  during the deployment process to all *existing* indexes that match the policy's pattern that do *not*
+  already have an policy applied.  This ensures no matching indexes are left unmanaged.
   * [CHANGE] Various settings within Fluent Bit, OpenSearch and OpenSearch Dashboards were
 adjusted to allow deployment on clusters using IPv6 as well as those using IPv4.
 * **Metrics**

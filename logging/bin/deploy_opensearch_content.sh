@@ -75,9 +75,10 @@ function set_retention_period {
 
     policy_name=$1
     retention_period_var=$2
+    pattern=$3
 
     # shellcheck disable=2145
-    log_debug "Function called: set_retention_perid ARGS: $@"
+    log_debug "Function called: set_retention_perid ARGS: $@ argCount [$#]}"
 
     retention_period=${!retention_period_var} # Retention Period (unit: days)
 
@@ -87,12 +88,12 @@ function set_retention_period {
 
     # confirm value is number
     if ! [[ $retention_period =~ $digits_re ]]; then
-        log_error "An invalid valid was provided for [$retention_period_var]; exiting."
+        log_error "An invalid value was provided for [$retention_period_var]; exiting."
         exit 1
     fi
 
     #Update retention period in json file prior to loading it
-    sed -i'.bak' "s/\"min_index_age\": \"xxxRETENTION_PERIODxxx\"/\"min_index_age\": \"${retention_period}d\"/g" "$TMP_DIR"/"$policy_name".json
+    v4m_replace "xxxRETENTION_PERIODxxx" "${retention_period}d" "$TMP_DIR"/"$policy_name".json
 
     log_debug "Contents of $policy_name.json after substitution:"
     log_debug "$(cat "$TMP_DIR"/"${policy_name}".json)"
@@ -106,6 +107,17 @@ function set_retention_period {
         exit 1
     else
         log_debug "Index management policy [$policy_name] loaded into OpenSearch [$response]"
+    fi
+
+    if [ -n "$pattern" ]; then
+        # Apply policy to existing indexes (will NOT override existing policy assignment) via API
+        response=$(curl -s -o /dev/null -w "%{http_code}" -XPOST "$ism_api_url/add/$pattern" -H 'Content-Type: application/json' -d '{"policy_id": "'"$policy_name"'"}' --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
+        if [[ $response != 2* ]]; then
+            log_error "There was an issue aplying the index management policy [$policy_name] to existing indexes matching the pattern [$pattern] [$response]"
+            exit 1
+        else
+            log_debug "Index management policy [$policy_name] applied to indexes matching the pattern [$pattern] that do NOT have an existing policy assigned [$response]"
+        fi
     fi
 }
 
@@ -150,9 +162,9 @@ function add_ism_template {
             log_debug "Index policy [$policy_name] deleted [$response]."
         fi
 
-        #handle change in policy name w/ our 1.1.0 release
+        #handle change in policy name w/ our 1.1.0 release (underscores=>dashes)
         if [ "$policy_name" == "viya_infra_idxmgmt_policy" ]; then
-            sed -i'.bak' "s/viya_infra_idxmgmt_policy/viya-infra-idxmgmt-policy/g" "$TMP_DIR"/ism_policy_patch.json
+            v4m_replace "viya_infra_idxmgmt_policy" "viya-infra-idxmgmt-policy" "$TMP_DIR"/ism_policy_patch.json
             policy_name="viya-infra-idxmgmt-policy"
         fi
 
@@ -174,7 +186,7 @@ function add_ism_template {
 set -e
 
 LOG_RETENTION_PERIOD="${LOG_RETENTION_PERIOD:-3}"
-set_retention_period viya_logs_idxmgmt_policy LOG_RETENTION_PERIOD
+set_retention_period viya_logs_idxmgmt_policy LOG_RETENTION_PERIOD 'viya_logs-*'
 add_ism_template "viya_logs_idxmgmt_policy" "viya_logs-*" 100
 
 # Create Ingest Pipeline to "burst" incoming log messages to separate indexes based on namespace
@@ -201,7 +213,7 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
     # INFRASTRUCTURE LOGS
     # Handle "infrastructure" logs differently
     INFRA_LOG_RETENTION_PERIOD="${INFRA_LOG_RETENTION_PERIOD:-1}"
-    set_retention_period viya_infra_idxmgmt_policy INFRA_LOG_RETENTION_PERIOD
+    set_retention_period viya_infra_idxmgmt_policy INFRA_LOG_RETENTION_PERIOD 'viya_logs-openshift-*'
     add_ism_template "viya_infra_idxmgmt_policy" "viya_logs-openshift-*" 5
 
     # Link index management policy Index Template
@@ -215,11 +227,32 @@ if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
     fi
 fi
 
+# OpenSearch Security Audit Log (security-auditlog)
+
+OS_SECAUDIT_RETENTION_POLICY_ENABLE=${OS_SECAUDIT_RETENTION_POLICY_ENABLE:-true}
+if [ "$OS_SECAUDIT_RETENTION_POLICY_ENABLE" == "true" ]; then
+
+    OS_SECAUDIT_RETENTION_PERIOD="${OS_SECAUDIT_RETENTION_PERIOD:-90}"
+    set_retention_period security-auditlog_idxmgmt_policy OS_SECAUDIT_RETENTION_PERIOD 'security-auditlog-*'
+
+    #NOTE: Since this policy was added post-ODFE, no need to call add_ism_template function
+
+    # Link index management policy Index Template
+    response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/security-audit-template" -H 'Content-Type: application/json' -d @logging/opensearch/set_index_template_settings_infra_openshift.json --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
+    # request returns: {"acknowledged":true}
+    if [[ $response != 2* ]]; then
+        log_error "There was an issue loading security audit index template settings into OpenSearch [$response]"
+        exit 1
+    else
+        log_info "The Security Audit template setting loaded into OpenSearch [$response]"
+    fi
+fi
+
 # METALOGGING: Create index management policy object & link policy to index template
 # ...index management policy automates the deletion of indexes after the specified time
 
 OPS_LOG_RETENTION_PERIOD="${OPS_LOG_RETENTION_PERIOD:-1}"
-set_retention_period viya_ops_idxmgmt_policy OPS_LOG_RETENTION_PERIOD
+set_retention_period viya_ops_idxmgmt_policy OPS_LOG_RETENTION_PERIOD 'viya_ops-*'
 add_ism_template "viya_ops_idxmgmt_policy" "viya_ops-*" 50
 
 # Load template
