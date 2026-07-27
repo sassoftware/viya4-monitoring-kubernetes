@@ -23,6 +23,9 @@ env:
        secretKeyRef:
          name: internal-user-logcollector
          key: password
+envFrom:
+   - configMapRef:
+       name: ipv6-settings
 
 extraVolumes:
 - name: fb-events-db
