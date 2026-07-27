@@ -68,6 +68,9 @@ else
     fi
 fi
 
+# load IPv6-specific settings if needed
+create_ipv6_settings
+
 HELM_DEBUG="${HELM_DEBUG:-false}"
 helmDebug=""
 if [ "$HELM_DEBUG" == "true" ]; then
