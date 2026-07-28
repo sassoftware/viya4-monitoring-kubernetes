@@ -80,6 +80,9 @@ env:
        secretKeyRef:
          name: internal-user-logcollector
          key: password
+   - name: FB_HTTP_LISTEN
+     value: "0.0.0.0"
+
 envFrom:
    - configMapRef:
         name: fb-env-vars
