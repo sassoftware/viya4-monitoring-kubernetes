@@ -35,9 +35,6 @@ fi
 
 log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 
-# load IPv6-specific settings if needed
-create_ipv6_settings
-
 set -e
 
 ##################################

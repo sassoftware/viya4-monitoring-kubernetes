@@ -143,9 +143,6 @@ else
     log_debug "Autogeneration of ingresss NOT enabled"
 fi
 
-# load IPv6-specific settings if needed
-create_ipv6_settings
-
 # enable debug on Helm via env var
 export HELM_DEBUG="${HELM_DEBUG:-false}"
 

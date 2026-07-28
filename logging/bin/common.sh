@@ -59,31 +59,5 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
 
     export SAS_LOGGING_COMMON_SOURCED=true
 
-    export IPV6_PROCESSING_COMPLETED=false
-
-    function create_ipv6_settings {
-
-        if [ "$IPV6_PROCESSING_COMPLETED" == "true" ]; then
-            log_debug "IPv6 processing has already been completed; exiting function"
-            return 0
-        fi
-
-        if [ "$IPV6_ENABLE" == "true" ]; then
-            kubectl -n "$LOG_NS" delete configmap ipv6-settings --ignore-not-found
-            kubectl -n "$LOG_NS" create configmap ipv6-settings --from-env-file logging/ipv6_settings.env
-            log_debug "IPv6 Configuration requested; configmap [ipv6-settings] created"
-        else
-            kubectl -n "$LOG_NS" delete configmap ipv6-settings --ignore-not-found
-            kubectl -n "$LOG_NS" create configmap ipv6-settings --from-env-file "$TMP_DIR"/empty.yaml
-            kubectl -n "$LOG_NS" annotate configmap ipv6-settings INTENTIONALLY_EMPTY=true DO_NOT_DELETE=true
-            log_debug "IPv6 Configuration NOT requested; empty configmap [ipv6-settings] created"
-        fi
-
-        IPV6_PROCESSING_COMPLETED=true
-
-    }
-
-    export -f create_ipv6_settings
-
 fi
 echo ""
