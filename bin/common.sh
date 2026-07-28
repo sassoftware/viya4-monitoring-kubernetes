@@ -339,6 +339,9 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
 
     export AIRGAP_DEPLOYMENT=${AIRGAP_DEPLOYMENT:-false}
 
+    #default to IPv4 settings
+    export IPV6_ENABLE=${IPV6_ENABLE:-false}
+
     CHECK_HELM=${CHECK_HELM:-true}
     if [ "$CHECK_HELM" == "true" ]; then
         source bin/helm-include.sh
