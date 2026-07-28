@@ -175,20 +175,6 @@ kubectl -n "$LOG_NS" delete configmap fbaz-dbmigrate-script --ignore-not-found
 kubectl -n "$LOG_NS" create configmap fbaz-dbmigrate-script --from-file=logging/fb/migrate_fbstate_db.sh
 kubectl -n "$LOG_NS" label configmap fbaz-dbmigrate-script managed-by=v4m-es-script
 
-helm_values_yaml="logging/fb/fluent-bit_helm_values_azmonitor.yaml"
-if [ "$IPV6_ENABLE" == "true" ]; then
-
-    cp "$helm_values_yaml" "$TMP_DIR/fluent-bit_helm_values_azmonitor.yaml"
-    helm_values_yaml="$TMP_DIR/fluent-bit_helm_values_azmonitor.yaml"
-
-    #replace ipv4 wildcard with ipv6 wildcard
-    v4m_replace "0.0.0.0" "::" "$helm_values_yaml"
-
-    log_debug "IPv6 settings requested; updated yaml file [$helm_values_yaml]"
-else
-    log_debug "IPv6 settings NOT requested; using original yaml file [$helm_values_yaml]"
-fi
-
 ## Get Helm Chart Name
 log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference "$FLUENTBIT_HELM_CHART_REPO" "$FLUENTBIT_HELM_CHART_NAME" "$FLUENTBIT_HELM_CHART_VERSION")"
@@ -203,7 +189,7 @@ helm $helmDebug upgrade --install v4m-fbaz --namespace "$LOG_NS" \
     $versionstring \
     --values "$TMP_DIR/fb_imagekeysfile.yaml" \
     --values "$imageKeysFile" \
-    --values "$helm_values_yaml" \
+    --values logging/fb/fluent-bit_helm_values_azmonitor.yaml \
     --values "$FB_AZMONITOR_USER_YAML" \
     --values "$tracingValuesFile" \
     --set fullnameOverride=v4m-fbaz \
