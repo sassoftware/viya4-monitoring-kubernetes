@@ -1,8 +1,7 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Overall**
-  * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernets clusters.  The changes
-needed to enable this should be transparent and have no impact on deployments to clusters only configured for IPv4.
+  * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernetes clusters. To enable IPv6 configuration, set the environment variable `IPV6_ENABLE` to ***true***, preferably in the `$USER_DIR/user.env` file, prior to running the deployment scripts.
   * [CHORE] Logic related to semantic versioning processing was refactored to
 handle things more consistently across the project
 * **Logging**
