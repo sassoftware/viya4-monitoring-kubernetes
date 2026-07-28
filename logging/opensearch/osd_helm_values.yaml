@@ -30,10 +30,6 @@ extraVolumes:
 - name: uuid-file
   emptyDir: {}
 
-envFrom:
-   - configMapRef:
-       name: ipv6-settings
-
 extraVolumeMounts:
 - name: kibana-certs
   mountPath: "/usr/share/opensearchdashboards/certs/kibana-crt.pem"
@@ -85,7 +81,7 @@ podSecurityContext:
   seccompProfile:
     type: RuntimeDefault
 
-#serverHost: "0.0.0.0"
+serverHost: "0.0.0.0"
 
 startupProbe:
   # OSD can take 2+ minutes

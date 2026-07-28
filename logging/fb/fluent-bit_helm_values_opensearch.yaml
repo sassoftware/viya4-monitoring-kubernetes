@@ -83,8 +83,6 @@ env:
 envFrom:
    - configMapRef:
         name: fb-env-vars
-   - configMapRef:
-       name: ipv6-settings
 
 # Be very tolerant
 tolerations:

@@ -79,16 +79,12 @@ extraEnvs:
        key: admin_dn
  - name: DISABLE_PERFORMANCE_ANALYZER_AGENT_CLI
    value: "true"
-## - name: network.bind_host
-##   value: "0.0.0.0"
+ - name: network.bind_host
+   value: "0.0.0.0"
  - name: network.publish_host
    valueFrom:
      fieldRef:
        fieldPath: status.podIP
-
-envFrom:
-   - configMapRef:
-       name: ipv6-settings
 
 networkHost: "0.0.0.0"
 
