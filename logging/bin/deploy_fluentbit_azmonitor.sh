@@ -179,7 +179,7 @@ helm_values_yaml="logging/fb/fluent-bit_helm_values_azmonitor.yaml"
 if [ "$IPV6_ENABLE" == "true" ]; then
 
     cp "$helm_values_yaml" "$TMP_DIR/fluent-bit_helm_values_azmonitor.yaml"
-    helm_values_yaml="$TMP_DIR/ffluent-bit_helm_values_azmonitor.yaml"
+    helm_values_yaml="$TMP_DIR/fluent-bit_helm_values_azmonitor.yaml"
 
     #replace ipv4 wildcard with ipv6 wildcard
     v4m_replace "0.0.0.0" "::" "$helm_values_yaml"
