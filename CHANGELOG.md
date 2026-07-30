@@ -1,7 +1,7 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Overall**
-  * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernets clusters.
+  * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernetes clusters.
 The changes needed to enable this should be transparent and have no impact on deployments to clusters 
 only configured for IPv4.
 * **Logging**
@@ -10,8 +10,8 @@ only configured for IPv4.
   the environment variable `OS_SECAUDIT_RETENTION_POLICY_ENABLE` to 'false' before deploying) and the
   retention period can be changed from the default 90 days (via the `OS_SECAUDIT_RETENTION_PERIOD` environment variable).
   * [CHANGE] The configuration of all of the OpenSearch Index Management policies included in the project have
-  been adjusted to increase the reliability of the data roll-off process.  Prior to this change, three attempts
-  within a narrow ~15 minute window were attempted to delete obsolete data.  With this change, nine attempts,
+  been adjusted to increase the reliability of the data roll-off process.  Prior to this change, three retries
+  within a narrow ~15 minute window were attempted to delete obsolete data.  With this change, up to ten attempts,
   spaced exponentially, over an ~18 hour window will be made.  This should help ensure obsolete data can be
   deleted even if OpenSearch experiences periods of very heavy activity that prevent the clean-up activity
   from being completed initially.
@@ -20,7 +20,7 @@ only configured for IPv4.
   Existing policy definitions are *never* updated during an upgrade-in-place.
   * [CHANGE] The OpenSearch Index Management policies included in the project are now retroactively applied
   during the deployment process to all *existing* indexes that match the policy's pattern that do *not*
-  already have an policy applied.  This ensures no matching indexes are left unmanaged.
+  already have a policy applied.  This ensures no matching indexes are left unmanaged.
   * [CHANGE] Various settings within Fluent Bit, OpenSearch and OpenSearch Dashboards were
   adjusted to allow deployment on clusters using IPv6 as well as those using IPv4.
 * **Metrics**

@@ -235,17 +235,10 @@ if [ "$OS_SECAUDIT_RETENTION_POLICY_ENABLE" == "true" ]; then
     OS_SECAUDIT_RETENTION_PERIOD="${OS_SECAUDIT_RETENTION_PERIOD:-90}"
     set_retention_period security-auditlog_idxmgmt_policy OS_SECAUDIT_RETENTION_PERIOD 'security-auditlog-*'
 
-    #NOTE: Since this policy was added post-ODFE, no need to call add_ism_template function
+    #NOTE: Processing for this set of indexes is different than the others
+    #      * Since this policy was added post-ODFE, no need to call add_ism_template function
+    #      * Since these indexes are created by the OpenSearch Index Management plugin, no need for us to define a template
 
-    # Link index management policy Index Template
-    response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$es_api_url/_template/security-audit-template" -H 'Content-Type: application/json' -d @logging/opensearch/set_index_template_settings_infra_openshift.json --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
-    # request returns: {"acknowledged":true}
-    if [[ $response != 2* ]]; then
-        log_error "There was an issue loading security audit index template settings into OpenSearch [$response]"
-        exit 1
-    else
-        log_info "The Security Audit template setting loaded into OpenSearch [$response]"
-    fi
 fi
 
 # METALOGGING: Create index management policy object & link policy to index template
