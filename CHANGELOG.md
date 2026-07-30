@@ -1,8 +1,9 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Overall**
-  * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernets clusters.  The changes
-  needed to enable this should be transparent and have no impact on deployments to clusters only configured for IPv4.
+  * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernets clusters.
+The changes needed to enable this should be transparent and have no impact on deployments to clusters 
+only configured for IPv4.
 * **Logging**
   * [FEATURE] A new OpenSearch Index Management policy is now deployed to roll-off audit information stored
   in the `security-auditlog-*` indexes after 90 days.  Deploying this policy is ***optional*** (to disable set
