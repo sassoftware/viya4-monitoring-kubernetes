@@ -1,10 +1,30 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Overall**
-  * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernetes clusters. To enable IPv6 configuration, set the environment variable `IPV6_ENABLE` to ***true***, preferably in the `$USER_DIR/user.env` file, prior to running the deployment scripts.
+  * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernetes clusters.
+To enable IPv6 configuration, set the environment variable `IPV6_ENABLE` to ***true***, preferably in
+the `$USER_DIR/user.env` file, prior to running the deployment scripts.
   * [CHORE] Logic related to semantic versioning processing was refactored to
 handle things more consistently across the project
 * **Logging**
+  * [FEATURE] A new OpenSearch Index Management policy is now deployed to roll-off audit information stored
+  in the `security-auditlog-*` indexes after 90 days.  The retention period can be changed from the default
+  90 days by setting the `OS_SECAUDIT_RETENTION_PERIOD` environment variable prior to running the deployment
+  script.  Deploying this policy is ***optional***; to disable it, set the environment variable
+ `OS_SECAUDIT_RETENTION_POLICY_ENABLE` to ***false*** before running the deployment script.  When the policy
+  id disabled, these audit indexes are kept indefinitely.
+  * [CHANGE] The configuration of all of the OpenSearch Index Management policies included in the project have
+  been adjusted to increase the reliability of the data roll-off process.  Prior to this change, three retries
+  within a narrow ~15 minute window were attempted to delete obsolete data.  With this change, up to ten attempts,
+  spaced exponentially, over an ~18 hour window will be made.  This should help ensure obsolete data can be
+  deleted even if OpenSearch experiences periods of very heavy activity that prevent the clean-up activity
+  from being completed initially.
+    * NOTE: For *existing* deployments, you will need to delete the existing Index Management policies
+  (via OpenSearch Dashboards) prior to re-deploying the log monitoring stack to pick up this change.
+  Existing policy definitions are *never* updated during an upgrade-in-place.
+  * [CHANGE] The OpenSearch Index Management policies included in the project are now retroactively applied
+  during the deployment process to all *existing* indexes that match the policy's pattern that do *not*
+  already have a policy applied.  This ensures no matching indexes are left unmanaged.
   * [CHANGE] Various settings within Fluent Bit, OpenSearch and OpenSearch Dashboards were
 adjusted to allow deployment on clusters using IPv6 as well as those using IPv4.
 * **Metrics**

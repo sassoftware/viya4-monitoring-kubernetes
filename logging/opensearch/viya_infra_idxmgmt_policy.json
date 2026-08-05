@@ -21,6 +21,11 @@
                 "name": "doomed",
                 "actions": [
                     {
+                        "retry": {
+                            "count": 9,
+                            "backoff": "exponential",
+                            "delay": "2m"
+                        },
                         "delete": {}
                     }
                 ],
