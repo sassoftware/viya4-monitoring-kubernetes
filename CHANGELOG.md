@@ -8,9 +8,10 @@ the `$USER_DIR/user.env` file, prior to running the deployment scripts.
 handle things more consistently across the project
 * **Logging**
   * [FEATURE] A new OpenSearch Index Management policy is now deployed to roll-off audit information stored
-  in the `security-auditlog-*` indexes after 90 days.  Deploying this policy is ***optional*** (to disable set
-  the environment variable `OS_SECAUDIT_RETENTION_POLICY_ENABLE` to 'false' before deploying) and the
-  retention period can be changed from the default 90 days (via the `OS_SECAUDIT_RETENTION_PERIOD` environment variable).
+  in the `security-auditlog-*` indexes after 90 days.  Deploying this policy is ***optional***; to disable set
+  the environment variable `OS_SECAUDIT_RETENTION_POLICY_ENABLE` to ***false*** before running the deployment
+  script.  The retention period can be changed from the default 90 days by setting the
+ `OS_SECAUDIT_RETENTION_PERIOD` environment variable prior to running the deployment script.
   * [CHANGE] The configuration of all of the OpenSearch Index Management policies included in the project have
   been adjusted to increase the reliability of the data roll-off process.  Prior to this change, three retries
   within a narrow ~15 minute window were attempted to delete obsolete data.  With this change, up to ten attempts,
