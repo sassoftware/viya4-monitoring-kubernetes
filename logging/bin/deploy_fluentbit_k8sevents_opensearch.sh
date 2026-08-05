@@ -95,6 +95,20 @@ else
     log_debug "Fluent Bit is NOT being deployed on OpenShift cluster"
 fi
 
+helm_values_yaml="logging/fb/fluent-bit_helm_values_events.yaml"
+if [ "$IPV6_ENABLE" == "true" ]; then
+
+    cp "$helm_values_yaml" "$TMP_DIR/fluent-bit_helm_values_events.yaml"
+    helm_values_yaml="$TMP_DIR/fluent-bit_helm_values_events.yaml"
+
+    #replace ipv4 wildcard with ipv6 wildcard
+    v4m_replace "0.0.0.0" "::" "$helm_values_yaml"
+
+    log_debug "IPv6 settings requested; updated yaml file [$helm_values_yaml]"
+else
+    log_debug "IPv6 settings NOT requested; using original yaml file [$helm_values_yaml]"
+fi
+
 ## Get Helm Chart Name
 log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference "$FLUENTBIT_HELM_CHART_REPO" "$FLUENTBIT_HELM_CHART_NAME" "$FLUENTBIT_HELM_CHART_VERSION")"
@@ -108,7 +122,7 @@ helm $helmDebug upgrade --install --namespace "$LOG_NS" v4m-fb-events \
     $helm4opts \
     $versionstring \
     --values "$imageKeysFile" \
-    --values logging/fb/fluent-bit_helm_values_events.yaml \
+    --values "$helm_values_yaml" \
     --values "$wnpValuesFile" \
     --values "$openshiftValuesFile" \
     --values "$FB_EVENTS_USER_YAML" \
