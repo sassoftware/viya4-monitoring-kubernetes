@@ -1,0 +1,81 @@
+# Apply:  kubectl apply -f ollama.yaml
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-models
+  namespace: monitoring
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi
+  # storageClassName: gp3   # uncomment to pin an EKS StorageClass; omit for the cluster default
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: monitoring
+  labels:
+    app: ollama
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate            # RWO model PVC: old pod must release before new one mounts
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      imagePullSecrets:
+      - name: acr-secret
+      containers:
+      - name: ollama
+        image: viyamonitoring.azurecr.io/ollama:latest   
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          ollama serve &
+          pid=$!
+          until ollama list >/dev/null 2>&1; do sleep 1; done
+          ollama pull nomic-embed-text
+          wait $pid
+        ports:
+        - containerPort: 11434
+        env:
+        - name: OLLAMA_HOST
+          value: "0.0.0.0:11434"   # bind all interfaces so the Service can reach it (default is localhost-only)
+        - name: OLLAMA_KEEP_ALIVE
+          value: "-1"              # keep the embed model resident (it's small) to avoid reload latency
+        volumeMounts:
+        - name: models
+          mountPath: /root/.ollama
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "2Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+      volumes:
+      - name: models
+        persistentVolumeClaim:
+          claimName: ollama-models
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama
+  namespace: monitoring
+spec:
+  selector:
+    app: ollama
+  ports:
+  - name: http
+    port: 11434
+    targetPort: 11434
+  type: ClusterIP

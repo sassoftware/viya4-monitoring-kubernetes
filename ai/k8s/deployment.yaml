@@ -5,6 +5,8 @@ metadata:
   namespace: monitoring
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: v4m-mcp-server
@@ -22,10 +24,23 @@ spec:
         ports:
         - containerPort: 8000
         env:
+        - name: PYTHONUNBUFFERED
+          value: "1"                    # without this, print() output sits in a buffer and kubectl logs shows nothing
         - name: PROMETHEUS_URL
           value: "https://prometheus-operated.monitoring.svc:9090"
         - name: PORT
           value: "8000"
+        # --- added for the docs RAG tool ---
+        - name: EMBED_BASE_URL
+          value: "http://ollama.monitoring.svc:11434/v1"   # EDIT: your embeddings endpoint
+        - name: EMBED_MODEL
+          value: "nomic-embed-text"
+        - name: EMBED_API_KEY
+          value: "ollama"
+        - name: WARM_INDEX
+          value: "1"                    # build the docs index at startup (visible in logs)
+        - name: INDEX_CACHE
+          value: "/app/cache/doc_index.npz"
         resources:
           requests:
             cpu: "50m"
@@ -33,15 +48,23 @@ spec:
           limits:
             cpu: "500m"
             memory: "512Mi"
-        readinessProbe:
-          httpGet:
-            path: /mcp/
+        volumeMounts:
+        - name: cache
+          mountPath: /app/cache          # persists the embedding index across restarts
+        - name: pdfs
+          mountPath: /app/docs/pdfs      # your PDFs get indexed alongside the baked-in repo
+        # Covers the first-run/re-embed warm-up, during which the server hasn't
+        # bound port 8000 yet. Without this, the pod shows Ready immediately on
+        # container start, before the app is actually listening.
+        startupProbe:
+          tcpSocket:
             port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        livenessProbe:
-          httpGet:
-            path: /mcp/
-            port: 8000
-          initialDelaySeconds: 15
-          periodSeconds: 30
+          periodSeconds: 5
+          failureThreshold: 120          # up to 10 minutes for a full re-embed
+      volumes:
+      - name: cache
+        persistentVolumeClaim:
+          claimName: v4m-mcp-cache
+      - name: pdfs
+        persistentVolumeClaim:
+          claimName: v4m-mcp-pdfs

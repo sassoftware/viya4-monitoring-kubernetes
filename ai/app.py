@@ -12,6 +12,8 @@ import time
 from fastmcp import FastMCP
 from prometheus_api_client import PrometheusConnect
  
+from rag import DocIndex  # documentation retrieval engine
+ 
 mcp = FastMCP("v4m-mcp")
  
 prom = PrometheusConnect(
@@ -21,6 +23,19 @@ prom = PrometheusConnect(
     ),
     disable_ssl=True,
 )
+ 
+# Documentation index — built lazily so a docs/embeddings problem can never
+# take down the Prometheus tools. The first search_docs() call builds it (or
+# loads the on-disk cache); later calls are instant.
+_docs_index = None
+ 
+ 
+def _docs():
+    global _docs_index
+    if _docs_index is None:
+        _docs_index = DocIndex.from_env()
+    return _docs_index
+ 
  
 # Helpers
  
@@ -212,7 +227,48 @@ def firing_alerts() -> dict:
     }
  
  
+# Tool 3: search_docs (RAG as a tool)
+ 
+@mcp.tool()
+def search_docs(query: str, top_k: int = 5) -> str:
+    """Search the SAS Viya Monitoring documentation for relevant passages.
+ 
+    Call this for conceptual or how-to questions the Prometheus tools can't
+    answer from live metrics: what a component does, how to configure or deploy
+    it, what an alert means, or troubleshooting steps. Returns ranked passages,
+    each with its source file/heading and a relevance score.
+ 
+    Args:
+        query: A natural-language question or keywords to look up in the docs.
+        top_k: How many passages to return (default 5; keep it <= ~10).
+    """
+    try:
+        return _docs().search(query, top_k)
+    except Exception as exc:
+        # Degrade gracefully: a docs/embeddings issue must never surface as a
+        # server error to the operational tools.
+        return f"Documentation search is currently unavailable: {exc}"
+ 
+ 
+@mcp.tool()
+def docs_index_stats() -> str:
+    """Report how many documentation chunks are indexed, and from which sources."""
+    try:
+        idx = _docs()
+    except Exception as exc:
+        return f"Documentation index is not available: {exc}"
+    sources = sorted({c.source for c in idx.chunks})
+    return f"{len(idx.chunks)} chunks indexed from {len(sources)} source(s):\n" + "\n".join(sources)
+ 
+ 
 if __name__ == "__main__":
+    if os.getenv("WARM_INDEX", "").lower() in ("1", "true", "yes"):
+        try:
+            _docs()
+            print(f"[v4m-mcp] docs index ready: {len(_docs_index.chunks)} chunks")
+        except Exception as exc:
+            print(f"[v4m-mcp] docs index warm-up skipped: {exc}")
+ 
     mcp.run(
         transport="http",
         host="0.0.0.0",
