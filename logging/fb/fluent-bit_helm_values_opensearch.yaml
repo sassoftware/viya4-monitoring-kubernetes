@@ -15,7 +15,7 @@
 ###  tag: foo
 ###imagePullSecrets: foo
 
-podAnnotations: 
+podAnnotations:
   fluentbit.io/parser: fluentbit
 podLabels:
   fbout: es
@@ -80,10 +80,12 @@ env:
        secretKeyRef:
          name: internal-user-logcollector
          key: password
+   - name: FB_HTTP_LISTEN
+     value: "0.0.0.0"
+
 envFrom:
    - configMapRef:
         name: fb-env-vars
-
 
 # Be very tolerant
 tolerations:

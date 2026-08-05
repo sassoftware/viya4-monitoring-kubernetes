@@ -173,6 +173,20 @@ kubectl -n "$LOG_NS" delete configmap fb-dbmigrate-script --ignore-not-found
 kubectl -n "$LOG_NS" create configmap fb-dbmigrate-script --from-file=logging/fb/migrate_fbstate_db.sh
 kubectl -n "$LOG_NS" label configmap fb-dbmigrate-script managed-by=v4m-es-script
 
+helm_values_yaml="logging/fb/fluent-bit_helm_values_opensearch.yaml"
+if [ "$IPV6_ENABLE" == "true" ]; then
+
+    cp "$helm_values_yaml" "$TMP_DIR/fluent-bit_helm_values_opensearch.yaml"
+    helm_values_yaml="$TMP_DIR/fluent-bit_helm_values_opensearch.yaml"
+
+    #replace ipv4 wildcard with ipv6 wildcard
+    v4m_replace "0.0.0.0" "::" "$helm_values_yaml"
+
+    log_debug "IPv6 settings requested; updated yaml file [$helm_values_yaml]"
+else
+    log_debug "IPv6 settings NOT requested; using original yaml file [$helm_values_yaml]"
+fi
+
 ## Get Helm Chart Name
 log_debug "Fluent Bit Helm Chart: repo [$FLUENTBIT_HELM_CHART_REPO] name [$FLUENTBIT_HELM_CHART_NAME] version [$FLUENTBIT_HELM_CHART_VERSION]"
 chart2install="$(get_helmchart_reference "$FLUENTBIT_HELM_CHART_REPO" "$FLUENTBIT_HELM_CHART_NAME" "$FLUENTBIT_HELM_CHART_VERSION")"
@@ -187,7 +201,7 @@ helm $helmDebug upgrade --install --namespace "$LOG_NS" v4m-fb \
     $versionstring \
     --values "$TMP_DIR/fb_imagekeysfile.yaml" \
     --values "$imageKeysFile" \
-    --values logging/fb/fluent-bit_helm_values_opensearch.yaml \
+    --values "$helm_values_yaml" \
     --values "$openshiftValuesFile" \
     --values "$tracingValuesFile" \
     --values "$FB_OPENSEARCH_USER_YAML" \

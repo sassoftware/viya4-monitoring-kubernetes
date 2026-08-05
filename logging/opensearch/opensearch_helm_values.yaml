@@ -80,13 +80,13 @@ extraEnvs:
  - name: DISABLE_PERFORMANCE_ANALYZER_AGENT_CLI
    value: "true"
  - name: network.bind_host
-   value: "::"
+   value: "0.0.0.0"
  - name: network.publish_host
    valueFrom:
      fieldRef:
        fieldPath: status.podIP
 
-networkHost: "::"
+networkHost: "0.0.0.0"
 
 extraVolumes:
 - name: v4m-security-script

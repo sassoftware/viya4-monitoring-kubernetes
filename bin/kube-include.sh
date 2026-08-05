@@ -1,4 +1,4 @@
-# Copyright © 2024,2020, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2020-2026, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # shellcheck disable=SC2148
@@ -11,24 +11,14 @@ if [ ! "$(which kubectl)" ]; then
     exit 1
 fi
 
-KUBE_CLIENT_VER=$(kubectl version --output=json | tr -d '\n' | tr -s " " | sed -E 's/^\{.*"clientVersion": \{([^\}]+)}.*/\1\n/' | sed -E 's/.*"gitVersion": "([^\"]*)".*$/\1/')
-KUBE_SERVER_VER=$(kubectl version --output=json | tr -d '\n' | tr -s " " | sed -E 's/^\{.*"serverVersion": \{([^\}]+)}.*/\1\n/' | sed -E 's/.*"gitVersion": "([^\"]*)".*$/\1/')
+KUBE_CLIENT_VER=$(kubectl version | sed -n 's/^Client Version:[[:space:]]*//p')
+KUBE_SERVER_VER=$(kubectl version | sed -n 's/^Server Version:[[:space:]]*//p')
 
-if [[ $KUBE_CLIENT_VER =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
-    KUBE_CLIENT_MAJOR=${BASH_REMATCH[1]}
-    KUBE_CLIENT_MINOR=${BASH_REMATCH[2]}
-    KUBE_CLIENT_PATCH=${BASH_REMATCH[3]}
-    log_debug "Kubernetes CLIENT - Major: [$KUBE_CLIENT_MAJOR] Minor: [$KUBE_CLIENT_MINOR] Patch: [$KUBE_CLIENT_PATCH]"
-else
+if ! semver_check "$KUBE_CLIENT_VER" VALID; then
     log_error "Kubernetes Client Version does not match expected pattern."
 fi
 
-if [[ $KUBE_SERVER_VER =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
-    KUBE_SERVER_MAJOR=${BASH_REMATCH[1]}
-    KUBE_SERVER_MINOR=${BASH_REMATCH[2]}
-    KUBE_SERVER_PATCH=${BASH_REMATCH[3]}
-    log_debug "Kubernetes SERVER - Major: [$KUBE_SERVER_MAJOR] Minor: [$KUBE_SERVER_MINOR] Patch: [$KUBE_SERVER_PATCH]"
-else
+if ! semver_check "$KUBE_SERVER_VER" VALID; then
     log_error "Kubernetes SERVER Version does not match expected pattern."
 fi
 
@@ -45,19 +35,20 @@ fi
 ## * EOL: 1.28
 ## % OCP Only: 1.29
 
-# Client version allowed to be one minor version earlier than minimum server version
-if [ "$KUBE_CLIENT_MAJOR" -eq "1" ] && [ "$KUBE_CLIENT_MINOR" -gt "26" ]; then
-    :
-else
-    log_warn "Unsupported kubectl version: [$KUBE_CLIENT_VER]."
-    log_warn "This script might not work as expected. Support might not be available until kubectl is upgraded to a supported version."
-fi
+KUBE_MIN_VER=${KUBE_MIN_VER:-"1.28.0"} #Set in component_versions.env
 
-if [ "$KUBE_SERVER_MAJOR" -eq "1" ] && [ "$KUBE_SERVER_MINOR" -gt "27" ]; then
-    :
-else
+if semver_check "$KUBE_SERVER_VER" LT "$KUBE_MIN_VER"; then
     log_warn "The detected version of Kubernetes [$KUBE_SERVER_VER] is not supported by any of the currently supported releases of SAS Viya."
     log_warn "This script might not work as expected. Support might not be available until Kubernetes is upgraded to a supported version."
+fi
+
+# Client version allowed to be one MINOR version earlier than
+# minimum server version (PATCH value does not matter, set to 0)
+KUBE_CLIENT_MIN_VER=$(semver_parse "$KUBE_MIN_VER" MAJOR).$(($(semver_parse "$KUBE_MIN_VER" MINOR) - 1)).0
+
+if semver_check "$KUBE_CLIENT_VER" LT "$KUBE_CLIENT_MIN_VER"; then
+    log_warn "Unsupported kubectl version: [$KUBE_CLIENT_VER]."
+    log_warn "This script might not work as expected. Support might not be available until kubectl is upgraded to a supported version."
 fi
 
 export KUBE_CLIENT_VER="$KUBE_CLIENT_VER"

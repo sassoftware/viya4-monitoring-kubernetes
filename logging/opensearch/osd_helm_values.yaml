@@ -81,7 +81,7 @@ podSecurityContext:
   seccompProfile:
     type: RuntimeDefault
 
-serverHost: "::"
+serverHost: "0.0.0.0"
 
 startupProbe:
   # OSD can take 2+ minutes

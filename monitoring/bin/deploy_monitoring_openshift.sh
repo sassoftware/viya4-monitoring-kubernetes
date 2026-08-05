@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021-2026, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
@@ -75,7 +75,7 @@ disable_sa_token_automount "$MON_NS" grafana-serviceaccount
 log_debug "Adding cluster role..."
 oc adm policy add-cluster-role-to-user cluster-monitoring-view -z grafana-serviceaccount -n "$MON_NS"
 
-if [ "$OSHIFT_MAJOR_VERSION" -eq "4" ] && [ "$OSHIFT_MINOR_VERSION" -gt "10" ] && [ "$OSHIFT_MINOR_VERSION" -lt "16" ]; then
+if semver_check "$OSHIFT_FULL_VERSION" GE 4.11.0 && semver_check "$OSHIFT_FULL_VERSION" LT 4.16.0; then
 
     # OCP versions 4.11-4.15: We need to patch service account to add API Token
 
@@ -88,7 +88,9 @@ fi
 
 log_debug "Obtaining token..."
 # NOTE: $grafanaToken is an actual token and NOT the name of a k8s resouce
-if [ "$OSHIFT_MAJOR_VERSION" -eq "4" ] && [ "$OSHIFT_MINOR_VERSION" -gt "15" ]; then
+
+if semver_check "$OSHIFT_FULL_VERSION" GE 4.16.0; then
+
     # OCP 4.16: removed deprecated oc serviceaccounts get-token command
     # NOTE: 12000 hours = 500 days although OpenShift *may* expire token after 12 months
     grafanaToken=$(oc create token grafana-serviceaccount -n "$MON_NS" --duration 12000h)
@@ -125,7 +127,7 @@ TRACING_ENABLE="${TRACING_ENABLE:-false}"
 if [ "$TRACING_ENABLE" == "false" ]; then
     kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-tempo
 else
-    log_info "WOMBAT: TEMPO ENABLED"
+    log_info "TEMPO enabled"
     TEMPO_USER_YAML="${TEMPO_USER_YAML:-$USER_DIR/monitoring/user-values-tempo.yaml}"
     if [ ! -f "$TEMPO_USER_YAML" ]; then
         log_debug "[$TEMPO_USER_YAML] not found. Using $TMP_DIR/empty.yaml"

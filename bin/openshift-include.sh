@@ -1,86 +1,10 @@
 # shellcheck disable=SC2148
-# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2026,2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # This script is not intended to be run directly
 # Assumes bin/common.sh has been sourced
 
-function ocVersionCheck {
-    origIFS=$IFS
-    IFS=$'\n'
-
-    # shellcheck disable=SC2207
-    allArr=($(oc version 2> /dev/null))
-    IFS=$origIFS
-
-    for ((i = 0; i < ${#allArr[@]}; i++)); do
-        # Split the line into an array
-        # shellcheck disable=SC2206
-        verArr=(${allArr[$i]})
-        if [ ${#verArr[@]} -eq 3 ]; then
-            verType="${verArr[0]}"
-            ver="${verArr[2]}"
-            if [ "$verType" == "Client" ]; then
-                ver="${verArr[2]}"
-                if [[ $ver =~ v?(([0-9]+)\.([0-9]+)\.([0-9]+)) ]]; then
-                    OC_FULL_VERSION=${BASH_REMATCH[1]}
-                    OC_MAJOR_VERSION=${BASH_REMATCH[2]}
-                    OC_MINOR_VERSION=${BASH_REMATCH[3]}
-                    OC_PATCH_VERSION=${BASH_REMATCH[4]}
-                else
-                    echo "Unable to parse client version: [$ver]"
-                fi
-            elif [ "$verType" == "Server" ]; then
-                ver="${verArr[2]}"
-                if [[ $ver =~ (([0-9]+)\.([0-9]+)\.([0-9]+)) ]]; then
-                    OSHIFT_FULL_VERSION=${BASH_REMATCH[1]}
-                    OSHIFT_MAJOR_VERSION=${BASH_REMATCH[2]}
-                    OSHIFT_MINOR_VERSION=${BASH_REMATCH[3]}
-                    OSHIFT_PATCH_VERSION=${BASH_REMATCH[4]}
-                else
-                    echo "Unable to parse server version: [$ver]"
-                fi
-            fi
-        fi
-    done
-    log_info "OpenShift client version: $OC_FULL_VERSION"
-    log_info "OpenShift server version: $OSHIFT_FULL_VERSION"
-
-    # Version enforcement
-    if [ "$OPENSHIFT_VERSION_CHECK" == "true" ]; then
-        ## Server Version
-        ### Openshift versions that do not start with a 4 should produce an error.
-        if ((OSHIFT_MAJOR_VERSION != 4)); then
-            log_error "Unsupported OpenShift server version: $OSHIFT_FULL_VERSION"
-            log_error "Version 4.14+ is required"
-            exit 1
-        ### 21FEB24: Openshift 4 versions earlier than 4.12 should produce an error.
-        elif ((OSHIFT_MINOR_VERSION < 14)); then
-            log_error "Unsupported OpenShift server version: $OSHIFT_FULL_VERSION"
-            log_error "Version 4.14+ is required"
-            exit 1
-        else
-            log_debug "OpenShift server version check OK"
-        fi
-
-        ## Client Version
-        ### Openshift versions that do not start with a 4 should produce an error.
-        if ((OC_MAJOR_VERSION != 4)); then
-            log_error "Unsupported OpenShift client version: $OC_FULL_VERSION"
-            log_error "Version 4.13+ is required"
-            exit 1
-        ### Openshift 4 client version must be w/in 1 minor releases of server minimum.
-        elif ((OC_MINOR_VERSION < 13)); then
-            log_error "Unsupported OpenShift client version: $OC_FULL_VERSION"
-            log_error "Version 4.13+ is required"
-            exit 1
-        else
-            log_debug "OpenShift client version check OK"
-        fi
-    fi
-}
-
-OPENSHIFT_VERSION_CHECK=${OPENSHIFT_VERSION_CHECK:-true}
 if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
     if [ "$OPENSHIFT_CLUSTER" == "" ]; then
         # Detect OpenShift cluster
@@ -96,28 +20,85 @@ if [ "$SAS_OPENSHIFT_SOURCED" != "true" ]; then
     fi
 
     if [ "$OPENSHIFT_CLUSTER" == "true" ]; then
-        if [ "${OPENSHIFT_OC_CHECK:-true}" == "true" ]; then
-            if ! which oc 1> /dev/null; then
-                echo "'oc' is required for OpenShift and not found on the current PATH"
-                exit 1
-            fi
-            ocVersionCheck
 
-            # Get base OpenShift route hostname
-            OPENSHIFT_ROUTE_DOMAIN=${OPENSHIFT_ROUTE_DOMAIN:-$(oc get route -n openshift-console console -o 'jsonpath={.spec.host}' | cut -c 27-)}
-            if [ "$OPENSHIFT_ROUTE_DOMAIN" != "" ]; then
-                log_debug "OpenShift route host is [$OPENSHIFT_ROUTE_DOMAIN]"
-            else
-                log_error "Unable to determine OpenShift route host. Set OPENSHIFT_ROUTE_DOMAIN if necessary."
-                exit 1
-            fi
-
-            export OPENSHIFT_ROUTE_DOMAIN
-            export OC_MAJOR_VERSION OC_MINOR_VERSION OC_PATCH_VERSION
-            export OSHIFT_MAJOR_VERSION OSHIFT_MINOR_VERSION OSHIFT_PATCH_VERSION
+        #Confirm oc CLI is available
+        if ! which oc 1> /dev/null; then
+            echo "'oc' is required for OpenShift and not found on the current PATH"
+            exit 1
         fi
+
+        OSHIFT_VER=$(oc version | sed -n 's/^Server Version:[[:space:]]*//p')
+
+        if semver_check "$OSHIFT_VER" VALID; then
+            OSHIFT_FULL_VERSION="$(semver_parse "$OSHIFT_VER" FULL)"
+            OSHIFT_MAJOR_VERSION="$(semver_parse "$OSHIFT_VER" MAJOR)"
+            OSHIFT_MINOR_VERSION="$(semver_parse "$OSHIFT_VER" MINOR)"
+            OSHIFT_PATCH_VERSION="$(semver_parse "$OSHIFT_VER" PATCH)"
+        else
+            log_error "OpenShift Version [$OSHIFT_VER] does not match expected pattern."
+        fi
+        log_info "OpenShift server version: $OSHIFT_FULL_VERSION"
+
+        OC_VER=$(oc version | sed -n 's/^Client Version:[[:space:]]*//p')
+
+        if semver_check "$OC_VER" VALID; then
+            OC_FULL_VERSION="$(semver_parse "$OC_VER" FULL)"
+            OC_MAJOR_VERSION="$(semver_parse "$OC_VER" MAJOR)"
+            OC_MINOR_VERSION="$(semver_parse "$OC_VER" MINOR)"
+            OC_PATCH_VERSION="$(semver_parse "$OC_VER" PATCH)"
+        else
+            log_error "OpenShift CLI Version [$OC_VER] does not match expected pattern."
+        fi
+        log_info "OpenShift client version: $OC_FULL_VERSION"
+
+        OPENSHIFT_VERSION_CHECK=${OPENSHIFT_VERSION_CHECK:-true}
+        # OpenShift  Version enforcement
+        if [ "$OPENSHIFT_VERSION_CHECK" == "true" ]; then
+
+            OPENSHIFT_MIN_VER=${OPENSHIFT_MIN_VER:-"4.14.0"} #Set in component_versions.env
+
+            ## Server Version
+            if semver_check "$OSHIFT_FULL_VERSION" GE "$OPENSHIFT_MIN_VER"; then
+                log_debug "OpenShift server version check OK"
+            else
+                log_error "Unsupported OpenShift server version: $OSHIFT_FULL_VERSION"
+                log_error "Version [$OPENSHIFT_MIN_VER] or higher is required"
+                exit 1
+            fi
+
+            ## Client Version
+            OC_MIN_VER="$OSHIFT_MAJOR_VERSION.$((OSHIFT_MINOR_VERSION - 1)).0"
+            if semver_check "$OC_FULL_VERSION" GE "$OC_MIN_VER"; then
+                log_debug "OpenShift client version check OK"
+            else
+                log_error "Unsupported OpenShift client version: $OC_FULL_VERSION"
+                log_error "Client version [$OC_MIN_VER] or higher is required"
+                exit 1
+            fi
+        fi
+
+        # Get base OpenShift route hostname
+        # shellcheck disable=SC2269
+        OPENSHIFT_ROUTE_DOMAIN=${OPENSHIFT_ROUTE_DOMAIN} #clarifies that this can be set externally
+        if [ -z "$OPENSHIFT_ROUTE_DOMAIN" ]; then
+            OPENSHIFT_ROUTE_DOMAIN=$(oc get route -n openshift-console console -o 'jsonpath={.spec.host}' | cut -c 27-)
+        fi
+
+        #confirms OPENSHIFT_ROUTE_DOMAIN is set one way or another
+        if [ "$OPENSHIFT_ROUTE_DOMAIN" != "" ]; then
+            log_debug "OpenShift route host is [$OPENSHIFT_ROUTE_DOMAIN]"
+        else
+            log_error "Unable to determine OpenShift route host. Set OPENSHIFT_ROUTE_DOMAIN if necessary."
+            exit 1
+        fi
+
+        export OPENSHIFT_ROUTE_DOMAIN
+        export OC_MAJOR_VERSION OC_MINOR_VERSION OC_PATCH_VERSION             #TODO: Remove? Not used anywhere else
+        export OSHIFT_MAJOR_VERSION OSHIFT_MINOR_VERSION OSHIFT_PATCH_VERSION #TODO: Remove? Not used anywhere else
+        export OSHIFT_FULL_VERSION
+
     else
-        log_debug "OpenShift not detected. Skipping 'oc' checks."
+        log_debug "OpenShift not detected. Skipping 'oc' and version checks."
     fi
     export OPENSHIFT_CLUSTER
     export SAS_OPENSHIFT_SOURCED="true"
