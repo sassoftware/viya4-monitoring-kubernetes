@@ -35,6 +35,9 @@ artifacts/
 work/
 ci/
 
+# Plugin zip built by monitoring/bin/deploy_ai_chatbot.sh
+*.zip
+
 # e2e test directories
 /test-results/
 /playwright-report/
