@@ -14,8 +14,7 @@
 #      deploy_monitoring_cluster.sh already uses for Grafana/Prometheus/
 #      Alertmanager) rather than provisioning a LoadBalancer per service.
 #      nginx only — no contour support. Only ROUTING=host is supported for
-#      now. This has no dependency on Grafana and is safe/idempotent to run
-#      anytime.
+#      now.
 #
 #   2. Provisioning: creates the grafana-chatbot-provisioning ConfigMap
 #      (grafana-llm-app's provider config ONLY — see
@@ -27,8 +26,7 @@
 #      (see monitoring/samples/ai-chatbot/user-values-prom-operator.yaml) —
 #      with `--atomic` set on that helm call, a pod that can't start because
 #      these are missing risks rolling back the ENTIRE monitoring release,
-#      not just the chatbot piece. This step is idempotent — safe to re-run
-#      any time.
+#      not just the chatbot piece. 
 #
 #   3. Plugin delivery + configuration: kubectl cp's the built chatbot plugin
 #      into the running Grafana pod, restarts it, then — once Grafana and the
@@ -39,7 +37,7 @@
 #      overlay — i.e. it needs to run AFTER a `helm upgrade --install` that
 #      picked up that overlay.
 #
-# Because of that ordering, run this script manually once BEFORE your first
+# Due to the ordering, run this script manually once BEFORE your first
 # deploy_monitoring_cluster.sh run with AI_CHATBOT_ENABLE=true (steps 1-2 will
 # succeed; step 3 will no-op with a warning if Grafana isn't running the new
 # overlay yet — that's expected on a first pass). deploy_monitoring_cluster.sh
@@ -70,11 +68,6 @@ fi
 log_info "Applying Ollama (v4m-mcp's embeddings dependency), v4m-mcp, and grafana-mcp k8s manifests..."
 kubectl apply -f ai/k8s/pvcs.yaml
 
-# ai/k8s/{ollama,deployment,grafana-mcp-deployment}.yaml stay unchanged as
-# checked-in working samples — same philosophy as the ingress templates below:
-# the tracked file is a reference, the script patches a $TMP_DIR copy so
-# per-user values (registries, pull secrets, external hostnames) never need
-# to be hand-edited into a tracked file.
 ollamaDefFile="$TMP_DIR/ollama_def_file.yaml"
 cp ai/k8s/ollama.yaml "$ollamaDefFile"
 imgSnippet="$OLLAMA_FULL_IMAGE" yq -i '(select(.kind=="Deployment") | .spec.template.spec.containers[0].image) = env(imgSnippet)' "$ollamaDefFile"
@@ -113,17 +106,6 @@ kubectl apply -f ai/k8s/grafana-mcp-service.yaml
 # kube-prometheus-stack chart's own ingress sub-values), v4m-mcp-server and
 # grafana-mcp-server aren't part of any Helm chart, so their Ingress objects
 # are built directly from the ai/k8s/ingress-templates/*_ingress.yaml templates.
-#
-# TLS: no secret is created or reused here on purpose. Grafana's own Ingress
-# on this cluster references a TLS secret (grafana-ingress-tls-secret) that
-# doesn't actually exist either — deploy_monitoring_cluster.sh's own
-# create_ingress_certs call for it silently no-ops when the local cert/key
-# files it expects aren't present, same gap we'd hit trying to provision one
-# ourselves. ingress-nginx doesn't hard-fail on a missing referenced secret —
-# it falls back to its own default self-signed certificate, which is exactly
-# what you already accepted in the browser for Grafana and for these two new
-# hosts. Matching that existing (if imperfect) state rather than trying to
-# fix TLS trust here specifically.
 v4mMcpSecret="v4m-mcp-ingress-tls-secret"
 grafanaMcpSecret="grafana-mcp-ingress-tls-secret"
 
@@ -217,12 +199,6 @@ log_info "Copying chatbot plugin into Grafana pod..."
 # subdirectory rather than straight into /var/lib/grafana/plugins/, or
 # plugin.json ends up loose in the plugins root and Grafana won't find it.
 
-# Clean up debris from any earlier run that extracted flat into the plugins
-# root (fixed above, but /var/lib/grafana/plugins is on a PVC and survives
-# pod restarts, so leftovers from a prior broken run would otherwise persist
-# forever alongside the correctly-placed subfolder). Named explicitly rather
-# than wiping the whole plugins root, so other installed plugins (e.g.
-# grafana-llm-app, in its own subfolder) are never touched.
 kubectl exec -n "$MON_NS" "$grafanaPod" -- sh -c '
     cd /var/lib/grafana/plugins &&
     rm -rf plugin.json module.js module.js.map img CHANGELOG.md LICENSE README.md \
@@ -238,10 +214,7 @@ log_info "Chatbot plugin installed. Restarting Grafana pod to load it..."
 kubectl delete pods -n "$MON_NS" -l "app.kubernetes.io/name=grafana"
 kubectl -n "$MON_NS" wait pods --selector "app.kubernetes.io/name=grafana" --for condition=Ready --timeout=5m
 
-# Now that the plugin is actually installed and Grafana is back up, set its
-# MCP server URLs via the settings API — NOT via provisioning, since
-# provisioning is evaluated at boot, before this step ever ran (see
-# monitoring/grafana-llm-app-provisioning.yaml's comment on why).
+# Now that the plugin is actually installed and Grafana is back up, set the MCP server URLs via the settings API
 grafanaPod=$(kubectl -n "$MON_NS" get pods -l app.kubernetes.io/name=grafana -o jsonpath='{.items[0].metadata.name}')
 
 adminSecretName="${GRAFANA_ADMIN_SECRET_NAME:-v4m-grafana}"
