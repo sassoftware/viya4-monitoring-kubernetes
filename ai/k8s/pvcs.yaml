@@ -9,7 +9,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  # storageClassName: managed-csi   # uncomment to pin an AKS StorageClass; omit for the cluster default
+  # storageClassName: gp3   # EKS example; AKS: managed-csi, GKE: standard-rwo — uncomment to pin, omit for the cluster default
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -21,4 +21,4 @@ spec:
   resources:
     requests:
       storage: 2Gi
-  # storageClassName: managed-csi
+  # storageClassName: gp3   # EKS example; AKS: managed-csi, GKE: standard-rwo — uncomment to pin, omit for the cluster default

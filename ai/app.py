@@ -8,12 +8,14 @@ call to answer common SAS Viya operational questions.
 import math
 import os
 import time
- 
+
 from fastmcp import FastMCP
 from prometheus_api_client import PrometheusConnect
- 
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
+
 from rag import DocIndex  # documentation retrieval engine
- 
+
 mcp = FastMCP("v4m-mcp")
  
 prom = PrometheusConnect(
@@ -269,8 +271,30 @@ if __name__ == "__main__":
         except Exception as exc:
             print(f"[v4m-mcp] docs index warm-up skipped: {exc}")
  
+    # The Grafana chatbot plugin calls this server directly from the browser
+    # (no backend proxy), so it needs CORS. ALLOWED_ORIGIN is comma-separated;
+    # defaults to "*" to match the already-accepted no-auth posture of this
+    # endpoint — tighten to the real Grafana origin(s) when auth is added.
+    allowed_origins = [
+        o.strip() for o in os.getenv("ALLOWED_ORIGIN", "*").split(",") if o.strip()
+    ]
+
     mcp.run(
         transport="http",
         host="0.0.0.0",
         port=int(os.getenv("PORT", "8000")),
+        middleware=[
+            Middleware(
+                CORSMiddleware,
+                allow_origins=allowed_origins,
+                allow_methods=["GET", "POST", "OPTIONS", "DELETE"],
+                allow_headers=["*"],
+                # Browsers hide cross-origin response headers from JS fetch()
+                # unless explicitly exposed — the MCP streamable-http client
+                # reads mcp-session-id from the initialize response to tag
+                # every subsequent request. Without this, the session ID is
+                # silently dropped and every request after initialize fails.
+                expose_headers=["mcp-session-id"],
+            ),
+        ],
     )

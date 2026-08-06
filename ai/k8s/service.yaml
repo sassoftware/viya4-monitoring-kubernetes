@@ -4,6 +4,12 @@ metadata:
   name: v4m-mcp-server
   namespace: monitoring
 spec:
+  # ClusterIP — reachability for the Grafana chatbot plugin (which calls this
+  # server directly from users' browsers) comes from an Ingress/HTTPProxy
+  # resource routed through this cluster's existing ingress controller (see
+  # monitoring/bin/deploy_ai_chatbot.sh), not from exposing this Service
+  # itself externally. No auth exists on this endpoint yet (see ai/app.py's
+  # CORS comment) — that's an accepted, deliberate exposure for now.
   type: ClusterIP
   selector:
     app: v4m-mcp-server

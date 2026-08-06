@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-mcp-server
+  namespace: monitoring
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: grafana-mcp-server
+  template:
+    metadata:
+      labels:
+        app: grafana-mcp-server
+    spec:
+      # Public, off-the-shelf image (unlike v4m-mcp-server, which is custom-built
+      # and pulled from our own ACR) — no imagePullSecrets needed.
+      containers:
+      - name: mcp
+        image: docker.io/grafana/mcp-grafana:1.0.0
+        imagePullPolicy: Always
+        args:
+        - "-t"
+        - "streamable-http"
+        - "--address"
+        - ":8000"
+        - "--endpoint-path"
+        - "/mcp"
+        - "--allowed-origins=$(ALLOWED_ORIGIN)"
+        - "--disable-write"          # this endpoint has no auth of its own yet; keep it read-only
+        # Grafana serves HTTPS directly on 3000 on this cluster (confirmed via
+        # the readiness probe hitting https://<pod-ip>:3000 earlier) — a plain
+        # HTTP request to that port gets Go's stock "400 Bad Request: Client
+        # sent an HTTP request to an HTTPS server", which is exactly what
+        # surfaced as dashboard-search calls failing with HTTP 400. Grafana's
+        # own internal cert here is self-signed (TLS_ENABLE's openssl
+        # generator), hence --tls-skip-verify.
+        - "--tls-skip-verify"
+        ports:
+        - containerPort: 8000
+        env:
+        - name: GRAFANA_URL
+          # deploy_ai_chatbot.sh patches this to <scheme>://v4m-grafana.monitoring.svc:3000
+          # at deploy time, scheme derived from TLS_ENABLE (override with
+          # GRAFANA_INTERNAL_SCHEME) — the value below only applies if you apply
+          # this file directly.
+          value: "https://v4m-grafana.monitoring.svc:3000"
+        - name: GRAFANA_USERNAME
+          value: "admin"
+        - name: GRAFANA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              # deploy_ai_chatbot.sh patches this name from GRAFANA_ADMIN_SECRET_NAME
+              # (default v4m-grafana) at deploy time.
+              name: v4m-grafana
+              key: admin-password
+        - name: ALLOWED_ORIGIN
+          # grafana-mcp's --allowed-origins feeds its server-side Origin-header
+          # validation (MCP's DNS-rebinding protection) — confirmed via direct
+          # curl testing that "*" is NOT treated as a wildcard here (rejected
+          # with "forbidden: origin not allowed"), unlike v4m-mcp-server's CORS
+          # handling. Must be the literal origin, comma-separated if multiple.
+          # deploy_ai_chatbot.sh patches this to https://grafana.$BASE_DOMAIN at
+          # deploy time — the value below only applies if you apply this file directly.
+          value: "https://grafana.vizsax-eks-con-aws-nginx-4ffea33e.unx.sas.com"
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        startupProbe:
+          tcpSocket:
+            port: 8000
+          periodSeconds: 5
+          failureThreshold: 30

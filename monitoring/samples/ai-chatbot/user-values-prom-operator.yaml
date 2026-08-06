@@ -1,0 +1,65 @@
+# Sample overlay for the Grafana AI chatbot integration (v4m-mcp + grafana-mcp).
+#
+# Copy the keys below into your own $USER_DIR/monitoring/user-values-prom-operator.yaml
+# (do not point PROM_OPER_USER_YAML directly at this file — it's a reference,
+# and USER_DIR is meant to hold your own copy). This file is loaded LAST in
+# deploy_monitoring_cluster.sh's `helm upgrade --install` call, so these keys
+# take precedence over everything else.
+#
+# Prerequisites before this takes effect:
+#   1. Set AZURE_OPENAI_API_KEY, AZURE_OPENAI_URL, and AZURE_OPENAI_DEPLOYMENT
+#      in user.env, then run monitoring/bin/deploy_ai_chatbot.sh once, manually
+#      (applies the MCP server manifests, creates the
+#      grafana-chatbot-provisioning/grafana-llm-config ConfigMaps and the
+#      grafana-llm-openai-secret Secret referenced below; it will skip plugin
+#      delivery/configuration with a warning until step 2 below has run at
+#      least once — that's expected).
+#   2. Set AI_CHATBOT_ENABLE=true when running deploy_monitoring_cluster.sh,
+#      so monitoring/bin/deploy_ai_chatbot.sh runs again afterward to deliver
+#      the plugin dist/ and configure its MCP URLs via the Grafana API (this
+#      overlay only prepares the Grafana pod to accept the plugin —
+#      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS has to be present when the
+#      pod is created).
+
+grafana:
+  # Installs grafana-llm-app from the Grafana plugin catalog automatically at
+  # pod startup (it's signed/published, unlike the chatbot plugin itself).
+  plugins:
+    - grafana-llm-app
+
+  # Allows the private, unsigned chatbot plugin to load. Must match
+  # ai/chatbot-plugin/src/plugin.json's "id", and CHATBOT_PLUGIN_ID in
+  # user.env if you've overridden it from the default (mainorg-joelmcpchat-app)
+  # — this file is Helm-consumed, not bash, so it can't reference that
+  # variable directly.
+  env:
+    GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: mainorg-joelmcpchat-app
+
+  # Feeds the Azure OpenAI key to grafana-llm-app-provisioning.yaml's
+  # ${AZURE_OPENAI_API_KEY} substitution, without ever putting the key in a
+  # ConfigMap. Secret created by deploy_ai_chatbot.sh.
+  envValueFrom:
+    AZURE_OPENAI_API_KEY:
+      secretKeyRef:
+        name: grafana-llm-openai-secret
+        key: apiKey
+
+  # Feeds the non-sensitive Azure OpenAI endpoint/deployment name to
+  # grafana-llm-app-provisioning.yaml's ${AZURE_OPENAI_URL}/
+  # ${AZURE_OPENAI_DEPLOYMENT} substitutions. ConfigMap created by
+  # deploy_ai_chatbot.sh.
+  envFrom:
+    - configMapRef:
+        name: grafana-llm-config
+
+  # Mounts the grafana-llm-app provisioning file into Grafana's provisioning
+  # directory, following the same extraVolumes/extraVolumeMounts pattern the
+  # base values file already uses for grafana-alert-rules. The chatbot
+  # plugin's own MCP server URLs are deliberately NOT provisioned here — see
+  # monitoring/grafana-llm-app-provisioning.yaml's comment for why; they're
+  # set via the Grafana API instead, by deploy_ai_chatbot.sh.
+  extraConfigmapMounts:
+    - name: grafana-chatbot-provisioning
+      configMap: grafana-chatbot-provisioning
+      mountPath: /etc/grafana/provisioning/plugins/grafana-llm-app-provisioning.yaml
+      subPath: grafana-llm-app-provisioning.yaml

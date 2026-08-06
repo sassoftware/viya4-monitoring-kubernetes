@@ -1,0 +1,20 @@
+name: Create Plugin Update
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 1 * *' # run once a month on the 1st day
+
+# To use this workflow please create a fine-grained personal access token for your repository with:
+# `contents: read and write`
+# `pull requests: read and write`
+# `workflows: read and write`
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: grafana/plugin-actions/create-plugin-update@create-plugin-update/v2.0.1
+        with:
+          # Make sure to save the token in your repository secrets as `GH_PAT_TOKEN`
+          token: ${{ secrets.GH_PAT_TOKEN }}

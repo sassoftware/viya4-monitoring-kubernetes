@@ -1,0 +1,21 @@
+apiVersion: 1
+
+apps:
+  - type: 'mainorg-joelmcpchat-app'
+    org_id: 1
+    org_name: 'Main Org.'
+    disabled: false
+    jsonData:
+      apiUrl: http://default-url.com
+      # LOCAL DEV (docker-compose) ONLY — this file is picked up automatically
+      # by the docker-compose volume mount, but is NOT used by the EKS/Helm
+      # deployment in viya4-monitoring-kubernetes. There, mcpServerOneUrl/
+      # mcpServerTwoUrl are set at deploy time via the Grafana
+      # /api/plugins/:id/settings API (see monitoring/bin/deploy_ai_chatbot.sh),
+      # using the real ingress hostnames for v4m-mcp-server/grafana-mcp-server
+      # on that cluster. EDIT these two for your own local MCP servers if
+      # running docker-compose directly.
+      mcpServerOneUrl: http://172.171.67.172:8000/mcp
+      mcpServerTwoUrl: http://40.76.148.28:9000/sse
+    secureJsonData:
+      apiKey: secret-key
