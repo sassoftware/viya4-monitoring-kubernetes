@@ -4,9 +4,6 @@ metadata:
   name: grafana-mcp-server
   namespace: monitoring
 spec:
-  # ClusterIP — same reasoning as ai/k8s/service.yaml: reachability comes from
-  # an Ingress/HTTPProxy resource, not from exposing this Service directly.
-  # No auth exists on this endpoint yet, mitigated only by --disable-write.
   type: ClusterIP
   selector:
     app: grafana-mcp-server

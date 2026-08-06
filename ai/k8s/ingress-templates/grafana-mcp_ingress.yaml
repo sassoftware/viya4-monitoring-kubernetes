@@ -15,23 +15,9 @@ metadata:
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS, DELETE"
-    # "*" is NOT treated as a true wildcard here — confirmed via curl that it
-    # silently falls back to nginx's own default header list, which doesn't
-    # include the MCP-specific headers the streamable-http client sends.
-    # Listing explicitly: nginx's usual defaults plus what MCP actually needs.
     nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept,mcp-session-id,mcp-protocol-version"
     nginx.ingress.kubernetes.io/cors-expose-headers: "mcp-session-id"
-    # enable-cors defaults to also sending Access-Control-Allow-Credentials:
-    # true — combined with a wildcard allow-origin, that's a spec-forbidden
-    # combination browsers reject outright (confirmed via curl showing 200
-    # with both headers present, while the browser's fetch() still failed).
-    # MCP doesn't need cookie-based credentials here, so just turn it off.
     nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
-    # grafana-mcp rejects requests with "forbidden: host not allowed" — its
-    # MCP DNS-rebinding protection validates the Host header server-side, with
-    # no CLI flag to configure an allowlist. Rewriting the Host header nginx
-    # forwards to the backend (independent of the real external hostname the
-    # client used) so the backend sees a value it trusts by default.
     nginx.ingress.kubernetes.io/upstream-vhost: "localhost:8000"
 spec:
   ingressClassName: nginx
