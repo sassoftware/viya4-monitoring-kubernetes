@@ -1,0 +1,48 @@
+apiVersion: 1
+
+# Configures the grafana-llm-app plugin (installed via grafana.plugins in the
+# Helm values) so the chatbot's openai.enabled() check passes, using Azure
+# OpenAI. Grafana substitutes ${AZURE_OPENAI_API_KEY}/${AZURE_OPENAI_URL}/
+# ${AZURE_OPENAI_DEPLOYMENT} from the pod's environment at load time, so none
+# of these sit hardcoded in this file or the ConfigMap/ConfigMap+Secret pair
+# built from it — see monitoring/bin/deploy_ai_chatbot.sh (grafana-llm-config
+# ConfigMap + grafana-llm-openai-secret Secret) and the grafana.envValueFrom/
+# envFrom entries in monitoring/samples/ai-chatbot/user-values-prom-operator.yaml.
+#
+# NOTE: this MUST be a classic Azure OpenAI Service resource endpoint
+# (https://<resource>.openai.azure.com), not an Azure AI Foundry project's
+# Responses API endpoint (*.services.ai.azure.com/openai/v1/responses) —
+# grafana-llm-app's azure provider targets the deployment-based Chat
+# Completions API, not the newer unified Responses API. Confirm your
+# resource exposes the classic endpoint (Azure Portal -> your Azure OpenAI
+# resource -> Keys and Endpoint) before relying on this.
+#
+# The chatbot plugin's own MCP server URLs are deliberately NOT provisioned
+# here. Grafana's app-provisioning module treats "config references a plugin
+# ID that isn't installed yet" as fatal — it kills the whole server, not just
+# that one entry — and mainorg-joelmcpchat-app isn't installed until
+# deploy_ai_chatbot.sh delivers it post-boot. Its config is set via the
+# /api/plugins/:id/settings API instead, after both Grafana and the plugin
+# are confirmed up — see deploy_ai_chatbot.sh.
+apps:
+  - type: grafana-llm-app
+    disabled: false
+    jsonData:
+      openAI:
+        provider: azure
+        # Bare resource endpoint only — no path suffix. grafana-llm-app
+        # constructs its own request path (/openai/deployments/<deployment>/
+        # chat/completions?api-version=...) by appending onto this; a
+        # trailing path here (e.g. the /openai/v1 this had before) doubles up
+        # into a malformed URL and 404s against Azure.
+        url: ${AZURE_OPENAI_URL}
+        # Keys are the abstract model tiers the @grafana/llm frontend SDK
+        # requests (Model.BASE/Model.LARGE — see node_modules/@grafana/llm),
+        # NOT OpenAI model name strings. The chatbot plugin only ever
+        # requests the default (base), but both are mapped to your one
+        # deployment since that's the only model available.
+        azureModelMapping:
+          - ["base", "${AZURE_OPENAI_DEPLOYMENT}"]
+          - ["large", "${AZURE_OPENAI_DEPLOYMENT}"]
+    secureJsonData:
+      openAIKey: ${AZURE_OPENAI_API_KEY}

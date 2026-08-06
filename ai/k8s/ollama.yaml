@@ -10,7 +10,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  # storageClassName: gp3   # uncomment to pin an EKS StorageClass; omit for the cluster default
+  # storageClassName: gp3   # EKS example; AKS: managed-csi, GKE: standard-rwo — uncomment to pin, omit for the cluster default
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -31,11 +31,14 @@ spec:
       labels:
         app: ollama
     spec:
+      # deploy_ai_chatbot.sh patches image/imagePullSecrets from
+      # OLLAMA_FULL_IMAGE/OLLAMA_IMAGE_PULL_SECRET (component_versions.env) at
+      # deploy time — the values below only apply if you apply this file directly.
       imagePullSecrets:
       - name: acr-secret
       containers:
       - name: ollama
-        image: viyamonitoring.azurecr.io/ollama:latest   
+        image: viyamonitoring.azurecr.io/ollama:latest
         command: ["/bin/sh", "-c"]
         args:
         - |

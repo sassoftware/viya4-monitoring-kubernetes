@@ -15,6 +15,9 @@ spec:
       labels:
         app: v4m-mcp-server
     spec:
+      # deploy_ai_chatbot.sh patches image/imagePullSecrets from
+      # V4M_MCP_FULL_IMAGE/V4M_MCP_IMAGE_PULL_SECRET (component_versions.env)
+      # at deploy time — the values below only apply if you apply this file directly.
       imagePullSecrets:
       - name: acr-secret
       containers:
@@ -41,6 +44,11 @@ spec:
           value: "1"                    # build the docs index at startup (visible in logs)
         - name: INDEX_CACHE
           value: "/app/cache/doc_index.npz"
+        # --- added for the Grafana chatbot plugin (browser calls this server directly) ---
+        - name: ALLOWED_ORIGIN
+          # deploy_ai_chatbot.sh patches this to https://grafana.$BASE_DOMAIN at deploy
+          # time — the "*" below only applies if you apply this file directly.
+          value: "*"
         resources:
           requests:
             cpu: "50m"
@@ -56,11 +64,19 @@ spec:
         # Covers the first-run/re-embed warm-up, during which the server hasn't
         # bound port 8000 yet. Without this, the pod shows Ready immediately on
         # container start, before the app is actually listening.
+        #
+        # 10 minutes (the old failureThreshold*periodSeconds) turned out to
+        # not be enough for a full re-embed on this cluster's CPU budget — the
+        # embed only gets cached to disk AFTER it fully completes, so if
+        # kubelet kills the container right as it's about to finish, the next
+        # attempt starts the whole embed over from scratch, forever. Widened
+        # to 30 minutes; once the cache is actually written once, subsequent
+        # restarts are fast (cache hit) unless the docs fingerprint changes.
         startupProbe:
           tcpSocket:
             port: 8000
           periodSeconds: 5
-          failureThreshold: 120          # up to 10 minutes for a full re-embed
+          failureThreshold: 360          # up to 30 minutes for a full re-embed
       volumes:
       - name: cache
         persistentVolumeClaim:

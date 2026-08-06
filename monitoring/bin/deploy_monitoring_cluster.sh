@@ -674,6 +674,14 @@ fi
 echo ""
 monitoring/bin/deploy_dashboards.sh
 
+AI_CHATBOT_ENABLE="${AI_CHATBOT_ENABLE:-false}"
+if [ "$AI_CHATBOT_ENABLE" == "true" ]; then
+    log_info "Deploying the Grafana AI chatbot plugin"
+    monitoring/bin/deploy_ai_chatbot.sh
+else
+    log_debug "AI_CHATBOT_ENABLE not set; skipping deployment of the Grafana AI chatbot plugin"
+fi
+
 set +e
 # call function to get HTTP/HTTPS ports from ingress controller
 get_ingress_ports

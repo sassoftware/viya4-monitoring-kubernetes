@@ -1,0 +1,31 @@
+# Template — host/tls/secretName get substituted at deploy time by
+# monitoring/bin/deploy_ai_chatbot.sh based on BASE_DOMAIN. Not applied
+# directly with kubectl; not consumed by deploy_monitoring_cluster.sh either
+# (unlike the Helm-chart-driven ingress for Grafana/Prometheus/Alertmanager),
+# since v4m-mcp-server isn't part of that chart.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: v4m-mcp-server
+  namespace: monitoring
+  annotations:
+    # Our backend is plain HTTP (unlike Grafana/Prometheus/Alertmanager, which
+    # serve TLS internally on this cluster) — do not set backend-protocol: HTTPS.
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: v4m-mcp.host.cluster.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: v4m-mcp-server
+            port:
+              number: 8000
+  tls:
+  - hosts:
+    - v4m-mcp.host.cluster.example.com
+    secretName: v4m-mcp-ingress-tls-secret
