@@ -47,10 +47,11 @@ grafana:
   # Feeds the non-sensitive Azure OpenAI endpoint/deployment name to
   # grafana-llm-app-provisioning.yaml's ${AZURE_OPENAI_URL}/
   # ${AZURE_OPENAI_DEPLOYMENT} substitutions. ConfigMap created by
-  # deploy_ai_chatbot.sh.
-  envFrom:
-    - configMapRef:
-        name: grafana-llm-config
+  # deploy_ai_chatbot.sh. NOTE: this chart has no raw `envFrom` passthrough —
+  # it only recognizes its own envFromConfigMaps/envFromSecrets/envValueFrom
+  # keys, so `envFrom:` here is silently ignored by the templates.
+  envFromConfigMaps:
+    - name: grafana-llm-config
 
   # Mounts the grafana-llm-app provisioning file into Grafana's provisioning
   # directory, following the same extraVolumes/extraVolumeMounts pattern the
