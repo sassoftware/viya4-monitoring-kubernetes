@@ -10,7 +10,6 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  # storageClassName: gp3   # EKS example; AKS: managed-csi, GKE: standard-rwo — uncomment to pin, omit for the cluster default
 ---
 apiVersion: apps/v1
 kind: Deployment
