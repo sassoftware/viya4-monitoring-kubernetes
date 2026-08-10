@@ -24,15 +24,16 @@ fi
 
 # SAS Viya 4 versions
 # supported by SAS Tech Support
-# Updated: 06JUL26
-# 2024.09 LTS 1.28* 1.30
-# 2025.03 LTS 1.29% 1.31
+# Updated: 10AUG26
+# 2024.09 LTS 1.28* 1.29% 1.30*
+# 2025.03 LTS 1.29% 1.30* 1.31
 # 2025.09 LTS 1.31  1.33
 # 2026.03 LTS 1.32  1.35
-# 2026.03     1.32  1.34
+# 2026.04     1.32  1.34
 # 2026.05     1.33  1.35
 # 2026.06     1.33  1.35
-## * EOL: 1.28
+# 2026.07     1.33  1.35
+## * EOL: 1.28, 1.30
 ## % OCP Only: 1.29
 
 KUBE_MIN_VER=${KUBE_MIN_VER:-"1.28.0"} #Set in component_versions.env
