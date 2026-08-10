@@ -230,11 +230,11 @@ function create_root_httpproxy {
     fi
 
     if [ "$any_apps_enabled" == "true" ] ; then
-      kubectl --namespace "$namespace" apply -f "$resourceDefFile"
-      kubectl -n "$namespace" label httpproxy "v4m-${app_group}-root-proxy" managed-by="v4m-es-script"
+        kubectl --namespace "$namespace" apply -f "$resourceDefFile"
+        kubectl -n "$namespace" label httpproxy "v4m-${app_group}-root-proxy" managed-by="v4m-es-script"
     else
-      #remove a root proxy instance created earlier (if it exists)
-      kubectl -n "$namespace" delete httpproxy "v4m-${app_group}-root-proxy" --ignore-not-found
+        #remove a root proxy instance created earlier (if it exists)
+        kubectl -n "$namespace" delete httpproxy "v4m-${app_group}-root-proxy" --ignore-not-found
     fi
 }
 export -f create_root_httpproxy
