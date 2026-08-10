@@ -1,4 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Metrics**
+  * [FIX] Corrected an issue which prevented metrics from being available in Grafana when path-based
+routing using Contour was configured automatically.  (Fixes #882)
+
+
 ## Version 1.2.53 (07AUG2026)
 * **Overall**
   * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernetes clusters.
