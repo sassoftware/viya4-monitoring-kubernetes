@@ -229,7 +229,7 @@ function create_root_httpproxy {
         return 1
     fi
 
-    if [ "$any_apps_enabled" == "true" ] ; then
+    if [ "$any_apps_enabled" == "true" ]; then
         kubectl --namespace "$namespace" apply -f "$resourceDefFile"
         kubectl -n "$namespace" label httpproxy "v4m-${app_group}-root-proxy" managed-by="v4m-es-script"
     else
