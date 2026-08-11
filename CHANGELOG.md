@@ -3,7 +3,11 @@
 * **Metrics**
   * [FIX] Corrected an issue which prevented metrics from being available in Grafana when path-based
 routing using Contour was configured automatically.  (Fixes #882)
-
+  * [FIX] Corrected Alertmanager URL when `ALERTMANAGER_PATH` is set and path-based routing using Contour
+is configured automatically
+  * [FIX] The `v4m-logging-root-proxy` HTTPProxy resource is only created in appropriate scenarios
+(i.e. auto-generated path-based routing using Contour) and any existing instance of this resource
+is deleted if found in other deployment scenarios (where it is not needed)
 
 ## Version 1.2.53 (07AUG2026)
 * **Overall**
