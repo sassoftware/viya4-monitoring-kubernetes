@@ -6,7 +6,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.31
+       Set  fb_configMap_version 0.2.32-vault3
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -783,6 +783,25 @@ data:
        Parser          crunchy_stderr2
        Parser          zpg3
        Parser          zpgboot
+       Reserve_Data    On
+
+    [FILTER]
+       #
+       # Vault
+       #
+       Alias           flag_vault
+       Name            modify
+       Match           kube.*
+       Condition       Key_value_matches  PROPS__appname sas-vault-server
+       Copy            message            vault_message
+       Rename          message            unparsed_message
+       Add             flagged4parsing    vault
+    [FILTER]
+       Alias           parse_vault
+       Name            parser
+       Match           kube.*
+       Key_name        vault_message
+       Parser          sasvault
        Reserve_Data    On
 
 
