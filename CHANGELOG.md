@@ -1,4 +1,8 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Logging**
+  * [CHANGE] Improved handling of log messages from Vault
+
 ## Version 1.2.56 (06NOV2026)
 * **Metrics**
   * [FIX] A bug which prevented the auto-generation of storage class customization when
