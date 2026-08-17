@@ -1,4 +1,8 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Logging**
+  * [CHANGE] Improved handling of log messages from Vault
+
 ## Version 1.2.53 (07AUG2026)
 * **Overall**
   * [ANNOUNCEMENT] With this release, the project supports deployment onto IPv6-only Kubernetes clusters.
