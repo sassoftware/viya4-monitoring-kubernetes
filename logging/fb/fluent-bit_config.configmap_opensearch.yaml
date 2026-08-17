@@ -6,7 +6,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.32-vault3
+       Set  fb_configMap_version 0.2.32-vault4
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -802,6 +802,7 @@ data:
        Match           kube.*
        Key_name        vault_message
        Parser          sasvault
+       Parser          sasvault2
        Reserve_Data    On
 
 
