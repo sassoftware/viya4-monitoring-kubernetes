@@ -12,6 +12,17 @@ metadata:
     # Our backend is plain HTTP (unlike Grafana/Prometheus/Alertmanager, which
     # serve TLS internally on this cluster) — do not set backend-protocol: HTTPS.
     nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    # v4m-mcp-server responds over MCP Streamable HTTP, which uses
+    # text/event-stream (SSE) framing and may hold a long-lived GET connection
+    # open for server-push messages. nginx's defaults — response buffering and
+    # a 60s idle read timeout — don't play well with that: nginx can buffer
+    # the whole stream before flushing (defeating SSE) or abruptly reset an
+    # idle-but-still-open connection, which browsers surface as
+    # net::ERR_HTTP2_PROTOCOL_ERROR. grafana-mcp doesn't need this — it
+    # responds with plain application/json, not a standing stream.
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 spec:
   ingressClassName: nginx
   rules:

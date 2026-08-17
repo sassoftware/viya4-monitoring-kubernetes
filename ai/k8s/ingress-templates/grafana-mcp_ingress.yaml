@@ -19,6 +19,14 @@ metadata:
     nginx.ingress.kubernetes.io/cors-expose-headers: "mcp-session-id"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
     nginx.ingress.kubernetes.io/upstream-vhost: "localhost:8000"
+    # Same SSE/long-lived-connection reasoning as v4m-mcp_ingress.yaml: the
+    # MCP JS client may hold a standing GET connection open against this
+    # server too, and nginx's default response buffering + 60s idle read
+    # timeout can abruptly reset it, surfacing as net::ERR_HTTP2_PROTOCOL_ERROR
+    # in the browser.
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 spec:
   ingressClassName: nginx
   rules:
