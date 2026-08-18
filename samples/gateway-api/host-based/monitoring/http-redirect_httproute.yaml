@@ -1,0 +1,25 @@
+# Sample: gateway-api/host-based Version: 0.1.0 (POC)
+
+# Unlike Contour's HTTPProxy -- which redirects HTTP to HTTPS implicitly as soon
+# as TLS is configured on the virtualhost -- Gateway API requires an explicit
+# HTTPRoute with a RequestRedirect filter and no backendRefs.  It is attached to
+# the Gateway's HTTP listener via sectionName.
+#
+# One redirect route per Gateway is sufficient; it covers every host name served
+# by the HTTP listener.  If you do not want HTTP exposed at all, remove the HTTP
+# listener from the Gateway and do not create this resource.
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: v4m-http-redirect
+spec:
+  parentRefs:
+    - name: v4m-gateway
+      sectionName: http
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301

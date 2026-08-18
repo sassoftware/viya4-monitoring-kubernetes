@@ -1,0 +1,29 @@
+# Sample: gateway-api/host-based Version: 0.1.0 (POC)
+
+
+# This sample does NOT make Prometheus and Alertmanager accessible by default.
+# However, you can make one or both of these web applications accessible by
+# creating an HTTPRoute resource for it using this sample file.
+
+# Note that neither Prometheus nor Alertmanager have any authentication
+# configured by default, and exposing an unauthenticated application
+# without other restrictions in place is insecure.
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: v4m-prometheus
+spec:
+  parentRefs:
+    - name: v4m-gateway
+      sectionName: https
+  hostnames:
+    - prometheus.host.cluster.example.com
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: v4m-prometheus
+          port: 9090
