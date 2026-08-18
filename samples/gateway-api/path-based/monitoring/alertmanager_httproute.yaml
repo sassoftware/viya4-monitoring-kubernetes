@@ -1,0 +1,42 @@
+# Sample: gateway-api/path-based Version: 0.1.0 (POC)
+
+
+# This sample does NOT make Prometheus and Alertmanager accessible by default.
+# However, you can make one or both of these web applications accessible by
+# creating an HTTPRoute resource for it using this sample file.
+
+# Note that neither Prometheus nor Alertmanager have any authentication
+# configured by default, and exposing an unauthenticated application
+# without other restrictions in place is insecure.
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: v4m-alertmanager
+spec:
+  parentRefs:
+    - name: v4m-gateway
+      sectionName: https
+  rules:
+    # Trailing-slash redirect; see grafana_httproute.yaml for an explanation.
+    - matches:
+        - path:
+            type: Exact
+            value: /alertmanager
+      filters:
+        - type: RequestRedirect
+          requestRedirect:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /alertmanager/
+            statusCode: 302
+
+    # No rewrite: Alertmanager is configured with routePrefix=/alertmanager
+    # (see user-values-prom-operator.yaml) and expects the prefix intact.
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /alertmanager/
+      backendRefs:
+        - name: v4m-alertmanager
+          port: 9093

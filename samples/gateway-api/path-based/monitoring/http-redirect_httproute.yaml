@@ -1,0 +1,19 @@
+# Sample: gateway-api/path-based Version: 0.1.0 (POC)
+
+# Explicit HTTP-to-HTTPS redirect; Gateway API has no implicit equivalent of
+# Contour's automatic redirect once TLS is set on the virtualhost.
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: v4m-http-redirect
+spec:
+  parentRefs:
+    - name: v4m-gateway
+      sectionName: http
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301

@@ -1,0 +1,48 @@
+# Sample: gateway-api/path-based Version: 0.1.0 (POC)
+
+# REFERENCE ONLY -- the Gateway resource is expected to be owned and managed by
+# the platform/cluster administrator, not by SAS Viya Monitoring for Kubernetes.
+# It MUST live in the same namespace as the TLS Secret it references.
+#
+# In the path-based scenario the Gateway itself plays the role that Contour's
+# "root proxy" HTTPProxy played: it owns the host name and the TLS certificate,
+# and the per-application HTTPRoutes attach to it and contribute path rules.
+# There is therefore NO equivalent of root_httpproxy.yaml in this sample, and no
+# equivalent of the INGRESS_CREATE_ROOT_PROXY setting.
+#
+# As in the Contour sample, the host name is prefixed with the application group
+# ("monitoring.") so that these resources are independent of any other Gateway
+# already serving the base domain.  If you drop the prefix, you will likely need
+# to attach these HTTPRoutes to an existing Gateway rather than create your own.
+#
+# Substitute the GatewayClass for your implementation (contour, istio, kgateway,
+# eg, openshift-default, alb, ...).  Everything else in this sample is portable.
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: v4m-gateway
+spec:
+  gatewayClassName: contour
+  listeners:
+    # HTTP listener exists solely so that the http-to-https redirect
+    # HTTPRoute (see http-redirect_httproute.yaml) has something to attach to.
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: monitoring.host.cluster.example.com
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: monitoring.host.cluster.example.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: v4m-ingress-tls-secret
+      allowedRoutes:
+        namespaces:
+          from: Same

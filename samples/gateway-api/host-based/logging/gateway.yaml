@@ -1,0 +1,41 @@
+# Sample: gateway-api/host-based Version: 0.1.0 (POC)
+
+# REFERENCE ONLY -- see the comments in
+# samples/gateway-api/host-based/monitoring/gateway.yaml for a full explanation.
+#
+# A separate Gateway is used for the logging namespace because a Gateway can
+# only reference TLS Secrets in its own namespace (absent a ReferenceGrant), and
+# the deployment scripts create an ingress TLS Secret in each namespace.
+#
+# If your site prefers a single shared Gateway in a dedicated namespace, that
+# works too: set allowedRoutes.namespaces.from to Selector (or All), and the
+# HTTPRoutes in this sample only need their parentRefs given a `namespace:` key.
+# Cross-namespace backendRefs are NOT used by this sample, so no ReferenceGrant
+# for Services is required.
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: v4m-gateway
+spec:
+  gatewayClassName: contour
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: "*.host.cluster.example.com"
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.host.cluster.example.com"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: v4m-ingress-tls-secret
+      allowedRoutes:
+        namespaces:
+          from: Same
