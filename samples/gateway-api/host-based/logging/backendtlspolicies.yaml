@@ -1,0 +1,51 @@
+# Sample: gateway-api/host-based Version: 0.1.0 (POC)
+
+# BackendTLSPolicy replaces Contour's `services[].protocol: tls`.  See the
+# extended notes in samples/gateway-api/host-based/monitoring/backendtlspolicies.yaml.
+#
+# The CA certificate must live in a ConfigMap (not a Secret).  Create it with
+# samples/gateway-api/bin/create-ca-configmap.sh.
+#
+# `validation.hostname` must match a SAN on the backend's serving certificate.
+# For the logging applications the SANs come from logging/tls/*.yaml and are NOT
+# the Service names:
+#
+#   Service v4m-osd     -> prometheus-operator-kibana   (kibana-tls-cert)
+#   Service v4m-search  -> v4m-es-client-service        (es-rest-tls-cert)
+#
+# API version: v1 as of Gateway API v1.4.0 (Standard channel).  If your cluster
+# or controller only knows v1alpha3, change the apiVersion below; the spec fields
+# are identical.  See the monitoring copy of this file for details.
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: v4m-osd-backend-tls
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: v4m-osd
+  validation:
+    caCertificateRefs:
+      - group: ""
+        kind: ConfigMap
+        name: v4m-ca-certs
+    hostname: prometheus-operator-kibana
+---
+# Only needed if you created opensearch_httproute.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: v4m-search-backend-tls
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: v4m-search
+  validation:
+    caCertificateRefs:
+      - group: ""
+        kind: ConfigMap
+        name: v4m-ca-certs
+    hostname: v4m-es-client-service

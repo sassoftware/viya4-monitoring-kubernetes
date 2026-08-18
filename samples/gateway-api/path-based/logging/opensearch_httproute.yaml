@@ -1,0 +1,45 @@
+# Sample: gateway-api/path-based Version: 0.1.0 (POC)
+
+
+# This sample does NOT make the OpenSearch API endpoint accessible
+# by default because there are limited use-cases for which this
+# would be required.  However, if needed, you can make the
+# OpenSearch API accessible by creating an HTTPRoute resource for
+# it using this sample file.
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: v4m-search
+spec:
+  parentRefs:
+    - name: v4m-gateway
+      sectionName: https
+  rules:
+    # Trailing-slash redirect; see osd_httproute.yaml for an explanation.
+    - matches:
+        - path:
+            type: Exact
+            value: /opensearch
+      filters:
+        - type: RequestRedirect
+          requestRedirect:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /opensearch/
+            statusCode: 302
+
+    # The OpenSearch API has no base-path concept, so the prefix is stripped.
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /opensearch/
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: v4m-search
+          port: 9200
