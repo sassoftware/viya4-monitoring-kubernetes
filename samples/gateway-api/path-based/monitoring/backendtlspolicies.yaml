@@ -1,0 +1,87 @@
+# Sample: gateway-api/path-based Version: 0.1.0 (POC)
+
+# BackendTLSPolicy is the Gateway API replacement for Contour's
+# `services[].protocol: tls` -- it tells the gateway to re-encrypt traffic on the
+# hop between the gateway and the application Pod ("full-stack TLS").
+#
+# Two things differ materially from the Contour configuration:
+#
+# 1. The CA certificate must be supplied in a ConfigMap, NOT a Secret.  The
+#    deployment scripts create only a kubernetes.io/tls Secret, so the ConfigMap
+#    has to be produced separately.  Use the helper script
+#    samples/gateway-api/bin/create-ca-configmap.sh, or create it by hand.
+#
+# 2. `validation.hostname` is matched against the SANs in the backend's serving
+#    certificate, and some implementations enforce this strictly (kgateway does;
+#    Istio was more lenient).  The certificates issued by the deployment scripts
+#    do NOT use the Service name as a SAN -- the SANs come from the Certificate
+#    resources in monitoring/tls/*.yaml.  The correct values are therefore:
+#
+#      Service v4m-grafana       -> prometheus-operator-grafana
+#      Service v4m-prometheus    -> prometheus-operator-prometheus
+#      Service v4m-alertmanager  -> prometheus-operator-alertmanager
+#
+#    Verify against your own deployment with, for example:
+#      kubectl -n monitoring get secret grafana-tls-secret \
+#        -o jsonpath='{.data.tls\.crt}' | base64 -d \
+#        | openssl x509 -noout -text | grep -A1 'Subject Alternative Name'
+#
+# Only create the policies for the applications you have actually exposed.
+#
+# API version: as of Gateway API v1.4.0, BackendTLSPolicy is part of the Standard
+# channel and is served as v1; v1alpha3 is still defined but is NOT served by the
+# standard install.  Older Gateway API installs -- and some controllers, Contour
+# among them -- know only v1alpha3.  If applying this file is rejected with
+# "no matches for kind BackendTLSPolicy in version .../v1", change the apiVersion
+# below to gateway.networking.k8s.io/v1alpha3.  The spec fields are identical.
+# bin/check-gateway-api-support.sh reports which versions your cluster serves.
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: v4m-grafana-backend-tls
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: v4m-grafana
+  validation:
+    caCertificateRefs:
+      - group: ""
+        kind: ConfigMap
+        name: v4m-ca-certs
+    hostname: prometheus-operator-grafana
+---
+# Only needed if you created prometheus_httproute.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: v4m-prometheus-backend-tls
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: v4m-prometheus
+  validation:
+    caCertificateRefs:
+      - group: ""
+        kind: ConfigMap
+        name: v4m-ca-certs
+    hostname: prometheus-operator-prometheus
+---
+# Only needed if you created alertmanager_httproute.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: v4m-alertmanager-backend-tls
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: v4m-alertmanager
+  validation:
+    caCertificateRefs:
+      - group: ""
+        kind: ConfigMap
+        name: v4m-ca-certs
+    hostname: prometheus-operator-alertmanager

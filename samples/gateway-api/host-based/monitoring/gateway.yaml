@@ -1,0 +1,55 @@
+# Sample: gateway-api/host-based Version: 0.1.0 (POC)
+
+# REFERENCE ONLY -- the Gateway resource is expected to be owned and managed by
+# the platform/cluster administrator, not by SAS Viya Monitoring for Kubernetes.
+# This file is provided so that you have a known-good starting point that matches
+# the HTTPRoute resources in this sample.
+#
+# The Gateway MUST be created in the same namespace as the TLS Secret it
+# references (Gateway API does not allow a Gateway to reference a Secret in
+# another namespace without a ReferenceGrant).  Because the deployment scripts
+# create the ingress TLS Secret in the monitoring namespace, the sample places
+# the Gateway there as well.
+#
+# gatewayClassName is the ONLY implementation-specific value in this sample.
+# Substitute the GatewayClass provided by your implementation, for example:
+#   contour                  (Project Contour)
+#   istio                    (Istio / OpenShift Service Mesh 3)
+#   kgateway                 (kgateway)
+#   eg                       (Envoy Gateway)
+#   openshift-default        (OpenShift Ingress Operator, 4.19+)
+#   alb / gke-l7-global-external-managed  (AWS LBC / GKE)
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: v4m-gateway
+spec:
+  gatewayClassName: contour
+  listeners:
+    # HTTP listener exists solely so that the http-to-https redirect
+    # HTTPRoute (see http-redirect_httproute.yaml) has something to attach to.
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: "*.host.cluster.example.com"
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      protocol: HTTPS
+      port: 443
+      # A single wildcard listener requires a wildcard TLS certificate covering
+      # every application host name (grafana.*, prometheus.*, alertmanager.*).
+      # If you cannot obtain a wildcard certificate, replace this listener with
+      # one listener per application, each with its own hostname and
+      # certificateRefs, and set sectionName in each HTTPRoute accordingly.
+      hostname: "*.host.cluster.example.com"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: v4m-ingress-tls-secret
+      allowedRoutes:
+        namespaces:
+          from: Same

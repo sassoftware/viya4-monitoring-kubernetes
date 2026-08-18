@@ -1,0 +1,63 @@
+# Sample: gateway-api/path-based Version: 0.1.0 (POC)
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: v4m-osd
+spec:
+  parentRefs:
+    - name: v4m-gateway
+      sectionName: https
+  rules:
+    # Rule 1 -- trailing-slash redirect.
+    #
+    # An Exact match on "/dashboards" that redirects to "/dashboards/".  This
+    # ordered Exact-then-PathPrefix pair is the portable replacement for the
+    # nginx `configuration-snippet` regex rewrite the deprecated ingress-nginx
+    # sample used for OpenSearch Dashboards.  Regex path matching is explicitly
+    # implementation-specific in the Gateway API spec, so it is not used here --
+    # and this approach also avoids nginx's regex-replacement problems with
+    # special characters in URLs.
+    #
+    # Exact outranks PathPrefix in Gateway API's match precedence rules, so
+    # "/dashboards" hits this rule and "/dashboards/..." falls through to rule 2.
+    - matches:
+        - path:
+            type: Exact
+            value: /dashboards
+      filters:
+        - type: RequestRedirect
+          requestRedirect:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /dashboards/
+            statusCode: 302
+
+    # Rule 2 -- the actual route, with the prefix stripped.
+    #
+    # OpenSearch Dashboards runs with SERVER_BASEPATH=/dashboards (see
+    # user-values-osd.yaml) but does not rewrite incoming paths itself, so the
+    # gateway must strip the prefix.  This URLRewrite filter is the equivalent of
+    # Contour's `pathRewritePolicy.replacePrefix`.
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /dashboards/
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: v4m-osd
+          port: 5601
+
+      # Session persistence (sticky sessions) -- EXPERIMENTAL channel only.
+      # See the extended note in
+      # samples/gateway-api/host-based/logging/osd_httproute.yaml.
+      #
+      # sessionPersistence:
+      #   type: Cookie
+      #   cookieConfig:
+      #     lifetimeType: Session
