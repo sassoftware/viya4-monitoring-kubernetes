@@ -147,7 +147,9 @@ function create_root_httpproxy {
     ### create_root_httpproxy  LOGGING v4m-ingress-tls-secret logging
 
     ### Assumes set: BASE_DOMAIN
-    local app_group secretName namespace
+    local app_group secretName namespace any_apps_enabled
+
+    any_apps_enabled=false
 
     app_group="${1}" # logging|monitoring
     namespace="${2}" # Namespace for the ROOT HTTPProxy resource
@@ -186,6 +188,8 @@ function create_root_httpproxy {
                 #need to update the namespace
                 yq -i '(.spec.includes[] | select(.name == "v4m-osd") | .namespace) = "'"$namespace"'"' "$resourceDefFile"
             fi
+            any_apps_enabled="true"
+
         else
             #Access to OpenSearch Dashboards is disabled, delete include block for it
             yq -i e 'del(.spec.includes[] |select(.name == "v4m-osd"))' "$resourceDefFile"
@@ -193,6 +197,8 @@ function create_root_httpproxy {
 
         if [ "$OPENSEARCH_INGRESS_ENABLE" == "true" ]; then
             yq -i '.spec.includes += [{"name": "v4m-search","namespace": "'"$namespace"'"}]' "$resourceDefFile"
+            any_apps_enabled="true"
+
         fi
     elif [ "$app_group" == "monitoring" ]; then
 
@@ -202,6 +208,8 @@ function create_root_httpproxy {
                 yq -i '(.spec.includes[] | select(.name == "v4m-grafana") | .namespace) = "'"$namespace"'"' "$resourceDefFile"
 
             fi
+
+            any_apps_enabled="true"
         else
             #Access to Grafana is disabled, delete include block for it
             yq -i e 'del(.spec.includes[] |select(.name == "v4m-grafana"))' "$resourceDefFile"
@@ -209,18 +217,25 @@ function create_root_httpproxy {
 
         if [ "$ALERTMANAGER_INGRESS_ENABLE" == "true" ]; then
             yq -i '.spec.includes += [{"name": "v4m-alertmanager","namespace": "'"$namespace"'"}]' "$resourceDefFile"
+            any_apps_enabled="true"
         fi
 
         if [ "$PROMETHEUS_INGRESS_ENABLE" == "true" ]; then
             yq -i '.spec.includes += [{"name": "v4m-prometheus","namespace": "'"$namespace"'"}]' "$resourceDefFile"
+            any_apps_enabled="true"
         fi
     else
         log_error "Invalid application group [$app_group] passed to function [create_root_httpproxy]"
         return 1
     fi
 
-    kubectl --namespace "$namespace" apply -f "$resourceDefFile"
-    kubectl -n "$namespace" label httpproxy "v4m-${app_group}-root-proxy" managed-by="v4m-es-script"
+    if [ "$any_apps_enabled" == "true" ]; then
+        kubectl --namespace "$namespace" apply -f "$resourceDefFile"
+        kubectl -n "$namespace" label httpproxy "v4m-${app_group}-root-proxy" managed-by="v4m-es-script"
+    else
+        #remove a root proxy instance created earlier (if it exists)
+        kubectl -n "$namespace" delete httpproxy "v4m-${app_group}-root-proxy" --ignore-not-found
+    fi
 }
 export -f create_root_httpproxy
 
