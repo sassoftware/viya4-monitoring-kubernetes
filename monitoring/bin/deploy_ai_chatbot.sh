@@ -10,11 +10,20 @@
 #      (v4m-mcp + its embeddings dependency) and
 #      ai/k8s/grafana-mcp-{service,deployment}.yaml (grafana-mcp) as
 #      ClusterIP Services, then routes to both through this cluster's
-#      existing ingress-nginx controller (same BASE_DOMAIN/ROUTING convention
+#      existing ingress controller — ingress-nginx or Contour, per
+#      INGRESS_TYPE (same BASE_DOMAIN/ROUTING/INGRESS_TYPE convention
 #      deploy_monitoring_cluster.sh already uses for Grafana/Prometheus/
 #      Alertmanager) rather than provisioning a LoadBalancer per service.
-#      nginx only — no contour support. Only ROUTING=host is supported for
-#      now.
+#      Only ROUTING=host is supported for now.
+#
+#      Both MCP servers are reached at hostnames of their own
+#      (v4m-mcp.$BASE_DOMAIN, grafana-mcp.$BASE_DOMAIN), so they need ingress
+#      TLS certs covering those hostnames. Where those certs come from follows
+#      the same INGRESS_USE_SEPARATE_CERTS convention as the rest of the
+#      project — see create_mcp_ingress_certs in bin/autogenerate-include.sh.
+#      A missing cert is only a warning under ingress-nginx, which falls back
+#      to its own default certificate, but is fatal under Contour, which
+#      rejects an HTTPProxy whose TLS secret does not resolve.
 #
 #   2. Provisioning: creates the grafana-chatbot-provisioning ConfigMap
 #      (grafana-llm-app's provider config ONLY — see
@@ -46,12 +55,14 @@
 
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
 source monitoring/bin/common.sh
+source bin/autogenerate-include.sh
 
 set -e
 
 # --- Step 1: MCP servers -----------------------------------------------------
 
 ROUTING="${ROUTING:-host}"
+INGRESS_TYPE="${INGRESS_TYPE:-ingress-nginx}"
 
 if [ -z "$BASE_DOMAIN" ]; then
     log_error "BASE_DOMAIN is not set. It's required to generate ingress hostnames for the MCP"
@@ -63,6 +74,44 @@ if [ "$ROUTING" != "host" ]; then
     log_error "Only host-based routing (ROUTING=host) is currently supported for the MCP"
     log_error "server ingress — path-based support hasn't been built yet."
     exit 1
+fi
+if [ "$INGRESS_TYPE" != "ingress-nginx" ] && [ "$INGRESS_TYPE" != "contour" ]; then
+    log_error "Invalid INGRESS_TYPE value [$INGRESS_TYPE], valid values are 'ingress-nginx' or 'contour'"
+    exit 1
+fi
+if [ "$INGRESS_TYPE" == "contour" ] && ! kubectl get crd "httpproxies.projectcontour.io" 1> /dev/null 2>&1; then
+    log_error "Ingress type [contour] specified but the required HTTPProxy CRD is not installed"
+    exit 1
+fi
+
+# Match the per-ingress-type defaults set in bin/autogenerate-include.sh; they
+# only get exported from there when AUTOGENERATE_INGRESS=true, and this script
+# is also meant to run against a manually configured ingress.
+if [ "$INGRESS_TYPE" == "contour" ]; then
+    INGRESS_USE_SEPARATE_CERTS="${INGRESS_USE_SEPARATE_CERTS:-false}"
+else
+    INGRESS_USE_SEPARATE_CERTS="${INGRESS_USE_SEPARATE_CERTS:-true}"
+fi
+export INGRESS_USE_SEPARATE_CERTS
+
+v4mMcpSecret="$(get_ingress_tls_secret_name v4m-mcp)"
+grafanaMcpSecret="$(get_ingress_tls_secret_name grafana-mcp)"
+
+if ! create_mcp_ingress_certs; then
+    if [ "$INGRESS_TYPE" == "contour" ]; then
+        log_error "Contour rejects an HTTPProxy whose TLS secret does not exist, which would leave"
+        log_error "the MCP servers unreachable and the chatbot unable to answer any question."
+        log_error "Supply the ingress certs — for example, by placing the cert and key files in"
+        log_error "your USER_DIR and pointing these variables at them in user.env:"
+        log_error "  INGRESS_CERT=\$USER_DIR/monitoring/ingress.crt"
+        log_error "  INGRESS_KEY=\$USER_DIR/monitoring/ingress.key"
+        log_error "(or V4M_MCP_INGRESS_CERT/KEY and GRAFANA_MCP_INGRESS_CERT/KEY for per-server"
+        log_error "certs), then re-run this script. Alternatively, create the secrets yourself:"
+        log_error "  kubectl create secret tls <secretName> -n $MON_NS --cert=cert_file --key=cert_key_file"
+        exit 1
+    fi
+    log_warn "ingress-nginx will serve the MCP hostnames with its own default certificate until"
+    log_warn "these secrets are created, which browsers flag as an untrusted certificate."
 fi
 
 log_info "Applying Ollama (v4m-mcp's embeddings dependency), v4m-mcp, and grafana-mcp k8s manifests..."
@@ -102,22 +151,36 @@ kubectl apply -f "$grafanaMcpDefFile"
 
 kubectl apply -f ai/k8s/grafana-mcp-service.yaml
 
-# Unlike Grafana/Prometheus/Alertmanager (whose Ingress objects come from the
-# kube-prometheus-stack chart's own ingress sub-values), v4m-mcp-server and
-# grafana-mcp-server aren't part of any Helm chart, so their Ingress objects
-# are built directly from the ai/k8s/ingress-templates/*_ingress.yaml templates.
-v4mMcpSecret="v4m-mcp-ingress-tls-secret"
-grafanaMcpSecret="grafana-mcp-ingress-tls-secret"
-
+# Unlike Grafana/Prometheus/Alertmanager (whose Ingress/HTTPProxy objects come
+# from the kube-prometheus-stack chart's own ingress sub-values and from
+# samples/contour respectively), v4m-mcp-server and grafana-mcp-server aren't
+# part of any Helm chart, so their ingress objects are built directly from the
+# ai/k8s/ingress-templates/*_{ingress,httpproxy}.yaml templates.
 for entry in "v4m-mcp:$v4mMcpSecret" "grafana-mcp:$grafanaMcpSecret"; do
     app="${entry%%:*}"
     secretName="${entry##*:}"
-    resourceDefFile="$TMP_DIR/${app}_ingress_def_file.yaml"
-    yq eval-all '. as $item ireduce ({}; . * $item )' "ai/k8s/ingress-templates/${app}_ingress.yaml" > "$resourceDefFile"
-    hostSnippet="$app.$BASE_DOMAIN" yq -i '.spec.rules[0].host=env(hostSnippet)' "$resourceDefFile"
-    hostSnippet="$app.$BASE_DOMAIN" yq -i '.spec.tls[0].hosts[0]=env(hostSnippet)' "$resourceDefFile"
-    secretSnippet="$secretName" yq -i '.spec.tls[0].secretName=env(secretSnippet)' "$resourceDefFile"
-    kubectl apply -n "$MON_NS" -f "$resourceDefFile"
+    resourceDefFile="$TMP_DIR/${app}_${INGRESS_TYPE}_def_file.yaml"
+
+    if [ "$INGRESS_TYPE" == "contour" ]; then
+        yq eval-all '. as $item ireduce ({}; . * $item )' "ai/k8s/ingress-templates/${app}_httpproxy.yaml" > "$resourceDefFile"
+        hostSnippet="$app.$BASE_DOMAIN" yq -i '.spec.virtualhost.fqdn=env(hostSnippet)' "$resourceDefFile"
+        secretSnippet="$secretName" yq -i '.spec.virtualhost.tls.secretName=env(secretSnippet)' "$resourceDefFile"
+        kubectl apply -n "$MON_NS" -f "$resourceDefFile"
+        kubectl -n "$MON_NS" label --overwrite httpproxy "${app}-server" managed-by="v4m-es-script"
+        # Drop the other ingress type's leftovers so switching INGRESS_TYPE on
+        # an existing deployment doesn't leave two controllers claiming the
+        # same hostname.
+        kubectl -n "$MON_NS" delete ingress "${app}-server" --ignore-not-found
+    else
+        yq eval-all '. as $item ireduce ({}; . * $item )' "ai/k8s/ingress-templates/${app}_ingress.yaml" > "$resourceDefFile"
+        hostSnippet="$app.$BASE_DOMAIN" yq -i '.spec.rules[0].host=env(hostSnippet)' "$resourceDefFile"
+        hostSnippet="$app.$BASE_DOMAIN" yq -i '.spec.tls[0].hosts[0]=env(hostSnippet)' "$resourceDefFile"
+        secretSnippet="$secretName" yq -i '.spec.tls[0].secretName=env(secretSnippet)' "$resourceDefFile"
+        kubectl apply -n "$MON_NS" -f "$resourceDefFile"
+        if kubectl get crd "httpproxies.projectcontour.io" 1> /dev/null 2>&1; then
+            kubectl -n "$MON_NS" delete httpproxy "${app}-server" --ignore-not-found
+        fi
+    fi
 done
 
 v4mMcpUrl="https://v4m-mcp.$BASE_DOMAIN/mcp"

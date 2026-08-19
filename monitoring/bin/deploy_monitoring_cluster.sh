@@ -269,6 +269,26 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
         create_ingress_certs "$MON_NS" "$ingress_tls_secret" "$INGRESS_CERT" "$INGRESS_KEY"
     fi
 
+    # The AI chatbot's MCP servers are reached at hostnames of their own, so
+    # they need ingress TLS certs covering those hostnames. Handling them here,
+    # alongside the other ingress certs, means a missing cert surfaces now
+    # rather than after the (20-minute) Helm install completes and
+    # deploy_ai_chatbot.sh finally runs.
+    if [ "${AI_CHATBOT_ENABLE:-false}" == "true" ]; then
+        if ! create_mcp_ingress_certs; then
+            if [ "$INGRESS_TYPE" == "contour" ]; then
+                log_error "Contour rejects an HTTPProxy whose TLS secret does not exist, which would leave"
+                log_error "the AI chatbot's MCP servers unreachable. Supply the ingress certs (see"
+                log_error "INGRESS_CERT/INGRESS_KEY, or V4M_MCP_INGRESS_CERT/KEY and"
+                log_error "GRAFANA_MCP_INGRESS_CERT/KEY, in monitoring/user.env) or create the secrets"
+                log_error "yourself, then re-run this script."
+                exit 1
+            fi
+            log_warn "ingress-nginx will serve the AI chatbot's MCP hostnames with its own default"
+            log_warn "certificate until these secrets are created, which browsers flag as untrusted."
+        fi
+    fi
+
     ALERTMANAGER_INGRESS_ENABLE="${ALERTMANAGER_INGRESS_ENABLE:-false}"
     ALERTMANAGER_PATH="${ALERTMANAGER_PATH:-alertmanager}"
     ALERTMANAGER_FQDN="$(get_app_ingress_fqdn "$ALERTMANAGER_FQDN" "$ALERTMANAGER_PATH")"

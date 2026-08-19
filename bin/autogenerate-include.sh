@@ -59,6 +59,82 @@ function create_ingress_certs {
 }
 export -f create_ingress_certs
 
+function get_ingress_tls_secret_name {
+    # input parms: $1  application prefix (e.g. grafana, prometheus, v4m-mcp)
+    #
+    # Echoes the name of the Kubernetes Secret holding the TLS certs used to
+    # secure ingress to the specified application.  When INGRESS_USE_SEPARATE_CERTS
+    # is 'true', each application gets its own secret; otherwise every
+    # application shares the single 'v4m-ingress-tls-secret' secret.
+
+    local app_prefix
+    app_prefix="$1"
+
+    if [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
+        echo "${app_prefix}-ingress-tls-secret"
+    else
+        echo "v4m-ingress-tls-secret"
+    fi
+}
+export -f get_ingress_tls_secret_name
+
+function create_mcp_ingress_certs {
+    # Creates (or confirms the existence of) the Kubernetes Secrets holding the
+    # TLS certs securing ingress to the AI chatbot's two MCP servers.
+    #
+    # Unlike Grafana/Prometheus/Alertmanager, whose ingress definitions come
+    # from the kube-prometheus-stack chart, the MCP servers are reached at
+    # hostnames of their own (v4m-mcp.$BASE_DOMAIN and
+    # grafana-mcp.$BASE_DOMAIN), so a certificate covering only the Grafana
+    # hostname is not sufficient — the cert must cover these hostnames too (a
+    # wildcard cert for BASE_DOMAIN does).  Per-server cert/key files can be
+    # supplied via V4M_MCP_INGRESS_CERT/V4M_MCP_INGRESS_KEY and
+    # GRAFANA_MCP_INGRESS_CERT/GRAFANA_MCP_INGRESS_KEY; both fall back to
+    # INGRESS_CERT/INGRESS_KEY.
+    #
+    # Returns non-zero if either secret is still missing afterwards.  Callers
+    # decide how much that matters: ingress-nginx serves the MCP hostnames with
+    # its own default certificate when the secret is absent, but Contour
+    # rejects an HTTPProxy referencing a missing secret outright, leaving the
+    # MCP servers unreachable.
+
+    local grafanaMcpSecret namespace rc secretName secretsToCheck v4mMcpSecret
+
+    namespace="${MON_NS:-monitoring}"
+    rc=0
+
+    v4mMcpSecret="$(get_ingress_tls_secret_name v4m-mcp)"
+    grafanaMcpSecret="$(get_ingress_tls_secret_name grafana-mcp)"
+
+    if [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
+        create_ingress_certs "$namespace" "$v4mMcpSecret" \
+            "${V4M_MCP_INGRESS_CERT:-$INGRESS_CERT}" "${V4M_MCP_INGRESS_KEY:-$INGRESS_KEY}"
+        create_ingress_certs "$namespace" "$grafanaMcpSecret" \
+            "${GRAFANA_MCP_INGRESS_CERT:-$INGRESS_CERT}" "${GRAFANA_MCP_INGRESS_KEY:-$INGRESS_KEY}"
+    else
+        log_debug "Using the shared ingress TLS certs [$v4mMcpSecret] for the MCP servers; that certificate must cover the [v4m-mcp] and [grafana-mcp] hostnames"
+    fi
+
+    if [ "$v4mMcpSecret" == "$grafanaMcpSecret" ]; then
+        secretsToCheck=("$v4mMcpSecret")
+    else
+        secretsToCheck=("$v4mMcpSecret" "$grafanaMcpSecret")
+    fi
+
+    for secretName in "${secretsToCheck[@]}"; do
+        # shellcheck disable=SC2091
+        if $(kubectl get secret "$secretName" --namespace "$namespace" -o name &> /dev/null); then
+            log_debug "Confirmed secret [$namespace/$secretName] exists"
+        else
+            log_warn "The Kubernetes secret [$namespace/$secretName], holding the ingress TLS certs for the AI chatbot's MCP servers, does not exist."
+            rc=1
+        fi
+    done
+
+    return $rc
+}
+export -f create_mcp_ingress_certs
+
 function get_app_ingress_fqdn {
     # Assumes ROUTING and BASE_DOMAIN set
     #

@@ -1,0 +1,40 @@
+# Template — fqdn/secretName get substituted at deploy time by
+# monitoring/bin/deploy_ai_chatbot.sh based on BASE_DOMAIN. Contour counterpart
+# of v4m-mcp_ingress.yaml, used when INGRESS_TYPE=contour. Not applied directly
+# with kubectl, and not built by the create_httpproxy function in
+# bin/autogenerate-include.sh either (unlike the Grafana/Prometheus/Alertmanager
+# HTTPProxy resources, whose definitions live under samples/contour/), since
+# v4m-mcp-server is not part of the kube-prometheus-stack chart.
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: v4m-mcp-server
+  namespace: monitoring
+spec:
+  virtualhost:
+    fqdn: v4m-mcp.host.cluster.example.com
+    tls:
+      # Contour rejects the entire HTTPProxy if this secret does not exist, so
+      # deploy_ai_chatbot.sh confirms it is present before applying this file.
+      secretName: v4m-mcp-ingress-tls-secret
+  routes:
+  - conditions:
+    - prefix: /
+    services:
+    # Our backend is plain HTTP, so no 'protocol: tls' here — unlike the
+    # Grafana/Prometheus/Alertmanager HTTPProxy samples, whose backends serve
+    # TLS internally on this cluster. This is the Contour equivalent of the
+    # nginx backend-protocol: HTTP annotation.
+    - name: v4m-mcp-server
+      port: 8000
+    # v4m-mcp-server responds over MCP Streamable HTTP, which uses
+    # text/event-stream (SSE) framing and may hold a long-lived, mostly-idle
+    # GET connection open for server-push messages. Envoy's default 15s route
+    # timeout and 5m stream-idle timeout tear that down mid-stream, which
+    # browsers surface as net::ERR_HTTP2_PROTOCOL_ERROR — the same failure the
+    # proxy-read-timeout/proxy-send-timeout annotations avoid on ingress-nginx.
+    # No buffering setting is needed here: Envoy streams responses by default,
+    # so there is no equivalent of nginx's proxy-buffering to turn off.
+    timeoutPolicy:
+      response: infinity
+      idle: infinity

@@ -1,0 +1,64 @@
+# Template — see v4m-mcp_httpproxy.yaml for the shape; this one additionally
+# handles CORS at the ingress layer rather than relying on the grafana-mcp
+# binary's own --allowed-origins flag, which was confirmed NOT to produce
+# working CORS headers (unlike v4m-mcp-server, which handles its own CORS
+# correctly in app.py and doesn't need this). mcp-session-id must be exposed
+# so the MCP streamable-http JS client can read it from the initialize
+# response — see the CORS comment in ai/app.py for the full explanation.
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: grafana-mcp-server
+  namespace: monitoring
+spec:
+  virtualhost:
+    fqdn: grafana-mcp.host.cluster.example.com
+    tls:
+      secretName: grafana-mcp-ingress-tls-secret
+    # Contour attaches CORS to the virtual host rather than to individual
+    # routes, which is why ROUTING=path is not supported for the MCP servers:
+    # under path-based routing this proxy would be an include of the shared
+    # monitoring root proxy and would have no virtualhost of its own to carry
+    # this policy.
+    corsPolicy:
+      allowOrigin:
+      - "*"
+      allowMethods:
+      - GET
+      - POST
+      - OPTIONS
+      - DELETE
+      allowHeaders:
+      - DNT
+      - Keep-Alive
+      - User-Agent
+      - X-Requested-With
+      - If-Modified-Since
+      - Cache-Control
+      - Content-Type
+      - Range
+      - Authorization
+      - Accept
+      - mcp-session-id
+      - mcp-protocol-version
+      exposeHeaders:
+      - mcp-session-id
+      allowCredentials: false
+  routes:
+  - conditions:
+    - prefix: /
+    services:
+    - name: grafana-mcp-server
+      port: 8000
+      # Contour equivalent of nginx's upstream-vhost annotation. Contour allows
+      # a static Host rewrite at either the route or the service level; it sits
+      # on the service here because that is what the nginx annotation it
+      # replaces does — rewrite the Host seen by this one backend.
+      requestHeadersPolicy:
+        set:
+        - name: Host
+          value: localhost:8000
+    # Same SSE/long-lived-connection reasoning as v4m-mcp_httpproxy.yaml.
+    timeoutPolicy:
+      response: infinity
+      idle: infinity
