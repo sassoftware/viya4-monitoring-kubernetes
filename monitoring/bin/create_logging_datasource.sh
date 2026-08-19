@@ -112,7 +112,7 @@ kubectl create secret generic -n "$MON_NS" grafana-datasource-opensearch --from-
 kubectl label secret -n "$MON_NS" grafana-datasource-opensearch grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
 
 # Deploy the log-enabled Viya dashboards
-WELCOME_DASH="false" KUBE_DASH="false" VIYA_DASH="false" VIYA_LOGS_DASH="true" PGMONITOR_DASH="false" RABBITMQ_DASH="false" NGINX_DASH="false" LOGGING_DASH="false" USER_DASH="false" monitoring/bin/deploy_dashboards.sh
+WELCOME_DASH="false" KUBE_DASH="false" VIYA_DASH="false" VIYA_LOGS_DASH="true" PGMONITOR_DASH="false" RABBITMQ_DASH="false" VAULT_DASH="false" NGINX_DASH="false" LOGGING_DASH="false" USER_DASH="false" monitoring/bin/deploy_dashboards.sh
 
 # Delete pods so that they can be restarted with the change.
 log_info "Logging data source provisioned in Grafana.  Restarting pods to apply the change"

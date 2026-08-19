@@ -1,6 +1,12 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Metrics**
+  * [FEATURE] Metric monitoring support for the new Vault component of SAS Viya has been added.  A
+ServiceMonitor (`sas-vault-server`) is now deployed to the SAS Viya namespace to enable Prometheus to
+collect Vault metrics, and a new Grafana dashboard, *Vault / Overview* (based on the
+[vault-mixin](https://github.com/adinhodovic/vault-mixin) project), is now deployed to surface these
+metrics.  Deployment of the dashboard can be disabled by setting the environment variable `VAULT_DASH`
+to ***false*** prior to running the deployment scripts.
   * [FIX] Corrected an issue which prevented metrics from being available in Grafana when path-based
 routing using Contour was configured automatically.  (Fixes #882)
   * [FIX] Corrected Alertmanager URL when `ALERTMANAGER_PATH` is set and path-based routing using Contour

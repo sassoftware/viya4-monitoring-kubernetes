@@ -13,5 +13,8 @@ public community dashboards from grafana.com:
 - [RabbitMQ Overview](https://grafana.com/grafana/dashboards/10991)
 - [Java Micrometer](https://grafana.com/grafana/dashboards/4701)
 - [Postgres](https://grafana.com/grafana/dashboards/9628)
+- [Vault Overview](https://grafana.com/grafana/dashboards/25314) (from the
+  [vault-mixin](https://github.com/adinhodovic/vault-mixin) project; modified
+  to remove the Replication Status panel)
 
 All other provided dashboards were manually created by SAS.

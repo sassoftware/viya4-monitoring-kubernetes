@@ -20,7 +20,7 @@ log_info "Removing third-party exporters..."
 helm delete --namespace "$VIYA_NS" prometheus-pushgateway 2> /dev/null
 
 log_info "Removing ServiceMonitors in the [$VIYA_NS] namespace..."
-monitors=(sas-java-services sas-go-services sas-arke sas-cas-server sas-deployment-operator sas-cas-operator sas-postgres sas-rabbitmq-server pushgateway)
+monitors=(sas-java-services sas-go-services sas-arke sas-cas-server sas-deployment-operator sas-cas-operator sas-postgres sas-rabbitmq-server sas-vault-server pushgateway)
 for mon in "${monitors[@]}"; do
     kubectl delete --ignore-not-found -n "$VIYA_NS" servicemonitor "$mon"
 done
