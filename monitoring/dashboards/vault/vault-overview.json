@@ -4,7 +4,7 @@
    "annotations": {
       "list": []
    },
-   "description": "A dashboard that monitors Vault. It is created using the [vault-mixin](https://github.com/adinhodovic/vault-mixin). For an in-depth view of Go runtime internals (CPU, memory, GC, scheduling, contention, file descriptor pressure), pair this dashboard with the [Go / Overview dashboard](https://grafana.com/grafana/dashboards/25063-go-overview/) from the [go-mixin](https://github.com/adinhodovic/go-mixin) project.",
+   "description": "A dashboard that monitors Vault. It is derived from a dashboard defined in the vault-mixin project.",
    "editable": false,
    "panels": [
       {
@@ -2122,33 +2122,6 @@
             "name": "datasource",
             "query": "prometheus",
             "type": "datasource"
-         },
-         {
-            "datasource": {
-               "type": "prometheus",
-               "uid": "${datasource}"
-            },
-            "hide": 2,
-            "label": "Cluster",
-            "name": "cluster",
-            "query": "label_values(vault_core_unsealed{job=~\".*vault.*\"}, cluster)",
-            "refresh": 2,
-            "sort": 1,
-            "type": "query"
-         },
-         {
-            "datasource": {
-               "type": "prometheus",
-               "uid": "${datasource}"
-            },
-            "includeAll": true,
-            "label": "Namespace",
-            "multi": true,
-            "name": "namespace",
-            "query": "label_values(up{job=~\".*vault.*\"}, namespace)",
-            "refresh": 2,
-            "sort": 1,
-            "type": "query"
          },
          {
             "datasource": {
