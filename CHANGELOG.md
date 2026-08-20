@@ -1,7 +1,7 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Metrics**
-  * [FEATURE] Support for collecting and reporting on metrics from Vault has been added. This includes a new ServiceMonitor (sas-vault-server) and a new Grafana dashboards (Vault/Overview). To disable deployment of the new dashboard, set the environment variable VAULT_DASHBOARD to to false prior to running the deployment scripts.
+  * [FEATURE] Support for collecting and reporting on metrics from Vault has been added. This includes a new ServiceMonitor (sas-vault-server) and a new Grafana dashboards (Vault/Overview). To disable deployment of the new dashboard, set the environment variable VAULT_DASH to to false prior to running the deployment scripts.
   * [FIX] Corrected an issue which prevented metrics from being available in Grafana when path-based
 routing using Contour was configured automatically.  (Fixes #882)
   * [FIX] Corrected Alertmanager URL when `ALERTMANAGER_PATH` is set and path-based routing using Contour
