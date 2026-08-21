@@ -522,6 +522,43 @@ else
         --dry-run=client -o yaml | kubectl apply -f -
 fi
 
+# Work around an upstream kube-state-metrics chart bug: when
+# kubeRBACProxy.enabled=true, the kube-state-metrics container's own
+# liveness/readiness probes reference named ports ("http"/"metrics") that
+# only exist on the kube-rbac-proxy sidecar, not on that container itself, so
+# the pod never becomes Ready and the rollout below times out.
+# See: https://github.com/prometheus-community/helm-charts/issues/6164
+# Race the atomic rollout wait below: as soon as the Deployment exists,
+# repoint both probes at the rbac-proxy's numeric port (8080), which proxies
+# /livez unauthenticated (--ignore-paths=/livez,/readyz) through to
+# kube-state-metrics's main metrics port. /readyz is only served on the
+# telemetry port, which isn't reachable through this proxy when selfMonitor
+# is disabled (our default), so both probes use /livez.
+(
+    ksmDeployment="$promName-kube-state-metrics"
+    for _ in $(seq 1 120); do
+        if kubectl -n "$MON_NS" get deployment "$ksmDeployment" > /dev/null 2>&1; then
+            kubectl -n "$MON_NS" patch deployment "$ksmDeployment" --patch '
+spec:
+  template:
+    spec:
+      containers:
+      - name: kube-state-metrics
+        livenessProbe:
+          httpGet:
+            path: /livez
+            port: 8080
+        readinessProbe:
+          httpGet:
+            path: /livez
+            port: 8080
+' > /dev/null 2>&1 && break
+        fi
+        sleep 1
+    done
+) &
+ksmProbePatchPid=$!
+
 # shellcheck disable=SC2086
 helm $helmDebug upgrade --install "$promRelease" \
     $helm4opts \
@@ -546,6 +583,8 @@ helm $helmDebug upgrade --install "$promRelease" \
     --set prometheus.prometheusSpec.alertingEndpoints[0].namespace="$MON_NS" \
     $versionstring \
     "$chart2install"
+
+wait "$ksmProbePatchPid" 2> /dev/null || true
 
 sleep 2
 
@@ -634,6 +673,9 @@ fi
 
 # Eventrouter ServiceMonitor
 kubectl apply -n "$MON_NS" -f monitoring/monitors/kube/podMonitor-eventrouter.yaml 2> /dev/null
+
+# kube-state-metrics NetworkPolicy: restrict ingress to Prometheus pods only
+kubectl apply -n "$MON_NS" -f monitoring/monitors/kube/networkPolicy-kube-state-metrics.yaml
 
 # Elasticsearch ServiceMonitor
 ## remove obsolete version, if installed
