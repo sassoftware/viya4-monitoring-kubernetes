@@ -4,7 +4,7 @@
    "annotations": {
       "list": []
    },
-   "description": "A dashboard that monitors Vault. It is derived from a dashboard defined in the vault-mixin project.",
+   "description": "A dashboard that monitors Vault. It is derived from a dashboard defined in the vault-mixin project found here: https://github.com/adinhodovic/vault-mixin",
    "editable": false,
    "panels": [
       {
@@ -2107,8 +2107,7 @@
    ],
    "schemaVersion": 39,
    "tags": [
-      "vault",
-      "vault-mixin"
+      "vault"
    ],
    "templating": {
       "list": [
