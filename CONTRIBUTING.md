@@ -3,14 +3,6 @@
 We'd love to accept your patches and contributions to this project. There are
 just a few guidelines you need to follow.
 
-## Contributor License Agreement
-
-Contributions to this project must be accompanied by a signed
-[Contributor Agreement](ContributorAgreement.txt).
-You (or your employer) retain the copyright to your contribution,
-this simply gives us permission to use and redistribute your contributions as
-part of the project.
-
 ## Developer Certificate of Origin (Sign-off)
 
 In addition to the Contributor Agreement, every commit must be signed off to
@@ -40,8 +32,7 @@ or `git rebase --signoff`) before they can be merged.
 6. Push your branch to your fork and open a pull request against `main` in
    this repository.
 
-If you're planning a larger change, consider opening an issue first to
-discuss the approach before investing significant time in an implementation.
+If you're planning a larger change, please open an issue first to discuss the approach before investing significant time in an implementation.
 
 ## Reporting Issues
 
@@ -106,10 +97,7 @@ config, test-only changes) don't need a changelog entry.
 
 ### Artifact Inventory
 
-You don't need to manually update [ARTIFACT_INVENTORY.md](ARTIFACT_INVENTORY.md)
-as part of your PR. It's regenerated automatically by a GitHub Actions
-workflow (`.github/workflows/artifact-inventory.yml`) on every push to
-`main`, which opens its own follow-up pull request with the changes. Leave
+Do not update the [ARTIFACT_INVENTORY.md](ARTIFACT_INVENTORY.md) file. It's regenerated automatically by a GitHub Actions workflow (`.github/workflows/artifact-inventory.yml`) on every push to `main`, which opens its own follow-up pull request with the changes. Leave
 this file out of your diff.
 
 ## Style and Conventions
