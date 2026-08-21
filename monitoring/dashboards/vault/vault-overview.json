@@ -2143,7 +2143,7 @@
                "uid": "${datasource}"
             },
             "includeAll": true,
-            "label": "Exported Cluster",
+            "label": "Cluster",
             "multi": true,
             "name": "exported_cluster",
             "query": "label_values(vault_core_unsealed{job=~\"$job\"}, cluster)",
@@ -2157,7 +2157,7 @@
                "uid": "${datasource}"
             },
             "includeAll": true,
-            "label": "Exported Namespace",
+            "label": "Namespace",
             "multi": true,
             "name": "exported_namespace",
             "query": "label_values(vault_token_count_by_auth{job=~\"$job\"}, namespace)",
