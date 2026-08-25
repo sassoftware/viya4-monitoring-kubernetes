@@ -21,3 +21,7 @@ export const useAppMeta = (): AppRootProps['meta'] => {
 
   return value;
 };
+
+// Extension components (panel-menu modal, sidebar) render outside the app root,
+// where the AppMetaProvider is not mounted.
+export const useOptionalAppMeta = (): AppRootProps['meta'] | null => useContext(AppMetaContext);

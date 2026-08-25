@@ -62,6 +62,15 @@
       "addToNav": true
     }
   ],
+  "extensions": {
+    "addedLinks": [
+      {
+        "targets": ["grafana/dashboard/panel/menu"],
+        "title": "Ask Observability Chatbot",
+        "description": "Ask the observability agent about this panel"
+      }
+    ]
+  },
   "dependencies": {
     "grafanaDependency": ">=12.3.0",
     "plugins": []
