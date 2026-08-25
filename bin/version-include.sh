@@ -108,10 +108,10 @@ function getHelmReleaseVersion() {
         log_debug "No [$releaseName] release found in [$namespace]"
     else
 
-        releaseVer=$(helm list -n "$namespace" --filter "$releaseName" -o yaml| yq '.[].app_version')
+        releaseVer=$(helm list -n "$namespace" --filter "$releaseName" -o yaml | yq '.[].app_version')
 
         helmchart_release_version_full=$(semver_parse "$releaseVer" FULL)
-        helmchart_release_status=$(helm list -n "$namespace" --filter "$releaseName" -o yaml| yq '.[].status')
+        helmchart_release_status=$(helm list -n "$namespace" --filter "$releaseName" -o yaml | yq '.[].status')
 
     fi
 }
