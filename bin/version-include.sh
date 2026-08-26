@@ -108,10 +108,12 @@ function getHelmReleaseVersion() {
         log_debug "No [$releaseName] release found in [$namespace] namespace"
         helmchart_release_status="NOT FOUND"
     else
-        releaseVer=$(helm list -n "$namespace" --filter "^$releaseName\$" -o yaml | yq '.[].chart')
+        # NOTE: `helm list` returns `chart` which combines chart-name+chart-version
+        # `helm get metadata` returns the chart version by itself (i.e w/o chart-name)
+        releaseVer=$(helm get metadata -n "$namespace" "$releaseName" -o yaml | yq '.version')
 
         helmchart_release_version_full=$(semver_parse "$releaseVer" FULL)
-        helmchart_release_status=$(helm list -n "$namespace" --filter "^$releaseName\$" -o yaml | yq '.[].status')
+        helmchart_release_status=$(helm get metadata -n "$namespace" "$releaseName" -o yaml | yq '.status')
     fi
 }
 function getV4MVersion() {
