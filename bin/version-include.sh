@@ -105,7 +105,8 @@ function getHelmReleaseVersion() {
     helmchart_release_status=""
 
     if [ -z "$(helm list -n "$namespace" --filter "^$releaseName\$" -q)" ]; then
-        log_debug "No [$releaseName] release found in [$namespace]"
+        log_debug "No [$releaseName] release found in [$namespace] namespace"
+        return 1
     else
 
         releaseVer=$(helm list -n "$namespace" --filter "^$releaseName\$" -o yaml | yq '.[].chart')
@@ -113,6 +114,7 @@ function getHelmReleaseVersion() {
         helmchart_release_version_full=$(semver_parse "$releaseVer" FULL)
         helmchart_release_status=$(helm list -n "$namespace" --filter "^$releaseName\$" -o yaml | yq '.[].status')
 
+        return 0
     fi
 }
 function getV4MVersion() {
@@ -122,15 +124,20 @@ function getV4MVersion() {
     namespace=$1
     releaseName=$2
 
-    getHelmReleaseVersion "$namespace" "$releaseName"
+    if getHelmReleaseVersion "$namespace" "$releaseName"; then
 
-    V4M_CURRENT_STATUS="$helmchart_release_status"
-    V4M_CURRENT_VERSION_FULL="$helmchart_release_version_full"
-    V4M_CURRENT_VERSION_MAJOR=$(semver_parse "$helmchart_release_version_full" MAJOR)
-    V4M_CURRENT_VERSION_MINOR=$(semver_parse "$helmchart_release_version_full" MINOR)
-    V4M_CURRENT_VERSION_PATCH=$(semver_parse "$helmchart_release_version_full" PATCH)
+        V4M_CURRENT_STATUS="$helmchart_release_status"
+        V4M_CURRENT_VERSION_FULL="$helmchart_release_version_full"
+        V4M_CURRENT_VERSION_MAJOR=$(semver_parse "$helmchart_release_version_full" MAJOR)
+        V4M_CURRENT_VERSION_MINOR=$(semver_parse "$helmchart_release_version_full" MINOR)
+        V4M_CURRENT_VERSION_PATCH=$(semver_parse "$helmchart_release_version_full" PATCH)
 
-    log_debug "V4M Release [$releaseName] version [$V4M_CURRENT_VERSION_FULL] current status [$V4M_CURRENT_STATUS]"
+        log_debug "V4M Release [$releaseName] version [$V4M_CURRENT_VERSION_FULL] current status [$V4M_CURRENT_STATUS]"
+        return 0
+    else
+        V4M_CURRENT_STATUS="NOT FOUND"
+        return 1
+    fi
 }
 
 if [ -z "$V4M_VERSION_INCLUDE" ]; then
