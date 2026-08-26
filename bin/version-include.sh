@@ -130,12 +130,7 @@ function getV4MVersion() {
     V4M_CURRENT_VERSION_MINOR=$(semver_parse "$helmchart_release_version_full" MINOR)
     V4M_CURRENT_VERSION_PATCH=$(semver_parse "$helmchart_release_version_full" PATCH)
 
-    log_debug "V4M Release [$releaseName]"
-    log_debug "V4M_CURRENT_VERSION_FULL=$V4M_CURRENT_VERSION_FULL"
-    log_debug "V4M_CURRENT_VERSION_MAJOR=$V4M_CURRENT_VERSION_MAJOR"
-    log_debug "V4M_CURRENT_VERSION_MINOR=$V4M_CURRENT_VERSION_MINOR"
-    log_debug "V4M_CURRENT_VERSION_PATCH=$V4M_CURRENT_VERSION_PATCH"
-    log_debug "V4M_CURRENT_STATUS=$V4M_CURRENT_STATUS"
+    log_debug "V4M Release [$releaseName] version [$V4M_CURRENT_VERSION_FULL] current status [$V4M_CURRENT_STATUS]"
 }
 
 if [ -z "$V4M_VERSION_INCLUDE" ]; then
