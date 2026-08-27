@@ -87,6 +87,12 @@ kube-state-metrics:
     tag: __KSM_IMAGE_TAG__
     pullPolicy: __KSM_IMAGE_PULL_POLICY__
 ####  imagePullSecrets: __KSM_IMAGE_PULL_SECRETS__
+  kubeRBACProxy:
+    image:
+      registry: __KSM_RBAC_PROXY_IMAGE_REGISTRY__
+      repository: __KSM_RBAC_PROXY_IMAGE_REPO_2LEVEL__
+      tag: __KSM_RBAC_PROXY_IMAGE_TAG__
+      pullPolicy: __KSM_RBAC_PROXY_IMAGE_PULL_POLICY__
 
 ##Node Exporter
 prometheus-node-exporter:
