@@ -106,10 +106,10 @@ prometheus-node-exporter:
 ####  imagePullSecrets: __IMAGE_PULL_SECRETS__
   kubeRBACProxy:
     image:
-      registry: __NODE_EXPORTER_RBAC_PROXY_IMAGE_REGISTRY__
-      repository: __NODE_EXPORTER_RBAC_PROXY_IMAGE_REPO_2LEVEL__
-      tag: __NODE_EXPORTER_RBAC_PROXY_IMAGE_TAG__
-      pullPolicy: __NODE_EXPORTER_RBAC_PROXY_IMAGE_PULL_POLICY__
+      registry: __RBAC_PROXY_IMAGE_REGISTRY__
+      repository: __RBAC_PROXY_IMAGE_REPO_2LEVEL__
+      tag: __RBAC_PROXY_IMAGE_TAG__
+      pullPolicy: __RBAC_PROXY_IMAGE_PULL_POLICY__
 
 ##Prometheus
 prometheus:

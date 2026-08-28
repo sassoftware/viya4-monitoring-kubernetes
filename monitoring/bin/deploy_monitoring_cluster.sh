@@ -135,7 +135,7 @@ generateImageKeysFile "$ALERTMANAGER_FULL_IMAGE" "$imageKeysFile" "ALERTMANAGER_
 generateImageKeysFile "$ADMWEBHOOK_FULL_IMAGE" "$imageKeysFile" "ADMWEBHOOK_"
 generateImageKeysFile "$KSM_FULL_IMAGE" "$imageKeysFile" "KSM_"
 generateImageKeysFile "$NODEXPORT_FULL_IMAGE" "$imageKeysFile" "NODEXPORT_"
-generateImageKeysFile "$NODE_EXPORTER_RBAC_PROXY_FULL_IMAGE" "$imageKeysFile" "NODE_EXPORTER_RBAC_PROXY_"
+generateImageKeysFile "$RBAC_PROXY_FULL_IMAGE" "$imageKeysFile" "RBAC_PROXY_"
 generateImageKeysFile "$PROMETHEUS_FULL_IMAGE" "$imageKeysFile" "PROMETHEUS_"
 generateImageKeysFile "$CONFIGRELOAD_FULL_IMAGE" "$imageKeysFile" "CONFIGRELOAD_"
 generateImageKeysFile "$GRAFANA_FULL_IMAGE" "$imageKeysFile" "GRAFANA_"
