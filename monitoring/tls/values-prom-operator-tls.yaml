@@ -39,18 +39,22 @@ alertmanager:
       insecureSkipVerify: true
 
 prometheus-node-exporter:
-  extraArgs:
-    - "--web.config.file=/opt/node-exporter/node-exporter-web.yaml"
-  configmaps:
-    - name: node-exporter-tls-web-config
-      mountPath: /opt/node-exporter
-
-# node-exporter helm chart does not yet support HTTPS
-# node-exporter:
-#   sidecarVolumeMount:
-#   - name: tls-secret
-#     mountPath: /cert
-#     readOnly: true
+  # Node Exporter binds to localhost only; kube-rbac-proxy is deployed as a
+  # sidecar and is the sole externally-reachable entry point, enforcing
+  # Kubernetes RBAC (SubjectAccessReview) via a bearer token before
+  # forwarding to Node Exporter. Same pattern used for kube-state-metrics.
+  # See: https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter#tls-and-client-certificate-authentication
+  kubeRBACProxy:
+    enabled: true
+  prometheus:
+    monitor:
+      # kube-rbac-proxy terminates TLS with a self-signed cert (no cert
+      # management required) and authenticates the scrape using Prometheus's
+      # own ServiceAccount token.
+      scheme: https
+      tlsConfig:
+        insecureSkipVerify: true
+      bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
 
 grafana:
   readinessProbe:

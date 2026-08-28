@@ -135,6 +135,7 @@ generateImageKeysFile "$ALERTMANAGER_FULL_IMAGE" "$imageKeysFile" "ALERTMANAGER_
 generateImageKeysFile "$ADMWEBHOOK_FULL_IMAGE" "$imageKeysFile" "ADMWEBHOOK_"
 generateImageKeysFile "$KSM_FULL_IMAGE" "$imageKeysFile" "KSM_"
 generateImageKeysFile "$NODEXPORT_FULL_IMAGE" "$imageKeysFile" "NODEXPORT_"
+generateImageKeysFile "$NODE_EXPORTER_RBAC_PROXY_FULL_IMAGE" "$imageKeysFile" "NODE_EXPORTER_RBAC_PROXY_"
 generateImageKeysFile "$PROMETHEUS_FULL_IMAGE" "$imageKeysFile" "PROMETHEUS_"
 generateImageKeysFile "$CONFIGRELOAD_FULL_IMAGE" "$imageKeysFile" "CONFIGRELOAD_"
 generateImageKeysFile "$GRAFANA_FULL_IMAGE" "$imageKeysFile" "GRAFANA_"
@@ -221,13 +222,6 @@ if [ "$TLS_ENABLE" == "true" ]; then
     kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-prom-https
     kubectl create cm -n "$MON_NS" grafana-datasource-prom-https --from-file "monitoring/tls/$grafanaDS"
     kubectl label cm -n "$MON_NS" grafana-datasource-prom-https grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
-
-    # node-exporter TLS
-    log_verbose "Enabling Prometheus node-exporter for TLS"
-    kubectl delete cm -n "$MON_NS" node-exporter-tls-web-config --ignore-not-found
-    sleep 1
-    kubectl create cm -n "$MON_NS" node-exporter-tls-web-config --from-file monitoring/tls/node-exporter-web.yaml
-    kubectl label cm -n "$MON_NS" node-exporter-tls-web-config sas.com/monitoring-base=kube-viya-monitoring
 fi
 
 AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
@@ -634,6 +628,11 @@ fi
 
 # Eventrouter ServiceMonitor
 kubectl apply -n "$MON_NS" -f monitoring/monitors/kube/podMonitor-eventrouter.yaml 2> /dev/null
+
+if [ "$TLS_ENABLE" == "true" ]; then
+    # node-exporter NetworkPolicy: restrict ingress to Prometheus pods only
+    kubectl apply -n "$MON_NS" -f monitoring/monitors/kube/networkPolicy-node-exporter.yaml
+fi
 
 # Elasticsearch ServiceMonitor
 ## remove obsolete version, if installed

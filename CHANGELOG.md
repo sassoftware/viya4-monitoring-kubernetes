@@ -8,6 +8,14 @@ is configured automatically
   * [FIX] The `v4m-logging-root-proxy` HTTPProxy resource is only created in appropriate scenarios
 (i.e. auto-generated path-based routing using Contour) and any existing instance of this resource
 is deleted if found in other deployment scenarios (where it is not needed)
+  * [SECURITY] Node Exporter previously exposed infrastructure metrics (CPU, memory, disk, network,
+kernel info) over an unauthenticated, unencrypted HTTP endpoint reachable by any pod in the cluster.
+Node Exporter is now fronted by a `kube-rbac-proxy` sidecar enforcing Kubernetes RBAC and bound to
+localhost only; Prometheus scrapes it using its existing ServiceAccount token, with no certificate
+management required. Only enabled when `TLS_ENABLE=true`. A NetworkPolicy was also added restricting
+access to Prometheus pods only, though because Node Exporter runs with `hostNetwork: true`, this
+NetworkPolicy is not enforced on all CNIs (confirmed on Calico); actual access control is provided by
+the `kube-rbac-proxy` RBAC check.
 
 ## Version 1.2.53 (07AUG2026)
 * **Overall**
