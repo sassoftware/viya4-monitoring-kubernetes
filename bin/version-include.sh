@@ -108,6 +108,9 @@ function getHelmReleaseVersion() {
         log_debug "No [$releaseName] release found in [$namespace] namespace"
         helmchart_release_status="NOT FOUND"
     else
+        # `helm get metadata` only available in Helm 3.13+
+	if semver_check $HELM_VER_FULL LT 3.13.0; then return
+
         # NOTE: `helm list` returns `chart` which combines chart-name+chart-version
         # `helm get metadata` returns the chart version by itself (i.e w/o chart-name)
         releaseVer=$(helm get metadata -n "$namespace" "$releaseName" -o yaml | yq '.version')
