@@ -1,0 +1,2190 @@
+{
+   "__inputs": [],
+   "__requires": [],
+   "annotations": {
+      "list": []
+   },
+   "description": "A dashboard that monitors Vault. It is derived from a dashboard defined in the vault-mixin project found here: https://github.com/adinhodovic/vault-mixin",
+   "editable": false,
+   "panels": [
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+         },
+         "id": 1,
+         "title": "Summary",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "mappings": [],
+               "thresholds": {
+                  "steps": [
+                     {
+                        "color": "red",
+                        "value": 0
+                     },
+                     {
+                        "color": "green",
+                        "value": 1
+                     }
+                  ]
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 0,
+            "y": 1
+         },
+         "id": 2,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${datasource}"
+               },
+               "expr": "sum(\n  vault_core_unsealed{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n\n  }\n)\n"
+            }
+         ],
+         "title": "Unsealed Nodes",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "mappings": [],
+               "thresholds": {
+                  "steps": [
+                     {
+                        "color": "green",
+                        "value": 0
+                     }
+                  ]
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 4,
+            "y": 1
+         },
+         "id": 3,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${datasource}"
+               },
+               "expr": "count(\n  vault_core_unsealed{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n\n  }\n)\n"
+            }
+         ],
+         "title": "Total Nodes",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "mappings": [],
+               "thresholds": {
+                  "steps": [
+                     {
+                        "color": "red",
+                        "value": 0
+                     },
+                     {
+                        "color": "green",
+                        "value": 1
+                     }
+                  ]
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 8,
+            "y": 1
+         },
+         "id": 4,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${datasource}"
+               },
+               "expr": "sum(\n  up{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n\n  }\n)\n"
+            }
+         ],
+         "title": "Scrape Up",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "mappings": [],
+               "thresholds": {
+                  "steps": [
+                     {
+                        "color": "green",
+                        "value": 0
+                     }
+                  ]
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 12,
+            "y": 1
+         },
+         "id": 5,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${datasource}"
+               },
+               "expr": "max(\n  vault_expire_num_leases{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n\n  }\n)\n"
+            }
+         ],
+         "title": "Active Leases",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "mappings": [],
+               "thresholds": {
+                  "steps": [
+                     {
+                        "color": "green",
+                        "value": 0
+                     },
+                     {
+                        "color": "orange",
+                        "value": 1
+                     },
+                     {
+                        "color": "red",
+                        "value": 10
+                     }
+                  ]
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 16,
+            "y": 1
+         },
+         "id": 6,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${datasource}"
+               },
+               "expr": "max(\n  vault_expire_num_irrevocable_leases{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n\n  }\n)\n"
+            }
+         ],
+         "title": "Irrevocable Leases",
+         "type": "stat"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "mappings": [],
+               "thresholds": {
+                  "steps": [
+                     {
+                        "color": "green",
+                        "value": 0
+                     }
+                  ]
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 20,
+            "y": 1
+         },
+         "id": 7,
+         "options": {
+            "graphMode": "area",
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "${datasource}"
+               },
+               "expr": "sum(\n  vault_core_in_flight_requests{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n\n  }\n)\n"
+            }
+         ],
+         "title": "In-Flight Requests",
+         "type": "stat"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 5
+         },
+         "id": 8,
+         "title": "Responses",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "reqps"
+            },
+            "overrides": []
+         },
+         "gridPos": {
+            "h": 6,
+            "w": 8,
+            "x": 0,
+            "y": 6
+         },
+         "id": 9,
+         "options": {
+            "displayLabels": [
+               "percent"
+            ],
+            "legend": {
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "values": [
+                  "percent"
+               ]
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "sum by (type) (\n  rate(\n    vault_core_response_status_code{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "instant": true,
+               "legendFormat": "{{ type }}"
+            }
+         ],
+         "title": "Response Rate by Type",
+         "type": "piechart"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "axisSoftMin": 0,
+                  "fillOpacity": 100,
+                  "lineWidth": 1,
+                  "stacking": {
+                     "mode": "normal"
+                  }
+               },
+               "unit": "reqps"
+            }
+         },
+         "gridPos": {
+            "h": 6,
+            "w": 8,
+            "x": 8,
+            "y": 6
+         },
+         "id": 10,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum by (type) (\n  rate(\n    vault_core_response_status_code{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "{{ type }}"
+            }
+         ],
+         "title": "Response Rate by Type",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "axisSoftMax": 100,
+                  "axisSoftMin": 0,
+                  "fillOpacity": 10
+               },
+               "unit": "percent"
+            }
+         },
+         "gridPos": {
+            "h": 6,
+            "w": 8,
+            "x": 16,
+            "y": 6
+         },
+         "id": 11,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "(\n  1 -\n  (\n    sum(\n      rate(\n        vault_core_response_status_code{\n          job=~\"$job\",\ninstance=~\"$instance\"\n\n,\n          type=\"5xx\"\n        }[$__rate_interval]\n      )\n    )\n    /\n    sum(\n      rate(\n        vault_core_response_status_code{\n          job=~\"$job\",\ninstance=~\"$instance\"\n\n\n        }[$__rate_interval]\n      )\n    )\n  )\n)\n* 100\n",
+               "legendFormat": "Success Rate"
+            }
+         ],
+         "title": "Response Success Rate",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 12
+         },
+         "id": 12,
+         "title": "Mounts",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "short"
+            },
+            "overrides": []
+         },
+         "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 13
+         },
+         "id": 13,
+         "options": {
+            "displayLabels": [
+               "percent"
+            ],
+            "legend": {
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "values": [
+                  "percent"
+               ]
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "sum by (type, local) (\n  vault_core_mount_table_num_entries{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n\n  }\n)\n",
+               "instant": true,
+               "legendFormat": "{{ type }} local={{ local }}"
+            }
+         ],
+         "title": "Mount Entries by Type",
+         "type": "piechart"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "bytes"
+            },
+            "overrides": []
+         },
+         "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 12,
+            "y": 13
+         },
+         "id": 14,
+         "options": {
+            "displayLabels": [
+               "percent"
+            ],
+            "legend": {
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "values": [
+                  "percent"
+               ]
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "sum by (type, local) (\n  vault_core_mount_table_size{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n\n  }\n)\n",
+               "instant": true,
+               "legendFormat": "{{ type }} local={{ local }}"
+            }
+         ],
+         "title": "Mount Table Size by Type",
+         "type": "piechart"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 19
+         },
+         "id": 15,
+         "title": "Cluster",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 20
+         },
+         "id": 16,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "min(\n  vault_autopilot_healthy{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n\n  }\n)\n",
+               "legendFormat": "Healthy"
+            }
+         ],
+         "title": "Autopilot Healthy",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 20
+         },
+         "id": 17,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "min(\n  vault_autopilot_failure_tolerance{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n\n  }\n)\n",
+               "legendFormat": "Tolerance"
+            }
+         ],
+         "title": "Autopilot Failure Tolerance",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 28
+         },
+         "id": 18,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "min by (node_id) (\n  vault_autopilot_node_healthy{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n\n  }\n)\n",
+               "legendFormat": "{{ node_id }}"
+            }
+         ],
+         "title": "Autopilot Node Healthy",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 36
+         },
+         "id": 20,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "vault_core_active{\n  job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n\n}\n",
+               "legendFormat": "{{ instance }}"
+            }
+         ],
+         "title": "Active Node",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 36
+         },
+         "id": 21,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    vault_core_leadership_lost_count{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "Leadership lost"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    vault_core_step_down_count{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "Step down"
+            }
+         ],
+         "title": "Leadership Changes",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "ms"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 44
+         },
+         "id": 22,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "max(\n  vault_raft_commitTime{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\n    quantile=\"0.99\"\n  }\n)\n",
+               "legendFormat": "p99"
+            }
+         ],
+         "title": "Raft Commit Time (p99)",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "ops"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 44
+         },
+         "id": 23,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    vault_raft_apply{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "apply/s"
+            }
+         ],
+         "title": "Raft Apply Rate",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 52
+         },
+         "id": 24,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "max by (peer_id) (\n  vault_raft_storage_stats_commit_index{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n\n  }\n)\n",
+               "legendFormat": "Commit {{ peer_id }}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "max by (peer_id) (\n  vault_raft_storage_stats_applied_index{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n\n  }\n)\n",
+               "legendFormat": "Applied {{ peer_id }}"
+            }
+         ],
+         "title": "Raft Peer Indexes",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 52
+         },
+         "id": 25,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "max by (peer_id) (\n  vault_raft_storage_stats_fsm_pending{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n\n  }\n)\n",
+               "legendFormat": "{{ peer_id }}"
+            }
+         ],
+         "title": "Raft FSM Pending",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 68
+         },
+         "id": 26,
+         "title": "Raft Storage",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "bytes"
+            },
+            "overrides": []
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 69
+         },
+         "id": 27,
+         "options": {
+            "displayLabels": [
+               "percent"
+            ],
+            "legend": {
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "values": [
+                  "percent"
+               ]
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "sum by (database) (\n  vault_raft_storage_bolt_page_bytes_allocated{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n\n  }\n)\n",
+               "instant": true,
+               "legendFormat": "{{ database }}"
+            }
+         ],
+         "title": "Raft Bolt Page Bytes by Database",
+         "type": "piechart"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 69
+         },
+         "id": 28,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum by (database) (\n  vault_raft_storage_bolt_freelist_free_pages{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n\n  }\n)\n",
+               "legendFormat": "{{ database }}"
+            }
+         ],
+         "title": "Raft Bolt Free Pages",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 77
+         },
+         "id": 29,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum by (database) (\n  vault_raft_storage_bolt_write_count{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n\n  }\n)\n",
+               "legendFormat": "{{ database }}"
+            }
+         ],
+         "title": "Raft Bolt Write Count",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "ms"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 77
+         },
+         "id": 30,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum by (database) (\n  rate(\n    vault_raft_storage_bolt_write_time{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "{{ database }}"
+            }
+         ],
+         "title": "Raft Bolt Write Time Rate",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 85
+         },
+         "id": 31,
+         "title": "Requests",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "reqps"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 86
+         },
+         "id": 32,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    vault_core_handle_request_count{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "Requests"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    vault_core_handle_login_request_count{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "Login requests"
+            }
+         ],
+         "title": "Request Rate",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "ms"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 86
+         },
+         "id": 33,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "max(\n  vault_core_handle_request{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\n    quantile=\"0.5\"\n  }\n)\n",
+               "legendFormat": "p50"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "max(\n  vault_core_handle_request{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\n    quantile=\"0.99\"\n  }\n)\n",
+               "legendFormat": "p99"
+            }
+         ],
+         "title": "Request Latency",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 94
+         },
+         "id": 34,
+         "title": "Tokens",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "axisSoftMin": 0,
+                  "fillOpacity": 100,
+                  "lineWidth": 1,
+                  "stacking": {
+                     "mode": "normal"
+                  }
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 95
+         },
+         "id": 35,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  vault_token_count_by_auth{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n,\nnamespace=~\"$exported_namespace\"\n\n  }\n)\n",
+               "legendFormat": "Tokens"
+            }
+         ],
+         "title": "Available Tokens",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "axisSoftMin": 0,
+                  "fillOpacity": 100,
+                  "lineWidth": 1,
+                  "stacking": {
+                     "mode": "normal"
+                  }
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 95
+         },
+         "id": 36,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum by (auth_method) (\n  vault_token_count_by_auth{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n,\nnamespace=~\"$exported_namespace\"\n\n  }\n)\n",
+               "legendFormat": "{{ auth_method }}"
+            }
+         ],
+         "title": "Tokens by Auth Method",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "axisSoftMin": 0,
+                  "fillOpacity": 100,
+                  "lineWidth": 1,
+                  "stacking": {
+                     "mode": "normal"
+                  }
+               },
+               "unit": "ops"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 103
+         },
+         "id": 37,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    vault_token_creation{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n,\ncluster=~\"$exported_cluster\"\n,\nnamespace=~\"$exported_namespace\"\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "Create"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    vault_token_store_count{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "Store"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    vault_token_lookup_count{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "Lookup"
+            }
+         ],
+         "title": "Token Operations",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 111
+         },
+         "id": 38,
+         "title": "Audit",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "reqps"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 112
+         },
+         "id": 39,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    vault_audit_log_request_count{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "Request"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    vault_audit_log_response_count{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "Response"
+            }
+         ],
+         "title": "Audit Log Requests",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "reqps"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 112
+         },
+         "id": 40,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    vault_audit_log_request_failure{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "Request failure"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    vault_audit_log_response_failure{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "Response failure"
+            }
+         ],
+         "title": "Audit Log Failures",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 120
+         },
+         "id": 41,
+         "title": "Runtime",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "decbytes"
+            }
+         },
+         "gridPos": {
+            "h": 6,
+            "w": 8,
+            "x": 0,
+            "y": 121
+         },
+         "id": 42,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "avg(\n  vault_runtime_alloc_bytes{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n\n  }\n)\n",
+               "legendFormat": "Allocated"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "avg(\n  vault_runtime_sys_bytes{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n\n  }\n)\n",
+               "legendFormat": "System"
+            }
+         ],
+         "title": "Memory",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 6,
+            "w": 8,
+            "x": 8,
+            "y": 121
+         },
+         "id": 43,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "avg(\n  vault_runtime_num_goroutines{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n\n  }\n)\n",
+               "legendFormat": "Goroutines"
+            }
+         ],
+         "title": "Goroutines",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 6,
+            "w": 8,
+            "x": 16,
+            "y": 121
+         },
+         "id": 44,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    process_cpu_seconds_total{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "CPU seconds/s"
+            }
+         ],
+         "title": "Process CPU",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "axisSoftMax": 100,
+                  "axisSoftMin": 0,
+                  "fillOpacity": 10
+               },
+               "unit": "percent"
+            }
+         },
+         "gridPos": {
+            "h": 6,
+            "w": 8,
+            "x": 0,
+            "y": 127
+         },
+         "id": 45,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "max(\n  process_open_fds{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n\n  }\n  /\n  process_max_fds{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n\n  }\n  * 100\n)\n",
+               "legendFormat": "Open FDs"
+            }
+         ],
+         "title": "Open FD Usage",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "decbytes"
+            }
+         },
+         "gridPos": {
+            "h": 6,
+            "w": 8,
+            "x": 8,
+            "y": 127
+         },
+         "id": 46,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "avg(\n  process_resident_memory_bytes{\n    job=~\"$job\",\ninstance=~\"$instance\"\n\n\n  }\n)\n",
+               "legendFormat": "RSS"
+            }
+         ],
+         "title": "Process Resident Memory",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "custom": {
+                  "fillOpacity": 10
+               },
+               "unit": "ops"
+            }
+         },
+         "gridPos": {
+            "h": 6,
+            "w": 8,
+            "x": 16,
+            "y": 127
+         },
+         "id": 47,
+         "options": {
+            "legend": {
+               "calcs": [
+                  "mean",
+                  "max"
+               ],
+               "displayMode": "table",
+               "placement": "right",
+               "showLegend": true,
+               "sortBy": "mean",
+               "sortDesc": true
+            },
+            "tooltip": {
+               "mode": "multi",
+               "sort": "desc"
+            }
+         },
+         "pluginVersion": "v11.4.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "exemplar": false,
+               "expr": "sum(\n  rate(\n    vault_cache_hit{\n      job=~\"$job\",\ninstance=~\"$instance\"\n\n\n    }[$__rate_interval]\n  )\n)\n",
+               "legendFormat": "Hits"
+            }
+         ],
+         "title": "Cache Hit Rate",
+         "type": "timeseries"
+      }
+   ],
+   "schemaVersion": 39,
+   "tags": [
+      "vault"
+   ],
+   "templating": {
+      "list": [
+         {
+            "current": {
+               "selected": true,
+               "text": "default",
+               "value": "default"
+            },
+            "label": "Data source",
+            "name": "datasource",
+            "query": "prometheus",
+            "type": "datasource"
+         },
+         {
+            "datasource": {
+               "type": "prometheus",
+               "uid": "${datasource}"
+            },
+            "includeAll": true,
+            "label": "Job",
+            "multi": true,
+            "name": "job",
+            "query": "label_values(up{job=~\".*vault.*\"}, job)",
+            "refresh": 2,
+            "sort": 1,
+            "type": "query"
+         },
+         {
+            "datasource": {
+               "type": "prometheus",
+               "uid": "${datasource}"
+            },
+            "includeAll": true,
+            "label": "Cluster",
+            "multi": true,
+            "name": "exported_cluster",
+            "query": "label_values(vault_core_unsealed{job=~\"$job\"}, cluster)",
+            "refresh": 2,
+            "sort": 1,
+            "type": "query"
+         },
+         {
+            "datasource": {
+               "type": "prometheus",
+               "uid": "${datasource}"
+            },
+            "includeAll": true,
+            "label": "Namespace",
+            "multi": true,
+            "name": "exported_namespace",
+            "query": "label_values(vault_token_count_by_auth{job=~\"$job\"}, namespace)",
+            "refresh": 2,
+            "sort": 1,
+            "type": "query"
+         },
+         {
+            "datasource": {
+               "type": "prometheus",
+               "uid": "${datasource}"
+            },
+            "includeAll": true,
+            "label": "Instance",
+            "multi": true,
+            "name": "instance",
+            "query": "label_values(up{job=~\"$job\"}, instance)",
+            "refresh": 2,
+            "sort": 1,
+            "type": "query"
+         }
+      ]
+   },
+   "time": {
+      "from": "now-6h",
+      "to": "now"
+   },
+   "timezone": "utc",
+   "title": "Vault / Overview",
+   "uid": "vault-overview-skj2"
+}
