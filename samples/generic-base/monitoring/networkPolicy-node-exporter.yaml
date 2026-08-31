@@ -1,0 +1,31 @@
+# Optional: override the default NetworkPolicy that restricts access to the
+# Node Exporter service to Prometheus pods only. This file is only used if it
+# exists at $USER_DIR/monitoring/networkPolicy-node-exporter.yaml; otherwise
+# the project's default (shown below) is applied automatically -- you do not
+# need to copy this file unless you want to customize the rules (e.g. allow
+# an additional scraper) or you already manage a NetworkPolicy of your own
+# with the same name in the monitoring namespace.
+#
+# NOTE: Node Exporter runs with hostNetwork: true, so this NetworkPolicy is
+# not enforced on all CNIs (confirmed on Calico); actual access control is
+# provided by the kube-rbac-proxy RBAC check.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: node-exporter
+  labels:
+    sas.com/monitoring-base: kube-viya-monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus-node-exporter
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+    ports:
+    - protocol: TCP
+      port: 9110

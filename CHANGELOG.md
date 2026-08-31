@@ -12,10 +12,13 @@ is deleted if found in other deployment scenarios (where it is not needed)
 kernel info) over an unauthenticated, unencrypted HTTP endpoint reachable by any pod in the cluster.
 Node Exporter is now fronted by a `kube-rbac-proxy` sidecar enforcing Kubernetes RBAC and bound to
 localhost only; Prometheus scrapes it using its existing ServiceAccount token, with no certificate
-management required. Only enabled when `TLS_ENABLE=true`. A NetworkPolicy was also added restricting
-access to Prometheus pods only, though because Node Exporter runs with `hostNetwork: true`, this
-NetworkPolicy is not enforced on all CNIs (confirmed on Calico); actual access control is provided by
-the `kube-rbac-proxy` RBAC check.
+management required. This is controlled by the new `RBAC_PROXY_ENABLE` environment variable (default
+`true`), which is independent of `TLS_ENABLE`. A NetworkPolicy restricting access to Prometheus pods
+only is also always applied, regardless of `RBAC_PROXY_ENABLE`, since NetworkPolicies are additive and
+cannot weaken or replace a site's existing policies; sites needing custom rules or hitting a naming
+collision can supply their own at `$USER_DIR/monitoring/networkPolicy-node-exporter.yaml`. Because Node
+Exporter runs with `hostNetwork: true`, this NetworkPolicy is not enforced on all CNIs (confirmed on
+Calico); actual access control is provided by the `kube-rbac-proxy` RBAC check.
 
 ## Version 1.2.53 (07AUG2026)
 * **Overall**
