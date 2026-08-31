@@ -12,9 +12,12 @@ is deleted if found in other deployment scenarios (where it is not needed)
 labels used to identify per-user SAS job activity, over an unauthenticated HTTP endpoint reachable by
 any pod in the cluster. KSM is now fronted by a `kube-rbac-proxy` sidecar enforcing Kubernetes RBAC and
 bound to localhost only; Prometheus scrapes it using its existing ServiceAccount token, with no
-certificate management required. A NetworkPolicy was also added restricting access to Prometheus pods
-only. This is controlled by the new `RBAC_PROXY_ENABLE` environment variable (default `true`), which is
-independent of `TLS_ENABLE`. Not applicable to OpenShift, which does not deploy KSM as part of this project.
+certificate management required. This is controlled by the new `RBAC_PROXY_ENABLE` environment variable
+(default `true`), which is independent of `TLS_ENABLE`. A NetworkPolicy restricting access to Prometheus
+pods only is also always applied, regardless of `RBAC_PROXY_ENABLE`, since NetworkPolicies are additive
+and cannot weaken or replace a site's existing policies; sites needing custom rules or hitting a naming
+collision can supply their own at `$USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml`. Not
+applicable to OpenShift, which does not deploy KSM as part of this project.
 
 ## Version 1.2.53 (07AUG2026)
 * **Overall**

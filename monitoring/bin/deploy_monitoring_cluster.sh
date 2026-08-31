@@ -691,12 +691,18 @@ fi
 # Eventrouter ServiceMonitor
 kubectl apply -n "$MON_NS" -f monitoring/monitors/kube/podMonitor-eventrouter.yaml 2> /dev/null
 
-# kube-state-metrics NetworkPolicy: restrict ingress to Prometheus pods only
-if [ "$RBAC_PROXY_ENABLE" == "true" ]; then
-    kubectl apply -n "$MON_NS" -f monitoring/monitors/kube/networkPolicy-kube-state-metrics.yaml
-else
-    kubectl delete -n "$MON_NS" --ignore-not-found -f monitoring/monitors/kube/networkPolicy-kube-state-metrics.yaml
+# kube-state-metrics NetworkPolicy: restrict ingress to Prometheus pods only.
+# Applied unconditionally (independent of RBAC_PROXY_ENABLE) since
+# NetworkPolicies are additive -- this can only ever add an allowed ingress
+# source, never weaken or replace a site's own existing policies. A site that
+# wants custom ingress rules, or hits a naming collision with a NetworkPolicy
+# they already manage, can drop their own replacement at
+# $USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml.
+ksmNetworkPolicyYAML="monitoring/monitors/kube/networkPolicy-kube-state-metrics.yaml"
+if [ -f "$USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml" ]; then
+    ksmNetworkPolicyYAML="$USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml"
 fi
+kubectl apply -n "$MON_NS" -f "$ksmNetworkPolicyYAML"
 
 # Elasticsearch ServiceMonitor
 ## remove obsolete version, if installed
