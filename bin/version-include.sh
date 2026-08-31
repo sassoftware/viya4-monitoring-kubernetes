@@ -143,6 +143,6 @@ if [ -z "$V4M_VERSION_INCLUDE" ]; then
     export V4M_CURRENT_STATUS
     export helmchart_release_version_full helmchart_release_status
 
-    export -f deployV4MInfo removeV4MInfo getHelmReleaseVersion
+    export -f deployV4MInfo removeV4MInfo getHelmReleaseVersion getV4MVersion
     export V4M_VERSION_INCLUDE=true
 fi
