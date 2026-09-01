@@ -55,7 +55,9 @@ if [ "$SAS_LOGGING_COMMON_SOURCED" = "" ]; then
     fi
 
     source bin/version-include.sh
-    getV4MVersion "$LOG_NS" "v4m-logs"
+    if [ "$CHECK_HELM" != "false" ]; then
+        getV4MVersion "$LOG_NS" "v4m-logs"
+    fi
 
     export SAS_LOGGING_COMMON_SOURCED=true
 

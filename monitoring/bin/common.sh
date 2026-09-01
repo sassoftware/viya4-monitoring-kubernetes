@@ -38,7 +38,9 @@ if [ "$SAS_MONITORING_COMMON_SOURCED" = "" ]; then
     export V4M_NS=$MON_NS
 
     source bin/version-include.sh
-    getV4MVersion "$MON_NS" "v4m-metrics"
+    if [ "$CHECK_HELM" != "false" ]; then
+        getV4MVersion "$MON_NS" "v4m-metrics"
+    fi
 
     export SAS_MONITORING_COMMON_SOURCED=true
 
