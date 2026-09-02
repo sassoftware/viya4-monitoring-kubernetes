@@ -3,6 +3,18 @@
 * **Overall**
   * [CHORE] Refactor Helm Chart version checking/reporting
 * **Metrics**
+  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 85.1.3 to 88.2.0
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded from 12.3.3 to 12.10.4
+  * [UPGRADE] Alertmanager has been upgraded from 0.32.1 to 0.33.1
+  * [UPGRADE] The config-reloader has been upgraded from 0.90.1 to 0.93.0
+  * [UPGRADE] Grafana has been upgraded from 13.0.1 to 13.0.3
+  * [UPGRADE] The k8s-sidecar has been upgraded from 2.7.3 to 2.10.1
+  * [UPGRADE] Node-Exporter has been upgraded from 1.11.1 to 1.12.1
+  * [UPGRADE] Prometheus has been upgraded from 3.11.3 to 3.13.2
+  * [UPGRADE] Prometheus Operator has been upgraded from 0.90.1 to 0.93.0
+  * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 3.6.0 to 3.7.0
+  * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.11.2 to 1.11.3
+  * [UPGRADE] OpenSearch Data Source Plugin for Grafana upgraded from 2.33.1 to 2.34.3
   * [FIX] Corrected an issue which prevented metrics from being available in Grafana when path-based
 routing using Contour was configured automatically.  (Fixes #882)
   * [FIX] Corrected Alertmanager URL when `ALERTMANAGER_PATH` is set and path-based routing using Contour
