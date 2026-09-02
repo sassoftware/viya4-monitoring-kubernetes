@@ -430,7 +430,7 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
             #      NOT calling create_httpproxy.sh *script*
             create_root_httpproxy monitoring
         else
-            kubectl -n $"MON_NS" delete httpproxy v4m-monitoring-root-proxy --ignore-not-found
+            kubectl -n "$MON_NS" delete httpproxy v4m-monitoring-root-proxy --ignore-not-found
             log_debug "Skipping creation of 'root' HTTPProxy resource for [monitoring] components because INGRESS_CREATE_ROOT_PROXY is set to [$INGRESS_CREATE_ROOT_PROXY]"
         fi
     fi
@@ -467,7 +467,9 @@ else
 fi
 
 # See https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#from-21x-to-22x
-if [ "$V4M_CURRENT_VERSION_MAJOR" == "1" ] && [[ $V4M_CURRENT_VERSION_MINOR =~ [0-5] ]]; then
+getHelmReleaseVersion "$MON_NS" "v4m-prometheus-operator"
+if semver_check "$helmchart_release_version_full" LT 22.0.0; then
+    log_debug "Prometheus Operator version earlier than 22.0.0 detected"
     kubectl delete -n "$MON_NS" --ignore-not-found \
         deployments.apps \
         -l app.kubernetes.io/instance=v4m-prometheus-operator,app.kubernetes.io/name=kube-state-metrics

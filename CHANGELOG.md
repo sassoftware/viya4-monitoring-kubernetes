@@ -1,5 +1,7 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
+* **Overall**
+  * [CHORE] Refactor Helm Chart version checking/reporting
 * **Metrics**
   * [FIX] Corrected an issue which prevented metrics from being available in Grafana when path-based
 routing using Contour was configured automatically.  (Fixes #882)
