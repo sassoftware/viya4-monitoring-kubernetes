@@ -89,8 +89,16 @@ fi
 
 get_sec_api_url
 
+#TODO: Move this someplace more appropriate at some point
+curl_security_opts="--insecure"
+kubectl -n "$LOG_NS" get secret es-rest-tls-secret -o jsonpath="{.data['ca\.crt']}" | base64 --decode > "$TMP_DIR"/ca.crt
+curl_security_opts=" -v --cacert $TMP_DIR/ca.crt"
+log_debug "curl_security_opts: [$curl_security_opts]"
+
 # Attempt to change password using current user credentials
-response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/account" -H 'Content-Type: application/json' -d'{"current_password" : "'"$ES_PASSWD"'", "password" : "'"$NEW_PASSWD"'"}' --user "$ES_USER:$ES_PASSWD" --insecure)
+set -x #REMOVE
+response=$(curl -s -o /dev/null -w "%{http_code}" -XPUT "$sec_api_url/account" -H 'Content-Type: application/json' -d'{"current_password" : "'"$ES_PASSWD"'", "password" : "'"$NEW_PASSWD"'"}' --user "$ES_USER:$ES_PASSWD" $curl_security_opts)
+set +x #REMOVE
 if [[ $response == 4* ]]; then
     if [ "$USER_NAME" != "logadm" ]; then
         log_warn "The currently stored credentials for [$USER_NAME] do NOT appear to be up-to-date; unable to use them to change password. [$response]"
@@ -109,7 +117,9 @@ if [[ $response == 4* ]]; then
         if [ "$rc" == "0" ]; then
 
             #try changing password using admin password
-            response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/internalusers/$ES_USER" -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "/hash", "value" : "'"$hashed_passwd"'"}]' --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
+            set -x #REMOVE
+            response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/internalusers/$ES_USER" -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "/hash", "value" : "'"$hashed_passwd"'"}]' --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" $curl_security_opts)
+            set +x #REMOVE
             if [[ $response == "404" ]]; then
                 log_error "Unable to change password for [$USER_NAME] because that user does not exist. [$response]"
                 success="non-existent_user"
@@ -147,7 +157,7 @@ if [[ $response == 4* ]]; then
         hashed_passwd=$(kubectl -n "$LOG_NS" exec $targetpod -c $targetcontainer -- $toolsrootdir/tools/hash.sh -p "$NEW_PASSWD" | grep -v '*')
 
         #obtain admin cert
-        rm -f "$TMP_DIR"/tls.crt
+        rm -f "$TMP_DIR"/admin_tls.crt
         admin_tls_cert=$(kubectl -n "$LOG_NS" get secrets es-admin-tls-secret -o "jsonpath={.data['tls\.crt']}")
         if [ -z "$admin_tls_cert" ]; then
             log_error "Unable to obtain admin certs from secret [es-admin-tls-secret] in the [$LOG_NS] namespace. Password for [$USER_NAME] has NOT been changed."
@@ -167,8 +177,9 @@ if [[ $response == 4* ]]; then
                 echo "$admin_tls_key" | base64 --decode > "$TMP_DIR"/admin_tls.key
 
                 # Attempt to change password using admin certs
-                response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/internalusers/$ES_USER" -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "/hash", "value" : "'"$hashed_passwd"'"}]' --cert "$TMP_DIR"/admin_tls.crt --key "$TMP_DIR"/admin_tls.key --insecure)
-
+                set -x #REMOVE
+                response=$(curl -s -o /dev/null -w "%{http_code}" -XPATCH "$sec_api_url/internalusers/$ES_USER" -H 'Content-Type: application/json' -d'[{"op" : "replace", "path" : "/hash", "value" : "'"$hashed_passwd"'"}]' --cert "$TMP_DIR"/admin_tls.crt --key "$TMP_DIR"/admin_tls.key $curl_security_opts)
+                set +x #REMOVE
                 if [[ $response == 2* ]]; then
                     log_debug "Password for [$USER_NAME] has been changed in OpenSearch. [$response]"
                     success="true"
