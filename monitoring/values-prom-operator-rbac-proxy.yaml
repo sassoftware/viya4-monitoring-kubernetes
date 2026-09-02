@@ -1,0 +1,29 @@
+# Applied only when RBAC_PROXY_ENABLE=true (the default).
+#
+# This is independent of TLS_ENABLE: TLS_ENABLE controls whether Prometheus,
+# Alertmanager, and Grafana serve their own web endpoints over TLS using
+# managed certificates. This file controls whether metrics-scraping targets
+# (KSM, Node Exporter) require an authenticated caller. kube-rbac-proxy does
+# terminate its own TLS, but with a self-signed cert Prometheus is told to
+# skip verification on (insecureSkipVerify: true) -- the actual security
+# control here is the RBAC/bearer-token check, not the TLS encryption.
+
+# https://github.com/kubernetes/kube-state-metrics
+kube-state-metrics:
+  # KSM binds to localhost only; kube-rbac-proxy is deployed as a sidecar and
+  # is the sole externally-reachable entry point, enforcing Kubernetes RBAC
+  # (SubjectAccessReview) via a bearer token before forwarding to KSM.
+  # See: https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics#exposing-the-kube-state-metrics-service-using-the-kube-rbac-proxy
+  kubeRBACProxy:
+    enabled: true
+
+  prometheus:
+    monitor:
+      # kube-rbac-proxy terminates TLS with a self-signed cert (no cert
+      # management required) and authenticates the scrape using Prometheus's
+      # own ServiceAccount token.
+      http:
+        scheme: https
+        tlsConfig:
+          insecureSkipVerify: true
+        bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
