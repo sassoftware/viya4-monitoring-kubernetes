@@ -67,11 +67,11 @@ v4m_replace "__ADMWEBHOOK_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 parseFullImage "$KSM_FULL_IMAGE"
 v4m_replace "__KSM_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
-parseFullImage "$RBAC_PROXY_FULL_IMAGE"
-v4m_replace "__RBAC_PROXY_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
-
 parseFullImage "$NODEXPORT_FULL_IMAGE"
 v4m_replace "__NODEXPORT_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
+
+parseFullImage "$RBAC_PROXY_FULL_IMAGE"
+v4m_replace "__RBAC_PROXY_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
 parseFullImage "$PROMETHEUS_FULL_IMAGE"
 v4m_replace "__PROMETHEUS_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"

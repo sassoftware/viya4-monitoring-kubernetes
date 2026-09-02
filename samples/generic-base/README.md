@@ -40,3 +40,12 @@ NetworkPolicy is always applied automatically; copy this file to your
 customization directory only if you need custom ingress rules, or if you
 already manage a NetworkPolicy of your own with the same name in the
 monitoring namespace.
+
+## Node Exporter NetworkPolicy
+
+The `monitoring/networkPolicy-node-exporter.yaml` file in this sample is an
+optional override for the default NetworkPolicy that restricts access to the
+Node Exporter service to Prometheus pods only. This default NetworkPolicy is
+always applied automatically; copy this file to your customization directory
+only if you need custom ingress rules, or if you already manage a
+NetworkPolicy of your own with the same name in the monitoring namespace.

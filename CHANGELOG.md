@@ -32,6 +32,16 @@ pods only is also always applied, regardless of `RBAC_PROXY_ENABLE`, since Netwo
 and cannot weaken or replace a site's existing policies; sites needing custom rules or hitting a naming
 collision can supply their own at `$USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml`. Not
 applicable to OpenShift, which does not deploy KSM as part of this project.
+  * [SECURITY] Node Exporter previously exposed infrastructure metrics (CPU, memory, disk, network,
+kernel info) over an unauthenticated, unencrypted HTTP endpoint reachable by any pod in the cluster.
+Node Exporter is now fronted by a `kube-rbac-proxy` sidecar enforcing Kubernetes RBAC and bound to
+localhost only; Prometheus scrapes it using its existing ServiceAccount token, with no certificate
+management required. This is also controlled by `RBAC_PROXY_ENABLE`. A NetworkPolicy restricting access
+to Prometheus pods only is also always applied, regardless of `RBAC_PROXY_ENABLE`; sites needing custom
+rules or hitting a naming collision can supply their own at
+`$USER_DIR/monitoring/networkPolicy-node-exporter.yaml`. Because Node Exporter runs with
+`hostNetwork: true`, this NetworkPolicy is not enforced on all CNIs (confirmed on Calico); actual access
+control is provided by the `kube-rbac-proxy` RBAC check.
 
 ## Version 1.2.53 (07AUG2026)
 * **Overall**

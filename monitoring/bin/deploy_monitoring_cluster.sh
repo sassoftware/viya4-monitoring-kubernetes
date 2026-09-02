@@ -222,13 +222,6 @@ if [ "$TLS_ENABLE" == "true" ]; then
     kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-prom-https
     kubectl create cm -n "$MON_NS" grafana-datasource-prom-https --from-file "monitoring/tls/$grafanaDS"
     kubectl label cm -n "$MON_NS" grafana-datasource-prom-https grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
-
-    # node-exporter TLS
-    log_verbose "Enabling Prometheus node-exporter for TLS"
-    kubectl delete cm -n "$MON_NS" node-exporter-tls-web-config --ignore-not-found
-    sleep 1
-    kubectl create cm -n "$MON_NS" node-exporter-tls-web-config --from-file monitoring/tls/node-exporter-web.yaml
-    kubectl label cm -n "$MON_NS" node-exporter-tls-web-config sas.com/monitoring-base=kube-viya-monitoring
 fi
 
 # Optional RBAC-proxy protection for metrics-scraping targets (KSM, Node
@@ -693,18 +686,28 @@ fi
 # Eventrouter ServiceMonitor
 kubectl apply -n "$MON_NS" -f monitoring/monitors/kube/podMonitor-eventrouter.yaml 2> /dev/null
 
-# kube-state-metrics NetworkPolicy: restrict ingress to Prometheus pods only.
-# Applied unconditionally (independent of RBAC_PROXY_ENABLE) since
-# NetworkPolicies are additive -- this can only ever add an allowed ingress
-# source, never weaken or replace a site's own existing policies. A site that
-# wants custom ingress rules, or hits a naming collision with a NetworkPolicy
-# they already manage, can drop their own replacement at
-# $USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml.
+# NetworkPolicies restricting ingress to Prometheus pods only, for KSM and
+# Node Exporter. Applied unconditionally (independent of RBAC_PROXY_ENABLE)
+# since NetworkPolicies are additive -- this can only ever add an allowed
+# ingress source, never weaken or replace a site's own existing policies. A
+# site that wants custom ingress rules, or hits a naming collision with a
+# NetworkPolicy they already manage, can drop their own replacement at
+# $USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml or
+# $USER_DIR/monitoring/networkPolicy-node-exporter.yaml.
+# NOTE: Node Exporter runs with hostNetwork: true, so its NetworkPolicy is
+# not enforced on all CNIs (confirmed on Calico); actual access control for
+# Node Exporter is provided by the kube-rbac-proxy RBAC check.
 ksmNetworkPolicyYAML="monitoring/monitors/kube/networkPolicy-kube-state-metrics.yaml"
 if [ -f "$USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml" ]; then
     ksmNetworkPolicyYAML="$USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml"
 fi
 kubectl apply -n "$MON_NS" -f "$ksmNetworkPolicyYAML"
+
+nodeExporterNetworkPolicyYAML="monitoring/monitors/kube/networkPolicy-node-exporter.yaml"
+if [ -f "$USER_DIR/monitoring/networkPolicy-node-exporter.yaml" ]; then
+    nodeExporterNetworkPolicyYAML="$USER_DIR/monitoring/networkPolicy-node-exporter.yaml"
+fi
+kubectl apply -n "$MON_NS" -f "$nodeExporterNetworkPolicyYAML"
 
 # Elasticsearch ServiceMonitor
 ## remove obsolete version, if installed
