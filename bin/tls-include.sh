@@ -282,7 +282,7 @@ function tls_cert_managed_by_v4m() {
 }
 
 function create_tls_certs_openssl {
-    local namespace apps
+    local namespace apps openssl_extensions
     namespace="$1"
     shift
     apps=("$@")
@@ -336,7 +336,18 @@ function create_tls_certs_openssl {
         openssl genrsa -out "$TMP_DIR"/"${app}"-key-temp.pem 4096 2> /dev/null
         openssl pkcs8 -inform PEM -outform PEM -in "$TMP_DIR"/"${app}"-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out "$TMP_DIR"/"${app}"-key.pem
         openssl req -new -key "$TMP_DIR"/"${app}"-key.pem -subj "$cert_subject" -out "$TMP_DIR"/"${app}".csr
-        openssl x509 -req -in "$TMP_DIR"/"${app}".csr -CA "$TMP_DIR"/root-ca.pem -CAkey "$TMP_DIR"/root-ca-key.pem -CAcreateserial -CAserial "$TMP_DIR"/ca.srl -sha256 -out "$TMP_DIR"/"${app}".pem -days "$cert_life" 2> /dev/null
+        openssl_extensions=()
+        if [ "$app" == "es-rest" ]; then
+            if [ -z "$OPENSEARCH_FQDN" ]; then
+                # Create cert with SAN=localhost only (for port-forwarding)
+                printf '%s\n' '[v3_req]' 'subjectAltName=DNS:localhost' > "$TMP_DIR/${app}-extensions.cnf"
+            else
+                # Create OpenSearch REST cert with both SAN=localhost and SAN=OPENSEARCH_FQDN (for port-forwarding and ingress)
+                printf '%s\n' '[v3_req]' "subjectAltName=DNS:localhost,DNS:$OPENSEARCH_FQDN" > "$TMP_DIR/${app}-extensions.cnf"
+            fi
+            openssl_extensions=(-extfile "$TMP_DIR/${app}-extensions.cnf" -extensions v3_req)
+        fi
+        openssl x509 -req -in "$TMP_DIR"/"${app}".csr -CA "$TMP_DIR"/root-ca.pem -CAkey "$TMP_DIR"/root-ca-key.pem -CAcreateserial -CAserial "$TMP_DIR"/ca.srl -sha256 -out "$TMP_DIR"/"${app}".pem -days "$cert_life" "${openssl_extensions[@]}" 2> /dev/null
 
         create_cert_secret "$namespace" "$app"
 
