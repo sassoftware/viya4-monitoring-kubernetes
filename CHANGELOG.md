@@ -40,8 +40,13 @@ management required. This is also controlled by `RBAC_PROXY_ENABLE`. A NetworkPo
 to Prometheus pods only is also always applied, regardless of `RBAC_PROXY_ENABLE`; sites needing custom
 rules or hitting a naming collision can supply their own at
 `$USER_DIR/monitoring/networkPolicy-node-exporter.yaml`. Because Node Exporter runs with
-`hostNetwork: true`, this NetworkPolicy is not enforced on all CNIs (confirmed on Calico); actual access
-control is provided by the `kube-rbac-proxy` RBAC check.
+`hostNetwork: true`, this NetworkPolicy is not enforced on all CNIs -- confirmed NOT enforced (i.e.
+traffic is not actually blocked by it) when Calico is the CNI; actual access control is provided by
+the `kube-rbac-proxy` RBAC check. Note that `kube-rbac-proxy` is also the only source of transport
+encryption for KSM and Node Exporter; setting `RBAC_PROXY_ENABLE=false` serves both over plain,
+unauthenticated HTTP regardless of `TLS_ENABLE`. Node Exporter previously supported its own native TLS
+independent of RBAC/auth; that capability has been retired in favor of `kube-rbac-proxy` for both
+targets.
 
 ## Version 1.2.53 (07AUG2026)
 * **Overall**

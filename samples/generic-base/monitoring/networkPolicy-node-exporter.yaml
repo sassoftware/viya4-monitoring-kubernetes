@@ -6,9 +6,11 @@
 # an additional scraper) or you already manage a NetworkPolicy of your own
 # with the same name in the monitoring namespace.
 #
-# NOTE: Node Exporter runs with hostNetwork: true, so this NetworkPolicy is
-# not enforced on all CNIs (confirmed on Calico); actual access control is
-# provided by the kube-rbac-proxy RBAC check.
+# NOTE: Node Exporter runs with hostNetwork: true. Standard NetworkPolicy
+# does not apply to a pod's host network namespace on all CNIs -- we have
+# confirmed this NetworkPolicy is NOT enforced (i.e. traffic is not actually
+# blocked by it) when Calico is the CNI. Actual access control for Node
+# Exporter is provided by the kube-rbac-proxy RBAC check, not this policy.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:

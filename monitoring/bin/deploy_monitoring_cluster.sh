@@ -227,12 +227,18 @@ fi
 # Optional RBAC-proxy protection for metrics-scraping targets (KSM, Node
 # Exporter). Independent of TLS_ENABLE -- see
 # monitoring/values-prom-operator-rbac-proxy.yaml for why.
+#
+# NOTE: kube-rbac-proxy is also the *only* source of transport encryption for
+# these two targets -- unlike Prometheus/Alertmanager/Grafana, Node Exporter
+# has no other supported way to serve TLS, and KSM never had one. Setting
+# RBAC_PROXY_ENABLE=false means both targets fall back to plain, unauthenticated
+# HTTP regardless of TLS_ENABLE.
 rbacProxyValuesFile=$TMP_DIR/empty.yaml
 if [ "$RBAC_PROXY_ENABLE" == "true" ]; then
     rbacProxyValuesFile=monitoring/values-prom-operator-rbac-proxy.yaml
     log_debug "Including RBAC-proxy response file $rbacProxyValuesFile"
 else
-    log_debug "RBAC_PROXY_ENABLE is false; KSM and Node Exporter will not be fronted by kube-rbac-proxy"
+    log_warn "RBAC_PROXY_ENABLE is false; KSM and Node Exporter will be served over plain, unauthenticated HTTP, even if TLS_ENABLE=true -- kube-rbac-proxy is their only source of both authentication and transport encryption."
 fi
 
 AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
@@ -694,9 +700,11 @@ kubectl apply -n "$MON_NS" -f monitoring/monitors/kube/podMonitor-eventrouter.ya
 # NetworkPolicy they already manage, can drop their own replacement at
 # $USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml or
 # $USER_DIR/monitoring/networkPolicy-node-exporter.yaml.
-# NOTE: Node Exporter runs with hostNetwork: true, so its NetworkPolicy is
-# not enforced on all CNIs (confirmed on Calico); actual access control for
-# Node Exporter is provided by the kube-rbac-proxy RBAC check.
+# NOTE: Node Exporter runs with hostNetwork: true. Standard NetworkPolicy
+# does not apply to a pod's host network namespace on all CNIs -- we have
+# confirmed this NetworkPolicy is NOT enforced (i.e. traffic is not actually
+# blocked by it) when Calico is the CNI. Actual access control for Node
+# Exporter is provided by the kube-rbac-proxy RBAC check, not this policy.
 ksmNetworkPolicyYAML="monitoring/monitors/kube/networkPolicy-kube-state-metrics.yaml"
 if [ -f "$USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml" ]; then
     ksmNetworkPolicyYAML="$USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml"
