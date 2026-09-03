@@ -12,12 +12,13 @@ log_debug "Script [$this_script] has started [$(date)]"
 fqdn=contour.gemini-m1.opsmonitor.sashq-d.openstack.sas.com
 namespace=logging
 
+#create temp space
+mkdir $TMP_DIR/$namespace/tls -p
+
+
 # Extract Root CA info from v4m-root-ca-tls-secret
 kubectl -n "$namespace" get secret v4m-root-ca-tls-secret   -o jsonpath='{.data.tls\.crt}' | base64 --decode > $TMP_DIR/$namespace/tls/root-ca.pem
 kubectl -n "$namespace" get secret v4m-root-ca-tls-secret   -o jsonpath='{.data.tls\.key}' | base64 --decode > $TMP_DIR/$namespace/tls/root-ca-key.pem
-
-#create temp space
-mkdir $TMP_DIR/$namespace/tls -p
 
 # Generate TLS cert
 cat > $TMP_DIR/$namespace/tls/contour-extensions.cnf <<EOF
