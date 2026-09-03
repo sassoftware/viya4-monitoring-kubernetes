@@ -31,21 +31,8 @@ In addition to customizing the deployment, this sample show how you can add
 your own Grafana dashboards, alerts, contact points and notifications policies. See [Add More Grafana Dashboards](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n1sg9bc44ow616n1sw7l3dlsbmgz.htm) and
 [Provision Alert Rules, Contact Points, and Notification Policies](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#p1cb39v8tr2379n1c4posre4v8wx) for details.
 
-## Kube State Metrics NetworkPolicy
+## NetworkPolicy
 
-The `monitoring/networkPolicy-kube-state-metrics.yaml` file in this sample is
-an optional override for the default NetworkPolicy that restricts access to
-the Kube State Metrics (KSM) service to Prometheus pods only. This default
-NetworkPolicy is always applied automatically; copy this file to your
-customization directory only if you need custom ingress rules, or if you
-already manage a NetworkPolicy of your own with the same name in the
-monitoring namespace.
-
-## Node Exporter NetworkPolicy
-
-The `monitoring/networkPolicy-node-exporter.yaml` file in this sample is an
-optional override for the default NetworkPolicy that restricts access to the
-Node Exporter service to Prometheus pods only. This default NetworkPolicy is
-always applied automatically; copy this file to your customization directory
-only if you need custom ingress rules, or if you already manage a
-NetworkPolicy of your own with the same name in the monitoring namespace.
+This sample also shows how you can supply your own `NetworkPolicy` resources
+to override the defaults that protect Kube State Metrics and Node Exporter.
+See [monitoring/networkPolicy](monitoring/networkPolicy) for details.

@@ -698,22 +698,24 @@ kubectl apply -n "$MON_NS" -f monitoring/monitors/kube/podMonitor-eventrouter.ya
 # ingress source, never weaken or replace a site's own existing policies. A
 # site that wants custom ingress rules, or hits a naming collision with a
 # NetworkPolicy they already manage, can drop their own replacement at
-# $USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml or
-# $USER_DIR/monitoring/networkPolicy-node-exporter.yaml.
-# NOTE: Node Exporter runs with hostNetwork: true. Standard NetworkPolicy
-# does not apply to a pod's host network namespace on all CNIs -- we have
-# confirmed this NetworkPolicy is NOT enforced (i.e. traffic is not actually
-# blocked by it) when Calico is the CNI. Actual access control for Node
-# Exporter is provided by the kube-rbac-proxy RBAC check, not this policy.
+# $USER_DIR/monitoring/networkPolicy/kube-state-metrics.yaml or
+# $USER_DIR/monitoring/networkPolicy/node-exporter.yaml. See
+# samples/generic-base/monitoring/networkPolicy/README.md for details.
+# NOTE: Because Node Exporter runs with hostNetwork: true, its NetworkPolicy
+# may not be enforced on all Container Network Interfaces (CNI). For example,
+# we have confirmed this NetworkPolicy will not be enforced with the Calico
+# CNI. Even if the NetworkPolicy is not enforced by your CNI, the RBAC proxy,
+# if enabled, will still limit access to the Node Exporter pods to the
+# Prometheus ServiceAccount.
 ksmNetworkPolicyYAML="monitoring/monitors/kube/networkPolicy-kube-state-metrics.yaml"
-if [ -f "$USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml" ]; then
-    ksmNetworkPolicyYAML="$USER_DIR/monitoring/networkPolicy-kube-state-metrics.yaml"
+if [ -f "$USER_DIR/monitoring/networkPolicy/kube-state-metrics.yaml" ]; then
+    ksmNetworkPolicyYAML="$USER_DIR/monitoring/networkPolicy/kube-state-metrics.yaml"
 fi
 kubectl apply -n "$MON_NS" -f "$ksmNetworkPolicyYAML"
 
 nodeExporterNetworkPolicyYAML="monitoring/monitors/kube/networkPolicy-node-exporter.yaml"
-if [ -f "$USER_DIR/monitoring/networkPolicy-node-exporter.yaml" ]; then
-    nodeExporterNetworkPolicyYAML="$USER_DIR/monitoring/networkPolicy-node-exporter.yaml"
+if [ -f "$USER_DIR/monitoring/networkPolicy/node-exporter.yaml" ]; then
+    nodeExporterNetworkPolicyYAML="$USER_DIR/monitoring/networkPolicy/node-exporter.yaml"
 fi
 kubectl apply -n "$MON_NS" -f "$nodeExporterNetworkPolicyYAML"
 
