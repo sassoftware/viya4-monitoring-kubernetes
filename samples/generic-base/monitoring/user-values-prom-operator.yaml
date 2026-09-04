@@ -80,39 +80,3 @@
 
 # nodeExporter:
 #   enabled: true
-
-# Kube State Metrics and Node Exporter are each protected by a default
-# NetworkPolicy that restricts ingress to Prometheus pods only. Override
-# these values to customize the ingress rules (e.g. allow an additional
-# scraper), or set 'enabled: false' if you already manage a NetworkPolicy of
-# your own with the same name in the monitoring namespace. See
-# https://kubernetes.io/docs/concepts/services-networking/network-policies/
-# for details on defining a NetworkPolicy resource.
-# kube-state-metrics:
-#   networkPolicy:
-#     enabled: true
-#     ingress:
-#       - from:
-#           - podSelector:
-#               matchLabels:
-#                 app.kubernetes.io/name: prometheus
-#         ports:
-#           - protocol: TCP
-#             port: 8080
-#     egress:
-#       - {}
-
-# prometheus-node-exporter:
-#   networkPolicy:
-#     enabled: true
-#     ingress:
-#       - from:
-#           - podSelector:
-#               matchLabels:
-#                 app.kubernetes.io/name: prometheus
-#         ports:
-#           - protocol: TCP
-#             port: 9110
-#     # NOTE: this chart has no supported way to open egress once
-#     # networkPolicy.enabled=true -- any 'egress' value here is ignored and
-#     # ALL egress from Node Exporter pods will be denied.

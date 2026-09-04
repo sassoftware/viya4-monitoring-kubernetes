@@ -543,12 +543,18 @@ if [ "$RBAC_PROXY_ENABLE" == "true" ]; then
     # only exist on the kube-rbac-proxy sidecar, not on that container itself,
     # so the pod never becomes Ready and the rollout below times out.
     # See: https://github.com/prometheus-community/helm-charts/issues/6164
-    # Race the atomic rollout wait below: as soon as the Deployment exists,
-    # repoint both probes at the rbac-proxy's numeric port (8080), which
-    # proxies /livez unauthenticated (--ignore-paths=/livez,/readyz) through
-    # to kube-state-metrics's main metrics port. /readyz is only served on
-    # the telemetry port, which isn't reachable through this proxy when
-    # selfMonitor is disabled (our default), so both probes use /livez.
+    # Race the atomic rollout wait below: repoint both probes at the
+    # rbac-proxy's numeric port (8080), which proxies /livez unauthenticated
+    # (--ignore-paths=/livez,/readyz) through to kube-state-metrics's main
+    # metrics port. /readyz is only served on the telemetry port, which isn't
+    # reachable through this proxy when selfMonitor is disabled (our
+    # default), so both probes use /livez.
+    #
+    # On upgrades, wait for the Deployment's generation to change from its
+    # pre-Helm baseline before patching, so we patch after Helm writes the
+    # new pod template instead of racing ahead of it.
+    ksmDeployment="$promName-kube-state-metrics"
+    ksmBaselineGeneration=$(kubectl -n "$MON_NS" get deployment "$ksmDeployment" -o jsonpath='{.metadata.generation}' 2> /dev/null) || true
     (
         for _ in $(seq 1 120); do
             ksmCurrentGeneration=$(kubectl -n "$MON_NS" get deployment "$ksmDeployment" -o jsonpath='{.metadata.generation}' 2> /dev/null) || true
@@ -691,14 +697,6 @@ fi
 
 # Eventrouter ServiceMonitor
 kubectl apply -n "$MON_NS" -f monitoring/monitors/kube/podMonitor-eventrouter.yaml 2> /dev/null
-
-# NetworkPolicies restricting ingress to Prometheus pods only, for KSM and
-# Node Exporter, are defined natively via kube-state-metrics.networkPolicy
-# and prometheus-node-exporter.networkPolicy in monitoring/values-prom-operator.yaml
-# (rendered as part of the helm upgrade --install below), matching how
-# Prometheus's own NetworkPolicy is defined by this chart. Sites needing
-# custom ingress rules can override those values in their own
-# user-values-prom-operator.yaml.
 
 # Elasticsearch ServiceMonitor
 ## remove obsolete version, if installed
