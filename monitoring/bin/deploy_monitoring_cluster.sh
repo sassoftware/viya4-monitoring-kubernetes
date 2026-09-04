@@ -560,10 +560,10 @@ if [ "$RBAC_PROXY_ENABLE" == "true" ]; then
     # generation to change from that baseline -- which only happens once
     # Helm has actually applied this release's spec -- before patching.
     ksmDeployment="$promName-kube-state-metrics"
-    ksmBaselineGeneration=$(kubectl -n "$MON_NS" get deployment "$ksmDeployment" -o jsonpath='{.metadata.generation}' 2> /dev/null)
+    ksmBaselineGeneration=$(kubectl -n "$MON_NS" get deployment "$ksmDeployment" -o jsonpath='{.metadata.generation}' 2> /dev/null) || true
     (
         for _ in $(seq 1 120); do
-            ksmCurrentGeneration=$(kubectl -n "$MON_NS" get deployment "$ksmDeployment" -o jsonpath='{.metadata.generation}' 2> /dev/null)
+            ksmCurrentGeneration=$(kubectl -n "$MON_NS" get deployment "$ksmDeployment" -o jsonpath='{.metadata.generation}' 2> /dev/null) || true
             if [ -n "$ksmCurrentGeneration" ] && [ "$ksmCurrentGeneration" != "$ksmBaselineGeneration" ]; then
                 kubectl -n "$MON_NS" patch deployment "$ksmDeployment" --patch '
 spec:
