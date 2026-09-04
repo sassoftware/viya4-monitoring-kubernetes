@@ -1,5 +1,5 @@
 # SAS Viya Monitoring for Kubernetes
-## Unreleased
+## Version 1.2.54 (04SEP2026)
 * **Overall**
   * [CHORE] Refactor Helm Chart version checking/reporting
 * **Metrics**
