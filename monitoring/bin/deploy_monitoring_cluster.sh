@@ -211,34 +211,60 @@ if [ "$TLS_ENABLE" == "true" ]; then
 
     tlsValuesFile=monitoring/tls/values-prom-operator-tls.yaml
     tlsPromAlertingEndpointFile=monitoring/tls/prom-alertendpoint-host-https.yaml
-    log_debug "Including TLS response file $tlsValuesFile"
-
-    log_verbose "Provisioning TLS-enabled Prometheus datasource for Grafana"
-    grafanaDS=grafana-datasource-prom-https.yaml
     if [ "$MON_TLS_PATH_INGRESS" == "true" ]; then
-        grafanaDS=grafana-datasource-prom-https-path.yaml
         tlsPromAlertingEndpointFile=monitoring/tls/prom-alertendpoint-path-https.yaml
     fi
-    kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-prom-https
-    kubectl create cm -n "$MON_NS" grafana-datasource-prom-https --from-file "monitoring/tls/$grafanaDS"
-    kubectl label cm -n "$MON_NS" grafana-datasource-prom-https grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
+    log_debug "Including TLS response file $tlsValuesFile"
 fi
 
-# Optional RBAC-proxy protection for metrics-scraping targets (KSM, Node
-# Exporter). Independent of TLS_ENABLE -- see
-# monitoring/values-prom-operator-rbac-proxy.yaml for why.
-#
-# NOTE: kube-rbac-proxy is also the *only* source of transport encryption for
-# these two targets -- unlike Prometheus/Alertmanager/Grafana, Node Exporter
-# has no other supported way to serve TLS, and KSM never had one. Setting
-# RBAC_PROXY_ENABLE=false means both targets fall back to plain, unauthenticated
-# HTTP regardless of TLS_ENABLE.
+# Optional RBAC-proxy protection for the metrics-scraping targets (KSM, Node
+# Exporter) and for the Prometheus HTTP endpoint itself.
 rbacProxyValuesFile=$TMP_DIR/empty.yaml
 if [ "$RBAC_PROXY_ENABLE" == "true" ]; then
-    rbacProxyValuesFile=monitoring/values-prom-operator-rbac-proxy.yaml
+    rbacProxyValuesFile=$TMP_DIR/values-prom-operator-rbac-proxy.yaml
+    cp monitoring/values-prom-operator-rbac-proxy.yaml "$rbacProxyValuesFile"
+    if [ "$TLS_ENABLE" == "true" ]; then
+        log_debug "Configuring the Prometheus kube-rbac-proxy sidecar to serve the prometheus-tls-secret certificate"
+        yq -i '
+            .prometheus.prometheusSpec.volumes += [{"name": "rbac-proxy-tls", "secret": {"secretName": "prometheus-tls-secret"}}] |
+            (.prometheus.prometheusSpec.containers[] | select(.name == "kube-rbac-proxy-web")) |= (
+                .args += ["--tls-cert-file=/etc/kube-rbac-proxy-tls/tls.crt", "--tls-private-key-file=/etc/kube-rbac-proxy-tls/tls.key"] |
+                .volumeMounts += [{"name": "rbac-proxy-tls", "mountPath": "/etc/kube-rbac-proxy-tls", "readOnly": true}]
+            )' "$rbacProxyValuesFile"
+    else
+        log_debug "TLS_ENABLE is false; the Prometheus kube-rbac-proxy sidecar will serve a self-signed certificate (callers must still use HTTPS)"
+    fi
     log_debug "Including RBAC-proxy response file $rbacProxyValuesFile"
 else
-    log_warn "RBAC_PROXY_ENABLE is false; KSM and Node Exporter will be served over plain, unauthenticated HTTP, even if TLS_ENABLE=true -- kube-rbac-proxy is their only source of both authentication and transport encryption."
+    log_warn "RBAC_PROXY_ENABLE is false; KSM and Node Exporter will be served over plain, unauthenticated HTTP, even if TLS_ENABLE=true -- kube-rbac-proxy is their only source of both authentication and transport encryption. The Prometheus HTTP endpoint will accept unauthenticated requests."
+fi
+
+# Replacement Prometheus datasource for Grafana. Used when both TLS_ENABLE or RBAC_PROXY_ENABLE are true. 
+function create_grafana_prom_datasource {
+    local promurl=$1 # optional override of the datasource URL
+
+    cp "monitoring/tls/$grafanaDS" "$TMP_DIR/grafanaDS.yaml"
+    if [ -n "$promurl" ]; then
+        promurl="$promurl" yq -i '.datasources.[0].url=env(promurl)' "$TMP_DIR/grafanaDS.yaml"
+    fi
+    if [ "$RBAC_PROXY_ENABLE" == "true" ]; then
+        # shellcheck disable=SC2016  # $__file{} is expanded by Grafana, not the shell
+        yq -i '.datasources.[0].jsonData.httpHeaderName1 = "Authorization" |
+               .datasources.[0].secureJsonData.httpHeaderValue1 = "Bearer $__file{/var/run/secrets/kubernetes.io/serviceaccount/token}"' "$TMP_DIR/grafanaDS.yaml"
+    fi
+
+    kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-prom-https
+    kubectl create cm -n "$MON_NS" grafana-datasource-prom-https --from-file "$TMP_DIR/grafanaDS.yaml"
+    kubectl label cm -n "$MON_NS" grafana-datasource-prom-https grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
+}
+
+grafanaDS=grafana-datasource-prom-https.yaml
+if [ "$MON_TLS_PATH_INGRESS" == "true" ]; then
+    grafanaDS=grafana-datasource-prom-https-path.yaml
+fi
+if [ "$TLS_ENABLE" == "true" ] || [ "$RBAC_PROXY_ENABLE" == "true" ]; then
+    log_verbose "Provisioning HTTPS Prometheus datasource for Grafana"
+    create_grafana_prom_datasource
 fi
 
 AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
@@ -357,15 +383,8 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
             #      file already contains keys and we have been updated them above
             tlsPromAlertingEndpointFile="$TMP_DIR/empty.yaml"
 
-            #Handle Prometheus datasource definition for Grafana
-            ##Copy and update YAML file
-            cp "monitoring/tls/$grafanaDS" "$TMP_DIR/grafanaDS.yaml"
-            promurl="https://v4m-prometheus:9090/$PROMETHEUS_PATH" yq -i '.datasources.[0].url=env(promurl)' "$TMP_DIR/grafanaDS.yaml"
-
-            ##Re-create configmap
-            kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-prom-https
-            kubectl create cm -n "$MON_NS" grafana-datasource-prom-https --from-file "$TMP_DIR/grafanaDS.yaml"
-            kubectl label cm -n "$MON_NS" grafana-datasource-prom-https grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
+            #Re-create the Prometheus datasource definition for Grafana with the path-based URL
+            create_grafana_prom_datasource "https://v4m-prometheus:9090/$PROMETHEUS_PATH"
 
         fi
     elif [ "$INGRESS_TYPE" == "contour" ]; then
@@ -398,15 +417,8 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
             #      file already contains keys and we have been updated them above
             tlsPromAlertingEndpointFile="$TMP_DIR/empty.yaml"
 
-            #Handle Prometheus datasource definition for Grafana
-            ##Copy and update YAML file
-            cp "monitoring/tls/$grafanaDS" "$TMP_DIR/grafanaDS.yaml"
-            promurl="https://v4m-prometheus:9090/$PROMETHEUS_PATH" yq -i '.datasources.[0].url=env(promurl)' "$TMP_DIR/grafanaDS.yaml"
-
-            ##Re-create configmap
-            kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-prom-https
-            kubectl create cm -n "$MON_NS" grafana-datasource-prom-https --from-file "$TMP_DIR/grafanaDS.yaml"
-            kubectl label cm -n "$MON_NS" grafana-datasource-prom-https grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
+            #Re-create the Prometheus datasource definition for Grafana with the path-based URL
+            create_grafana_prom_datasource "https://v4m-prometheus:9090/$PROMETHEUS_PATH"
         fi
 
         if [ "$ALERTMANAGER_INGRESS_ENABLE" == "true" ]; then

@@ -124,6 +124,10 @@ kube-state-metrics:
 # Prometheus
 # ==========
 prometheus:
+  # NOTE: When RBAC_PROXY_ENABLE=true (the default), the Prometheus HTTP
+  #       endpoint is fronted by a kube-rbac-proxy sidecar configured in
+  #       monitoring/values-prom-operator-rbac-proxy.yaml. See that file for
+  #       details (service targetPort, probes, RBAC rules, etc.).
   serviceAccount:
     name: sas-ops-acct
   service:

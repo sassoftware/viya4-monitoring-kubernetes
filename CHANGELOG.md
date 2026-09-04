@@ -33,6 +33,16 @@ setting `RBAC_PROXY_ENABLE=false` serves them over plain, unauthenticated HTTP r
 `TLS_ENABLE`. Node Exporter previously supported its own native TLS independent of RBAC/auth; that
 capability has been retired in favor of `kube-rbac-proxy`. Not applicable to OpenShift, which does not
 deploy KSM or Node Exporter as part of this project.
+  * [SECURITY] The Prometheus HTTP endpoint (query API and web UI, `v4m-prometheus:9090`) previously
+accepted unauthenticated requests from any pod in the cluster (and from anyone able to reach it through an
+ingress or NodePort). It is now fronted by the same `kube-rbac-proxy` sidecar pattern: Prometheus binds to
+localhost only and every request must carry a Kubernetes bearer token allowed to `get`/`create` the
+`services/v4m-prometheus` subresource in the monitoring namespace. Prometheus (self-scrape) and Grafana are
+granted this automatically and Grafana's datasource is provisioned with Grafana's own ServiceAccount token;
+see `samples/generic-base/monitoring/prometheus-access` for granting other clients. Controlled by the same
+`RBAC_PROXY_ENABLE` variable. Callers must use HTTPS: with `TLS_ENABLE=true` the sidecar serves the existing
+cert-manager-issued `prometheus-tls-secret`, otherwise a self-signed certificate. The operator-managed
+`prometheus-operated` Service no longer reaches Prometheus; use `v4m-prometheus` instead.
   * [SECURITY] NetworkPolicies restricting access to KSM and Node Exporter to Prometheus pods only are
 always applied, regardless of `RBAC_PROXY_ENABLE`, as a defense-in-depth measure independent of the
 `kube-rbac-proxy` RBAC check above. Since NetworkPolicies are additive, these cannot weaken or replace a

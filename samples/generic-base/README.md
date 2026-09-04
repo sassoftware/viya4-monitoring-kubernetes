@@ -36,3 +36,9 @@ your own Grafana dashboards, alerts, contact points and notifications policies. 
 This sample also shows how you can supply your own `NetworkPolicy` resources
 to override the defaults that protect Kube State Metrics and Node Exporter.
 See [monitoring/networkPolicy](monitoring/networkPolicy) for details.
+
+## Prometheus Access (RBAC Proxy)
+
+When `RBAC_PROXY_ENABLE=true` (the default), the Prometheus API/UI requires a
+Kubernetes bearer token. See [monitoring/prometheus-access](monitoring/prometheus-access)
+for how to grant additional ServiceAccounts, users, or groups access.

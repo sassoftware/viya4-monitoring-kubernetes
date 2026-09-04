@@ -3,10 +3,16 @@
 # This is independent of TLS_ENABLE: TLS_ENABLE controls whether Prometheus,
 # Alertmanager, and Grafana serve their own web endpoints over TLS using
 # managed certificates. This file controls whether metrics-scraping targets
-# (KSM, Node Exporter) require an authenticated caller. kube-rbac-proxy does
-# terminate its own TLS, but with a self-signed cert Prometheus is told to
-# skip verification on (insecureSkipVerify: true) -- the actual security
-# control here is the RBAC/bearer-token check, not the TLS encryption.
+# (KSM, Node Exporter) and the Prometheus HTTP API/UI itself require an
+# authenticated caller. kube-rbac-proxy does terminate its own TLS, but with a
+# self-signed cert callers are told to skip verification on
+# (insecureSkipVerify / tlsSkipVerify: true) -- the actual security control
+# here is the RBAC/bearer-token check, not the TLS encryption.
+#
+# (Exception: when TLS_ENABLE=true, deploy_monitoring_cluster.sh swaps the
+# Prometheus sidecar's self-signed cert for the cert-manager-issued
+# prometheus-tls-secret, so the certificate Prometheus callers see is the same
+# one they saw before the sidecar existed.)
 
 # https://github.com/kubernetes/kube-state-metrics
 kube-state-metrics:
@@ -45,3 +51,186 @@ prometheus-node-exporter:
       tlsConfig:
         insecureSkipVerify: true
       bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+# ==========
+# Prometheus
+# ==========
+# Prometheus's own HTTP endpoint (the query API and web UI, i.e. port 9090 of
+# the v4m-prometheus Service) is fronted by a kube-rbac-proxy sidecar
+# ("kube-rbac-proxy-web") in the Prometheus pod, following the same pattern as
+# KSM and Node Exporter above. Neither the kube-prometheus-stack chart nor the
+# Prometheus Operator offer a built-in switch for this, so the pieces are
+# assembled here by hand:
+#
+#   * Prometheus is bound to 127.0.0.1:9090 (--web.listen-address, see
+#     additionalArgs) so it is unreachable from outside its pod.
+#   * The sidecar listens on 0.0.0.0:9091 (HTTPS), authenticates the caller's
+#     bearer token (TokenReview), authorizes it with a SubjectAccessReview for
+#     the `services/v4m-prometheus` subresource in the monitoring namespace
+#     (GET -> `get`, POST -> `create`; see the ConfigMap under extraManifests),
+#     and only then forwards the request to Prometheus over the pod loopback.
+#   * The v4m-prometheus Service keeps port 9090 for callers but now targets
+#     the sidecar (9091) instead of Prometheus.
+#   * The kubelet probes for the Prometheus container are re-pointed at the
+#     sidecar, which lets /-/healthy and /-/ready through unauthenticated
+#     (--ignore-paths). prometheusSpec.listenLocal is deliberately NOT used:
+#     with it the operator emits `sh -c "curl ..."` exec probes, which cannot
+#     run in the distroless Prometheus image.
+#
+# Consequences for callers: every client of v4m-prometheus:9090 must now use
+# HTTPS and present a ServiceAccount (or user) token that is allowed to `get`
+# and/or `create` the `services/v4m-prometheus` subresource. Prometheus itself
+# (self-scrape) and Grafana are granted that below; the deploy script
+# provisions Grafana's datasource with Grafana's own token. To grant anyone
+# else -- e.g. people using the Prometheus UI through an ingress -- see
+# samples/generic-base/monitoring/prometheus-access/README.md.
+#
+# NOTE: the operator-managed headless Service `prometheus-operated` still
+#       targets Prometheus's (now loopback-only) port and is therefore no
+#       longer usable; use v4m-prometheus:9090 instead.
+prometheus:
+  service:
+    # Callers keep using v4m-prometheus:9090; the traffic lands on the sidecar.
+    targetPort: 9091
+
+  # Prometheus scraping its own /metrics goes through the sidecar as well.
+  serviceMonitor:
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
+    bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+  # Added to the ClusterRole bound to Prometheus's ServiceAccount
+  # (sas-ops-acct), which the sidecar runs as too. The first two rules let
+  # kube-rbac-proxy perform TokenReviews/SubjectAccessReviews; the last lets
+  # Prometheus scrape itself through the sidecar.
+  additionalRulesForClusterRole:
+    - apiGroups: ["authentication.k8s.io"]
+      resources: ["tokenreviews"]
+      verbs: ["create"]
+    - apiGroups: ["authorization.k8s.io"]
+      resources: ["subjectaccessreviews"]
+      verbs: ["create"]
+    - apiGroups: [""]
+      resources: ["services/v4m-prometheus"]
+      verbs: ["get"]
+
+  prometheusSpec:
+    # The sidecar terminates TLS now, not Prometheus. Setting a key to null
+    # removes it from the merged Helm values, which drops the web.tlsConfig
+    # that monitoring/tls/values-prom-operator-tls.yaml sets when
+    # TLS_ENABLE=true (that file is applied before this one).
+    web: null
+
+    additionalArgs:
+      - name: web.listen-address
+        value: 127.0.0.1:9090
+
+    volumes:
+      - name: rbac-proxy-config
+        configMap:
+          name: v4m-prometheus-rbac-proxy-config
+
+    # NOTE: the chart renders this list through Helm's `tpl`, which is how the
+    #       sidecar reuses the kube-rbac-proxy image coordinates (including any
+    #       airgap registry / pull policy) that prom-operator_container_image.template
+    #       sets for kube-state-metrics.
+    # NOTE: when TLS_ENABLE=true, deploy_monitoring_cluster.sh appends
+    #       --tls-cert-file/--tls-private-key-file (and the matching
+    #       prometheus-tls-secret volume/mount) to the sidecar with yq.
+    containers:
+      - name: kube-rbac-proxy-web
+        image: '{{ index .Values "kube-state-metrics" "kubeRBACProxy" "image" "registry" }}/{{ index .Values "kube-state-metrics" "kubeRBACProxy" "image" "repository" }}:{{ index .Values "kube-state-metrics" "kubeRBACProxy" "image" "tag" }}'
+        imagePullPolicy: '{{ index .Values "kube-state-metrics" "kubeRBACProxy" "image" "pullPolicy" }}'
+        args:
+          - --secure-listen-address=:9091
+          - --proxy-endpoints-port=9092
+          - --upstream=http://127.0.0.1:9090/
+          - --config-file=/etc/kube-rbac-proxy/config-file.yaml
+          # Lets the kubelet probe Prometheus through the proxy without a
+          # token. The second pair covers a routePrefix (path-based ingress).
+          - --ignore-paths=/-/healthy,/-/ready,/*/-/healthy,/*/-/ready
+        ports:
+          - name: rbac-proxy
+            containerPort: 9091
+          - name: rbac-healthz
+            containerPort: 9092
+        readinessProbe:
+          httpGet:
+            scheme: HTTPS
+            port: rbac-healthz
+            path: /healthz
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "32Mi"
+          limits:
+            memory: "128Mi"
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+          - name: rbac-proxy-config
+            mountPath: /etc/kube-rbac-proxy
+            readOnly: true
+      # Merged by name (strategic merge) into the operator-generated Prometheus
+      # container: only the probe target changes, from Prometheus's own port
+      # (loopback-only now) to the sidecar. Paths (/-/ready, /-/healthy,
+      # prefixed with routePrefix if set) are kept from the operator.
+      - name: prometheus
+        startupProbe:
+          httpGet:
+            port: 9091
+            scheme: HTTPS
+        readinessProbe:
+          httpGet:
+            port: 9091
+            scheme: HTTPS
+        livenessProbe:
+          httpGet:
+            port: 9091
+            scheme: HTTPS
+
+# =======
+# Grafana
+# =======
+grafana:
+  rbac:
+    # Lets Grafana's ServiceAccount (v4m-grafana) query Prometheus through the
+    # sidecar. `create` is needed because Grafana issues POST requests to the
+    # Prometheus query API.
+    extraClusterRoleRules:
+      - apiGroups: [""]
+        resources: ["services/v4m-prometheus"]
+        verbs: ["get", "create"]
+  sidecar:
+    datasources:
+      # The chart's default Prometheus datasource is unauthenticated (and
+      # plain http://); deploy_monitoring_cluster.sh provisions a replacement
+      # that carries Grafana's ServiceAccount token instead.
+      defaultDatasourceEnabled: false
+
+# kube-rbac-proxy configuration for the Prometheus sidecar: which
+# SubjectAccessReview a caller must pass. Mirrors what the kube-state-metrics
+# and node-exporter charts generate for their own sidecars.
+extraManifests:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: v4m-prometheus-rbac-proxy-config
+      namespace: '{{ .Release.Namespace }}'
+      labels:
+        sas.com/monitoring-base: kube-viya-monitoring
+    data:
+      config-file.yaml: |
+        authorization:
+          resourceAttributes:
+            namespace: {{ .Release.Namespace }}
+            apiVersion: v1
+            resource: services
+            subresource: v4m-prometheus
+            name: v4m-prometheus

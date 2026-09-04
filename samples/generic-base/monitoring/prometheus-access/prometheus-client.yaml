@@ -1,0 +1,47 @@
+# Sample Role/RoleBinding that lets additional clients query Prometheus
+# through its kube-rbac-proxy sidecar (RBAC_PROXY_ENABLE=true).
+#
+# Apply in the monitoring namespace (the SubjectAccessReview issued by the
+# sidecar is scoped to that namespace):
+#   kubectl apply -n monitoring -f prometheus-client.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus-client
+  labels:
+    sas.com/monitoring-base: kube-viya-monitoring
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: v4m-prometheus-client
+  labels:
+    sas.com/monitoring-base: kube-viya-monitoring
+rules:
+  - apiGroups: [""]
+    resources: ["services/v4m-prometheus"]
+    # get -> HTTP GET, create -> HTTP POST (used by many API clients)
+    verbs: ["get", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: v4m-prometheus-client
+  labels:
+    sas.com/monitoring-base: kube-viya-monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: v4m-prometheus-client
+subjects:
+  # Add/replace with the ServiceAccounts, users or groups that need access.
+  - kind: ServiceAccount
+    name: prometheus-client
+    namespace: monitoring
+  # - kind: User
+  #   name: jane.doe@example.com
+  #   apiGroup: rbac.authorization.k8s.io
+  # - kind: Group
+  #   name: prometheus-readers
+  #   apiGroup: rbac.authorization.k8s.io

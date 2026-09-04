@@ -1,3 +1,8 @@
+# NOTE: When RBAC_PROXY_ENABLE=true (the default), the prometheus.prometheusSpec.web
+#       and prometheus.service.targetPort settings below are overridden by
+#       monitoring/values-prom-operator-rbac-proxy.yaml (applied after this
+#       file): TLS for Prometheus is then terminated by its kube-rbac-proxy
+#       sidecar, using the same prometheus-tls-secret.
 prometheus:
   prometheusSpec:
     web:
