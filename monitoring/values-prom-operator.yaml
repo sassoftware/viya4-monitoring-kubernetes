@@ -81,6 +81,10 @@ kube-state-metrics:
   extraArgs:
     - --metric-labels-allowlist=nodes=[*],namespaces=[*],pods=[*],deployments=[*],statefulsets=[*],daemonsets=[*],jobs=[*]
 
+  # NOTE: kube-rbac-proxy sidecar config lives in
+  #       monitoring/values-prom-operator-rbac-proxy.yaml, applied when
+  #       RBAC_PROXY_ENABLE=true (the default). See that file for details.
+
   # Available collectors for kube-state-metrics.
   # By default, all available resources are enabled, comment out to disable.
   collectors:

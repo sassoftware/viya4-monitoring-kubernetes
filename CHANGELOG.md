@@ -22,6 +22,17 @@ is configured automatically
   * [FIX] The `v4m-logging-root-proxy` HTTPProxy resource is only created in appropriate scenarios
 (i.e. auto-generated path-based routing using Contour) and any existing instance of this resource
 is deleted if found in other deployment scenarios (where it is not needed)
+  * [SECURITY] Kube State Metrics (KSM) and Node Exporter previously exposed cluster-wide resource state
+and infrastructure metrics -- including pod labels used to identify per-user SAS job activity -- over
+unauthenticated, unencrypted HTTP endpoints reachable by any pod in the cluster. Both are now fronted by
+a `kube-rbac-proxy` sidecar enforcing Kubernetes RBAC and bound to localhost only; Prometheus scrapes
+them using its existing ServiceAccount token, with no certificate management required. This is
+controlled by the new `RBAC_PROXY_ENABLE` environment variable (default `true`), which is independent
+of `TLS_ENABLE`. `kube-rbac-proxy` is also the only source of transport encryption for both targets;
+setting `RBAC_PROXY_ENABLE=false` serves them over plain, unauthenticated HTTP regardless of
+`TLS_ENABLE`. Node Exporter previously supported its own native TLS independent of RBAC/auth; that
+capability has been retired in favor of `kube-rbac-proxy`. Not applicable to OpenShift, which does not
+deploy KSM or Node Exporter as part of this project.
 
 ## Version 1.2.53 (07AUG2026)
 * **Overall**

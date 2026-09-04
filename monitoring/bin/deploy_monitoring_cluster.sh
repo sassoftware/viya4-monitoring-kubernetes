@@ -134,6 +134,7 @@ fi
 generateImageKeysFile "$ALERTMANAGER_FULL_IMAGE" "$imageKeysFile" "ALERTMANAGER_"
 generateImageKeysFile "$ADMWEBHOOK_FULL_IMAGE" "$imageKeysFile" "ADMWEBHOOK_"
 generateImageKeysFile "$KSM_FULL_IMAGE" "$imageKeysFile" "KSM_"
+generateImageKeysFile "$RBAC_PROXY_FULL_IMAGE" "$imageKeysFile" "RBAC_PROXY_"
 generateImageKeysFile "$NODEXPORT_FULL_IMAGE" "$imageKeysFile" "NODEXPORT_"
 generateImageKeysFile "$PROMETHEUS_FULL_IMAGE" "$imageKeysFile" "PROMETHEUS_"
 generateImageKeysFile "$CONFIGRELOAD_FULL_IMAGE" "$imageKeysFile" "CONFIGRELOAD_"
@@ -221,13 +222,23 @@ if [ "$TLS_ENABLE" == "true" ]; then
     kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-prom-https
     kubectl create cm -n "$MON_NS" grafana-datasource-prom-https --from-file "monitoring/tls/$grafanaDS"
     kubectl label cm -n "$MON_NS" grafana-datasource-prom-https grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
+fi
 
-    # node-exporter TLS
-    log_verbose "Enabling Prometheus node-exporter for TLS"
-    kubectl delete cm -n "$MON_NS" node-exporter-tls-web-config --ignore-not-found
-    sleep 1
-    kubectl create cm -n "$MON_NS" node-exporter-tls-web-config --from-file monitoring/tls/node-exporter-web.yaml
-    kubectl label cm -n "$MON_NS" node-exporter-tls-web-config sas.com/monitoring-base=kube-viya-monitoring
+# Optional RBAC-proxy protection for metrics-scraping targets (KSM, Node
+# Exporter). Independent of TLS_ENABLE -- see
+# monitoring/values-prom-operator-rbac-proxy.yaml for why.
+#
+# NOTE: kube-rbac-proxy is also the *only* source of transport encryption for
+# these two targets -- unlike Prometheus/Alertmanager/Grafana, Node Exporter
+# has no other supported way to serve TLS, and KSM never had one. Setting
+# RBAC_PROXY_ENABLE=false means both targets fall back to plain, unauthenticated
+# HTTP regardless of TLS_ENABLE.
+rbacProxyValuesFile=$TMP_DIR/empty.yaml
+if [ "$RBAC_PROXY_ENABLE" == "true" ]; then
+    rbacProxyValuesFile=monitoring/values-prom-operator-rbac-proxy.yaml
+    log_debug "Including RBAC-proxy response file $rbacProxyValuesFile"
+else
+    log_warn "RBAC_PROXY_ENABLE is false; KSM and Node Exporter will be served over plain, unauthenticated HTTP, even if TLS_ENABLE=true -- kube-rbac-proxy is their only source of both authentication and transport encryption."
 fi
 
 AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
@@ -524,6 +535,52 @@ else
         --dry-run=client -o yaml | kubectl apply -f -
 fi
 
+ksmProbePatchPid=""
+if [ "$RBAC_PROXY_ENABLE" == "true" ]; then
+    # Work around an upstream kube-state-metrics chart bug: when
+    # kubeRBACProxy.enabled=true, the kube-state-metrics container's own
+    # liveness/readiness probes reference named ports ("http"/"metrics") that
+    # only exist on the kube-rbac-proxy sidecar, not on that container itself,
+    # so the pod never becomes Ready and the rollout below times out.
+    # See: https://github.com/prometheus-community/helm-charts/issues/6164
+    # Race the atomic rollout wait below: repoint both probes at the
+    # rbac-proxy's numeric port (8080), which proxies /livez unauthenticated
+    # (--ignore-paths=/livez,/readyz) through to kube-state-metrics's main
+    # metrics port. /readyz is only served on the telemetry port, which isn't
+    # reachable through this proxy when selfMonitor is disabled (our
+    # default), so both probes use /livez.
+    #
+    # On upgrades, wait for the Deployment's generation to change from its
+    # pre-Helm baseline before patching, so we patch after Helm writes the
+    # new pod template instead of racing ahead of it.
+    ksmDeployment="$promName-kube-state-metrics"
+    ksmBaselineGeneration=$(kubectl -n "$MON_NS" get deployment "$ksmDeployment" -o jsonpath='{.metadata.generation}' 2> /dev/null) || true
+    (
+        for _ in $(seq 1 120); do
+            ksmCurrentGeneration=$(kubectl -n "$MON_NS" get deployment "$ksmDeployment" -o jsonpath='{.metadata.generation}' 2> /dev/null) || true
+            if [ -n "$ksmCurrentGeneration" ] && [ "$ksmCurrentGeneration" != "$ksmBaselineGeneration" ]; then
+                kubectl -n "$MON_NS" patch deployment "$ksmDeployment" --patch '
+spec:
+  template:
+    spec:
+      containers:
+      - name: kube-state-metrics
+        livenessProbe:
+          httpGet:
+            path: /livez
+            port: 8080
+        readinessProbe:
+          httpGet:
+            path: /livez
+            port: 8080
+' > /dev/null 2>&1 && break
+            fi
+            sleep 1
+        done
+    ) &
+    ksmProbePatchPid=$!
+fi
+
 # shellcheck disable=SC2086
 helm $helmDebug upgrade --install "$promRelease" \
     $helm4opts \
@@ -533,6 +590,7 @@ helm $helmDebug upgrade --install "$promRelease" \
     -f "$istioValuesFile" \
     -f "$tlsValuesFile" \
     -f "$tlsPromAlertingEndpointFile" \
+    -f "$rbacProxyValuesFile" \
     -f "$nodePortValuesFile" \
     -f "$wnpValuesFile" \
     -f "$autogeneratedYAMLFile" \
@@ -548,6 +606,9 @@ helm $helmDebug upgrade --install "$promRelease" \
     --set prometheus.prometheusSpec.alertingEndpoints[0].namespace="$MON_NS" \
     $versionstring \
     "$chart2install"
+
+[ -n "$ksmProbePatchPid" ] && wait "$ksmProbePatchPid" 2> /dev/null
+true
 
 sleep 2
 
