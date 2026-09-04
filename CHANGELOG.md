@@ -35,14 +35,18 @@ capability has been retired in favor of `kube-rbac-proxy`. Not applicable to Ope
 deploy KSM or Node Exporter as part of this project.
   * [SECURITY] NetworkPolicies restricting access to KSM and Node Exporter to Prometheus pods only are
 always applied, regardless of `RBAC_PROXY_ENABLE`, as a defense-in-depth measure independent of the
-`kube-rbac-proxy` RBAC check above. Since NetworkPolicies are additive, these cannot weaken or replace a
-site's existing policies; sites needing custom rules or hitting a naming collision can supply their own
-at `$USER_DIR/monitoring/networkPolicy/kube-state-metrics.yaml` or
-`$USER_DIR/monitoring/networkPolicy/node-exporter.yaml`. Because Node Exporter runs with
-`hostNetwork: true`, its NetworkPolicy may not be enforced on all Container Network Interfaces (CNI).
-For example, we have confirmed this NetworkPolicy will not be enforced with the Calico CNI. Even if the
+`kube-rbac-proxy` RBAC check above. These are defined natively via the `kube-state-metrics.networkPolicy`
+and `prometheus-node-exporter.networkPolicy` Helm values (consistent with how this chart already defines
+Prometheus's own NetworkPolicy); sites needing custom rules can override those same values in their own
+`user-values-prom-operator.yaml`. Since NetworkPolicies are additive, this cannot weaken or replace a
+site's existing policies. Because Node Exporter runs with
+`hostNetwork: true`, its NetworkPolicy may not be enforced on all Container Network Interfaces (CNI). For
+example, we have confirmed this NetworkPolicy will not be enforced with the Calico CNI. Even if the
 NetworkPolicy is not enforced by your CNI, the RBAC proxy, if enabled, will still limit access to the
-Node Exporter pods to the Prometheus ServiceAccount.
+Node Exporter pods to the Prometheus ServiceAccount. Note that the `prometheus-node-exporter` chart has
+no supported way to open egress once its NetworkPolicy is enabled, so Node Exporter's NetworkPolicy also
+denies all egress; Node Exporter does not initiate any outbound connections during normal operation, so
+this is not expected to have any functional impact.
 
 ## Version 1.2.53 (07AUG2026)
 * **Overall**

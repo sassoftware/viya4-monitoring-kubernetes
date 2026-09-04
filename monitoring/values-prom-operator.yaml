@@ -85,6 +85,24 @@ kube-state-metrics:
   #       monitoring/values-prom-operator-rbac-proxy.yaml, applied when
   #       RBAC_PROXY_ENABLE=true (the default). See that file for details.
 
+  # Restrict ingress to Prometheus pods only, as a defense-in-depth measure
+  # independent of the kube-rbac-proxy RBAC check above. NOTE: this chart
+  # unconditionally sets policyTypes to [Ingress, Egress] whenever
+  # networkPolicy.enabled=true, so egress must be explicitly opened here to
+  # avoid inadvertently blocking KSM's access to the Kubernetes API server.
+  networkPolicy:
+    enabled: true
+    ingress:
+      - from:
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: prometheus
+        ports:
+          - protocol: TCP
+            port: 8080
+    egress:
+      - {}
+
   # Available collectors for kube-state-metrics.
   # By default, all available resources are enabled, comment out to disable.
   collectors:
@@ -216,6 +234,24 @@ prometheus-node-exporter:
   # Be very tolerant
   tolerations:
     - operator: "Exists"
+  # Restrict ingress to Prometheus pods only, as a defense-in-depth measure
+  # independent of the kube-rbac-proxy RBAC check (see
+  # monitoring/values-prom-operator-rbac-proxy.yaml). NOTE: this chart
+  # unconditionally sets policyTypes to [Ingress, Egress] whenever
+  # networkPolicy.enabled=true, so egress must be explicitly opened here to
+  # avoid inadvertently blocking Node Exporter's egress.
+  networkPolicy:
+    enabled: true
+    ingress:
+      - from:
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: prometheus
+        ports:
+          - protocol: TCP
+            port: 9110
+    egress:
+      - {}
   prometheus:
     monitor:
       relabelings:

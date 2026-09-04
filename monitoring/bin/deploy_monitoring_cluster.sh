@@ -693,31 +693,16 @@ fi
 kubectl apply -n "$MON_NS" -f monitoring/monitors/kube/podMonitor-eventrouter.yaml 2> /dev/null
 
 # NetworkPolicies restricting ingress to Prometheus pods only, for KSM and
-# Node Exporter. Applied unconditionally (independent of RBAC_PROXY_ENABLE)
-# since NetworkPolicies are additive -- this can only ever add an allowed
-# ingress source, never weaken or replace a site's own existing policies. A
-# site that wants custom ingress rules, or hits a naming collision with a
-# NetworkPolicy they already manage, can drop their own replacement at
-# $USER_DIR/monitoring/networkPolicy/kube-state-metrics.yaml or
-# $USER_DIR/monitoring/networkPolicy/node-exporter.yaml. See
-# samples/generic-base/monitoring/networkPolicy/README.md for details.
-# NOTE: Because Node Exporter runs with hostNetwork: true, its NetworkPolicy
-# may not be enforced on all Container Network Interfaces (CNI). For example,
-# we have confirmed this NetworkPolicy will not be enforced with the Calico
-# CNI. Even if the NetworkPolicy is not enforced by your CNI, the RBAC proxy,
-# if enabled, will still limit access to the Node Exporter pods to the
-# Prometheus ServiceAccount.
-ksmNetworkPolicyYAML="monitoring/monitors/kube/networkPolicy-kube-state-metrics.yaml"
-if [ -f "$USER_DIR/monitoring/networkPolicy/kube-state-metrics.yaml" ]; then
-    ksmNetworkPolicyYAML="$USER_DIR/monitoring/networkPolicy/kube-state-metrics.yaml"
-fi
-kubectl apply -n "$MON_NS" -f "$ksmNetworkPolicyYAML"
-
-nodeExporterNetworkPolicyYAML="monitoring/monitors/kube/networkPolicy-node-exporter.yaml"
-if [ -f "$USER_DIR/monitoring/networkPolicy/node-exporter.yaml" ]; then
-    nodeExporterNetworkPolicyYAML="$USER_DIR/monitoring/networkPolicy/node-exporter.yaml"
-fi
-kubectl apply -n "$MON_NS" -f "$nodeExporterNetworkPolicyYAML"
+# Node Exporter, are now defined natively via kube-state-metrics.networkPolicy
+# and prometheus-node-exporter.networkPolicy in monitoring/values-prom-operator.yaml
+# (rendered as part of the helm upgrade --install below), matching how
+# Prometheus's own NetworkPolicy is defined by this chart. Sites needing
+# custom ingress rules can override those values in their own
+# user-values-prom-operator.yaml.
+# Clean up the old, standalone-manifest-based NetworkPolicy objects (fixed
+# names "kube-state-metrics"/"node-exporter") from prior versions of this
+# project that are no longer managed by this script.
+kubectl delete -n "$MON_NS" networkpolicy --ignore-not-found kube-state-metrics node-exporter
 
 # Elasticsearch ServiceMonitor
 ## remove obsolete version, if installed

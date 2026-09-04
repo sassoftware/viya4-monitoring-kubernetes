@@ -30,9 +30,3 @@ log-monitoring components. See [Deploy](https://documentation.sas.com/?softwareI
 In addition to customizing the deployment, this sample show how you can add
 your own Grafana dashboards, alerts, contact points and notifications policies. See [Add More Grafana Dashboards](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n1sg9bc44ow616n1sw7l3dlsbmgz.htm) and
 [Provision Alert Rules, Contact Points, and Notification Policies](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#p1cb39v8tr2379n1c4posre4v8wx) for details.
-
-## NetworkPolicy
-
-This sample also shows how you can supply your own `NetworkPolicy` resources
-to override the defaults that protect Kube State Metrics and Node Exporter.
-See [monitoring/networkPolicy](monitoring/networkPolicy) for details.
