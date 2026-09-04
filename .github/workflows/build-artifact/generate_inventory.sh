@@ -9,7 +9,9 @@
 
 V4M_BUILD_REPO=${V4M_BUILD_REPO:-"../v4m-build"}
 
+# shellcheck disable=SC2034 # used by bin/common.sh after it is sourced below
 CHECK_HELM=false
+# shellcheck disable=SC2034 # used by bin/common.sh after it is sourced below
 CHECK_KUBERNETES=false
 
 source bin/common.sh
