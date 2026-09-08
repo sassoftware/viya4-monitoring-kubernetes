@@ -6,18 +6,40 @@
 # Deploys the Grafana AI chatbot integration. RUN THIS SCRIPT MANUALLY ONLY IF YOU NEED TO RESET THE CHATBOT. 
 # OTHERWISE, THIS SCRIPT IS AUTOMATICALLY RUN IN deploy_monitoring_cluster.sh
 # deploy_monitoring_cluster.sh handles ordering automatically when
-# AI_CHATBOT_ENABLE=true: it runs this script with
-# AI_CHATBOT_PROVISION_ONLY=true (steps 1-2 only) before its
-# `helm upgrade --install` creates/updates the Grafana pod, then runs it again
-# in full afterward, at which point steps 1-2 are harmless no-ops and step 3
-# completes. Running this script manually is still supported, e.g. to redeploy
-# the chatbot pieces without a full cluster deploy.
+# AI_CHATBOT_PROVISION=true is set in user.env: it runs this script with
+# --provision-only (steps 1-2 only) before its `helm upgrade --install`
+# creates/updates the Grafana pod, then runs it again in full afterward, at
+# which point steps 1-2 are harmless no-ops and step 3 completes. Running this
+# script manually is still supported, e.g. to redeploy the chatbot pieces
+# without a full cluster deploy.
 
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
 source monitoring/bin/common.sh
 source bin/autogenerate-include.sh
 
 set -e
+
+provisionOnly="false"
+for arg in "$@"; do
+    case "$arg" in
+        --provision-only)
+            provisionOnly="true"
+            ;;
+        *)
+            log_error "Unknown option [$arg]. The only supported option is --provision-only."
+            exit 1
+            ;;
+    esac
+done
+
+# The env-var form of this switch is deliberately NOT honored: user.env is
+# loaded by every script sourcing common.sh, so a value parked there would
+# silently turn the post-helm plugin-delivery call into a no-op.
+if [ -n "${AI_CHATBOT_PROVISION_ONLY:-}" ]; then
+    log_warn "AI_CHATBOT_PROVISION_ONLY is set in the environment or user.env but is IGNORED;"
+    log_warn "use the --provision-only command-line option instead, and remove the variable"
+    log_warn "from user.env so plugin delivery is not accidentally skipped."
+fi
 
 # --- Step 1: MCP servers -----------------------------------------------------
 
@@ -182,11 +204,11 @@ log_info "Provisioning objects ready. Make sure the grafana.* keys from"
 log_info "monitoring/samples/ai-chatbot/user-values-prom-operator.yaml are in your"
 log_info "user-values-prom-operator.yaml before running deploy_monitoring_cluster.sh."
 
-# Set by deploy_monitoring_cluster.sh's pre-helm call: steps 1-2 are all that
-# must exist before helm creates the Grafana pod, and running step 3 here too
-# would deliver the plugin and restart Grafana twice per deploy.
-if [ "${AI_CHATBOT_PROVISION_ONLY:-false}" == "true" ]; then
-    log_info "AI_CHATBOT_PROVISION_ONLY=true; skipping plugin delivery."
+# Passed by deploy_monitoring_cluster.sh's pre-helm call: steps 1-2 are all
+# that must exist before helm creates the Grafana pod, and running step 3 here
+# too would deliver the plugin and restart Grafana twice per deploy.
+if [ "$provisionOnly" == "true" ]; then
+    log_info "--provision-only: skipping plugin delivery."
     exit 0
 fi
 
@@ -201,7 +223,7 @@ if [ "$grafanaRunning" -ne 0 ]; then
     log_warn "No Grafana pod found in [$MON_NS] yet."
     log_warn "MCP servers are up and provisioning is done — the chatbot plugin itself"
     log_warn "will be delivered and configured automatically the next time"
-    log_warn "deploy_monitoring_cluster.sh runs with AI_CHATBOT_ENABLE=true."
+    log_warn "deploy_monitoring_cluster.sh runs with AI_CHATBOT_PROVISION=true."
     exit 0
 fi
 

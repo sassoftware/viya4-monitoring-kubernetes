@@ -9,7 +9,7 @@
 # Prerequisites before this takes effect:
 #   1. Set AZURE_OPENAI_API_KEY, AZURE_OPENAI_URL, and AZURE_OPENAI_DEPLOYMENT
 #      (exported, or in user.env).
-#   2. Set AI_CHATBOT_ENABLE=true when running deploy_monitoring_cluster.sh.
+#   2. Set AI_CHATBOT_PROVISION=true in user.env and run deploy_monitoring_cluster.sh.
 #      It runs monitoring/bin/deploy_ai_chatbot.sh twice: once BEFORE its helm
 #      install (applies the MCP server manifests and creates the
 #      grafana-chatbot-provisioning/grafana-llm-config ConfigMaps and the
