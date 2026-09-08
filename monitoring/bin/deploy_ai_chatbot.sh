@@ -32,14 +32,6 @@ for arg in "$@"; do
     esac
 done
 
-# The env-var form of this switch is deliberately NOT honored: user.env is
-# loaded by every script sourcing common.sh, so a value parked there would
-# silently turn the post-helm plugin-delivery call into a no-op.
-if [ -n "${AI_CHATBOT_PROVISION_ONLY:-}" ]; then
-    log_warn "AI_CHATBOT_PROVISION_ONLY is set in the environment or user.env but is IGNORED;"
-    log_warn "use the --provision-only command-line option instead, and remove the variable"
-    log_warn "from user.env so plugin delivery is not accidentally skipped."
-fi
 
 # --- Step 1: MCP servers -----------------------------------------------------
 
