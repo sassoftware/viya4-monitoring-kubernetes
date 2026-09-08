@@ -3,55 +3,15 @@
 # Copyright © 2026, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-# Deploys the Grafana AI chatbot integration in three steps, in the order
-# they have to run:
-#
-#   1. MCP servers: applies ai/k8s/{pvcs,ollama,service,deployment}.yaml
-#      (v4m-mcp + its embeddings dependency) and
-#      ai/k8s/grafana-mcp-{service,deployment}.yaml (grafana-mcp) as
-#      ClusterIP Services, then routes to both through this cluster's
-#      existing ingress controller — ingress-nginx or Contour, per
-#      INGRESS_TYPE (same BASE_DOMAIN/ROUTING/INGRESS_TYPE convention
-#      deploy_monitoring_cluster.sh already uses for Grafana/Prometheus/
-#      Alertmanager) rather than provisioning a LoadBalancer per service.
-#      Only ROUTING=host is supported for now.
-#
-#      Both MCP servers are reached at hostnames of their own
-#      (v4m-mcp.$BASE_DOMAIN, grafana-mcp.$BASE_DOMAIN), so they need ingress
-#      TLS certs covering those hostnames. Where those certs come from follows
-#      the same INGRESS_USE_SEPARATE_CERTS convention as the rest of the
-#      project — see create_mcp_ingress_certs in bin/autogenerate-include.sh.
-#      A missing cert is only a warning under ingress-nginx, which falls back
-#      to its own default certificate, but is fatal under Contour, which
-#      rejects an HTTPProxy whose TLS secret does not resolve.
-#
-#   2. Provisioning: creates the grafana-chatbot-provisioning ConfigMap
-#      (grafana-llm-app's provider config ONLY — see
-#      monitoring/grafana-llm-app-provisioning.yaml for why the chatbot
-#      plugin's own config is deliberately NOT in here) and the
-#      grafana-llm-openai-secret Secret. These must exist BEFORE
-#      `helm upgrade --install` creates/updates the Grafana pod, since the pod
-#      spec references them directly via envValueFrom/extraConfigmapMounts
-#      (see monitoring/samples/ai-chatbot/user-values-prom-operator.yaml) —
-#      with `--atomic` set on that helm call, a pod that can't start because
-#      these are missing risks rolling back the ENTIRE monitoring release,
-#      not just the chatbot piece. 
-#
-#   3. Plugin delivery + configuration: kubectl cp's the built chatbot plugin
-#      into the running Grafana pod, restarts it, then — once Grafana and the
-#      plugin are BOTH confirmed up — sets the plugin's MCP server URLs via
-#      Grafana's `/api/plugins/:id/settings` API, using the hostnames
-#      discovered in step 1. This needs a Grafana pod that's already up AND
-#      already carrying the unsigned-plugin allowlist env var from step 2's
-#      overlay — i.e. it needs to run AFTER a `helm upgrade --install` that
-#      picked up that overlay.
-#
-# Due to the ordering, run this script manually once BEFORE your first
-# deploy_monitoring_cluster.sh run with AI_CHATBOT_ENABLE=true (steps 1-2 will
-# succeed; step 3 will no-op with a warning if Grafana isn't running the new
-# overlay yet — that's expected on a first pass). deploy_monitoring_cluster.sh
-# then calls this same script again automatically when AI_CHATBOT_ENABLE=true,
-# at which point steps 1-2 are harmless no-ops and step 3 completes for real.
+# Deploys the Grafana AI chatbot integration. RUN THIS SCRIPT MANUALLY ONLY IF YOU NEED TO RESET THE CHATBOT. 
+# OTHERWISE, THIS SCRIPT IS AUTOMATICALLY RUN IN deploy_monitoring_cluster.sh
+# deploy_monitoring_cluster.sh handles ordering automatically when
+# AI_CHATBOT_ENABLE=true: it runs this script with
+# AI_CHATBOT_PROVISION_ONLY=true (steps 1-2 only) before its
+# `helm upgrade --install` creates/updates the Grafana pod, then runs it again
+# in full afterward, at which point steps 1-2 are harmless no-ops and step 3
+# completes. Running this script manually is still supported, e.g. to redeploy
+# the chatbot pieces without a full cluster deploy.
 
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
 source monitoring/bin/common.sh
@@ -221,6 +181,14 @@ kubectl create configmap grafana-llm-config \
 log_info "Provisioning objects ready. Make sure the grafana.* keys from"
 log_info "monitoring/samples/ai-chatbot/user-values-prom-operator.yaml are in your"
 log_info "user-values-prom-operator.yaml before running deploy_monitoring_cluster.sh."
+
+# Set by deploy_monitoring_cluster.sh's pre-helm call: steps 1-2 are all that
+# must exist before helm creates the Grafana pod, and running step 3 here too
+# would deliver the plugin and restart Grafana twice per deploy.
+if [ "${AI_CHATBOT_PROVISION_ONLY:-false}" == "true" ]; then
+    log_info "AI_CHATBOT_PROVISION_ONLY=true; skipping plugin delivery."
+    exit 0
+fi
 
 # --- Step 3: plugin delivery + configuration --------------------------------
 

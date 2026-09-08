@@ -8,16 +8,15 @@
 #
 # Prerequisites before this takes effect:
 #   1. Set AZURE_OPENAI_API_KEY, AZURE_OPENAI_URL, and AZURE_OPENAI_DEPLOYMENT
-#      in user.env, then run monitoring/bin/deploy_ai_chatbot.sh once, manually
-#      (applies the MCP server manifests, creates the
+#      (exported, or in user.env).
+#   2. Set AI_CHATBOT_ENABLE=true when running deploy_monitoring_cluster.sh.
+#      It runs monitoring/bin/deploy_ai_chatbot.sh twice: once BEFORE its helm
+#      install (applies the MCP server manifests and creates the
 #      grafana-chatbot-provisioning/grafana-llm-config ConfigMaps and the
-#      grafana-llm-openai-secret Secret referenced below; it will skip plugin
-#      delivery/configuration with a warning until step 2 below has run at
-#      least once — that's expected).
-#   2. Set AI_CHATBOT_ENABLE=true when running deploy_monitoring_cluster.sh,
-#      so monitoring/bin/deploy_ai_chatbot.sh runs again afterward to deliver
-#      the plugin dist/ and configure its MCP URLs via the Grafana API (this
-#      overlay only prepares the Grafana pod to accept the plugin —
+#      grafana-llm-openai-secret Secret referenced below, which must exist
+#      before the Grafana pod does), and once afterward to deliver the plugin
+#      dist/ and configure its MCP URLs via the Grafana API (this overlay only
+#      prepares the Grafana pod to accept the plugin —
 #      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS has to be present when the
 #      pod is created).
 

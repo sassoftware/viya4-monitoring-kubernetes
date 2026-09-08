@@ -468,6 +468,18 @@ if [ "$PROM_NODEPORT_ENABLE" == "true" ]; then
     nodePortValuesFile=monitoring/values-prom-nodeport.yaml
 fi
 
+# With the chatbot enabled, the MCP servers and the provisioning objects the
+# Grafana pod references (grafana-chatbot-provisioning, grafana-llm-config,
+# grafana-llm-openai-secret) must exist BEFORE the helm install below creates
+# the pod — a missing reference leaves Grafana stuck in ContainerCreating and,
+# with --atomic, can roll back the entire release. Plugin delivery itself
+# still happens in the post-helm deploy_ai_chatbot.sh call at the end of this
+# script, once Grafana is up with the chatbot overlay.
+if [ "${AI_CHATBOT_ENABLE:-false}" == "true" ]; then
+    log_info "Provisioning the Grafana AI chatbot prerequisites (MCP servers and LLM provisioning objects)"
+    AI_CHATBOT_PROVISION_ONLY=true monitoring/bin/deploy_ai_chatbot.sh
+fi
+
 if helm3ReleaseExists prometheus-operator "$MON_NS"; then
     promRelease=prometheus-operator
     promName=prometheus-operator
