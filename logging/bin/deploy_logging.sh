@@ -59,14 +59,15 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
     if [ "$INGRESS_CREATE_ROOT_PROXY" == "true" ] && [ "$INGRESS_TYPE" == "contour" ]; then
         create_root_httpproxy logging "$LOG_NS"
     else
-        if kubectl get crd httpproxies.projectcontour.io --ignore-not-found -o name > /dev/null; then
+        if kubectl get crd httpproxies.projectcontour.io -o name > /dev/null 2>&1; then
+
 
             log_debug "Deleting [httpproxy/v4m-logging-root-proxy] if it exists"
             kubectl -n "$LOG_NS" delete httpproxy v4m-logging-root-proxy --ignore-not-found
         fi
     fi
 else
-    if kubectl get crd httpproxies.projectcontour.io --ignore-not-found -o name > /dev/null; then
+    if kubectl get crd httpproxies.projectcontour.io -o name > /dev/null 2>&1; then
         log_debug "Deleting [httpproxy/v4m-logging-root-proxy] if it exists (AUTOGENERATE_INGRESS=[$AUTOGENERATE_INGRESS])"
         kubectl -n "$LOG_NS" delete httpproxy v4m-logging-root-proxy --ignore-not-found
     fi
