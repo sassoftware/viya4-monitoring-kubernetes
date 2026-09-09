@@ -61,7 +61,6 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
     else
         if kubectl get crd httpproxies.projectcontour.io -o name > /dev/null 2>&1; then
 
-
             log_debug "Deleting [httpproxy/v4m-logging-root-proxy] if it exists"
             kubectl -n "$LOG_NS" delete httpproxy v4m-logging-root-proxy --ignore-not-found
         fi
