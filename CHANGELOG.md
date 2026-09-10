@@ -1,6 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Logging**
+  * [CHANGE] As part of the upgrade to OpenSearch Dashboards 3.8.0 (see below),
+the CPU resource limit for the OpenSearch Dashboards pod was increased to 1 CPU.
+This addresses a persistent problem which had caused the application to fail to
+load consistently.  Note that this is an upper limit and the pod will generally
+need/use far less during normal operation.
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 3.6.0 to 3.8.0
   * [UPGRADE] OpenSearch Helm chart upgraded from 3.6.0 to 3.8.0
   * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 3.6.0 to 3.8.0
