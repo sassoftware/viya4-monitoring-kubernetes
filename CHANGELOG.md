@@ -10,7 +10,7 @@ need/use far less during normal operation.
   * [UPGRADE] OpenSearch Helm chart upgraded from 3.6.0 to 3.8.0
   * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 3.6.0 to 3.8.0
   * [UPGRADE] Fluent Bit upgraded from 5.0.7 to 5.1.2
-  * [UPGRADE] Fluent Bit Helm chart upgraded from 0.57.7 to 0.58.1
+  * [UPGRADE] Fluent Bit Helm chart upgraded from 0.57.7 to 0.58.2
   * [UPGRADE] Elasticsearch Exporter upgraded from 1.10.0 to 1.11.0
   * [UPGRADE] Elasticsearch Exporter Helm chart upgraded from 7.2.1 to 7.4.0
 
