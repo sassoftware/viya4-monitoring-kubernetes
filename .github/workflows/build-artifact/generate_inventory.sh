@@ -9,7 +9,9 @@
 
 V4M_BUILD_REPO=${V4M_BUILD_REPO:-"../v4m-build"}
 
+# shellcheck disable=SC2034 # used by bin/common.sh after it is sourced below
 CHECK_HELM=false
+# shellcheck disable=SC2034 # used by bin/common.sh after it is sourced below
 CHECK_KUBERNETES=false
 
 source bin/common.sh
@@ -21,18 +23,18 @@ cp "$template" "$file"
 
 function buildHelmArchiveFilename {
 
-   local prefix repo name version format chart_archive_filename
+    local prefix repo name version format chart_archive_filename
 
-   prefix=$1
-   repo="${prefix}_CHART_REPO"
-   name="${prefix}_CHART_NAME"
-   version="${prefix}_CHART_VERSION"
-   format="tgz"
-   chart_archive_filename="${!repo}\/${!name}-${!version}.$format"
-   v4m_replace "__${prefix}_CHART_REPO__" "${!repo}" "$file"
-   v4m_replace "__${prefix}_CHART_NAME__" "${!name}" "$file"
-   v4m_replace "__${prefix}_CHART_VERSION__" "${!version}" "$file"
-   v4m_replace "__${prefix}_CHART_ARCHIVE__" "$chart_archive_filename" "$file"
+    prefix=$1
+    repo="${prefix}_CHART_REPO"
+    name="${prefix}_CHART_NAME"
+    version="${prefix}_CHART_VERSION"
+    format="tgz"
+    chart_archive_filename="${!repo}\/${!name}-${!version}.$format"
+    v4m_replace "__${prefix}_CHART_REPO__" "${!repo}" "$file"
+    v4m_replace "__${prefix}_CHART_NAME__" "${!name}" "$file"
+    v4m_replace "__${prefix}_CHART_VERSION__" "${!version}" "$file"
+    v4m_replace "__${prefix}_CHART_ARCHIVE__" "$chart_archive_filename" "$file"
 
 }
 
@@ -47,7 +49,6 @@ buildHelmArchiveFilename "OPENSHIFT_GRAFANA"
 buildHelmArchiveFilename "KUBE_PROM_STACK"
 buildHelmArchiveFilename "PUSHGATEWAY"
 buildHelmArchiveFilename "TEMPO"
-
 
 ##
 ## Container Images (Table #1)
@@ -69,6 +70,9 @@ v4m_replace "__KSM_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
 parseFullImage "$NODEXPORT_FULL_IMAGE"
 v4m_replace "__NODEXPORT_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
+
+parseFullImage "$RBAC_PROXY_FULL_IMAGE"
+v4m_replace "__RBAC_PROXY_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 
 parseFullImage "$PROMETHEUS_FULL_IMAGE"
 v4m_replace "__PROMETHEUS_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
@@ -106,6 +110,6 @@ v4m_replace "__PUSHGATEWAY_FULL_IMAGE__" "$FULL_IMAGE_ESCAPED" "$file"
 ##
 ## Misc components (Table #4)
 ##
-v4m_replace "__GRAFANA_DATASOURCE_PLUGIN_VERSION__" "$GRAFANA_DATASOURCE_PLUGIN_VERSION" "$file" 
+v4m_replace "__GRAFANA_DATASOURCE_PLUGIN_VERSION__" "$GRAFANA_DATASOURCE_PLUGIN_VERSION" "$file"
 
 log_notice "Be sure to review the generated file [$file] prior to adding/committing it to the repo"
