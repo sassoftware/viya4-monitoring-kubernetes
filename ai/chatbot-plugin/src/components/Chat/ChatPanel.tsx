@@ -427,6 +427,7 @@ const QUERY_GUIDANCE = [
   '- Spike/anomaly -> query_prometheus around when it started, then recent_changes with the same window to correlate restarts/rollouts/OOM kills.',
   '- "the Viya namespace" -> Viya namespaces are customer-named (e.g. d122472); call list_viya_namespaces to resolve, never assume namespace="viya" or "Viya".',
   '- Pod inventory / "what does each pod do" -> list_pods for the workloads, then search_docs to explain each component.',
+  '- "What do the logs say" / errors from a pod / why did it crash -> search_logs (filter by namespace/pod/level). Metrics show WHAT is wrong; logs show WHY — after finding a metric anomaly, check the logs of the affected pods.',
   '- Panel queries may contain unresolved dashboard variables like $cluster or ${datasource}. "$var" is never a literal value: drop or substitute those matchers before querying, and never diagnose the datasource as broken merely because its uid is a $variable.',
   '- Conceptual/how-to/meaning questions -> search_docs.',
   'Server routing (two tool servers):',
@@ -473,7 +474,7 @@ const makeAgentPrompt = (
     'Conversation so far:',
     JSON.stringify(safeHistory),
     '',
-    'Previous tool events this turn:',
+    'Recent tool events (earlier turns included — reuse this evidence instead of re-running identical calls):',
     JSON.stringify(safeEvents),
     '',
     'Available tools:',
@@ -602,6 +603,10 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
   const [error, setError] = useState<string | null>(null);
   const requestSeqRef = useRef(0);
   const cancelRequestedRef = useRef(false);
+  // Tool evidence gathered in previous turns. Without this, every follow-up
+  // question starts amnesiac: the agent re-fetches (or worse, guesses about)
+  // data it collected one message ago.
+  const eventLogRef = useRef<AgentEvent[]>([]);
 
   const [pendingApproval, setPendingApproval] = useState<PendingApproval | null>(null);
 
@@ -778,11 +783,14 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
       const discovery = await listAllToolsSafe(servers);
       assertActiveRequest();
       const catalog = getToolCatalog(discovery.tools);
-      const events: AgentEvent[] = discovery.errors.map((e: ToolDiscoveryError) => ({
-        type: 'discovery_error',
-        server: e.server,
-        message: e.message,
-      }));
+      // `events` IS the persistent cross-turn log: this turn's tool results
+      // are pushed into it below, so they survive into later turns through
+      // the ref. Trimmed here so it can't grow without bound.
+      eventLogRef.current = eventLogRef.current.slice(-15);
+      const events = eventLogRef.current;
+      discovery.errors.forEach((e: ToolDiscoveryError) => {
+        events.push({ type: 'discovery_error', server: e.server, message: e.message });
+      });
 
       if (catalog.length === 0) {
         const discoverySummary =

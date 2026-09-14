@@ -1,5 +1,6 @@
 fastmcp==3.2.4
 prometheus-api-client
+requests>=2.31         # explicit: search_logs and targets API use it directly
 httpx>=0.27
 numpy>=1.26
 beautifulsoup4>=4.12   # for .html files / URL ingestion

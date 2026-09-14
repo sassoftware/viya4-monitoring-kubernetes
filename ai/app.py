@@ -11,6 +11,7 @@ import re
 import time
 from datetime import datetime, timedelta
 
+import requests
 from fastmcp import FastMCP
 from prometheus_api_client import PrometheusConnect
 from starlette.middleware import Middleware
@@ -706,6 +707,115 @@ def recent_changes(namespace: str = "", window: str = "1h") -> dict:
         else f"No restarts, new pods, rollouts, or OOM kills detected in the last {window}."
     )
     return changes
+
+
+# Log search against the V4M logging stack (OpenSearch). Metrics say THAT
+# something is wrong; logs say WHY — this closes the investigation loop.
+
+OPENSEARCH_URL = os.getenv("OPENSEARCH_URL", "https://v4m-es-client-service.logging.svc:9200")
+OPENSEARCH_USER = os.getenv("OPENSEARCH_USER", "admin")
+OPENSEARCH_PASSWORD = os.getenv("OPENSEARCH_PASSWORD", "admin")
+OPENSEARCH_INDEX = os.getenv("OPENSEARCH_INDEX", "viya_logs-*")
+
+
+@mcp.tool()
+def search_logs(
+    query: str = "",
+    namespace: str = "",
+    pod: str = "",
+    level: str = "",
+    window: str = "1h",
+    max_lines: int = 20,
+) -> dict:
+    """Search the cluster's log store (OpenSearch) and summarize what it finds.
+
+    Use AFTER metrics show something is wrong, to find out WHY: error lines
+    from a crash-looping pod, messages around a spike, what a component logged
+    before restarting. Returns level counts plus the most recent matching
+    lines (newest first).
+
+    Args:
+        query: Free-text search over log messages, e.g. 'error' or
+            'connection refused' (empty = all messages).
+        namespace: Restrict to one namespace.
+        pod: Restrict to pods whose name starts with this (e.g. a workload
+            name from list_pods matches all its pods).
+        level: Restrict to one log level, e.g. 'ERROR' or 'WARN'.
+        window: How far back to search, e.g. '15m', '1h', '1d' (default '1h').
+        max_lines: How many log lines to return (default 20, max 50).
+    """
+    seconds = _parse_window(window)
+    filters = [{"range": {"@timestamp": {"gte": f"now-{seconds}s"}}}]
+    if namespace:
+        if not _NAMESPACE_RE.fullmatch(namespace):
+            return {"error": f"'{namespace}' is not a valid namespace name."}
+        filters.append({"term": {"kube.namespace": namespace}})
+    if pod:
+        filters.append({"wildcard": {"kube.pod": {"value": pod + "*"}}})
+    if level:
+        filters.append({"term": {"level": level.upper()}})
+
+    must = []
+    if query:
+        must.append({"match": {"message": {"query": query, "operator": "and"}}})
+
+    body = {
+        "size": max(1, min(int(max_lines), 50)),
+        "sort": [{"@timestamp": "desc"}],
+        "query": {"bool": {"filter": filters, "must": must}},
+        "aggs": {"levels": {"terms": {"field": "level", "size": 10}}},
+        "_source": ["@timestamp", "level", "kube.namespace", "kube.pod", "kube.container", "message"],
+    }
+
+    try:
+        resp = requests.post(
+            f"{OPENSEARCH_URL}/{OPENSEARCH_INDEX}/_search",
+            json=body,
+            auth=(OPENSEARCH_USER, OPENSEARCH_PASSWORD),
+            verify=False,
+            timeout=20,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    except Exception as exc:
+        return {
+            "error": f"Log search failed: {exc}",
+            "hint": (
+                "The V4M logging stack (OpenSearch) may not be deployed or reachable "
+                f"at {OPENSEARCH_URL}. Answer from metrics only and say logs were unavailable."
+            ),
+        }
+
+    hits = data.get("hits", {})
+    total = hits.get("total", {})
+    total_count = total.get("value", 0) if isinstance(total, dict) else total
+    buckets = data.get("aggregations", {}).get("levels", {}).get("buckets", [])
+
+    lines = []
+    for h in hits.get("hits", []):
+        src = h.get("_source", {})
+        kube = src.get("kube", {}) if isinstance(src.get("kube"), dict) else {}
+        lines.append({
+            "time": src.get("@timestamp"),
+            "level": src.get("level"),
+            "namespace": kube.get("namespace") or src.get("kube.namespace"),
+            "pod": kube.get("pod") or src.get("kube.pod"),
+            "container": kube.get("container") or src.get("kube.container"),
+            "message": str(src.get("message", ""))[:300],
+        })
+
+    return {
+        "window": window,
+        "total_matches": total_count,
+        "matches_by_level": {b.get("key"): b.get("doc_count") for b in buckets},
+        "returned_lines": len(lines),
+        "lines_newest_first": lines,
+        "note": (
+            "Narrow with query/namespace/pod/level if total_matches is large."
+            if total_count > len(lines)
+            else ""
+        ),
+    }
 
 
 @mcp.tool()

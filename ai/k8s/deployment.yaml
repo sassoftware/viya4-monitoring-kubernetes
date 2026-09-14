@@ -31,6 +31,18 @@ spec:
           value: "1"                    # without this, print() output sits in a buffer and kubectl logs shows nothing
         - name: PROMETHEUS_URL
           value: "https://prometheus-operated.monitoring.svc:9090"
+        # --- log search (V4M logging stack / OpenSearch) ---
+        # If the logging stack isn't deployed, search_logs degrades gracefully.
+        # Change OPENSEARCH_PASSWORD if your logging deployment doesn't use the
+        # default admin password (see the logging stack's internal-user-admin).
+        - name: OPENSEARCH_URL
+          value: "https://v4m-es-client-service.logging.svc:9200"
+        - name: OPENSEARCH_USER
+          value: "admin"
+        - name: OPENSEARCH_PASSWORD
+          value: "admin"
+        - name: OPENSEARCH_INDEX
+          value: "viya_logs-*"
         - name: PORT
           value: "8000"
         # --- added for the docs RAG tool ---
