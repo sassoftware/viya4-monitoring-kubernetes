@@ -27,7 +27,14 @@ spec:
         - "--endpoint-path"
         - "/mcp"
         - "--allowed-origins=$(ALLOWED_ORIGIN)"
-        - "--disable-write"          # this endpoint has no auth of its own yet; keep it read-only
+        - "--disable-write"          #  Disabling those categories keeps
+        # dead tools out of the agent's 20-tool planner catalog, where they
+        # would crowd out tools that actually work here.
+        - "--disable-loki"
+        - "--disable-incident"
+        - "--disable-oncall"
+        - "--disable-sift"
+        - "--disable-asserts"
         - "--tls-skip-verify"
         ports:
         - containerPort: 8000

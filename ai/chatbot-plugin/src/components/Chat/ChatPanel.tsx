@@ -75,8 +75,8 @@ const AGENT_MAX_STEPS = 5;
 const MAX_HISTORY_MESSAGES = 8;
 const MAX_TOOLS_FOR_PROMPT = 20;
 const MAX_MESSAGE_CHARS = 1200;
-const MAX_EVENT_CHARS = 1200;
-const MAX_TOOL_SUMMARY_CHARS = 4000;
+const MAX_EVENT_CHARS = 2500;
+const MAX_TOOL_SUMMARY_CHARS = 6000;
 const MAX_CONTEXT_QUERY_CHARS = 1500;
 
 const clamp = (value: string, limit: number): string =>
@@ -429,6 +429,11 @@ const QUERY_GUIDANCE = [
   '- Pod inventory / "what does each pod do" -> list_pods for the workloads, then search_docs to explain each component.',
   '- Panel queries may contain unresolved dashboard variables like $cluster or ${datasource}. "$var" is never a literal value: drop or substitute those matchers before querying, and never diagnose the datasource as broken merely because its uid is a $variable.',
   '- Conceptual/how-to/meaning questions -> search_docs.',
+  'Server routing (two tool servers):',
+  '- Metric ANALYSIS (values, trends, comparisons) -> the local server\'s query_prometheus (returns compact stats). The grafana server\'s query_prometheus returns raw frames — avoid it for analysis.',
+  '- Discovering valid label values / metric names -> the grafana server\'s list_prometheus_label_values / list_prometheus_metric_names.',
+  '- Finding dashboards or another dashboard\'s queries -> the grafana server\'s search_dashboards / get_dashboard_panel_queries; datasource inventory -> list_datasources.',
+  '- Alert RULE definitions and thresholds -> the grafana server\'s alerting tools; alerts CURRENTLY FIRING -> firing_alerts on the local server.',
 ].join('\n');
 
 const makeAgentPrompt = (

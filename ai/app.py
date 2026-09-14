@@ -743,16 +743,21 @@ def list_viya_namespaces() -> dict:
 
 
 @mcp.tool()
-def list_pods(namespace: str) -> dict:
-    """List the pods in a namespace with their workload, readiness, and restarts.
+def list_pods(namespace: str, detail: bool = False) -> dict:
+    """List what runs in a namespace: workloads (default) or individual pods.
 
-    Use for "what pods are running in X" or "what does each pod do": the
-    returned workload (owner) names identify the components — pair them with
-    search_docs to explain each component's function.
+    Use for "what pods are running in X" or "what does each pod do". The
+    default workload-grouped view covers EVERY pod in the namespace with no
+    truncation (one row per Deployment/StatefulSet/etc. with pod/ready/restart
+    counts) — pair the workload names with search_docs to explain each
+    component's function. Pass detail=true only when individual pod names are
+    needed (capped at 60 pods).
 
     Args:
         namespace: The namespace to list, e.g. 'monitoring' or a Viya
             namespace from list_viya_namespaces.
+        detail: false (default) = one row per workload, complete coverage;
+            true = individual pods, capped at 60.
     """
     if not _NAMESPACE_RE.fullmatch(namespace):
         return {"error": f"'{namespace}' is not a valid namespace name."}
@@ -798,10 +803,33 @@ def list_pods(namespace: str) -> dict:
         })
 
     pods.sort(key=lambda p: (p["workload"], p["pod"]))
-    out = {"namespace": namespace, "pod_count": len(pods), "pods": pods[:60]}
-    if len(pods) > 60:
-        out["truncated"] = f"showing 60 of {len(pods)} pods"
-    return out
+
+    if detail:
+        out = {"namespace": namespace, "pod_count": len(pods), "pods": pods[:60]}
+        if len(pods) > 60:
+            out["truncated"] = (
+                f"showing 60 of {len(pods)} pods — the default workload view "
+                "(detail=false) covers all of them"
+            )
+        return out
+
+    workloads: dict = {}
+    for p in pods:
+        entry = workloads.setdefault(
+            (p["workload"], p["owner_kind"]),
+            {"workload": p["workload"], "kind": p["owner_kind"], "pods": 0, "ready": 0, "restarts": 0},
+        )
+        entry["pods"] += 1
+        entry["ready"] += 1 if p["ready"] else 0
+        entry["restarts"] += p["restarts"]
+
+    return {
+        "namespace": namespace,
+        "pod_count": len(pods),
+        "workload_count": len(workloads),
+        "workloads": sorted(workloads.values(), key=lambda w: w["workload"]),
+        "note": "One row per workload, covering all pods. Call with detail=true for individual pod names.",
+    }
 
 
 # Tool 3: search_docs (RAG as a tool)
