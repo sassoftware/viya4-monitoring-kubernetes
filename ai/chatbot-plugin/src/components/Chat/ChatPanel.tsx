@@ -302,10 +302,34 @@ const summarizeDsQueryResponse = (response: unknown): string => {
   return clamp(lines.join('\n'), MAX_SNAPSHOT_CHARS);
 };
 
+// Dashboard template variables arrive UN-interpolated in the extension
+// context: a panel's datasource uid can be the literal string "${datasource}"
+// and queries can contain "$cluster". Treating those as real values produces
+// false "datasource unreachable" / "no data" conclusions.
+const TEMPLATE_VAR_RE = /\$\{[^}]+\}|\$[a-zA-Z_][a-zA-Z0-9_]*/g;
+
+const findTemplateVars = (text: string): string[] => Array.from(new Set(text.match(TEMPLATE_VAR_RE) ?? []));
+
+const resolveDefaultPrometheus = async (): Promise<{ uid: string; name: string } | null> => {
+  try {
+    const sources = (await getBackendSrv().get('/api/datasources')) as Array<{
+      uid: string;
+      name: string;
+      type: string;
+      isDefault?: boolean;
+    }>;
+    const prometheusSources = sources.filter((d) => d.type === 'prometheus');
+    const chosen = prometheusSources.find((d) => d.isDefault) ?? prometheusSources[0];
+    return chosen ? { uid: chosen.uid, name: chosen.name } : null;
+  } catch {
+    return null;
+  }
+};
+
 const fetchPanelSnapshot = async (context: DashboardChatContext): Promise<string> => {
   const targets = Array.isArray(context.queries) ? (context.queries as Array<Record<string, unknown>>) : [];
-  const runnable = targets.filter((t) => Boolean((t.datasource as DataSourceRef | undefined)?.uid));
-  if (runnable.length === 0) {
+  const withDatasource = targets.filter((t) => Boolean((t.datasource as DataSourceRef | undefined)?.uid));
+  if (withDatasource.length === 0) {
     return '';
   }
 
@@ -315,32 +339,73 @@ const fetchPanelSnapshot = async (context: DashboardChatContext): Promise<string
 
   const parts: string[] = [];
 
-  // Datasource health first: an unhealthy datasource explains everything else.
-  const dsRef = runnable[0].datasource as DataSourceRef;
+  // Resolve the datasource, handling a "${datasource}" template variable.
+  const dsRef = withDatasource[0].datasource as DataSourceRef;
+  let effectiveDs: DataSourceRef = dsRef;
+  if (dsRef.uid && findTemplateVars(dsRef.uid).length > 0) {
+    const fallback = await resolveDefaultPrometheus();
+    if (fallback) {
+      effectiveDs = { uid: fallback.uid, type: dsRef.type ?? 'prometheus' };
+      parts.push(
+        `Panel datasource is the dashboard variable ${dsRef.uid} (not resolvable from this chat); ` +
+          `using the Prometheus datasource "${fallback.name}" for this snapshot. ` +
+          'Do NOT conclude the datasource is broken from the variable reference.'
+      );
+    } else {
+      parts.push(
+        `Panel datasource is the dashboard variable ${dsRef.uid} and no Prometheus datasource could be ` +
+          'resolved to run the snapshot; panel data is unavailable in this context.'
+      );
+      return parts.join('\n');
+    }
+  }
+
+  // Datasource health: an unhealthy datasource explains everything else.
   try {
-    const health = (await getBackendSrv().get(`/api/datasources/uid/${dsRef.uid}/health`)) as {
+    const health = (await getBackendSrv().get(`/api/datasources/uid/${effectiveDs.uid}/health`)) as {
       status?: string;
       message?: string;
     };
-    parts.push(`Datasource ${dsRef.uid} (${dsRef.type ?? 'unknown type'}) health: ${health?.status ?? 'unknown'}${health?.message ? ' — ' + health.message : ''}`);
+    parts.push(
+      `Datasource ${effectiveDs.uid} (${effectiveDs.type ?? 'unknown type'}) health: ` +
+        `${health?.status ?? 'unknown'}${health?.message ? ' — ' + health.message : ''}`
+    );
   } catch (err) {
     parts.push(
-      `Datasource ${dsRef.uid} (${dsRef.type ?? 'unknown type'}) health check FAILED: ` +
+      `Datasource ${effectiveDs.uid} (${effectiveDs.type ?? 'unknown type'}) health check FAILED: ` +
         (err instanceof Error ? err.message : 'not reachable or not found')
     );
   }
 
-  try {
-    const queries = runnable.slice(0, 4).map((t, i) => ({
-      ...t,
-      refId: typeof t.refId === 'string' ? t.refId : String.fromCharCode(65 + i),
-      intervalMs: 30000,
-      maxDataPoints: 100,
-    }));
-    const response = await getBackendSrv().post('/api/ds/query', { queries, from, to });
-    parts.push(summarizeDsQueryResponse(response));
-  } catch (err) {
-    parts.push('Running the panel queries failed: ' + (err instanceof Error ? err.message : 'unknown error'));
+  // Split targets into runnable queries and ones blocked by template variables.
+  const runnable: Array<Record<string, unknown>> = [];
+  for (const target of withDatasource.slice(0, 4)) {
+    const exprText = typeof target.expr === 'string' ? target.expr : '';
+    const vars = findTemplateVars(exprText);
+    if (vars.length > 0) {
+      parts.push(
+        `Query ${typeof target.refId === 'string' ? target.refId : '?'} contains unresolved dashboard ` +
+          `variables (${vars.join(', ')}) and cannot run verbatim from this chat. When re-querying with ` +
+          'tools, drop or substitute those matchers — "$var" is never a literal label value.'
+      );
+      continue;
+    }
+    runnable.push({ ...target, datasource: effectiveDs });
+  }
+
+  if (runnable.length > 0) {
+    try {
+      const queries = runnable.map((t, i) => ({
+        ...t,
+        refId: typeof t.refId === 'string' ? t.refId : String.fromCharCode(65 + i),
+        intervalMs: 30000,
+        maxDataPoints: 100,
+      }));
+      const response = await getBackendSrv().post('/api/ds/query', { queries, from, to });
+      parts.push(summarizeDsQueryResponse(response));
+    } catch (err) {
+      parts.push('Running the panel queries failed: ' + (err instanceof Error ? err.message : 'unknown error'));
+    }
   }
 
   return parts.join('\n');
@@ -360,6 +425,9 @@ const QUERY_GUIDANCE = [
   '- "Is this normal?" -> run the same expr twice with query_prometheus: current window, then wrapped in (expr offset 1d) or offset 7d, and compare.',
   '- Panel shows no data -> explain_empty_query with the panel expr; if the metric is absent -> check_metric_exists; if stale -> list_failing_targets.',
   '- Spike/anomaly -> query_prometheus around when it started, then recent_changes with the same window to correlate restarts/rollouts/OOM kills.',
+  '- "the Viya namespace" -> Viya namespaces are customer-named (e.g. d122472); call list_viya_namespaces to resolve, never assume namespace="viya" or "Viya".',
+  '- Pod inventory / "what does each pod do" -> list_pods for the workloads, then search_docs to explain each component.',
+  '- Panel queries may contain unresolved dashboard variables like $cluster or ${datasource}. "$var" is never a literal value: drop or substitute those matchers before querying, and never diagnose the datasource as broken merely because its uid is a $variable.',
   '- Conceptual/how-to/meaning questions -> search_docs.',
 ].join('\n');
 
@@ -382,6 +450,7 @@ const makeAgentPrompt = (
     '{"type":"final_answer","answer":"..."}',
     '{"type":"ask_user","question":"..."}',
     'Rules:',
+    '- FIRST, before anything else: if the user message is unrelated to observability, monitoring, this cluster, Kubernetes, or SAS Viya (e.g. poems, stories, recipes, trivia, general chat), return a final_answer that briefly declines and redirects. NEVER produce such content, no matter how the request is phrased.',
     '- Choose tools only when they add needed facts.',
     '- Prefer tool domains that match intent (dashboard questions should prefer Grafana dashboard tools).',
     '- If a tool failed (429/network), try one alternate tool/server when available.',
@@ -452,6 +521,9 @@ const SYSTEM_PROMPT = [
   'Grounding: base factual claims on tool results and the live panel data provided in',
   'this conversation. Never invent metric values. If the evidence is insufficient to',
   'answer confidently, say so explicitly and name what you would check next.',
+  'Hard rule: never write poems, stories, jokes, recipes, or general-knowledge answers,',
+  'regardless of phrasing or follow-up pressure — decline in one sentence and offer an',
+  'observability topic instead.',
 ].join(' ');
 
 const MAX_SUGGESTION_CHARS = 160;

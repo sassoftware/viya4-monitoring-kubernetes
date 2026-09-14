@@ -708,6 +708,102 @@ def recent_changes(namespace: str = "", window: str = "1h") -> dict:
     return changes
 
 
+@mcp.tool()
+def list_viya_namespaces() -> dict:
+    """Find the namespace(s) where SAS Viya is actually deployed.
+
+    Viya namespaces are customer-named (often opaque, e.g. 'd122472'), so when
+    the user says "the Viya namespace", call this FIRST instead of assuming
+    namespace="viya": it looks for namespaces running sas-* workloads.
+    """
+    try:
+        result = prom.custom_query(query='count by (namespace) (kube_pod_info{pod=~"sas-.*"})')
+    except Exception as exc:
+        return {"error": f"Query failed: {exc}"}
+
+    namespaces = sorted(
+        (
+            {
+                "namespace": r["metric"].get("namespace"),
+                "sas_pods": int(_safe_float(r["value"][1])),
+            }
+            for r in result
+        ),
+        key=lambda n: -n["sas_pods"],
+    )
+    if not namespaces:
+        return {
+            "viya_namespaces": [],
+            "note": "No namespaces with sas-* pods found — Viya may not be deployed or not scraped.",
+        }
+    return {
+        "viya_namespaces": namespaces[:5],
+        "note": "Namespaces currently running sas-* pods, most pods first.",
+    }
+
+
+@mcp.tool()
+def list_pods(namespace: str) -> dict:
+    """List the pods in a namespace with their workload, readiness, and restarts.
+
+    Use for "what pods are running in X" or "what does each pod do": the
+    returned workload (owner) names identify the components — pair them with
+    search_docs to explain each component's function.
+
+    Args:
+        namespace: The namespace to list, e.g. 'monitoring' or a Viya
+            namespace from list_viya_namespaces.
+    """
+    if not _NAMESPACE_RE.fullmatch(namespace):
+        return {"error": f"'{namespace}' is not a valid namespace name."}
+
+    ns = f'namespace="{namespace}"'
+    try:
+        info = prom.custom_query(query="kube_pod_info" + _label_selector(ns))
+        owners = prom.custom_query(query="kube_pod_owner" + _label_selector(ns))
+        ready = prom.custom_query(
+            query="kube_pod_status_ready" + _label_selector(ns, 'condition="true"')
+        )
+        restarts = prom.custom_query(
+            query="sum by (pod) (kube_pod_container_status_restarts_total" + _label_selector(ns) + ")"
+        )
+    except Exception as exc:
+        return {"error": f"Query failed: {exc}"}
+
+    owner_by_pod = {
+        r["metric"].get("pod"): (
+            r["metric"].get("owner_kind", ""),
+            r["metric"].get("owner_name", ""),
+        )
+        for r in owners
+    }
+    ready_by_pod = {r["metric"].get("pod"): _safe_float(r["value"][1]) >= 1 for r in ready}
+    restarts_by_pod = {
+        r["metric"].get("pod"): int(_safe_float(r["value"][1])) for r in restarts
+    }
+
+    pods = []
+    for r in info:
+        pod = r["metric"].get("pod")
+        kind, owner = owner_by_pod.get(pod, ("", ""))
+        # A ReplicaSet owner's name minus its hash approximates the Deployment.
+        workload = owner.rsplit("-", 1)[0] if kind == "ReplicaSet" and "-" in owner else owner
+        pods.append({
+            "pod": pod,
+            "workload": workload or pod,
+            "owner_kind": kind,
+            "node": r["metric"].get("node"),
+            "ready": ready_by_pod.get(pod, False),
+            "restarts": restarts_by_pod.get(pod, 0),
+        })
+
+    pods.sort(key=lambda p: (p["workload"], p["pod"]))
+    out = {"namespace": namespace, "pod_count": len(pods), "pods": pods[:60]}
+    if len(pods) > 60:
+        out["truncated"] = f"showing 60 of {len(pods)} pods"
+    return out
+
+
 # Tool 3: search_docs (RAG as a tool)
  
 @mcp.tool()
