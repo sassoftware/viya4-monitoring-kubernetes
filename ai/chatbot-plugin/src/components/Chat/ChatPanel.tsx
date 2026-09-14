@@ -298,6 +298,62 @@ const parseAgentAction = (text: string): AgentAction | null => {
 const SYSTEM_PROMPT =
   'You are a helpful assistant with deep knowledge of the Grafana, Prometheus and general observability ecosystem.';
 
+const MAX_SUGGESTION_CHARS = 160;
+
+const GENERAL_SUGGESTIONS = [
+  'Summarize the health of the monitoring namespace.',
+  'Are any pods pending or crash-looping right now?',
+  'Search the docs: what does SAS Viya Monitoring for Kubernetes include?',
+];
+
+const makeStaticSuggestions = (context?: DashboardChatContext): string[] => {
+  if (!context) {
+    return GENERAL_SUGGESTIONS;
+  }
+
+  const panel = context.panelTitle ? '"' + context.panelTitle + '"' : 'this panel';
+  const dashboard = context.dashboardTitle ? '"' + context.dashboardTitle + '"' : 'this dashboard';
+
+  return [
+    'What is the ' + panel + ' panel showing right now?',
+    'Explain the metrics behind ' + panel + ' and what healthy values look like.',
+    'Is anything on ' + dashboard + ' indicating a problem?',
+  ];
+};
+
+const makeSuggestionPrompt = (dashboardPrompt: string): string =>
+  [
+    'Suggest three short questions an operator monitoring a SAS Viya Kubernetes platform',
+    'would most likely ask an observability assistant right now, given this context:',
+    dashboardPrompt,
+    'Focus on the panel\'s metrics: what they mean, why they might look unusual, and how to investigate.',
+    'Return strict JSON only: an array of exactly three question strings, each under 90 characters.',
+    'Example: ["...","...","..."]',
+  ].join('\n');
+
+const parseSuggestions = (text: string): string[] | null => {
+  const first = text.indexOf('[');
+  const last = text.lastIndexOf(']');
+  if (first < 0 || last < first) {
+    return null;
+  }
+
+  try {
+    const parsed: unknown = JSON.parse(text.slice(first, last + 1));
+    if (!Array.isArray(parsed)) {
+      return null;
+    }
+
+    const questions = parsed
+      .filter((q): q is string => typeof q === 'string' && q.trim() !== '')
+      .map((q) => clamp(q.trim(), MAX_SUGGESTION_CHARS));
+
+    return questions.length >= 3 ? questions.slice(0, 3) : null;
+  } catch {
+    return null;
+  }
+};
+
 export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => {
   const s = useStyles2(getStyles);
   const appMeta = useOptionalAppMeta();
@@ -316,6 +372,53 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
 
   const [pendingApproval, setPendingApproval] = useState<PendingApproval | null>(null);
 
+  const [suggestions, setSuggestions] = useState<string[]>(() => makeStaticSuggestions(context));
+  const suggestionKeyRef = useRef<string | null>(null);
+
+  // Static suggestions render immediately; when dashboard context is present,
+  // ask the model for three questions tailored to the panel's queries and
+  // swap them in. The key ref keeps re-renders with an identical context from
+  // re-triggering the LLM call.
+  useEffect(() => {
+    const key = context ? JSON.stringify([context.dashboardUid, context.panelTitle]) : '';
+    if (suggestionKeyRef.current === key) {
+      return;
+    }
+    suggestionKeyRef.current = key;
+
+    setSuggestions(makeStaticSuggestions(context));
+
+    const dashboardPrompt = makeDashboardContextPrompt(context);
+    if (!dashboardPrompt) {
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const enabled = await openai.enabled();
+        if (!enabled || cancelled) {
+          return;
+        }
+
+        const response = await openai.chatCompletions({
+          messages: [{ role: 'system', content: makeSuggestionPrompt(dashboardPrompt) }],
+        });
+
+        const tailored = parseSuggestions(response?.choices?.[0]?.message?.content ?? '');
+        if (tailored && !cancelled) {
+          setSuggestions(tailored);
+        }
+      } catch {
+        // Keep the static fallbacks; suggestions must never surface an error.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [context]);
+
   const stopProcessing = () => {
     cancelRequestedRef.current = true;
     requestSeqRef.current += 1;
@@ -333,8 +436,12 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
 
   const sendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    await submitMessage(input);
+  };
 
-    const trimmedInput = input.trim();
+  // Shared send path for the input form and the suggestion chips.
+  const submitMessage = async (raw: string) => {
+    const trimmedInput = raw.trim();
     if (!trimmedInput || isSending) {
       return;
     }
@@ -702,9 +809,24 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
       <div className={cx(s.conversation, compact && s.conversationCompact)} aria-live="polite">
         {messages.length === 0 ? (
           <div className={s.emptyState}>
-            {context
-              ? 'Ask a question about this panel or dashboard, or anything else you want to explore.'
-              : 'Ask a question about Grafana, Prometheus, observability, or anything else you want to explore.'}
+            <div>
+              {context
+                ? 'Ask a question about this panel or dashboard, or anything else you want to explore.'
+                : 'Ask a question about Grafana, Prometheus, observability, or anything else you want to explore.'}
+            </div>
+            <div className={s.suggestionRow}>
+              {suggestions.map((question) => (
+                <button
+                  key={question}
+                  type="button"
+                  className={s.suggestionChip}
+                  onClick={() => submitMessage(question)}
+                  disabled={isSending}
+                >
+                  {question}
+                </button>
+              ))}
+            </div>
           </div>
         ) : (
           messages.map((message, index) => (
@@ -819,6 +941,41 @@ const getStyles = (theme: GrafanaTheme2) => ({
   emptyState: css`
     color: ${theme.colors.text.secondary};
     padding: ${theme.spacing(2)};
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing(2)};
+  `,
+  suggestionRow: css`
+    display: flex;
+    flex-wrap: wrap;
+    gap: ${theme.spacing(1)};
+  `,
+  suggestionChip: css`
+    max-width: 100%;
+    padding: ${theme.spacing(1)} ${theme.spacing(1.5)};
+    border: 1px solid ${theme.colors.border.medium};
+    border-radius: ${theme.shape.radius.pill};
+    background: ${theme.colors.background.secondary};
+    color: ${theme.colors.text.primary};
+    font-size: ${theme.typography.bodySmall.fontSize};
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      border-color: ${theme.colors.primary.border};
+      background: ${theme.colors.action.hover};
+    }
+
+    &:focus-visible {
+      outline: 2px solid ${theme.colors.primary.border};
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.6;
+    }
   `,
   userRow: css`
     display: flex;
