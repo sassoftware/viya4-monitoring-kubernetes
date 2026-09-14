@@ -224,13 +224,27 @@ pluginFile="${pluginId}.zip"
 pluginSrcDir="ai/chatbot-plugin"
 builtZip="$pluginSrcDir/$pluginFile"
 
+# Rebuild when the zip is missing OR any plugin source is newer than it —
+# without the freshness check, a git pull leaves the pre-pull zip in place and
+# every later deploy silently ships the old bundle.
+needsBuild="false"
 if [ ! -f "$builtZip" ]; then
+    needsBuild="true"
+elif [ -n "$(find "$pluginSrcDir/src" "$pluginSrcDir/package.json" "$pluginSrcDir/package-lock.json" -newer "$builtZip" -print -quit 2> /dev/null)" ]; then
+    log_info "Chatbot plugin sources are newer than $builtZip; rebuilding."
+    needsBuild="true"
+fi
+
+if [ "$needsBuild" == "true" ]; then
     if ! command -v npm &> /dev/null; then
         log_error "npm is required to build the chatbot plugin but wasn't found on PATH."
         exit 1
     fi
     log_info "Building chatbot plugin from $pluginSrcDir..."
     ( cd "$pluginSrcDir" && npm ci && npm run build ) || { log_error "Chatbot plugin build failed."; exit 1; }
+    # Remove the old archive first: zip -r into an existing archive MERGES,
+    # which would keep chunk files that no longer exist in dist/.
+    rm -f "$builtZip"
     ( cd "$pluginSrcDir/dist" && zip -qr "../${pluginFile}" . )
 fi
 userPluginFile="$builtZip"
