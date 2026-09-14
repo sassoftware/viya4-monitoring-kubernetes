@@ -7,7 +7,9 @@ call to answer common SAS Viya operational questions.
  
 import math
 import os
+import re
 import time
+from datetime import datetime, timedelta
 
 from fastmcp import FastMCP
 from prometheus_api_client import PrometheusConnect
@@ -229,6 +231,483 @@ def firing_alerts() -> dict:
     }
  
  
+# Live-metric + no-data-diagnosis tools
+#
+# These give the agent direct eyes on the data: it can run the exact PromQL a
+# panel uses, and when a query comes back empty it can walk the causal chain
+# (query -> metric -> label matchers -> scrape targets) instead of guessing.
+
+_METRIC_NAME_RE = re.compile(r"[a-zA-Z_:][a-zA-Z0-9_:]*$")
+_LABEL_NAME_RE = re.compile(r"[a-zA-Z_][a-zA-Z0-9_]*$")
+
+_PROMQL_RESERVED = {
+    # keywords / modifiers
+    "by", "without", "on", "ignoring", "group_left", "group_right",
+    "and", "or", "unless", "offset", "bool",
+    # common functions (bare tokens followed by '(' are filtered separately;
+    # this catches them in edge cases as well)
+    "rate", "irate", "increase", "delta", "idelta", "deriv", "predict_linear",
+    "sum", "avg", "min", "max", "count", "topk", "bottomk", "quantile",
+    "stddev", "stdvar", "count_values", "histogram_quantile",
+    "sum_over_time", "avg_over_time", "min_over_time", "max_over_time",
+    "count_over_time", "last_over_time", "present_over_time", "quantile_over_time",
+    "abs", "absent", "absent_over_time", "ceil", "floor", "round",
+    "clamp", "clamp_max", "clamp_min", "changes", "resets", "exp", "ln",
+    "log2", "log10", "scalar", "sort", "sort_desc", "sqrt", "time",
+    "timestamp", "vector", "label_replace", "label_join",
+    "year", "month", "minute", "hour", "day_of_month", "day_of_week",
+    "days_in_month",
+}
+
+
+def _parse_window(window: str) -> int:
+    """'30m' / '1h' / '2d' -> seconds; falls back to 1h on anything odd."""
+    m = re.fullmatch(r"(\d+)([smhdw])", (window or "").strip())
+    if not m:
+        return 3600
+    mult = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}[m.group(2)]
+    return int(m.group(1)) * mult
+
+
+def _series_label(metric: dict) -> str:
+    name = metric.get("__name__", "")
+    labels = ", ".join(
+        f"{k}={v}" for k, v in sorted(metric.items()) if k != "__name__"
+    )
+    text = f"{name}{{{labels}}}" if labels else (name or "{}")
+    return text if len(text) <= 160 else text[:160] + "..."
+
+
+def _downsample(points: list, max_points: int = 20) -> list:
+    if len(points) <= max_points:
+        return points
+    stride = len(points) / max_points
+    sampled = [points[int(i * stride)] for i in range(max_points - 1)]
+    sampled.append(points[-1])
+    return sampled
+
+
+def _summarize_matrix(series_list: list, max_series: int = 8) -> dict:
+    """Reduce a Prometheus range-query result to LLM-sized statistics."""
+    summary = {"series_count": len(series_list), "series": []}
+
+    for series in series_list[:max_series]:
+        raw = [(int(_safe_float(ts)), _safe_float(v)) for ts, v in series.get("values", [])]
+        vals = [v for _, v in raw]
+        if not vals:
+            continue
+
+        avg = sum(vals) / len(vals)
+        quarter = max(1, len(vals) // 4)
+        head_avg = sum(vals[:quarter]) / quarter
+        tail_avg = sum(vals[-quarter:]) / quarter
+        if head_avg == 0 and tail_avg == 0:
+            trend = "flat_at_zero"
+        elif head_avg == 0:
+            trend = "rising"
+        else:
+            change = (tail_avg - head_avg) / abs(head_avg)
+            trend = "rising" if change > 0.15 else "falling" if change < -0.15 else "flat"
+
+        summary["series"].append({
+            "labels": _series_label(series.get("metric", {})),
+            "points": len(vals),
+            "min": round(min(vals), 4),
+            "max": round(max(vals), 4),
+            "avg": round(avg, 4),
+            "last": round(vals[-1], 4),
+            "trend": trend,
+            "sampled_values": [[ts, round(v, 4)] for ts, v in _downsample(raw)],
+        })
+
+    if len(series_list) > max_series:
+        summary["truncated"] = (
+            f"showing {max_series} of {len(series_list)} series; "
+            "aggregate (sum/avg/topk) in the query to see the rest"
+        )
+    return summary
+
+
+def _count_query(query: str) -> int:
+    """Evaluate a count(...) query; -1 signals the query itself errored."""
+    try:
+        result = prom.custom_query(query=query)
+    except Exception:
+        return -1
+    if not result:
+        return 0
+    return int(_safe_float(result[0]["value"][1]))
+
+
+def _extract_selectors(expr: str) -> list:
+    """Pull (metric, [matchers]) pairs out of a PromQL expression.
+
+    Heuristic, not a full parser: handles metric{...} selectors and bare
+    metric names; a comma inside a label VALUE will split a matcher wrongly.
+    """
+    selectors = []
+    braced_names = set()
+
+    for m in re.finditer(r"([a-zA-Z_:][a-zA-Z0-9_:]*)\s*\{([^}]*)\}", expr):
+        name = m.group(1)
+        if name.lower() in _PROMQL_RESERVED:
+            continue
+        braced_names.add(name)
+        matchers = [x.strip() for x in m.group(2).split(",") if x.strip()]
+        selectors.append({"metric": name, "matchers": matchers})
+
+    for m in re.finditer(r"[a-zA-Z_:][a-zA-Z0-9_:]*", expr):
+        token = m.group(0)
+        if token in braced_names or token.lower() in _PROMQL_RESERVED:
+            continue
+        rest = expr[m.end():]
+        if re.match(r"\s*[({]", rest):  # function call or already-handled selector
+            continue
+        if not _METRIC_NAME_RE.fullmatch(token) or token.isdigit():
+            continue
+        if any(s["metric"] == token for s in selectors):
+            continue
+        selectors.append({"metric": token, "matchers": []})
+
+    return selectors[:3]
+
+
+@mcp.tool()
+def query_prometheus(expr: str, window: str = "1h") -> dict:
+    """Run a PromQL query and return a compact statistical summary of the live data.
+
+    Use this to READ THE ACTUAL METRIC DATA — e.g. run a dashboard panel's own
+    query to see what the user is looking at, check a metric's current value,
+    or examine behavior over time. Returns per-series min/max/avg/last, a
+    trend direction, and ~20 downsampled points per series.
+
+    Args:
+        expr: A PromQL expression, e.g.
+            'sum(rate(container_cpu_usage_seconds_total{namespace="viya"}[5m]))'.
+        window: Lookback range such as '30m', '1h', '6h', '1d' (default '1h').
+    """
+    seconds = _parse_window(window)
+    end = datetime.now()
+    start = end - timedelta(seconds=seconds)
+    step = max(15, seconds // 100)
+
+    try:
+        result = prom.custom_query_range(
+            query=expr, start_time=start, end_time=end, step=str(step)
+        )
+    except Exception as exc:
+        return {
+            "expr": expr,
+            "error": f"Query failed to evaluate: {exc}",
+            "hint": "Check the PromQL syntax; if the syntax is valid, call explain_empty_query.",
+        }
+
+    summary = _summarize_matrix(result)
+    summary["expr"] = expr
+    summary["window"] = window
+    if summary["series_count"] == 0:
+        summary["note"] = (
+            "The query evaluated successfully but returned no series over the "
+            "window. Call explain_empty_query to find out why."
+        )
+    return summary
+
+
+@mcp.tool()
+def check_metric_exists(metric: str) -> dict:
+    """Check whether a metric exists in Prometheus now, and when it was last seen.
+
+    Use when a panel or query shows no data and you need to know if the
+    underlying metric is present at all, recently disappeared, or was never
+    scraped (wrong name, exporter missing).
+
+    Args:
+        metric: A bare metric name, e.g. 'kube_pod_status_phase'.
+    """
+    if not _METRIC_NAME_RE.fullmatch(metric):
+        return {"error": f"'{metric}' is not a valid Prometheus metric name."}
+
+    now_count = _count_query(f"count({metric})")
+    day_count = _count_query(f"count(count_over_time({metric}[1d]))")
+    week_count = _count_query(f"count(count_over_time({metric}[7d]))")
+
+    if now_count > 0:
+        verdict = "present"
+    elif day_count > 0:
+        verdict = "disappeared_recently (existed within the last 24h)"
+    elif week_count > 0:
+        verdict = "stale (last seen more than 24h ago, within 7d)"
+    else:
+        verdict = "absent (not seen in 7d — wrong metric name, or its exporter was never scraped)"
+
+    return {
+        "metric": metric,
+        "series_now": now_count,
+        "series_seen_last_24h": day_count,
+        "series_seen_last_7d": week_count,
+        "verdict": verdict,
+    }
+
+
+@mcp.tool()
+def list_failing_targets() -> dict:
+    """List Prometheus scrape targets that are not healthy, with their last error.
+
+    Use to check the COLLECTION layer: when a metric is missing or stale, a
+    down exporter/scrape target is a common root cause. Pair with the pod
+    diagnostics tools to see whether the exporter's pod itself is unhealthy.
+    """
+    try:
+        resp = prom._session.get(
+            f"{prom.url}/api/v1/targets",
+            params={"state": "active"},
+            verify=False,
+            timeout=15,
+        )
+        targets = resp.json()["data"]["activeTargets"]
+    except Exception as exc:
+        return {"error": f"Could not read scrape targets: {exc}"}
+
+    failing = [t for t in targets if t.get("health") != "up"]
+    return {
+        "active_targets": len(targets),
+        "down_targets": len(failing),
+        "failing": [
+            {
+                "job": t.get("labels", {}).get("job"),
+                "instance": t.get("labels", {}).get("instance"),
+                "health": t.get("health"),
+                "last_error": (t.get("lastError") or "")[:300],
+                "last_scrape": t.get("lastScrape"),
+            }
+            for t in failing[:25]
+        ],
+    }
+
+
+@mcp.tool()
+def explain_empty_query(expr: str) -> dict:
+    """Diagnose WHY a PromQL query returns no data.
+
+    Decomposes the query into its metric selectors, then checks each layer:
+    does the metric exist at all, did it exist recently, and which individual
+    label matcher eliminates every series. Use whenever a panel shows
+    "No data" or query_prometheus reports zero series.
+
+    Args:
+        expr: The PromQL expression that is returning nothing.
+    """
+    try:
+        current = prom.custom_query(query=expr)
+    except Exception as exc:
+        return {
+            "verdict": "query_error",
+            "error": str(exc),
+            "explanation": "The query fails to evaluate — a syntax or type error, not missing data.",
+        }
+
+    if current:
+        return {
+            "verdict": "has_data",
+            "series_now": len(current),
+            "explanation": (
+                "The query returns data right now. If a panel is empty, suspect the "
+                "panel's time range, datasource, or a dashboard variable instead."
+            ),
+        }
+
+    selectors = _extract_selectors(expr)
+    if not selectors:
+        return {
+            "verdict": "unknown",
+            "explanation": "Could not extract metric selectors from the expression; inspect it manually.",
+        }
+
+    findings = []
+    for sel in selectors:
+        name, matchers = sel["metric"], sel["matchers"]
+        entry = {"metric": name}
+
+        base_count = _count_query(f"count({name})")
+        entry["series_without_matchers"] = base_count
+
+        if base_count <= 0:
+            week_count = _count_query(f"count(count_over_time({name}[7d]))")
+            entry["series_seen_last_7d"] = week_count
+            entry["finding"] = (
+                "metric existed within the last 7d but has no series now — its exporter "
+                "likely stopped; check list_failing_targets"
+                if week_count > 0
+                else "metric not seen in 7d — wrong metric name, or its exporter is not scraped at all"
+            )
+            findings.append(entry)
+            continue
+
+        dead_matchers = []
+        for matcher in matchers[:8]:
+            if _count_query(f"count({name}{{{matcher}}})") == 0:
+                dead_matchers.append(matcher)
+
+        if dead_matchers:
+            entry["matchers_matching_nothing"] = dead_matchers
+            label = re.split(r"!?=~?", dead_matchers[0])[0].strip()
+            if _LABEL_NAME_RE.fullmatch(label):
+                try:
+                    grouped = prom.custom_query(query=f"count by ({label}) ({name})")
+                    entry[f"actual_{label}_values"] = sorted(
+                        {g["metric"].get(label, "(none)") for g in grouped}
+                    )[:10]
+                except Exception:
+                    pass
+            entry["finding"] = (
+                f"metric exists ({base_count} series) but these matchers match nothing: "
+                f"{dead_matchers} — compare with the actual label values"
+            )
+        else:
+            entry["finding"] = (
+                "metric and every individual matcher match series, so the empty result "
+                "comes from the matcher COMBINATION, a range function over too little "
+                "data, or vector matching between series that share no labels"
+            )
+        findings.append(entry)
+
+    return {
+        "verdict": "diagnosed",
+        "expr": expr,
+        "findings": findings,
+        "note": "Selector analysis is heuristic; a comma inside a label value can confuse it.",
+    }
+
+
+_NAMESPACE_RE = re.compile(r"[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$")
+
+
+def _label_selector(*matchers: str) -> str:
+    parts = [m for m in matchers if m]
+    return "{" + ",".join(parts) + "}" if parts else ""
+
+
+@mcp.tool()
+def recent_changes(namespace: str = "", window: str = "1h") -> dict:
+    """What changed in the cluster recently: restarts, new pods, rollouts, OOM kills.
+
+    Use to answer "what changed?" or "did a deploy cause this?" — correlate a
+    metric anomaly with cluster changes in the same window. Call it with the
+    window in which the anomaly started (e.g. the spike began 30 minutes ago
+    -> window='45m').
+
+    Args:
+        namespace: Restrict to one namespace (default: all namespaces).
+        window: How far back to look, e.g. '30m', '1h', '6h' (default '1h').
+    """
+    if namespace and not _NAMESPACE_RE.fullmatch(namespace):
+        return {"error": f"'{namespace}' is not a valid namespace name."}
+
+    seconds = _parse_window(window)
+    now = time.time()
+    cutoff = now - seconds
+    ns_matcher = f'namespace="{namespace}"' if namespace else ""
+
+    changes = {"window": window, "namespace": namespace or "(all)"}
+
+    # Container restarts within the window.
+    try:
+        restarts = prom.custom_query(
+            query=(
+                "increase(kube_pod_container_status_restarts_total"
+                + _label_selector(ns_matcher)
+                + f"[{window}]) > 0"
+            )
+        )
+        changes["container_restarts"] = [
+            {
+                "namespace": r["metric"].get("namespace"),
+                "pod": r["metric"].get("pod"),
+                "container": r["metric"].get("container"),
+                "restarts": int(round(_safe_float(r["value"][1]))),
+            }
+            for r in restarts[:15]
+        ]
+    except Exception as exc:
+        changes["container_restarts"] = f"query failed: {exc}"
+
+    # Pods created within the window.
+    try:
+        created = prom.custom_query(query="kube_pod_created" + _label_selector(ns_matcher))
+        new_pods = sorted(
+            (
+                {
+                    "namespace": r["metric"].get("namespace"),
+                    "pod": r["metric"].get("pod"),
+                    "created_seconds_ago": int(now - _safe_float(r["value"][1])),
+                }
+                for r in created
+                if _safe_float(r["value"][1]) >= cutoff
+            ),
+            key=lambda p: p["created_seconds_ago"],
+        )
+        changes["new_pods"] = new_pods[:15]
+    except Exception as exc:
+        changes["new_pods"] = f"query failed: {exc}"
+
+    # New ReplicaSets = deployment rollouts (RS name minus its hash suffix
+    # approximates the Deployment name).
+    try:
+        replicasets = prom.custom_query(
+            query="kube_replicaset_created" + _label_selector(ns_matcher)
+        )
+        rollouts = sorted(
+            (
+                {
+                    "namespace": r["metric"].get("namespace"),
+                    "replicaset": r["metric"].get("replicaset"),
+                    "deployment": (r["metric"].get("replicaset") or "").rsplit("-", 1)[0],
+                    "created_seconds_ago": int(now - _safe_float(r["value"][1])),
+                }
+                for r in replicasets
+                if _safe_float(r["value"][1]) >= cutoff
+            ),
+            key=lambda p: p["created_seconds_ago"],
+        )
+        changes["rollouts"] = rollouts[:15]
+    except Exception as exc:
+        changes["rollouts"] = f"query failed: {exc}"
+
+    # Containers whose last termination was an OOM kill.
+    try:
+        oom = prom.custom_query(
+            query=(
+                "kube_pod_container_status_last_terminated_reason"
+                + _label_selector('reason="OOMKilled"', ns_matcher)
+                + " == 1"
+            )
+        )
+        changes["oom_killed_containers"] = [
+            {
+                "namespace": r["metric"].get("namespace"),
+                "pod": r["metric"].get("pod"),
+                "container": r["metric"].get("container"),
+            }
+            for r in oom[:15]
+        ]
+    except Exception as exc:
+        changes["oom_killed_containers"] = f"query failed: {exc}"
+
+    def _count(value) -> int:
+        return len(value) if isinstance(value, list) else 0
+
+    total = sum(
+        _count(changes.get(k))
+        for k in ("container_restarts", "new_pods", "rollouts", "oom_killed_containers")
+    )
+    changes["summary"] = (
+        f"{total} change(s) detected in the last {window}"
+        if total
+        else f"No restarts, new pods, rollouts, or OOM kills detected in the last {window}."
+    )
+    return changes
+
+
 # Tool 3: search_docs (RAG as a tool)
  
 @mcp.tool()

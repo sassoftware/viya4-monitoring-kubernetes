@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { css, cx } from '@emotion/css';
 import { GrafanaTheme2, usePluginContext } from '@grafana/data';
 import { openai } from '@grafana/llm';
+import { getBackendSrv } from '@grafana/runtime';
 import { Button, Input, Spinner, useStyles2 } from '@grafana/ui';
 import { useOptionalAppMeta } from '../App/AppContext';
 import {
@@ -69,7 +70,7 @@ export type ChatPanelProps = {
   compact?: boolean;
 };
 
-const AGENT_MAX_STEPS = 2;
+const AGENT_MAX_STEPS = 5;
 
 const MAX_HISTORY_MESSAGES = 8;
 const MAX_TOOLS_FOR_PROMPT = 20;
@@ -190,7 +191,7 @@ const validatePlannedCall = (call: PlannedToolCall, catalog: ToolDescriptor[]): 
 const isApproval = (text: string): boolean => /^(approve|yes|y|ok|run|allow)\b/i.test(text.trim());
 const isDenial = (text: string): boolean => /^(deny|no|n|cancel|block|reject)\b/i.test(text.trim());
 
-const makeDashboardContextPrompt = (context?: DashboardChatContext): string => {
+const makeDashboardContextPrompt = (context?: DashboardChatContext, liveData?: string): string => {
   if (!context) {
     return '';
   }
@@ -213,10 +214,154 @@ const makeDashboardContextPrompt = (context?: DashboardChatContext): string => {
     parts.push('Current time range: ' + clamp(JSON.stringify(context.timeRange), 200));
   }
 
+  if (liveData) {
+    parts.push('Live panel data (fetched when this chat opened):');
+    parts.push(liveData);
+    parts.push('Use the query_prometheus tool for other metrics or time ranges.');
+  }
+
   parts.push('When the user says "this dashboard" or "this panel", they mean the above.');
 
   return parts.join('\n');
 };
+
+// ---- Panel data snapshot ----------------------------------------------------
+// Runs the panel's own queries through Grafana's datasource-query API when the
+// chat opens, so the model sees the data the user is looking at without
+// needing a tool call, plus the panel datasource's health.
+
+const MAX_SNAPSHOT_CHARS = 2000;
+
+type DataSourceRef = { uid?: string; type?: string };
+
+type DsQueryFrame = {
+  schema?: { name?: string; fields?: Array<{ name?: string; labels?: Record<string, string> }> };
+  data?: { values?: unknown[][] };
+};
+
+const describeFieldSeries = (frame: DsQueryFrame, fieldIndex: number): string | null => {
+  const field = frame.schema?.fields?.[fieldIndex];
+  const values = (frame.data?.values?.[fieldIndex] ?? []).filter(
+    (v): v is number => typeof v === 'number' && Number.isFinite(v)
+  );
+  if (values.length === 0) {
+    return null;
+  }
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const avg = values.reduce((a, b) => a + b, 0) / values.length;
+  const last = values[values.length - 1];
+  const name =
+    field?.labels && Object.keys(field.labels).length > 0
+      ? JSON.stringify(field.labels)
+      : field?.name ?? frame.schema?.name ?? 'value';
+
+  const round = (n: number) => Number(n.toFixed(4));
+  return `${name}: ${values.length} points, min=${round(min)}, max=${round(max)}, avg=${round(avg)}, last=${round(last)}`;
+};
+
+const summarizeDsQueryResponse = (response: unknown): string => {
+  const results = (response as { results?: Record<string, { frames?: DsQueryFrame[]; error?: string }> })?.results;
+  if (!results) {
+    return 'Panel query returned no result payload.';
+  }
+
+  const lines: string[] = [];
+  for (const [refId, result] of Object.entries(results)) {
+    if (result?.error) {
+      lines.push(`Query ${refId}: ERROR: ${result.error}`);
+      continue;
+    }
+
+    const frames = result?.frames ?? [];
+    let seriesLines: string[] = [];
+    for (const frame of frames) {
+      const fieldCount = frame.schema?.fields?.length ?? 0;
+      // Field 0 is conventionally time; describe the value fields.
+      for (let i = 1; i < fieldCount; i += 1) {
+        const described = describeFieldSeries(frame, i);
+        if (described) {
+          seriesLines.push(described);
+        }
+      }
+    }
+
+    if (seriesLines.length === 0) {
+      lines.push(`Query ${refId}: NO DATA over the panel's time range.`);
+    } else {
+      const totalSeries = seriesLines.length;
+      if (totalSeries > 8) {
+        seriesLines = seriesLines.slice(0, 8);
+        seriesLines.push(`... plus ${totalSeries - 8} more series`);
+      }
+      lines.push(`Query ${refId}: ${totalSeries} series:\n  ` + seriesLines.join('\n  '));
+    }
+  }
+
+  return clamp(lines.join('\n'), MAX_SNAPSHOT_CHARS);
+};
+
+const fetchPanelSnapshot = async (context: DashboardChatContext): Promise<string> => {
+  const targets = Array.isArray(context.queries) ? (context.queries as Array<Record<string, unknown>>) : [];
+  const runnable = targets.filter((t) => Boolean((t.datasource as DataSourceRef | undefined)?.uid));
+  if (runnable.length === 0) {
+    return '';
+  }
+
+  const range = (context.timeRange ?? {}) as { from?: string; to?: string };
+  const from = typeof range.from === 'string' ? range.from : 'now-1h';
+  const to = typeof range.to === 'string' ? range.to : 'now';
+
+  const parts: string[] = [];
+
+  // Datasource health first: an unhealthy datasource explains everything else.
+  const dsRef = runnable[0].datasource as DataSourceRef;
+  try {
+    const health = (await getBackendSrv().get(`/api/datasources/uid/${dsRef.uid}/health`)) as {
+      status?: string;
+      message?: string;
+    };
+    parts.push(`Datasource ${dsRef.uid} (${dsRef.type ?? 'unknown type'}) health: ${health?.status ?? 'unknown'}${health?.message ? ' — ' + health.message : ''}`);
+  } catch (err) {
+    parts.push(
+      `Datasource ${dsRef.uid} (${dsRef.type ?? 'unknown type'}) health check FAILED: ` +
+        (err instanceof Error ? err.message : 'not reachable or not found')
+    );
+  }
+
+  try {
+    const queries = runnable.slice(0, 4).map((t, i) => ({
+      ...t,
+      refId: typeof t.refId === 'string' ? t.refId : String.fromCharCode(65 + i),
+      intervalMs: 30000,
+      maxDataPoints: 100,
+    }));
+    const response = await getBackendSrv().post('/api/ds/query', { queries, from, to });
+    parts.push(summarizeDsQueryResponse(response));
+  } catch (err) {
+    parts.push('Running the panel queries failed: ' + (err instanceof Error ? err.message : 'unknown error'));
+  }
+
+  return parts.join('\n');
+};
+
+// Worked examples for the planner: without these the model has to invent
+// PromQL and investigation patterns from scratch, which is where wrong
+// queries and guessed answers come from.
+const QUERY_GUIDANCE = [
+  'Query recipes (adapt namespace/labels as needed):',
+  '- Namespace CPU: sum(rate(container_cpu_usage_seconds_total{namespace="X",container!=""}[5m]))',
+  '- Namespace memory: sum(container_memory_working_set_bytes{namespace="X",container!=""})',
+  '- Pod count: count(kube_pod_info{namespace="X"})',
+  '- Pod restarts: increase(kube_pod_container_status_restarts_total{namespace="X"}[1h])',
+  '- Disk fill forecast: predict_linear(kubelet_volume_stats_available_bytes[6h], 86400)',
+  'Investigation patterns:',
+  '- "Is this normal?" -> run the same expr twice with query_prometheus: current window, then wrapped in (expr offset 1d) or offset 7d, and compare.',
+  '- Panel shows no data -> explain_empty_query with the panel expr; if the metric is absent -> check_metric_exists; if stale -> list_failing_targets.',
+  '- Spike/anomaly -> query_prometheus around when it started, then recent_changes with the same window to correlate restarts/rollouts/OOM kills.',
+  '- Conceptual/how-to/meaning questions -> search_docs.',
+].join('\n');
 
 const makeAgentPrompt = (
   userMessage: string,
@@ -243,6 +388,9 @@ const makeAgentPrompt = (
     '- Never invent tools; use only the listed catalog.',
     '- Avoid mutating tools unless user explicitly requested state changes.',
     '- Keep args minimal and valid for required fields.',
+    '- Stay on observability topics; for unrelated questions return a final_answer that briefly declines.',
+    '',
+    QUERY_GUIDANCE,
     '',
     ...(dashboardPrompt ? ['Dashboard context:', dashboardPrompt, ''] : []),
     'User message:',
@@ -295,8 +443,16 @@ const parseAgentAction = (text: string): AgentAction | null => {
   }
 };
 
-const SYSTEM_PROMPT =
-  'You are a helpful assistant with deep knowledge of the Grafana, Prometheus and general observability ecosystem.';
+const SYSTEM_PROMPT = [
+  'You are the SAS Viya Monitoring observability assistant, with deep knowledge of',
+  'Grafana, Prometheus, Kubernetes, and the observability ecosystem.',
+  'Scope: ONLY answer questions related to observability, monitoring, this cluster,',
+  'the SAS Viya platform, and the dashboards and metrics around them. If asked about',
+  'anything unrelated, briefly decline and steer the conversation back to observability.',
+  'Grounding: base factual claims on tool results and the live panel data provided in',
+  'this conversation. Never invent metric values. If the evidence is insufficient to',
+  'answer confidently, say so explicitly and name what you would check next.',
+].join(' ');
 
 const MAX_SUGGESTION_CHARS = 160;
 
@@ -374,6 +530,40 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
 
   const [suggestions, setSuggestions] = useState<string[]>(() => makeStaticSuggestions(context));
   const suggestionKeyRef = useRef<string | null>(null);
+
+  const [panelSnapshot, setPanelSnapshot] = useState('');
+  const snapshotKeyRef = useRef<string | null>(null);
+
+  // Fetch the panel's live data (and datasource health) once per panel, at
+  // chat open, so the model sees what the user sees without a tool call.
+  useEffect(() => {
+    const key = context ? JSON.stringify([context.dashboardUid, context.panelTitle]) : '';
+    if (snapshotKeyRef.current === key) {
+      return;
+    }
+    snapshotKeyRef.current = key;
+    setPanelSnapshot('');
+
+    if (!context) {
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const snapshot = await fetchPanelSnapshot(context);
+        if (snapshot && !cancelled) {
+          setPanelSnapshot(snapshot);
+        }
+      } catch {
+        // The snapshot is best-effort context; the agent can still use tools.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [context]);
 
   // Static suggestions render immediately; when dashboard context is present,
   // ask the model for three questions tailored to the panel's queries and
@@ -462,7 +652,7 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
 
     const errText = (err: unknown): string => (err instanceof Error ? err.message : 'unknown');
 
-    const dashboardPrompt = makeDashboardContextPrompt(context);
+    const dashboardPrompt = makeDashboardContextPrompt(context, panelSnapshot);
     const dashboardSystemMessages = dashboardPrompt
       ? [{ role: 'system' as const, content: dashboardPrompt }]
       : [];
