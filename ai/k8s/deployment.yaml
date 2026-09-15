@@ -73,10 +73,11 @@ spec:
             cpu: "500m"
             memory: "512Mi"
         volumeMounts:
+        # Documentation (repo markdown + SAS doc-set PDFs) is baked into the
+        # image at build time (see ai/Dockerfile) — deliberately no runtime
+        # docs volume, so the agent's knowledge set is fixed per image build.
         - name: cache
           mountPath: /app/cache          # persists the embedding index across restarts
-        - name: pdfs
-          mountPath: /app/docs/pdfs      # your PDFs get indexed alongside the baked-in repo
         # Covers the first-run/re-embed warm-up, during which the server hasn't
         # bound port 8000 yet. Without this, the pod shows Ready immediately on
         # container start, before the app is actually listening.
@@ -97,6 +98,3 @@ spec:
       - name: cache
         persistentVolumeClaim:
           claimName: v4m-mcp-cache
-      - name: pdfs
-        persistentVolumeClaim:
-          claimName: v4m-mcp-pdfs
