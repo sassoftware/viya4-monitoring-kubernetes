@@ -131,14 +131,23 @@ const scoreToolForPrompt = (tool: ToolDescriptor, userMessage: string): number =
   return score;
 };
 
-const compactCatalog = (catalog: ToolDescriptor[], userMessage: string): ToolDescriptor[] =>
+const compactCatalog = (
+  catalog: ToolDescriptor[],
+  scoringText: string,
+  recentToolKeys: Set<string>
+): ToolDescriptor[] =>
   catalog
     .map((tool) => ({
       tool: {
         ...tool,
         description: tool.description ? clamp(tool.description, MAX_MESSAGE_CHARS) : undefined,
       },
-      score: scoreToolForPrompt(tool, userMessage),
+      // Tools used in recent turns stay in the catalog even when the current
+      // message ("approve", "yes, all of them") matches nothing by keyword —
+      // otherwise mid-task follow-ups lose the very tool being used.
+      score:
+        scoreToolForPrompt(tool, scoringText) +
+        (recentToolKeys.has(tool.server + '.' + tool.name) ? 12 : 0),
     }))
     .sort((left, right) => right.score - left.score)
     .slice(0, MAX_TOOLS_FOR_PROMPT)
@@ -152,12 +161,13 @@ const compactEvents = (events: AgentEvent[]): AgentEvent[] =>
     return { ...e, message: clamp(e.message, MAX_MESSAGE_CHARS) };
   });
 
-const MUTATING_HINTS = ['update', 'create', 'delete', 'patch', 'manage', 'save', 'write', 'set'];
+// Word-boundary matching, NOT substring: "offset" and "StatefulSet" must not
+// classify a read-only tool as mutating (which both gates it behind approval
+// and down-ranks it out of the planner catalog).
+const MUTATING_HINT_RE = /\b(update|create|delete|patch|manage|save|write|set)\b/;
 
-const isMutatingTool = (name: string, description?: string): boolean => {
-  const hay = name + ' ' + (description ?? '');
-  return MUTATING_HINTS.some((hint) => hay.toLowerCase().includes(hint));
-};
+const isMutatingTool = (name: string, description?: string): boolean =>
+  MUTATING_HINT_RE.test((name + ' ' + (description ?? '')).toLowerCase());
 
 const getToolCatalog = (tools: MCPTool[]): ToolDescriptor[] =>
   tools.map((tool) => {
@@ -450,7 +460,20 @@ const makeAgentPrompt = (
   const safeMessage = clamp(userMessage, MAX_MESSAGE_CHARS);
   const safeHistory = compactHistory(history);
   const safeEvents = compactEvents(events);
-  const safeCatalog = compactCatalog(catalog, userMessage);
+
+  // Score the catalog against recent conversation, not just the latest
+  // message, and pin recently-used tools (see compactCatalog).
+  const recentToolKeys = new Set<string>();
+  for (const event of events) {
+    if (event.type === 'tool_success' || event.type === 'tool_error') {
+      recentToolKeys.add(event.server + '.' + event.name);
+    }
+  }
+  const scoringText = [
+    ...history.filter((m) => m.role === 'user').slice(-3).map((m) => m.content),
+    userMessage,
+  ].join(' ');
+  const safeCatalog = compactCatalog(catalog, scoringText, recentToolKeys);
 
   return [
     'You are deciding the next action for a tool-enabled assistant.',

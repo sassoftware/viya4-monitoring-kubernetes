@@ -823,14 +823,20 @@ def search_logs(
     for h in hits.get("hits", []):
         src = h.get("_source", {})
         kube = src.get("kube", {}) if isinstance(src.get("kube"), dict) else {}
-        lines.append({
+        entry = {
             "time": src.get("@timestamp"),
             "level": src.get("level"),
-            "namespace": kube.get("namespace") or src.get("kube.namespace"),
             "pod": kube.get("pod") or src.get("kube.pod"),
             "container": kube.get("container") or src.get("kube.container"),
-            "message": str(src.get("message", ""))[:300],
-        })
+            "message": str(src.get("message", ""))[:220],
+        }
+        # Omit fields that just repeat the filter — every char counts against
+        # the client's per-result budget when there are many lines.
+        if not namespace:
+            entry["namespace"] = kube.get("namespace") or src.get("kube.namespace")
+        if pod and entry.get("container") == entry.get("pod"):
+            entry.pop("container", None)
+        lines.append(entry)
 
     sample_by_level: dict = {}
     for line in lines:
