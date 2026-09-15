@@ -28,7 +28,7 @@ export async function connectMcpServer(config: McpServerConfig): Promise<Client>
     return existing.client;
   }
 
-  const client = new Client({ name: 'joel-mcp-chat', version: '1.0.0' });
+  const client = new Client({ name: 'v4m-ai-agent', version: '1.0.0' });
   const transport = await createTransport(config.url);
 
   await client.connect(transport);

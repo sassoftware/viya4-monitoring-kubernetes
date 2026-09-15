@@ -712,7 +712,7 @@ def recent_changes(namespace: str = "", window: str = "1h") -> dict:
 # Log search against the V4M logging stack (OpenSearch). Metrics say THAT
 # something is wrong; logs say WHY — this closes the investigation loop.
 
-OPENSEARCH_URL = os.getenv("OPENSEARCH_URL", "https://v4m-es-client-service.logging.svc:9200")
+OPENSEARCH_URL = os.getenv("OPENSEARCH_URL", "https://v4m-search.logging.svc:9200")
 OPENSEARCH_USER = os.getenv("OPENSEARCH_USER", "admin")
 OPENSEARCH_PASSWORD = os.getenv("OPENSEARCH_PASSWORD", "admin")
 OPENSEARCH_INDEX = os.getenv("OPENSEARCH_INDEX", "viya_logs-*")
@@ -761,21 +761,37 @@ def search_logs(
 
     body = {
         "size": max(1, min(int(max_lines), 50)),
-        "sort": [{"@timestamp": "desc"}],
+        "sort": [{"@timestamp": {"order": "desc", "unmapped_type": "date"}}],
         "query": {"bool": {"filter": filters, "must": must}},
         "aggs": {"levels": {"terms": {"field": "level", "size": 10}}},
         "_source": ["@timestamp", "level", "kube.namespace", "kube.pod", "kube.container", "message"],
     }
 
-    try:
-        resp = requests.post(
+    def _search(request_body: dict):
+        return requests.post(
             f"{OPENSEARCH_URL}/{OPENSEARCH_INDEX}/_search",
-            json=body,
+            json=request_body,
             auth=(OPENSEARCH_USER, OPENSEARCH_PASSWORD),
             verify=False,
             timeout=20,
         )
-        resp.raise_for_status()
+
+    try:
+        resp = _search(body)
+        if resp.status_code == 400:
+            # Field mappings vary between logging deployments — e.g. a terms
+            # aggregation on a text-mapped `level` is an HTTP 400. Retry once
+            # without the aggregation before giving up.
+            body.pop("aggs", None)
+            resp = _search(body)
+        if resp.status_code >= 400:
+            return {
+                "error": f"OpenSearch rejected the query (HTTP {resp.status_code}): {resp.text[:400]}",
+                "hint": (
+                    "The index pattern or field names may not match this cluster's log "
+                    "schema. Report the rejection reason above to the user."
+                ),
+            }
         data = resp.json()
     except Exception as exc:
         return {

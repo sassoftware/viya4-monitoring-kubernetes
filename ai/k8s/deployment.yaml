@@ -38,7 +38,9 @@ spec:
         # internal-user-admin secret — the literal below only applies if you
         # apply this file directly.
         - name: OPENSEARCH_URL
-          value: "https://v4m-es-client-service.logging.svc:9200"
+          # The logging stack's OpenSearch service (ES_SERVICENAME in
+          # logging/bin/common.sh)
+          value: "https://v4m-search.logging.svc:9200"
         - name: OPENSEARCH_USER
           value: "admin"
         - name: OPENSEARCH_PASSWORD

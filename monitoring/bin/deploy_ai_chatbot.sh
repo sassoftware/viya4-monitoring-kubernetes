@@ -241,7 +241,7 @@ if [ "$grafanaRunning" -ne 0 ]; then
     exit 0
 fi
 
-pluginId="${CHATBOT_PLUGIN_ID:-mainorg-joelmcpchat-app}"
+pluginId="${CHATBOT_PLUGIN_ID:-v4m-aiagent-app}"
 pluginFile="${pluginId}.zip"
 pluginSrcDir="ai/chatbot-plugin"
 builtZip="$pluginSrcDir/$pluginFile"

@@ -1,13 +1,13 @@
 {
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
   "type": "app",
-  "name": "Observability-MCP-Chat",
-  "id": "mainorg-joelmcpchat-app",
+  "name": "V4M AI Agent",
+  "id": "v4m-aiagent-app",
   "info": {
-    "keywords": ["app"],
-    "description": "",
+    "keywords": ["app", "observability", "ai"],
+    "description": "AI assistant for SAS Viya Monitoring for Kubernetes — ask about your cluster, dashboards, metrics, and logs in plain language.",
     "author": {
-      "name": "Main org"
+      "name": "SAS"
     },
     "logos": {
       "small": "img/logo.svg",
