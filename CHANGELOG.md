@@ -7,6 +7,13 @@ This addresses a persistent problem which had caused the application to fail to
 load consistently.  Note that this is an upper limit and the pod will generally
 need/use far less during normal operation.
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 3.6.0 to 3.8.0
+     * NOTE: During testing, an issue with the OpenSearch Dashboards API and
+versions of `curl`  prior to version 7.69.0 (released in March 2020) was identified.
+The issue prevented the successful import of this project's pre-built content into
+OpenSearch Dashboards.  The recommended solution is to update `curl` to a more
+recent version.  Disabling the use of Kubernetes port-forwarding (by setting the
+environment variable `LOG_ALWAY_PORT_FORWARD` to '*false*') prior to deploying
+the log monitoring stack also resolved the issue when Contour was used for ingress.
   * [UPGRADE] OpenSearch Helm chart upgraded from 3.6.0 to 3.8.0
   * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 3.6.0 to 3.8.0
   * [UPGRADE] Fluent Bit upgraded from 5.0.7 to 5.1.2
