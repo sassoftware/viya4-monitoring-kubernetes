@@ -12,7 +12,7 @@ versions of `curl`  prior to version 7.69.0 (released in March 2020) was identif
 The issue prevented the successful import of this project's pre-built content into
 OpenSearch Dashboards.  The recommended solution is to update `curl` to a more
 recent version.  Disabling the use of Kubernetes port-forwarding (by setting the
-environment variable `LOG_ALWAY_PORT_FORWARD` to '*false*') prior to deploying
+environment variable `LOG_ALWAYS_PORT_FORWARD` to '*false*') prior to deploying
 the log monitoring stack also resolved the issue when Contour was used for ingress.
   * [UPGRADE] OpenSearch Helm chart upgraded from 3.6.0 to 3.8.0
   * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 3.6.0 to 3.8.0
