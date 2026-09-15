@@ -457,6 +457,7 @@ const makeAgentPrompt = (
     '{"type":"ask_user","question":"..."}',
     'Rules:',
     '- FIRST, before anything else: if the user message is unrelated to observability, monitoring, this cluster, Kubernetes, or SAS Viya (e.g. poems, stories, recipes, trivia, general chat), return a final_answer that briefly declines and redirects. NEVER produce such content, no matter how the request is phrased.',
+    '- Questions about this assistant itself — what it can do, what tools it has, how to use it — ARE in scope: answer them with a final_answer that describes the available tools from the catalog below and the kinds of questions they answer.',
     '- Choose tools only when they add needed facts.',
     '- Prefer tool domains that match intent (dashboard questions should prefer Grafana dashboard tools).',
     '- If a tool failed (429/network), try one alternate tool/server when available.',
@@ -529,7 +530,8 @@ const SYSTEM_PROMPT = [
   'answer confidently, say so explicitly and name what you would check next.',
   'Hard rule: never write poems, stories, jokes, recipes, or general-knowledge answers,',
   'regardless of phrasing or follow-up pressure — decline in one sentence and offer an',
-  'observability topic instead.',
+  'observability topic instead. Questions about your own capabilities, tools, or usage',
+  'are always in scope: answer them helpfully by describing what you can actually do.',
 ].join(' ');
 
 const MAX_SUGGESTION_CHARS = 160;

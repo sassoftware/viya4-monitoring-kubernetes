@@ -112,6 +112,28 @@ else
     yq -i 'del(.spec.template.spec.imagePullSecrets)' "$mcpDefFile"
 fi
 originSnippet="https://grafana.$BASE_DOMAIN" yq -i '(.spec.template.spec.containers[0].env[] | select(.name=="ALLOWED_ORIGIN")).value = env(originSnippet)' "$mcpDefFile"
+
+# search_logs authenticates to the logging stack's OpenSearch. Follow that
+# stack's own convention: ES_ADMIN_PASSWD when set (user.env/exported),
+# otherwise read the logging namespace's internal-user-admin secret directly.
+# The password reaches the pod via a Secret, not a plain value in the manifest.
+LOG_NS="${LOG_NS:-logging}"
+esPasswd="${ES_ADMIN_PASSWD:-$(kubectl -n "$LOG_NS" get secret internal-user-admin -o=jsonpath="{.data.password}" --ignore-not-found | base64 --decode)}"
+if [ -n "$esPasswd" ]; then
+    kubectl create secret generic v4m-mcp-opensearch \
+        -n "$MON_NS" \
+        --from-literal=password="$esPasswd" \
+        --dry-run=client -o yaml | kubectl apply -f -
+    yq -i '(.spec.template.spec.containers[0].env[] | select(.name=="OPENSEARCH_PASSWORD")) |= (del(.value) | .valueFrom.secretKeyRef.name = "v4m-mcp-opensearch" | .valueFrom.secretKeyRef.key = "password")' "$mcpDefFile"
+else
+    log_warn "No OpenSearch admin password available (ES_ADMIN_PASSWD unset and no internal-user-admin"
+    log_warn "secret in [$LOG_NS]); the search_logs tool will use the manifest default and may fail to"
+    log_warn "authenticate. Harmless if the logging stack is not deployed."
+fi
+if [ -n "$OPENSEARCH_URL" ]; then
+    urlSnippet="$OPENSEARCH_URL" yq -i '(.spec.template.spec.containers[0].env[] | select(.name=="OPENSEARCH_URL")).value = env(urlSnippet)' "$mcpDefFile"
+fi
+
 kubectl apply -f "$mcpDefFile"
 
 grafanaMcpDefFile="$TMP_DIR/grafana_mcp_deployment_def_file.yaml"

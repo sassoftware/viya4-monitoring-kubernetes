@@ -33,8 +33,10 @@ spec:
           value: "https://prometheus-operated.monitoring.svc:9090"
         # --- log search (V4M logging stack / OpenSearch) ---
         # If the logging stack isn't deployed, search_logs degrades gracefully.
-        # Change OPENSEARCH_PASSWORD if your logging deployment doesn't use the
-        # default admin password (see the logging stack's internal-user-admin).
+        # deploy_ai_chatbot.sh replaces OPENSEARCH_PASSWORD with a secretKeyRef
+        # sourced from ES_ADMIN_PASSWD or the logging namespace's
+        # internal-user-admin secret — the literal below only applies if you
+        # apply this file directly.
         - name: OPENSEARCH_URL
           value: "https://v4m-es-client-service.logging.svc:9200"
         - name: OPENSEARCH_USER
