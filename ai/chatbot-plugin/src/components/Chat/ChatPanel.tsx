@@ -72,7 +72,7 @@ export type ChatPanelProps = {
 
 const AGENT_MAX_STEPS = 5;
 
-const MAX_HISTORY_MESSAGES = 8;
+const MAX_HISTORY_MESSAGES = 6;
 // High enough that the ENTIRE combined catalog always fits with headroom
 // (13 v4m tools + ~20 grafana-mcp tools ≈ 33 today): every "tool not in my
 // catalog" failure so far came from tools being scored out of a too-small
@@ -87,6 +87,23 @@ const MAX_CONTEXT_QUERY_CHARS = 1500;
 
 const clamp = (value: string, limit: number): string =>
   value.length <= limit ? value : value.slice(0, limit) + '... [truncated]';
+
+// Every empty completion logs its finish_reason to the browser console —
+// the one field that distinguishes the possible root causes: "length" means
+// the (reasoning) token budget ran out before any visible text was emitted,
+// "content_filter" means the gateway suppressed the output, and "stop" with
+// no content is a genuine model quirk.
+const logEmptyCompletion = (stage: string, response: unknown): void => {
+  const parsed = response as {
+    choices?: Array<{ finish_reason?: string }>;
+    usage?: unknown;
+  };
+  console.warn('[v4m-ai-agent] empty completion', {
+    stage,
+    finish_reason: parsed?.choices?.[0]?.finish_reason ?? '(none)',
+    usage: parsed?.usage,
+  });
+};
 
 const compactHistory = (history: ChatMessage[]): ChatMessage[] =>
   history.slice(-MAX_HISTORY_MESSAGES).map((m) => ({
@@ -159,23 +176,36 @@ const compactCatalog = (
     .slice(0, MAX_TOOLS_FOR_PROMPT)
     .map((entry) => entry.tool);
 
-const compactEvents = (events: AgentEvent[]): AgentEvent[] =>
-  events.slice(-10).map((e) => {
-    if (e.type === 'tool_success') {
-      return { ...e, result: clamp(serializeResult(e.result), MAX_EVENT_CHARS) };
-    }
-    return { ...e, message: clamp(e.message, MAX_MESSAGE_CHARS) };
-  });
+// Tiered compaction: the newest 3 events keep full detail (they're what the
+// current answer is being built from); older ones shrink to headlines. Keeps
+// cross-turn tool memory without the planner prompt growing to ~25KB of
+// stale JSON — outsized prompts drive up (reasoning-)token burn, which is
+// the leading cause of empty completions.
+const MAX_STALE_EVENT_CHARS = 500;
 
-// Whole-word matching, NOT substring: "offset" and "StatefulSet" must not
-// classify a read-only tool as mutating (which both gates it behind approval
-// and down-ranks it out of the planner catalog). snake_case and kebab-case
-// are split first so "update_dashboard" still counts as mutating — \b alone
-// treats "_" as a word character and would miss it.
+const compactEvents = (events: AgentEvent[]): AgentEvent[] => {
+  const recent = events.slice(-10);
+  const detailedFrom = Math.max(0, recent.length - 3);
+  return recent.map((e, index) => {
+    const limit = index >= detailedFrom ? MAX_EVENT_CHARS : MAX_STALE_EVENT_CHARS;
+    if (e.type === 'tool_success') {
+      return { ...e, result: clamp(serializeResult(e.result), limit) };
+    }
+    return { ...e, message: clamp(e.message, Math.min(limit, MAX_MESSAGE_CHARS)) };
+  });
+};
+
+// Whole-word matching on the tool NAME only. Write tools declare themselves
+// by name (update_dashboard, create_folder); descriptions are prose where
+// words like "set" ("returns the set of alerts") and "create" appear
+// innocently — checking them produced false approval gates on read-only
+// tools. snake_case/kebab-case names are split first so "update_dashboard"
+// still matches — \b alone treats "_" as a word character and would miss it.
+// The server-side --disable-write flag remains the hard enforcement.
 const MUTATING_HINT_RE = /\b(update|create|delete|patch|manage|save|write|set)\b/;
 
-const isMutatingTool = (name: string, description?: string): boolean =>
-  MUTATING_HINT_RE.test((name + ' ' + (description ?? '')).toLowerCase().replace(/[_\-.]/g, ' '));
+const isMutatingTool = (name: string): boolean =>
+  MUTATING_HINT_RE.test(name.toLowerCase().replace(/[_\-.]/g, ' '));
 
 const getToolCatalog = (tools: MCPTool[]): ToolDescriptor[] =>
   tools.map((tool) => {
@@ -185,7 +215,7 @@ const getToolCatalog = (tools: MCPTool[]): ToolDescriptor[] =>
       name: tool.name,
       description: tool.description,
       required: Array.isArray(schema.required) ? schema.required : [],
-      mutating: isMutatingTool(tool.name, tool.description),
+      mutating: isMutatingTool(tool.name),
     };
   });
 
@@ -433,29 +463,21 @@ const fetchPanelSnapshot = async (context: DashboardChatContext): Promise<string
 // PromQL and investigation patterns from scratch, which is where wrong
 // queries and guessed answers come from.
 const QUERY_GUIDANCE = [
-  'Query recipes (adapt namespace/labels as needed):',
+  'Query recipes (adapt labels; the window arg spans "30m"-"7d" — the range is NOT fixed, no panel ID needed):',
   '- Namespace CPU: sum(rate(container_cpu_usage_seconds_total{namespace="X",container!=""}[5m]))',
   '- Namespace memory: sum(container_memory_working_set_bytes{namespace="X",container!=""})',
-  '- Pod count: count(kube_pod_info{namespace="X"})',
-  '- Pod restarts: increase(kube_pod_container_status_restarts_total{namespace="X"}[1h])',
+  '- Pods: count(kube_pod_info{namespace="X"}); restarts: increase(kube_pod_container_status_restarts_total{namespace="X"}[1h])',
   '- Disk fill forecast: predict_linear(kubelet_volume_stats_available_bytes[6h], 86400)',
-  'Investigation patterns:',
-  '- "Is this normal?" -> run the same expr twice with query_prometheus: current window, then wrapped in (expr offset 1d) or offset 7d, and compare.',
-  '- Panel shows no data -> explain_empty_query with the panel expr; if the metric is absent -> check_metric_exists; if stale -> list_failing_targets.',
-  '- Spike/anomaly -> query_prometheus around when it started, then recent_changes with the same window to correlate restarts/rollouts/OOM kills.',
-  '- "the Viya namespace" -> Viya namespaces are customer-named (e.g. d122472); call list_viya_namespaces to resolve, never assume namespace="viya" or "Viya".',
-  '- Pod inventory / "what does each pod do" -> list_pods for the workloads, then search_docs to explain each component.',
-  '- "What do the logs say" / errors from a pod / why did it crash -> search_logs (filter by namespace/pod/level). Metrics show WHAT is wrong; logs show WHY — after finding a metric anomaly, check the logs of the affected pods.',
-  '- A SPECIFIC pod ("why is pod X pending/unhealthy", "analyze pod X") -> describe_pod, then search_logs for that pod.',
-  '- Full pod-name lists in big namespaces -> list_pods detail=true is PAGINATED: follow next_offset (0, 30, 60, ...) across multiple tool calls until null — never report the list as unavailable because one page was truncated.',
-  '- query_prometheus\'s window argument DOES change the time range ("30m" through "7d"): for "show this over the last 24 hours", re-run the same expr with window="1d". There is no separate snapshot tool and no panel ID is needed.',
-  '- Panel queries may contain unresolved dashboard variables like $cluster or ${datasource}. "$var" is never a literal value: drop or substitute those matchers before querying, and never diagnose the datasource as broken merely because its uid is a $variable.',
-  '- Conceptual/how-to/meaning questions -> search_docs.',
-  'Server routing (two tool servers):',
-  '- Metric ANALYSIS (values, trends, comparisons, rankings) -> the local server\'s query_prometheus: it takes a raw PromQL expr and NO datasource UID — never ask the user for a datasource UID to run a metric query. The grafana server\'s query_prometheus (which does want a UID) returns raw frames — avoid it for analysis.',
-  '- Discovering valid label values / metric names -> the grafana server\'s list_prometheus_label_values / list_prometheus_metric_names.',
-  '- Finding dashboards or another dashboard\'s queries -> the grafana server\'s search_dashboards / get_dashboard_panel_queries; datasource inventory -> list_datasources.',
-  '- Alert RULE definitions and thresholds -> the grafana server\'s alerting tools; alerts CURRENTLY FIRING -> firing_alerts on the local server.',
+  'Patterns:',
+  '- "Is this normal?" -> same expr now vs (expr offset 1d) or 7d; compare.',
+  '- No data -> explain_empty_query; metric absent -> check_metric_exists; stale -> list_failing_targets.',
+  '- Spike -> query_prometheus around onset + recent_changes over the same window.',
+  '- "the Viya namespace" is customer-named (e.g. d122472) -> list_viya_namespaces first; never assume namespace="viya".',
+  '- Pod inventory -> list_pods (workloads + search_docs for functions); full names -> detail=true, paginated: follow next_offset until null, never stop at one page. One pod -> describe_pod, then search_logs.',
+  '- Logs answer WHY after metrics show WHAT -> search_logs (namespace/pod/level filters). Concepts/how-to -> search_docs.',
+  '- "$var"/"${var}" in panel queries are unresolved dashboard variables, never literal values: drop or substitute them, and a $variable datasource uid is not a broken datasource.',
+  '- If the user agrees with or echoes proposed next steps, run them now instead of replying with prose.',
+  'Server routing: the local query_prometheus takes raw PromQL, NO datasource UID, and returns compact stats — use it for all analysis/rankings (the grafana one wants a UID and returns raw frames; avoid for analysis). Discover metric/label names via grafana list_prometheus_*; dashboards and datasource inventory via grafana search/list tools; alert RULES via grafana alerting tools, alerts FIRING NOW via firing_alerts.',
 ].join('\n');
 
 const makeAgentPrompt = (
@@ -569,6 +591,12 @@ const SYSTEM_PROMPT = [
 ].join(' ');
 
 const MAX_SUGGESTION_CHARS = 160;
+
+// Shown as a normal assistant message when every recovery attempt still
+// produced empty content — conversational, instead of a red error banner.
+const EMPTY_REPLY_FALLBACK =
+  "I wasn't able to put together an answer for that one. Could you rephrase it, " +
+  'or tell me a specific check to run (metrics, logs, pods, alerts, docs)?';
 
 const GENERAL_SUGGESTIONS = [
   'Summarize the health of the monitoring namespace.',
@@ -780,12 +808,17 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
 
     type LlmMessages = Parameters<typeof openai.chatCompletions>[0]['messages'];
 
-    // Stream the user-facing answer token-by-token into the draft bubble;
-    // falls back to a plain completion if the LLM gateway can't stream.
+    // Stream the user-facing answer token-by-token into the draft bubble.
+    // Recovery ladder for the empty-response failure mode: a stream that
+    // errors OR completes with no content falls back to a plain completion,
+    // and a still-empty result gets one retry with an explicit nudge (models
+    // sometimes emit nothing for statement/acknowledgement messages).
     const getFinalAnswer = async (llmMessages: LlmMessages): Promise<string> => {
       setActivity('Writing the answer...');
+      let answer = '';
+
       try {
-        return await new Promise<string>((resolve, reject) => {
+        answer = await new Promise<string>((resolve, reject) => {
           let accumulated = '';
           streamSubRef.current = openai
             .streamChatCompletions({ messages: llmMessages })
@@ -802,11 +835,39 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
             });
         });
       } catch {
-        const response = await openai.chatCompletions({ messages: llmMessages });
-        return response?.choices?.[0]?.message?.content ?? '';
+        answer = '';
       } finally {
         streamSubRef.current = null;
       }
+
+      if (!answer.trim()) {
+        const response = await openai.chatCompletions({ messages: llmMessages });
+        answer = response?.choices?.[0]?.message?.content ?? '';
+        if (!answer.trim()) {
+          logEmptyCompletion('final-answer', response);
+        }
+      }
+
+      if (!answer.trim()) {
+        const nudged = await openai.chatCompletions({
+          messages: [
+            ...llmMessages,
+            {
+              role: 'system' as const,
+              content:
+                'Your previous attempt returned empty content. Respond now with a brief, helpful ' +
+                'answer. If the user message is a statement or acknowledgement rather than a ' +
+                'question, briefly confirm and propose the concrete next step.',
+            },
+          ],
+        });
+        answer = nudged?.choices?.[0]?.message?.content ?? '';
+        if (!answer.trim()) {
+          logEmptyCompletion('final-answer-nudged', nudged);
+        }
+      }
+
+      return answer;
     };
 
     const dashboardPrompt = makeDashboardContextPrompt(context, panelSnapshot);
@@ -847,7 +908,7 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
         if (finalReply) {
           setMessages((current) => [...current, { role: 'assistant', content: finalReply }]);
         } else {
-          setError('The model returned an empty response.');
+          setMessages((current) => [...current, { role: 'assistant', content: EMPTY_REPLY_FALLBACK }]);
         }
 
         setDraftReply('');
@@ -886,7 +947,7 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
         if (finalReply) {
           setMessages((current) => [...current, { role: 'assistant', content: finalReply }]);
         } else {
-          setError('The model returned an empty response.');
+          setMessages((current) => [...current, { role: 'assistant', content: EMPTY_REPLY_FALLBACK }]);
         }
 
         setDraftReply('');
@@ -951,6 +1012,9 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
         assertActiveRequest();
 
         const actionText = actionResp?.choices?.[0]?.message?.content ?? '';
+        if (!actionText.trim()) {
+          logEmptyCompletion(`planner-step-${step + 1}`, actionResp);
+        }
         const action = parseAgentAction(actionText);
 
         if (!action) {
