@@ -111,70 +111,31 @@ const compactHistory = (history: ChatMessage[]): ChatMessage[] =>
     content: clamp(m.content, MAX_MESSAGE_CHARS),
   }));
 
-const tokenize = (text: string): string[] =>
-  Array.from(new Set(text.toLowerCase().split(/[^a-z0-9]+/).filter((token) => token.length > 2)));
+// The LLM-app health check costs a round trip on every message. A positive
+// result is cached for the page's lifetime; a negative one is re-checked
+// each time, so enabling the integration mid-session works without a reload.
+let llmEnabledCache = false;
 
-const scoreToolForPrompt = (tool: ToolDescriptor, userMessage: string): number => {
-  const message = userMessage.toLowerCase();
-  const haystack = `${tool.server} ${tool.name} ${tool.description ?? ''}`.toLowerCase();
-  const tokens = tokenize(userMessage);
-
-  let score = 0;
-
-  for (const token of tokens) {
-    if (haystack.includes(token)) {
-      score += 3;
-    }
+const isLlmEnabled = async (): Promise<boolean> => {
+  if (!llmEnabledCache) {
+    llmEnabledCache = await openai.enabled();
   }
-
-  if (message.includes('grafana') && tool.server === 'grafana') {
-    score += 8;
-  }
-
-  if ((message.includes('dashboard') || message.includes('dashboards')) && haystack.includes('dashboard')) {
-    score += 10;
-  }
-
-  if ((message.includes('alert') || message.includes('alerts')) && haystack.includes('alert')) {
-    score += 10;
-  }
-
-  if ((message.includes('folder') || message.includes('folders')) && haystack.includes('folder')) {
-    score += 10;
-  }
-
-  if ((message.includes('datasource') || message.includes('data source')) && haystack.includes('datasource')) {
-    score += 10;
-  }
-
-  if (!tool.mutating) {
-    score += 1;
-  }
-
-  return score;
+  return llmEnabledCache;
 };
 
-const compactCatalog = (
-  catalog: ToolDescriptor[],
-  scoringText: string,
-  recentToolKeys: Set<string>
-): ToolDescriptor[] =>
-  catalog
-    .map((tool) => ({
-      tool: {
-        ...tool,
-        description: tool.description ? clamp(tool.description, MAX_TOOL_DESC_CHARS) : undefined,
-      },
-      // Tools used in recent turns stay in the catalog even when the current
-      // message ("approve", "yes, all of them") matches nothing by keyword —
-      // otherwise mid-task follow-ups lose the very tool being used.
-      score:
-        scoreToolForPrompt(tool, scoringText) +
-        (recentToolKeys.has(tool.server + '.' + tool.name) ? 12 : 0),
-    }))
-    .sort((left, right) => right.score - left.score)
+// Deterministic catalog: since MAX_TOOLS_FOR_PROMPT exceeds the combined
+// tool count, per-message relevance scoring no longer decides anything —
+// a stable alphabetical order instead keeps the planner prompt's prefix
+// byte-identical across calls, which lets the LLM gateway's automatic
+// prompt caching kick in (lower latency and token cost per planning step).
+const compactCatalog = (catalog: ToolDescriptor[]): ToolDescriptor[] =>
+  [...catalog]
+    .sort((a, b) => (a.server + '.' + a.name).localeCompare(b.server + '.' + b.name))
     .slice(0, MAX_TOOLS_FOR_PROMPT)
-    .map((entry) => entry.tool);
+    .map((tool) => ({
+      ...tool,
+      description: tool.description ? clamp(tool.description, MAX_TOOL_DESC_CHARS) : undefined,
+    }));
 
 // Tiered compaction: the newest 3 events keep full detail (they're what the
 // current answer is being built from); older ones shrink to headlines. Keeps
@@ -473,7 +434,7 @@ const QUERY_GUIDANCE = [
   '- No data -> explain_empty_query; metric absent -> check_metric_exists; stale -> list_failing_targets.',
   '- Spike -> query_prometheus around onset + recent_changes over the same window.',
   '- "the Viya namespace" is customer-named (e.g. d122472) -> list_viya_namespaces first; never assume namespace="viya".',
-  '- Pod inventory -> list_pods (workloads + search_docs for functions); full names -> detail=true, paginated: follow next_offset until null, never stop at one page. One pod -> describe_pod (includes Kubernetes events with exact failure messages).',
+  '- Pod inventory -> list_pods (workloads + search_docs for functions); "pending/failed pods" -> list_pods(phase="Pending"|"Failed") — every row carries phase; full names -> detail=true, paginated: follow next_offset until null, never stop at one page. One pod -> describe_pod (includes Kubernetes events with exact failure messages).',
   '- Logs answer WHY after metrics show WHAT: get_pod_logs = live tail of one pod (previous=true for the pre-crash container); search_logs = indexed store for many pods / by level / history. Concepts/how-to -> search_docs.',
   '- "$var"/"${var}" in panel queries are unresolved dashboard variables, never literal values: drop or substitute them, and a $variable datasource uid is not a broken datasource.',
   '- If the user agrees with or echoes proposed next steps, run them now instead of replying with prose.',
@@ -491,20 +452,11 @@ const makeAgentPrompt = (
   const safeHistory = compactHistory(history);
   const safeEvents = compactEvents(events);
 
-  // Score the catalog against recent conversation, not just the latest
-  // message, and pin recently-used tools (see compactCatalog).
-  const recentToolKeys = new Set<string>();
-  for (const event of events) {
-    if (event.type === 'tool_success' || event.type === 'tool_error') {
-      recentToolKeys.add(event.server + '.' + event.name);
-    }
-  }
-  const scoringText = [
-    ...history.filter((m) => m.role === 'user').slice(-3).map((m) => m.content),
-    userMessage,
-  ].join(' ');
-  const safeCatalog = compactCatalog(catalog, scoringText, recentToolKeys);
+  const safeCatalog = compactCatalog(catalog);
 
+  // Section order matters for provider prompt caching: everything stable
+  // across a session (rules, guidance, catalog) comes first as an unchanging
+  // prefix; volatile content (context, history, events, the question) last.
   return [
     'You are deciding the next action for a tool-enabled assistant.',
     'Return strict JSON only with one of these shapes:',
@@ -524,18 +476,18 @@ const makeAgentPrompt = (
     '',
     QUERY_GUIDANCE,
     '',
-    ...(dashboardPrompt ? ['Dashboard context:', dashboardPrompt, ''] : []),
-    'User message:',
-    safeMessage,
+    'Available tools:',
+    JSON.stringify(safeCatalog),
     '',
+    ...(dashboardPrompt ? ['Dashboard context:', dashboardPrompt, ''] : []),
     'Conversation so far:',
     JSON.stringify(safeHistory),
     '',
     'Recent tool events (earlier turns included — reuse this evidence instead of re-running identical calls):',
     JSON.stringify(safeEvents),
     '',
-    'Available tools:',
-    JSON.stringify(safeCatalog),
+    'User message:',
+    safeMessage,
   ].join('\n');
 };
 
@@ -737,7 +689,7 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
     let cancelled = false;
     (async () => {
       try {
-        const enabled = await openai.enabled();
+        const enabled = await isLlmEnabled();
         if (!enabled || cancelled) {
           return;
         }
@@ -876,7 +828,7 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
       : [];
 
     try {
-      const enabled = await openai.enabled();
+      const enabled = await isLlmEnabled();
       assertActiveRequest();
       if (!enabled) {
         setError('The OpenAI integration is not enabled for this plugin.');

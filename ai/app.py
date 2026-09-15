@@ -904,17 +904,20 @@ def list_viya_namespaces() -> dict:
     }
 
 
+_POD_PHASES = {"Pending", "Running", "Succeeded", "Failed", "Unknown"}
+
+
 @mcp.tool()
-def list_pods(namespace: str, detail: bool = False, offset: int = 0) -> dict:
+def list_pods(namespace: str, detail: bool = False, offset: int = 0, phase: str = "") -> dict:
     """List what runs in a namespace: workloads (default) or individual pods.
 
-    Use for "what pods are running in X" or "what does each pod do". The
-    default workload-grouped view covers EVERY pod in the namespace (one row
-    per Deployment/StatefulSet/etc. with pod/ready/restart counts) — pair the
-    workload names with search_docs to explain each component's function.
-    Pass detail=true for individual pod names, PAGINATED 30 at a time: the
-    result's next_offset tells you the offset for the next page — keep calling
-    until next_offset is null to enumerate every pod in a large namespace.
+    Use for "what pods are running in X", "what does each pod do", or
+    "which pods are Pending/Failed" (pass phase= to filter — every row carries
+    the pod's phase either way). The default workload-grouped view covers
+    EVERY pod in the namespace (one row per Deployment/StatefulSet/etc.);
+    pair workload names with search_docs to explain each component. Pass
+    detail=true for individual pod names, PAGINATED 30 at a time: follow the
+    result's next_offset until null to enumerate a large namespace.
 
     Args:
         namespace: The namespace to list, e.g. 'monitoring' or a Viya
@@ -922,9 +925,14 @@ def list_pods(namespace: str, detail: bool = False, offset: int = 0) -> dict:
         detail: false (default) = one row per workload; true = individual
             pods, 30 per page.
         offset: Page start for detail=true (0, 30, 60, ...).
+        phase: Optional filter: Pending, Running, Succeeded, Failed, Unknown.
     """
     if not _NAMESPACE_RE.fullmatch(namespace):
         return {"error": f"'{namespace}' is not a valid namespace name."}
+
+    phase = phase.strip().capitalize() if phase else ""
+    if phase and phase not in _POD_PHASES:
+        return {"error": f"'{phase}' is not a pod phase; valid: {sorted(_POD_PHASES)}."}
 
     ns = f'namespace="{namespace}"'
     try:
@@ -935,6 +943,9 @@ def list_pods(namespace: str, detail: bool = False, offset: int = 0) -> dict:
         )
         restarts = prom.custom_query(
             query="sum by (pod) (kube_pod_container_status_restarts_total" + _label_selector(ns) + ")"
+        )
+        phases = prom.custom_query(
+            query="kube_pod_status_phase" + _label_selector(ns) + " == 1"
         )
     except Exception as exc:
         return {"error": f"Query failed: {exc}"}
@@ -950,6 +961,7 @@ def list_pods(namespace: str, detail: bool = False, offset: int = 0) -> dict:
     restarts_by_pod = {
         r["metric"].get("pod"): int(_safe_float(r["value"][1])) for r in restarts
     }
+    phase_by_pod = {r["metric"].get("pod"): r["metric"].get("phase") for r in phases}
 
     pods = []
     for r in info:
@@ -962,9 +974,21 @@ def list_pods(namespace: str, detail: bool = False, offset: int = 0) -> dict:
             "workload": workload or pod,
             "owner_kind": kind,
             "node": r["metric"].get("node"),
+            "phase": phase_by_pod.get(pod, "unknown"),
             "ready": ready_by_pod.get(pod, False),
             "restarts": restarts_by_pod.get(pod, 0),
         })
+
+    if phase:
+        pods = [p for p in pods if p["phase"] == phase]
+        if not pods:
+            return {
+                "namespace": namespace,
+                "phase_filter": phase,
+                "pod_count": 0,
+                "pods": [],
+                "note": f"No pods in phase {phase} — that phase is currently empty in this namespace.",
+            }
 
     pods.sort(key=lambda p: (p["workload"], p["pod"]))
 

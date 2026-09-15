@@ -279,7 +279,24 @@ export type ToolDiscoveryResult = {
   errors: ToolDiscoveryError[];
 };
 
+// Tool catalogs change when a server is redeployed, not between messages —
+// a short cache removes two MCP round trips from every turn. Only fully
+// successful discoveries are cached, so partial failures retry each turn.
+const TOOL_DISCOVERY_TTL_MS = 5 * 60 * 1000;
+let toolDiscoveryKey = '';
+let toolDiscoveryAt = 0;
+let toolDiscoveryCache: ToolDiscoveryResult | null = null;
+
 export async function listAllToolsSafe(configs: McpServerConfig[]): Promise<ToolDiscoveryResult> {
+  const cacheKey = JSON.stringify(configs);
+  if (
+    toolDiscoveryCache &&
+    toolDiscoveryKey === cacheKey &&
+    Date.now() - toolDiscoveryAt < TOOL_DISCOVERY_TTL_MS
+  ) {
+    return toolDiscoveryCache;
+  }
+
   const settled = await Promise.allSettled(
     configs.map(async (config) => {
       const client = await connectMcpServer(config);
@@ -307,5 +324,11 @@ export async function listAllToolsSafe(configs: McpServerConfig[]): Promise<Tool
     }
   });
 
-  return { tools, errors };
+  const result: ToolDiscoveryResult = { tools, errors };
+  if (errors.length === 0) {
+    toolDiscoveryKey = cacheKey;
+    toolDiscoveryAt = Date.now();
+    toolDiscoveryCache = result;
+  }
+  return result;
 }
