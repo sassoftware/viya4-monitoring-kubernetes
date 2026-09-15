@@ -753,7 +753,15 @@ def search_logs(
     if pod:
         filters.append({"wildcard": {"kube.pod": {"value": pod + "*"}}})
     if level:
-        filters.append({"term": {"level": level.upper()}})
+        # Mapping-proof: matches whether `level` is keyword-mapped or text
+        # with a .keyword subfield (an unmapped clause simply never matches).
+        lv = level.upper()
+        filters.append({
+            "bool": {
+                "should": [{"term": {"level": lv}}, {"term": {"level.keyword": lv}}],
+                "minimum_should_match": 1,
+            }
+        })
 
     must = []
     if query:
@@ -763,7 +771,11 @@ def search_logs(
         "size": max(1, min(int(max_lines), 50)),
         "sort": [{"@timestamp": {"order": "desc", "unmapped_type": "date"}}],
         "query": {"bool": {"filter": filters, "must": must}},
-        "aggs": {"levels": {"terms": {"field": "level", "size": 10}}},
+        # .keyword never 400s: on a keyword-mapped `level` the subfield is
+        # simply unmapped (empty buckets, harmless), and on text-mapped it is
+        # the only aggregatable form. returned_sample_by_level covers the
+        # empty-bucket case.
+        "aggs": {"levels": {"terms": {"field": "level.keyword", "size": 10}}},
         "_source": ["@timestamp", "level", "kube.namespace", "kube.pod", "kube.container", "message"],
     }
 
@@ -820,10 +832,16 @@ def search_logs(
             "message": str(src.get("message", ""))[:300],
         })
 
+    sample_by_level: dict = {}
+    for line in lines:
+        key = line.get("level") or "unknown"
+        sample_by_level[key] = sample_by_level.get(key, 0) + 1
+
     return {
         "window": window,
         "total_matches": total_count,
         "matches_by_level": {b.get("key"): b.get("doc_count") for b in buckets},
+        "returned_sample_by_level": sample_by_level,
         "returned_lines": len(lines),
         "lines_newest_first": lines,
         "note": (
@@ -869,21 +887,23 @@ def list_viya_namespaces() -> dict:
 
 
 @mcp.tool()
-def list_pods(namespace: str, detail: bool = False) -> dict:
+def list_pods(namespace: str, detail: bool = False, offset: int = 0) -> dict:
     """List what runs in a namespace: workloads (default) or individual pods.
 
     Use for "what pods are running in X" or "what does each pod do". The
-    default workload-grouped view covers EVERY pod in the namespace with no
-    truncation (one row per Deployment/StatefulSet/etc. with pod/ready/restart
-    counts) — pair the workload names with search_docs to explain each
-    component's function. Pass detail=true only when individual pod names are
-    needed (capped at 60 pods).
+    default workload-grouped view covers EVERY pod in the namespace (one row
+    per Deployment/StatefulSet/etc. with pod/ready/restart counts) — pair the
+    workload names with search_docs to explain each component's function.
+    Pass detail=true for individual pod names, PAGINATED 30 at a time: the
+    result's next_offset tells you the offset for the next page — keep calling
+    until next_offset is null to enumerate every pod in a large namespace.
 
     Args:
         namespace: The namespace to list, e.g. 'monitoring' or a Viya
             namespace from list_viya_namespaces.
-        detail: false (default) = one row per workload, complete coverage;
-            true = individual pods, capped at 60.
+        detail: false (default) = one row per workload; true = individual
+            pods, 30 per page.
+        offset: Page start for detail=true (0, 30, 60, ...).
     """
     if not _NAMESPACE_RE.fullmatch(namespace):
         return {"error": f"'{namespace}' is not a valid namespace name."}
@@ -931,13 +951,16 @@ def list_pods(namespace: str, detail: bool = False) -> dict:
     pods.sort(key=lambda p: (p["workload"], p["pod"]))
 
     if detail:
-        out = {"namespace": namespace, "pod_count": len(pods), "pods": pods[:60]}
-        if len(pods) > 60:
-            out["truncated"] = (
-                f"showing 60 of {len(pods)} pods — the default workload view "
-                "(detail=false) covers all of them"
-            )
-        return out
+        page_size = 30
+        start = max(0, int(offset))
+        end = min(start + page_size, len(pods))
+        return {
+            "namespace": namespace,
+            "pod_count": len(pods),
+            "showing": f"pods {start + 1}-{end} of {len(pods)}",
+            "pods": pods[start:end],
+            "next_offset": end if end < len(pods) else None,
+        }
 
     workloads: dict = {}
     for p in pods:
@@ -956,6 +979,126 @@ def list_pods(namespace: str, detail: bool = False) -> dict:
         "workloads": sorted(workloads.values(), key=lambda w: w["workload"]),
         "note": "One row per workload, covering all pods. Call with detail=true for individual pod names.",
     }
+
+
+_POD_NAME_RE = re.compile(r"[a-z0-9]([a-z0-9.-]{0,251}[a-z0-9])?$")
+
+
+@mcp.tool()
+def describe_pod(namespace: str, pod: str) -> dict:
+    """Deep-dive one pod: phase, why it is Pending/waiting, restarts, OOM history.
+
+    Use when the user asks about a SPECIFIC pod — "why is X pending", "is X
+    healthy", "analyze pod X". Combines kube-state-metrics signals: phase,
+    unschedulable condition, per-container waiting reasons (ImagePullBackOff,
+    CreateContainerConfigError, CrashLoopBackOff...), restarts, last
+    termination reason, node, age, owner, and resource requests. Follow up
+    with search_logs for the pod's log lines.
+
+    Args:
+        namespace: The pod's namespace.
+        pod: The exact pod name, e.g. from list_pods.
+    """
+    if not _NAMESPACE_RE.fullmatch(namespace):
+        return {"error": f"'{namespace}' is not a valid namespace name."}
+    if not _POD_NAME_RE.fullmatch(pod):
+        return {"error": f"'{pod}' is not a valid pod name."}
+
+    sel = _label_selector(f'namespace="{namespace}"', f'pod="{pod}"')
+
+    def _q(query: str) -> list:
+        try:
+            return prom.custom_query(query=query)
+        except Exception:
+            return []
+
+    info = _q("kube_pod_info" + sel)
+    if not info:
+        recent = _count_query(f"count(count_over_time(kube_pod_info{sel}[1d]))")
+        return {
+            "namespace": namespace,
+            "pod": pod,
+            "found": False,
+            "existed_last_24h": recent > 0,
+            "hint": (
+                "Pod not known to kube-state-metrics right now. If it existed within 24h it "
+                "was deleted/replaced — check list_pods for its successor (hash suffixes change)."
+            ),
+        }
+
+    out = {"namespace": namespace, "pod": pod, "found": True}
+    out["node"] = info[0]["metric"].get("node") or "(not scheduled to a node)"
+
+    created = _q("kube_pod_created" + sel)
+    if created:
+        out["age_seconds"] = int(time.time() - _safe_float(created[0]["value"][1]))
+
+    owners = _q("kube_pod_owner" + sel)
+    if owners:
+        out["owner"] = {
+            "kind": owners[0]["metric"].get("owner_kind"),
+            "name": owners[0]["metric"].get("owner_name"),
+        }
+
+    phase = [r["metric"].get("phase") for r in _q(f"kube_pod_status_phase{sel} == 1")]
+    out["phase"] = phase[0] if phase else "unknown"
+
+    unschedulable = _q(
+        "kube_pod_status_scheduled" + _label_selector(
+            f'namespace="{namespace}"', f'pod="{pod}"', 'condition="false"'
+        ) + " == 1"
+    )
+    out["unschedulable"] = bool(unschedulable)
+
+    waiting = _q(f"kube_pod_container_status_waiting_reason{sel} == 1")
+    init_waiting = _q(f"kube_pod_init_container_status_waiting_reason{sel} == 1")
+    out["containers_waiting"] = [
+        {"container": r["metric"].get("container"), "reason": r["metric"].get("reason")}
+        for r in waiting
+    ] + [
+        {"container": r["metric"].get("container"), "reason": r["metric"].get("reason"), "init_container": True}
+        for r in init_waiting
+    ]
+
+    restarts = _q(f"sum by (container) (kube_pod_container_status_restarts_total{sel})")
+    out["restarts_by_container"] = {
+        r["metric"].get("container"): int(_safe_float(r["value"][1])) for r in restarts
+    }
+
+    terminated = _q(f"kube_pod_container_status_last_terminated_reason{sel} == 1")
+    out["last_termination_reasons"] = [
+        {"container": r["metric"].get("container"), "reason": r["metric"].get("reason")}
+        for r in terminated
+    ]
+
+    requests = _q(f"sum by (resource) (kube_pod_container_resource_requests{sel})")
+    out["resource_requests"] = {
+        r["metric"].get("resource"): _safe_float(r["value"][1]) for r in requests
+    }
+
+    hints = []
+    if out["phase"] == "Pending" and out["unschedulable"]:
+        hints.append(
+            "Pending because the scheduler cannot place it: insufficient CPU/memory on any "
+            "node, or unsatisfiable node selectors/taints. Compare resource_requests with "
+            "node capacity (query_prometheus) and check recent_changes for competing arrivals."
+        )
+    for w in out["containers_waiting"]:
+        reason = (w.get("reason") or "")
+        if reason in ("ImagePullBackOff", "ErrImagePull"):
+            hints.append(f"Container {w.get('container')}: image cannot be pulled — wrong image ref or missing pull secret.")
+        elif reason == "CreateContainerConfigError":
+            hints.append(f"Container {w.get('container')}: a referenced ConfigMap or Secret is missing.")
+        elif reason == "CrashLoopBackOff":
+            hints.append(f"Container {w.get('container')}: crashing after start — check search_logs for this pod.")
+    if out["phase"] == "Pending" and not out["unschedulable"] and not out["containers_waiting"]:
+        hints.append(
+            "Pending but scheduled with no waiting reason visible in metrics — often a volume "
+            "attach/mount issue or init container still running; Kubernetes Events (kubectl "
+            "describe pod) hold the detail that metrics do not."
+        )
+    out["diagnosis_hints"] = hints
+    return out
 
 
 # Tool 3: search_docs (RAG as a tool)

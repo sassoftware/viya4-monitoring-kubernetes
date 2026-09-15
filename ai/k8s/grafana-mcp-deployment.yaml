@@ -35,6 +35,7 @@ spec:
         - "--disable-oncall"
         - "--disable-sift"
         - "--disable-asserts"
+        - "--disable-pyroscope"       # no Pyroscope (continuous profiling) in this stack
         - "--tls-skip-verify"
         ports:
         - containerPort: 8000
