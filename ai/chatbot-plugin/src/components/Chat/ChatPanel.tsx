@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { css, cx } from '@emotion/css';
-import { GrafanaTheme2, usePluginContext } from '@grafana/data';
+import { GrafanaTheme2, renderMarkdown, usePluginContext } from '@grafana/data';
 import { openai } from '@grafana/llm';
 import { getBackendSrv } from '@grafana/runtime';
 import { Button, Input, Spinner, useStyles2 } from '@grafana/ui';
@@ -1247,9 +1247,16 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
               key={`${message.role}-${index}-${message.content.slice(0, 20)}`}
               className={message.role === 'user' ? s.userRow : s.assistantRow}
             >
-              <div className={message.role === 'user' ? s.userBubble : s.assistantBubble}>
-                {message.content}
-              </div>
+              {message.role === 'user' ? (
+                <div className={s.userBubble}>{message.content}</div>
+              ) : (
+                <div
+                  className={cx(s.assistantBubble, s.markdownBody)}
+                  // renderMarkdown sanitizes its output; assistant text is
+                  // rendered so headings/bold/lists don't show as raw ### and **.
+                  dangerouslySetInnerHTML={{ __html: renderMarkdown(message.content) }}
+                />
+              )}
             </div>
           ))
         )}
@@ -1264,7 +1271,12 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
               {activitySteps.length > 0 ? (
                 <div className={s.activityTrail}>{activitySteps.join(' → ')}</div>
               ) : null}
-              {draftReply ? <div className={s.streamingText}>{draftReply}</div> : null}
+              {draftReply ? (
+                <div
+                  className={cx(s.streamingText, s.markdownBody)}
+                  dangerouslySetInnerHTML={{ __html: renderMarkdown(draftReply) }}
+                />
+              ) : null}
             </div>
           </div>
         ) : null}
@@ -1406,9 +1418,65 @@ const getStyles = (theme: GrafanaTheme2) => ({
     border-radius: ${theme.shape.radius.default};
     background: ${theme.colors.background.secondary};
     color: ${theme.colors.text.primary};
-    white-space: pre-wrap;
     word-break: break-word;
     border: 1px solid ${theme.colors.border.weak};
+  `,
+  // Styling for rendered assistant markdown. No white-space: pre-wrap here —
+  // block elements carry the spacing, and pre-wrap would double it.
+  markdownBody: css`
+    & p,
+    & ul,
+    & ol,
+    & pre,
+    & table,
+    & blockquote {
+      margin: 0 0 ${theme.spacing(1)};
+    }
+    & > *:last-child {
+      margin-bottom: 0;
+    }
+    & h1,
+    & h2,
+    & h3,
+    & h4,
+    & h5 {
+      font-size: ${theme.typography.h5.fontSize};
+      font-weight: ${theme.typography.fontWeightBold};
+      margin: ${theme.spacing(1)} 0 ${theme.spacing(0.5)};
+    }
+    & ul,
+    & ol {
+      padding-left: ${theme.spacing(2.5)};
+    }
+    & code {
+      font-family: ${theme.typography.fontFamilyMonospace};
+      font-size: ${theme.typography.bodySmall.fontSize};
+      background: ${theme.colors.background.canvas};
+      border-radius: ${theme.shape.radius.default};
+      padding: 1px 4px;
+    }
+    & pre {
+      background: ${theme.colors.background.canvas};
+      border-radius: ${theme.shape.radius.default};
+      padding: ${theme.spacing(1)};
+      overflow-x: auto;
+    }
+    & pre code {
+      background: none;
+      padding: 0;
+    }
+    & table {
+      border-collapse: collapse;
+    }
+    & th,
+    & td {
+      border: 1px solid ${theme.colors.border.weak};
+      padding: ${theme.spacing(0.5)} ${theme.spacing(1)};
+      text-align: left;
+    }
+    & a {
+      color: ${theme.colors.text.link};
+    }
   `,
   streamingHeader: css`
     display: inline-flex;
@@ -1418,7 +1486,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
     margin-bottom: ${theme.spacing(1)};
   `,
   streamingText: css`
-    white-space: pre-wrap;
     word-break: break-word;
   `,
   activityTrail: css`
