@@ -473,8 +473,8 @@ const QUERY_GUIDANCE = [
   '- No data -> explain_empty_query; metric absent -> check_metric_exists; stale -> list_failing_targets.',
   '- Spike -> query_prometheus around onset + recent_changes over the same window.',
   '- "the Viya namespace" is customer-named (e.g. d122472) -> list_viya_namespaces first; never assume namespace="viya".',
-  '- Pod inventory -> list_pods (workloads + search_docs for functions); full names -> detail=true, paginated: follow next_offset until null, never stop at one page. One pod -> describe_pod, then search_logs.',
-  '- Logs answer WHY after metrics show WHAT -> search_logs (namespace/pod/level filters). Concepts/how-to -> search_docs.',
+  '- Pod inventory -> list_pods (workloads + search_docs for functions); full names -> detail=true, paginated: follow next_offset until null, never stop at one page. One pod -> describe_pod (includes Kubernetes events with exact failure messages).',
+  '- Logs answer WHY after metrics show WHAT: get_pod_logs = live tail of one pod (previous=true for the pre-crash container); search_logs = indexed store for many pods / by level / history. Concepts/how-to -> search_docs.',
   '- "$var"/"${var}" in panel queries are unresolved dashboard variables, never literal values: drop or substitute them, and a $variable datasource uid is not a broken datasource.',
   '- If the user agrees with or echoes proposed next steps, run them now instead of replying with prose.',
   'Server routing: the local query_prometheus takes raw PromQL, NO datasource UID, and returns compact stats — use it for all analysis/rankings (the grafana one wants a UID and returns raw frames; avoid for analysis). Discover metric/label names via grafana list_prometheus_*; dashboards and datasource inventory via grafana search/list tools; alert RULES via grafana alerting tools, alerts FIRING NOW via firing_alerts.',
@@ -599,7 +599,7 @@ const EMPTY_REPLY_FALLBACK =
   'or tell me a specific check to run (metrics, logs, pods, alerts, docs)?';
 
 const GENERAL_SUGGESTIONS = [
-  'Summarize the health of the monitoring namespace.',
+  'Summarize the health of the Viya namespace.',
   'Are any pods pending or crash-looping right now?',
   'Search the docs: what does SAS Viya Monitoring for Kubernetes include?',
 ];

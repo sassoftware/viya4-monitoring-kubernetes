@@ -1001,17 +1001,108 @@ def list_pods(namespace: str, detail: bool = False, offset: int = 0) -> dict:
 
 _POD_NAME_RE = re.compile(r"[a-z0-9]([a-z0-9.-]{0,251}[a-z0-9])?$")
 
+# In-cluster Kubernetes API access (read-only; see ai/k8s/rbac.yaml). Covers
+# what kube-state-metrics cannot: Event messages with exact failure reasons,
+# and live container logs.
+_K8S_API = "https://kubernetes.default.svc"
+_K8S_TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+_K8S_CA_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+
+
+def _k8s_get(path: str, params: dict = None):
+    """GET against the K8s API with the pod's ServiceAccount; (response, error)."""
+    try:
+        with open(_K8S_TOKEN_PATH) as f:
+            token = f.read().strip()
+    except OSError:
+        return None, "no ServiceAccount token mounted — apply ai/k8s/rbac.yaml and redeploy"
+    try:
+        resp = requests.get(
+            _K8S_API + path,
+            params=params or {},
+            headers={"Authorization": f"Bearer {token}"},
+            verify=_K8S_CA_PATH if os.path.exists(_K8S_CA_PATH) else False,
+            timeout=15,
+        )
+        if resp.status_code == 403:
+            return None, "Kubernetes API denied access (403) — the v4m-mcp-server RBAC is missing or incomplete"
+        resp.raise_for_status()
+        return resp, None
+    except Exception as exc:
+        return None, str(exc)
+
+
+@mcp.tool()
+def get_pod_logs(namespace: str, pod: str, container: str = "", lines: int = 40, previous: bool = False) -> dict:
+    """Tail a pod's container logs directly from Kubernetes (like kubectl logs).
+
+    Use for the CURRENT raw output of one specific pod — including crashed
+    containers: previous=true reads the pre-crash instance, which is the key
+    evidence for CrashLoopBackOff. For searching across many pods, by log
+    level, or over history, use search_logs (the indexed log store) instead.
+
+    Args:
+        namespace: The pod's namespace.
+        pod: The exact pod name.
+        container: Container name, required only for multi-container pods
+            (describe_pod shows the containers).
+        lines: How many trailing lines (default 40, max 60).
+        previous: true to read the previous (crashed) container instance.
+    """
+    if not _NAMESPACE_RE.fullmatch(namespace):
+        return {"error": f"'{namespace}' is not a valid namespace name."}
+    if not _POD_NAME_RE.fullmatch(pod):
+        return {"error": f"'{pod}' is not a valid pod name."}
+    if container and not _NAMESPACE_RE.fullmatch(container):
+        return {"error": f"'{container}' is not a valid container name."}
+
+    params = {"tailLines": max(1, min(int(lines), 60)), "timestamps": "true"}
+    if container:
+        params["container"] = container
+    if previous:
+        params["previous"] = "true"
+
+    resp, err = _k8s_get(f"/api/v1/namespaces/{namespace}/pods/{pod}/log", params)
+    if err:
+        return {
+            "error": f"Could not read logs: {err}",
+            "hint": (
+                "A 400 here usually means the container name is required (multi-container "
+                "pod) or previous=true was requested for a container that never restarted."
+            ),
+        }
+
+    # Keep the newest lines that fit the client's per-result budget.
+    tail = [line[:200] for line in resp.text.splitlines()]
+    kept, used = [], 0
+    for line in reversed(tail):
+        if used + len(line) > 2000:
+            break
+        kept.append(line)
+        used += len(line)
+    kept.reverse()
+
+    return {
+        "namespace": namespace,
+        "pod": pod,
+        "container": container or "(single/default container)",
+        "previous_instance": previous,
+        "lines_returned": len(kept),
+        "log_tail": kept,
+    }
+
 
 @mcp.tool()
 def describe_pod(namespace: str, pod: str) -> dict:
-    """Deep-dive one pod: phase, why it is Pending/waiting, restarts, OOM history.
+    """Deep-dive one pod: phase, WHY it is Pending/waiting (with exact Kubernetes
+    Event messages), restarts, exit codes, OOM history.
 
     Use when the user asks about a SPECIFIC pod — "why is X pending", "is X
-    healthy", "analyze pod X". Combines kube-state-metrics signals: phase,
-    unschedulable condition, per-container waiting reasons (ImagePullBackOff,
-    CreateContainerConfigError, CrashLoopBackOff...), restarts, last
-    termination reason, node, age, owner, and resource requests. Follow up
-    with search_logs for the pod's log lines.
+    healthy", "analyze pod X". Combines kube-state-metrics signals (phase,
+    unschedulable condition, container waiting reasons, restarts, termination
+    reasons and exit codes, node, age, owner, resource requests) with the
+    pod's recent Kubernetes Events, whose messages carry the precise failure
+    reason. Follow up with get_pod_logs (live tail) or search_logs (indexed).
 
     Args:
         namespace: The pod's namespace.
@@ -1089,6 +1180,41 @@ def describe_pod(namespace: str, pod: str) -> dict:
         for r in terminated
     ]
 
+    exit_codes = _q(f"kube_pod_container_status_last_terminated_exitcode{sel}")
+    if exit_codes:
+        out["last_exit_codes"] = {
+            r["metric"].get("container"): int(_safe_float(r["value"][1])) for r in exit_codes
+        }
+
+    status_reason = [r["metric"].get("reason") for r in _q(f"kube_pod_status_reason{sel} == 1")]
+    if status_reason:
+        out["pod_status_reason"] = status_reason[0]
+
+    # Kubernetes Events carry the exact failure messages metrics don't
+    # (e.g. FailedScheduling: "0/11 nodes are available: insufficient memory").
+    resp, err = _k8s_get(
+        f"/api/v1/namespaces/{namespace}/events",
+        params={"fieldSelector": f"involvedObject.name={pod},involvedObject.kind=Pod"},
+    )
+    if err:
+        out["events"] = f"unavailable: {err}"
+    else:
+        items = resp.json().get("items", [])
+        items.sort(
+            key=lambda e: e.get("lastTimestamp") or e.get("eventTime") or "", reverse=True
+        )
+        # Warnings first — they carry the failure reasons.
+        items.sort(key=lambda e: 0 if e.get("type") == "Warning" else 1)
+        out["events"] = [
+            {
+                "type": e.get("type"),
+                "reason": e.get("reason"),
+                "count": e.get("count"),
+                "message": (e.get("message") or "")[:220],
+            }
+            for e in items[:8]
+        ]
+
     requests = _q(f"sum by (resource) (kube_pod_container_resource_requests{sel})")
     out["resource_requests"] = {
         r["metric"].get("resource"): _safe_float(r["value"][1]) for r in requests
@@ -1112,8 +1238,8 @@ def describe_pod(namespace: str, pod: str) -> dict:
     if out["phase"] == "Pending" and not out["unschedulable"] and not out["containers_waiting"]:
         hints.append(
             "Pending but scheduled with no waiting reason visible in metrics — often a volume "
-            "attach/mount issue or init container still running; Kubernetes Events (kubectl "
-            "describe pod) hold the detail that metrics do not."
+            "attach/mount issue or an init container still running; check the events list "
+            "above for the exact message."
         )
     out["diagnosis_hints"] = hints
     return out

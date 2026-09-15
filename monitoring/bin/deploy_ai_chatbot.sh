@@ -90,6 +90,7 @@ fi
 
 log_info "Applying Ollama (v4m-mcp's embeddings dependency), v4m-mcp, and grafana-mcp k8s manifests..."
 kubectl apply -f ai/k8s/pvcs.yaml
+kubectl apply -f ai/k8s/rbac.yaml
 
 ollamaDefFile="$TMP_DIR/ollama_def_file.yaml"
 cp ai/k8s/ollama.yaml "$ollamaDefFile"

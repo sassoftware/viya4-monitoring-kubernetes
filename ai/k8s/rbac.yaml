@@ -1,0 +1,35 @@
+# Read-only Kubernetes API access for the v4m-mcp server: pod specs and
+# Events (the exact failure messages kube-state-metrics doesn't carry, e.g.
+# FailedScheduling reasons) plus direct container-log tailing. Strictly
+# read-only; note that pods/log across namespaces is sensitive — one more
+# reason the MCP endpoint needs auth before production exposure.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: v4m-mcp-server
+  namespace: monitoring
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: v4m-mcp-server-read
+rules:
+- apiGroups: [""]
+  resources: ["pods", "events"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: v4m-mcp-server-read
+subjects:
+- kind: ServiceAccount
+  name: v4m-mcp-server
+  namespace: monitoring
+roleRef:
+  kind: ClusterRole
+  name: v4m-mcp-server-read
+  apiGroup: rbac.authorization.k8s.io

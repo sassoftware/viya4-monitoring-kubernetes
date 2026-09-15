@@ -20,6 +20,11 @@ spec:
       # at deploy time — the values below only apply if you apply this file directly.
       imagePullSecrets:
       - name: acr-secret
+      # Read-only K8s API access (see ai/k8s/rbac.yaml) for pod events and
+      # container-log tailing. Automount is explicit because the cluster
+      # deploy disables it on default ServiceAccounts.
+      serviceAccountName: v4m-mcp-server
+      automountServiceAccountToken: true
       containers:
       - name: mcp
         image: viyamonitoring.azurecr.io/v4m-mcp-server:latest
