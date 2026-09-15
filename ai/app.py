@@ -288,11 +288,17 @@ def _downsample(points: list, max_points: int = 20) -> list:
     return sampled
 
 
-def _summarize_matrix(series_list: list, max_series: int = 8) -> dict:
-    """Reduce a Prometheus range-query result to LLM-sized statistics."""
-    summary = {"series_count": len(series_list), "series": []}
+def _summarize_matrix(series_list: list, max_series: int = 12) -> dict:
+    """Reduce a Prometheus range-query result to LLM-sized statistics.
 
-    for series in series_list[:max_series]:
+    Self-sizing: per-point samples are included only when there are few
+    series; with many series each row is stats-only, sorted by avg descending,
+    so a ranking query's full order survives the client's per-result budget.
+    """
+    include_points = len(series_list) <= 3
+    rows = []
+
+    for series in series_list:
         raw = [(int(_safe_float(ts)), _safe_float(v)) for ts, v in series.get("values", [])]
         vals = [v for _, v in raw]
         if not vals:
@@ -310,7 +316,7 @@ def _summarize_matrix(series_list: list, max_series: int = 8) -> dict:
             change = (tail_avg - head_avg) / abs(head_avg)
             trend = "rising" if change > 0.15 else "falling" if change < -0.15 else "flat"
 
-        summary["series"].append({
+        row = {
             "labels": _series_label(series.get("metric", {})),
             "points": len(vals),
             "min": round(min(vals), 4),
@@ -318,12 +324,18 @@ def _summarize_matrix(series_list: list, max_series: int = 8) -> dict:
             "avg": round(avg, 4),
             "last": round(vals[-1], 4),
             "trend": trend,
-            "sampled_values": [[ts, round(v, 4)] for ts, v in _downsample(raw)],
-        })
+        }
+        if include_points:
+            row["sampled_values"] = [[ts, round(v, 4)] for ts, v in _downsample(raw)]
+        rows.append(row)
 
-    if len(series_list) > max_series:
+    rows.sort(key=lambda r: -abs(r["avg"]))
+    summary = {"series_count": len(series_list), "series": rows[:max_series]}
+    if not include_points and rows:
+        summary["note"] = "stats only (sorted by avg, highest first); per-point samples omitted with this many series"
+    if len(rows) > max_series:
         summary["truncated"] = (
-            f"showing {max_series} of {len(series_list)} series; "
+            f"showing top {max_series} of {len(rows)} series by avg; "
             "aggregate (sum/avg/topk) in the query to see the rest"
         )
     return summary

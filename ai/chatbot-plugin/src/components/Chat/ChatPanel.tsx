@@ -73,7 +73,13 @@ export type ChatPanelProps = {
 const AGENT_MAX_STEPS = 5;
 
 const MAX_HISTORY_MESSAGES = 8;
-const MAX_TOOLS_FOR_PROMPT = 20;
+// High enough that the ENTIRE combined catalog always fits with headroom
+// (13 v4m tools + ~20 grafana-mcp tools ≈ 33 today): every "tool not in my
+// catalog" failure so far came from tools being scored out of a too-small
+// window, so scoring must only ORDER the catalog, never evict from it.
+// Token cost is held down by MAX_TOOL_DESC_CHARS instead.
+const MAX_TOOLS_FOR_PROMPT = 40;
+const MAX_TOOL_DESC_CHARS = 350;
 const MAX_MESSAGE_CHARS = 1200;
 const MAX_EVENT_CHARS = 2500;
 const MAX_TOOL_SUMMARY_CHARS = 6000;
@@ -140,7 +146,7 @@ const compactCatalog = (
     .map((tool) => ({
       tool: {
         ...tool,
-        description: tool.description ? clamp(tool.description, MAX_MESSAGE_CHARS) : undefined,
+        description: tool.description ? clamp(tool.description, MAX_TOOL_DESC_CHARS) : undefined,
       },
       // Tools used in recent turns stay in the catalog even when the current
       // message ("approve", "yes, all of them") matches nothing by keyword —
@@ -161,13 +167,15 @@ const compactEvents = (events: AgentEvent[]): AgentEvent[] =>
     return { ...e, message: clamp(e.message, MAX_MESSAGE_CHARS) };
   });
 
-// Word-boundary matching, NOT substring: "offset" and "StatefulSet" must not
+// Whole-word matching, NOT substring: "offset" and "StatefulSet" must not
 // classify a read-only tool as mutating (which both gates it behind approval
-// and down-ranks it out of the planner catalog).
+// and down-ranks it out of the planner catalog). snake_case and kebab-case
+// are split first so "update_dashboard" still counts as mutating — \b alone
+// treats "_" as a word character and would miss it.
 const MUTATING_HINT_RE = /\b(update|create|delete|patch|manage|save|write|set)\b/;
 
 const isMutatingTool = (name: string, description?: string): boolean =>
-  MUTATING_HINT_RE.test((name + ' ' + (description ?? '')).toLowerCase());
+  MUTATING_HINT_RE.test((name + ' ' + (description ?? '')).toLowerCase().replace(/[_\-.]/g, ' '));
 
 const getToolCatalog = (tools: MCPTool[]): ToolDescriptor[] =>
   tools.map((tool) => {
@@ -444,7 +452,7 @@ const QUERY_GUIDANCE = [
   '- Panel queries may contain unresolved dashboard variables like $cluster or ${datasource}. "$var" is never a literal value: drop or substitute those matchers before querying, and never diagnose the datasource as broken merely because its uid is a $variable.',
   '- Conceptual/how-to/meaning questions -> search_docs.',
   'Server routing (two tool servers):',
-  '- Metric ANALYSIS (values, trends, comparisons) -> the local server\'s query_prometheus (returns compact stats). The grafana server\'s query_prometheus returns raw frames — avoid it for analysis.',
+  '- Metric ANALYSIS (values, trends, comparisons, rankings) -> the local server\'s query_prometheus: it takes a raw PromQL expr and NO datasource UID — never ask the user for a datasource UID to run a metric query. The grafana server\'s query_prometheus (which does want a UID) returns raw frames — avoid it for analysis.',
   '- Discovering valid label values / metric names -> the grafana server\'s list_prometheus_label_values / list_prometheus_metric_names.',
   '- Finding dashboards or another dashboard\'s queries -> the grafana server\'s search_dashboards / get_dashboard_panel_queries; datasource inventory -> list_datasources.',
   '- Alert RULE definitions and thresholds -> the grafana server\'s alerting tools; alerts CURRENTLY FIRING -> firing_alerts on the local server.',
@@ -629,6 +637,11 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
   const [draftReply, setDraftReply] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Live progress: what the agent is doing right now, and the tools already
+  // run this turn — replaces the opaque "Thinking..." during multi-step work.
+  const [activity, setActivity] = useState('');
+  const [activitySteps, setActivitySteps] = useState<string[]>([]);
+  const streamSubRef = useRef<{ unsubscribe: () => void } | null>(null);
   const requestSeqRef = useRef(0);
   const cancelRequestedRef = useRef(false);
   // Tool evidence gathered in previous turns. Without this, every follow-up
@@ -722,6 +735,8 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
   const stopProcessing = () => {
     cancelRequestedRef.current = true;
     requestSeqRef.current += 1;
+    streamSubRef.current?.unsubscribe();
+    streamSubRef.current = null;
     setIsSending(false);
     setDraftReply('');
     setError(null);
@@ -731,6 +746,7 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
     return () => {
       cancelRequestedRef.current = true;
       requestSeqRef.current += 1;
+      streamSubRef.current?.unsubscribe();
     };
   }, []);
 
@@ -762,6 +778,37 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
 
     const errText = (err: unknown): string => (err instanceof Error ? err.message : 'unknown');
 
+    type LlmMessages = Parameters<typeof openai.chatCompletions>[0]['messages'];
+
+    // Stream the user-facing answer token-by-token into the draft bubble;
+    // falls back to a plain completion if the LLM gateway can't stream.
+    const getFinalAnswer = async (llmMessages: LlmMessages): Promise<string> => {
+      setActivity('Writing the answer...');
+      try {
+        return await new Promise<string>((resolve, reject) => {
+          let accumulated = '';
+          streamSubRef.current = openai
+            .streamChatCompletions({ messages: llmMessages })
+            .pipe(openai.accumulateContent())
+            .subscribe({
+              next: (text: string) => {
+                accumulated = text;
+                if (isActiveRequest()) {
+                  setDraftReply(text);
+                }
+              },
+              error: reject,
+              complete: () => resolve(accumulated),
+            });
+        });
+      } catch {
+        const response = await openai.chatCompletions({ messages: llmMessages });
+        return response?.choices?.[0]?.message?.content ?? '';
+      } finally {
+        streamSubRef.current = null;
+      }
+    };
+
     const dashboardPrompt = makeDashboardContextPrompt(context, panelSnapshot);
     const dashboardSystemMessages = dashboardPrompt
       ? [{ role: 'system' as const, content: dashboardPrompt }]
@@ -781,6 +828,8 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
       ].filter(isConfiguredServer);
 
       setDraftReply('');
+      setActivity('');
+      setActivitySteps([]);
       setIsSending(true);
 
       const nextMessages = [...messages, { role: 'user' as const, content: trimmedInput }];
@@ -791,12 +840,10 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
       setHistoryDraft('');
 
       if (servers.length === 0) {
-        const response = await openai.chatCompletions({
-          messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...dashboardSystemMessages, ...messagesForModel],
-        });
+        const finalReply = (
+          await getFinalAnswer([{ role: 'system', content: SYSTEM_PROMPT }, ...dashboardSystemMessages, ...messagesForModel])
+        ).trim();
         assertActiveRequest();
-
-        const finalReply = response?.choices?.[0]?.message?.content?.trim() ?? '';
         if (finalReply) {
           setMessages((current) => [...current, { role: 'assistant', content: finalReply }]);
         } else {
@@ -808,6 +855,7 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
         return;
       }
 
+      setActivity('Discovering tools...');
       const discovery = await listAllToolsSafe(servers);
       assertActiveRequest();
       const catalog = getToolCatalog(discovery.tools);
@@ -826,17 +874,15 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
             ? 'No MCP tools available. Discovery errors: ' + discovery.errors.map((e) => e.server + ': ' + e.message).join(' | ')
             : '';
 
-        const response = await openai.chatCompletions({
-          messages: [
+        const finalReply = (
+          await getFinalAnswer([
             { role: 'system', content: SYSTEM_PROMPT },
             ...dashboardSystemMessages,
             ...(discoverySummary ? [{ role: 'system' as const, content: discoverySummary }] : []),
             ...messagesForModel,
-          ],
-        });
+          ])
+        ).trim();
         assertActiveRequest();
-
-        const finalReply = response?.choices?.[0]?.message?.content?.trim() ?? '';
         if (finalReply) {
           setMessages((current) => [...current, { role: 'assistant', content: finalReply }]);
         } else {
@@ -893,6 +939,7 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
       let askedQuestion = '';
 
       for (let step = 0; step < AGENT_MAX_STEPS; step += 1) {
+        setActivity(`Planning next step (${step + 1}/${AGENT_MAX_STEPS})...`);
         const actionResp = await openai.chatCompletions({
           messages: [
             {
@@ -962,6 +1009,7 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
           return;
         }
 
+        setActivity(`Running ${call.name}...`);
         try {
           const result = await callMcpTool(call.server, call.name, call.args);
           assertActiveRequest();
@@ -981,6 +1029,7 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
             message: errText(err),
           });
         }
+        setActivitySteps((current) => [...current, call.name]);
       }
 
       if (askedQuestion) {
@@ -1005,17 +1054,15 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
           MAX_TOOL_SUMMARY_CHARS
         );
 
-        const response = await openai.chatCompletions({
-          messages: [
+        finalAnswer = (
+          await getFinalAnswer([
             { role: 'system', content: SYSTEM_PROMPT },
             ...dashboardSystemMessages,
             ...(toolSummary ? [{ role: 'system' as const, content: 'Tool execution summary:\n' + toolSummary }] : []),
             ...messagesForModel,
-          ],
-        });
+          ])
+        ).trim();
         assertActiveRequest();
-
-        finalAnswer = response?.choices?.[0]?.message?.content?.trim() ?? '';
       }
 
       if (finalAnswer) {
@@ -1103,10 +1150,9 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
           <div className={s.contextChip}>Context: {contextLabel}</div>
         ) : null
       ) : (
-        <div className={s.header}>
-          <div className={s.title}>Observability Chatbot</div>
-          <div className={s.subtitle}>Powered by the Grafana LLM integration</div>
-        </div>
+        // PluginPage already renders the page title above this component;
+        // repeating it here read as a duplicated header. Keep only the byline.
+        <div className={s.subtitle}>Powered by the Grafana LLM integration</div>
       )}
 
       <div className={cx(s.conversation, compact && s.conversationCompact)} aria-live="polite">
@@ -1149,8 +1195,11 @@ export const ChatPanel = ({ context, compact }: ChatPanelProps): JSX.Element => 
             <div className={s.assistantBubble}>
               <div className={s.streamingHeader}>
                 <Spinner size="sm" />
-                <span>Thinking...</span>
+                <span>{activity || 'Thinking...'}</span>
               </div>
+              {activitySteps.length > 0 ? (
+                <div className={s.activityTrail}>{activitySteps.join(' → ')}</div>
+              ) : null}
               {draftReply ? <div className={s.streamingText}>{draftReply}</div> : null}
             </div>
           </div>
@@ -1203,16 +1252,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing(1)};
-  `,
-  header: css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing(0.5)};
-  `,
-  title: css`
-    font-size: ${theme.typography.h2.fontSize};
-    font-weight: ${theme.typography.fontWeightBold};
-    color: ${theme.colors.text.primary};
   `,
   subtitle: css`
     color: ${theme.colors.text.secondary};
@@ -1316,6 +1355,12 @@ const getStyles = (theme: GrafanaTheme2) => ({
   `,
   streamingText: css`
     white-space: pre-wrap;
+    word-break: break-word;
+  `,
+  activityTrail: css`
+    color: ${theme.colors.text.secondary};
+    font-size: ${theme.typography.bodySmall.fontSize};
+    margin-bottom: ${theme.spacing(1)};
     word-break: break-word;
   `,
   error: css`
