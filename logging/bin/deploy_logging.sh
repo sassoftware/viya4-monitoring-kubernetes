@@ -54,9 +54,9 @@ logging/bin/deploy_opensearch.sh
 # Create "root" HTTPProxy(if nec)#
 ##################################
 
-if [[ "$AUTOGENERATE_INGRESS" == "true" &&
-    "$INGRESS_CREATE_ROOT_PROXY" == "true" &&
-    "$INGRESS_TYPE" == "contour" ]]; then
+if [[ $AUTOGENERATE_INGRESS == "true" &&
+    $INGRESS_CREATE_ROOT_PROXY == "true" &&
+    $INGRESS_TYPE == "contour" ]]; then
 
     create_root_httpproxy logging "$LOG_NS"
 
