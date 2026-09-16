@@ -1,6 +1,8 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Logging**
+  * [FIX] Only attempt to delete an unneeded `v4m-logging-root-proxy` HTTPProxy resource if the
+CRD (httpproxies.projectcontour.io) is installed
   * [CHANGE] As part of the upgrade to OpenSearch Dashboards 3.8.0 (see below),
 the CPU resource limit for the OpenSearch Dashboards pod was increased to 1 CPU.
 This addresses a persistent problem which had caused the application to fail to
@@ -41,6 +43,7 @@ the log monitoring stack also resolved the issue when Contour was used for ingre
 routing using Contour was configured automatically.  (Fixes #882)
   * [FIX] Corrected Alertmanager URL when `ALERTMANAGER_PATH` is set and path-based routing using Contour
 is configured automatically
+* **Logging**
   * [FIX] The `v4m-logging-root-proxy` HTTPProxy resource is only created in appropriate scenarios
 (i.e. auto-generated path-based routing using Contour) and any existing instance of this resource
 is deleted if found in other deployment scenarios (where it is not needed)
