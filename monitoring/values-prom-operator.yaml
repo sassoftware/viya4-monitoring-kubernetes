@@ -204,11 +204,11 @@ prometheus-node-exporter:
     targetPort: 9110
   resources:
     requests:
-      cpu: "50m"
-      memory: "50Mi"
+      cpu: "30m"
+      memory: "30Mi"
     limits:
-      cpu: "250m"
-      memory: "100Mi"
+      cpu: "200m"
+      memory: "75Mi"
   # Be very tolerant
   tolerations:
     - operator: "Exists"

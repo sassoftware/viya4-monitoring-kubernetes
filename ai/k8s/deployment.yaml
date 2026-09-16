@@ -78,22 +78,10 @@ spec:
             cpu: "500m"
             memory: "512Mi"
         volumeMounts:
-        # Documentation (repo markdown + SAS doc-set PDFs) is baked into the
-        # image at build time (see ai/Dockerfile) — deliberately no runtime
-        # docs volume, so the agent's knowledge set is fixed per image build.
         - name: cache
           mountPath: /app/cache          # persists the embedding index across restarts
-        # Covers the first-run/re-embed warm-up, during which the server hasn't
-        # bound port 8000 yet. Without this, the pod shows Ready immediately on
-        # container start, before the app is actually listening.
-        #
-        # 10 minutes (the old failureThreshold*periodSeconds) turned out to
-        # not be enough for a full re-embed on this cluster's CPU budget — the
-        # embed only gets cached to disk AFTER it fully completes, so if
-        # kubelet kills the container right as it's about to finish, the next
-        # attempt starts the whole embed over from scratch, forever. Widened
-        # to 30 minutes; once the cache is actually written once, subsequent
-        # restarts are fast (cache hit) unless the docs fingerprint changes.
+        - name: pdfs
+          mountPath: /app/docs/pdfs      # PDFs get indexed alongside the baked-in repo
         startupProbe:
           tcpSocket:
             port: 8000
@@ -103,3 +91,6 @@ spec:
       - name: cache
         persistentVolumeClaim:
           claimName: v4m-mcp-cache
+      - name: pdfs
+        persistentVolumeClaim:
+          claimName: v4m-mcp-pdfs

@@ -9,3 +9,17 @@ spec:
   resources:
     requests:
       storage: 1Gi
+---
+# Holds user-supplied SAS doc-set PDFs for the docs RAG tool (mounted at
+# /app/docs/pdfs in the v4m-mcp-server pod). Empty on a fresh deploy; see
+# monitoring/user.env ("AI chatbot: adding SAS documentation PDFs").
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: v4m-mcp-pdfs
+  namespace: monitoring
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 2Gi
