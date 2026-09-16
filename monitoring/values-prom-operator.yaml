@@ -207,8 +207,8 @@ prometheus-node-exporter:
       cpu: "30m"
       memory: "30Mi"
     limits:
-      cpu: "200m"
-      memory: "75Mi"
+      cpu: "100m"
+      memory: "50Mi"
   # Be very tolerant
   tolerations:
     - operator: "Exists"

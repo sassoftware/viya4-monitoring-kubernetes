@@ -73,12 +73,14 @@ export type ChatPanelProps = {
 const AGENT_MAX_STEPS = 5;
 
 const MAX_HISTORY_MESSAGES = 6;
-// High enough that the ENTIRE combined catalog always fits with headroom
-// (13 v4m tools + ~20 grafana-mcp tools ≈ 33 today): every "tool not in my
-// catalog" failure so far came from tools being scored out of a too-small
-// window, so scoring must only ORDER the catalog, never evict from it.
-// Token cost is held down by MAX_TOOL_DESC_CHARS instead.
-const MAX_TOOLS_FOR_PROMPT = 40;
+// High enough that the ENTIRE combined catalog fits even when grafana-mcp
+// runs with every category enabled (~40+ tools; a cluster whose grafana-mcp
+// predates the --disable-* flags proved the "~20" assumption wrong and
+// silently evicted the alphabetical tail). Eviction must never happen —
+// local tools sort first as insurance, and compactCatalog console.warns if
+// the cap is ever actually hit. Token cost is held down by
+// MAX_TOOL_DESC_CHARS instead.
+const MAX_TOOLS_FOR_PROMPT = 60;
 const MAX_TOOL_DESC_CHARS = 350;
 const MAX_MESSAGE_CHARS = 1200;
 const MAX_EVENT_CHARS = 2500;
@@ -123,19 +125,34 @@ const isLlmEnabled = async (): Promise<boolean> => {
   return llmEnabledCache;
 };
 
-// Deterministic catalog: since MAX_TOOLS_FOR_PROMPT exceeds the combined
-// tool count, per-message relevance scoring no longer decides anything —
-// a stable alphabetical order instead keeps the planner prompt's prefix
-// byte-identical across calls, which lets the LLM gateway's automatic
-// prompt caching kick in (lower latency and token cost per planning step).
-const compactCatalog = (catalog: ToolDescriptor[]): ToolDescriptor[] =>
-  [...catalog]
-    .sort((a, b) => (a.server + '.' + a.name).localeCompare(b.server + '.' + b.name))
-    .slice(0, MAX_TOOLS_FOR_PROMPT)
-    .map((tool) => ({
-      ...tool,
-      description: tool.description ? clamp(tool.description, MAX_TOOL_DESC_CHARS) : undefined,
-    }));
+// Deterministic catalog, ordered so the cap can never cut what matters:
+// the purpose-built local server's tools sort FIRST (a plain alphabetical
+// sort put search_docs/search_logs at the very end of the list, where a
+// grafana-mcp with more tools than expected pushed them over the cap and
+// silently evicted exactly those two). Stable order also keeps the planner
+// prompt prefix byte-identical across calls for gateway prompt caching.
+const compactCatalog = (catalog: ToolDescriptor[]): ToolDescriptor[] => {
+  const ordered = [...catalog].sort((a, b) => {
+    const aLocal = a.server === 'local-fastmcp' ? 0 : 1;
+    const bLocal = b.server === 'local-fastmcp' ? 0 : 1;
+    if (aLocal !== bLocal) {
+      return aLocal - bLocal;
+    }
+    return (a.server + '.' + a.name).localeCompare(b.server + '.' + b.name);
+  });
+
+  if (ordered.length > MAX_TOOLS_FOR_PROMPT) {
+    console.warn(
+      '[v4m-ai-agent] tool catalog exceeds the prompt cap — evicting',
+      ordered.slice(MAX_TOOLS_FOR_PROMPT).map((t) => t.server + '.' + t.name)
+    );
+  }
+
+  return ordered.slice(0, MAX_TOOLS_FOR_PROMPT).map((tool) => ({
+    ...tool,
+    description: tool.description ? clamp(tool.description, MAX_TOOL_DESC_CHARS) : undefined,
+  }));
+};
 
 // Tiered compaction: the newest 3 events keep full detail (they're what the
 // current answer is being built from); older ones shrink to headlines. Keeps
