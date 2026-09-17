@@ -11,6 +11,28 @@ of `TLS_ENABLE`. `kube-rbac-proxy` is also the only source of transport encrypti
 setting `RBAC_PROXY_ENABLE=false` serves them over plain, unauthenticated HTTP regardless of
 `TLS_ENABLE`. Node Exporter previously supported its own native TLS independent of RBAC/auth; that
 capability has been retired in favor of `kube-rbac-proxy`.
+* **Logging**
+  * [FIX] Only attempt to delete an unneeded `v4m-logging-root-proxy` HTTPProxy resource if the
+CRD (httpproxies.projectcontour.io) is installed
+  * [CHANGE] As part of the upgrade to OpenSearch Dashboards 3.8.0 (see below),
+the CPU resource limit for the OpenSearch Dashboards pod was increased to 1 CPU.
+This addresses a persistent problem which had caused the application to fail to
+load consistently.  Note that this is an upper limit and the pod will generally
+need/use far less during normal operation.
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 3.6.0 to 3.8.0
+     * NOTE: During testing, an issue with the OpenSearch Dashboards API and
+versions of `curl`  prior to version 7.69.0 (released in March 2020) was identified.
+The issue prevented the successful import of this project's pre-built content into
+OpenSearch Dashboards.  The recommended solution is to update `curl` to a more
+recent version.  Disabling the use of Kubernetes port-forwarding (by setting the
+environment variable `LOG_ALWAYS_PORT_FORWARD` to '*false*') prior to deploying
+the log monitoring stack also resolved the issue when Contour was used for ingress.
+  * [UPGRADE] OpenSearch Helm chart upgraded from 3.6.0 to 3.8.0
+  * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 3.6.0 to 3.8.0
+  * [UPGRADE] Fluent Bit upgraded from 5.0.7 to 5.1.2
+  * [UPGRADE] Fluent Bit Helm chart upgraded from 0.57.7 to 0.58.2
+  * [UPGRADE] Elasticsearch Exporter upgraded from 1.10.0 to 1.11.0
+  * [UPGRADE] Elasticsearch Exporter Helm chart upgraded from 7.2.1 to 7.4.0
 
 ## Version 1.2.54 (04SEP2026)
 * **Overall**
@@ -32,6 +54,7 @@ capability has been retired in favor of `kube-rbac-proxy`.
 routing using Contour was configured automatically.  (Fixes #882)
   * [FIX] Corrected Alertmanager URL when `ALERTMANAGER_PATH` is set and path-based routing using Contour
 is configured automatically
+* **Logging**
   * [FIX] The `v4m-logging-root-proxy` HTTPProxy resource is only created in appropriate scenarios
 (i.e. auto-generated path-based routing using Contour) and any existing instance of this resource
 is deleted if found in other deployment scenarios (where it is not needed)
