@@ -4,8 +4,7 @@
 > [!IMPORTANT]
 > * [ANNOUNCEMENT] Helm 3 has reached [end-of-life](https://helm.sh/blog/helm-v3-end-of-life/) and
 users are strongly encouraged to move to [Helm 4](https://github.com/helm/helm/releases) as soon as
-possible. Our project added support for Helm 4 in May and it will become the ***required minimum
-version*** in the coming months.
+possible. Our project added support for Helm 4 in May and it will become ***required*** in the coming months.
 * **Logging**
   * [FIX] Only attempt to delete an unneeded `v4m-logging-root-proxy` HTTPProxy resource if the
 CRD (httpproxies.projectcontour.io) is installed
