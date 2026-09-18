@@ -253,7 +253,8 @@ if [ "$TLS_ENABLE" == "true" ] || [ "$RBAC_PROXY_ENABLE" == "true" ]; then
         # kube-rbac-proxy requires a bearer token; Grafana expands $__file{...}
         # from its own ServiceAccount token at provisioning time
         yq -i '.datasources.[0].jsonData.httpHeaderName1="Authorization"' "$TMP_DIR/grafanaDS.yaml"
-        authHeader="Bearer $__file{/var/run/secrets/kubernetes.io/serviceaccount/token}" yq -i '.datasources.[0].secureJsonData.httpHeaderValue1=strenv(authHeader)' "$TMP_DIR/grafanaDS.yaml"
+        # shellcheck disable=SC2016 
+        authHeader='Bearer $__file{/var/run/secrets/kubernetes.io/serviceaccount/token}' yq -i '.datasources.[0].secureJsonData.httpHeaderValue1=strenv(authHeader)' "$TMP_DIR/grafanaDS.yaml"
     fi
     kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-prom-https
     kubectl create cm -n "$MON_NS" grafana-datasource-prom-https --from-file "$TMP_DIR/grafanaDS.yaml"
