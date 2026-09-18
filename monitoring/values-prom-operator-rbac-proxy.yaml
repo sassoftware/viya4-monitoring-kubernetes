@@ -156,6 +156,11 @@ grafana:
         resources:
           - services/v4m-prometheus
         verbs: ["get", "create"]
+  envValueFrom:
+    PROMETHEUS_BEARER_TOKEN:
+      secretKeyRef:
+        name: v4m-grafana-prometheus-token
+        key: token
   sidecar:
     datasources:
       # The Prometheus datasource (with bearer token) is provisioned by
@@ -180,4 +185,13 @@ extraManifests:
             resource: services
             subresource: v4m-prometheus
             name: v4m-prometheus
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: v4m-grafana-prometheus-token
+      labels:
+        sas.com/monitoring-base: kube-viya-monitoring
+      annotations:
+        kubernetes.io/service-account.name: '{{ include "grafana.serviceAccountName" (index .Subcharts "grafana") }}'
+    type: kubernetes.io/service-account-token
 
