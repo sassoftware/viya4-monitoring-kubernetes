@@ -3,8 +3,7 @@
 * **Metrics**
   * [SECURITY] Kube State Metrics (KSM), Node Exporter, and Prometheus previously exposed cluster-wide resource state
 and infrastructure metrics -- including pod labels used to identify per-user SAS job activity -- over
-unauthenticated, unencrypted HTTP endpoints reachable by any pod in the cluster. Both are now fronted by
-a `kube-rbac-proxy` sidecar enforcing Kubernetes RBAC and bound to localhost only; Prometheus scrapes
+unauthenticated, unencrypted HTTP endpoints reachable by any pod in the cluster. All three are now fronted by a `kube-rbac-proxy` sidecar enforcing Kubernetes RBAC and bound to localhost only; Prometheus scrapes
 them using its existing ServiceAccount token, with no certificate management required. This is
 controlled by the new `RBAC_PROXY_ENABLE` environment variable (default `true`), which is independent
 of `TLS_ENABLE`. `kube-rbac-proxy` is also the only source of transport encryption for both targets;
