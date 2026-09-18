@@ -45,3 +45,139 @@ prometheus-node-exporter:
       tlsConfig:
         insecureSkipVerify: true
       bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+# ==========
+# Prometheus
+# ==========
+prometheus:
+  prometheusSpec:
+    # Prometheus binds to localhost only; kube-rbac-proxy is deployed as a
+    # sidecar and is the sole externally-reachable entry point, enforcing
+    # Kubernetes RBAC (SubjectAccessReview) via a bearer token before
+    # forwarding to Prometheus. Same pattern used for kube-state-metrics.
+    listenLocal: true
+    # kube-rbac-proxy terminates TLS, so Prometheus' own web TLS config
+    # (monitoring/tls/values-prom-operator-tls.yaml) is not used.
+    web: null
+    # NOTE: The chart renders this list through Helm's tpl function.
+    containers:
+      - name: kube-rbac-proxy
+        image: '{{ with index .Values "kube-state-metrics" "kubeRBACProxy" "image" }}{{ .registry }}/{{ .repository }}:{{ .tag }}{{ end }}'
+        imagePullPolicy: '{{ index .Values "kube-state-metrics" "kubeRBACProxy" "image" "pullPolicy" }}'
+        args:
+          - --secure-listen-address=:8443
+          - --upstream=http://127.0.0.1:9090/
+          - --proxy-endpoints-port=8888
+          - --config-file=/etc/kube-rbac-proxy-config/config-file.yaml
+        ports:
+          - name: https
+            containerPort: 8443
+          - name: http-healthz
+            containerPort: 8888
+        readinessProbe:
+          httpGet:
+            scheme: HTTPS
+            port: http-healthz
+            path: /healthz
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+        volumeMounts:
+          - name: kube-rbac-proxy-config
+            mountPath: /etc/kube-rbac-proxy-config
+            readOnly: true
+      # With listenLocal, the operator generates sh/curl/wget-based exec probes
+      # which cannot run in the distroless Prometheus image; promtool performs
+      # the same /-/ready and /-/healthy checks.
+      - name: prometheus
+        startupProbe:
+          exec:
+            command:
+              - /bin/promtool
+              - check
+              - ready
+              - --url=http://localhost:9090{{ .Values.prometheus.prometheusSpec.routePrefix }}
+        readinessProbe:
+          exec:
+            command:
+              - /bin/promtool
+              - check
+              - ready
+              - --url=http://localhost:9090{{ .Values.prometheus.prometheusSpec.routePrefix }}
+        livenessProbe:
+          exec:
+            command:
+              - /bin/promtool
+              - check
+              - healthy
+              - --url=http://localhost:9090{{ .Values.prometheus.prometheusSpec.routePrefix }}
+    volumes:
+      - name: kube-rbac-proxy-config
+        configMap:
+          name: v4m-prometheus-rbac-config
+  service:
+    targetPort: 8443
+  serviceMonitor:
+    # kube-rbac-proxy terminates TLS with a self-signed cert (no cert
+    # management required) and authenticates the scrape using Prometheus's
+    # own ServiceAccount token.
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
+    bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+  # Prometheus' ServiceAccount: kube-rbac-proxy needs to perform token and
+  # subject access reviews; Prometheus needs access through the proxy to
+  # scrape itself.
+  additionalRulesForClusterRole:
+    - apiGroups: [""]
+      resources:
+        - services/v4m-prometheus
+      verbs: ["get"]
+    - apiGroups: ["authentication.k8s.io"]
+      resources:
+        - tokenreviews
+      verbs: ["create"]
+    - apiGroups: ["authorization.k8s.io"]
+      resources:
+        - subjectaccessreviews
+      verbs: ["create"]
+
+grafana:
+  rbac:
+    # Grafana queries Prometheus through kube-rbac-proxy using its own
+    # ServiceAccount token (GET and POST requests).
+    extraClusterRoleRules:
+      - apiGroups: [""]
+        resources:
+          - services/v4m-prometheus
+        verbs: ["get", "create"]
+  sidecar:
+    datasources:
+      # The Prometheus datasource (with bearer token) is provisioned by
+      # deploy_monitoring_cluster.sh instead.
+      defaultDatasourceEnabled: false
+
+# kube-rbac-proxy authorizes every request against this (virtual) resource;
+# callers need "get" (and "create" for POST) on services/v4m-prometheus.
+extraManifests:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: v4m-prometheus-rbac-config
+      labels:
+        sas.com/monitoring-base: kube-viya-monitoring
+    data:
+      config-file.yaml: |
+        authorization:
+          resourceAttributes:
+            namespace: {{ .Release.Namespace }}
+            apiVersion: v1
+            resource: services
+            subresource: v4m-prometheus
+            name: v4m-prometheus
+

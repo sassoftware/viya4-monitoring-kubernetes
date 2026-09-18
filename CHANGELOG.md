@@ -1,7 +1,7 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Metrics**
-  * [SECURITY] Kube State Metrics (KSM) and Node Exporter previously exposed cluster-wide resource state
+  * [SECURITY] Kube State Metrics (KSM), Node Exporter, and Prometheus previously exposed cluster-wide resource state
 and infrastructure metrics -- including pod labels used to identify per-user SAS job activity -- over
 unauthenticated, unencrypted HTTP endpoints reachable by any pod in the cluster. Both are now fronted by
 a `kube-rbac-proxy` sidecar enforcing Kubernetes RBAC and bound to localhost only; Prometheus scrapes

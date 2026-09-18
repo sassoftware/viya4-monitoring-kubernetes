@@ -238,7 +238,26 @@ if [ "$RBAC_PROXY_ENABLE" == "true" ]; then
     rbacProxyValuesFile=monitoring/values-prom-operator-rbac-proxy.yaml
     log_debug "Including RBAC-proxy response file $rbacProxyValuesFile"
 else
-    log_warn "RBAC_PROXY_ENABLE is false; KSM and Node Exporter will be served over plain, unauthenticated HTTP, even if TLS_ENABLE=true -- kube-rbac-proxy is their only source of both authentication and transport encryption."
+    log_warn "RBAC_PROXY_ENABLE is false; Prometheus, KSM and Node Exporter will be served without authentication, and KSM and Node Exporter over plain HTTP even if TLS_ENABLE=true -- kube-rbac-proxy is their only source of both authentication and transport encryption."
+fi
+
+# Prometheus serves HTTPS when either TLS_ENABLE or RBAC_PROXY_ENABLE is true
+if [ "$TLS_ENABLE" == "true" ] || [ "$RBAC_PROXY_ENABLE" == "true" ]; then
+    log_verbose "Provisioning TLS-enabled Prometheus datasource for Grafana"
+    grafanaDS=grafana-datasource-prom-https.yaml
+    if [ "$MON_TLS_PATH_INGRESS" == "true" ]; then
+        grafanaDS=grafana-datasource-prom-https-path.yaml
+    fi
+    cp "monitoring/tls/$grafanaDS" "$TMP_DIR/grafanaDS.yaml"
+    if [ "$RBAC_PROXY_ENABLE" == "true" ]; then
+        # kube-rbac-proxy requires a bearer token; Grafana expands $__file{...}
+        # from its own ServiceAccount token at provisioning time
+        yq -i '.datasources.[0].jsonData.httpHeaderName1="Authorization"' "$TMP_DIR/grafanaDS.yaml"
+        authHeader='Bearer $__file{/var/run/secrets/kubernetes.io/serviceaccount/token}' yq -i '.datasources.[0].secureJsonData.httpHeaderValue1=strenv(authHeader)' "$TMP_DIR/grafanaDS.yaml"
+    fi
+    kubectl delete cm -n "$MON_NS" --ignore-not-found grafana-datasource-prom-https
+    kubectl create cm -n "$MON_NS" grafana-datasource-prom-https --from-file "$TMP_DIR/grafanaDS.yaml"
+    kubectl label cm -n "$MON_NS" grafana-datasource-prom-https grafana_datasource=1 sas.com/monitoring-base=kube-viya-monitoring
 fi
 
 AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
