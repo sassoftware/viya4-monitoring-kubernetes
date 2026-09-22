@@ -318,28 +318,6 @@ Replace the placeholder host names with the ones you specified.
 * Alertmanager — `https://monitoring.host.cluster.example.com/alertmanager` (if enabled)
 * OpenSearch — `https://logging.host.cluster.example.com/opensearch` (if enabled)
 
-## Known Limitations
-
-1. **Not validated against Contour.** This sample has been validated
-   end-to-end (both host-based and path-based routing, backend re-encryption
-   included) against Envoy Gateway, which is expected to be the primary
-   supported implementation going forward. It has not been tested against
-   Contour's own Gateway API support, which is the implementation our users
-   are most likely to already have installed. Specifically unverified on
-   Contour: `sessionPersistence` support, `BackendTLSPolicy` with
-   ConfigMap-based CA certificates, and available proxy-tuning knobs.
-2. **OpenShift scope.** `AUTOGENERATE_INGRESS` is hard-disabled on OpenShift
-   because `deploy_monitoring_openshift.sh` uses Routes instead. That rationale
-   may not hold here — OpenShift has GA Gateway API support as of 4.19. Confirm
-   with IRIS/ADR-0151 whether OpenShift is in scope.
-3. **Session persistence scope.** Decide whether OSD affinity parity is a hard
-   requirement or an accepted gap.
-4. **Real LoadBalancer path.** Validation to date has been over
-   NodePort/port-forward, since the test cluster had no LoadBalancer
-   implementation. Needs a pass with a real LoadBalancer (e.g. MetalLB) to
-   confirm the Gateway actually gets `Programmed: True` with an assigned
-   address.
-
 ## Autogeneration
 
 `AUTOGENERATE_INGRESS=true` with `INGRESS_TYPE=gateway-api` generates and applies
