@@ -340,7 +340,7 @@ function create_tls_certs_openssl {
         # Cover the short name and the full in-cluster DNS forms so validation
         # can target whichever one it's configured with.
         sanExtFile="$TMP_DIR/${app}-ext.cnf"
-        cat > "$sanExtFile" <<EOF
+        cat > "$sanExtFile" << EOF
 [ v3_req ]
 subjectAltName = DNS:$app,DNS:$app.$namespace,DNS:$app.$namespace.svc,DNS:$app.$namespace.svc.cluster.local
 EOF

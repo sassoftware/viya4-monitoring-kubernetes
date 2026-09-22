@@ -24,9 +24,9 @@ fail() { echo "  [ FAIL ] $1"; }
 echo
 echo "-- Standard-channel CRDs (required) --"
 for crd in gatewayclasses.gateway.networking.k8s.io \
-           gateways.gateway.networking.k8s.io \
-           httproutes.gateway.networking.k8s.io \
-           referencegrants.gateway.networking.k8s.io; do
+    gateways.gateway.networking.k8s.io \
+    httproutes.gateway.networking.k8s.io \
+    referencegrants.gateway.networking.k8s.io; do
     if kubectl get crd "$crd" > /dev/null 2>&1; then
         version="$(kubectl get crd "$crd" -o jsonpath='{.spec.versions[*].name}')"
         pass "$crd (served versions: $version)"
