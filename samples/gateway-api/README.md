@@ -188,6 +188,19 @@ Istio was more permissive. The certificates issued by our deployment scripts do
 | `v4m-osd`          | `prometheus-operator-kibana`       |
 | `v4m-search`       | `v4m-es-client-service`            |
 
+> [!WARNING]
+> **These values are only correct when certs come from the `cert-manager` flow**
+> (`monitoring/tls/*-tls-cert.yaml`, `logging/tls/*-tls-cert.yaml`), whose
+> `dnsNames` match this table. If the deployment falls back to the **openssl
+> path** (`bin/tls-include.sh`) instead, the issued certs carry SANs of the
+> form `<service>`, `<service>.<namespace>`, `<service>.<namespace>.svc`,
+> `<service>.<namespace>.svc.cluster.local` (e.g. `grafana`,
+> `grafana.monitoring`, ...) -- with **no** `prometheus-operator-` prefix.
+> `AUTOGENERATE_INGRESS=true` deployments don't need this table -- the deploy
+> scripts read the SAN off the actual cert (see Autogeneration below). It only
+> matters if you're applying `backendtlspolicies.yaml` by hand; confirm against
+> the actual issued cert with the command below first.
+
 Verify against your own deployment before relying on these:
 
 ```
@@ -351,11 +364,21 @@ These must be resolved before this POC becomes a supported sample.
    confirm the Gateway actually gets `Programmed: True` with an assigned
    address.
 
-## Next Step: Autogeneration
+## Autogeneration
 
-Following the Contour precedent, autogeneration is a separate, later stage. It
-would add `INGRESS_TYPE=gateway` to `bin/autogenerate-include.sh` alongside a
-`create_httproute` function paralleling the existing `create_httpproxy`. The
+`AUTOGENERATE_INGRESS=true` with `INGRESS_TYPE=gateway-api` generates and applies
+the `HTTPRoute` resources shown in this sample as part of a normal deploy,
+following the same pattern as `INGRESS_TYPE=contour`. It requires
+`GATEWAY_CLASS_NAME` to be set, and requires a `Gateway` named `v4m-gateway`
+using that `GatewayClass` to already exist in the `monitoring`/`logging`
+namespace (the Gateway itself is never created by the deploy scripts -- see
+[The Gateway is not ours to create](#the-gateway-is-not-ours-to-create)). The
 existing per-application enable flags (`GRAFANA_INGRESS_ENABLE` and friends) and
-the FQDN/path override variables carry through unchanged. `create_root_httpproxy`
-has no counterpart, since Gateway API needs no root resource.
+the FQDN/path override variables carry through unchanged. There is no
+`INGRESS_CREATE_ROOT_PROXY` equivalent, since Gateway API needs no root resource.
+
+Backend re-encryption via `BackendTLSPolicy` is on by default
+(`INGRESS_BACKEND_TLS_ENABLE=true`), since application backends serve HTTPS by
+default and Gateway API has no per-route TLS toggle. The deploy scripts read
+`validation.hostname` off the actual issued cert rather than using the values in
+`backendtlspolicies.yaml`, so it works regardless of which TLS flow is active.

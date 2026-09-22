@@ -65,6 +65,12 @@ elif kubectl get crd httpproxies.projectcontour.io -o name > /dev/null 2>&1; the
     kubectl -n "$LOG_NS" delete httpproxy v4m-logging-root-proxy --ignore-not-found
 fi
 
+if [[ $AUTOGENERATE_INGRESS == "true" &&
+    $INGRESS_TYPE == "gateway-api" ]]; then
+
+    create_http_redirect_httproute logging "$LOG_NS"
+fi
+
 ##################################
 # Elasticsearch Metric Exporter  #
 ##################################
