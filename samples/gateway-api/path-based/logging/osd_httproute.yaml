@@ -1,4 +1,4 @@
-# Sample: gateway-api/path-based Version: 0.1.0 (POC)
+# Sample: gateway-api/path-based Version: 0.1.0
 
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute

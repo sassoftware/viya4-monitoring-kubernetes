@@ -1,4 +1,4 @@
-# Sample: gateway-api/host-based Version: 0.1.0 (POC)
+# Sample: gateway-api/host-based Version: 0.1.0
 
 # Unlike Contour's HTTPProxy -- which redirects HTTP to HTTPS implicitly as soon
 # as TLS is configured on the virtualhost -- Gateway API requires an explicit

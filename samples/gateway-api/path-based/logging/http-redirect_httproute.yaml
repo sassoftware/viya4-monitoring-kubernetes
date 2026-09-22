@@ -1,4 +1,4 @@
-# Sample: gateway-api/path-based Version: 0.1.0 (POC)
+# Sample: gateway-api/path-based Version: 0.1.0
 
 # Explicit HTTP-to-HTTPS redirect.  Gateway API has no implicit equivalent of
 # Contour's automatic redirect; see the monitoring copy of this file for details.

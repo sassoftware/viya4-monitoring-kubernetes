@@ -2,12 +2,12 @@
 # Copyright © 2026, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-# POC helper -- samples/gateway-api Version: 0.1.0
+# Helper script -- samples/gateway-api Version: 0.1.0
 #
 # Reports what the Gateway API implementation in the current cluster actually
-# supports, focused on the features this sample depends on.  Intended to answer
-# the open validation questions before the sample is finalized -- in particular
-# whether Contour supports sessionPersistence and BackendTLSPolicy.
+# supports, focused on the features this sample depends on.  Run it before
+# enabling AUTOGENERATE_INGRESS with INGRESS_TYPE=gateway-api to confirm the
+# required CRDs are installed and to find your GatewayClass name.
 #
 # Read-only: this script creates nothing and changes nothing.
 #

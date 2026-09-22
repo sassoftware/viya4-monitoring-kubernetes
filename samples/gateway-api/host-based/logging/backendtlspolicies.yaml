@@ -1,4 +1,4 @@
-# Sample: gateway-api/host-based Version: 0.1.0 (POC)
+# Sample: gateway-api/host-based Version: 0.1.0
 
 # BackendTLSPolicy replaces Contour's `services[].protocol: tls`.  See the
 # extended notes in samples/gateway-api/host-based/monitoring/backendtlspolicies.yaml.

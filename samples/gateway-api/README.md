@@ -1,9 +1,4 @@
-# Gateway API (Proof of Concept)
-
-> [!WARNING]
-> **This sample is a proof of concept and is not yet supported.** It has not been
-> validated end-to-end against any implementation. Several design questions
-> remain open (see [Open Items](#open-items)). Do not use it in production.
+# Gateway API
 
 ## Overview
 
@@ -16,6 +11,12 @@ SIG-Network. Its core resources (`GatewayClass`, `Gateway`, `HTTPRoute`,
 `ReferenceGrant`, `GRPCRoute`) reached v1/GA in the Standard channel as of
 Gateway API v1.4.0. Adopting it aligns SAS Viya Monitoring for Kubernetes with
 the direction established for SAS Viya itself in ADR-0151.
+
+> [!IMPORTANT]
+> The customization files in this sample can be applied manually, as described
+> below, or generated and applied automatically by setting
+> `AUTOGENERATE_INGRESS=true` and `INGRESS_TYPE=gateway-api`. See
+> [Autogeneration](#autogeneration).
 
 ### Gateway API is not the same thing as Contour
 
@@ -317,48 +318,23 @@ Replace the placeholder host names with the ones you specified.
 * Alertmanager — `https://monitoring.host.cluster.example.com/alertmanager` (if enabled)
 * OpenSearch — `https://logging.host.cluster.example.com/opensearch` (if enabled)
 
-## Open Items
+## Known Limitations
 
-These must be resolved before this POC becomes a supported sample.
-
-1. **Validate against Contour.** Prior hands-on research (PSCIE-63) used Istio
-   and kgateway; Contour was not tested. This sample has since been validated
-   against Envoy Gateway, which is expected to be the primary supported
-   implementation going forward, so Contour is no longer a hard prerequisite for
-   this sample to be considered supported -- but it is still the implementation
-   our users are most likely to already have installed, so validating against it
-   remains worthwhile. Specifically unverified on Contour: `sessionPersistence`
-   support, `BackendTLSPolicy` with ConfigMap-based CA certificates, and available
-   proxy-tuning knobs.
-2. **BackendTLSPolicy validation against Envoy Gateway.** Confirmed working:
-   `GatewayClass`/`Gateway`/`HTTPRoute` reconciliation, TLS termination with
-   SNI-based host routing, end-to-end request routing to the correct backend, and
-   `bin/create-ca-configmap.sh` itself (it correctly extracted the CA and created
-   the ConfigMap). Not yet confirmed: whether `BackendTLSPolicy` actually accepts
-   a backend connection using that ConfigMap -- on the cluster used for
-   validation, every application's backend serving certificate (Grafana,
-   Prometheus, Alertmanager, Kibana/OSD, Elasticsearch) had no SAN, only a bare
-   CN, which Envoy Gateway's SAN-only matcher rejects unconditionally regardless
-   of the configured `hostname`, independent of whether the CA ConfigMap itself
-   is correct. This is a cert-issuance gap in that environment,
-   not a defect in this sample, but it means backend re-encryption is still
-   unverified end-to-end. Needs either a re-test against a deployment with
-   SAN-bearing backend certs, or a fix to the cert-issuance flow.
-3. **OpenShift scope.** `AUTOGENERATE_INGRESS` is hard-disabled on OpenShift
+1. **Not validated against Contour.** This sample has been validated
+   end-to-end (both host-based and path-based routing, backend re-encryption
+   included) against Envoy Gateway, which is expected to be the primary
+   supported implementation going forward. It has not been tested against
+   Contour's own Gateway API support, which is the implementation our users
+   are most likely to already have installed. Specifically unverified on
+   Contour: `sessionPersistence` support, `BackendTLSPolicy` with
+   ConfigMap-based CA certificates, and available proxy-tuning knobs.
+2. **OpenShift scope.** `AUTOGENERATE_INGRESS` is hard-disabled on OpenShift
    because `deploy_monitoring_openshift.sh` uses Routes instead. That rationale
    may not hold here — OpenShift has GA Gateway API support as of 4.19. Confirm
-   with IRIS/ADR-0151 whether OpenShift is in scope this time.
-4. **CA-cert-in-ConfigMap flow.** `bin/create-ca-configmap.sh` is a POC
-   stopgap. Decide where this belongs: extend `create_ingress_certs`, have
-   certframe emit the ConfigMap, or append to a shared
-   `customer-provided-ca-certificates` ConfigMap.
-5. **Session persistence scope.** Decide whether OSD affinity parity is a hard
-   requirement for v1 or an accepted gap.
-6. **Path-based routing.** Only host-based routing has been exercised
-   end-to-end so far. Path-based needs its own pass -- it exercises the
-   `Exact`/`PathPrefix` redirect-pair precedence and the OSD `URLRewrite` filter,
-   neither of which host-based touches.
-7. **Real LoadBalancer path.** Validation to date has been over
+   with IRIS/ADR-0151 whether OpenShift is in scope.
+3. **Session persistence scope.** Decide whether OSD affinity parity is a hard
+   requirement or an accepted gap.
+4. **Real LoadBalancer path.** Validation to date has been over
    NodePort/port-forward, since the test cluster had no LoadBalancer
    implementation. Needs a pass with a real LoadBalancer (e.g. MetalLB) to
    confirm the Gateway actually gets `Programmed: True` with an assigned
