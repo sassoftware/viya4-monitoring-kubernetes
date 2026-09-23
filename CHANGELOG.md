@@ -9,10 +9,6 @@ This addresses a persistent problem which had caused the application to fail to
 load consistently.  Note that this is an upper limit and the pod will generally
 need/use far less during normal operation.
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 3.6.0 to 3.8.0
-     * NOTE: The request used to import this project's pre-built content into
-OpenSearch Dashboards no longer sends an `Expect: 100-continue` header. This ensures
-the import works with OpenSearch Dashboards 3.8.0 regardless of the version of `curl`
-in use.
   * [UPGRADE] OpenSearch Helm chart upgraded from 3.6.0 to 3.8.0
   * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 3.6.0 to 3.8.0
   * [UPGRADE] Fluent Bit upgraded from 5.0.7 to 5.1.2
