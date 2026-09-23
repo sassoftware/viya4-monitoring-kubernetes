@@ -1,10 +1,6 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Logging**
-  * [FIX] Importing pre-built content into OpenSearch Dashboards no longer requires
-a newer version of `curl` or disabling Kubernetes port-forwarding. The import request
-no longer sends the `Expect: 100-continue` header that older `curl` versions add to
-file uploads.
   * [FIX] Only attempt to delete an unneeded `v4m-logging-root-proxy` HTTPProxy resource if the
 CRD (httpproxies.projectcontour.io) is installed
   * [CHANGE] As part of the upgrade to OpenSearch Dashboards 3.8.0 (see below),
@@ -13,13 +9,10 @@ This addresses a persistent problem which had caused the application to fail to
 load consistently.  Note that this is an upper limit and the pod will generally
 need/use far less during normal operation.
   * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 3.6.0 to 3.8.0
-     * NOTE: During testing, an issue with the OpenSearch Dashboards API and
-versions of `curl`  prior to version 7.69.0 (released in March 2020) was identified.
-The issue prevented the successful import of this project's pre-built content into
-OpenSearch Dashboards.  The recommended solution is to update `curl` to a more
-recent version.  Disabling the use of Kubernetes port-forwarding (by setting the
-environment variable `LOG_ALWAYS_PORT_FORWARD` to '*false*') prior to deploying
-the log monitoring stack also resolved the issue when Contour was used for ingress.
+     * NOTE: The request used to import this project's pre-built content into
+OpenSearch Dashboards no longer sends an `Expect: 100-continue` header. This ensures
+the import works with OpenSearch Dashboards 3.8.0 regardless of the version of `curl`
+in use.
   * [UPGRADE] OpenSearch Helm chart upgraded from 3.6.0 to 3.8.0
   * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 3.6.0 to 3.8.0
   * [UPGRADE] Fluent Bit upgraded from 5.0.7 to 5.1.2
