@@ -1,6 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Logging**
+  * [FIX] Importing pre-built content into OpenSearch Dashboards no longer requires
+a newer version of `curl` or disabling Kubernetes port-forwarding. The import request
+no longer sends the `Expect: 100-continue` header that older `curl` versions add to
+file uploads.
   * [FIX] Only attempt to delete an unneeded `v4m-logging-root-proxy` HTTPProxy resource if the
 CRD (httpproxies.projectcontour.io) is installed
   * [CHANGE] As part of the upgrade to OpenSearch Dashboards 3.8.0 (see below),
