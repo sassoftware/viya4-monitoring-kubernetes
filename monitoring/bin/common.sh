@@ -20,6 +20,7 @@ if [ "$SAS_MONITORING_COMMON_SOURCED" = "" ]; then
 
     export MON_NS="${MON_NS:-monitoring}"
     export TLS_ENABLE="${MON_TLS_ENABLE:-${TLS_ENABLE:-true}}"
+    export RBAC_PROXY_ENABLE="${RBAC_PROXY_ENABLE:-true}"
 
     if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
