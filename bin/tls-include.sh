@@ -333,10 +333,22 @@ function create_tls_certs_openssl {
 
         log_debug "Creating TLS Cert for [$app] using OpenSSL"
         cert_subject="/O=v4m/CN=$app"
+
+        # BackendTLSPolicy-style consumers (e.g. Gateway API implementations)
+        # validate the backend certificate's SAN, not its CN, and reject a
+        # certificate with no SAN at all regardless of the configured hostname.
+        # Cover the short name and the full in-cluster DNS forms so validation
+        # can target whichever one it's configured with.
+        sanExtFile="$TMP_DIR/${app}-ext.cnf"
+        cat > "$sanExtFile" << EOF
+[ v3_req ]
+subjectAltName = DNS:$app,DNS:$app.$namespace,DNS:$app.$namespace.svc,DNS:$app.$namespace.svc.cluster.local
+EOF
+
         openssl genrsa -out "$TMP_DIR"/"${app}"-key-temp.pem 4096 2> /dev/null
         openssl pkcs8 -inform PEM -outform PEM -in "$TMP_DIR"/"${app}"-key-temp.pem -topk8 -nocrypt -v1 PBE-SHA1-3DES -out "$TMP_DIR"/"${app}"-key.pem
         openssl req -new -key "$TMP_DIR"/"${app}"-key.pem -subj "$cert_subject" -out "$TMP_DIR"/"${app}".csr
-        openssl x509 -req -in "$TMP_DIR"/"${app}".csr -CA "$TMP_DIR"/root-ca.pem -CAkey "$TMP_DIR"/root-ca-key.pem -CAcreateserial -CAserial "$TMP_DIR"/ca.srl -sha256 -out "$TMP_DIR"/"${app}".pem -days "$cert_life" 2> /dev/null
+        openssl x509 -req -in "$TMP_DIR"/"${app}".csr -CA "$TMP_DIR"/root-ca.pem -CAkey "$TMP_DIR"/root-ca-key.pem -CAcreateserial -CAserial "$TMP_DIR"/ca.srl -sha256 -out "$TMP_DIR"/"${app}".pem -days "$cert_life" -extfile "$sanExtFile" -extensions v3_req 2> /dev/null
 
         create_cert_secret "$namespace" "$app"
 

@@ -104,10 +104,25 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "tr
         create_httpproxy "logging" "opensearch" "$targetPath" "$targetFqdn" "$ingress_tls_secret"
         kubectl -n "$LOG_NS" label httpproxy v4m-search managed-by="v4m-es-script"
 
+    elif [ "$INGRESS_TYPE" == "gateway-api" ]; then
+
+        create_httproute "logging" "opensearch" "$targetPath" "$targetFqdn"
+        kubectl -n "$LOG_NS" label httproute v4m-search managed-by="v4m-es-script"
+
+        if [ "$INGRESS_BACKEND_TLS_ENABLE" == "true" ]; then
+            create_backend_tls_ca_configmap "$LOG_NS"
+            apply_backend_tls_policy "$LOG_NS" v4m-search-backend-tls v4m-search es-rest-tls-secret
+        else
+            kubectl -n "$LOG_NS" delete backendtlspolicy v4m-search-backend-tls --ignore-not-found
+        fi
     fi
 elif [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "false" ] && [ "$INGRESS_TYPE" == "contour" ]; then
     log_debug "Access to [OpenSearch] disabled; removing HTTPProxy resource"
     kubectl -n "$LOG_NS" delete httpproxy v4m-search --ignore-not-found
+elif [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "false" ] && [ "$INGRESS_TYPE" == "gateway-api" ]; then
+    log_debug "Access to [OpenSearch] disabled; removing HTTPRoute resource"
+    kubectl -n "$LOG_NS" delete backendtlspolicy v4m-search-backend-tls --ignore-not-found
+    kubectl -n "$LOG_NS" delete httproute v4m-search --ignore-not-found
 else
     log_debug "Autogeneration of ingresss NOT enabled and/or ingress NOT enabled for OpenSearch"
 fi
