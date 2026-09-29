@@ -317,6 +317,7 @@ function create_tls_certs_openssl {
                     else
                         log_warn "TLS Secret for [$app] has no SAN (issued before SAN support was added); it will fail strict backend TLS validation (e.g. Gateway API's BackendTLSPolicy)."
                         log_warn "It can be renewed with a SAN using: ./bin/renew-tls-certs.sh -t <target> (see -h for valid targets)"
+                        # TODO: Same as below, regen certs automatically
                         continue
                     fi
                 else

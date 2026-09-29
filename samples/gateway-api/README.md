@@ -31,14 +31,8 @@ sample:
 
 Everything in this sample is portable Gateway API YAML. The **only**
 implementation-specific value is `spec.gatewayClassName` on the `Gateway`
-resource. The same HTTPRoutes work against Contour, Istio, kgateway, Envoy
-Gateway, Cilium, Kong, NGINX Gateway Fabric, AWS Load Balancer Controller, GKE's
-native Gateway controller, Azure Application Gateway for Containers, and
-OpenShift's Ingress Operator (4.19+). That portability is the entire point.
-
-Contour appears repeatedly in the comments not because it is architecturally
-special, but because it is the controller we already recommend, making it the
-most convenient one to validate against first.
+resource. The same HTTPRoutes work against many controllers. That portability 
+is the entire point.
 
 > [!IMPORTANT]
 > Your implementation should have **Extended** conformance, not merely Core.
@@ -61,7 +55,7 @@ actually serves.
 
 ## Scenarios
 
-As with the Contour sample, two scenarios are provided:
+Two scenarios are provided:
 
 * **host-based routing** — the application name is part of the host name
   (for example, `https://grafana.host.cluster.example.com/`).
@@ -112,15 +106,12 @@ path-based/{monitoring,logging}/
 Only apply the `BackendTLSPolicy` documents for applications you actually
 exposed; the sample file contains policies for all of them.
 
-## Differences from the Contour HTTPProxy Sample
+## Key Gateway API Concepts Used in This Sample
 
-If you are already familiar with [`samples/contour`](../contour), these are the
-substantive changes.
+### Gateway Ownership
 
-### The Gateway is not ours to create
-
-The `Gateway` resource is expected to be owned and managed by the platform or
-cluster administrator, not by SAS Viya Monitoring for Kubernetes. The
+The `Gateway` resource is owned and managed by the platform or cluster
+administrator, not by SAS Viya Monitoring for Kubernetes. The
 `gateway.yaml` files in this sample are **reference material only** — a
 known-good starting point that matches the HTTPRoutes shipped here.
 
@@ -136,27 +127,23 @@ Gateway that references it becomes usable. The Gateway will simply report a
 
 ### There is no "root proxy"
 
-In the path-based Contour scenario an extra "root" `HTTPProxy` owned the host
-name and TLS certificate, and per-application HTTPProxies were pulled in via
-`includes`. In Gateway API the `Gateway` itself plays that role: HTTPRoutes
-attach to it via `parentRefs` and each contributes path rules independently.
-
-There is therefore no equivalent of `root_httpproxy.yaml`, and no equivalent of
-the `INGRESS_CREATE_ROOT_PROXY` setting.
+The `Gateway` owns the host name and TLS certificate; each application's
+`HTTPRoute` attaches to it independently via `parentRefs` and contributes its
+own path rules. There is no separate resource that "includes" the others, and
+no `INGRESS_CREATE_ROOT_PROXY`-equivalent setting.
 
 ### HTTP-to-HTTPS redirect is explicit
 
-Contour's `HTTPProxy` redirects HTTP to HTTPS implicitly as soon as TLS is
-configured on the virtualhost. Gateway API requires a dedicated `HTTPRoute` with
-a `RequestRedirect` filter and no `backendRefs`, attached to the Gateway's HTTP
-listener via `sectionName`. That is `http-redirect_httproute.yaml`. One per
-Gateway is sufficient.
+Gateway API has no implicit HTTP-to-HTTPS redirect. It requires a dedicated
+`HTTPRoute` with a `RequestRedirect` filter and no `backendRefs`, attached to
+the Gateway's HTTP listener via `sectionName`. That is
+`http-redirect_httproute.yaml`. One per Gateway is sufficient.
 
 ### Backend TLS uses a separate resource
 
-Contour marks a backend as HTTPS with `services[].protocol: tls` inline on the
-route. Gateway API has no per-`backendRef` equivalent; backend re-encryption is
-configured out-of-band by a `BackendTLSPolicy` that targets the `Service`.
+Gateway API has no per-`backendRef` field for marking a backend as HTTPS;
+backend re-encryption is configured out-of-band by a `BackendTLSPolicy` that
+targets the `Service`.
 
 Two gotchas follow from this.
 
@@ -176,8 +163,8 @@ displace the ConfigMap requirement.
 #### The hostname to validate is not the Service name
 
 `validation.hostname` is matched against the SANs on the backend's serving
-certificate, and some implementations enforce this strictly — kgateway does;
-Istio was more permissive. The certificates issued by our deployment scripts do
+certificate, and some implementations enforce this strictly.
+The certificates issued by our deployment scripts do
 **not** carry the Service name as a SAN. The correct values, taken from
 `monitoring/tls/*.yaml` and `logging/tls/*.yaml`, are:
 
@@ -227,32 +214,17 @@ for OpenSearch Dashboards, and is a genuine improvement — it avoids that
 approach's problems with special characters in URLs.
 
 For OpenSearch Dashboards and the OpenSearch API, the second rule also carries a
-`URLRewrite` filter with `ReplacePrefixMatch: /`, which is the equivalent of
-Contour's `pathRewritePolicy.replacePrefix`. Grafana, Prometheus and Alertmanager
-need no rewrite because they are configured to serve from their sub-path.
+`URLRewrite` filter with `ReplacePrefixMatch: /`, which strips the path prefix
+before forwarding to the backend. Grafana, Prometheus and Alertmanager need no
+rewrite because they are configured to serve from their sub-path.
 
 ### Session persistence is experimental
 
-The deprecated ingress-nginx sample set
-`nginx.ingress.kubernetes.io/affinity: "cookie"` for OpenSearch Dashboards
-(`samples/ingress/path-based-ingress/logging/user-values-osd.yaml`). That setting
-was silently dropped when the sample moved to Contour's `HTTPProxy`.
-
-In Gateway API, `sessionPersistence` on `HTTPRoute` is **experimental channel
-only**. Confirmed against the v1.4.0 CRDs: the Standard-channel `HTTPRoute` has
-no `sessionPersistence` field on its rules at all, while the experimental channel
-does (`type`, `sessionName`, `cookieConfig.lifetimeType`, `absoluteTimeout`,
-`idleTimeout`). Using it therefore requires installing the experimental CRD set,
-and implementation support is inconsistent (Istio does not support it; kgateway does, behind
-`KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES`; Contour's support is
-unconfirmed). It is therefore present but commented out in the OSD routes.
-
-Per GEP-1619 the cookie path is derived automatically from the matched route,
-which matches the current nginx behavior without manual configuration; `samesite`
-is left to the implementation, and in practice browsers default to `Lax`, which
-also matches the previous nginx behavior.
-
-This gap is consequential only if OpenSearch Dashboards is scaled beyond a single
+`sessionPersistence` on `HTTPRoute` (needed for OSD sticky sessions) is
+**experimental channel only** -- the Standard-channel `HTTPRoute` has no such
+field at all, so using it requires installing the experimental CRD set, and
+implementation support varies. It is present but commented out in the OSD
+routes. This only matters if OpenSearch Dashboards is scaled beyond a single
 replica, which the default deployment does not do.
 
 ### Proxy tuning is a documentation matter
@@ -326,7 +298,7 @@ following the same pattern as `INGRESS_TYPE=contour`. It requires
 `GATEWAY_CLASS_NAME` to be set, and requires a `Gateway` named `v4m-gateway`
 using that `GatewayClass` to already exist in the `monitoring`/`logging`
 namespace (the Gateway itself is never created by the deploy scripts -- see
-[The Gateway is not ours to create](#the-gateway-is-not-ours-to-create)). The
+[Gateway Ownership](#gateway-ownership)). The
 existing per-application enable flags (`GRAFANA_INGRESS_ENABLE` and friends) and
 the FQDN/path override variables carry through unchanged. There is no
 `INGRESS_CREATE_ROOT_PROXY` equivalent, since Gateway API needs no root resource.
