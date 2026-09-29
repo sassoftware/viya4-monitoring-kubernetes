@@ -250,7 +250,12 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
         exit 1
     fi
 
-    if [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
+    if [ "$INGRESS_TYPE" == "gateway-api" ]; then
+        # The Gateway's TLS material is owned by whoever manages that Gateway
+        # (see GATEWAY_NAMESPACE) -- we never create it, the same way we never
+        # create the Gateway itself.
+        log_debug "Skipping ingress TLS secret creation for INGRESS_TYPE=gateway-api; the Gateway's own TLS Secret is platform-managed."
+    elif [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
 
         amIngressCert="${ALERTMANAGER_INGRESS_CERT}"
         amIngressKey="${ALERTMANAGER_INGRESS_KEY}"

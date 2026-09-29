@@ -44,4 +44,4 @@ spec:
           port: 3000
 
 # Backend re-encryption is configured by BackendTLSPolicy; see
-# backendtlspolicies.yaml in this directory.
+# "Backend TLS uses a separate resource" in samples/gateway-api/README.md.

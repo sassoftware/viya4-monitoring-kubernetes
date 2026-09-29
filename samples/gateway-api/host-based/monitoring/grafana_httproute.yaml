@@ -22,4 +22,5 @@ spec:
 # NOTE: Gateway API has no per-backendRef "use TLS to the backend" field, which
 # is what `protocol: tls` does on a Contour HTTPProxy service.  Backend
 # re-encryption is configured out-of-band by a BackendTLSPolicy resource that
-# targets the Service.  See backendtlspolicies.yaml in this directory.
+# targets the Service.  See "Backend TLS uses a separate resource" in
+# samples/gateway-api/README.md.

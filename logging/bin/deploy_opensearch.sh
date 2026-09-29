@@ -46,7 +46,12 @@ AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
 
 if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "true" ]; then
 
-    if [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
+    if [ "${INGRESS_TYPE:-ingress-nginx}" == "gateway-api" ]; then
+        # The Gateway's TLS material is owned by whoever manages that Gateway
+        # (see GATEWAY_NAMESPACE) -- we never create it, the same way we never
+        # create the Gateway itself.
+        log_debug "Skipping ingress TLS secret creation for INGRESS_TYPE=gateway-api; the Gateway's own TLS Secret is platform-managed."
+    elif [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
         ingress_tls_secret="elasticsearch-ingress-tls-secret"
         create_ingress_certs "$LOG_NS" "$ingress_tls_secret" "$OPENSEARCH_INGRESS_CERT" "$OPENSEARCH_INGRESS_KEY"
     else
