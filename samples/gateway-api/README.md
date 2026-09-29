@@ -295,13 +295,14 @@ Replace the placeholder host names with the ones you specified.
 `AUTOGENERATE_INGRESS=true` with `INGRESS_TYPE=gateway-api` generates and applies
 the `HTTPRoute` resources shown in this sample as part of a normal deploy,
 following the same pattern as `INGRESS_TYPE=contour`. It requires
-`GATEWAY_CLASS_NAME` to be set, and requires a `Gateway` named `v4m-gateway`
-using that `GatewayClass` to already exist in the `monitoring`/`logging`
-namespace (the Gateway itself is never created by the deploy scripts -- see
-[Gateway Ownership](#gateway-ownership)). The
-existing per-application enable flags (`GRAFANA_INGRESS_ENABLE` and friends) and
-the FQDN/path override variables carry through unchanged. There is no
-`INGRESS_CREATE_ROOT_PROXY` equivalent, since Gateway API needs no root resource.
+`GATEWAY_CLASS_NAME` to be set, and requires a `Gateway` (named `v4m-gateway` by
+default -- override with `GATEWAY_NAME`) using that `GatewayClass` to already
+exist in the `monitoring`/`logging` namespace (the Gateway itself is never
+created by the deploy scripts -- see [Gateway Ownership](#gateway-ownership)).
+The existing per-application enable flags (`GRAFANA_INGRESS_ENABLE` and
+friends) and the FQDN/path override variables carry through unchanged. There is
+no `INGRESS_CREATE_ROOT_PROXY` equivalent, since Gateway API needs no root
+resource.
 
 Backend re-encryption via `BackendTLSPolicy` is on by default
 (`INGRESS_BACKEND_TLS_ENABLE=true`), since application backends serve HTTPS by
