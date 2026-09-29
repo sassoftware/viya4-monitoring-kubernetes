@@ -281,6 +281,22 @@ function tls_cert_managed_by_v4m() {
     fi
 }
 
+# Checks if the cert in a secret has a usable DNS SAN. Certs issued before
+# SANs were added to create_tls_certs_openssl have none, which fails
+# BackendTLSPolicy validation (see get_backend_tls_hostname in
+# bin/autogenerate-include.sh) even though the cert itself is otherwise valid.
+# Return 0: cert has a DNS SAN
+# Return 1: cert has no DNS SAN (or the secret/cert can't be read)
+function tls_cert_has_san() {
+    namespace="$1"
+    secretName="$2"
+
+    kubectl get secret -n "$namespace" "$secretName" -o "jsonpath={.data['tls\.crt']}" 2> /dev/null \
+        | base64 -d 2> /dev/null \
+        | openssl x509 -noout -ext subjectAltName 2> /dev/null \
+        | grep -q 'DNS:'
+}
+
 function create_tls_certs_openssl {
     local namespace apps
     namespace="$1"
@@ -295,8 +311,14 @@ function create_tls_certs_openssl {
         if [ -n "$(kubectl get secret -n "$namespace" "$secretName" -o name 2> /dev/null)" ]; then
             if (tls_cert_managed_by_v4m "$namespace" "$secretName"); then
                 if ! (tls_cert_expired "$namespace" "$app" "$secretName"); then
-                    log_debug "TLS Secret for [$app] already exists and cert is not expired; skipping TLS certificate generation."
-                    continue
+                    if (tls_cert_has_san "$namespace" "$secretName"); then
+                        log_debug "TLS Secret for [$app] already exists and cert is not expired; skipping TLS certificate generation."
+                        continue
+                    else
+                        log_warn "TLS Secret for [$app] has no SAN (issued before SAN support was added); it will fail strict backend TLS validation (e.g. Gateway API's BackendTLSPolicy)."
+                        log_warn "It can be renewed with a SAN using: ./bin/renew-tls-certs.sh -t <target> (see -h for valid targets)"
+                        continue
+                    fi
                 else
                     log_info "TLS Secret for [$app] exists but cert has expired or will do so within ${TLS_CERT_RENEW_WINDOW:-7} days"
                     log_info "Renew cert using: renew-tls-certs.sh"
