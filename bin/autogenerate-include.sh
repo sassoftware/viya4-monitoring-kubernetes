@@ -269,6 +269,8 @@ function create_httproute {
     # shellcheck disable=SC2016
     yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
 
+    snippet="${GATEWAY_NAME:-v4m-gateway}" yq -i '.spec.parentRefs.[0].name=env(snippet)' "$resourceDefFile"
+
     if [ "$routing" == "host" ]; then
         snippet="$targetFqdn" yq -i '.spec.hostnames.[0]=env(snippet)' "$resourceDefFile"
     else
@@ -298,7 +300,7 @@ function create_http_redirect_httproute {
     ### create_http_redirect_httproute  APP_GRP  NAMESPACE
     ### create_http_redirect_httproute  monitoring monitoring
 
-    local app_group namespace routing sampleFile
+    local app_group namespace routing sampleFile resourceDefFile
 
     app_group="${1}" # logging|monitoring
     namespace="${2}"
@@ -306,8 +308,14 @@ function create_http_redirect_httproute {
     routing="${ROUTING:-host}"
 
     sampleFile="samples/gateway-api/${routing}-based/$app_group/http-redirect_httproute.yaml"
+    resourceDefFile="$TMP_DIR/${app_group}_http_redirect_httproute_def_file.yaml"
+    touch "$resourceDefFile"
 
-    kubectl apply -f "$sampleFile" -n "$namespace"
+    # shellcheck disable=SC2016
+    yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
+    snippet="${GATEWAY_NAME:-v4m-gateway}" yq -i '.spec.parentRefs.[0].name=env(snippet)' "$resourceDefFile"
+
+    kubectl apply -f "$resourceDefFile" -n "$namespace"
     kubectl -n "$namespace" label httproute v4m-http-redirect managed-by="v4m-es-script"
 }
 export -f create_http_redirect_httproute
@@ -501,6 +509,8 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
                 exit 1
             fi
 
+            GATEWAY_NAME="${GATEWAY_NAME:-v4m-gateway}"
+
             # verify required Gateway API CRDs available
             for crd in gatewayclasses.gateway.networking.k8s.io \
                 gateways.gateway.networking.k8s.io \
@@ -525,25 +535,25 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             fi
             log_debug "GatewayClass [$GATEWAY_CLASS_NAME] exists and is Accepted"
 
-            # verify a Gateway named "v4m-gateway" using this GatewayClass exists
-            # in each relevant namespace. HTTPRoute parentRefs are hardcoded to
-            # "v4m-gateway" (not templated like hostname/path), so a Gateway
-            # under any other name leaves routes silently unattached.
+            # verify a Gateway named $GATEWAY_NAME using this GatewayClass exists
+            # in each relevant namespace. HTTPRoute parentRefs are templated to
+            # $GATEWAY_NAME, so a Gateway under any other name leaves routes
+            # silently unattached.
             for gwNamespace in "${MON_NS:-monitoring}" "${LOG_NS:-logging}"; do
-                gatewayClassInUse="$(kubectl -n "$gwNamespace" get gateway v4m-gateway \
+                gatewayClassInUse="$(kubectl -n "$gwNamespace" get gateway "$GATEWAY_NAME" \
                     -o jsonpath='{.spec.gatewayClassName}' 2> /dev/null)"
 
                 if [ -z "$gatewayClassInUse" ]; then
-                    log_error "No Gateway named [v4m-gateway] was found in namespace [$gwNamespace]"
+                    log_error "No Gateway named [$GATEWAY_NAME] was found in namespace [$gwNamespace]"
                     log_error "The Gateway resource must be created by the platform/cluster administrator before enabling AUTOGENERATE_INGRESS with INGRESS_TYPE=gateway-api."
-                    log_error "It MUST be named [v4m-gateway] -- the generated HTTPRoutes' parentRefs are hardcoded to that name."
+                    log_error "It must be named [$GATEWAY_NAME] (see GATEWAY_NAME) -- the generated HTTPRoutes' parentRefs are set to that name."
                     log_error "See samples/gateway-api/*/gateway.yaml for reference material."
                     exit 1
                 elif [ "$gatewayClassInUse" != "$GATEWAY_CLASS_NAME" ]; then
-                    log_error "Gateway [v4m-gateway] in namespace [$gwNamespace] uses GatewayClass [$gatewayClassInUse], not [$GATEWAY_CLASS_NAME] as specified in GATEWAY_CLASS_NAME"
+                    log_error "Gateway [$GATEWAY_NAME] in namespace [$gwNamespace] uses GatewayClass [$gatewayClassInUse], not [$GATEWAY_CLASS_NAME] as specified in GATEWAY_CLASS_NAME"
                     exit 1
                 fi
-                log_debug "Found Gateway [v4m-gateway] using GatewayClass [$GATEWAY_CLASS_NAME] in namespace [$gwNamespace]"
+                log_debug "Found Gateway [$GATEWAY_NAME] using GatewayClass [$GATEWAY_CLASS_NAME] in namespace [$gwNamespace]"
             done
 
             # Gateway API has no root-resource concept
@@ -554,7 +564,7 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             # per-backendRef TLS field -- without BackendTLSPolicy the gateway
             # sends plaintext to a TLS-only backend and every request fails.
             INGRESS_BACKEND_TLS_ENABLE="${INGRESS_BACKEND_TLS_ENABLE:-true}"
-            export INGRESS_BACKEND_TLS_ENABLE GATEWAY_CLASS_NAME
+            export INGRESS_BACKEND_TLS_ENABLE GATEWAY_CLASS_NAME GATEWAY_NAME
         fi
 
         if [ -z "$BASE_DOMAIN" ]; then
