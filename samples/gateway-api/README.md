@@ -31,8 +31,9 @@ release, check which versions it actually serves:
 kubectl get crd backendtlspolicies.gateway.networking.k8s.io -o jsonpath='{.spec.versions[?(@.served==true)].name}'
 ```
 
-and use whichever `apiVersion` it reports instead; the spec fields are
-identical.
+If `v1` isn't in the list, use a manifest matching whichever version your
+cluster actually serves (for example `v1alpha3`), or upgrade your Gateway API
+CRDs to a release that serves `v1`.
 
 ## Scenarios
 
@@ -77,9 +78,11 @@ platform or cluster administrator, not created by this sample -- see
    `Selector`). If they don't, your `HTTPRoute`s will attach nowhere; ask
    whoever manages the Gateway to widen it.
 5. Deploy SAS Viya Monitoring for Kubernetes.
-6. If you're enabling backend re-encryption (`BackendTLSPolicy`), create the
-   CA ConfigMap it requires (see
-   [CA certificates](#ca-certificates-must-be-in-a-configmap-not-a-secret)).
+6. Create the CA ConfigMap `BackendTLSPolicy` requires (see
+   [CA certificates](#ca-certificates-must-be-in-a-configmap-not-a-secret)),
+   and apply a `BackendTLSPolicy` for each app you're exposing. Application
+   backends serve HTTPS by default, so without this the Gateway sends
+   plaintext to a TLS-only backend and every request fails.
 7. Set `parentRefs` in each `HTTPRoute` to your Gateway's actual name and
    namespace, then apply the routing resources:
 
@@ -100,9 +103,9 @@ NOT recommend making the OpenSearch API endpoint accessible by default; although
 it does require authentication, there are limited use cases requiring it.**
 
 Files for these applications are included should you need them. Apply the
-relevant `_httproute.yaml`, write a `BackendTLSPolicy` for it if you're using
-backend re-encryption, and uncomment the corresponding section of
-`user-values-prom-operator.yaml`.
+relevant `_httproute.yaml`, write a `BackendTLSPolicy` for it (its backend
+serves HTTPS by default, same as the others), and uncomment the corresponding
+section of `user-values-prom-operator.yaml`.
 
 ## Gateway Ownership
 
