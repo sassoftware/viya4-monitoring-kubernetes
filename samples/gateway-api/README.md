@@ -229,12 +229,11 @@ Replace the placeholder host names with the ones you specified.
 applies the `HTTPRoute` resources shown in this sample as part of a normal
 deploy, following the same pattern as `INGRESS_TYPE=contour`.
 
-Required: `GATEWAY_CLASS_NAME` and `GATEWAY_NAMESPACE`. A Gateway named
-`v4m-gateway` by default (override with `GATEWAY_NAME`) must already exist in
-`GATEWAY_NAMESPACE`, using that `GatewayClass`, with listeners that allow
-routes from outside its own namespace -- the deploy scripts verify all of
-this and fail with a clear error if it's not met. Neither the Gateway nor its
-TLS Secret is ever created by the deploy scripts; see
+Required: `GATEWAY_CLASS_NAME`, `GATEWAY_NAMESPACE`, and `GATEWAY_NAME`. A
+Gateway matching all three must already exist, with listeners that allow
+routes from outside its own namespace; the deploy scripts verify all of this
+and fail with a clear error if it's not met. Neither the Gateway nor its TLS
+Secret is ever created by the deploy scripts; see
 [Gateway Ownership](#gateway-ownership).
 
 The existing per-application enable flags (`GRAFANA_INGRESS_ENABLE` and

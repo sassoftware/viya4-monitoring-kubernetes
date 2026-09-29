@@ -269,7 +269,7 @@ function create_httproute {
     # shellcheck disable=SC2016
     yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
 
-    snippet="${GATEWAY_NAME:-v4m-gateway}" yq -i '.spec.parentRefs.[0].name=env(snippet)' "$resourceDefFile"
+    snippet="$GATEWAY_NAME" yq -i '.spec.parentRefs.[0].name=env(snippet)' "$resourceDefFile"
     snippet="$GATEWAY_NAMESPACE" yq -i '.spec.parentRefs.[0].namespace=env(snippet)' "$resourceDefFile"
 
     if [ "$routing" == "host" ]; then
@@ -314,7 +314,7 @@ function create_http_redirect_httproute {
 
     # shellcheck disable=SC2016
     yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
-    snippet="${GATEWAY_NAME:-v4m-gateway}" yq -i '.spec.parentRefs.[0].name=env(snippet)' "$resourceDefFile"
+    snippet="$GATEWAY_NAME" yq -i '.spec.parentRefs.[0].name=env(snippet)' "$resourceDefFile"
     snippet="$GATEWAY_NAMESPACE" yq -i '.spec.parentRefs.[0].namespace=env(snippet)' "$resourceDefFile"
 
     kubectl apply -f "$resourceDefFile" -n "$namespace"
@@ -516,7 +516,10 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
                 exit 1
             fi
 
-            GATEWAY_NAME="${GATEWAY_NAME:-v4m-gateway}"
+            if [ -z "$GATEWAY_NAME" ]; then
+                log_error "Required parameter [GATEWAY_NAME] not provided"
+                exit 1
+            fi
 
             # verify required Gateway API CRDs available
             for crd in gatewayclasses.gateway.networking.k8s.io \
@@ -555,7 +558,6 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
                 log_error "No Gateway named [$GATEWAY_NAME] was found in namespace [$GATEWAY_NAMESPACE]"
                 log_error "The Gateway resource must be created by the platform/cluster administrator before enabling AUTOGENERATE_INGRESS with INGRESS_TYPE=gateway-api."
                 log_error "It must be named [$GATEWAY_NAME] (see GATEWAY_NAME) in namespace [$GATEWAY_NAMESPACE] (see GATEWAY_NAMESPACE) -- the generated HTTPRoutes' parentRefs are set to that name/namespace."
-                log_error "See samples/gateway-api/*/gateway.yaml for reference material."
                 exit 1
             elif [ "$gatewayClassInUse" != "$GATEWAY_CLASS_NAME" ]; then
                 log_error "Gateway [$GATEWAY_NAME] in namespace [$GATEWAY_NAMESPACE] uses GatewayClass [$gatewayClassInUse], not [$GATEWAY_CLASS_NAME] as specified in GATEWAY_CLASS_NAME"
@@ -585,6 +587,25 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             # per-backendRef TLS field -- without BackendTLSPolicy the gateway
             # sends plaintext to a TLS-only backend and every request fails.
             INGRESS_BACKEND_TLS_ENABLE="${INGRESS_BACKEND_TLS_ENABLE:-true}"
+
+            if [ "$INGRESS_BACKEND_TLS_ENABLE" == "true" ]; then
+                if ! kubectl get crd backendtlspolicies.gateway.networking.k8s.io 1> /dev/null 2>&1; then
+                    log_error "INGRESS_BACKEND_TLS_ENABLE is [true] but CRD [backendtlspolicies.gateway.networking.k8s.io] is not installed"
+                    log_error "Without BackendTLSPolicy the gateway sends plaintext to a TLS-only backend and every request fails; set INGRESS_BACKEND_TLS_ENABLE=false if that's intentional"
+                    exit 1
+                fi
+
+                backendTLSPolicyServedVersions="$(kubectl get crd backendtlspolicies.gateway.networking.k8s.io \
+                    -o jsonpath='{range .spec.versions[?(@.served==true)]}{.name}{" "}{end}' 2> /dev/null)"
+
+                if ! echo "$backendTLSPolicyServedVersions" | grep -qw "v1"; then
+                    log_error "INGRESS_BACKEND_TLS_ENABLE is [true] but CRD [backendtlspolicies.gateway.networking.k8s.io] does not serve [v1] (serves: ${backendTLSPolicyServedVersions:-none})"
+                    log_error "The generated BackendTLSPolicy uses apiVersion gateway.networking.k8s.io/v1; set INGRESS_BACKEND_TLS_ENABLE=false if your cluster only serves an older version"
+                    exit 1
+                fi
+                log_debug "CRD [backendtlspolicies.gateway.networking.k8s.io] installed and serves [v1]"
+            fi
+
             export INGRESS_BACKEND_TLS_ENABLE GATEWAY_CLASS_NAME GATEWAY_NAME GATEWAY_NAMESPACE
         fi
 
