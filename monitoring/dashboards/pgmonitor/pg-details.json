@@ -113,16 +113,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "ccp_connection_stats_max_connections{job=~\"$pgnodes\"}",
           "hide": false,
@@ -134,16 +126,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "ccp_connection_stats_active{job=~\"$pgnodes\"}",
           "intervalFactor": 2,
@@ -154,16 +138,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "ccp_connection_stats_idle_in_txn{job=~\"$pgnodes\"}",
           "interval": "",
@@ -175,16 +151,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "ccp_connection_stats_idle{job=~\"$pgnodes\"}",
           "intervalFactor": 2,
@@ -288,16 +256,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(ccp_database_size_bytes{job=~\"$pgnodes\"})",
           "format": "time_series",
@@ -307,16 +267,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "ccp_database_size_bytes{job=~\"$pgnodes\"}",
           "format": "time_series",
@@ -413,16 +365,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(irate(ccp_stat_database_xact_commit{job=~\"$pgnodes\"}[1m])) + sum(irate(ccp_stat_database_xact_rollback{job=~\"$pgnodes\"}[1m]))",
           "format": "time_series",
@@ -520,16 +464,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "ccp_replication_lag_size_bytes{job=~\"$pgnodes\"}",
           "format": "time_series",
@@ -627,16 +563,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "ccp_replication_lag_replay_time{job=~\"$pgnodes\"}",
           "format": "time_series",
@@ -733,16 +661,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "ccp_stat_database_blks_hit{ job=~\"$pgnodes\"}  / ( ccp_stat_database_blks_hit{job=~\"$pgnodes\"} + ccp_stat_database_blks_read{ job=~\"$pgnodes\"} ) * 100",
           "format": "time_series",
@@ -841,16 +761,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(irate(ccp_stat_database_xact_commit{job=~\"$pgnodes\"}[5m]))",
           "format": "time_series",
@@ -862,16 +774,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(irate(ccp_stat_database_xact_rollback{job=~\"$pgnodes\"}[5m]))",
           "format": "time_series",
@@ -980,16 +884,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(irate(ccp_stat_database_tup_fetched{job=~\"$pgnodes\"}[5m]))",
           "format": "time_series",
@@ -1001,16 +897,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(irate(ccp_stat_database_tup_inserted{job=~\"$pgnodes\"}[5m]))",
           "format": "time_series",
@@ -1022,16 +910,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(irate(ccp_stat_database_tup_updated{job=~\"$pgnodes\"}[5m]))",
           "format": "time_series",
@@ -1043,16 +923,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(irate(ccp_stat_database_tup_deleted{job=~\"$pgnodes\"}[5m]))",
           "format": "time_series",
@@ -1064,16 +936,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(irate(ccp_stat_database_tup_returned{job=~\"$pgnodes\"}[5m]))",
           "format": "time_series",
@@ -1173,16 +1037,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(ccp_locks_count{job=~\"$pgnodes\",mode=\"accessexclusivelock\"})",
           "format": "time_series",
@@ -1193,16 +1049,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(ccp_locks_count{job=~\"$pgnodes\",mode=\"accesssharelock\"})",
           "format": "time_series",
@@ -1213,16 +1061,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(ccp_locks_count{job=~\"$pgnodes\",mode=\"exclusivelock\"})",
           "format": "time_series",
@@ -1233,16 +1073,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(ccp_locks_count{job=~\"$pgnodes\",mode=\"rowexclusivelock\"})",
           "format": "time_series",
@@ -1253,16 +1085,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(ccp_locks_count{job=~\"$pgnodes\",mode=\"rowsharelock\"})",
           "format": "time_series",
@@ -1273,16 +1097,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(ccp_locks_count{job=~\"$pgnodes\",mode=\"sharelock\"})",
           "format": "time_series",
@@ -1293,16 +1109,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(ccp_locks_count{job=~\"$pgnodes\",mode=\"sharerowexclusivelock\"})",
           "format": "time_series",
@@ -1313,16 +1121,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(ccp_locks_count{job=~\"$pgnodes\",mode=\"shareupdateexclusivelock\"})",
           "format": "time_series",
@@ -1421,16 +1221,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(rate(ccp_stat_database_deadlocks{job=~\"$pgnodes\"}[5m]))",
           "format": "time_series",
@@ -1442,16 +1234,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(rate(ccp_stat_database_conflicts{job=~\"$pgnodes\"}[5m]))",
           "format": "time_series",
@@ -1553,16 +1337,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "irate(ccp_stat_bgwriter_buffers_alloc{job=~\"$pgnodes\"}[5m])",
           "format": "time_series",
@@ -1574,16 +1350,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "irate(ccp_stat_bgwriter_buffers_backend{job=~\"$pgnodes\"}[5m])",
           "format": "time_series",
@@ -1595,16 +1363,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "irate(ccp_stat_bgwriter_buffers_backend_fsync{job=~\"$pgnodes\"}[5m])",
           "format": "time_series",
@@ -1616,16 +1376,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "irate(ccp_stat_bgwriter_buffers_checkpoint{job=~\"$pgnodes\"}[5m])",
           "format": "time_series",
@@ -1637,16 +1389,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "irate(ccp_stat_bgwriter_buffers_clean{job=~\"$pgnodes\"}[5m])",
           "format": "time_series",
@@ -1744,16 +1488,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "ccp_transaction_wraparound_percent_towards_wraparound{job=~\"$pgnodes\"}",
           "format": "time_series",
@@ -1848,16 +1584,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "ccp_transaction_wraparound_percent_towards_emergency_autovac{job=~\"$pgnodes\"}",
           "format": "time_series",
@@ -1918,16 +1646,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "ccp_wal_activity_total_size_bytes{job=~\"$pgnodes\"}",
           "format": "time_series",
@@ -2017,16 +1737,8 @@
       "targets": [
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(rate(ccp_stat_user_tables_autovacuum_count{job=~\"$pgnodes\"}[5m]))",
           "format": "time_series",
@@ -2038,16 +1750,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(rate(ccp_stat_user_tables_autoanalyze_count{job=~\"$pgnodes\"}[5m]))",
           "format": "time_series",
@@ -2058,16 +1762,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(rate(ccp_stat_user_tables_vacuum_count{job=~\"$pgnodes\"}[5m]))",
           "format": "time_series",
@@ -2078,16 +1774,8 @@
         },
         {
           "datasource": {
-            "0": "P",
-            "1": "r",
-            "2": "o",
-            "3": "m",
-            "4": "e",
-            "5": "t",
-            "6": "h",
-            "7": "e",
-            "8": "u",
-            "9": "s"
+            "type": "prometheus",
+            "uid": "$datasource"
           },
           "expr": "sum(rate(ccp_stat_user_tables_analyze_count{job=~\"$pgnodes\"}[5m]))",
           "format": "time_series",
