@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
+* **Metrics**
+  * [FIX] The SAS Arke, SAS Micro Analytic Service (MAS) and PostgreSQL Details (pgmonitor)
+Grafana dashboards now use the dashboard's datasource variable instead of a hard-coded
+reference to a datasource named "Prometheus".  This allows these dashboards to work when
+the default Prometheus datasource is not the one containing SAS Viya Monitoring metrics.
 * **Logging**
   * [FIX] Only attempt to delete an unneeded `v4m-logging-root-proxy` HTTPProxy resource if the
 CRD (httpproxies.projectcontour.io) is installed
