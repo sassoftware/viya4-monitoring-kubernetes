@@ -503,8 +503,6 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
             kubectl -n "$MON_NS" delete httproute v4m-prometheus --ignore-not-found
         fi
 
-        create_http_redirect_httproute monitoring "$MON_NS"
-
         if [ "$INGRESS_BACKEND_TLS_ENABLE" == "true" ]; then
             create_backend_tls_ca_configmap "$MON_NS"
 
@@ -531,6 +529,16 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
     fi
 else
     log_debug "Autogeneration of ingresss NOT enabled"
+fi
+
+if [[ $AUTOGENERATE_INGRESS == "true" &&
+    $INGRESS_TYPE == "gateway-api" ]]; then
+
+    create_http_redirect_httproute monitoring "$MON_NS"
+
+elif kubectl get crd httproutes.gateway.networking.k8s.io -o name > /dev/null 2>&1; then
+    log_debug "Deleting [httproute/v4m-http-redirect] if it exists"
+    kubectl -n "$MON_NS" delete httproute v4m-http-redirect --ignore-not-found
 fi
 
 nodePortValuesFile=$TMP_DIR/empty.yaml

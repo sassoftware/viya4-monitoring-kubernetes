@@ -69,6 +69,10 @@ if [[ $AUTOGENERATE_INGRESS == "true" &&
     $INGRESS_TYPE == "gateway-api" ]]; then
 
     create_http_redirect_httproute logging "$LOG_NS"
+
+elif kubectl get crd httproutes.gateway.networking.k8s.io -o name > /dev/null 2>&1; then
+    log_debug "Deleting [httproute/v4m-http-redirect] if it exists"
+    kubectl -n "$LOG_NS" delete httproute v4m-http-redirect --ignore-not-found
 fi
 
 ##################################
