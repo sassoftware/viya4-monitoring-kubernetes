@@ -26,6 +26,7 @@ registry/repository/image_name:version
 | Metrics | [Admission Webhook](https://github.com/kubernetes/ingress-nginx) | ghcr.io/jkroepke/kube-webhook-certgen:1.8.2 |
 | Metrics | [Kube State Metrics](https://github.com/kubernetes/kube-state-metrics) | registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.19.1 |
 | Metrics | [Node Exporter](https://github.com/prometheus/node_exporter) | quay.io/prometheus/node-exporter:v1.12.1-distroless |
+| Metrics | [Kube RBAC Proxy](https://github.com/kube-rbac-proxy/kube-rbac-proxy) | quay.io/brancz/kube-rbac-proxy:v0.22.1 |
 | Metrics | [Prometheus](https://github.com/prometheus/prometheus) | quay.io/prometheus/prometheus:v3.13.2-distroless |
 | Metrics | [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator) | quay.io/prometheus-operator/prometheus-operator:v0.93.0 |
 | Metrics | [Configuration Reloader](https://github.com/prometheus-operator/prometheus-operator/tree/main/cmd/prometheus-config-reloader) | quay.io/prometheus-operator/prometheus-config-reloader:v0.93.0 |
