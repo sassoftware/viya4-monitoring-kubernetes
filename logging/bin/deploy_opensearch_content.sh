@@ -24,6 +24,7 @@ log_info "Loading Content into OpenSearch"
 
 log_info "GREG GREG GREG"
 curl --version
+log_info "LOG_ALWAYS_PORT_FORWARD: [$LOG_ALWAYS_PORT_FORWARD]"
 log_info "GREG GREG GREG"
 
 # temp file used to capture command output
