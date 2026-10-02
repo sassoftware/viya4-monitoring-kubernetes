@@ -22,6 +22,10 @@ fi
 
 log_info "Loading Content into OpenSearch"
 
+log_info "GREG GREG GREG"
+curl --version
+log_info "GREG GREG GREG"
+
 # temp file used to capture command output
 # shellcheck disable=SC2034
 tmpfile=$TMP_DIR/output.txt
@@ -44,9 +48,14 @@ fi
 
 get_ism_api_url
 
+log_info "GREG GREG GREG"
+log_info "ISM_API_URL: [$ism_api_url]"
+log_info "ES_API_URL: [$es_api_url]"
+log_info "GREG GREG GREG"
+
 # Confirm OpenSearch is ready
 for pause in 30 30 30 30 30 30 60; do
-    response=$(curl -s -o /dev/null -w "%{http_code}" -XGET "$es_api_url" --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
+    response=$(curl -v -s -o /dev/null -w "%{http_code}" -XGET "$es_api_url" --user "$ES_ADMIN_USER":"$ES_ADMIN_PASSWD" --insecure)
     # returns 503 (and outputs "Open Distro Security not initialized.") when ODFE isn't ready yet
     # TO DO: check for 503 specifically?
 
