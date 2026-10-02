@@ -334,6 +334,8 @@ if [ "$SAS_COMMON_SOURCED" = "" ]; then
         fi
     fi
 
+    export LOG_DEBUG_ENABLE=true   #REMOVE
+
     log_debug "Working directory: $(pwd)"
     log_info "User directory: $USER_DIR"
 
