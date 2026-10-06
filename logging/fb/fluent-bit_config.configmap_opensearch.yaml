@@ -44,6 +44,12 @@ data:
        Condition  Key_exists     json_log
        Set        DB__structlog  true
     [FILTER]
+       #Explicitly set DB__structlog to false if log message is not structured
+       Name           modify
+       Match          *
+       Condition      Key_does_not_exist DB__structlog
+       Set            DB__structlog  false
+    [FILTER]
        Name           nest
        Match          *
        Operation      lift
