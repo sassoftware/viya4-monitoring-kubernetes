@@ -6,7 +6,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.31
+       Set  fb_configMap_version 0.2.32-rabbitlog2611
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -183,6 +183,14 @@ data:
        Match          opsK.*
        Remove         JL__@timestamp
        Rename         JL__message message
+     [FILTER]
+       # Move fields from rabbitMQ JSON message format
+       # to the properties.* array
+       Name           modify
+       Match          kube.*
+       Condition      Key_value_equals logsource sas-rabbitmq-server
+       Rename         JL__pid    PROPS__rabbit_pid
+       Rename         JL__domain PROPS__domain
     #
     # Kubernetes Events Handling - Start
     #
@@ -557,6 +565,7 @@ data:
        Match           kube.*
        Condition       Key_value_equals   logsource sas-rabbitmq-server
        Condition       Key_value_equals   PROPS__stream  stdout
+       Condition       Key_value_does_not_equal   DB__structlog  true
        # pod label "app=sas-rabbitmq-server"
        # appname eq "sas-rabbitmq-server"
        Copy            message   rabbit_message
@@ -753,6 +762,7 @@ data:
        Name            modify
        Match           kube.*
        Condition       Key_value_matches   temp_k8sapp_name sas-redis-server|sas-airflow-redis
+       Condition       Key_value_does_not_equal   DB__structlog  true
        Copy            message   redis_message
        Rename          message   unparsed_message
        Add             flagged4parsing redis
