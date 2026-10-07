@@ -6,7 +6,7 @@ data:
     [FILTER]
        Name modify
        Match *
-       Set  fb_configMap_version 0.2.32-rabbitlog2611
+       Set  fb_configMap_version 0.2.32-rabbitlog2611z
        #Set clusterID NOT_SET
        # initialized to N to force level standardization
        Set  __temp_level_fixed   N
@@ -195,7 +195,7 @@ data:
        Name           modify
        Match          kube.*
        Condition      Key_value_equals logsource sas-rabbitmq-server
-       Rename         JL__pid    PROPS__rabbit_pid
+       Rename         JL__pid    PROPS__process_pid
        Rename         JL__domain PROPS__domain
     #
     # Kubernetes Events Handling - Start

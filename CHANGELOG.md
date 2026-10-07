@@ -3,7 +3,7 @@
 * **Logging**
   * [CHANGE] Additional fields from JSON-formatted log messages emitted from 
 RabbitMQ are now captured. The `domain` and `pid` values are now stored as
-`properties.domain` and `properties.rabbit_pid` within the OpenSearch indexes. 
+`properties.domain` and `properties.process_pid` within the OpenSearch indexes. 
 
 ## Version 1.2.55 (02OCT2026)
 * **Overall**
