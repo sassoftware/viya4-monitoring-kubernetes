@@ -23,7 +23,7 @@ registry/repository/image_name:version
 | Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/OpenSearch-Dashboards) | __OSD_FULL_IMAGE__ |
 | Metrics | [Alertmanager](https://github.com/prometheus/alertmanager) | __ALERTMANAGER_FULL_IMAGE__ |
 | Metrics | [Grafana](https://github.com/grafana/grafana) | __GRAFANA_FULL_IMAGE__ |
-| Metrics | [Admission Webhook](https://github.com/kubernetes/ingress-nginx) | __ADMWEBHOOK_FULL_IMAGE__ |
+| Metrics | [Admission Webhook](https://github.com/jkroepke/kube-webhook-certgen) | __ADMWEBHOOK_FULL_IMAGE__ |
 | Metrics | [Kube State Metrics](https://github.com/kubernetes/kube-state-metrics) | __KSM_FULL_IMAGE__ |
 | Metrics | [Node Exporter](https://github.com/prometheus/node_exporter) | __NODEXPORT_FULL_IMAGE__ |
 | Metrics | [Kube RBAC Proxy](https://github.com/kube-rbac-proxy/kube-rbac-proxy) | __RBAC_PROXY_FULL_IMAGE__ |
