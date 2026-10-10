@@ -29,6 +29,21 @@ json_contour_tls='{.spec.virtualhost.tls}'
 json_contour_currentStatus='{.status.currentStatus}'
 json_contour_errorMessage='{.status.conditions[0].errors[0].message}'
 
+# k8s object: Gateway API HTTPRoute
+# host-based routes set spec.hostnames[0]; path-based routes don't set
+# hostnames at all (they match by path only, on whatever hostname the parent
+# Gateway serves), so json_httproute_host is empty for those.
+json_httproute_host='{.spec.hostnames[0]}'
+# May match more than one rule; get_httproute_url keeps only the first value.
+json_httproute_path='{.spec.rules[*].matches[?(@.path.type=="PathPrefix")].path.value}'
+json_httproute_parentName='{.spec.parentRefs[0].name}'
+json_httproute_parentNamespace='{.spec.parentRefs[0].namespace}'
+json_httproute_parentSectionName='{.spec.parentRefs[0].sectionName}'
+json_httproute_accepted='{.status.parents[0].conditions[?(@.type=="Accepted")].status}'
+json_httproute_acceptedReason='{.status.parents[0].conditions[?(@.type=="Accepted")].reason}'
+json_httproute_resolvedRefs='{.status.parents[0].conditions[?(@.type=="ResolvedRefs")].status}'
+json_httproute_resolvedRefsReason='{.status.parents[0].conditions[?(@.type=="ResolvedRefs")].reason}'
+
 # misc k8s information
 metadata_name='{.metadata.name}'
 
@@ -136,6 +151,123 @@ function get_contour_url {
         echo ""
         return
     fi
+}
+
+function get_gateway_listener_hostname {
+    # Returns a non-wildcard HTTPS listener hostname on a Gateway, or empty if
+    # there isn't one (e.g. the Gateway has no hostname restriction, or only a
+    # wildcard) -- either way, not something we can build a concrete browsable
+    # URL from.
+    #
+    # If sectionName is given (an HTTPRoute's parentRef names the specific
+    # listener it attaches to), only that listener is considered -- a Gateway
+    # can have more than one HTTPS listener with different hostnames, so
+    # without this a route could get another listener's hostname. Falls back
+    # to "any HTTPS listener" when sectionName isn't set.
+    local namespace name sectionName jsonpath protocol hostname
+
+    namespace=$1
+    name=$2
+    sectionName=$3
+
+    if [ -n "$sectionName" ]; then
+        protocol="$(kubectl -n "$namespace" get gateway "$name" \
+            -o jsonpath="{.spec.listeners[?(@.name==\"$sectionName\")].protocol}" 2> /dev/null)"
+        if [ "$protocol" != "HTTPS" ]; then
+            echo ""
+            return
+        fi
+        jsonpath="{.spec.listeners[?(@.name==\"$sectionName\")].hostname}"
+    else
+        jsonpath='{.spec.listeners[?(@.protocol=="HTTPS")].hostname}'
+    fi
+
+    hostname="$(kubectl -n "$namespace" get gateway "$name" \
+        -o jsonpath="$jsonpath" 2> /dev/null \
+        | tr ' ' '\n' | grep -v '^\*' | head -1)"
+
+    echo "$hostname"
+}
+
+function get_httproute_url {
+    local namespace name host path scheme parentName parentNamespace parentSectionName url
+
+    namespace=$1
+    name=$2
+
+    path=$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_path")
+    path="${path%% *}" # may match more than one rule; keep only the first
+    [ -z "$path" ] && path="/"
+
+    host=$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_host")
+
+    if [ -z "$host" ]; then
+        # path-based route: no hostname on the route itself, so it's whatever
+        # hostname the parent Gateway serves. Only usable if that's a
+        # concrete (non-wildcard) hostname.
+        parentName=$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_parentName")
+        parentNamespace=$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_parentNamespace")
+        parentSectionName=$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_parentSectionName")
+        [ -z "$parentNamespace" ] && parentNamespace="$namespace"
+
+        if [ -n "$parentName" ]; then
+            host="$(get_gateway_listener_hostname "$parentNamespace" "$parentName" "$parentSectionName")"
+        fi
+
+        if [ -z "$host" ]; then
+            v4m_rc=1
+            echo ""
+            return
+        fi
+    fi
+
+    # All app HTTPRoutes shipped in this sample attach to the Gateway's HTTPS
+    # listener; there's no per-route TLS toggle in Gateway API (see
+    # samples/gateway-api/README.md).
+    scheme="https"
+
+    url="$scheme://$host$path"
+    url="${url%/}" # strip any trailing "/", matching get_ingress_url/get_route_url
+    echo "$url"
+}
+
+function check_httproute_status {
+    local namespace name accepted resolvedRefs
+
+    namespace=$1
+    name=$2
+
+    accepted="$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_accepted")"
+    resolvedRefs="$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_resolvedRefs")"
+
+    if [ "$accepted" == "True" ] && [ "$resolvedRefs" == "True" ]; then
+        echo "valid"
+    else
+        echo "invalid"
+    fi
+}
+
+function get_httproute_error {
+    local namespace name accepted acceptedReason resolvedRefs resolvedRefsReason msg
+
+    namespace=$1
+    name=$2
+
+    accepted="$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_accepted")"
+    resolvedRefs="$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_resolvedRefs")"
+
+    msg=""
+    if [ "$accepted" != "True" ]; then
+        acceptedReason="$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_acceptedReason")"
+        msg="Accepted=${accepted:-Unknown} (${acceptedReason:-no status reported})"
+    fi
+    if [ "$resolvedRefs" != "True" ]; then
+        resolvedRefsReason="$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_resolvedRefsReason")"
+        [ -n "$msg" ] && msg="$msg; "
+        msg="${msg}ResolvedRefs=${resolvedRefs:-Unknown} (${resolvedRefsReason:-no status reported})"
+    fi
+
+    echo "$msg"
 }
 
 function get_ingress_ports {
@@ -297,6 +429,9 @@ function get_service_url {
         if [ -n "$(get_k8s_info "$namespace" "httpproxy/$service" "$metadata_name")" ]; then
             #If an HTTPProxy resource exists - assume it is being used
             url=$(get_contour_url "$namespace" "$ingress")
+        elif [ -n "$(get_k8s_info "$namespace" "httproute/$service" "$metadata_name")" ]; then
+            #If an HTTPRoute resource exists - assume Gateway API is being used
+            url=$(get_httproute_url "$namespace" "$ingress")
         else
             get_ingress_ports
 
