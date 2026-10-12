@@ -5,6 +5,30 @@
 Grafana dashboards now use the dashboard's datasource variable instead of a hard-coded
 reference to a datasource named "Prometheus".  This allows these dashboards to work when
 the default Prometheus datasource is not the one containing SAS Viya Monitoring metrics.
+## Version 1.2.55 (02OCT2026)
+* **Overall**
+> [!IMPORTANT]
+> * [ANNOUNCEMENT] Helm 3 has reached [end-of-life](https://helm.sh/blog/helm-v3-end-of-life/) and
+users are strongly encouraged to move to [Helm 4](https://github.com/helm/helm/releases) as soon as
+possible. Our project added support for Helm 4 in May and it will become ***required*** in the coming months.
+* **Metrics**
+> [!IMPORTANT]
+>  * [BREAKING CHANGE] Due to the enhanced security provided by the security changes described below, enabling
+browser access to Prometheus now requires setting an additional environment variable.  Please review
+the details of the new security configuration below.  It is important to understand that enabling browser
+access to the Prometheus web application requires disabling this new enhanced security configuration.  If
+you are comfortable with that, you must now set the new `RBAC_PROXY_ENABLE` environment variable to `false`
+in addition to defining the Prometheus-related ingress information required in the past.
+  * [SECURITY] Prior to this update, Kube State Metrics (KSM), Node Exporter, and Prometheus previously exposed
+cluster-wide resource state and infrastructure metrics, including pod labels used to identify per-user SAS job
+activity, over unauthenticated endpoints reachable by any pod in the cluster.  All three applications are now
+fronted by a `kube-rbac-proxy` sidecar enforcing Kubernetes RBAC and bound to localhost only.  With this change,
+Prometheus scrapes metrics from the other two applications using its existing ServiceAccount token, with no
+certificate management required.  This new functionality is controlled by the new `RBAC_PROXY_ENABLE` environment
+variable which is set to `true` by default.  The `kube-rbac-proxy` sidecar is now the only source of transport
+encryption for KSM and Node Exporter.  Setting `RBAC_PROXY_ENABLE` to `false` makes their metrics available over
+plain, unauthenticated HTTP.  Node Exporter previously supported its own native TLS independent of RBAC/auth;
+that capability has been retired in favor of the `kube-rbac-proxy` sidecar.
 * **Logging**
   * [FIX] Only attempt to delete an unneeded `v4m-logging-root-proxy` HTTPProxy resource if the
 CRD (httpproxies.projectcontour.io) is installed
