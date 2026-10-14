@@ -38,6 +38,20 @@ log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 set -e
 
 ##################################
+# Create ListenerSet (if nec)    #
+##################################
+
+if [[ $AUTOGENERATE_INGRESS == "true" &&
+    $INGRESS_TYPE == "gateway-api" ]]; then
+
+    create_listenerset "logging" "$LOG_NS"
+
+elif kubectl get crd listenersets.gateway.networking.k8s.io -o name > /dev/null 2>&1; then
+    log_debug "Deleting [listenerset/v4m-listenerset] if it exists"
+    kubectl -n "$LOG_NS" delete listenerset v4m-listenerset --ignore-not-found
+fi
+
+##################################
 # OpenSearch Dashboards (Kibana) #
 ##################################
 # OSD take a while to spin up...deploying it first

@@ -15,10 +15,11 @@ metadata:
   name: v4m-prometheus
 spec:
   parentRefs:
-    - name: v4m-gateway
+    - kind: ListenerSet
+      name: v4m-listenerset
       sectionName: https
   hostnames:
-    - prometheus.host.cluster.example.com
+    - prometheus.monitoring.host.cluster.example.com
   rules:
     - matches:
         - path:

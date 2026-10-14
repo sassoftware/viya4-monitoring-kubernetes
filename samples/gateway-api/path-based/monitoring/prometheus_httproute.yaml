@@ -15,7 +15,8 @@ metadata:
   name: v4m-prometheus
 spec:
   parentRefs:
-    - name: v4m-gateway
+    - kind: ListenerSet
+      name: v4m-listenerset
       sectionName: https
   rules:
     # Trailing-slash redirect; see grafana_httproute.yaml for an explanation.

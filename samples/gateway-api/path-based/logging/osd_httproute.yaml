@@ -6,7 +6,8 @@ metadata:
   name: v4m-osd
 spec:
   parentRefs:
-    - name: v4m-gateway
+    - kind: ListenerSet
+      name: v4m-listenerset
       sectionName: https
   rules:
     # Rule 1 -- trailing-slash redirect.
@@ -52,12 +53,3 @@ spec:
       backendRefs:
         - name: v4m-osd
           port: 5601
-
-      # Session persistence (sticky sessions) -- EXPERIMENTAL channel only.
-      # See the extended note in
-      # samples/gateway-api/host-based/logging/osd_httproute.yaml.
-      #
-      # sessionPersistence:
-      #   type: Cookie
-      #   cookieConfig:
-      #     lifetimeType: Session

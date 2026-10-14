@@ -13,7 +13,8 @@ metadata:
   name: v4m-search
 spec:
   parentRefs:
-    - name: v4m-gateway
+    - kind: ListenerSet
+      name: v4m-listenerset
       sectionName: https
   rules:
     # Trailing-slash redirect; see osd_httproute.yaml for an explanation.

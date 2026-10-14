@@ -46,12 +46,7 @@ AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
 
 if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "true" ]; then
 
-    if [ "${INGRESS_TYPE:-ingress-nginx}" == "gateway-api" ]; then
-        # The Gateway's TLS material is owned by whoever manages that Gateway
-        # (see GATEWAY_NAMESPACE) -- we never create it, the same way we never
-        # create the Gateway itself.
-        log_debug "Skipping ingress TLS secret creation for INGRESS_TYPE=gateway-api; the Gateway's own TLS Secret is platform-managed."
-    elif [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
+    if [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
         ingress_tls_secret="elasticsearch-ingress-tls-secret"
         create_ingress_certs "$LOG_NS" "$ingress_tls_secret" "$OPENSEARCH_INGRESS_CERT" "$OPENSEARCH_INGRESS_KEY"
     else
@@ -62,9 +57,12 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "tr
     ROUTING="${ROUTING:-host}"
 
     targetPath="${OPENSEARCH_PATH:-search}"
-    targetFqdn="$(get_app_ingress_fqdn "$OPENSEARCH_FQDN" "$targetPath")"
-
-    INGRESS_TYPE="${INGRESS_TYPE:-ingress-nginx}"
+    # Gateway API's ListenerSet needs a namespace segment in the default
+    # host-based FQDN (see get_app_ingress_fqdn); other ingress types are
+    # unaffected (appGroupSegment stays empty).
+    appGroupSegment=""
+    [ "$INGRESS_TYPE" == "gateway-api" ] && appGroupSegment="logging"
+    targetFqdn="$(get_app_ingress_fqdn "$OPENSEARCH_FQDN" "$targetPath" "$appGroupSegment")"
 
     log_debug "INGRESS_TYPE [$INGRESS_TYPE] OPENSEARCH_INGRESS_ENABLE [$OPENSEARCH_INGRESS_ENABLE] OPENSEARCH_FQDN [$targetFqdn] OPENSEARCH_PATH [$targetPath]"
     export OPENSEARCH_INGRESS_ENABLE targetFqdn targetPath

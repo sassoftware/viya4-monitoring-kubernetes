@@ -6,10 +6,11 @@ metadata:
   name: v4m-osd
 spec:
   parentRefs:
-    - name: v4m-gateway
+    - kind: ListenerSet
+      name: v4m-listenerset
       sectionName: https
   hostnames:
-    - dashboards.host.cluster.example.com
+    - dashboards.logging.host.cluster.example.com
   rules:
     - matches:
         - path:
@@ -18,28 +19,3 @@ spec:
       backendRefs:
         - name: v4m-osd
           port: 5601
-
-      # ------------------------------------------------------------------ #
-      # Session persistence (sticky sessions)                              #
-      # ------------------------------------------------------------------ #
-      # The deprecated ingress-nginx sample set
-      #   nginx.ingress.kubernetes.io/affinity: "cookie"
-      # for OpenSearch Dashboards.  That setting was dropped in the move to
-      # Contour HTTPProxy and has no Standard-channel equivalent in Gateway API.
-      #
-      # `sessionPersistence` is available in the Gateway API EXPERIMENTAL channel
-      # only, and implementation support is inconsistent (Istio: unsupported;
-      # kgateway: behind KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES; Contour:
-      # unverified).  Uncomment the block below ONLY if you have installed the
-      # experimental CRD set and confirmed your implementation supports it.
-      #
-      # Per GEP-1619 the cookie path is derived from the matched route
-      # automatically, so no path configuration is needed here.
-      #
-      # This matters only if OpenSearch Dashboards is scaled beyond a single
-      # replica; the default deployment runs one replica.
-      #
-      # sessionPersistence:
-      #   type: Cookie
-      #   cookieConfig:
-      #     lifetimeType: Session

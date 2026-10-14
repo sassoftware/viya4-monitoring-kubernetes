@@ -37,7 +37,6 @@ json_httproute_host='{.spec.hostnames[0]}'
 # May match more than one rule; get_httproute_url keeps only the first value.
 json_httproute_path='{.spec.rules[*].matches[?(@.path.type=="PathPrefix")].path.value}'
 json_httproute_parentName='{.spec.parentRefs[0].name}'
-json_httproute_parentNamespace='{.spec.parentRefs[0].namespace}'
 json_httproute_parentSectionName='{.spec.parentRefs[0].sectionName}'
 json_httproute_accepted='{.status.parents[0].conditions[?(@.type=="Accepted")].status}'
 json_httproute_acceptedReason='{.status.parents[0].conditions[?(@.type=="Accepted")].reason}'
@@ -153,17 +152,35 @@ function get_contour_url {
     fi
 }
 
-function get_gateway_listener_hostname {
-    # Returns a non-wildcard HTTPS listener hostname on a Gateway, or empty if
-    # there isn't one (e.g. the Gateway has no hostname restriction, or only a
-    # wildcard) -- either way, not something we can build a concrete browsable
-    # URL from.
+function get_listenerset_listener_protocol {
+    # Returns the protocol ("HTTP" or "HTTPS") of a ListenerSet's listener
+    # named $sectionName, or empty if it has no such listener. Used so the
+    # scheme in a built URL reflects what's actually configured, rather than
+    # assuming HTTPS -- a hand-written ListenerSet is free to only define an
+    # HTTP listener.
+    local namespace name sectionName
+
+    namespace=$1
+    name=$2
+    sectionName=$3
+
+    [ -z "$sectionName" ] && return
+
+    kubectl -n "$namespace" get listenerset "$name" \
+        -o jsonpath="{.spec.listeners[?(@.name==\"$sectionName\")].protocol}" 2> /dev/null
+}
+
+function get_listenerset_hostname {
+    # Returns a non-wildcard hostname on a ListenerSet, or empty if there
+    # isn't one (e.g. the listener has no hostname restriction, or only a
+    # wildcard) -- either way, not something we can build a concrete
+    # browsable URL from.
     #
     # If sectionName is given (an HTTPRoute's parentRef names the specific
-    # listener it attaches to), only that listener is considered -- a Gateway
-    # can have more than one HTTPS listener with different hostnames, so
-    # without this a route could get another listener's hostname. Falls back
-    # to "any HTTPS listener" when sectionName isn't set.
+    # listener it attaches to), only that listener is considered -- our
+    # ListenerSet has both an HTTPS and an HTTP listener, so without this a
+    # route could get the wrong listener's hostname. Falls back to "any
+    # HTTPS listener" when sectionName isn't set.
     local namespace name sectionName jsonpath protocol hostname
 
     namespace=$1
@@ -171,9 +188,8 @@ function get_gateway_listener_hostname {
     sectionName=$3
 
     if [ -n "$sectionName" ]; then
-        protocol="$(kubectl -n "$namespace" get gateway "$name" \
-            -o jsonpath="{.spec.listeners[?(@.name==\"$sectionName\")].protocol}" 2> /dev/null)"
-        if [ "$protocol" != "HTTPS" ]; then
+        protocol="$(get_listenerset_listener_protocol "$namespace" "$name" "$sectionName")"
+        if [ "$protocol" != "HTTPS" ] && [ "$protocol" != "HTTP" ]; then
             echo ""
             return
         fi
@@ -182,7 +198,7 @@ function get_gateway_listener_hostname {
         jsonpath='{.spec.listeners[?(@.protocol=="HTTPS")].hostname}'
     fi
 
-    hostname="$(kubectl -n "$namespace" get gateway "$name" \
+    hostname="$(kubectl -n "$namespace" get listenerset "$name" \
         -o jsonpath="$jsonpath" 2> /dev/null \
         | tr ' ' '\n' | grep -v '^\*' | head -1)"
 
@@ -190,7 +206,7 @@ function get_gateway_listener_hostname {
 }
 
 function get_httproute_url {
-    local namespace name host path scheme parentName parentNamespace parentSectionName url
+    local namespace name host path scheme parentName parentNamespace parentSectionName protocol url
 
     namespace=$1
     name=$2
@@ -201,17 +217,16 @@ function get_httproute_url {
 
     host=$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_host")
 
+    parentName=$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_parentName")
+    parentSectionName=$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_parentSectionName")
+    parentNamespace="$namespace" # ListenerSet parentRefs are always same-namespace
+
     if [ -z "$host" ]; then
         # path-based route: no hostname on the route itself, so it's whatever
-        # hostname the parent Gateway serves. Only usable if that's a
+        # hostname the parent ListenerSet serves. Only usable if that's a
         # concrete (non-wildcard) hostname.
-        parentName=$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_parentName")
-        parentNamespace=$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_parentNamespace")
-        parentSectionName=$(get_k8s_info "$namespace" "httproute/$name" "$json_httproute_parentSectionName")
-        [ -z "$parentNamespace" ] && parentNamespace="$namespace"
-
         if [ -n "$parentName" ]; then
-            host="$(get_gateway_listener_hostname "$parentNamespace" "$parentName" "$parentSectionName")"
+            host="$(get_listenerset_hostname "$parentNamespace" "$parentName" "$parentSectionName")"
         fi
 
         if [ -z "$host" ]; then
@@ -221,10 +236,16 @@ function get_httproute_url {
         fi
     fi
 
-    # All app HTTPRoutes shipped in this sample attach to the Gateway's HTTPS
-    # listener; there's no per-route TLS toggle in Gateway API (see
-    # samples/gateway-api/README.md).
+    # Read the scheme off the actual listener this route attaches to, rather
+    # than assuming HTTPS -- the sample always attaches to an HTTPS listener,
+    # but a hand-written ListenerSet is free to only define an HTTP one.
+    # Defaults to https if the listener's protocol can't be determined (e.g.
+    # no sectionName set), since that's what every shipped sample does.
     scheme="https"
+    if [ -n "$parentName" ] && [ -n "$parentSectionName" ]; then
+        protocol="$(get_listenerset_listener_protocol "$parentNamespace" "$parentName" "$parentSectionName")"
+        [ "$protocol" == "HTTP" ] && scheme="http"
+    fi
 
     url="$scheme://$host$path"
     url="${url%/}" # strip any trailing "/", matching get_ingress_url/get_route_url

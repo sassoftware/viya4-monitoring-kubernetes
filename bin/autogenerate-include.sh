@@ -62,17 +62,31 @@ export -f create_ingress_certs
 function get_app_ingress_fqdn {
     # Assumes ROUTING and BASE_DOMAIN set
     #
-    # Inputs: fqdn, path
+    # Inputs: fqdn, path, [appGroupSegment]
     # Returns:  fqdn to applicaiton
     #
-    local app_fqdn app_path
+    # appGroupSegment is optional and only used for host-based default FQDN
+    # construction (producing "$app.$appGroupSegment.$BASE_DOMAIN" instead of
+    # "$app.$BASE_DOMAIN"). Gateway API's ListenerSet needs it: two namespaces
+    # sharing one Gateway each need a distinguishable hostname pattern for
+    # their own listener/TLS cert (SNI can't disambiguate two fully-wildcard
+    # listeners on the same port), so monitoring's and logging's apps can't
+    # share one flat BASE_DOMAIN the way Contour's HTTPProxy allows (it has no
+    # equivalent tenant-level listener object to collide). Omit it (as
+    # Contour/ingress-nginx callers do) to keep prior behavior unchanged.
+    local app_fqdn app_path appGroupSegment
 
     app_fqdn=$1
     app_path=$2
+    appGroupSegment=$3
 
     if [ -z "$app_fqdn" ]; then
         if [ "$ROUTING" == "host" ]; then
-            app_fqdn="$app_path.$BASE_DOMAIN"
+            if [ -n "$appGroupSegment" ]; then
+                app_fqdn="$app_path.$appGroupSegment.$BASE_DOMAIN"
+            else
+                app_fqdn="$app_path.$BASE_DOMAIN"
+            fi
         else
             app_fqdn="$BASE_DOMAIN"
         fi
@@ -239,6 +253,60 @@ function create_root_httpproxy {
 }
 export -f create_root_httpproxy
 
+function create_listenerset {
+
+    # ####################################################### #
+    # developed/tested with gateway-api sample version: 0.1.0 #
+    # ####################################################### #
+
+    ### create_listenerset  APP_GRP  NAMESPACE  [SECRET_NAME]
+    ### create_listenerset  monitoring monitoring
+
+    local app_group namespace secretName routing sampleFile resourceDefFile targetFqdn
+
+    app_group="${1}" # logging|monitoring
+    namespace="${2}"
+    secretName="${3:-v4m-ingress-tls-secret}"
+
+    routing="${ROUTING:-host}"
+
+    sampleFile="samples/gateway-api/${routing}-based/$app_group/listenerset.yaml"
+    resourceDefFile="$TMP_DIR/${app_group}_listenerset_def_file.yaml"
+    touch "$resourceDefFile"
+
+    # shellcheck disable=SC2016
+    yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
+
+    snippet="$GATEWAY_NAME" yq -i '.spec.parentRef.name=env(snippet)' "$resourceDefFile"
+    snippet="$GATEWAY_NAMESPACE" yq -i '.spec.parentRef.namespace=env(snippet)' "$resourceDefFile"
+    snippet="$secretName" yq -i '.spec.listeners.[0].tls.certificateRefs.[0].name=env(snippet)' "$resourceDefFile"
+
+    BASE_DOMAIN="${BASE_DOMAIN:-notset}"
+
+    if [ "$routing" == "path" ]; then
+        # One shared hostname per namespace (e.g. monitoring.$BASE_DOMAIN).
+        targetFqdn="$app_group.$BASE_DOMAIN"
+    else
+        # Host-based: each app's HTTPRoute carries its own concrete hostname
+        # ("$app.$app_group.$BASE_DOMAIN", see get_app_ingress_fqdn), so the
+        # listener just needs a wildcard that covers all of them for this
+        # namespace. It can't be a flat "*.$BASE_DOMAIN": monitoring and
+        # logging share BASE_DOMAIN, and SNI can't disambiguate two
+        # completely overlapping wildcard listeners on the same port between
+        # namespaces (reason: HostnameConflict) -- the per-namespace segment
+        # ("*.$app_group.$BASE_DOMAIN") keeps the two apart.
+        targetFqdn="*.$app_group.$BASE_DOMAIN"
+    fi
+    # strenv (not env): a host-based hostname starts with "*", which env()
+    # would parse as a YAML anchor alias rather than a literal string.
+    snippet="$targetFqdn" yq -i '.spec.listeners.[0].hostname=strenv(snippet)' "$resourceDefFile"
+    snippet="$targetFqdn" yq -i '.spec.listeners.[1].hostname=strenv(snippet)' "$resourceDefFile"
+
+    kubectl apply -f "$resourceDefFile" -n "$namespace"
+    kubectl -n "$namespace" label listenerset v4m-listenerset managed-by="v4m-es-script"
+}
+export -f create_listenerset
+
 function create_httproute {
 
     # ####################################################### #
@@ -252,7 +320,7 @@ function create_httproute {
     path="${3}"
     fqdn="${4}"
     # secretName is accepted for signature parity with create_httpproxy, but is
-    # unused: Gateway API terminates TLS on the Gateway, not the HTTPRoute.
+    # unused: Gateway API terminates TLS on the ListenerSet, not the HTTPRoute.
     secretName="${5:-v4m-ingress-tls-secret}"
 
     routing="${ROUTING:-host}"
@@ -260,7 +328,7 @@ function create_httproute {
     sampleFile="samples/gateway-api/${routing}-based/$app_group/${app_prefix}_httproute.yaml"
 
     # Construct host for application URL
-    targetFqdn="$(get_app_ingress_fqdn "$fqdn" "$path")"
+    targetFqdn="$(get_app_ingress_fqdn "$fqdn" "$path" "$app_group")"
 
     resourceDefFile="$TMP_DIR/${app_prefix}_httproute_def_file.yaml"
     touch "$resourceDefFile"
@@ -268,9 +336,6 @@ function create_httproute {
     #intialized the yaml file w/appropriate gateway-api sample
     # shellcheck disable=SC2016
     yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
-
-    snippet="$GATEWAY_NAME" yq -i '.spec.parentRefs.[0].name=env(snippet)' "$resourceDefFile"
-    snippet="$GATEWAY_NAMESPACE" yq -i '.spec.parentRefs.[0].namespace=env(snippet)' "$resourceDefFile"
 
     if [ "$routing" == "host" ]; then
         snippet="$targetFqdn" yq -i '.spec.hostnames.[0]=env(snippet)' "$resourceDefFile"
@@ -314,8 +379,6 @@ function create_http_redirect_httproute {
 
     # shellcheck disable=SC2016
     yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
-    snippet="$GATEWAY_NAME" yq -i '.spec.parentRefs.[0].name=env(snippet)' "$resourceDefFile"
-    snippet="$GATEWAY_NAMESPACE" yq -i '.spec.parentRefs.[0].namespace=env(snippet)' "$resourceDefFile"
 
     kubectl apply -f "$resourceDefFile" -n "$namespace"
     kubectl -n "$namespace" label httproute v4m-http-redirect managed-by="v4m-es-script"
@@ -524,6 +587,7 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             # verify required Gateway API CRDs available
             for crd in gatewayclasses.gateway.networking.k8s.io \
                 gateways.gateway.networking.k8s.io \
+                listenersets.gateway.networking.k8s.io \
                 httproutes.gateway.networking.k8s.io; do
                 if ! kubectl get crd "$crd" 1> /dev/null 2>&1; then
                     log_error "Ingress type [gateway-api] specified but required CRD [$crd] is not installed"
@@ -547,17 +611,18 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
 
             # Verify a Gateway named $GATEWAY_NAME using this GatewayClass
             # exists in $GATEWAY_NAMESPACE. This is expected to be a single
-            # shared Gateway -- HTTPRoutes from both monitoring and logging
-            # attach to it via a cross-namespace parentRef, the same way many
-            # applications typically attach to one platform-managed Gateway
-            # rather than each getting their own.
+            # shared, platform-managed Gateway. We never create or modify it;
+            # instead monitoring/logging each attach their own ListenerSet to
+            # it (see create_listenerset), which is how they bring their own
+            # host name and TLS cert without the Gateway owner provisioning
+            # anything on their behalf.
             gatewayClassInUse="$(kubectl -n "$GATEWAY_NAMESPACE" get gateway "$GATEWAY_NAME" \
                 -o jsonpath='{.spec.gatewayClassName}' 2> /dev/null)"
 
             if [ -z "$gatewayClassInUse" ]; then
                 log_error "No Gateway named [$GATEWAY_NAME] was found in namespace [$GATEWAY_NAMESPACE]"
                 log_error "The Gateway resource must be created by the platform/cluster administrator before enabling AUTOGENERATE_INGRESS with INGRESS_TYPE=gateway-api."
-                log_error "It must be named [$GATEWAY_NAME] (see GATEWAY_NAME) in namespace [$GATEWAY_NAMESPACE] (see GATEWAY_NAMESPACE) -- the generated HTTPRoutes' parentRefs are set to that name/namespace."
+                log_error "It must be named [$GATEWAY_NAME] (see GATEWAY_NAME) in namespace [$GATEWAY_NAMESPACE] (see GATEWAY_NAMESPACE) -- the generated ListenerSets' parentRef is set to that name/namespace."
                 exit 1
             elif [ "$gatewayClassInUse" != "$GATEWAY_CLASS_NAME" ]; then
                 log_error "Gateway [$GATEWAY_NAME] in namespace [$GATEWAY_NAMESPACE] uses GatewayClass [$gatewayClassInUse], not [$GATEWAY_CLASS_NAME] as specified in GATEWAY_CLASS_NAME"
@@ -565,17 +630,18 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
             fi
             log_debug "Found Gateway [$GATEWAY_NAME] using GatewayClass [$GATEWAY_CLASS_NAME] in namespace [$GATEWAY_NAMESPACE]"
 
-            # Verify the Gateway's listeners actually allow routes from
-            # outside its own namespace -- without this, HTTPRoutes from
-            # monitoring/logging attach silently nowhere
-            # (reason: NotAllowedByListeners) even though the Gateway itself
-            # looks otherwise correct.
-            listenerNamespacePolicies="$(kubectl -n "$GATEWAY_NAMESPACE" get gateway "$GATEWAY_NAME" \
-                -o jsonpath='{.spec.listeners[*].allowedRoutes.namespaces.from}' 2> /dev/null)"
+            # Verify the Gateway actually allows ListenerSets to attach from
+            # outside its own namespace. This is a separate field from
+            # listeners[].allowedRoutes (which gates HTTPRoute attachment to a
+            # Gateway's own listeners directly, not used here); without this,
+            # our ListenerSet attaches silently nowhere even though the
+            # Gateway itself looks otherwise correct.
+            allowedListenersPolicy="$(kubectl -n "$GATEWAY_NAMESPACE" get gateway "$GATEWAY_NAME" \
+                -o jsonpath='{.spec.allowedListeners.namespaces.from}' 2> /dev/null)"
 
-            if echo "$listenerNamespacePolicies" | grep -qw "Same"; then
-                log_error "Gateway [$GATEWAY_NAME] in namespace [$GATEWAY_NAMESPACE] has a listener with allowedRoutes.namespaces.from set to [Same]"
-                log_error "That rejects HTTPRoutes from other namespaces (e.g. monitoring/logging) attaching to it. It must be [All] or a namespace Selector."
+            if [ "$allowedListenersPolicy" != "All" ] && [ "$allowedListenersPolicy" != "Selector" ]; then
+                log_error "Gateway [$GATEWAY_NAME] in namespace [$GATEWAY_NAMESPACE] has spec.allowedListeners.namespaces.from set to [${allowedListenersPolicy:-None (unset)}]"
+                log_error "That rejects our ListenerSet from attaching to it. It must be [All] or a namespace Selector that matches our namespace."
                 exit 1
             fi
 

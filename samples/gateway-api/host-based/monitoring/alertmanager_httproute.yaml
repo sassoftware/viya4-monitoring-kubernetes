@@ -15,10 +15,11 @@ metadata:
   name: v4m-alertmanager
 spec:
   parentRefs:
-    - name: v4m-gateway
+    - kind: ListenerSet
+      name: v4m-listenerset
       sectionName: https
   hostnames:
-    - alertmanager.host.cluster.example.com
+    - alertmanager.monitoring.host.cluster.example.com
   rules:
     - matches:
         - path:

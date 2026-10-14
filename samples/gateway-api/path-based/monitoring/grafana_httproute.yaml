@@ -6,7 +6,8 @@ metadata:
   name: v4m-grafana
 spec:
   parentRefs:
-    - name: v4m-gateway
+    - kind: ListenerSet
+      name: v4m-listenerset
       sectionName: https
   rules:
     # Rule 1 -- trailing-slash redirect.
