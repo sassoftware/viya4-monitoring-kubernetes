@@ -1,5 +1,10 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
+* **Metrics**
+  * [FIX] The SAS Arke, SAS Micro Analytic Service (MAS) and PostgreSQL Details (pgmonitor)
+Grafana dashboards now use the dashboard's datasource variable instead of a hard-coded
+reference to a datasource named "Prometheus".  This allows these dashboards to work when
+the default Prometheus datasource is not the one containing SAS Viya Monitoring metrics.
 * **Logging**
   * [CHANGE] Additional fields from JSON-formatted log messages emitted from 
 RabbitMQ are now captured. The `domain` and `pid` values are now stored as

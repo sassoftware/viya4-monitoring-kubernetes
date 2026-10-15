@@ -23,7 +23,10 @@
   "liveNow": false,
   "panels": [
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -100,7 +103,10 @@
       },
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "expr": "sum(rate(arke_client_consumed{namespace=\"$namespace\"}[$__rate_interval]))",
           "hide": false,
@@ -110,7 +116,10 @@
           "refId": "A"
         },
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "expr": "sum(rate(arke_client_produced{namespace=\"$namespace\"}[$__rate_interval]))",
           "hide": false,
@@ -124,7 +133,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -202,7 +214,10 @@
       },
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "expr": "sum(arke_client_active_messages{namespace=\"$namespace\"})",
           "hide": false,
@@ -216,7 +231,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -293,7 +311,10 @@
       },
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "expr": "rate(arke_client_consumed{namespace=\"$namespace\"}[$__rate_interval]) > 0",
           "hide": false,
