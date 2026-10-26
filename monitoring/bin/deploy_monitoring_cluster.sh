@@ -393,7 +393,7 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
         ## tested with sample version: 0.2.2
         ingressSampleFile="samples/contour/${ROUTING}-based/monitoring/user-values-prom-operator.yaml"
 
-        #create temp copy of appropriate ingress sample and uncomment blocks for Alertmanager and Prometnheus
+        #create temp copy of appropriate ingress sample and uncomment blocks for Alertmanager and Prometheus
         sed s/##//g "$ingressSampleFile" > "$TMP_DIR/ingressSampleFile.yaml"
 
         #merge ingress sample file with any existing auto-generate YAML content
