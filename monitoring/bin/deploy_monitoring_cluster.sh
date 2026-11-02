@@ -191,6 +191,8 @@ fi
 
 # Remove existing DaemonSets in case of an upgrade-in-place
 kubectl delete daemonset -n "$MON_NS" -l app=prometheus-node-exporter --ignore-not-found
+kubectl delete daemonset -n "$MON_NS" -l app.kubernetes.io/name=prometheus-node-exporter --ignore-not-found
+
 
 # Optional workload node placement support
 MON_NODE_PLACEMENT_ENABLE=${MON_NODE_PLACEMENT_ENABLE:-${NODE_PLACEMENT_ENABLE:-false}}
