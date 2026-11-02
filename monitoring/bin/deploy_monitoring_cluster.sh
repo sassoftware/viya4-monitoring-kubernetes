@@ -646,6 +646,22 @@ if [ "$helmExitCode" -ne 0 ]; then
     exit "$helmExitCode"
 fi
 
+if [ "$RBAC_PROXY_ENABLE" == "true" ]; then
+    prometheusName="${promName}-prometheus"
+    prometheusResource=$(kubectl -n "$MON_NS" get prometheus "$prometheusName" --ignore-not-found --show-managed-fields -o json)
+    if [ -n "$prometheusResource" ]; then
+        prometheusWebManaged=$(yq -p=json '(.spec.web != null) and ([.metadata.managedFields[]? |
+            select(.manager == "Go-http-client") |
+            select(.fieldsV1."f:spec" | has("f:web"))] | length > 0)' \
+            <<< "$prometheusResource")
+        if [ "$prometheusWebManaged" == "true" ]; then
+            log_debug "Removing obsolete spec.web sub-tree from [$MON_NS/$prometheusName]"
+            kubectl -n "$MON_NS" patch prometheus "$prometheusName" --type=json \
+                -p='[{"op":"remove","path":"/spec/web"}]'
+        fi
+    fi
+fi
+
 sleep 2
 
 #Container Security: Disable serviceAccount Token Automounting
