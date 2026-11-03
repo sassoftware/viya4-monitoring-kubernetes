@@ -175,10 +175,13 @@ such an application without other restrictions in place is insecure. It also doe
 NOT recommend making the OpenSearch API endpoint accessible by default; although
 it does require authentication, there are limited use cases requiring it.**
 
-Files for these applications are included should you need them. Apply the
-relevant `_httproute.yaml`, write a `BackendTLSPolicy` for it (its backend
-serves HTTPS by default, same as the others), and uncomment the corresponding
-section of `user-values-prom-operator.yaml`.
+Files for these applications are included should you need them. For
+Prometheus and Alertmanager, apply the relevant `_httproute.yaml`, write a
+`BackendTLSPolicy` for it (its backend serves HTTPS by default, same as the
+others), and uncomment the corresponding section of
+`monitoring/user-values-prom-operator.yaml`. For the OpenSearch API, apply
+`logging/opensearch_httproute.yaml` and write its `BackendTLSPolicy`; there's
+no equivalent values file to uncomment for it.
 
 ## Gateway Ownership
 

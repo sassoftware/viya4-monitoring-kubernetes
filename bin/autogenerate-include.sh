@@ -472,6 +472,16 @@ function apply_backend_tls_policy {
 
     if [ -z "$hostname" ]; then
         log_error "Could not determine a SAN to validate for BackendTLSPolicy [$policyName] after waiting ${tlsWaitAttempt}x5s; secret [$namespace/$tlsSecretName] is missing or its cert has no usable SAN."
+        # bin/renew-tls-certs.sh's actual renewal case (not its -r restart-only
+        # mode) only accepts the ALL-MON/ALL-LOG group targets -- individual
+        # app names are only valid with -r. Point at the correct group,
+        # chosen by namespace, rather than suggesting a target that would
+        # just fail.
+        if [ "$namespace" == "$LOG_NS" ]; then
+            log_error "If the cert generator failed to issue this cert, try: ./bin/renew-tls-certs.sh -t ALL-LOG"
+        else
+            log_error "If the cert generator failed to issue this cert, try: ./bin/renew-tls-certs.sh -t ALL-MON"
+        fi
         exit 1
     fi
 
@@ -731,11 +741,17 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
                 exit 1
             fi
             INGRESS_USE_SEPARATE_CERTS="false"
-            # Default true: app backends serve HTTPS by default, and unlike
-            # Contour's unconditional `protocol: tls`, Gateway API has no
-            # per-backendRef TLS field -- without BackendTLSPolicy the gateway
-            # sends plaintext to a TLS-only backend and every request fails.
-            INGRESS_BACKEND_TLS_ENABLE="${INGRESS_BACKEND_TLS_ENABLE:-true}"
+            # Defaults to whatever TLS_ENABLE already is (itself defaulted by
+            # monitoring/bin/common.sh or logging/bin/common.sh before this
+            # runs), falling back to true only if that's unset too: app
+            # backends only serve HTTPS -- and thus only need a
+            # BackendTLSPolicy -- when TLS_ENABLE says they do. Defaulting
+            # this independently of TLS_ENABLE would try to apply backend TLS
+            # for a plaintext backend whenever TLS_ENABLE=false, which can't
+            # succeed (no TLS Secret/SAN ever exists) and now hard-fails the
+            # deploy (see apply_backend_tls_policy). An explicit
+            # INGRESS_BACKEND_TLS_ENABLE still wins either way.
+            INGRESS_BACKEND_TLS_ENABLE="${INGRESS_BACKEND_TLS_ENABLE:-${TLS_ENABLE:-true}}"
 
             if [ "$INGRESS_BACKEND_TLS_ENABLE" == "true" ]; then
                 if ! kubectl get crd backendtlspolicies.gateway.networking.k8s.io 1> /dev/null 2>&1; then
