@@ -802,7 +802,7 @@ else
 fi
 log_notice ""
 
-if [ "$RBAC_PROXY_ENABLE" == "true" ] && { [ "${PROM_NODEPORT_ENABLE:-false}" == "true" ] || [ "${PROMETHEUS_INGRESS_ENABLE:-false}" == "true" ]; }; then
+if [ "$RBAC_PROXY_ENABLE" == "true" ] && { [ "${PROM_NODEPORT_ENABLE:-false}" == "true" ] || { [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "${PROMETHEUS_INGRESS_ENABLE:-false}" == "true" ]; }; }; then
     log_notice "PROMETHEUS: "
     log_notice " Prometheus has been exposed via NodePort and/or ingress, but RBAC_PROXY_ENABLE is true,"
     log_notice " so every request to it must include a Kubernetes bearer token. The Prometheus web"
