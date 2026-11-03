@@ -802,6 +802,19 @@ else
 fi
 log_notice ""
 
+if [ "$RBAC_PROXY_ENABLE" == "true" ] && { [ "${PROM_NODEPORT_ENABLE:-false}" == "true" ] || [ "${PROMETHEUS_INGRESS_ENABLE:-false}" == "true" ]; }; then
+    log_notice "PROMETHEUS: "
+    log_notice " Prometheus has been exposed via NodePort and/or ingress, but RBAC_PROXY_ENABLE is true,"
+    log_notice " so every request to it must include a Kubernetes bearer token. The Prometheus web"
+    log_notice " application therefore cannot be opened directly in a web browser; requests without a"
+    log_notice " token are rejected with HTTP 401. Access is still possible from tools that can send an"
+    log_notice ' Authorization header, e.g. curl -H "Authorization: Bearer <token>" <prometheus-url>.'
+    log_notice " To restore unauthenticated browser access, set RBAC_PROXY_ENABLE=false and redeploy."
+    log_notice " Note that this also removes the authentication and transport encryption that"
+    log_notice " kube-rbac-proxy provides for kube-state-metrics and Node Exporter."
+    log_notice ""
+fi
+
 #log_notice ""
 #log_notice "================================================================================"
 #log_notice "==                    Accessing the monitoring applications                   =="
