@@ -49,6 +49,16 @@ if [[ $AUTOGENERATE_INGRESS == "true" &&
 elif kubectl get crd listenersets.gateway.networking.k8s.io -o name > /dev/null 2>&1; then
     log_debug "Deleting [listenerset/v4m-listenerset] if it exists"
     kubectl -n "$LOG_NS" delete listenerset v4m-listenerset --ignore-not-found
+
+    # Per-app HTTPRoutes are otherwise only cleaned up inside
+    # deploy_osd.sh/deploy_opensearch.sh's own INGRESS_TYPE==gateway-api
+    # branches, which don't run at all once AUTOGENERATE_INGRESS is turned
+    # off or INGRESS_TYPE is switched away from gateway-api -- without this
+    # they'd be orphaned permanently.
+    if kubectl get crd httproutes.gateway.networking.k8s.io -o name > /dev/null 2>&1; then
+        log_debug "Deleting [httproute/v4m-osd], [httproute/v4m-search] if they exist"
+        kubectl -n "$LOG_NS" delete httproute v4m-osd v4m-search --ignore-not-found
+    fi
 fi
 
 ##################################

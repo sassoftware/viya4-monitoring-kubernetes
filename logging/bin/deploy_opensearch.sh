@@ -113,7 +113,6 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "tr
         kubectl -n "$LOG_NS" label httproute v4m-search managed-by="v4m-es-script"
 
         if [ "$INGRESS_BACKEND_TLS_ENABLE" == "true" ]; then
-            create_backend_tls_ca_configmap "$LOG_NS"
             apply_backend_tls_policy "$LOG_NS" v4m-search-backend-tls v4m-search es-rest-tls-secret
         else
             kubectl -n "$LOG_NS" delete backendtlspolicy v4m-search-backend-tls --ignore-not-found

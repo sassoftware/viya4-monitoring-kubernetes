@@ -65,14 +65,17 @@ function get_app_ingress_fqdn {
     # Inputs: fqdn, path, [appGroupSegment]
     # Returns:  fqdn to applicaiton
     #
-    # appGroupSegment is optional and only used for host-based default FQDN
-    # construction (producing "$app.$appGroupSegment.$BASE_DOMAIN" instead of
-    # "$app.$BASE_DOMAIN"). Gateway API's ListenerSet needs it: two namespaces
-    # sharing one Gateway each need a distinguishable hostname pattern for
-    # their own listener/TLS cert (SNI can't disambiguate two fully-wildcard
-    # listeners on the same port), so monitoring's and logging's apps can't
-    # share one flat BASE_DOMAIN the way Contour's HTTPProxy allows (it has no
-    # equivalent tenant-level listener object to collide). Omit it (as
+    # appGroupSegment is optional and only used for default FQDN construction
+    # (producing "$app.$appGroupSegment.$BASE_DOMAIN" for host-based, or
+    # "$appGroupSegment.$BASE_DOMAIN" for path-based, instead of plain
+    # "$app.$BASE_DOMAIN"/"$BASE_DOMAIN"). Gateway API's ListenerSet needs it
+    # for both routing modes: two namespaces sharing one Gateway each need a
+    # distinguishable hostname for their own listener/TLS cert (host-based:
+    # SNI can't disambiguate two fully-wildcard listeners on the same port;
+    # path-based: two ListenerSets can't claim the identical bare BASE_DOMAIN
+    # either -- see create_listenerset), so monitoring's and logging's apps
+    # can't share one flat BASE_DOMAIN the way Contour's HTTPProxy allows (it
+    # has no equivalent tenant-level listener object to collide). Omit it (as
     # Contour/ingress-nginx callers do) to keep prior behavior unchanged.
     local app_fqdn app_path appGroupSegment
 
@@ -88,7 +91,11 @@ function get_app_ingress_fqdn {
                 app_fqdn="$app_path.$BASE_DOMAIN"
             fi
         else
-            app_fqdn="$BASE_DOMAIN"
+            if [ -n "$appGroupSegment" ]; then
+                app_fqdn="$appGroupSegment.$BASE_DOMAIN"
+            else
+                app_fqdn="$BASE_DOMAIN"
+            fi
         fi
     fi
 
@@ -337,7 +344,25 @@ function create_httproute {
     # shellcheck disable=SC2016
     yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
 
+    if [ "$app_group" == "logging" ]; then
+        namespace="${LOG_NS:-logging}"
+    else
+        namespace="${MON_NS:-monitoring}"
+    fi
+
     if [ "$routing" == "host" ]; then
+        # The ListenerSet's wildcard listener only covers
+        # "*.$app_group.$BASE_DOMAIN" (see create_listenerset) -- an
+        # explicit FQDN override (e.g. GRAFANA_FQDN) that doesn't fall
+        # within that pattern would otherwise get applied anyway and sit
+        # permanently broken (Accepted: False, reason: NoMatchingListenerHostname)
+        # with no indication until something downstream (e.g.
+        # show_app_url.sh) happens to check status.
+        if [[ $targetFqdn != *".$app_group.$BASE_DOMAIN" ]]; then
+            log_error "FQDN [$targetFqdn] for [$app_group/$app_prefix] does not fall under *.${app_group}.${BASE_DOMAIN}, the hostname pattern the [$app_group] ListenerSet's listener actually covers."
+            log_error "The resulting HTTPRoute would never match that listener (reason: NoMatchingListenerHostname). Set a value ending in .$app_group.$BASE_DOMAIN, or change BASE_DOMAIN."
+            return 1
+        fi
         snippet="$targetFqdn" yq -i '.spec.hostnames.[0]=env(snippet)' "$resourceDefFile"
     else
         oldPathToken="$(yq '.spec.rules.[0].matches.[0].path.value' "$resourceDefFile")"
@@ -345,12 +370,6 @@ function create_httproute {
             sed -i.bak "s#${oldPathToken}#/${path}#g" "$resourceDefFile"
             rm -f "${resourceDefFile}.bak"
         fi
-    fi
-
-    if [ "$app_group" == "logging" ]; then
-        namespace="${LOG_NS:-logging}"
-    else
-        namespace="${MON_NS:-monitoring}"
     fi
 
     kubectl apply -f "$resourceDefFile" -n "$namespace"
@@ -385,60 +404,6 @@ function create_http_redirect_httproute {
 }
 export -f create_http_redirect_httproute
 
-function create_backend_tls_ca_configmap {
-
-    ### create_backend_tls_ca_configmap  NAMESPACE  [CONFIGMAP_NAME]
-
-    local namespace configMapName caFile candidates secret found
-
-    namespace="${1}"
-    configMapName="${2:-v4m-ca-certs}"
-
-    if [ -z "$namespace" ]; then
-        log_error "Required parameter [NAMESPACE] not provided to function [create_backend_tls_ca_configmap]"
-        return 1
-    fi
-
-    caFile="$TMP_DIR/${namespace}-ca.crt"
-
-    # Candidate secrets, in preference order: the cert-manager CA secret first,
-    # then any app secret (all of which carry the CA under ca.crt in the
-    # openssl flow).
-    candidates=(
-        ca-certificate-secret
-        grafana-tls-secret
-        kibana-tls-secret
-        es-rest-tls-secret
-        prometheus-tls-secret
-        alertmanager-tls-secret
-    )
-
-    found=""
-    for secret in "${candidates[@]}"; do
-        if kubectl -n "$namespace" get secret "$secret" -o name > /dev/null 2>&1; then
-            if kubectl -n "$namespace" get secret "$secret" -o jsonpath='{.data.ca\.crt}' 2> /dev/null \
-                | base64 -d > "$caFile" 2> /dev/null && [ -s "$caFile" ]; then
-                found="$secret"
-                break
-            fi
-        fi
-    done
-
-    if [ -z "$found" ]; then
-        log_error "Could not locate a CA certificate (key 'ca.crt') in any of these secrets in namespace [$namespace]: ${candidates[*]}"
-        log_error "Confirm TLS is enabled for the deployment, or supply the CA certificate manually with:"
-        log_error "  kubectl -n $namespace create configmap $configMapName --from-file=ca.crt=/path/to/ca.crt"
-        return 1
-    fi
-
-    log_debug "Using CA certificate from secret [$namespace/$found]"
-
-    kubectl -n "$namespace" delete configmap "$configMapName" --ignore-not-found
-    kubectl -n "$namespace" create configmap "$configMapName" --from-file=ca.crt="$caFile"
-    kubectl -n "$namespace" label configmap "$configMapName" managed-by="v4m-es-script"
-}
-export -f create_backend_tls_ca_configmap
-
 function get_backend_tls_hostname {
 
     ### get_backend_tls_hostname  NAMESPACE  SECRET_NAME
@@ -470,15 +435,25 @@ export -f get_backend_tls_hostname
 
 function apply_backend_tls_policy {
 
-    ### apply_backend_tls_policy  NAMESPACE  POLICY_NAME  SERVICE_NAME  TLS_SECRET_NAME  CA_CONFIGMAP_NAME
+    ### apply_backend_tls_policy  NAMESPACE  POLICY_NAME  SERVICE_NAME  TLS_SECRET_NAME  [CA_CONFIGMAP_NAME]
 
-    local namespace policyName serviceName tlsSecretName caConfigMapName hostname
+    # The CA ConfigMap is derived from TLS_SECRET_NAME's own ca.crt, not
+    # guessed from some other secret in the namespace. Both TLS flows
+    # (openssl and cert-manager) put the CA that actually signed a given
+    # backend's cert into that same backend's own Secret -- apps in the same
+    # namespace commonly share one CA by default, but USER_DIR overrides
+    # (deploy_issuers/deploy_app_cert honor USER_DIR for exactly this) can
+    # give one app a different CA than another. Picking a CA from an
+    # unrelated secret in the namespace would silently validate the wrong
+    # one once that happens.
+
+    local namespace policyName serviceName tlsSecretName caConfigMapName hostname caCertB64 caFile
 
     namespace="${1}"
     policyName="${2}"
     serviceName="${3}"
     tlsSecretName="${4}"
-    caConfigMapName="${5:-v4m-ca-certs}"
+    caConfigMapName="${5:-${policyName}-ca-certs}"
 
     hostname="$(get_backend_tls_hostname "$namespace" "$tlsSecretName")"
 
@@ -489,7 +464,23 @@ function apply_backend_tls_policy {
         return 1
     fi
 
-    log_debug "Using hostname [$hostname] (from secret [$namespace/$tlsSecretName]) for BackendTLSPolicy [$policyName]"
+    caCertB64="$(kubectl -n "$namespace" get secret "$tlsSecretName" -o jsonpath='{.data.ca\.crt}' 2> /dev/null)"
+
+    if [ -z "$caCertB64" ]; then
+        log_warn "Secret [$namespace/$tlsSecretName] has no ca.crt; cannot create BackendTLSPolicy [$policyName]'s CA ConfigMap."
+        log_warn "Skipping creation of BackendTLSPolicy [$policyName]; removing any existing one."
+        kubectl -n "$namespace" delete backendtlspolicy "$policyName" --ignore-not-found
+        return 1
+    fi
+
+    caFile="$TMP_DIR/${policyName}-ca.crt"
+    echo "$caCertB64" | base64 -d > "$caFile"
+
+    kubectl -n "$namespace" delete configmap "$caConfigMapName" --ignore-not-found
+    kubectl -n "$namespace" create configmap "$caConfigMapName" --from-file=ca.crt="$caFile"
+    kubectl -n "$namespace" label configmap "$caConfigMapName" managed-by="v4m-es-script"
+
+    log_debug "Using hostname [$hostname] and CA from secret [$namespace/$tlsSecretName] for BackendTLSPolicy [$policyName]"
 
     kubectl -n "$namespace" apply -f - << EOF
 apiVersion: gateway.networking.k8s.io/v1
@@ -509,6 +500,31 @@ spec:
     hostname: $hostname
 EOF
     kubectl -n "$namespace" label backendtlspolicy "$policyName" managed-by="v4m-es-script" --overwrite
+
+    # kubectl apply succeeding only means the API server accepted the
+    # resource, not that the GatewayClass's controller actually implements
+    # BackendTLSPolicy -- there's no reliable way to check that up front
+    # (GatewayClass.status.supportedFeatures exists but is optional to
+    # report; Envoy Gateway, which this sample is developed against, doesn't
+    # populate it despite genuinely supporting BackendTLSPolicy). So check
+    # the applied policy's own status instead: if the controller rejected or
+    # never acknowledged it, say so now rather than silently assuming
+    # backend TLS is active.
+    local attempt accepted reason
+    accepted=""
+    for attempt in 1 2 3 4 5; do
+        accepted="$(kubectl -n "$namespace" get backendtlspolicy "$policyName" \
+            -o jsonpath='{.status.ancestors[0].conditions[?(@.type=="Accepted")].status}' 2> /dev/null)"
+        [ "$accepted" == "True" ] && break
+        sleep 1
+    done
+
+    if [ "$accepted" != "True" ]; then
+        reason="$(kubectl -n "$namespace" get backendtlspolicy "$policyName" \
+            -o jsonpath='{.status.ancestors[0].conditions[?(@.type=="Accepted")].reason}' 2> /dev/null)"
+        log_warn "BackendTLSPolicy [$namespace/$policyName] was applied but has not been Accepted after $attempt attempts (status: ${accepted:-no status reported}${reason:+, reason: $reason})."
+        log_warn "Backend TLS for [$serviceName] may not actually be active; check 'kubectl -n $namespace describe backendtlspolicy $policyName' and confirm your GatewayClass's controller supports BackendTLSPolicy."
+    fi
 }
 export -f apply_backend_tls_policy
 
@@ -645,9 +661,62 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
                 exit 1
             fi
 
+            # "Selector" alone doesn't guarantee OUR namespace matches it --
+            # build the equivalent kubectl label-selector string from
+            # spec.allowedListeners.namespaces.selector and confirm it
+            # actually selects LOG_NS/MON_NS (whichever this driver script
+            # set), rather than only checking the policy *type*.
+            if [ "$allowedListenersPolicy" == "Selector" ]; then
+                gatewayYamlFile="$TMP_DIR/gateway_def_file.yaml"
+                kubectl -n "$GATEWAY_NAMESPACE" get gateway "$GATEWAY_NAME" -o yaml > "$gatewayYamlFile" 2> /dev/null
+
+                selectorParts=()
+                while IFS= read -r labelPair; do
+                    [ -n "$labelPair" ] && selectorParts+=("$labelPair")
+                done < <(yq -r '.spec.allowedListeners.namespaces.selector.matchLabels // {} | to_entries | .[] | .key + "=" + .value' "$gatewayYamlFile")
+
+                while IFS='|' read -r exprKey exprOp exprValues; do
+                    [ -z "$exprKey" ] && continue
+                    case "$exprOp" in
+                    In) selectorParts+=("$exprKey in ($exprValues)") ;;
+                    NotIn) selectorParts+=("$exprKey notin ($exprValues)") ;;
+                    Exists) selectorParts+=("$exprKey") ;;
+                    DoesNotExist) selectorParts+=("!$exprKey") ;;
+                    esac
+                done < <(yq -r '.spec.allowedListeners.namespaces.selector.matchExpressions // [] | .[] | .key + "|" + .operator + "|" + (.values // [] | join(","))' "$gatewayYamlFile")
+
+                namespaceSelectorString="$(
+                    IFS=,
+                    echo "${selectorParts[*]}"
+                )"
+
+                for ourNamespace in "$LOG_NS" "$MON_NS"; do
+                    if [ -z "$ourNamespace" ]; then
+                        continue
+                    fi
+                    if ! kubectl get namespace -l "$namespaceSelectorString" -o name 2> /dev/null | grep -qx "namespace/$ourNamespace"; then
+                        log_error "Gateway [$GATEWAY_NAME] in namespace [$GATEWAY_NAMESPACE] restricts attachment to namespaces matching selector [$namespaceSelectorString], which namespace [$ourNamespace] does NOT match"
+                        log_error "Label namespace [$ourNamespace] to match that selector, or have the Gateway's spec.allowedListeners.namespaces.from set to [All]"
+                        exit 1
+                    fi
+                    log_debug "Namespace [$ourNamespace] matches Gateway [$GATEWAY_NAME]'s allowedListeners namespace selector"
+                done
+            fi
+
             # Gateway API has no root-resource concept
             INGRESS_CREATE_ROOT_PROXY="false"
-            INGRESS_USE_SEPARATE_CERTS="${INGRESS_USE_SEPARATE_CERTS:-false}"
+
+            # Unlike Contour (one HTTPProxy/cert per app), the ListenerSet
+            # terminates TLS once per app-group namespace (see
+            # create_listenerset) and create_httproute never takes a
+            # secretName override -- there's no per-app cert to apply here.
+            # Reject the setting rather than silently ignoring it.
+            if [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
+                log_error "INGRESS_USE_SEPARATE_CERTS=true is not supported with INGRESS_TYPE=gateway-api"
+                log_error "Gateway API terminates TLS once per app-group's ListenerSet, not per app; there is no per-app certificate to apply"
+                exit 1
+            fi
+            INGRESS_USE_SEPARATE_CERTS="false"
             # Default true: app backends serve HTTPS by default, and unlike
             # Contour's unconditional `protocol: tls`, Gateway API has no
             # per-backendRef TLS field -- without BackendTLSPolicy the gateway

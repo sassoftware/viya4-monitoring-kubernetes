@@ -157,7 +157,6 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OSD_INGRESS_ENABLE" == "true" ];
         kubectl -n "$LOG_NS" label httproute v4m-osd managed-by="v4m-es-script"
 
         if [ "$INGRESS_BACKEND_TLS_ENABLE" == "true" ]; then
-            create_backend_tls_ca_configmap "$LOG_NS"
             apply_backend_tls_policy "$LOG_NS" v4m-osd-backend-tls v4m-osd kibana-tls-secret
         else
             kubectl -n "$LOG_NS" delete backendtlspolicy v4m-osd-backend-tls --ignore-not-found
