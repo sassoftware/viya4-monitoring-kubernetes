@@ -85,6 +85,18 @@ ours: see [ListenerSet Ownership](#listenerset-ownership).
 
    If this isn't `All` or a matching `Selector`, your `ListenerSet` will
    attach nowhere; ask whoever manages the Gateway to widen it.
+
+   If it's a `Selector`, your `monitoring`/`logging` namespace must already
+   exist with labels matching it *before* you deploy. This sample's deploy
+   scripts create the namespace if it's missing, but never apply labels to
+   it; there's no generic way to know what label values an arbitrary
+   selector expects. Create and label the namespace yourself first, for
+   example:
+
+   ```
+   kubectl create namespace monitoring
+   kubectl label namespace monitoring team=viya  # match the actual selector
+   ```
 3. Copy the customization files from either the `host-based` or `path-based`
    subdirectories into your local customization directory (that is, your
    `USER_DIR`). `path-based/monitoring/user.env` sets
@@ -336,8 +348,16 @@ Gateway matching all three must already exist, with
 outside its own namespace; the deploy scripts verify all of this and fail
 with a clear error if it's not met. The Gateway itself is never created by
 the deploy scripts; see [Gateway Ownership](#gateway-ownership). Its own
-`ListenerSet` and TLS Secret, by contrast, are created automatically; see
+`ListenerSet`, by contrast, is created automatically; see
 [ListenerSet Ownership](#listenerset-ownership).
+
+The `ListenerSet`'s TLS Secret (`v4m-ingress-tls-secret` by default) is only
+created from `INGRESS_CERT`/`INGRESS_KEY` if those point at real files; the
+deploy scripts don't generate a cert from nothing. If those aren't set and
+the Secret doesn't already exist (for example from a previous deploy), the
+`ListenerSet` is still created, but its listener can't resolve the
+certificate reference (`ResolvedRefs: False`, reason `InvalidCertificateRef`)
+until you create that Secret yourself.
 
 The existing per-application enable flags (`GRAFANA_INGRESS_ENABLE` and
 friends) and the FQDN/path override variables carry through unchanged. Gateway
@@ -347,6 +367,15 @@ namespace segment: `grafana.monitoring.$BASE_DOMAIN`
 for host-based, `monitoring.$BASE_DOMAIN` for path-based (and the `logging`
 equivalents); an explicit `GRAFANA_FQDN` (and so on) overrides this entirely,
 same as for the other ingress types.
+
+For host-based routing, an explicit override must still end in
+`.monitoring.$BASE_DOMAIN` (or `.logging.$BASE_DOMAIN`). The `ListenerSet`'s
+listener only covers `*.monitoring.$BASE_DOMAIN`, so an override outside
+that pattern would never match it; the deploy scripts detect this and fail
+with a clear error rather than applying a route that would sit permanently
+unmatched (reason: `NoMatchingListenerHostname`). Path-based overrides have
+no such constraint, since the path segment, not the hostname, is what
+changes per app.
 
 Backend re-encryption via `BackendTLSPolicy` is on by default
 (`INGRESS_BACKEND_TLS_ENABLE=true`), since application backends serve HTTPS

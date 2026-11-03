@@ -455,22 +455,29 @@ function apply_backend_tls_policy {
     tlsSecretName="${4}"
     caConfigMapName="${5:-${policyName}-ca-certs}"
 
-    hostname="$(get_backend_tls_hostname "$namespace" "$tlsSecretName")"
+    # Callers can invoke this before TLS_SECRET_NAME actually exists (e.g.
+    # deploy_opensearch.sh applies ingress/BackendTLSPolicy resources before
+    # create_tls_certs runs later in the same script) or before cert-manager
+    # has finished issuing it. Poll for up to 2 minutes before giving up,
+    # rather than failing (or silently skipping) on what's often just a
+    # not-ready-yet race.
+    local tlsWaitAttempt
+    hostname=""
+    for tlsWaitAttempt in $(seq 1 24); do
+        hostname="$(get_backend_tls_hostname "$namespace" "$tlsSecretName")"
+        caCertB64="$(kubectl -n "$namespace" get secret "$tlsSecretName" -o jsonpath='{.data.ca\.crt}' 2> /dev/null)"
+        [ -n "$hostname" ] && [ -n "$caCertB64" ] && break
+        sleep 5
+    done
 
     if [ -z "$hostname" ]; then
-        log_warn "Could not determine a SAN to validate for BackendTLSPolicy [$policyName]; secret [$namespace/$tlsSecretName] is missing or its cert has no usable SAN."
-        log_warn "Skipping creation of BackendTLSPolicy [$policyName]; removing any existing one."
-        kubectl -n "$namespace" delete backendtlspolicy "$policyName" --ignore-not-found
-        return 1
+        log_error "Could not determine a SAN to validate for BackendTLSPolicy [$policyName] after waiting ${tlsWaitAttempt}x5s; secret [$namespace/$tlsSecretName] is missing or its cert has no usable SAN."
+        exit 1
     fi
 
-    caCertB64="$(kubectl -n "$namespace" get secret "$tlsSecretName" -o jsonpath='{.data.ca\.crt}' 2> /dev/null)"
-
     if [ -z "$caCertB64" ]; then
-        log_warn "Secret [$namespace/$tlsSecretName] has no ca.crt; cannot create BackendTLSPolicy [$policyName]'s CA ConfigMap."
-        log_warn "Skipping creation of BackendTLSPolicy [$policyName]; removing any existing one."
-        kubectl -n "$namespace" delete backendtlspolicy "$policyName" --ignore-not-found
-        return 1
+        log_error "Secret [$namespace/$tlsSecretName] has no ca.crt after waiting ${tlsWaitAttempt}x5s; cannot create BackendTLSPolicy [$policyName]'s CA ConfigMap."
+        exit 1
     fi
 
     caFile="$TMP_DIR/${policyName}-ca.crt"
@@ -696,7 +703,14 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
                     fi
                     if ! kubectl get namespace -l "$namespaceSelectorString" -o name 2> /dev/null | grep -qx "namespace/$ourNamespace"; then
                         log_error "Gateway [$GATEWAY_NAME] in namespace [$GATEWAY_NAMESPACE] restricts attachment to namespaces matching selector [$namespaceSelectorString], which namespace [$ourNamespace] does NOT match"
-                        log_error "Label namespace [$ourNamespace] to match that selector, or have the Gateway's spec.allowedListeners.namespaces.from set to [All]"
+                        # The deploy scripts create $ourNamespace themselves if
+                        # it doesn't already exist, but never apply labels to
+                        # it -- there's no safe, generic way to derive label
+                        # values that satisfy an arbitrary selector. If
+                        # [$ourNamespace] doesn't exist yet, create it and
+                        # apply matching labels yourself before running the
+                        # deploy scripts; the scripts will reuse it as-is.
+                        log_error "Label namespace [$ourNamespace] to match that selector before running the deploy scripts, or have the Gateway's spec.allowedListeners.namespaces.from set to [All]"
                         exit 1
                     fi
                     log_debug "Namespace [$ourNamespace] matches Gateway [$GATEWAY_NAME]'s allowedListeners namespace selector"
