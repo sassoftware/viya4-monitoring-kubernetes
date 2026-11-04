@@ -529,11 +529,11 @@ EOF
     # backend TLS is active.
     local attempt accepted reason
     accepted=""
-    for attempt in 1 2 3 4 5; do
+    for attempt in $(seq 1 24); do
         accepted="$(kubectl -n "$namespace" get backendtlspolicy "$policyName" \
             -o jsonpath='{.status.ancestors[0].conditions[?(@.type=="Accepted")].status}' 2> /dev/null)"
         [ "$accepted" == "True" ] && break
-        sleep 1
+        sleep 5
     done
 
     if [ "$accepted" != "True" ]; then
