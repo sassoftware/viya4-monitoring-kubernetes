@@ -165,9 +165,13 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OSD_INGRESS_ENABLE" == "true" ];
         kubectl -n "$LOG_NS" label httproute v4m-osd managed-by="v4m-es-script"
 
         # OSD_TLS_ENABLE=false means OSD serves plain HTTP; don't apply a
-        # BackendTLSPolicy telling the Gateway to speak TLS to it.
+        # BackendTLSPolicy telling the Gateway to speak TLS to it. The actual
+        # apply happens after the Helm install below, once the v4m-osd
+        # Service exists (apply_backend_tls_policy waits for it to be
+        # Accepted, which can't happen against a Service that isn't there
+        # yet).
         if [ "$INGRESS_BACKEND_TLS_ENABLE" == "true" ] && [ "$OSD_TLS_ENABLE" == "true" ]; then
-            apply_backend_tls_policy "$LOG_NS" v4m-osd-backend-tls v4m-osd kibana-tls-secret
+            applyBackendTlsPolicy="true"
         else
             kubectl -n "$LOG_NS" delete backendtlspolicy v4m-osd-backend-tls --ignore-not-found
         fi
@@ -291,6 +295,10 @@ helm $helmDebug upgrade --install v4m-osd \
     "$chart2install"
 
 log_info "OpenSearch Dashboards has been deployed"
+
+if [ "$applyBackendTlsPolicy" == "true" ]; then
+    apply_backend_tls_policy "$LOG_NS" v4m-osd-backend-tls v4m-osd kibana-tls-secret
+fi
 
 #Container Security: Disable serviceAccount Token Automounting
 if [ "$OPENSHIFT_CLUSTER" == "true" ]; then

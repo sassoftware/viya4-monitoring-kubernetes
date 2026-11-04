@@ -508,25 +508,25 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ]; then
             kubectl -n "$MON_NS" delete httproute v4m-prometheus --ignore-not-found
         fi
 
+        # The actual apply happens after the Helm install below, once
+        # v4m-alertmanager/v4m-grafana/v4m-prometheus exist
+        # (apply_backend_tls_policy waits for each to be Accepted, which
+        # can't happen against a Service that isn't there yet).
         if [ "$INGRESS_BACKEND_TLS_ENABLE" == "true" ]; then
 
-            if [ "$ALERTMANAGER_INGRESS_ENABLE" == "true" ]; then
-                apply_backend_tls_policy "$MON_NS" v4m-alertmanager-backend-tls v4m-alertmanager alertmanager-tls-secret
-            else
+            if [ "$ALERTMANAGER_INGRESS_ENABLE" != "true" ]; then
                 kubectl -n "$MON_NS" delete backendtlspolicy v4m-alertmanager-backend-tls --ignore-not-found
             fi
 
-            if [ "$GRAFANA_INGRESS_ENABLE" == "true" ]; then
-                apply_backend_tls_policy "$MON_NS" v4m-grafana-backend-tls v4m-grafana grafana-tls-secret
-            else
+            if [ "$GRAFANA_INGRESS_ENABLE" != "true" ]; then
                 kubectl -n "$MON_NS" delete backendtlspolicy v4m-grafana-backend-tls --ignore-not-found
             fi
 
-            if [ "$PROMETHEUS_INGRESS_ENABLE" == "true" ]; then
-                apply_backend_tls_policy "$MON_NS" v4m-prometheus-backend-tls v4m-prometheus prometheus-tls-secret
-            else
+            if [ "$PROMETHEUS_INGRESS_ENABLE" != "true" ]; then
                 kubectl -n "$MON_NS" delete backendtlspolicy v4m-prometheus-backend-tls --ignore-not-found
             fi
+
+            applyBackendTlsPolicy="true"
         else
             kubectl -n "$MON_NS" delete backendtlspolicy v4m-alertmanager-backend-tls v4m-grafana-backend-tls v4m-prometheus-backend-tls --ignore-not-found
         fi
@@ -667,6 +667,20 @@ helm $helmDebug upgrade --install "$promRelease" \
     --set prometheus.prometheusSpec.alertingEndpoints[0].namespace="$MON_NS" \
     $versionstring \
     "$chart2install"
+
+if [ "$applyBackendTlsPolicy" == "true" ]; then
+    if [ "$ALERTMANAGER_INGRESS_ENABLE" == "true" ]; then
+        apply_backend_tls_policy "$MON_NS" v4m-alertmanager-backend-tls v4m-alertmanager alertmanager-tls-secret
+    fi
+
+    if [ "$GRAFANA_INGRESS_ENABLE" == "true" ]; then
+        apply_backend_tls_policy "$MON_NS" v4m-grafana-backend-tls v4m-grafana grafana-tls-secret
+    fi
+
+    if [ "$PROMETHEUS_INGRESS_ENABLE" == "true" ]; then
+        apply_backend_tls_policy "$MON_NS" v4m-prometheus-backend-tls v4m-prometheus prometheus-tls-secret
+    fi
+fi
 
 sleep 2
 

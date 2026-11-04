@@ -524,6 +524,12 @@ EOF
     # the applied policy's own status instead: if the controller rejected or
     # never acknowledged it, say so now rather than silently assuming
     # backend TLS is active.
+    #
+    # Callers should invoke this function AFTER the backend's own Helm
+    # chart has been installed: the controller can't report Accepted for a
+    # policy targeting a Service that doesn't exist yet, and on a fresh
+    # deploy SERVICE_NAME's Service isn't created until that Helm install
+    # runs.
     local attempt accepted reason
     accepted=""
     for attempt in $(seq 1 24); do
