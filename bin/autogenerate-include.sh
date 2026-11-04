@@ -472,15 +472,12 @@ function apply_backend_tls_policy {
 
     if [ -z "$hostname" ]; then
         log_error "Could not determine a SAN to validate for BackendTLSPolicy [$policyName] after waiting ${tlsWaitAttempt}x5s; secret [$namespace/$tlsSecretName] is missing or its cert has no usable SAN."
-        # bin/renew-tls-certs.sh's actual renewal case (not its -r restart-only
-        # mode) only accepts the ALL-MON/ALL-LOG group targets -- individual
-        # app names are only valid with -r. Point at the correct group,
-        # chosen by namespace, rather than suggesting a target that would
-        # just fail.
+        # renew-tls-certs.sh only supports the ALL-MON/ALL-LOG group targets
+        # for actual renewal, and defaults LOG_NS/MON_NS if not exported.
         if [ "$namespace" == "$LOG_NS" ]; then
-            log_error "If the cert generator failed to issue this cert, try: ./bin/renew-tls-certs.sh -t ALL-LOG"
+            log_error "If the cert generator failed to issue this cert, try: LOG_NS=$namespace ./bin/renew-tls-certs.sh -t ALL-LOG"
         else
-            log_error "If the cert generator failed to issue this cert, try: ./bin/renew-tls-certs.sh -t ALL-MON"
+            log_error "If the cert generator failed to issue this cert, try: MON_NS=$namespace ./bin/renew-tls-certs.sh -t ALL-MON"
         fi
         exit 1
     fi

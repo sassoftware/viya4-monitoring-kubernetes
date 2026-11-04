@@ -54,6 +54,14 @@ fi
 # Create/Get necessary TLS certs
 create_tls_certs "$LOG_NS" logging kibana
 
+# Require TLS into OpenSearch Dashboards (nee Kibana)? Computed here (rather
+# than near its secret below) since the gateway-api ingress block also needs it.
+OSD_TLS_ENABLE=${OSD_TLS_ENABLE:-$TLS_ENABLE}
+if [ -z "$OSD_TLS_ENABLE" ]; then
+    #set to 'true' if still not set
+    OSD_TLS_ENABLE="true"
+fi
+
 AUTOGENERATE_INGRESS="${AUTOGENERATE_INGRESS:-false}"
 
 if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OSD_INGRESS_ENABLE" == "true" ]; then
@@ -156,7 +164,9 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OSD_INGRESS_ENABLE" == "true" ];
         create_httproute "logging" "osd" "$targetPath" "$targetFqdn"
         kubectl -n "$LOG_NS" label httproute v4m-osd managed-by="v4m-es-script"
 
-        if [ "$INGRESS_BACKEND_TLS_ENABLE" == "true" ]; then
+        # OSD_TLS_ENABLE=false means OSD serves plain HTTP; don't apply a
+        # BackendTLSPolicy telling the Gateway to speak TLS to it.
+        if [ "$INGRESS_BACKEND_TLS_ENABLE" == "true" ] && [ "$OSD_TLS_ENABLE" == "true" ]; then
             apply_backend_tls_policy "$LOG_NS" v4m-osd-backend-tls v4m-osd kibana-tls-secret
         else
             kubectl -n "$LOG_NS" delete backendtlspolicy v4m-osd-backend-tls --ignore-not-found
@@ -200,13 +210,6 @@ OSD_USER_YAML="${OSD_USER_YAML:-$USER_DIR/logging/user-values-osd.yaml}"
 if [ ! -f "$OSD_USER_YAML" ]; then
     log_debug "[$OSD_USER_YAML] not found. Using $TMP_DIR/empty.yaml"
     OSD_USER_YAML=$TMP_DIR/empty.yaml
-fi
-
-# Require TLS into OpenSearch Dashboards (nee Kibana)?
-OSD_TLS_ENABLE=${OSD_TLS_ENABLE:-$TLS_ENABLE}
-if [ -z "$OSD_TLS_ENABLE" ]; then
-    #set to 'true' if still not set
-    OSD_TLS_ENABLE="true"
 fi
 
 #(Re)Create secret containing OSD TLS Setting
