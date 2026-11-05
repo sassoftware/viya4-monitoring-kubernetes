@@ -808,11 +808,10 @@ if [ "$RBAC_PROXY_ENABLE" == "true" ] && { [ "$PROM_NODEPORT_ENABLE" == "true" ]
     log_notice " This means that every request to it must include a Kubernetes bearer token and requests without a "
     log_notice " token are rejected with HTTP 401. In most cases, this also means the Prometheus web application cannot "
     log_notice " be opened directly in a web browser since most browsers do not provide a mechanism for passing the required token."
-    log_notice " However, access is still possible from tools, such as curl, that can send an Authorization header, "
-    log_notice " e.g. curl -H 'Authorization: Bearer <token>' <prometheus-url>. The components of SAS Viya Monitoring for Kubernetes "
-    log_notice " If unauthenticated browser access to Prometheus is absolutely required in your environment, set RBAC_PROXY_ENABLE "
-    log_notice " to 'false' and redeploy. Note that this also removes the authentication and transport encryption that the "
-    log_notice " kube-rbac-proxy provides for the kube-state-metrics and Node Exporter components."
+    log_notice " All other components of SAS Viya Monitoring will continue to work as expected. "
+    log_notice ""
+    log_notice " If you require unauthenticated access to Prometheus or need to create a service token, "
+    log_notice " see Getting Access to Prometheus in the SAS Viya Monitoring for Kubernetes Documentation for more information."
     log_notice ""
 fi
 
