@@ -802,16 +802,17 @@ else
 fi
 log_notice ""
 
-if [ "$RBAC_PROXY_ENABLE" == "true" ] && { [ "${PROM_NODEPORT_ENABLE:-false}" == "true" ] || { [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "${PROMETHEUS_INGRESS_ENABLE:-false}" == "true" ]; }; }; then
+if [ "$RBAC_PROXY_ENABLE" == "true" ] && { [ "$PROM_NODEPORT_ENABLE" == "true" ] || { [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$PROMETHEUS_INGRESS_ENABLE" == "true" ]; }; }; then
     log_notice "PROMETHEUS: "
-    log_notice " Prometheus has been exposed via NodePort and/or ingress, but RBAC_PROXY_ENABLE is true,"
-    log_notice " so every request to it must include a Kubernetes bearer token. The Prometheus web"
-    log_notice " application therefore cannot be opened directly in a web browser; requests without a"
-    log_notice " token are rejected with HTTP 401. Access is still possible from tools that can send an"
-    log_notice ' Authorization header, e.g. curl -H "Authorization: Bearer <token>" <prometheus-url>.'
-    log_notice " To restore unauthenticated browser access, set RBAC_PROXY_ENABLE=false and redeploy."
-    log_notice " Note that this also removes the authentication and transport encryption that"
-    log_notice " kube-rbac-proxy provides for kube-state-metrics and Node Exporter."
+    log_notice " Prometheus has been exposed via NodePort and/or ingress, but RBAC_PROXY_ENABLE is also set to 'true'."
+    log_notice " This means that every request to it must include a Kubernetes bearer token and requests without a "
+    log_notice " token are rejected with HTTP 401. In most cases, this also means the Prometheus web application cannot "
+    log_notice " be opened directly in a web browser since most browsers do not provide a mechanism for passing the required token."
+    log_notice " However, access is still possible from tools, such as curl, that can send an Authorization header, "
+    log_notice " e.g. curl -H 'Authorization: Bearer <token>' <prometheus-url>. The components of SAS Viya Monitoring for Kubernetes "
+    log_notice " If unauthenticated browser access to Prometheus is absolutely required in your environment, set RBAC_PROXY_ENABLE "
+    log_notice " to 'false' and redeploy. Note that this also removes the authentication and transport encryption that the "
+    log_notice " kube-rbac-proxy provides for the kube-state-metrics and Node Exporter components."
     log_notice ""
 fi
 
