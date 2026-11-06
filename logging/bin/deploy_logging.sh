@@ -38,6 +38,30 @@ log_notice "Deploying logging components to the [$LOG_NS] namespace [$(date)]"
 set -e
 
 ##################################
+# Create ListenerSet (if nec)    #
+##################################
+
+if [[ $AUTOGENERATE_INGRESS == "true" &&
+    $INGRESS_TYPE == "gateway-api" ]]; then
+
+    create_listenerset "logging" "$LOG_NS"
+
+elif kubectl get crd listenersets.gateway.networking.k8s.io -o name > /dev/null 2>&1; then
+    log_debug "Deleting [listenerset/v4m-listenerset] if it exists"
+    kubectl -n "$LOG_NS" delete listenerset v4m-listenerset --ignore-not-found
+
+    # Per-app HTTPRoutes are otherwise only cleaned up inside
+    # deploy_osd.sh/deploy_opensearch.sh's own INGRESS_TYPE==gateway-api
+    # branches, which don't run at all once AUTOGENERATE_INGRESS is turned
+    # off or INGRESS_TYPE is switched away from gateway-api -- without this
+    # they'd be orphaned permanently.
+    if kubectl get crd httproutes.gateway.networking.k8s.io -o name > /dev/null 2>&1; then
+        log_debug "Deleting [httproute/v4m-osd], [httproute/v4m-search] if they exist"
+        kubectl -n "$LOG_NS" delete httproute v4m-osd v4m-search --ignore-not-found
+    fi
+fi
+
+##################################
 # OpenSearch Dashboards (Kibana) #
 ##################################
 # OSD take a while to spin up...deploying it first
@@ -63,6 +87,16 @@ if [[ $AUTOGENERATE_INGRESS == "true" &&
 elif kubectl get crd httpproxies.projectcontour.io -o name > /dev/null 2>&1; then
     log_debug "Deleting [httpproxy/v4m-logging-root-proxy] if it exists"
     kubectl -n "$LOG_NS" delete httpproxy v4m-logging-root-proxy --ignore-not-found
+fi
+
+if [[ $AUTOGENERATE_INGRESS == "true" &&
+    $INGRESS_TYPE == "gateway-api" ]]; then
+
+    create_http_redirect_httproute logging "$LOG_NS"
+
+elif kubectl get crd httproutes.gateway.networking.k8s.io -o name > /dev/null 2>&1; then
+    log_debug "Deleting [httproute/v4m-http-redirect] if it exists"
+    kubectl -n "$LOG_NS" delete httproute v4m-http-redirect --ignore-not-found
 fi
 
 ##################################
