@@ -1,5 +1,5 @@
 # SAS Viya Monitoring for Kubernetes
-## Unreleased
+## Version 1.2.56 (06NOV2026)
 * **Metrics**
   * [FIX] A bug which prevented the auto-generation of storage class customization when
 the auto-generation of Contour-based access was also enabled has been fixed.
