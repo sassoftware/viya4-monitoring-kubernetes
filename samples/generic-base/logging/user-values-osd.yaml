@@ -6,10 +6,17 @@
 # Default values: https://github.com/opensearch-project/helm-charts/blob/main/charts/opensearch-dashboards/values.yaml
 
 #image:
-#  tag: 3.4.0
+#  tag: 3.8.0
 #  repository: "opensearchproject/opensearch-dashboards"
 #  pullPolicy: "IfNotPresent"
 
 ## See samples/tls for examples of how to
 ## configure TLS+ingress (host or path based)
 
+#resources:
+#  requests:
+#    cpu: "100m"
+#    memory: "512M"
+#  limits:
+#    cpu: "1000m"
+#    memory: "512M"

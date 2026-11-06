@@ -21,7 +21,7 @@ v4m_replace "__LOG_NS__" "$LOG_NS" "$logDir"/eventrouter.yaml
 
 log_info "Removing Event Router [$(date)]"
 # Remove existing instance of Event Router in the kube-system namespace (if present).
-if [[ $V4M_CURRENT_VERSION_FULL =~ 1.0 || $V4M_CURRENT_VERSION_FULL =~ 1.1.[0-2] ]]; then
+if semver_check "$V4M_CURRENT_VERSION_FULL" LT 1.1.3; then
     # Remove existing instance of Event Router in the kube-system namespace (if present).
     log_info "Removing instance of Event Router in the kube-system namespace"
     kubectl delete --ignore-not-found -f logging/eventrouter/eventrouter_kubesystem.yaml
