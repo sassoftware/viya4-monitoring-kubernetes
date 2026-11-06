@@ -1,6 +1,8 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
 * **Metrics**
+  * [FIX] A bug which prevented the auto-generation of storage class customization when
+the auto-generation of Contour-based access was also enabled has been fixed.
   * [FIX] The SAS Arke, SAS Micro Analytic Service (MAS) and PostgreSQL Details (pgmonitor)
 Grafana dashboards now use the dashboard's datasource variable instead of a hard-coded
 reference to a datasource named "Prometheus".  This allows these dashboards to work when
