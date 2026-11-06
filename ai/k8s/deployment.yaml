@@ -35,7 +35,7 @@ spec:
         - name: PYTHONUNBUFFERED
           value: "1"                    # without this, print() output sits in a buffer and kubectl logs shows nothing
         - name: PROMETHEUS_URL
-          value: "https://prometheus-operated.monitoring.svc:9090"
+          value: "https://v4m-prometheus.monitoring.svc:9090"
         # --- log search (V4M logging stack / OpenSearch) ---
         # If the logging stack isn't deployed, search_logs degrades gracefully.
         # deploy_ai_chatbot.sh replaces OPENSEARCH_PASSWORD with a secretKeyRef

@@ -20,15 +20,41 @@ from starlette.middleware.cors import CORSMiddleware
 from rag import DocIndex  # documentation retrieval engine
 
 mcp = FastMCP("v4m-mcp")
- 
+
+# In-cluster identity. The pod's projected ServiceAccount token is used both
+# for the Kubernetes API (pod events/logs, see _k8s_get) and to authenticate to
+# Prometheus.
+_K8S_API = "https://kubernetes.default.svc"
+_K8S_TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+_K8S_CA_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+
+
+class _ServiceAccountTokenAuth(requests.auth.AuthBase):
+    """Attach the pod's current ServiceAccount token as a bearer token."""
+
+    def __call__(self, request):
+        try:
+            with open(_K8S_TOKEN_PATH) as f:
+                request.headers["Authorization"] = f"Bearer {f.read().strip()}"
+        except OSError:
+            pass  # not running in a pod; send the request unauthenticated
+        return request
+
+
+# Prometheus is fronted by a kube-rbac-proxy sidecar (RBAC_PROXY_ENABLE=true,
+# the default): every request must carry a bearer token for a subject granted
+# "get" on services/v4m-prometheus (ai/k8s/rbac.yaml). 
 prom = PrometheusConnect(
     url=os.getenv(
         "PROMETHEUS_URL",
-        "https://prometheus-operated.monitoring.svc:9090",
+        "https://v4m-prometheus.monitoring.svc:9090",
     ),
     disable_ssl=True,
 )
- 
+# Session-level auth applies to the library's own calls and to the direct
+# prom._session.get() used for the targets API.
+prom._session.auth = _ServiceAccountTokenAuth()
+
 # Documentation index — built lazily so a docs/embeddings problem can never
 # take down the Prometheus tools. The first search_docs() call builds it (or
 # loads the on-disk cache); later calls are instant.
@@ -1027,10 +1053,7 @@ _POD_NAME_RE = re.compile(r"[a-z0-9]([a-z0-9.-]{0,251}[a-z0-9])?$")
 
 # In-cluster Kubernetes API access (read-only; see ai/k8s/rbac.yaml). Covers
 # what kube-state-metrics cannot: Event messages with exact failure reasons,
-# and live container logs.
-_K8S_API = "https://kubernetes.default.svc"
-_K8S_TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-_K8S_CA_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+# and live container logs. Uses the _K8S_* constants defined at the top.
 
 
 def _k8s_get(path: str, params: dict = None):
