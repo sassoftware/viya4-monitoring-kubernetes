@@ -801,7 +801,6 @@ data:
        Parser          zpg3
        Parser          zpgboot
        Reserve_Data    On
-
     [FILTER]
        #
        # Vault
@@ -821,8 +820,6 @@ data:
        Parser          sasvault
        Parser          sasvault2
        Reserve_Data    On
-
-
     [FILTER]
        #
        # Try some misc. parsers for unparsed messages (stderr)
