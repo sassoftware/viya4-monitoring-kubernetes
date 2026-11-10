@@ -3,8 +3,8 @@
 # This sample does NOT expose OpenSearch via Ingress by default.
 # However, you can expose OpenSearch via ingress by changing
 # the "enabled" key from 'false' to 'true' in the 'ingress' stanza below
-persistence:
-  storageClass: azuredisk-v4m
+
+# The StorageClass is auto-generated from STORAGECLASS in ../user.env
 
 ingress:
   # change the following value to 'true'

@@ -13,8 +13,9 @@
 # NOTE: Edit hostnames and ingress port
 
 # This example shows path-based ingress using HTTPS. Refer to the [ingress samples](/samples/ingress) for other options.
-# The relevant AKS-specific settings for this sample are just the 'storageClassName:'
-# sections below referencing the custom azuredisk-v4m storage class.
+# StorageClass references are auto-generated from STORAGECLASS in ../user.env
+# (AUTOGENERATE_STORAGECLASS=true). Do not set storageClassName here unless you
+# want to override the auto-generated value.
 
 prometheus:
   service:
@@ -43,10 +44,6 @@ prometheus:
         scheme: https
         tlsConfig:
           insecureSkipVerify: true
-    storageSpec:
-      volumeClaimTemplate:
-        spec:
-         storageClassName: azuredisk-v4m
 
 alertmanager:
   # Disable default configuration of NodePort
@@ -72,10 +69,6 @@ alertmanager:
   alertmanagerSpec:
     routePrefix: /alertmanager
     externalUrl: https://host.cluster.example.com/alertmanager
-    storage:
-      volumeClaimTemplate:
-        spec:
-          storageClassName: azuredisk-v4m
 
 grafana:
   # Disable default configuration of NodePort
@@ -102,5 +95,3 @@ grafana:
       serve_from_sub_path: true
   testFramework:
     enabled: false
-  persistence:
-    storageClassName: azuredisk-v4m

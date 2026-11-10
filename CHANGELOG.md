@@ -1,4 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Overall**
+  * [CHANGE] The Azure deployment sample now uses the auto-generation of StorageClass
+references (`AUTOGENERATE_STORAGECLASS`, `STORAGECLASS`) instead of hard-coded
+references to the `azuredisk-v4m` StorageClass. Any existing StorageClass can be used.
+The `generic-base` sample `user.env` now lists the StorageClass auto-generation options. (Fixes #915)
+
 ## Version 1.2.56 (06NOV2026)
 * **Metrics**
   * [FIX] A bug which prevented the auto-generation of storage class customization when
