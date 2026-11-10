@@ -1,4 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Overall**
+  * [CHANGE] The Azure deployment sample now uses the auto-generation of StorageClass
+references (`AUTOGENERATE_STORAGECLASS`, `STORAGECLASS`) instead of hard-coded
+references to the `azuredisk-v4m` StorageClass. Any existing StorageClass can be used.
+The `generic-base` sample `user.env` now lists the StorageClass auto-generation options. (Fixes #915)
+
 ## Version 1.2.57 (19NOV2026)
 * **Overall**
   * [FEATURE] Support for the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) has been added.
