@@ -9,9 +9,11 @@ modify it for other solutions.
 1. Copy this directory to a local directory (for example, `my-viya4mon-user-dir/`).
 
 2. Set `STORAGECLASS` in `user.env` to the StorageClass to use for all PVCs.
-Any existing StorageClass works (for example, the AKS built-in `managed-csi-premium`).
-By default, the sample uses the custom StorageClass defined in `azuredisk-v4m.yaml`;
-edit that file as needed, or skip it if you use another StorageClass. To use
+By default, the sample uses the AKS built-in `managed-csi-premium` StorageClass
+(Premium SSD; requires VM sizes that support premium storage). Any existing
+StorageClass works. To use the custom `Standard_LRS` StorageClass defined in
+`azuredisk-v4m.yaml` instead, set `STORAGECLASS=azuredisk-v4m` and apply that file
+(step 6). To use
 different StorageClasses per component, set `PROMETHEUS_STORAGECLASS`,
 `ALERTMANAGER_STORAGECLASS`, `GRAFANA_STORAGECLASS`, `PUSHGATEWAY_STORAGECLASS`
 or `OPENSEARCH_STORAGECLASS`. See [Customize StorageClass](https://documentation.sas.com/?cdcId=obsrvcdc&cdcVersion=v_003&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#p1lvxtk81r8jgun1d789fqaz3lq1).

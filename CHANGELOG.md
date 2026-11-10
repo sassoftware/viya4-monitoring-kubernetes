@@ -4,6 +4,8 @@
   * [CHANGE] The Azure deployment sample now uses the auto-generation of StorageClass
 references (`AUTOGENERATE_STORAGECLASS`, `STORAGECLASS`) instead of hard-coded
 references to the `azuredisk-v4m` StorageClass. Any existing StorageClass can be used.
+The sample now defaults to the AKS built-in `managed-csi-premium` StorageClass (Premium SSD)
+instead of the custom `azuredisk-v4m` (`Standard_LRS`) StorageClass; set `STORAGECLASS=azuredisk-v4m` to keep the previous behavior.
 The `generic-base` sample `user.env` now lists the StorageClass auto-generation options. (Fixes #915)
 
 ## Version 1.2.56 (06NOV2026)
