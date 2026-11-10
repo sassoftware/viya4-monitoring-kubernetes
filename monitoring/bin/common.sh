@@ -20,6 +20,7 @@ if [ "$SAS_MONITORING_COMMON_SOURCED" = "" ]; then
 
     export MON_NS="${MON_NS:-monitoring}"
     export TLS_ENABLE="${MON_TLS_ENABLE:-${TLS_ENABLE:-true}}"
+    export RBAC_PROXY_ENABLE="${RBAC_PROXY_ENABLE:-true}"
 
     if [ "$AIRGAP_DEPLOYMENT" == "true" ]; then
 
@@ -38,6 +39,10 @@ if [ "$SAS_MONITORING_COMMON_SOURCED" = "" ]; then
     export V4M_NS=$MON_NS
 
     source bin/version-include.sh
+    if [ "$CHECK_HELM" != "false" ]; then
+        getV4MVersion "$MON_NS" "v4m-metrics"
+    fi
+
     export SAS_MONITORING_COMMON_SOURCED=true
 
 fi

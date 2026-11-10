@@ -1,11 +1,84 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
+  * [FEATURE] Support for collecting and reporting on metrics from Vault has been added. This
+includes a new ServiceMonitor (sas-vault-server) and a new Grafana dashboards (Vault/Overview).
+To disable deployment of the new dashboard, set the environment variable VAULT_DASH to to false
+prior to running the deployment scripts.
+
+## Version 1.2.56 (06NOV2026)
 * **Metrics**
-  * [FEATURE] Support for collecting and reporting on metrics from Vault has been added. This includes a new ServiceMonitor (sas-vault-server) and a new Grafana dashboards (Vault/Overview). To disable deployment of the new dashboard, set the environment variable VAULT_DASH to to false prior to running the deployment scripts.
+  * [FIX] A bug which prevented the auto-generation of storage class customization when
+the auto-generation of Contour-based access was also enabled has been fixed.
+  * [FIX] The SAS Arke, SAS Micro Analytic Service (MAS) and PostgreSQL Details (pgmonitor)
+Grafana dashboards now use the dashboard's datasource variable instead of a hard-coded
+reference to a datasource named "Prometheus".  This allows these dashboards to work when
+the default Prometheus datasource is not the one containing SAS Viya Monitoring metrics.
+* **Logging**
+  * [CHANGE] Additional fields from JSON-formatted log messages emitted from 
+RabbitMQ are now captured. The `domain` and `pid` values are now stored as
+`properties.domain` and `properties.process_pid` within the OpenSearch indexes. 
+
+## Version 1.2.55 (02OCT2026)
+* **Overall**
+> [!IMPORTANT]
+> * [ANNOUNCEMENT] Helm 3 has reached [end-of-life](https://helm.sh/blog/helm-v3-end-of-life/) and
+users are strongly encouraged to move to [Helm 4](https://github.com/helm/helm/releases) as soon as
+possible. Our project added support for Helm 4 in May and it will become ***required*** in the coming months.
+* **Metrics**
+> [!IMPORTANT]
+>  * [BREAKING CHANGE] Due to the enhanced security provided by the security changes described below, enabling
+browser access to Prometheus now requires setting an additional environment variable.  Please review
+the details of the new security configuration below.  It is important to understand that enabling browser
+access to the Prometheus web application requires disabling this new enhanced security configuration.  If
+you are comfortable with that, you must now set the new `RBAC_PROXY_ENABLE` environment variable to `false`
+in addition to defining the Prometheus-related ingress information required in the past.
+  * [SECURITY] Prior to this update, Kube State Metrics (KSM), Node Exporter, and Prometheus previously exposed
+cluster-wide resource state and infrastructure metrics, including pod labels used to identify per-user SAS job
+activity, over unauthenticated endpoints reachable by any pod in the cluster.  All three applications are now
+fronted by a `kube-rbac-proxy` sidecar enforcing Kubernetes RBAC and bound to localhost only.  With this change,
+Prometheus scrapes metrics from the other two applications using its existing ServiceAccount token, with no
+certificate management required.  This new functionality is controlled by the new `RBAC_PROXY_ENABLE` environment
+variable which is set to `true` by default.  The `kube-rbac-proxy` sidecar is now the only source of transport
+encryption for KSM and Node Exporter.  Setting `RBAC_PROXY_ENABLE` to `false` makes their metrics available over
+plain, unauthenticated HTTP.  Node Exporter previously supported its own native TLS independent of RBAC/auth;
+that capability has been retired in favor of the `kube-rbac-proxy` sidecar.
+* **Logging**
+  * [FIX] Only attempt to delete an unneeded `v4m-logging-root-proxy` HTTPProxy resource if the
+CRD (httpproxies.projectcontour.io) is installed
+  * [CHANGE] As part of the upgrade to OpenSearch Dashboards 3.8.0 (see below),
+the CPU resource limit for the OpenSearch Dashboards pod was increased to 1 CPU.
+This addresses a persistent problem which had caused the application to fail to
+load consistently.  Note that this is an upper limit and the pod will generally
+need/use far less during normal operation.
+  * [UPGRADE] OpenSearch and OpenSearch Dashboards upgraded from 3.6.0 to 3.8.0
+  * [UPGRADE] OpenSearch Helm chart upgraded from 3.6.0 to 3.8.0
+  * [UPGRADE] OpenSearch Dashboards Helm chart upgraded from 3.6.0 to 3.8.0
+  * [UPGRADE] Fluent Bit upgraded from 5.0.7 to 5.1.2
+  * [UPGRADE] Fluent Bit Helm chart upgraded from 0.57.7 to 0.58.2
+  * [UPGRADE] Elasticsearch Exporter upgraded from 1.10.0 to 1.11.0
+  * [UPGRADE] Elasticsearch Exporter Helm chart upgraded from 7.2.1 to 7.4.0
+
+## Version 1.2.54 (04SEP2026)
+* **Overall**
+  * [CHORE] Refactor Helm Chart version checking/reporting
+* **Metrics**
+  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 85.1.3 to 88.2.0
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded from 12.3.3 to 12.10.4
+  * [UPGRADE] Alertmanager has been upgraded from 0.32.1 to 0.33.1
+  * [UPGRADE] The config-reloader has been upgraded from 0.90.1 to 0.93.0
+  * [UPGRADE] Grafana has been upgraded from 13.0.1 to 13.0.3
+  * [UPGRADE] The k8s-sidecar has been upgraded from 2.7.3 to 2.10.1
+  * [UPGRADE] Node-Exporter has been upgraded from 1.11.1 to 1.12.1
+  * [UPGRADE] Prometheus has been upgraded from 3.11.3 to 3.13.2
+  * [UPGRADE] Prometheus Operator has been upgraded from 0.90.1 to 0.93.0
+  * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 3.6.0 to 3.7.0
+  * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.11.2 to 1.11.3
+  * [UPGRADE] OpenSearch Data Source Plugin for Grafana upgraded from 2.33.1 to 2.34.3
   * [FIX] Corrected an issue which prevented metrics from being available in Grafana when path-based
 routing using Contour was configured automatically.  (Fixes #882)
   * [FIX] Corrected Alertmanager URL when `ALERTMANAGER_PATH` is set and path-based routing using Contour
 is configured automatically
+* **Logging**
   * [FIX] The `v4m-logging-root-proxy` HTTPProxy resource is only created in appropriate scenarios
 (i.e. auto-generated path-based routing using Contour) and any existing instance of this resource
 is deleted if found in other deployment scenarios (where it is not needed)

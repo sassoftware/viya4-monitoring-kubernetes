@@ -42,7 +42,10 @@
       "type": "row"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -186,7 +189,10 @@
       "pluginVersion": "8.4.1",
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "exemplar": true,
           "expr": "sum(rate(mas_module_execution_seconds_count{module=\"$module\", client_id=~\"$client_id\"}[$interval]))",
@@ -197,7 +203,10 @@
           "refId": "A"
         },
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "exemplar": true,
           "expr": "sum(mas_module_execution_seconds_max{module=\"$module\", client_id=~\"$client_id\"})",
@@ -213,7 +222,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -259,7 +271,10 @@
       "pluginVersion": "11.0.0",
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "exemplar": true,
           "expr": "sum(rate(mas_module_execution_seconds_count{module=\"$module\", client_id=~\"$client_id\"}[$interval]))",
@@ -273,7 +288,10 @@
       "type": "gauge"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -319,7 +337,10 @@
       "pluginVersion": "11.0.0",
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "exemplar": true,
           "expr": "sum(rate(mas_module_execution_seconds_count{module=\"$module\", client_id=~\"$client_id\"}[$interval]))",
@@ -333,7 +354,10 @@
       "type": "gauge"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -379,7 +403,10 @@
       "pluginVersion": "11.0.0",
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "exemplar": true,
           "expr": "sum(rate(mas_module_execution_seconds_count{module=\"$module\", client_id=~\"$client_id\"}[$interval]))",
@@ -393,7 +420,10 @@
       "type": "gauge"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -439,7 +469,10 @@
       "pluginVersion": "11.0.0",
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "exemplar": true,
           "expr": "sum(mas_module_execution_seconds_max{module=\"$module\", client_id=~\"$client_id\"})",
@@ -453,7 +486,10 @@
       "type": "gauge"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -499,7 +535,10 @@
       "pluginVersion": "11.0.0",
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "exemplar": true,
           "expr": "sum(mas_module_execution_seconds_max{module=\"$module\", client_id=~\"$client_id\"})",
@@ -513,7 +552,10 @@
       "type": "gauge"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -559,7 +601,10 @@
       "pluginVersion": "11.0.0",
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "exemplar": true,
           "expr": "sum(mas_module_execution_seconds_max{module=\"$module\", client_id=~\"$client_id\"})",
@@ -574,7 +619,10 @@
     },
     {
       "collapsed": false,
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -585,7 +633,10 @@
       "panels": [],
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "refId": "A"
         }
       ],
@@ -593,7 +644,10 @@
       "type": "row"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -672,7 +726,10 @@
       "pluginVersion": "9.2.3",
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "expr": "rate(mas_module_execution_seconds_count{module=\"$module\", client_id=~\"$client_id\"}[$interval])",
           "interval": "",
@@ -685,7 +742,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "description": "The average latency for all execution calls to the module.",
       "fieldConfig": {
         "defaults": {
@@ -765,7 +825,10 @@
       "pluginVersion": "9.2.3",
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "expr": "rate(mas_module_execution_seconds_sum{module=\"$module\", client_id=~\"$client_id\"}[$interval])/rate(mas_module_execution_seconds_count{module=\"$module\", client_id=~\"$client_id\"}[$interval]) ",
           "interval": "",
@@ -783,7 +846,10 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "description": "The number of times that a module was called within the pod.",
       "fill": 1,
       "fillGradient": 0,
@@ -823,7 +889,10 @@
       "steppedLine": true,
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "expr": "mas_module_execution_seconds_count{module=\"$module\", client_id=~\"$client_id\"}",
           "format": "time_series",
@@ -872,7 +941,10 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "description": "The request with the maximum latency for the given time period.",
       "fieldConfig": {
         "defaults": {
@@ -917,7 +989,10 @@
       "steppedLine": true,
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "expr": "mas_module_execution_seconds_max{module=\"$module\", client_id=~\"$client_id\"}",
           "hide": false,
@@ -980,7 +1055,10 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "description": "The average output score over a period of time.",
       "fill": 1,
       "fillGradient": 0,
@@ -1019,7 +1097,10 @@
       "steppedLine": true,
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "expr": "rate(mas_module_score_count{module=\"$module\", client_id=~\"$client_id\"}[$__rate_interval])",
           "format": "time_series",
@@ -1068,7 +1149,10 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "description": "The max output score over a period of time.",
       "fill": 1,
       "fillGradient": 0,
@@ -1108,7 +1192,10 @@
       "steppedLine": true,
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "expr": "mas_module_score_max{module=\"$module\", client_id=~\"$client_id\"}",
           "format": "time_series",
@@ -1153,7 +1240,10 @@
     },
     {
       "collapsed": false,
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1164,7 +1254,10 @@
       "panels": [],
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "refId": "A"
         }
       ],
@@ -1172,7 +1265,10 @@
       "type": "row"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "description": "Current memory that is used by the SAS Micro Analytic Service core component.",
       "fieldConfig": {
         "defaults": {
@@ -1227,7 +1323,10 @@
       "pluginVersion": "9.2.3",
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "exemplar": false,
           "expr": "mas_core_memoryused",
@@ -1242,7 +1341,10 @@
       "type": "stat"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1286,7 +1388,10 @@
       "pluginVersion": "9.2.3",
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "exemplar": true,
           "expr": "count(kube_pod_container_status_ready{pod=~\"sas-microanalytic.*\"})",
           "interval": "",
@@ -1299,7 +1404,10 @@
       "type": "stat"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1376,7 +1484,10 @@
       "pluginVersion": "8.4.1",
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "exemplar": true,
           "expr": "node_namespace_pod_container:container_memory_rss{pod=~\"sas-microanalytic-score.*\"}",
           "interval": "",
@@ -1397,7 +1508,10 @@
           "value": "max"
         }
       ],
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "description": "The total number of times that a module was called.",
       "fontSize": "100%",
       "gridPos": {
@@ -1453,7 +1567,10 @@
       ],
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "editorMode": "code",
           "expr": "sum by (module) (mas_module_execution_seconds_count{client_id=~\"$client_id\"})",
           "format": "time_series",
@@ -1470,7 +1587,10 @@
     {
       "autoMigrateFrom": "table-old",
       "columns": [],
-      "datasource": "Prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "description": "All loaded modules.",
       "fontSize": "100%",
       "gridPos": {
@@ -1505,7 +1625,10 @@
       ],
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "$datasource"
+          },
           "expr": "mas_module_availability",
           "format": "time_series",
           "instant": false,

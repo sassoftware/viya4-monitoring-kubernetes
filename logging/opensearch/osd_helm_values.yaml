@@ -89,3 +89,11 @@ startupProbe:
   initialDelaySeconds: 60
   periodSeconds: 20
   failureThreshold: 30
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "512M"
+  limits:
+    cpu: "1000m"
+    memory: "512M"

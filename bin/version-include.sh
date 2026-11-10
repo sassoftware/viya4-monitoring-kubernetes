@@ -1,4 +1,4 @@
-# Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+# Copyright © 2021,2026 SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # shellcheck disable=SC2148
@@ -54,15 +54,9 @@ function populateValuesYAML() {
     fi
 
     # Encrypt passwords stored in V4M Helm Chart
-    if echo "$OSTYPE" | grep 'darwin' > /dev/null 2>&1; then
-        sed -i '' "s/GRAFANA_ADMIN_PASSWORD=.*/GRAFANA_ADMIN_PASSWORD=***/g" "$v4mValuesYAML"
-        sed -i '' "s/ES_ADMIN_PASSWD=.*/ES_ADMIN_PASSWD=***/g" "$v4mValuesYAML"
-        sed -i '' "s/LOG_LOGADM_PASSWD=.*/LOG_LOGADM_PASSWD=***/g" "$v4mValuesYAML"
-    else
-        sed -i "s/GRAFANA_ADMIN_PASSWORD=.*/GRAFANA_ADMIN_PASSWORD=***/g" "$v4mValuesYAML"
-        sed -i "s/ES_ADMIN_PASSWD=.*/ES_ADMIN_PASSWD=***/g" "$v4mValuesYAML"
-        sed -i "s/LOG_LOGADM_PASSWD=.*/LOG_LOGADM_PASSWD=***/g" "$v4mValuesYAML"
-    fi
+    v4m_replace "GRAFANA_ADMIN_PASSWORD=.*" "GRAFANA_ADMIN_PASSWORD=***" "$v4mValuesYAML"
+    v4m_replace "ES_ADMIN_PASSWD=.*" "ES_ADMIN_PASSWD=***" "$v4mValuesYAML"
+    v4m_replace "LOG_LOGADM_PASSWD=.*" "LOG_LOGADM_PASSWD=***" "$v4mValuesYAML"
 }
 
 function deployV4MInfo() {
@@ -101,60 +95,54 @@ function removeV4MInfo() {
 }
 
 function getHelmReleaseVersion() {
-    NS=$1
-    releaseName=${2:-'v4m'}
+    local namespace releaseName releaseVer
 
-    releaseVersionFull=""
-    releaseVersionMajor=""
-    releaseVersionMinor=""
-    releaseVersionPatch=""
-    releaseStatus=""
+    namespace=$1
+    releaseName=$2
 
-    origIFS=$IFS
-    # shellcheck disable=SC2207
-    IFS=$'\n' v4mHelmVersionLines=($(helm list -n "$NS" --filter "^$releaseName\$" -o yaml))
-    IFS=$origIFS
-    if [ -z "$v4mHelmVersionLines" ]; then
-        log_debug "No [$releaseName] release found in [$NS]"
+    #(re-)initialize "output" vars
+    helmchart_release_version_full=""
+    helmchart_release_status=""
+
+    if [ -z "$(helm list -n "$namespace" --filter "^$releaseName\$" -q)" ]; then
+        log_debug "No [$releaseName] release found in [$namespace] namespace"
+        helmchart_release_status="NOT FOUND"
     else
-        for ((i = 0; i < ${#v4mHelmVersionLines[@]}; i++)); do
-            line=${v4mHelmVersionLines[$i]}
-            vre='app_version: (([0-9]+).([[0-9]+).([0-9]+)\.?(-.+)?)'
-            sre='status: (.+)'
-            if [[ $line =~ $vre ]]; then
-                # Set
-                releaseVersionFull=${BASH_REMATCH[1]}
-                releaseVersionMajor=${BASH_REMATCH[2]}
-                releaseVersionMinor=${BASH_REMATCH[3]}
-                releaseVersionPatch=${BASH_REMATCH[4]}
-            elif [[ $line =~ $sre ]]; then
-                releaseStatus=${BASH_REMATCH[1]}
-            fi
-        done
+        # `helm get metadata` only available in Helm 3.13+
+        if semver_check "$HELM_VER_FULL" LT "3.13.0"; then return; fi
 
+        # NOTE: `helm list` returns `chart` which combines chart-name+chart-version
+        # `helm get metadata` returns the chart version by itself (i.e w/o chart-name)
+        releaseVer=$(helm get metadata -n "$namespace" "$releaseName" -o yaml | yq '.version')
+
+        helmchart_release_version_full=$(semver_parse "$releaseVer" FULL)
+        helmchart_release_status=$(helm get metadata -n "$namespace" "$releaseName" -o yaml | yq '.status')
     fi
+}
+function getV4MVersion() {
 
-    export releaseVersionFull releaseVersionMajor releaseVersionMinor releaseVersionPatch releaseStatus
+    local namespace releaseName
+
+    namespace=$1
+    releaseName=$2
+
+    getHelmReleaseVersion "$namespace" "$releaseName"
+
+    V4M_CURRENT_STATUS="$helmchart_release_status"
+    V4M_CURRENT_VERSION_FULL="$helmchart_release_version_full"
+    V4M_CURRENT_VERSION_MAJOR=$(semver_parse "$helmchart_release_version_full" MAJOR)
+    V4M_CURRENT_VERSION_MINOR=$(semver_parse "$helmchart_release_version_full" MINOR)
+    V4M_CURRENT_VERSION_PATCH=$(semver_parse "$helmchart_release_version_full" PATCH)
+
+    log_debug "V4M Release [$releaseName] version [$V4M_CURRENT_VERSION_FULL] current status [$V4M_CURRENT_STATUS]"
 }
 
 if [ -z "$V4M_VERSION_INCLUDE" ]; then
-    getHelmReleaseVersion "$V4M_NS"
-
-    V4M_CURRENT_VERSION_FULL=$releaseVersionFull
-    V4M_CURRENT_VERSION_MAJOR=$releaseVersionMajor
-    V4M_CURRENT_VERSION_MINOR=$releaseVersionMinor
-    V4M_CURRENT_VERSION_PATCH=$releaseVersionPatch
-    V4M_CURRENT_STATUS=$releaseStatus
-
-    log_debug "V4M_CURRENT_VERSION_FULL=$V4M_CURRENT_VERSION_FULL"
-    log_debug "V4M_CURRENT_VERSION_MAJOR=$V4M_CURRENT_VERSION_MAJOR"
-    log_debug "V4M_CURRENT_VERSION_MINOR=$V4M_CURRENT_VERSION_MINOR"
-    log_debug "V4M_CURRENT_VERSION_PATCH=$V4M_CURRENT_VERSION_PATCH"
-    log_debug "V4M_CURRENT_STATUS=$V4M_CURRENT_STATUS"
 
     export V4M_CURRENT_VERSION_FULL V4M_CURRENT_VERSION_MAJOR V4M_CURRENT_VERSION_MINOR V4M_CURRENT_VERSION_PATCH
     export V4M_CURRENT_STATUS
+    export helmchart_release_version_full helmchart_release_status
 
-    export -f deployV4MInfo removeV4MInfo getHelmReleaseVersion
+    export -f deployV4MInfo removeV4MInfo getHelmReleaseVersion getV4MVersion
     export V4M_VERSION_INCLUDE=true
 fi
