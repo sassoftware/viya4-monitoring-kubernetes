@@ -1,5 +1,8 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
+* **Logging**  
+  * [CHANGE] Improved handling of log messages from Vault
+* **Metrics**
   * [FEATURE] Support for collecting and reporting on metrics from Vault has been added. This
 includes a new ServiceMonitor (sas-vault-server) and a new Grafana dashboards (Vault/Overview).
 To disable deployment of the new dashboard, set the environment variable VAULT_DASH to to false
