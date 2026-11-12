@@ -809,11 +809,6 @@ monitoring/bin/deploy_dashboards.sh
 set +e
 # call function to get HTTP/HTTPS ports from ingress controller
 get_ingress_ports
-
-# get URLs for Grafana, Prometheus and AlertManager
-gf_url=$(get_service_url "$MON_NS" v4m-grafana "$TLS_ENABLE")
-# pr_url=$(get_url "$MON_NS" v4m-prometheus "$TLS_ENABLE")
-# am_url=$(get_url "$MON_NS" v4m-alertmanager "$TLS_ENABLE")
 set -e
 
 # If a deployment with the old name exists, remove it first
@@ -826,17 +821,8 @@ if ! deployV4MInfo "$MON_NS" "v4m-metrics"; then
     log_warn "Unable to update SAS Viya Monitoring Helm chart release"
 fi
 
-# Print URL to access web apps
-log_notice ""
-log_notice "GRAFANA: "
-if [ -n "$gf_url" ]; then
-    log_notice "  $gf_url"
-else
-    log_notice " It was not possible to determine the URL needed to access Grafana. Note  "
-    log_notice " that this is not necessarily a sign of a problem; it may only reflect an "
-    log_notice " ingress or network access configuration that this script does not handle."
-fi
-log_notice ""
+# Print URL to access web app, including a warning if its route/proxy is not valid
+bin/show_app_url.sh GRAFANA
 
 #log_notice ""
 #log_notice "================================================================================"
