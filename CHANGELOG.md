@@ -1,6 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
 ## Unreleased
-* **Logging**  
+* **Logging**
+  * [CHANGE] CPU resource requests for OpenSearch pods lowered to '500m' to ease intial
+pod scheduling.  This will not have any impact on performance unless the underlying
+Kubernetes nodes are subject to CPU contention.  If these pods are regularly throttled
+due to CPU contention for extended periods of time, you may want to revert to the
+original higher '1000m' (1 CPU) setting in your USER_DIR/logging/user-values-opensearch.yaml file.
   * [CHANGE] Improved handling of log messages from Vault
 * **Metrics**
   * [FEATURE] Support for collecting and reporting on metrics from Vault has been added. This
@@ -17,9 +22,9 @@ Grafana dashboards now use the dashboard's datasource variable instead of a hard
 reference to a datasource named "Prometheus".  This allows these dashboards to work when
 the default Prometheus datasource is not the one containing SAS Viya Monitoring metrics.
 * **Logging**
-  * [CHANGE] Additional fields from JSON-formatted log messages emitted from 
+  * [CHANGE] Additional fields from JSON-formatted log messages emitted from
 RabbitMQ are now captured. The `domain` and `pid` values are now stored as
-`properties.domain` and `properties.process_pid` within the OpenSearch indexes. 
+`properties.domain` and `properties.process_pid` within the OpenSearch indexes.
 
 ## Version 1.2.55 (02OCT2026)
 * **Overall**
