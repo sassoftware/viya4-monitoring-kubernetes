@@ -822,7 +822,9 @@ if ! deployV4MInfo "$MON_NS" "v4m-metrics"; then
 fi
 
 # Print URL to access web app, including a warning if its route/proxy is not valid
+set +e
 bin/show_app_url.sh GRAFANA
+set -e
 
 #log_notice ""
 #log_notice "================================================================================"
