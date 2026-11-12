@@ -62,19 +62,40 @@ export -f create_ingress_certs
 function get_app_ingress_fqdn {
     # Assumes ROUTING and BASE_DOMAIN set
     #
-    # Inputs: fqdn, path
+    # Inputs: fqdn, path, [appGroupSegment]
     # Returns:  fqdn to applicaiton
     #
-    local app_fqdn app_path
+    # appGroupSegment is optional and only used for default FQDN construction
+    # (producing "$app.$appGroupSegment.$BASE_DOMAIN" for host-based, or
+    # "$appGroupSegment.$BASE_DOMAIN" for path-based, instead of plain
+    # "$app.$BASE_DOMAIN"/"$BASE_DOMAIN"). Gateway API's ListenerSet needs it
+    # for both routing modes: two namespaces sharing one Gateway each need a
+    # distinguishable hostname for their own listener/TLS cert (host-based:
+    # SNI can't disambiguate two fully-wildcard listeners on the same port;
+    # path-based: two ListenerSets can't claim the identical bare BASE_DOMAIN
+    # either -- see create_listenerset), so monitoring's and logging's apps
+    # can't share one flat BASE_DOMAIN the way Contour's HTTPProxy allows (it
+    # has no equivalent tenant-level listener object to collide). Omit it (as
+    # Contour/ingress-nginx callers do) to keep prior behavior unchanged.
+    local app_fqdn app_path appGroupSegment
 
     app_fqdn=$1
     app_path=$2
+    appGroupSegment=$3
 
     if [ -z "$app_fqdn" ]; then
         if [ "$ROUTING" == "host" ]; then
-            app_fqdn="$app_path.$BASE_DOMAIN"
+            if [ -n "$appGroupSegment" ]; then
+                app_fqdn="$app_path.$appGroupSegment.$BASE_DOMAIN"
+            else
+                app_fqdn="$app_path.$BASE_DOMAIN"
+            fi
         else
-            app_fqdn="$BASE_DOMAIN"
+            if [ -n "$appGroupSegment" ]; then
+                app_fqdn="$appGroupSegment.$BASE_DOMAIN"
+            else
+                app_fqdn="$BASE_DOMAIN"
+            fi
         fi
     fi
 
@@ -239,6 +260,294 @@ function create_root_httpproxy {
 }
 export -f create_root_httpproxy
 
+function create_listenerset {
+
+    # ####################################################### #
+    # developed/tested with gateway-api sample version: 0.1.0 #
+    # ####################################################### #
+
+    ### create_listenerset  APP_GRP  NAMESPACE  [SECRET_NAME]
+    ### create_listenerset  monitoring monitoring
+
+    local app_group namespace secretName routing sampleFile resourceDefFile targetFqdn
+
+    app_group="${1}" # logging|monitoring
+    namespace="${2}"
+    secretName="${3:-v4m-ingress-tls-secret}"
+
+    routing="${ROUTING:-host}"
+
+    sampleFile="samples/gateway-api/${routing}-based/$app_group/listenerset.yaml"
+    resourceDefFile="$TMP_DIR/${app_group}_listenerset_def_file.yaml"
+    touch "$resourceDefFile"
+
+    # shellcheck disable=SC2016
+    yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
+
+    snippet="$GATEWAY_NAME" yq -i '.spec.parentRef.name=env(snippet)' "$resourceDefFile"
+    snippet="$GATEWAY_NAMESPACE" yq -i '.spec.parentRef.namespace=env(snippet)' "$resourceDefFile"
+    snippet="$secretName" yq -i '.spec.listeners.[0].tls.certificateRefs.[0].name=env(snippet)' "$resourceDefFile"
+
+    BASE_DOMAIN="${BASE_DOMAIN:-notset}"
+
+    if [ "$routing" == "path" ]; then
+        # One shared hostname per namespace (e.g. monitoring.$BASE_DOMAIN).
+        targetFqdn="$app_group.$BASE_DOMAIN"
+    else
+        # Host-based: each app's HTTPRoute carries its own concrete hostname
+        # ("$app.$app_group.$BASE_DOMAIN", see get_app_ingress_fqdn), so the
+        # listener just needs a wildcard that covers all of them for this
+        # namespace. It can't be a flat "*.$BASE_DOMAIN": monitoring and
+        # logging share BASE_DOMAIN, and SNI can't disambiguate two
+        # completely overlapping wildcard listeners on the same port between
+        # namespaces (reason: HostnameConflict) -- the per-namespace segment
+        # ("*.$app_group.$BASE_DOMAIN") keeps the two apart.
+        targetFqdn="*.$app_group.$BASE_DOMAIN"
+    fi
+    # strenv (not env): a host-based hostname starts with "*", which env()
+    # would parse as a YAML anchor alias rather than a literal string.
+    snippet="$targetFqdn" yq -i '.spec.listeners.[0].hostname=strenv(snippet)' "$resourceDefFile"
+    snippet="$targetFqdn" yq -i '.spec.listeners.[1].hostname=strenv(snippet)' "$resourceDefFile"
+
+    kubectl apply -f "$resourceDefFile" -n "$namespace"
+    kubectl -n "$namespace" label listenerset v4m-listenerset managed-by="v4m-es-script"
+}
+export -f create_listenerset
+
+function create_httproute {
+
+    # ####################################################### #
+    # developed/tested with gateway-api sample version: 0.1.0 #
+    # ####################################################### #
+
+    local app_group app_prefix fqdn path secretName targetFqdn resourceDefFile routing namespace oldPathToken
+
+    app_group="${1}"
+    app_prefix="${2}"
+    path="${3}"
+    fqdn="${4}"
+    # secretName is accepted for signature parity with create_httpproxy, but is
+    # unused: Gateway API terminates TLS on the ListenerSet, not the HTTPRoute.
+    secretName="${5:-v4m-ingress-tls-secret}"
+
+    routing="${ROUTING:-host}"
+
+    sampleFile="samples/gateway-api/${routing}-based/$app_group/${app_prefix}_httproute.yaml"
+
+    # Construct host for application URL
+    targetFqdn="$(get_app_ingress_fqdn "$fqdn" "$path" "$app_group")"
+
+    resourceDefFile="$TMP_DIR/${app_prefix}_httproute_def_file.yaml"
+    touch "$resourceDefFile"
+
+    #intialized the yaml file w/appropriate gateway-api sample
+    # shellcheck disable=SC2016
+    yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
+
+    if [ "$app_group" == "logging" ]; then
+        namespace="${LOG_NS:-logging}"
+    else
+        namespace="${MON_NS:-monitoring}"
+    fi
+
+    if [ "$routing" == "host" ]; then
+        # The ListenerSet's wildcard listener only covers
+        # "*.$app_group.$BASE_DOMAIN" (see create_listenerset) -- an
+        # explicit FQDN override (e.g. GRAFANA_FQDN) that doesn't fall
+        # within that pattern would otherwise get applied anyway and sit
+        # permanently broken (Accepted: False, reason: NoMatchingListenerHostname)
+        # with no indication until something downstream (e.g.
+        # show_app_url.sh) happens to check status.
+        if [[ $targetFqdn != *".$app_group.$BASE_DOMAIN" ]]; then
+            log_error "FQDN [$targetFqdn] for [$app_group/$app_prefix] does not fall under *.${app_group}.${BASE_DOMAIN}, the hostname pattern the [$app_group] ListenerSet's listener actually covers."
+            log_error "The resulting HTTPRoute would never match that listener (reason: NoMatchingListenerHostname). Set a value ending in .$app_group.$BASE_DOMAIN, or change BASE_DOMAIN."
+            return 1
+        fi
+        snippet="$targetFqdn" yq -i '.spec.hostnames.[0]=env(snippet)' "$resourceDefFile"
+    else
+        oldPathToken="$(yq '.spec.rules.[0].matches.[0].path.value' "$resourceDefFile")"
+        if [ "$oldPathToken" != "/$path" ]; then
+            sed -i.bak "s#${oldPathToken}#/${path}#g" "$resourceDefFile"
+            rm -f "${resourceDefFile}.bak"
+        fi
+    fi
+
+    kubectl apply -f "$resourceDefFile" -n "$namespace"
+}
+export -f create_httproute
+
+function create_http_redirect_httproute {
+
+    # ####################################################### #
+    # developed/tested with gateway-api sample version: 0.1.0 #
+    # ####################################################### #
+
+    ### create_http_redirect_httproute  APP_GRP  NAMESPACE
+    ### create_http_redirect_httproute  monitoring monitoring
+
+    local app_group namespace routing sampleFile resourceDefFile
+
+    app_group="${1}" # logging|monitoring
+    namespace="${2}"
+
+    routing="${ROUTING:-host}"
+
+    sampleFile="samples/gateway-api/${routing}-based/$app_group/http-redirect_httproute.yaml"
+    resourceDefFile="$TMP_DIR/${app_group}_http_redirect_httproute_def_file.yaml"
+    touch "$resourceDefFile"
+
+    # shellcheck disable=SC2016
+    yq -i eval-all '. as $item ireduce ({}; . * $item )' "$resourceDefFile" "$sampleFile"
+
+    kubectl apply -f "$resourceDefFile" -n "$namespace"
+    kubectl -n "$namespace" label httproute v4m-http-redirect managed-by="v4m-es-script"
+}
+export -f create_http_redirect_httproute
+
+function get_backend_tls_hostname {
+
+    ### get_backend_tls_hostname  NAMESPACE  SECRET_NAME
+
+    # Prints the first non-"localhost" DNS SAN on the cert in SECRET_NAME, for
+    # use as BackendTLSPolicy's validation.hostname. Works for both the
+    # cert-manager and openssl TLS flows without needing to know which is
+    # active. Prints nothing if the secret is missing or the cert has no SAN.
+
+    local namespace secretName certPem
+
+    namespace="${1}"
+    secretName="${2}"
+
+    if ! kubectl -n "$namespace" get secret "$secretName" -o name > /dev/null 2>&1; then
+        return 1
+    fi
+
+    certPem="$(kubectl -n "$namespace" get secret "$secretName" -o jsonpath='{.data.tls\.crt}' 2> /dev/null | base64 -d 2> /dev/null)"
+
+    if [ -z "$certPem" ]; then
+        return 1
+    fi
+
+    echo "$certPem" | openssl x509 -noout -ext subjectAltName 2> /dev/null \
+        | grep -oE 'DNS:[^,]+' | sed 's/^DNS://' | grep -v '^localhost$' | head -1
+}
+export -f get_backend_tls_hostname
+
+function apply_backend_tls_policy {
+
+    ### apply_backend_tls_policy  NAMESPACE  POLICY_NAME  SERVICE_NAME  TLS_SECRET_NAME  [CA_CONFIGMAP_NAME]
+
+    # The CA ConfigMap is derived from TLS_SECRET_NAME's own ca.crt, not
+    # guessed from some other secret in the namespace. Both TLS flows
+    # (openssl and cert-manager) put the CA that actually signed a given
+    # backend's cert into that same backend's own Secret -- apps in the same
+    # namespace commonly share one CA by default, but USER_DIR overrides
+    # (deploy_issuers/deploy_app_cert honor USER_DIR for exactly this) can
+    # give one app a different CA than another. Picking a CA from an
+    # unrelated secret in the namespace would silently validate the wrong
+    # one once that happens.
+
+    local namespace policyName serviceName tlsSecretName caConfigMapName hostname caCertB64 caFile
+
+    namespace="${1}"
+    policyName="${2}"
+    serviceName="${3}"
+    tlsSecretName="${4}"
+    caConfigMapName="${5:-${policyName}-ca-certs}"
+
+    # Callers can invoke this before TLS_SECRET_NAME actually exists (e.g.
+    # deploy_opensearch.sh applies ingress/BackendTLSPolicy resources before
+    # create_tls_certs runs later in the same script) or before cert-manager
+    # has finished issuing it. Poll for up to 2 minutes before giving up,
+    # rather than failing (or silently skipping) on what's often just a
+    # not-ready-yet race.
+    local tlsWaitAttempt
+    hostname=""
+    for tlsWaitAttempt in $(seq 1 24); do
+        hostname="$(get_backend_tls_hostname "$namespace" "$tlsSecretName")"
+        caCertB64="$(kubectl -n "$namespace" get secret "$tlsSecretName" -o jsonpath='{.data.ca\.crt}' 2> /dev/null)"
+        [ -n "$hostname" ] && [ -n "$caCertB64" ] && break
+        sleep 5
+    done
+
+    if [ -z "$hostname" ]; then
+        log_error "Could not determine a SAN to validate for BackendTLSPolicy [$policyName] after waiting ${tlsWaitAttempt}x5s; secret [$namespace/$tlsSecretName] is missing or its cert has no usable SAN."
+        # renew-tls-certs.sh only supports the ALL-MON/ALL-LOG group targets
+        # for actual renewal, and defaults LOG_NS/MON_NS if not exported.
+        if [ "$namespace" == "$LOG_NS" ]; then
+            log_error "If the cert generator failed to issue this cert, try: LOG_NS=$namespace ./bin/renew-tls-certs.sh -t ALL-LOG"
+        else
+            log_error "If the cert generator failed to issue this cert, try: MON_NS=$namespace ./bin/renew-tls-certs.sh -t ALL-MON"
+        fi
+        exit 1
+    fi
+
+    if [ -z "$caCertB64" ]; then
+        log_error "Secret [$namespace/$tlsSecretName] has no ca.crt after waiting ${tlsWaitAttempt}x5s; cannot create BackendTLSPolicy [$policyName]'s CA ConfigMap."
+        exit 1
+    fi
+
+    caFile="$TMP_DIR/${policyName}-ca.crt"
+    echo "$caCertB64" | base64 -d > "$caFile"
+
+    kubectl -n "$namespace" delete configmap "$caConfigMapName" --ignore-not-found
+    kubectl -n "$namespace" create configmap "$caConfigMapName" --from-file=ca.crt="$caFile"
+    kubectl -n "$namespace" label configmap "$caConfigMapName" managed-by="v4m-es-script"
+
+    log_debug "Using hostname [$hostname] and CA from secret [$namespace/$tlsSecretName] for BackendTLSPolicy [$policyName]"
+
+    kubectl -n "$namespace" apply -f - << EOF
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: $policyName
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: $serviceName
+  validation:
+    caCertificateRefs:
+      - group: ""
+        kind: ConfigMap
+        name: $caConfigMapName
+    hostname: $hostname
+EOF
+    kubectl -n "$namespace" label backendtlspolicy "$policyName" managed-by="v4m-es-script" --overwrite
+
+    # kubectl apply succeeding only means the API server accepted the
+    # resource, not that the GatewayClass's controller actually implements
+    # BackendTLSPolicy -- there's no reliable way to check that up front
+    # (GatewayClass.status.supportedFeatures exists but is optional to
+    # report; Envoy Gateway, which this sample is developed against, doesn't
+    # populate it despite genuinely supporting BackendTLSPolicy). So check
+    # the applied policy's own status instead: if the controller rejected or
+    # never acknowledged it, say so now rather than silently assuming
+    # backend TLS is active.
+    #
+    # Callers should invoke this function AFTER the backend's own Helm
+    # chart has been installed: the controller can't report Accepted for a
+    # policy targeting a Service that doesn't exist yet, and on a fresh
+    # deploy SERVICE_NAME's Service isn't created until that Helm install
+    # runs.
+    local attempt accepted reason
+    accepted=""
+    for attempt in $(seq 1 24); do
+        accepted="$(kubectl -n "$namespace" get backendtlspolicy "$policyName" \
+            -o jsonpath='{.status.ancestors[0].conditions[?(@.type=="Accepted")].status}' 2> /dev/null)"
+        [ "$accepted" == "True" ] && break
+        sleep 5
+    done
+
+    if [ "$accepted" != "True" ]; then
+        reason="$(kubectl -n "$namespace" get backendtlspolicy "$policyName" \
+            -o jsonpath='{.status.ancestors[0].conditions[?(@.type=="Accepted")].reason}' 2> /dev/null)"
+        log_warn "BackendTLSPolicy [$namespace/$policyName] was applied but has not been Accepted after $attempt attempts (status: ${accepted:-no status reported}${reason:+, reason: $reason})."
+        log_warn "Backend TLS for [$serviceName] may not actually be active; check 'kubectl -n $namespace describe backendtlspolicy $policyName' and confirm your GatewayClass's controller supports BackendTLSPolicy."
+    fi
+}
+export -f apply_backend_tls_policy
+
 #
 # Executing Script starts here
 #
@@ -278,8 +587,8 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
 
         INGRESS_TYPE="${INGRESS_TYPE:-ingress-nginx}"
 
-        if [ "$INGRESS_TYPE" != "ingress-nginx" ] && [ "$INGRESS_TYPE" != "contour" ]; then
-            log_error "Invalid INGRESS_TYPE value, valid values are 'ingress-nginx' or 'contour'"
+        if [ "$INGRESS_TYPE" != "ingress-nginx" ] && [ "$INGRESS_TYPE" != "contour" ] && [ "$INGRESS_TYPE" != "gateway-api" ]; then
+            log_error "Invalid INGRESS_TYPE value, valid values are 'ingress-nginx', 'contour' or 'gateway-api'"
             exit 1
         elif [ "$INGRESS_TYPE" == "contour" ]; then
             # verify Contour HTTPProxy CRDs available
@@ -294,6 +603,178 @@ if [ -z "$AUTOGENERATE_SOURCED" ]; then
         elif [ "$INGRESS_TYPE" == "ingress-nginx" ]; then
             INGRESS_CREATE_ROOT_PROXY="${INGRESS_CREATE_ROOT_PROXY:-false}"
             INGRESS_USE_SEPARATE_CERTS="${INGRESS_USE_SEPARATE_CERTS:-true}"
+        elif [ "$INGRESS_TYPE" == "gateway-api" ]; then
+
+            if [ -z "$GATEWAY_CLASS_NAME" ]; then
+                log_error "Required parameter [GATEWAY_CLASS_NAME] not provided"
+                exit 1
+            fi
+
+            if [ -z "$GATEWAY_NAMESPACE" ]; then
+                log_error "Required parameter [GATEWAY_NAMESPACE] not provided"
+                exit 1
+            fi
+
+            if [ -z "$GATEWAY_NAME" ]; then
+                log_error "Required parameter [GATEWAY_NAME] not provided"
+                exit 1
+            fi
+
+            # verify required Gateway API CRDs available
+            for crd in gatewayclasses.gateway.networking.k8s.io \
+                gateways.gateway.networking.k8s.io \
+                listenersets.gateway.networking.k8s.io \
+                httproutes.gateway.networking.k8s.io; do
+                if ! kubectl get crd "$crd" 1> /dev/null 2>&1; then
+                    log_error "Ingress type [gateway-api] specified but required CRD [$crd] is not installed"
+                    exit 1
+                fi
+            done
+            log_debug "Required Gateway API CRDs installed"
+
+            # verify the GatewayClass exists and is Accepted
+            gatewayClassAccepted="$(kubectl get gatewayclass "$GATEWAY_CLASS_NAME" \
+                -o jsonpath='{.status.conditions[?(@.type=="Accepted")].status}' 2> /dev/null)"
+
+            if [ -z "$gatewayClassAccepted" ]; then
+                log_error "GatewayClass [$GATEWAY_CLASS_NAME] specified in GATEWAY_CLASS_NAME does NOT exist"
+                exit 1
+            elif [ "$gatewayClassAccepted" != "True" ]; then
+                log_error "GatewayClass [$GATEWAY_CLASS_NAME] is not in an 'Accepted: True' state"
+                exit 1
+            fi
+            log_debug "GatewayClass [$GATEWAY_CLASS_NAME] exists and is Accepted"
+
+            # Verify a Gateway named $GATEWAY_NAME using this GatewayClass
+            # exists in $GATEWAY_NAMESPACE. This is expected to be a single
+            # shared, platform-managed Gateway. We never create or modify it;
+            # instead monitoring/logging each attach their own ListenerSet to
+            # it (see create_listenerset), which is how they bring their own
+            # host name and TLS cert without the Gateway owner provisioning
+            # anything on their behalf.
+            gatewayClassInUse="$(kubectl -n "$GATEWAY_NAMESPACE" get gateway "$GATEWAY_NAME" \
+                -o jsonpath='{.spec.gatewayClassName}' 2> /dev/null)"
+
+            if [ -z "$gatewayClassInUse" ]; then
+                log_error "No Gateway named [$GATEWAY_NAME] was found in namespace [$GATEWAY_NAMESPACE]"
+                log_error "The Gateway resource must be created by the platform/cluster administrator before enabling AUTOGENERATE_INGRESS with INGRESS_TYPE=gateway-api."
+                log_error "It must be named [$GATEWAY_NAME] (see GATEWAY_NAME) in namespace [$GATEWAY_NAMESPACE] (see GATEWAY_NAMESPACE) -- the generated ListenerSets' parentRef is set to that name/namespace."
+                exit 1
+            elif [ "$gatewayClassInUse" != "$GATEWAY_CLASS_NAME" ]; then
+                log_error "Gateway [$GATEWAY_NAME] in namespace [$GATEWAY_NAMESPACE] uses GatewayClass [$gatewayClassInUse], not [$GATEWAY_CLASS_NAME] as specified in GATEWAY_CLASS_NAME"
+                exit 1
+            fi
+            log_debug "Found Gateway [$GATEWAY_NAME] using GatewayClass [$GATEWAY_CLASS_NAME] in namespace [$GATEWAY_NAMESPACE]"
+
+            # Verify the Gateway actually allows ListenerSets to attach from
+            # outside its own namespace. This is a separate field from
+            # listeners[].allowedRoutes (which gates HTTPRoute attachment to a
+            # Gateway's own listeners directly, not used here); without this,
+            # our ListenerSet attaches silently nowhere even though the
+            # Gateway itself looks otherwise correct.
+            allowedListenersPolicy="$(kubectl -n "$GATEWAY_NAMESPACE" get gateway "$GATEWAY_NAME" \
+                -o jsonpath='{.spec.allowedListeners.namespaces.from}' 2> /dev/null)"
+
+            if [ "$allowedListenersPolicy" != "All" ] && [ "$allowedListenersPolicy" != "Selector" ]; then
+                log_error "Gateway [$GATEWAY_NAME] in namespace [$GATEWAY_NAMESPACE] has spec.allowedListeners.namespaces.from set to [${allowedListenersPolicy:-None (unset)}]"
+                log_error "That rejects our ListenerSet from attaching to it. It must be [All] or a namespace Selector that matches our namespace."
+                exit 1
+            fi
+
+            # "Selector" alone doesn't guarantee OUR namespace matches it --
+            # build the equivalent kubectl label-selector string from
+            # spec.allowedListeners.namespaces.selector and confirm it
+            # actually selects LOG_NS/MON_NS (whichever this driver script
+            # set), rather than only checking the policy *type*.
+            if [ "$allowedListenersPolicy" == "Selector" ]; then
+                gatewayYamlFile="$TMP_DIR/gateway_def_file.yaml"
+                kubectl -n "$GATEWAY_NAMESPACE" get gateway "$GATEWAY_NAME" -o yaml > "$gatewayYamlFile" 2> /dev/null
+
+                selectorParts=()
+                while IFS= read -r labelPair; do
+                    [ -n "$labelPair" ] && selectorParts+=("$labelPair")
+                done < <(yq -r '.spec.allowedListeners.namespaces.selector.matchLabels // {} | to_entries | .[] | .key + "=" + .value' "$gatewayYamlFile")
+
+                while IFS='|' read -r exprKey exprOp exprValues; do
+                    [ -z "$exprKey" ] && continue
+                    case "$exprOp" in
+                    In) selectorParts+=("$exprKey in ($exprValues)") ;;
+                    NotIn) selectorParts+=("$exprKey notin ($exprValues)") ;;
+                    Exists) selectorParts+=("$exprKey") ;;
+                    DoesNotExist) selectorParts+=("!$exprKey") ;;
+                    esac
+                done < <(yq -r '.spec.allowedListeners.namespaces.selector.matchExpressions // [] | .[] | .key + "|" + .operator + "|" + (.values // [] | join(","))' "$gatewayYamlFile")
+
+                namespaceSelectorString="$(
+                    IFS=,
+                    echo "${selectorParts[*]}"
+                )"
+
+                for ourNamespace in "$LOG_NS" "$MON_NS"; do
+                    if [ -z "$ourNamespace" ]; then
+                        continue
+                    fi
+                    if ! kubectl get namespace -l "$namespaceSelectorString" -o name 2> /dev/null | grep -qx "namespace/$ourNamespace"; then
+                        log_error "Gateway [$GATEWAY_NAME] in namespace [$GATEWAY_NAMESPACE] restricts attachment to namespaces matching selector [$namespaceSelectorString], which namespace [$ourNamespace] does NOT match"
+                        # The deploy scripts create $ourNamespace themselves if
+                        # it doesn't already exist, but never apply labels to
+                        # it -- there's no safe, generic way to derive label
+                        # values that satisfy an arbitrary selector. If
+                        # [$ourNamespace] doesn't exist yet, create it and
+                        # apply matching labels yourself before running the
+                        # deploy scripts; the scripts will reuse it as-is.
+                        log_error "Label namespace [$ourNamespace] to match that selector before running the deploy scripts, or have the Gateway's spec.allowedListeners.namespaces.from set to [All]"
+                        exit 1
+                    fi
+                    log_debug "Namespace [$ourNamespace] matches Gateway [$GATEWAY_NAME]'s allowedListeners namespace selector"
+                done
+            fi
+
+            # Gateway API has no root-resource concept
+            INGRESS_CREATE_ROOT_PROXY="false"
+
+            # Unlike Contour (one HTTPProxy/cert per app), the ListenerSet
+            # terminates TLS once per app-group namespace (see
+            # create_listenerset) and create_httproute never takes a
+            # secretName override -- there's no per-app cert to apply here.
+            # Reject the setting rather than silently ignoring it.
+            if [ "$INGRESS_USE_SEPARATE_CERTS" == "true" ]; then
+                log_error "INGRESS_USE_SEPARATE_CERTS=true is not supported with INGRESS_TYPE=gateway-api"
+                log_error "Gateway API terminates TLS once per app-group's ListenerSet, not per app; there is no per-app certificate to apply"
+                exit 1
+            fi
+            INGRESS_USE_SEPARATE_CERTS="false"
+            # Defaults to whatever TLS_ENABLE already is (itself defaulted by
+            # monitoring/bin/common.sh or logging/bin/common.sh before this
+            # runs), falling back to true only if that's unset too: app
+            # backends only serve HTTPS -- and thus only need a
+            # BackendTLSPolicy -- when TLS_ENABLE says they do. Defaulting
+            # this independently of TLS_ENABLE would try to apply backend TLS
+            # for a plaintext backend whenever TLS_ENABLE=false, which can't
+            # succeed (no TLS Secret/SAN ever exists) and now hard-fails the
+            # deploy (see apply_backend_tls_policy). An explicit
+            # INGRESS_BACKEND_TLS_ENABLE still wins either way.
+            INGRESS_BACKEND_TLS_ENABLE="${INGRESS_BACKEND_TLS_ENABLE:-${TLS_ENABLE:-true}}"
+
+            if [ "$INGRESS_BACKEND_TLS_ENABLE" == "true" ]; then
+                if ! kubectl get crd backendtlspolicies.gateway.networking.k8s.io 1> /dev/null 2>&1; then
+                    log_error "INGRESS_BACKEND_TLS_ENABLE is [true] but CRD [backendtlspolicies.gateway.networking.k8s.io] is not installed"
+                    log_error "Without BackendTLSPolicy the gateway sends plaintext to a TLS-only backend and every request fails; set INGRESS_BACKEND_TLS_ENABLE=false if that's intentional"
+                    exit 1
+                fi
+
+                backendTLSPolicyServedVersions="$(kubectl get crd backendtlspolicies.gateway.networking.k8s.io \
+                    -o jsonpath='{range .spec.versions[?(@.served==true)]}{.name}{" "}{end}' 2> /dev/null)"
+
+                if ! echo "$backendTLSPolicyServedVersions" | grep -qw "v1"; then
+                    log_error "INGRESS_BACKEND_TLS_ENABLE is [true] but CRD [backendtlspolicies.gateway.networking.k8s.io] does not serve [v1] (serves: ${backendTLSPolicyServedVersions:-none})"
+                    log_error "The generated BackendTLSPolicy uses apiVersion gateway.networking.k8s.io/v1; set INGRESS_BACKEND_TLS_ENABLE=false if your cluster only serves an older version"
+                    exit 1
+                fi
+                log_debug "CRD [backendtlspolicies.gateway.networking.k8s.io] installed and serves [v1]"
+            fi
+
+            export INGRESS_BACKEND_TLS_ENABLE GATEWAY_CLASS_NAME GATEWAY_NAME GATEWAY_NAMESPACE
         fi
 
         if [ -z "$BASE_DOMAIN" ]; then
