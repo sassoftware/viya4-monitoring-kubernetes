@@ -159,6 +159,11 @@ replicas: 3
 
 opensearchJavaOpts: "-Xms4096m -Xmx4096m"
 
+resources:
+  requests:
+    cpu: "500m"         #lowered from 1000m in Helm chart
+    ###memory: "100Mi"  #from Helm chart
+
 podAnnotations:
   fluentbit.io/parser: elasticsearch
 
