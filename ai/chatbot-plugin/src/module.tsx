@@ -41,13 +41,13 @@ export const plugin = new AppPlugin<{}>()
   })
   .addLink<PluginExtensionPanelContext>({
     targets: [PluginExtensionPoints.DashboardPanelMenu],
-    title: 'Ask Observability Chatbot',
+    title: 'Ask Observability Agent',
     description: 'Ask the observability agent about this panel',
     icon: 'comment-alt',
     onClick: (_event, helpers) => {
       const context = helpers?.context;
       helpers?.openModal?.({
-        title: 'Observability Chatbot',
+        title: 'Observability Agent',
         width: '55%',
         height: '75%',
         body: () => (
