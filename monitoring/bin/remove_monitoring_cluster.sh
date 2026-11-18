@@ -46,6 +46,20 @@ if helm3ReleaseExists v4m-tempo "$MON_NS"; then
     helm uninstall --namespace "$MON_NS" v4m-tempo
 fi
 
+# AI chatbot components (deployed by deploy_ai_chatbot.sh). 
+log_verbose "Removing AI agent components"
+kubectl delete deployment --ignore-not-found -n "$MON_NS" v4m-mcp-server grafana-mcp-server ollama
+kubectl delete service --ignore-not-found -n "$MON_NS" v4m-mcp-server grafana-mcp-server ollama
+kubectl delete ingress --ignore-not-found -n "$MON_NS" v4m-mcp-server grafana-mcp-server
+if kubectl get crd httpproxies.projectcontour.io 1> /dev/null 2>&1; then
+    kubectl delete httpproxy --ignore-not-found -n "$MON_NS" v4m-mcp-server grafana-mcp-server
+fi
+kubectl delete secret --ignore-not-found -n "$MON_NS" v4mai-pull v4m-mcp-opensearch grafana-llm-openai-secret
+kubectl delete cm --ignore-not-found -n "$MON_NS" grafana-chatbot-provisioning grafana-llm-config
+kubectl delete rolebinding,role --ignore-not-found -n "$MON_NS" v4m-mcp-server-prometheus
+kubectl delete serviceaccount --ignore-not-found -n "$MON_NS" v4m-mcp-server
+kubectl delete clusterrolebinding,clusterrole --ignore-not-found v4m-mcp-server-read
+
 if [ "$MON_DELETE_NAMESPACE_ON_REMOVE" == "true" ]; then
     log_info "Deleting the [$MON_NS] namespace..."
     if kubectl delete namespace "$MON_NS" --timeout "$KUBE_NAMESPACE_DELETE_TIMEOUT"; then
@@ -75,6 +89,7 @@ if [ "$MON_DELETE_PVCS_ON_REMOVE" == "true" ]; then
     kubectl delete pvc --ignore-not-found -n "$MON_NS" -l app=alertmanager
     kubectl delete pvc --ignore-not-found -n "$MON_NS" -l app.kubernetes.io/name=grafana
     kubectl delete pvc --ignore-not-found -n "$MON_NS" -l app=prometheus
+    kubectl delete pvc --ignore-not-found -n "$MON_NS" v4m-mcp-cache v4m-mcp-pdfs ollama-models
 fi
 
 # Check for and remove any v4m deployments with old naming convention
