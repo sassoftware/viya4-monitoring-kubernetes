@@ -33,11 +33,9 @@ spec:
       # deploy_ai_chatbot.sh patches image/imagePullSecrets from
       # OLLAMA_FULL_IMAGE/OLLAMA_IMAGE_PULL_SECRET (component_versions.env) at
       # deploy time — the values below only apply if you apply this file directly.
-      imagePullSecrets:
-      - name: acr-secret
       containers:
       - name: ollama
-        image: viyamonitoring.azurecr.io/ollama:latest
+        image: docker.io/ollama/ollama:latest
         command: ["/bin/sh", "-c"]
         args:
         - |

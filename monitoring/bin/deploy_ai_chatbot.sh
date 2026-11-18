@@ -107,9 +107,23 @@ kubectl apply -f ai/k8s/service.yaml
 mcpDefFile="$TMP_DIR/v4m_mcp_deployment_def_file.yaml"
 cp ai/k8s/deployment.yaml "$mcpDefFile"
 imgSnippet="$V4M_MCP_FULL_IMAGE" yq -i '.spec.template.spec.containers[0].image = env(imgSnippet)' "$mcpDefFile"
+# V4M_MCP_IMAGE_PULL_SECRET holds the registry password (username is always
+# V4M-SAS, registry is taken from V4M_MCP_FULL_IMAGE). The pull secret is
+# (re)created from it on every run, so a rotated password takes effect on the
+# next deploy. Leave it unset for a registry that needs no credentials.
+mcpPullSecretName="v4mai-pull"
 if [ -n "$V4M_MCP_IMAGE_PULL_SECRET" ]; then
-    secretSnippet="$V4M_MCP_IMAGE_PULL_SECRET" yq -i '.spec.template.spec.imagePullSecrets[0].name = env(secretSnippet)' "$mcpDefFile"
+    log_info "Creating imagePullSecret [$mcpPullSecretName] for [${V4M_MCP_FULL_IMAGE%%/*}] in the [$MON_NS] namespace..."
+    kubectl create secret docker-registry "$mcpPullSecretName" \
+        -n "$MON_NS" \
+        --docker-server="${V4M_MCP_FULL_IMAGE%%/*}" \
+        --docker-username="V4M-SAS" \
+        --docker-password="$V4M_MCP_IMAGE_PULL_SECRET" \
+        --dry-run=client -o yaml | kubectl apply -f -
+    secretSnippet="$mcpPullSecretName" yq -i '.spec.template.spec.imagePullSecrets[0].name = env(secretSnippet)' "$mcpDefFile"
 else
+    log_warn "V4M_MCP_IMAGE_PULL_SECRET is not set; pulling [$V4M_MCP_FULL_IMAGE] without credentials."
+    log_warn "Set it to the registry password in user.env if the image is in a private registry."
     yq -i 'del(.spec.template.spec.imagePullSecrets)' "$mcpDefFile"
 fi
 originSnippet="https://grafana.$BASE_DOMAIN" yq -i '(.spec.template.spec.containers[0].env[] | select(.name=="ALLOWED_ORIGIN")).value = env(originSnippet)' "$mcpDefFile"

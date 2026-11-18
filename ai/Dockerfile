@@ -24,7 +24,6 @@ ENV DOCS_PATH=/app/docs \
     INDEX_CACHE=/app/cache/doc_index.npz \
     EMBED_BASE_URL=http://localhost:11434/v1 \
     EMBED_MODEL=nomic-embed-text \
-    EMBED_API_KEY=ollama \
     PORT=8000
 
 EXPOSE 8000
