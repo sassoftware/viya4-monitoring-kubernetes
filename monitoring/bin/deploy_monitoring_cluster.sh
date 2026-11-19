@@ -846,18 +846,31 @@ else
 fi
 log_notice ""
 
-if [ "$RBAC_PROXY_ENABLE" == "true" ] && { [ "$PROM_NODEPORT_ENABLE" == "true" ] || { [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$PROMETHEUS_INGRESS_ENABLE" == "true" ]; }; }; then
-    log_notice "PROMETHEUS: "
-    log_notice " Prometheus has been exposed via NodePort and/or ingress, but RBAC_PROXY_ENABLE is also set to 'true'."
-    log_notice " This means that every request to it must include a Kubernetes bearer token and requests without a "
-    log_notice " token are rejected with HTTP 401. In most cases, this also means the Prometheus web application cannot "
-    log_notice " be opened directly in a web browser since most browsers do not provide a mechanism for passing the required token."
-    log_notice " All other components of SAS Viya Monitoring will continue to work as expected. "
-    log_notice ""
-    log_notice " If you require unauthenticated access to Prometheus or need to create a service token, "
-    log_notice " see Getting Access to Prometheus in the SAS Viya Monitoring for Kubernetes Documentation for more information."
+if [ "$AI_CHATBOT_PROVISION" == "true" ]; then
+    log_notice "AI AGENT: "
+    log_notice " Before using the AI agent in Grafana, open both of the following URLs in the"
+    log_notice " same web browser and accept (clear) the certificate warning for each. Until"
+    log_notice " you do, the browser blocks the agent's connections to its MCP servers and"
+    log_notice " the agent cannot run its tools. You can use kubectl get pods -n monitoring "
+    log_notice " to verify that all pods are ready. "
+    log_notice "  https://v4m-mcp.$BASE_DOMAIN/mcp"
+    log_notice "  https://grafana-mcp.$BASE_DOMAIN/mcp"
     log_notice ""
 fi
+
+# The Prometheus access notice is temporarily disabled on this branch.
+# if [ "$RBAC_PROXY_ENABLE" == "true" ] && { [ "$PROM_NODEPORT_ENABLE" == "true" ] || { [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$PROMETHEUS_INGRESS_ENABLE" == "true" ]; }; }; then
+#     log_notice "PROMETHEUS: "
+#     log_notice " Prometheus has been exposed via NodePort and/or ingress, but RBAC_PROXY_ENABLE is also set to 'true'."
+#     log_notice " This means that every request to it must include a Kubernetes bearer token and requests without a "
+#     log_notice " token are rejected with HTTP 401. In most cases, this also means the Prometheus web application cannot "
+#     log_notice " be opened directly in a web browser since most browsers do not provide a mechanism for passing the required token."
+#     log_notice " All other components of SAS Viya Monitoring will continue to work as expected. "
+#     log_notice ""
+#     log_notice " If you require unauthenticated access to Prometheus or need to create a service token, "
+#     log_notice " see Getting Access to Prometheus in the SAS Viya Monitoring for Kubernetes Documentation for more information."
+#     log_notice ""
+# fi
 
 #log_notice ""
 #log_notice "================================================================================"

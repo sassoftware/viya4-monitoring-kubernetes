@@ -59,7 +59,7 @@ spec:
             cpu: "500m"
             memory: "2Gi"
           limits:
-            cpu: "2"
+            cpu: "6"
             memory: "4Gi"
       volumes:
       - name: models

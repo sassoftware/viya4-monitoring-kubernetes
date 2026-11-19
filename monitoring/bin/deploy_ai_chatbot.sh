@@ -6,12 +6,7 @@
 # Deploys the Grafana AI chatbot integration. RUN THIS SCRIPT MANUALLY ONLY IF YOU NEED TO RESET THE CHATBOT. 
 # OTHERWISE, THIS SCRIPT IS AUTOMATICALLY RUN IN deploy_monitoring_cluster.sh
 # deploy_monitoring_cluster.sh handles ordering automatically when
-# AI_CHATBOT_PROVISION=true is set in user.env: it runs this script with
-# --provision-only (steps 1-2 only) before its `helm upgrade --install`
-# creates/updates the Grafana pod, then runs it again in full afterward, at
-# which point steps 1-2 are harmless no-ops and step 3 completes. Running this
-# script manually is still supported, e.g. to redeploy the chatbot pieces
-# without a full cluster deploy.
+# AI_CHATBOT_PROVISION=true
 
 cd "$(dirname "$BASH_SOURCE")/../.." || exit 1
 source monitoring/bin/common.sh
@@ -108,9 +103,7 @@ mcpDefFile="$TMP_DIR/v4m_mcp_deployment_def_file.yaml"
 cp ai/k8s/deployment.yaml "$mcpDefFile"
 imgSnippet="$V4M_MCP_FULL_IMAGE" yq -i '.spec.template.spec.containers[0].image = env(imgSnippet)' "$mcpDefFile"
 # V4M_MCP_IMAGE_PULL_SECRET holds the registry password (username is always
-# V4M-SAS, registry is taken from V4M_MCP_FULL_IMAGE). The pull secret is
-# (re)created from it on every run, so a rotated password takes effect on the
-# next deploy. Leave it unset for a registry that needs no credentials.
+# V4M-SAS, registry is taken from V4M_MCP_FULL_IMAGE).
 mcpPullSecretName="v4mai-pull"
 if [ -n "$V4M_MCP_IMAGE_PULL_SECRET" ]; then
     log_info "Creating imagePullSecret [$mcpPullSecretName] for [${V4M_MCP_FULL_IMAGE%%/*}] in the [$MON_NS] namespace..."
@@ -290,10 +283,6 @@ grafanaPod=$(kubectl -n "$MON_NS" get pods -l app.kubernetes.io/name=grafana -o 
 log_debug "Grafana Pod [$grafanaPod]"
 
 log_info "Copying chatbot plugin into Grafana pod..."
-# dist/ has plugin.json at its own root (not inside a named folder), so the
-# zip built from it does too — extract into an explicit, dedicated
-# subdirectory rather than straight into /var/lib/grafana/plugins/, or
-# plugin.json ends up loose in the plugins root and Grafana won't find it.
 
 kubectl exec -n "$MON_NS" "$grafanaPod" -- sh -c '
     cd /var/lib/grafana/plugins &&
