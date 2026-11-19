@@ -1,0 +1,34 @@
+# Sample: gateway-api/path-based Version: 0.1.0
+
+# A ListenerSet is how a tenant namespace attaches its own listeners (hostname,
+# TLS cert) to a Gateway it does not own, without the Gateway owner having to
+# provision anything on its behalf.  See "ListenerSet ownership" in
+# samples/gateway-api/README.md.
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: v4m-listenerset
+spec:
+  parentRef:
+    name: cluster-gateway
+  listeners:
+    - name: https
+      hostname: logging.host.cluster.example.com
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: Same
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: v4m-ingress-tls-secret
+    - name: http
+      hostname: logging.host.cluster.example.com
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same

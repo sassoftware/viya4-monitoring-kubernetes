@@ -137,6 +137,22 @@ for service in $servicelist; do
         else
             log_debug "HTTPProxy [$namespace/$servicename] is valid"
         fi
+    elif [ -n "$(get_k8s_info "$namespace" "httproute/$servicename" "$metadata_name")" ]; then
+
+        status="$(check_httproute_status "$namespace" "$servicename")"
+        if [ "$status" != "valid" ]; then
+            msg="$(get_httproute_error "$namespace" "$servicename")"
+
+            add_noticew "--------------------------------------------------------------------------------------------------------"
+            add_noticew "  WARNING: ***** Access to [$service] may not be available until the following issue is addressed. *****"
+            add_noticew ""
+            add_noticew "  NOTE: The HTTPRoute resource [$namespace/$servicename] reports an [$status] status"
+            add_noticew "        The issue reported is [$msg]"
+            add_noticew "--------------------------------------------------------------------------------------------------------"
+            add_notice ""
+        else
+            log_debug "HTTPRoute [$namespace/$servicename] is valid"
+        fi
     fi
 done
 

@@ -57,9 +57,12 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "tr
     ROUTING="${ROUTING:-host}"
 
     targetPath="${OPENSEARCH_PATH:-search}"
-    targetFqdn="$(get_app_ingress_fqdn "$OPENSEARCH_FQDN" "$targetPath")"
-
-    INGRESS_TYPE="${INGRESS_TYPE:-ingress-nginx}"
+    # Gateway API's ListenerSet needs a namespace segment in the default
+    # host-based FQDN (see get_app_ingress_fqdn); other ingress types are
+    # unaffected (appGroupSegment stays empty).
+    appGroupSegment=""
+    [ "$INGRESS_TYPE" == "gateway-api" ] && appGroupSegment="logging"
+    targetFqdn="$(get_app_ingress_fqdn "$OPENSEARCH_FQDN" "$targetPath" "$appGroupSegment")"
 
     log_debug "INGRESS_TYPE [$INGRESS_TYPE] OPENSEARCH_INGRESS_ENABLE [$OPENSEARCH_INGRESS_ENABLE] OPENSEARCH_FQDN [$targetFqdn] OPENSEARCH_PATH [$targetPath]"
     export OPENSEARCH_INGRESS_ENABLE targetFqdn targetPath
@@ -104,10 +107,28 @@ if [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "tr
         create_httpproxy "logging" "opensearch" "$targetPath" "$targetFqdn" "$ingress_tls_secret"
         kubectl -n "$LOG_NS" label httpproxy v4m-search managed-by="v4m-es-script"
 
+    elif [ "$INGRESS_TYPE" == "gateway-api" ]; then
+
+        create_httproute "logging" "opensearch" "$targetPath" "$targetFqdn"
+        kubectl -n "$LOG_NS" label httproute v4m-search managed-by="v4m-es-script"
+
+        # The actual apply happens after the Helm install below, once the
+        # v4m-search Service exists (apply_backend_tls_policy waits for it
+        # to be Accepted, which can't happen against a Service that isn't
+        # there yet).
+        if [ "$INGRESS_BACKEND_TLS_ENABLE" == "true" ]; then
+            applyBackendTlsPolicy="true"
+        else
+            kubectl -n "$LOG_NS" delete backendtlspolicy v4m-search-backend-tls --ignore-not-found
+        fi
     fi
 elif [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "false" ] && [ "$INGRESS_TYPE" == "contour" ]; then
     log_debug "Access to [OpenSearch] disabled; removing HTTPProxy resource"
     kubectl -n "$LOG_NS" delete httpproxy v4m-search --ignore-not-found
+elif [ "$AUTOGENERATE_INGRESS" == "true" ] && [ "$OPENSEARCH_INGRESS_ENABLE" = "false" ] && [ "$INGRESS_TYPE" == "gateway-api" ]; then
+    log_debug "Access to [OpenSearch] disabled; removing HTTPRoute resource"
+    kubectl -n "$LOG_NS" delete backendtlspolicy v4m-search-backend-tls --ignore-not-found
+    kubectl -n "$LOG_NS" delete httproute v4m-search --ignore-not-found
 else
     log_debug "Autogeneration of ingresss NOT enabled and/or ingress NOT enabled for OpenSearch"
 fi
@@ -355,6 +376,10 @@ helm $helmDebug upgrade --install opensearch \
     --set fullnameOverride=v4m-search \
     $versionstring \
     "$chart2install"
+
+if [ "$applyBackendTlsPolicy" == "true" ]; then
+    apply_backend_tls_policy "$LOG_NS" v4m-search-backend-tls v4m-search es-rest-tls-secret
+fi
 
 # waiting for PVCs to be bound
 declare -i pvcCounter=0

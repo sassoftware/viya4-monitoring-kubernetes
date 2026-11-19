@@ -1,0 +1,45 @@
+# Sample: gateway-api/host-based Version: 0.1.0
+
+# A ListenerSet is how a tenant namespace attaches its own listeners (hostname,
+# TLS cert) to a Gateway it does not own, without the Gateway owner having to
+# provision anything on its behalf.  See "ListenerSet ownership" in
+# samples/gateway-api/README.md.
+#
+# A wildcard hostname is set on the listener rather than none: each app's
+# HTTPRoute carries its own concrete hostname ("$app.monitoring.<domain>"; see
+# "ListenerSet Ownership" in the README), so the listener just needs to
+# match any of them. It can't be left empty, or
+# widened to just "*.<domain>": monitoring and logging share the same
+# BASE_DOMAIN, and two namespaces' fully (or identically) wildcarded listeners
+# on the same port are indistinguishable over SNI and get rejected (reason:
+# HostnameConflict). The namespace segment in the wildcard is what keeps the
+# two apart. The TLS cert must cover every app host name in use (for example
+# via a wildcard SAN matching this same pattern).
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: v4m-listenerset
+spec:
+  parentRef:
+    name: cluster-gateway
+  listeners:
+    - name: https
+      hostname: "*.monitoring.host.cluster.example.com"
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: Same
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: v4m-ingress-tls-secret
+    - name: http
+      hostname: "*.monitoring.host.cluster.example.com"
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
