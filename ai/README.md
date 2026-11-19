@@ -3,7 +3,7 @@
 An optional AI assistant for SAS Viya Monitoring for Kubernetes. It adds an
 **Observability Agent** page to Grafana that answers questions about your
 cluster, metrics, logs, and the V4M documentation, using an Azure OpenAI model
-and live data from your monitoring stack. **This preview is currently in an experimental internal-only phase, and will require a SAS username and password to setup.**
+and live data from your monitoring stack. **This preview is currently in an experimental internal-only phase, and will require a SAS username and password to setup. Currently, Nginx and Contour are supported for ingress.**
 
 ## Features
 
@@ -46,8 +46,9 @@ default).
   OpenAI format (`https://<resource>.openai.azure.com`). See
   [Set up the endpoint in Azure AI Foundry](#set-up-the-endpoint-in-azure-ai-foundry).
 - **The registry password for the MCP server image** (`v4mai.azurecr.io`). You can find this here: https://sasoffice365.sharepoint.com/:fl:/g/contentstorage/CSP_1a0d8ecc-06c9-4470-ba04-6b64858d511f/IQBnnfyL0gybQLCPxkFBrKCSASqdqu-eB1kYkSAgBov9l5M
-- **`BASE_DOMAIN` set, with host-based routing** This is part of the typical V4M deployment process. The MCP servers are exposed at `v4m-mcp.<BASE_DOMAIN>` and `grafana-mcp.<BASE_DOMAIN>`.
-- **A TLS certificate that covers those two hostnames** - If you are running this deployment on Contour, ensure that your INGRESS_CERT and INGRESS_KEY values are set prior to deployment pointing to your TLS certificates. 
+- **A User Directory with the following:**
+  - **`BASE_DOMAIN` set, with host-based routing** Make sure this variable is set in your user.env file. The MCP servers are exposed at `v4m-mcp.<BASE_DOMAIN>` and `grafana-mcp.<BASE_DOMAIN>`.
+  - **TLS certificates** - If you are running this deployment on Contour, ensure that your `INGRESS_CERT` and `INGRESS_KEY` values are set prior to deployment pointing to your TLS certificates. 
 - **`npm` and `zip` on the machine you deploy from**, to build the plugin.
 
 ## Set up the endpoint in Azure AI Foundry
@@ -105,7 +106,7 @@ V4M_MCP_IMAGE_PULL_SECRET=<registry-password>
 
 | Variable | Description |
 |---|---|
-| `AI_CHATBOT_PROVISION` | Set to `true` to deploy the chatbot. |
+| `AI_CHATBOT_PROVISION` | Set to `true` to deploy the agent. |
 | `AZURE_OPENAI_URL` | Your Azure OpenAI resource endpoint. |
 | `AZURE_OPENAI_DEPLOYMENT` | The name of your model deployment in that resource. |
 | `AZURE_OPENAI_API_KEY` | The API key for that resource. It's stored in the `grafana-llm-openai-secret` Secret. |
@@ -118,7 +119,7 @@ V4M_MCP_IMAGE_PULL_SECRET=<registry-password>
 ### 2. Add the Grafana Helm values
 
 Add these keys to `$USER_DIR/monitoring/user-values-prom-operator.yaml`. If the
-file already has a `grafana:` section, merge them into it. The same keys, with
+file already has a `grafana:` or `prometheus-node-exporter` section, merge them into it. The same keys, with
 comments, are in
 [monitoring/samples/ai-chatbot/user-values-prom-operator.yaml](../monitoring/samples/ai-chatbot/user-values-prom-operator.yaml).
 
@@ -149,6 +150,15 @@ grafana:
       configMap: grafana-chatbot-provisioning
       mountPath: /etc/grafana/provisioning/plugins/grafana-llm-app-provisioning.yaml
       subPath: grafana-llm-app-provisioning.yaml
+
+prometheus-node-exporter:
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "50Mi"
+    limits:
+      cpu: "250m"
+      memory: "100Mi"
 ```
 
 ### 3. Deploy
@@ -156,7 +166,7 @@ grafana:
 ```bash
 monitoring/bin/deploy_monitoring_cluster.sh
 ```
-With the proper environment variables set, the script will provision and deploy the AI Agent alongside the monitoring deployment. **IMPORTANT: The monitoring deployment script will output the MCP URLs while deploying. Be sure to visit them and clear out the cert warnings to prevent authentication errors.** Once finalized, you can visit the Grafana link provided at the bottom and sign in, and the agent should appear in the left sidebar. You can ask questions to the agent directly or click on the three dots on panels inside of dashboards, and click "ask observability agent" to interact with it.
+With the proper environment variables set, the script will provision and deploy the AI Agent alongside the monitoring deployment. **IMPORTANT: The monitoring deployment script will output the MCP URLs after deploying. Be sure to visit them and clear out the cert warnings to prevent authentication errors.** Once finalized, you can visit the Grafana link provided at the bottom and sign in, and the agent should appear in the left sidebar. You can ask questions to the agent directly or click on the three dots on panels inside of dashboards, and click "ask observability agent" to interact with it.
 
 ## Adding resources to the Agent
 
