@@ -1,5 +1,13 @@
 # SAS Viya Monitoring for Kubernetes
-## Unreleased
+## Version 1.2.57 (19NOV2026)
+* **Overall**
+  * [FEATURE] Support for the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) has been added.
+This includes a new [sample](samples/gateway-api/README.md) for manually configuring Gateway API resources,
+as well as auto-generation support: set the environment variable `INGRESS_TYPE` to `gateway-api`, along
+with `AUTOGENERATE_INGRESS=true` and `BASE_DOMAIN`. A compatible Gateway API implementation, `GatewayClass`,
+and `Gateway` must already exist in the cluster, identified via the new `GATEWAY_CLASS_NAME`,
+`GATEWAY_NAME`, and `GATEWAY_NAMESPACE` environment variables. Both host-based and path-based routing
+are supported. This project requires Gateway API v1.5.0 or later.
 * **Logging**  
   * [CHANGE] Improved handling of log messages from Vault
 * **Metrics**
