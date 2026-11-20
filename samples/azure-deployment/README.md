@@ -23,7 +23,9 @@ or `OPENSEARCH_STORAGECLASS`. See [Customize StorageClass](https://documentation
 3. Set `BASE_DOMAIN` in `user.env` to the host name used to access the web
 applications. `ROUTING` selects path-based (default) or host-based routing (see
 [Access the Applications](#access-the-applications)). To use TLS certificates for the
-generated HTTPProxy resources, set `INGRESS_CERT` and `INGRESS_KEY`. See
+generated HTTPProxy resources, set `INGRESS_CERT` and `INGRESS_KEY`. If you do not
+set them, create the `v4m-ingress-tls-secret` Secret in the `monitoring` and `logging`
+namespaces. Otherwise the generated HTTPProxy resources remain invalid. See
 [Configure Access to Web Applications](https://documentation.sas.com/?softwareId=obsrv&softwareVersion=prod&docsetId=obsrvdply&docsetTarget=n0auhd4hutsf7xn169hfvriysz4e.htm#n0jiph3lcb5rmsn1g71be3cesmo8).
 
 4. Add additional customization as desired.
