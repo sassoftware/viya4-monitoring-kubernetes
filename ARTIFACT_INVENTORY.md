@@ -23,7 +23,7 @@ registry/repository/image_name:version
 | Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/OpenSearch-Dashboards) | docker.io/opensearchproject/opensearch-dashboards:3.8.0 |
 | Metrics | [Alertmanager](https://github.com/prometheus/alertmanager) | quay.io/prometheus/alertmanager:v0.34.2 |
 | Metrics | [Grafana](https://github.com/grafana/grafana) | docker.io/grafana/grafana:13.3.0 |
-| Metrics | [Admission Webhook](https://github.com/jkroepke/kube-webhook-certgen) | ghcr.io/jkroepke/kube-webhook-certgen:1.8.2 |
+| Metrics | [Admission Webhook](https://github.com/jkroepke/kube-webhook-certgen) | ghcr.io/jkroepke/kube-webhook-certgen:1.11.1 |
 | Metrics | [Kube State Metrics](https://github.com/kubernetes/kube-state-metrics) | registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.20.0 |
 | Metrics | [Node Exporter](https://github.com/prometheus/node_exporter) | quay.io/prometheus/node-exporter:v1.12.1-distroless |
 | Metrics | [Kube RBAC Proxy](https://github.com/kube-rbac-proxy/kube-rbac-proxy) | quay.io/brancz/kube-rbac-proxy:v0.22.1 |
