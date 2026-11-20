@@ -1,4 +1,18 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased 
+  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 88.2.0 to 92.21.1
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded from 12.10.4 to 14.4.0
+  * [UPGRADE] Alertmanager has been upgraded from 0.33.1 to 0.34.2
+  * [UPGRADE] The Admission Webhook certificate generator (kube-webhook-certgen) has been upgraded from 1.8.2 to 1.11.1
+  * [UPGRADE] The config-reloader has been upgraded from 0.93.0 to 0.95.1
+  * [UPGRADE] Grafana has been upgraded from 13.0.3 to 13.3.0
+  * [UPGRADE] The k8s-sidecar has been upgraded from 2.10.1 to 2.14.3
+  * [UPGRADE] Kube-State-Metrics has been upgraded from 2.19.1 to 2.20.0
+  * [UPGRADE] Prometheus has been upgraded from 3.13.2 to 3.15.1
+  * [UPGRADE] Prometheus Operator has been upgraded from 0.93.0 to 0.95.1
+  * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 3.7.0 to 3.11.1
+  * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.11.3 to 1.11.5
+
 ## Version 1.2.57 (19NOV2026)
 * **Overall**
   * [FEATURE] Support for the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) has been added.
