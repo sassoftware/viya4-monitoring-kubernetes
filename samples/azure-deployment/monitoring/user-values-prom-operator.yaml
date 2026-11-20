@@ -1,7 +1,7 @@
 # Place overrides for the Prometheus Operator Helm Chart Here
 
 # Prometheus Operator Helm Chart
-# https://https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 #
 # CRDs
 # https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md
@@ -9,89 +9,17 @@
 # Default Values
 # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
 
-# Sample ingress configuration
-# NOTE: Edit hostnames and ingress port
-
-# This example shows path-based ingress using HTTPS. Refer to the [ingress samples](/samples/ingress) for other options.
-# StorageClass references are auto-generated from STORAGECLASS in ../user.env
-# (AUTOGENERATE_STORAGECLASS=true). Do not set storageClassName here unless you
-# want to override the auto-generated value.
-
-prometheus:
-  service:
-    type: ClusterIP
-    nodePort: null
-  ingress:
-    enabled: false
-    ingressClassName: nginx
-    annotations:
-      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-    tls:
-    - hosts:
-      - host.cluster.example.com
-      secretName: prometheus-ingress-tls-secret
-    hosts:
-    - host.cluster.example.com
-    path: /prometheus
-    pathType: Prefix
-  prometheusSpec:
-    routePrefix: /prometheus
-    externalUrl: https://host.cluster.example.com/prometheus
-    alertingEndpoints:
-      - name: v4m-alertmanager
-        port: http-web
-        pathPrefix: "/alertmanager"
-        scheme: https
-        tlsConfig:
-          insecureSkipVerify: true
-
-alertmanager:
-  # Disable default configuration of NodePort
-  service:
-    type: ClusterIP
-    nodePort: null
-  # Define path-based ingress
-  ingress:
-    # change the following value to 'true'
-    # to make Alertmanager accessible via ingress
-    enabled: false
-    ingressClassName: nginx
-    annotations:
-      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-    tls:
-    - hosts:
-      - host.cluster.example.com
-      secretName: alertmanager-ingress-tls-secret
-    hosts:
-    - host.cluster.example.com
-    path: /alertmanager
-    pathType: Prefix
-  alertmanagerSpec:
-    routePrefix: /alertmanager
-    externalUrl: https://host.cluster.example.com/alertmanager
+# Access to the web applications (Contour HTTPProxy resources, routePrefix,
+# externalUrl and grafana.ini server settings) is auto-generated from the
+# AUTOGENERATE_INGRESS settings in ../user.env, StorageClass references from
+# STORAGECLASS in ../user.env (AUTOGENERATE_STORAGECLASS=true).
+# Values set here are passed to Helm after the auto-generated values and
+# override them. Do not set ingress, routePrefix, externalUrl, grafana.ini
+# server or storageClassName keys here unless you want to override the
+# auto-generated values.
 
 grafana:
   # Disable default configuration of NodePort
   service:
     type: ClusterIP
     nodePort: null
-  ingress:
-    ingressClassName: nginx
-    annotations:
-      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-    enabled: true
-    tls:
-    - hosts:
-      - host.cluster.example.com
-      secretName: grafana-ingress-tls-secret
-    hosts:
-    - host.cluster.example.com
-    path: /grafana
-    pathType: Prefix
-  "grafana.ini":
-    server:
-      domain: host.cluster.example.com
-      root_url: https://host.cluster.example.com/grafana
-      serve_from_sub_path: true
-  testFramework:
-    enabled: false
