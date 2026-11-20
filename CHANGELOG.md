@@ -24,6 +24,17 @@ the auto-generation of Contour-based access was also enabled has been fixed.
 Grafana dashboards now use the dashboard's datasource variable instead of a hard-coded
 reference to a datasource named "Prometheus".  This allows these dashboards to work when
 the default Prometheus datasource is not the one containing SAS Viya Monitoring metrics.
+  * [UPGRADE] Kube-Prometheus Stack Helm chart has been upgraded from 88.2.0 to 92.21.1
+  * [UPGRADE] Grafana Helm Chart (for OpenShift deployments) has been upgraded from 12.10.4 to 14.4.0
+  * [UPGRADE] Alertmanager has been upgraded from 0.33.1 to 0.34.2
+  * [UPGRADE] The config-reloader has been upgraded from 0.93.0 to 0.95.1
+  * [UPGRADE] Grafana has been upgraded from 13.0.3 to 13.3.0
+  * [UPGRADE] The k8s-sidecar has been upgraded from 2.10.1 to 2.14.3
+  * [UPGRADE] Kube-State-Metrics has been upgraded from 2.19.1 to 2.20.0
+  * [UPGRADE] Prometheus has been upgraded from 3.13.2 to 3.15.1
+  * [UPGRADE] Prometheus Operator has been upgraded from 0.93.0 to 0.95.1
+  * [UPGRADE] Prometheus Pushgateway Helm chart has been upgraded from 3.7.0 to 3.11.1
+  * [UPGRADE] Prometheus Pushgateway has been upgraded from 1.11.3 to 1.11.5
 * **Logging**
   * [CHANGE] Additional fields from JSON-formatted log messages emitted from 
 RabbitMQ are now captured. The `domain` and `pid` values are now stored as
