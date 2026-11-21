@@ -1,28 +1,7 @@
-# OpenSearch ingress is optional
+# Place overrides for the OpenSearch Helm Chart Here
 
-# This sample does NOT expose OpenSearch via Ingress by default.
-# However, you can expose OpenSearch via ingress by changing
-# the "enabled" key from 'false' to 'true' in the 'ingress' stanza below
-persistence:
-  storageClass: azuredisk-v4m
+# Access to OpenSearch is optional and disabled by default. To enable it,
+# set OPENSEARCH_INGRESS_ENABLE=true in ../user.env; the Contour HTTPProxy
+# resource is then auto-generated.
 
-ingress:
-  # change the following value to 'true'
-  # to make OpenSearch accessible via ingress
-  enabled: false
-  ingressClassName: nginx
-  annotations:
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      rewrite (?i)/opensearch/(.*) /$1 break;
-      rewrite (?i)/opensearch$ / break;
-    nginx.ingress.kubernetes.io/rewrite-target: /opensearch
-    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-  path: /opensearch
-  pathType: Prefix
-  hosts:
-    - host.cluster.example.com
-  tls:
-    - secretName: elasticsearch-ingress-tls-secret
-      hosts:
-        - host.cluster.example.com
-
+# The StorageClass is auto-generated from STORAGECLASS in ../user.env

@@ -1,4 +1,17 @@
 # SAS Viya Monitoring for Kubernetes
+## Unreleased
+* **Overall**
+  * [CHANGE] The Azure deployment sample now uses the auto-generation of StorageClass
+references (`AUTOGENERATE_STORAGECLASS`, `STORAGECLASS`) instead of hard-coded
+references to the `azuredisk-v4m` StorageClass. Any existing StorageClass can be used.
+The sample now defaults to the AKS built-in `managed-csi-premium` StorageClass (Premium SSD)
+instead of the custom `azuredisk-v4m` (`Standard_LRS`) StorageClass; set `STORAGECLASS=azuredisk-v4m` to keep the previous behavior.
+The `generic-base` sample `user.env` now lists the StorageClass auto-generation options. (Fixes #915)
+  * [CHANGE] The Azure deployment sample now uses Contour instead of the deprecated
+ingress-nginx and auto-generates the HTTPProxy resources for the web applications
+(`AUTOGENERATE_INGRESS=true`, `INGRESS_TYPE=contour`). The ingress-nginx-specific
+Ingress definitions have been removed from the sample. (Fixes #921)
+
 ## Version 1.2.57 (19NOV2026)
 * **Overall**
   * [FEATURE] Support for the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) has been added.
