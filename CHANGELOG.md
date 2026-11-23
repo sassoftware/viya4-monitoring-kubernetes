@@ -1,4 +1,11 @@
 # SAS Viya Monitoring for Kubernetes
+
+## Unreleased
+* **Metrics**
+  * [FEATURE] Collect metrics from the SAS Redis Server exporter and display Redis
+availability, memory, client connections, and command rates in the SAS Arke dashboard.
+The Redis panels require a SAS Redis Server version that includes the metrics exporter.
+
 ## Version 1.2.57 (19NOV2026)
 * **Overall**
   * [FEATURE] Support for the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) has been added.
