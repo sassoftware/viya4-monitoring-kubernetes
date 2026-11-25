@@ -21,17 +21,17 @@ registry/repository/image_name:version
 | Logging | initContainer (Fluent Bit, OpenSearch) | docker.io/library/busybox:latest |
 | Logging | [OpenSearch](https://github.com/opensearch-project/OpenSearch) | docker.io/opensearchproject/opensearch:3.8.0 |
 | Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/OpenSearch-Dashboards) | docker.io/opensearchproject/opensearch-dashboards:3.8.0 |
-| Metrics | [Alertmanager](https://github.com/prometheus/alertmanager) | quay.io/prometheus/alertmanager:v0.33.1 |
-| Metrics | [Grafana](https://github.com/grafana/grafana) | docker.io/grafana/grafana:13.0.3 |
-| Metrics | [Admission Webhook](https://github.com/jkroepke/kube-webhook-certgen) | ghcr.io/jkroepke/kube-webhook-certgen:1.8.2 |
-| Metrics | [Kube State Metrics](https://github.com/kubernetes/kube-state-metrics) | registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.19.1 |
+| Metrics | [Alertmanager](https://github.com/prometheus/alertmanager) | quay.io/prometheus/alertmanager:v0.34.2 |
+| Metrics | [Grafana](https://github.com/grafana/grafana) | docker.io/grafana/grafana:13.3.0 |
+| Metrics | [Admission Webhook](https://github.com/jkroepke/kube-webhook-certgen) | ghcr.io/jkroepke/kube-webhook-certgen:1.11.1 |
+| Metrics | [Kube State Metrics](https://github.com/kubernetes/kube-state-metrics) | registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.20.0 |
 | Metrics | [Node Exporter](https://github.com/prometheus/node_exporter) | quay.io/prometheus/node-exporter:v1.12.1-distroless |
 | Metrics | [Kube RBAC Proxy](https://github.com/kube-rbac-proxy/kube-rbac-proxy) | quay.io/brancz/kube-rbac-proxy:v0.22.1 |
-| Metrics | [Prometheus](https://github.com/prometheus/prometheus) | quay.io/prometheus/prometheus:v3.13.2-distroless |
-| Metrics | [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator) | quay.io/prometheus-operator/prometheus-operator:v0.93.0 |
-| Metrics | [Configuration Reloader](https://github.com/prometheus-operator/prometheus-operator/tree/main/cmd/prometheus-config-reloader) | quay.io/prometheus-operator/prometheus-config-reloader:v0.93.0 |
-| Metrics | [Prometheus Pushgateway](https://github.com/prometheus/pushgateway) | quay.io/prometheus/pushgateway:v1.11.3 |
-| Metrics | [Auto-load Sidecars](https://github.com/kiwigrid/k8s-sidecar) | quay.io/kiwigrid/k8s-sidecar:2.10.1 |
+| Metrics | [Prometheus](https://github.com/prometheus/prometheus) | quay.io/prometheus/prometheus:v3.15.1-distroless |
+| Metrics | [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator) | quay.io/prometheus-operator/prometheus-operator:v0.95.1 |
+| Metrics | [Configuration Reloader](https://github.com/prometheus-operator/prometheus-operator/tree/main/cmd/prometheus-config-reloader) | quay.io/prometheus-operator/prometheus-config-reloader:v0.95.1 |
+| Metrics | [Prometheus Pushgateway](https://github.com/prometheus/pushgateway) | quay.io/prometheus/pushgateway:v1.11.5 |
+| Metrics | [Auto-load Sidecars](https://github.com/kiwigrid/k8s-sidecar) | quay.io/kiwigrid/k8s-sidecar:2.14.3 |
 | Metrics | OpenShift OAUTH Proxy (Grafana, OpenShift only) | registry.redhat.io/openshift4/ose-oauth-proxy:latest |
 | Metrics | [Tempo](https://github.com/grafana/tempo) | docker.io/grafana/tempo:2.10.7 |
 
@@ -55,9 +55,9 @@ This table identifies the Helm charts used by SAS Viya Monitoring for Kubernetes
 | Logging | [Fluent Bit](https://github.com/fluent/helm-charts/tree/main/charts/fluent-bit)| fluent | fluent-bit | 0.58.2 | fluent/fluent-bit-0.58.2.tgz |
 | Logging | [OpenSearch](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch)| opensearch | opensearch | 3.8.0 | opensearch/opensearch-3.8.0.tgz |
 | Logging | [OpenSearch Dashboards](https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch-dashboards)| opensearch | opensearch-dashboards | 3.8.0 | opensearch/opensearch-dashboards-3.8.0.tgz |
-| Metrics | [Grafana (on OpenShift)](https://github.com/grafana-community/helm-charts/tree/main/charts/grafana)| grafana-community | grafana | 12.10.4 | grafana-community/grafana-12.10.4.tgz |
-| Metrics | [Kube Prometheus Stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)| prometheus-community | kube-prometheus-stack | 88.2.0 | prometheus-community/kube-prometheus-stack-88.2.0.tgz |
-| Metrics | [Prometheus Pushgateway](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway)| prometheus-community | prometheus-pushgateway | 3.7.0 | prometheus-community/prometheus-pushgateway-3.7.0.tgz |
+| Metrics | [Grafana (on OpenShift)](https://github.com/grafana-community/helm-charts/tree/main/charts/grafana)| grafana-community | grafana | 14.4.0 | grafana-community/grafana-14.4.0.tgz |
+| Metrics | [Kube Prometheus Stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)| prometheus-community | kube-prometheus-stack | 92.21.1 | prometheus-community/kube-prometheus-stack-92.21.1.tgz |
+| Metrics | [Prometheus Pushgateway](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway)| prometheus-community | prometheus-pushgateway | 3.11.1 | prometheus-community/prometheus-pushgateway-3.11.1.tgz |
 | Metrics | [Tempo](https://github.com/grafana-community/helm-charts/tree/main/charts/tempo)| grafana-community | tempo | 2.2.3 | grafana-community/tempo-2.2.3.tgz |
 
 ## Table 4. Miscellaneous Component Version Information
